@@ -38,8 +38,8 @@ Alternatively, run the script in the script editor (Alt-P), and access from UI p
 bl_info = {
     'name': 'MakeHuman pose tool',
     'author': 'Thomas Larsson',
-    'version': '0.8',
-    'blender': (2, 5, 6),
+    'version': '0.9',
+    'blender': (2, 5, 9),
     "api": 35774,
     "location": "View3D > UI panel > MHX Lipsync, MHX Expressions, MHX Pose",
     "description": "Lipsync, expression, pose tool for the MHX rig",
@@ -50,9 +50,6 @@ bl_info = {
 import bpy, os, mathutils
 from mathutils import *
 from bpy.props import *
-
-theRig = None
-theMesh = None
 
 ###################################################################################    
 #
@@ -302,9 +299,9 @@ magpieVisemes = dict({
 #    class VIEW3D_OT_MhxVisemeButton(bpy.types.Operator):
 #
 
-def getVisemeSet(context):
+def getVisemeSet(context, rig):
     try:
-        visset = theRig['MhxVisemeSet']
+        visset = rig['MhxVisemeSet']
     except:
         return bodyLanguageVisemes
     if visset == 'StopStaring':
@@ -315,13 +312,13 @@ def getVisemeSet(context):
         raise NameError("Unknown viseme set %s" % visset)
 
 def setViseme(context, vis, setKey, frame):
-    global theRig
-    pbones = theRig.pose.bones
+    rig = getMhxRig(context.object)
+    pbones = rig.pose.bones
     try:
         scale = pbones['PFace'].bone.length
     except:
         return
-    visemes = getVisemeSet(context)
+    visemes = getVisemeSet(context, rig)
     for (b, (x, z)) in visemes[vis]:
         loc = mathutils.Vector((float(x),0,float(z)))
         try:
@@ -370,7 +367,8 @@ def openFile(context, filepath):
     return open(filepath, "rU")
 
 def readMoho(context, filepath, offs):
-    context.scene.objects.active = theRig
+    rig = getMhxRig(context.object)
+    context.scene.objects.active = rig
     bpy.ops.object.mode_set(mode='POSE')    
     fp = openFile(context, filepath)        
     for line in fp:
@@ -386,7 +384,8 @@ def readMoho(context, filepath, offs):
     return
 
 def readMagpie(context, filepath, offs):
-    context.scene.objects.active = theRig
+    rig = getMhxRig(context.object)
+    context.scene.objects.active = rig
     bpy.ops.object.mode_set(mode='POSE')    
     fp = openFile(context, filepath)        
     for line in fp: 
@@ -453,122 +452,32 @@ class MhxLipsyncPanel(bpy.types.Panel):
         return context.object
 
     def draw(self, context):
-        setGlobals(context)
-        if theRig:
-            layout = self.layout        
-            layout.label(text="Visemes")
-            for (vis1, vis2, vis3) in VisemeList:
-                row = layout.row()
-                row.operator("mhx.pose_viseme", text=vis1).viseme = vis1
-                row.operator("mhx.pose_viseme", text=vis2).viseme = vis2
-                row.operator("mhx.pose_viseme", text=vis3).viseme = vis3
-            layout.separator()
-            row = layout.row()
-            row.operator("mhx.pose_viseme", text="Blink").viseme = 'Blink'
-            row.operator("mhx.pose_viseme", text="Unblink").viseme = 'Unblink'
-            layout.label(text="Load file")
-            row = layout.row()
-            row.operator("mhx.pose_load_moho")
-            row.operator("mhx.pose_load_magpie")
+        rig = getMhxRig(context.object)
+        if not rig:
+            return
 
+        layout = self.layout        
+        layout.label(text="Visemes")
+        for (vis1, vis2, vis3) in VisemeList:
+            row = layout.row()
+            row.operator("mhx.pose_viseme", text=vis1).viseme = vis1
+            row.operator("mhx.pose_viseme", text=vis2).viseme = vis2
+            row.operator("mhx.pose_viseme", text=vis3).viseme = vis3
+        layout.separator()
+        row = layout.row()
+        row.operator("mhx.pose_viseme", text="Blink").viseme = 'Blink'
+        row.operator("mhx.pose_viseme", text="Unblink").viseme = 'Unblink'
+        layout.label(text="Load file")
+        row = layout.row()
+        row.operator("mhx.pose_load_moho")
+        row.operator("mhx.pose_load_magpie")
+        return
 
 ###################################################################################    
 #
 #    Expression panel
 #
 ###################################################################################    
-
-#
-#    Expressions - the same as in read_expression.py
-#
-
-Expressions = [
-    'smile',
-    'hopeful',
-    'innocent',
-    'tender',
-    'seductive',
-
-    'grin',
-    'excited',
-    'ecstatic',
-
-    'proud',
-    'pleased',
-    'amused',
-    'laughing1',
-    'laughing2',
-
-    'so-so',
-    'blue',
-    'depressed',
-    'sad',
-    'distressed',
-    'crying',
-    'pain',
-
-    'disappointed',
-    'frustrated',
-    'stressed',
-    'worried',
-    'scared',
-    'terrified',
-
-    'shy',
-    'guilty',
-    'embarassed',
-    'relaxed',
-    'peaceful',
-    'refreshed',
-
-    'lazy',
-    'bored',
-    'tired',
-    'drained',
-    'sleepy',
-    'groggy',
-
-    'curious',
-    'surprised',
-    'impressed',
-    'puzzled',
-    'shocked',
-    'frown',
-    'upset',
-    'angry',
-    'enraged',
-
-    'skeptical',
-    'vindictive',
-    'pout',
-    'furious',
-    'grumpy',
-    'arrogant',
-    'sneering',
-    'haughty',
-    'disgusted',
-]
-
-
-#
-#    meshHasExpressions(mesh):
-#    rigHasExpressions(rig):
-#
-    
-def meshHasExpressions(mesh):
-    try:
-        mesh.data.shape_keys.key_blocks['guilty']
-        return True
-    except:
-        return False
-
-def rigHasExpressions(rig):
-    try:
-        rig['guilty']
-        return True
-    except:
-        return False
-
 #
 #    class VIEW3D_OT_MhxResetExpressionsButton(bpy.types.Operator):
 #
@@ -578,117 +487,11 @@ class VIEW3D_OT_MhxResetExpressionsButton(bpy.types.Operator):
     bl_label = "Reset expressions"
 
     def execute(self, context):
-        global theMesh
-        skeys = theMesh.data.shape_keys
-        if skeys:
-            for name in Expressions:
-                try:
-                    skeys.key_blocks[name].value = 0.0
-                except:
-                    pass
-        print("Expressions reset")
-        return{'FINISHED'}    
-
-#
-#    class VIEW3D_OT_MhxResetRigExpressionsButton(bpy.types.Operator):
-#
-
-class VIEW3D_OT_MhxResetRigExpressionsButton(bpy.types.Operator):
-    bl_idname = "mhx.pose_reset_rig_expressions"
-    bl_label = "Reset expressions"
-
-    def execute(self, context):
-        global theRig
-        for name in Expressions:
-            try:
-                theRig[name] = 0.0
-            except:
-                pass
-        print("Expressions reset")
-        return{'FINISHED'}
-        
-#
-#    createExpressionDrivers(context):    
-#
-#    class VIEW3D_OT_MhxCreateExpressionDriversButton(bpy.types.Operator):
-#
-
-def createExpressionDrivers(context):        
-    global theMesh, theRig
-    skeys = theMesh.data.shape_keys
-    context.scene.objects.active = theRig
-    if skeys:
-        for name in Expressions:
-            try:
-                theRig[name] = skeys.key_blocks[name].value
-                exists = True
-            except:
-                exists = False
-            if exists:
-                #theRig[name].min = 0.0
-                #theRig[name].max = 1.0
-                #bpy.ops.wm.properties_edit(data_path="object", property=name, min=0, max=1)
-                createExpressionDriver(name, skeys)
-    return
-                
-def createExpressionDriver(name, skeys):
-    global theRig
-    print("Create driver %s" % name)
-    fcu = skeys.key_blocks[name].driver_add('value')
-
-    drv = fcu.driver
-    drv.type = 'AVERAGE'
-    drv.show_debug_info = True
-
-    var = drv.variables.new()
-    var.name = name
-    var.type = 'SINGLE_PROP'
-
-    trg = var.targets[0]
-    trg.id = theRig
-    trg.data_path = '["%s"]' % name
-
-    return
-    
-class VIEW3D_OT_MhxCreateExpressionDriversButton(bpy.types.Operator):
-    bl_idname = "mhx.pose_create_drivers"
-    bl_label = "Create drivers"
-
-    def execute(self, context):
-        createExpressionDrivers(context)
-        print("ExpressionDrivers created")
-        return{'FINISHED'}    
-
-#
-#    removeExpressionDrivers(context):        
-#    class VIEW3D_OT_MhxRemoveExpressionDriversButton(bpy.types.Operator):
-#
-
-def removeExpressionDrivers(context):        
-    global theMesh, theRig
-    skeys = theMesh.data.shape_keys
-    if skeys:
-        context.scene.objects.active = theRig
-        for name in Expressions:            
-            try:
-                del(theRig[name])
-                print("Removed prop", name)
-            except:
-                pass
-            try:
-                skeys.key_blocks[name].driver_remove('value')
-                print("Removed driver %s" % name)
-            except:
-                pass
-    return
-
-class VIEW3D_OT_MhxRemoveExpressionDriversButton(bpy.types.Operator):
-    bl_idname = "mhx.pose_remove_drivers"
-    bl_label = "Remove drivers"
-
-    def execute(self, context):
-        removeExpressionDrivers(context)
-        print("ExpressionDrivers removed")
+        rig = getMhxRig(context.object)
+        props = getShapeProps(rig)
+        for (prop, name) in props:
+            rig[prop] = 0.0
+        rig.update_tag()
         return{'FINISHED'}    
 
 #
@@ -700,58 +503,13 @@ class VIEW3D_OT_MhxKeyExpressionsButton(bpy.types.Operator):
     bl_label = "Key expressions"
 
     def execute(self, context):
-        global theMesh
-        skeys = theMesh.data.shape_keys
-        keyAll = context.scene.MhxKeyAll
-        if skeys:
-            keylist = findActiveFcurves(skeys.animation_data)
-            frame = context.scene.frame_current
-            for name in Expressions:
-                try:
-                    shape = skeys.key_blocks[name]
-                except:
-                    shape = None
-                if shape and (keyAll or (name in keylist)):
-                    shape.keyframe_insert("value", index=-1, frame=frame)
-        return{'FINISHED'}    
-
-def findActiveFcurves(adata):            
-    if adata:
-        action = adata.action
-    else:
-        return []
-    if action:
-        keylist = []
-        for fcu in action.fcurves:
-            words = fcu.data_path.split('"')
-            keylist.append(words[1])
-        return keylist
-    return []
-    
-#
-#    class VIEW3D_OT_MhxKeyExpressionButton(bpy.types.Operator):
-#
-
-class VIEW3D_OT_MhxKeyDriversButton(bpy.types.Operator):
-    bl_idname = "mhx.pose_key_drivers"
-    bl_label = "Key drivers"
-    keyall = bpy.props.BoolProperty()
-
-    def execute(self, context):
-        global theRig
+        rig = getMhxRig(context.object)
+        props = getShapeProps(rig)
         frame = context.scene.frame_current
-        keyAll = context.scene.MhxKeyAll
-        keylist = findActiveFcurves(theRig.animation_data)
-        for name in Expressions:
-            try:
-                oldvalue = theRig[name]
-                success = True
-            except:
-                success = False
-            if success and (keyAll or (name in keylist)):
-                theRig.keyframe_insert('["%s"]' % name, index=-1, frame=frame)
+        for (prop, name) in props:
+            rig.keyframe_insert('["%s"]' % prop, frame=frame)
+        rig.update_tag()
         return{'FINISHED'}    
-
 #
 #    class VIEW3D_OT_MhxPinExpressionButton(bpy.types.Operator):
 #
@@ -762,53 +520,39 @@ class VIEW3D_OT_MhxPinExpressionButton(bpy.types.Operator):
     expression = bpy.props.StringProperty()
 
     def execute(self, context):
-        global theMesh
-        skeys = theMesh.data.shape_keys
-        keyAll = context.scene.MhxKeyAll
-        if skeys:
+        rig = getMhxRig(context.object)
+        props = getShapeProps(rig)
+        if context.tool_settings.use_keyframe_insert_auto:
             frame = context.scene.frame_current
-            for name in Expressions:
-                value = 1.0 if name == self.expression else 0.0
-                try:
-                    shape = skeys.key_blocks[name]
-                except:
-                    shape = None
-                if shape:
-                    oldvalue = shape.value
-                    shape.value = value
-                    if (context.tool_settings.use_keyframe_insert_auto and 
-                        (keyAll or (value > 0.01) or (abs(value-oldvalue) > 0.01))):
-                        shape.keyframe_insert("value", index=-1, frame=frame)
+            for (prop, name) in props:
+                old = rig[prop]
+                if prop == self.expression:
+                    rig[prop] = 1.0
+                else:
+                    rig[prop] = 0.0
+                if abs(rig[prop] - old) > 1e-3:
+                    rig.keyframe_insert('["%s"]' % prop, frame=frame)
+        else:                    
+            for (prop, name) in props:
+                if prop == self.expression:
+                    rig[prop] = 1.0
+                else:
+                    rig[prop] = 0.0
+        rig.update_tag()
         return{'FINISHED'}    
 
 #
-#    class VIEW3D_OT_MhxPinDriverButton(bpy.types.Operator):
+#   getShapeProps(ob):        
 #
 
-class VIEW3D_OT_MhxPinDriverButton(bpy.types.Operator):
-    bl_idname = "mhx.pose_pin_driver"
-    bl_label = "Pin"
-    driver = bpy.props.StringProperty()
-
-    def execute(self, context):
-        global theRig
-        frame = context.scene.frame_current
-        keyAll = context.scene.MhxKeyAll
-        for name in Expressions:
-            value = 1.0 if name == self.driver else 0.0
-            try:
-                oldvalue = theRig[name]
-                success = True
-            except:
-                success = False
-
-            if success:
-                theRig[name] = value
-                context.scene.update()
-                if (context.tool_settings.use_keyframe_insert_auto and
-                    (keyAll or (value > 0.01) or (abs(value-oldvalue) > 0.01))):
-                    theRig.keyframe_insert('["%s"]' % name, index=-1, frame=frame)
-        return{'FINISHED'}    
+def getShapeProps(rig):
+    props = []        
+    plist = list(rig.keys())
+    plist.sort()
+    for prop in plist:
+        if prop[0] == '*':
+            props.append((prop, prop[1:]))
+    return props                
 
 #
 #    class MhxExpressionsPanel(bpy.types.Panel):
@@ -824,408 +568,28 @@ class MhxExpressionsPanel(bpy.types.Panel):
         return context.object
 
     def draw(self, context):
-        setGlobals(context)
+        rig = getMhxRig(context.object)
+        if not rig:
+            return
+        props = getShapeProps(rig)
+        if not props:
+            return
         layout = self.layout
-        
-        if theRig and rigHasExpressions(theRig):
-            layout.separator()
-            layout.label(text="Expressions (driven)")
-            layout.operator("mhx.pose_reset_rig_expressions")
-            if theMesh:
-                layout.operator("mhx.pose_remove_drivers")
-            layout.prop(context.scene, "MhxKeyAll")
-            layout.operator("mhx.pose_key_drivers")
-            layout.separator()
-            for name in Expressions:
-                try:
-                    prop = theRig[name]
-                except:
-                    prop = -10
-                if prop > -5:
-                    row = layout.split(0.75)
-                    row.prop(theRig, '["%s"]' % name, index=-1, text=name)
-                    row.operator("mhx.pose_pin_driver").driver = name
-        
-        elif theMesh and meshHasExpressions(theMesh):    
-            layout.separator()
-            layout.label(text="Expressions")
-            layout.operator("mhx.pose_reset_expressions")
-            layout.operator("mhx.pose_create_drivers")
-            layout.prop(context.scene, "MhxKeyAll")
-            layout.operator("mhx.pose_key_expressions")
-            layout.separator()
-            skeys = theMesh.data.shape_keys
-            if skeys:
-                for name in Expressions:
-                    try:
-                        datum = skeys.key_blocks[name]
-                    except:
-                        datum = None
-                    if datum:
-                        row = layout.split(0.75)
-                        row.prop(datum, 'value', text=name)
-                        row.operator("mhx.pose_pin_expression").expression = name
+        layout.label(text="Expressions")
+        layout.operator("mhx.pose_reset_expressions")
+        layout.operator("mhx.pose_key_expressions")
+        layout.separator()
+        for (prop, name) in props:
+            row = layout.split(0.75)
+            row.prop(rig, '["%s"]' % prop, text=name)
+            row.operator("mhx.pose_pin_expression").expression = prop
         return
 
 ###################################################################################    
 #
 #    Posing panel
 #
-###################################################################################    
-
-# 
-
-RNA_PROPS = False
-
-# Property types
-D_ENUM = 1
-D_INT = 2
-D_FLOAT = 3
-D_BOOL = 4
-D_BOOLINV = 5
-D_MULTIVAR = 6
-
-PropTypeName = ['', 'Enum', 'Int', 'Float', 'Bool', 'Bool', '']
-
-#    Parenting
-ParentProperties = [
-    ('RootParent', D_ENUM, ["Floor","Hips","Neck"], 'name="Master", description=""' ),
-    ('GazeParent', D_ENUM, ['Head','World'], 'name="Gaze", description=""' ),
-]
-
-MasterDrivers = [
-    ('Floor', ['RootParent'], 'x1==0'),
-    ('Hips', ['RootParent'], 'x1==1'),
-    ('Neck', ['RootParent'], 'x1==2')
-]
-
-ParentConstraintDrivers = {
-    'Root' :        MasterDrivers,
-    'Elbow_L' :        MasterDrivers,
-    'Elbow_R' :        MasterDrivers,
-    'Wrist_L' :        MasterDrivers,
-    'Wrist_R' :        MasterDrivers,
-    'LegIK_L' :        MasterDrivers,
-    'LegIK_R' :        MasterDrivers,
-
-    'Gaze' :     [
-        ('Head', ['GazeParent'], 'x1==0') ,
-        ('World', ['GazeParent'], 'x1==1') 
-    ]
-}
-
-#
-#
-#
-
-FloatProperties = [
-    ('SpineIK', D_FLOAT, 0.0, 'name="Spine FK/IK", description=""' ),
-]
-
-FloatConstraintDrivers = {
-    'Spine1' : [ ('Rot', ['SpineIK'], '0.4*x1')],
-    'Spine2' : [ ('Rot', ['SpineIK'], '0.4*x1')],
-    'Spine3' : [ ('Rot', ['SpineIK'], '0.2*x1')],
-}
-
-#    Left - right
-
-LeftRightProperties = [
-    ('ArmFkIk', D_FLOAT, 0.0, 'name="Arm FK/IK", description=""' ),
-    ('ArmHinge', D_FLOAT, 0.0, 'name="Arm hinge", description=""' ),
-    ('ElbowPlant', D_FLOAT, 0.0, 'name="Elbow plant", description=""' ),
-    ('ForearmFkIk', D_FLOAT, 0.0, 'name="Forearm FK/IK", description=""' ),
-    ('ArmStretch', D_FLOAT, 0.0, 'name="Arm stretch", description=""' ),
-    ('HandFollowsWrist', D_FLOAT, 0.0, 'name="Hand follows wrist", description=""' ),
-
-    ('LegFkIk', D_FLOAT, 0.0, 'name="Leg FK/IK", description=""' ),
-
-    ('FingerControl', D_BOOL, True, 'name="Controlled fingers", description=""'),
-]
-
-LeftRightConstraintDrivers = {
-    'UpArm' : [
-        ('Elbow', ['ArmFkIk', 'ElbowPlant', 'ArmStretch'], 'max(x1*x2, x3)')
-    ],
-
-    'Elbow' : [
-        ('DistShoulder', ['ArmStretch'], '0'),
-    ],
-
-    'LoArm' : [
-        ('ArmIK', ['ArmFkIk', 'ElbowPlant', 'ForearmFkIk', 'ArmStretch'], 'x1*(1-x2)*(1-x3)*(1-x4)'),
-        ('Wrist', ['ArmFkIk', 'ElbowPlant', 'ForearmFkIk', 'ArmStretch'], 'x1*x2*x3*(1-x4) + x4'),
-    ],
-
-    'Wrist' : [
-        ('DistShoulder', ['ElbowPlant', 'ForearmFkIk', 'ArmStretch'], '(1-x1)*(1-x2)*(1-x3)'),
-        ('DistElbow', ['ElbowPlant', 'ForearmFkIk', 'ArmStretch'], 'x1*x2*(1-x3)'),
-    ],
-
-    'Hand' : [
-        ('FreeIK', ['ArmFkIk', 'ElbowPlant', 'ForearmFkIk'], '(1-x1)*(1-x2)*(1-x3)'),
-        ('WristLoc', ['ArmFkIk', 'ForearmFkIk'], '(1-(1-x1)*(1-x2))'),
-        ('WristRot', ['ArmFkIk', 'ForearmFkIk', 'HandFollowsWrist'], '(1-(1-x1)*(1-x2))*x3'),
-    ],
-
-    'ArmLoc': [
-        ('Shoulder', ['ArmHinge'], '1-x1'),
-        ('Root', ['ArmHinge'], 'x1'),
-    ],
-
-    'LoLeg' : [
-        ('LegIK', ['LegFkIk'], 'x1'),
-    ],
-
-    'Foot' : [
-        ('RevRot', ['LegFkIk'], 'x1'),
-        ('RevIK', ['LegFkIk'], 'x1'),
-        ('FreeIK', ['LegFkIk'], '1-x1'),
-    ],
-
-    'Toe' : [
-        ('RevIK', ['LegFkIk'], 'x1'),
-    ],
-}
-
-#    Finger
-
-def defineFingerPropDrivers():
-    global LeftRightConstraintDrivers
-    for fnum in range(1,6):
-        for lnum in range(1,4):
-            if (lnum != 1 or fnum != 1):
-                finger = 'Finger-%d-%d' % (fnum,lnum)
-                LeftRightConstraintDrivers[finger] = [('Rot', ['FingerControl'], 'x1')]
-
-    return
-
-defineFingerPropDrivers()
-
-#
-#    defineProperties():
-#
-
-def defineProperties():
-    if not RNA_PROPS:
-        return
-    for (prop, typ, value, options) in LeftRightProperties:
-        defineProperty('Left'+prop, typ, value, options)
-        defineProperty('Right'+prop, typ, value, options)
-    for (prop, typ, value, options) in ParentProperties+FloatProperties:
-        defineProperty(prop, typ, value, options)
-    return
-
-def defineRnaProperty(prop, typ, value, options):
-    expr = 'bpy.types.Object.%s = %sProperty(' % (prop, PropTypeName[typ])
-    if typ == D_ENUM:
-        items = []
-        for val in value:
-            items.append( (val,val,val) )
-        expr += 'items=%s, ' % items
-    else:
-        expr += 'default=%s, ' % value
-    if typ == D_FLOAT:
-        expr += '%s, min = 0.0, max = 1.0)' % options
-    else:
-        expr += '%s)' % options
-    print(expr)
-    exec(expr)
-    return
-
-#
-#    resetProperties()
-#    class VIEW3D_OT_MhxResetPropertiesButton(bpy.types.Operator):
-#
-
-def resetProperties():
-    for (prop, typ, value, options) in LeftRightProperties:
-        resetProperty('Left'+prop, typ, value, options)
-        resetProperty('Right'+prop, typ, value, options)
-    for (prop, typ, value, options) in ParentProperties + FloatProperties:
-        resetProperty(prop, typ, value, options)
-    return
-
-def resetProperty(prop, typ, value, options):
-    global theRig
-    if RNA_PROPS:
-        expr = "theRig.%s = 0" % prop
-        exec(expr)
-    elif typ == D_FLOAT:
-        theRig[prop] = 0.0
-        theRig["_RNA_UI"] = {prop: {"min":0.0, "max":1.0}}
-    elif typ == D_INT:
-        theRig[prop] = 0
-    elif typ == D_BOOL:
-        theRig[prop] = False
-    elif typ == D_ENUM:
-        theRig[prop] = 0
-
-    #print(theRig[prop], theRig["_RNA_UI"])
-    return
-
-class VIEW3D_OT_MhxResetPropertiesButton(bpy.types.Operator):
-    bl_idname = "mhx.pose_reset_properties"
-    bl_label = "Reset properties"
-    bl_options = {'REGISTER'}
-
-    def execute(self, context):
-        resetProperties()
-        print("Properties reset")
-        return{'FINISHED'}    
-
-
-#
-#    redefinePropDrivers():
-#
-
-def redefinePropDrivers():
-    global theRig
-    try:
-        theRig.pose.bones
-    except:
-        return
-    # Remove old drivers
-    for pb in theRig.pose.bones:
-        for cns in pb.constraints:
-            try:
-                cns.driver_remove('influence', -1)
-            except:
-                pass
-    defineProperties()
-
-    # Create new drivers
-    for (bone, drivers) in LeftRightConstraintDrivers.items():
-        defineDriver(bone+'_L', drivers, 'Left')
-        defineDriver(bone+'_R', drivers, 'Right')
-    for (bone, drivers) in ParentConstraintDrivers.items():
-        defineDriver(bone, drivers, '')
-    for (bone, drivers) in FloatConstraintDrivers.items():
-        defineDriver(bone, drivers, '')
-    return
-
-def defineDriver(bone, drivers, prefix):
-    pb = theRig.pose.bones[bone]
-    for (cnsName, props, expr) in drivers:
-        for cns in pb.constraints:
-            if cns.name == cnsName:
-                # print(pb.name, cns.name, props, expr)
-                addPropDriver(cns, props, expr, prefix)
-    return
-
-def addPropDriver(cns, props, expr, prefix):
-    global theRig
-    fcu = cns.driver_add('influence', -1)
-    drv = fcu.driver
-    if expr:
-        drv.type = 'SCRIPTED'
-        drv.expression = expr
-    else:
-        drv.type = 'AVERAGE'
-    drv.show_debug_info = True
-
-    for n,prop in enumerate(props):
-        var = drv.variables.new()
-        var.name = 'x%d' % (n+1)
-        var.type = 'SINGLE_PROP'
-
-        targ = var.targets[0]
-        targ.id = theRig
-        if RNA_PROPS:
-            targ.data_path = prefix+prop
-        else:
-            targ.data_path = '["%s"]' % (prefix+prop)
-    return                
-
-
-class VIEW3D_OT_MhxTogglePropButton(bpy.types.Operator):
-    bl_idname = "mhx.pose_toggle_prop"
-    bl_label = "Toggle"
-    bl_options = {'REGISTER'}
-    strprop = bpy.props.StringProperty()
-
-    def execute(self, context):
-        prop = self.strprop
-        print(prop)
-        if theRig[prop] < 0.5:
-            theRig[prop] = 1.0
-        else:
-            theRig[prop] = 0.0
-        if context.tool_settings.use_keyframe_insert_auto:
-            scn = context.scene
-            theRig.keyframe_insert('["%s"]' % prop, index=-1, frame=scn.frame_current)
-        return{'FINISHED'}    
-
-
-#
-#    initCharacter(doReset):
-#    class VIEW3D_OT_MhxInitCharacterButton(bpy.types.Operator):
-#
-
-
-def initCharacter(doReset):
-    global theRig
-    # print("Initializing")
-    defineProperties()
-    redefinePropDrivers()
-    if doReset:    
-        resetProperties()
-    theRig['MhxRigInited'] = True
-
-    for (prop, typ, value, options) in ParentProperties:
-        theRig['Old'+prop] = theRig[prop]
-    return
-
-class VIEW3D_OT_MhxInitCharacterButton(bpy.types.Operator):
-    bl_idname = "mhx.pose_init_character"
-    bl_label = "Initialize character"
-    bl_options = {'REGISTER'}
-    doReset = BoolProperty()
-
-    def execute(self, context):
-        initCharacter(self.doReset)
-        print("Character initialized")
-        return{'FINISHED'}    
-
-#
-#    setInverse(context):
-#
-
-def setInverse(context):
-    global theRig
-    amt = theRig.data
-    pbones = theRig.pose.bones
-    for (bone, drivers) in ParentConstraintDrivers.items():
-        pb = pbones[bone]
-        for (cnsName, props, expr) in drivers:
-            print(cnsName, expr)
-            cns = pb.constraints[cnsName]
-            print(cns)
-            if cns.type == 'CHILD_OF' and changedProp(props):
-                amt.bones.active = pb.bone
-                print("Set inverse", pb.name, amt.bones.active, cns.name)
-                bpy.ops.constraint.childof_set_inverse(constraint=cns.name, owner='BONE')
-    for (prop, typ, value, options) in ParentProperties:
-        theRig['Old'+prop] = theRig[prop]
-    return
-
-def changedProp(props):
-    global theRig
-    for prop in props:
-        print("old", theRig['Old'+prop])
-        print("new", theRig[prop])
-        if theRig[prop] != theRig['Old'+prop]:
-            return True
-    return False
-                    
-class VIEW3D_OT_MhxSetInverseButton(bpy.types.Operator):
-    bl_idname = "mhx.pose_set_inverse"
-    bl_label = "Set inverse"
-
-    def execute(self, context):
-        setInverse(context)
-        return{'FINISHED'}    
-                
+###################################################################################          
 #
 #    class MhxDriversPanel(bpy.types.Panel):
 #
@@ -1237,47 +601,33 @@ class MhxDriversPanel(bpy.types.Panel):
     
     @classmethod
     def poll(cls, context):
-        return context.object
+        return pollMhxRig(context.object)
 
     def draw(self, context):
-        setGlobals(context)
-        if theRig:
-            layout = self.layout
-            try:
-                inited = theRig['MhxRigInited']
-            except:
-                inited = False
-
-            if not inited:
-                layout.operator("mhx.pose_init_character", text='Initialize character').doReset = True
-                return
-
-            layout.operator("mhx.pose_init_character", text='Reinitialize character').doReset = False
-            layout.operator("mhx.pose_reset_properties")
-            pbones = theRig.pose.bones
-            
-            layout.separator()
-            for (prop, typ, values, options) in ParentProperties:
-                layout.prop(theRig, '["%s"]' % prop, text=prop, expand=True)
-            layout.operator('mhx.pose_set_inverse')
-
-            layout.separator()
-            for (prop, typ, values, options) in FloatProperties:
-                layout.prop(theRig, '["%s"]' % prop, text=prop, expand=True)
-
-            for prefix in ['Left', 'Right']:
-                layout.label(prefix)
-                for (prop, typ, values, options) in LeftRightProperties:
-                        lprop = prefix+prop
-                        #print(lprop, typ, values, options)
-                        if typ == D_ENUM:
-                            layout.label(prop)
-                        row = layout.split(0.75)
-                        if RNA_PROPS:
-                            row.prop(theRig, lprop, text=prop, expand=True)
-                        else:
-                            row.prop(theRig, '["%s"]' % lprop, text=prop, toggle=True, expand=True)
-                        row.operator("mhx.pose_toggle_prop").strprop = lprop
+        lProps = []
+        rProps = []
+        props = []
+        plist = list(context.object.keys())
+        plist.sort()
+        for prop in plist:
+            if prop[-2:] == '_L':
+                lProps.append((prop, prop[:-2]))
+            elif prop[-2:] == '_R':
+                rProps.append((prop, prop[:-2]))
+            elif prop[:3] == 'Mhx' or prop[0] == '_' or prop[0] == '*':
+                pass
+            else:
+                props.append(prop)
+        ob = context.object
+        layout = self.layout
+        for prop in props:
+            layout.prop(ob, '["%s"]' % prop, text=prop)
+        layout.label("Left")
+        for (prop, pname) in lProps:
+            layout.prop(ob, '["%s"]' % prop, text=pname)
+        layout.label("Right")
+        for (prop, pname) in rProps:
+            layout.prop(ob, '["%s"]' % prop, text=pname)
         return
 
 ###################################################################################    
@@ -1289,10 +639,12 @@ class MhxDriversPanel(bpy.types.Panel):
 MhxLayers = [
     (( 0,    'Root', 'MhxRoot'),
      ( 8,    'Face', 'MhxFace')),
-    (( 9,    'Varia', 'MhxVaria'),
+    (( 9,    'Tweak', 'MhxTweak'),
      (10,    'Head', 'MhxHead')),
     (( 1,    'FK Spine', 'MhxFKSpine'),
-     ( 17,    'IK Spine', 'MhxIKSpine')),
+     (17,    'IK Spine', 'MhxIKSpine')),
+    ((13,    'Inv FK Spine', 'MhxInvFKSpine'),
+     (29,    'Inv IK Spine', 'MhxInvIKSpine')),
     ('Left', 'Right'),
     (( 2,    'IK Arm', 'MhxIKArm'),
      (18,    'IK Arm', 'MhxIKArm')),
@@ -1302,10 +654,14 @@ MhxLayers = [
      (20,    'IK Leg', 'MhxIKLeg')),
     (( 5,    'FK Leg', 'MhxFKLeg'),
      (21,    'FK Leg', 'MhxFKLeg')),
+    ((12,    'Tweak', 'MhxTweak'),
+     (28,    'Tweak', 'MhxTweak')),
     (( 6,    'Fingers', 'MhxFingers'),
      (22,    'Fingers', 'MhxFingers')),
     (( 7,    'Links', 'MhxLinks'),
      (23,    'Links', 'MhxLinks')),
+    ((11,    'Palm', 'MhxPalm'),
+     (27,    'Palm', 'MhxPalm')),
 ]
 
 #
@@ -1319,23 +675,21 @@ class MhxLayersPanel(bpy.types.Panel):
     
     @classmethod
     def poll(cls, context):
-        return context.object
+        return pollMhxRig(context.object)
 
     def draw(self, context):
-        setGlobals(context)
-        if theRig:
-            layout = self.layout
-            layout.operator("mhx.pose_set_all_layers", text='Enable all layers').value = True
-            layout.operator("mhx.pose_set_all_layers", text='Disable all layers').value = False
-            amt = theRig.data
-            for (left,right) in MhxLayers:
-                row = layout.row()
-                if type(left) == str:
-                    row.label(left)
-                    row.label(right)
-                else:
-                    for (n, name, prop) in [left,right]:
-                        row.prop(amt, "layers", index=n, toggle=True, text=name)
+        layout = self.layout
+        layout.operator("mhx.pose_set_all_layers", text='Enable all layers').value = True
+        layout.operator("mhx.pose_set_all_layers", text='Disable all layers').value = False
+        amt = context.object.data
+        for (left,right) in MhxLayers:
+            row = layout.row()
+            if type(left) == str:
+                row.label(left)
+                row.label(right)
+            else:
+                for (n, name, prop) in [left,right]:
+                    row.prop(amt, "layers", index=n, toggle=True, text=name)
         return
 
 class VIEW3D_OT_MhxSetAllLayersButton(bpy.types.Operator):
@@ -1344,13 +698,11 @@ class VIEW3D_OT_MhxSetAllLayersButton(bpy.types.Operator):
     value = bpy.props.BoolProperty()
 
     def execute(self, context):
-        global theRig
-        amt = theRig.data
-        #amt.layers = 32*[False]
+        rig = getMhxRig(context.object)
         for (left,right) in MhxLayers:
             if type(left) != str:
                 for (n, name, prop) in [left,right]:
-                    amt.layers[n] = self.value
+                    rig.data.layers[n] = self.value
         return{'FINISHED'}    
                 
 ###################################################################################    
@@ -1358,53 +710,33 @@ class VIEW3D_OT_MhxSetAllLayersButton(bpy.types.Operator):
 #    Common functions
 #
 ###################################################################################    
-
 #
-#    hasMeshChild(rig):
-#    isMhxRig(ob):    
-#    setGlobals(context):
+#   pollMhxRig(ob):
+#   getMhxRig(ob):
 #
 
-def hasMeshChild(rig):
-    global theMesh
-    for child in rig.children:
-        if (child.type == 'MESH') and meshHasExpressions(child):
-            theMesh = child
-            return True
-    return False
-
-def isMhxRig(ob):    
+def pollMhxRig(ob):
     try:
-        ob.data.bones['PArmIK_L']
-        return True
+        return (ob["MhxRig"] == "MHX")
     except:
         return False
-
-def setGlobals(context):
-    global theRig, theMesh, theScale    
-    theMesh = None
-    theRig = None
-    if isMhxRig(context.object):
-        theRig = context.object
-        if not hasMeshChild(theRig):
-            for child in theRig.children:
-                if (child.type == 'ARMATURE') and hasMeshChild(child):
-                    break
-    elif context.object.type == 'MESH':
-        if meshHasExpressions(context.object):
-            theMesh = context.object
-            parent = theMesh.parent
-            if isMhxRig(parent):
-                theRig = parent
-            elif parent:
-                grandParent = parent.parent
-                if isMhxRig(grandParent):
-                    theRig = grandParent
-        else:
-            return
+        
+def getMhxRig(ob):
+    if ob.type == 'ARMATURE':
+        rig = ob
+    elif ob.type == 'MESH':
+        rig = ob.parent
     else:
-        return
-
+        return None
+    try:        
+        if (rig["MhxRig"] == "MHX"):
+            return rig
+        else:
+            return None
+    except:
+        return None
+    
+        
 #
 #    setInterpolation(rig):
 #
@@ -1428,14 +760,7 @@ def setInterpolation(rig):
 #
 ###################################################################################    
 
-def init():
-    bpy.types.Scene.MhxKeyAll = BoolProperty(
-    name="Key all",
-    description="Set skeys for all shapes",
-    default=False)
-
 def register():
-    init()
     bpy.utils.register_module(__name__)
     pass
 
