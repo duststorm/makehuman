@@ -217,7 +217,7 @@ LegArmature = [
     
     # Tweaks
     ('UpLegRot_L',      0.0, 'Hip_L', F_WIR, L_LTWEAK, NoBB),
-    ('UpLegRot_R',      0.0, 'Hip_R', F_WIR, L_LTWEAK, NoBB),
+    ('UpLegRot_R',      0.0, 'Hip_R', F_WIR, L_RTWEAK, NoBB),
 
     # Pole targets
     ('LegTrg_L',        0.0, 'Hip_L', 0, L_HELP, NoBB),
@@ -231,8 +231,8 @@ LegArmature = [
     ('LegTrg_R',        0.0, 'Hip_R', 0, L_HELP, NoBB),
     ('UpLeg1PT_R',      0.0, 'UpLegRot_R', 0, L_HELP, NoBB),
     ('UpLeg2PT_R',      0.0, 'UpLeg_R', 0, L_HELP, NoBB),
-    ('KneePT_R',        0.0, 'LegIK_R', F_WIR, L_LLEGIK, NoBB),
-    ('KneeLinkPT_R',    0.0, 'UpLeg_R', F_RES, L_LLEGIK, NoBB),
+    ('KneePT_R',        0.0, 'LegIK_R', F_WIR, L_RLEGIK, NoBB),
+    ('KneeLinkPT_R',    0.0, 'UpLeg_R', F_RES, L_RLEGIK, NoBB),
     ('FootPT_R',        0.0, 'FootRev_R', 0, L_HELP, NoBB),
     ('ToePT_R',         0.0, 'ToeRev_R', 0, L_HELP, NoBB),
 
