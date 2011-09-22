@@ -200,8 +200,8 @@ ArmArmature = [
     ('LoArmPT_R',         0, 'LoArm_R', 0, L_HELP, NoBB),
 
     # Pole target
-    ('ElbowPT_L',         0, 'Clavicle_L', F_WIR, L_LARMIK, NoBB),
-    ('ElbowPT_R',         0, 'Clavicle_R', F_WIR, L_RARMIK, NoBB),
+    ('ElbowPT_L',         0, None, F_WIR, L_LARMIK, NoBB),
+    ('ElbowPT_R',         0, None, F_WIR, L_RARMIK, NoBB),
     ('ElbowLinkPT_L',     0, 'UpArm_L', F_RES, L_LARMIK, NoBB),
     ('ElbowLinkPT_R',     0, 'UpArm_R', F_RES, L_RARMIK, NoBB),
 
@@ -349,7 +349,9 @@ def ArmControlPoses(fp):
         ])
 
 
-    addPoseBone(fp, 'ElbowPT_L', 'MHCube025', 'IK_L', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+    addPoseBone(fp, 'ElbowPT_L', 'MHCube025', 'IK_L', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
+        [('ChildOf', C_CHILDOF, 0, ['Hand', 'Wrist_L', (1,1,1), (1,1,1), (1,1,1)]),
+         ('ChildOf', C_CHILDOF, 1, ['Shoulder', 'Clavicle_L', (1,1,1), (1,1,1), (1,1,1)]) ])
 
     addPoseBone(fp, 'ElbowLinkPT_L', None, 'IK_L', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'ElbowPT_L', 0])])
@@ -362,7 +364,9 @@ def ArmControlPoses(fp):
          ('CopyRot', C_LOCAL, 0.45, ['Rot', 'UpArm_L', (0,1,0), (0,0,0), False])
         ])
 
-    addPoseBone(fp, 'ElbowPT_R', 'MHCube025', 'IK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+    addPoseBone(fp, 'ElbowPT_R', 'MHCube025', 'IK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('ChildOf', C_CHILDOF, 0, ['Hand', 'Wrist_R', (1,1,1), (1,1,1), (1,1,1)]),
+         ('ChildOf', C_CHILDOF, 1, ['Shoulder', 'Clavicle_R', (1,1,1), (1,1,1), (1,1,1)]) ])
 
     addPoseBone(fp, 'ElbowLinkPT_R', None, 'IK_R', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'ElbowPT_R', 0])])
@@ -474,6 +478,8 @@ ArmPropLRDrivers = [
     ('Hand', 'WristRot', ['ArmIk', 'HandFollowsWrist'], 'x1*x2'),
     ('Shoulder', 'Shoulder', ['ArmHinge'], '1-x1'),
     ('Shoulder', 'Root', ['ArmHinge'], 'x1'),
+    ('ElbowPT', 'Hand', ['ElbowFollowsWrist'], 'x1'),
+    ('ElbowPT', 'Shoulder', ['ElbowFollowsWrist'], '1-x1'),
  ]
 
 #

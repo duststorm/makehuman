@@ -42,8 +42,14 @@ end Armature
   Property HandFollowsWrist_L 1.0 Left_hand_follows_wrist ;
   PropKeys HandFollowsWrist_L "min":0.0,"max":1.0, ;
 
+  Property ElbowFollowsWrist_L 0.0 Left_elbow_follows_wrist ;
+  PropKeys ElbowFollowsWrist_L "min":0.0,"max":1.0, ;
+
   Property LegIk_L 0.0 Left_leg_FK/IK ;
   PropKeys LegIk_L "min":0.0,"max":1.0, ;
+
+  Property KneeFollowsFoot_L 1.0 Left_knee_follows_foot ;
+  PropKeys KneeFollowsFoot_L "min":0.0,"max":1.0, ;
 
   Property FingerControl_L True Left_fingers_controlled ;
   PropKeys FingerControl_L "min":0,"max":1, ;
@@ -60,8 +66,14 @@ end Armature
   Property HandFollowsWrist_R 1.0 Right_hand_follows_wrist ;
   PropKeys HandFollowsWrist_R "min":0.0,"max":1.0, ;
 
+  Property ElbowFollowsWrist_R 0.0 Right_elbow_follows_wrist ;
+  PropKeys ElbowFollowsWrist_R "min":0.0,"max":1.0, ;
+
   Property LegIk_R 0.0 Right_leg_FK/IK ;
   PropKeys LegIk_R "min":0.0,"max":1.0, ;
+
+  Property KneeFollowsFoot_R 1.0 Right_knee_follows_foot ;
+  PropKeys KneeFollowsFoot_R "min":0.0,"max":1.0, ;
 
   Property FingerControl_R True Right_fingers_controlled ;
   PropKeys FingerControl_R "min":0,"max":1, ;

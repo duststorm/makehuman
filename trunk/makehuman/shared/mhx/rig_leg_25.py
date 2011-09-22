@@ -223,7 +223,7 @@ LegArmature = [
     ('LegTrg_L',        0.0, 'Hip_L', 0, L_HELP, NoBB),
     ('UpLeg1PT_L',      0.0, 'UpLegRot_L', 0, L_HELP, NoBB),
     ('UpLeg2PT_L',      0.0, 'UpLeg_L', 0, L_HELP, NoBB),
-    ('KneePT_L',        0.0, 'LegIK_L', F_WIR, L_LLEGIK, NoBB),
+    ('KneePT_L',        0.0, None, F_WIR, L_LLEGIK, NoBB),
     ('KneeLinkPT_L',    0.0, 'UpLeg_L', F_RES, L_LLEGIK, NoBB),
     ('FootPT_L',        0.0, 'FootRev_L', 0, L_HELP, NoBB),
     ('ToePT_L',         0.0, 'ToeRev_L', 0, L_HELP, NoBB),
@@ -231,7 +231,7 @@ LegArmature = [
     ('LegTrg_R',        0.0, 'Hip_R', 0, L_HELP, NoBB),
     ('UpLeg1PT_R',      0.0, 'UpLegRot_R', 0, L_HELP, NoBB),
     ('UpLeg2PT_R',      0.0, 'UpLeg_R', 0, L_HELP, NoBB),
-    ('KneePT_R',        0.0, 'LegIK_R', F_WIR, L_RLEGIK, NoBB),
+    ('KneePT_R',        0.0, None, F_WIR, L_RLEGIK, NoBB),
     ('KneeLinkPT_R',    0.0, 'UpLeg_R', F_RES, L_RLEGIK, NoBB),
     ('FootPT_R',        0.0, 'FootRev_R', 0, L_HELP, NoBB),
     ('ToePT_R',         0.0, 'ToeRev_R', 0, L_HELP, NoBB),
@@ -406,7 +406,9 @@ def LegControlPoses(fp):
 
     # Pole target
 
-    addPoseBone(fp, 'KneePT_L', 'MHCube025', 'IK_L', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+    addPoseBone(fp, 'KneePT_L', 'MHCube025', 'IK_L', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('ChildOf', C_CHILDOF, 1, ['Foot', 'LegIK_L', (1,1,1), (1,1,1), (1,1,1)]),
+         ('ChildOf', C_CHILDOF, 0, ['Hip', 'Hip_L', (1,1,1), (1,1,1), (1,1,1)]) ])
 
     addPoseBone(fp, 'KneeLinkPT_L', None, 'IK_L', (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
         [('StretchTo', 0, 1, ['Stretch', 'KneePT_L', 0])])
@@ -418,7 +420,9 @@ def LegControlPoses(fp):
          [('IK', 0, 1, ['LegIK', 'LoLeg_L', 1, None, (True, False,True)])])
 
 
-    addPoseBone(fp, 'KneePT_R', 'MHCube025', 'IK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+    addPoseBone(fp, 'KneePT_R', 'MHCube025', 'IK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
+        [('ChildOf', C_CHILDOF, 1, ['Foot', 'LegIK_R', (1,1,1), (1,1,1), (1,1,1)]),
+         ('ChildOf', C_CHILDOF, 0, ['Hip', 'Hip_R', (1,1,1), (1,1,1), (1,1,1)]) ])
 
     addPoseBone(fp, 'KneeLinkPT_R', None, 'IK_R', (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
         [('StretchTo', 0, 1, ['Stretch', 'KneePT_R', 0])])
@@ -533,6 +537,8 @@ LegPropLRDrivers = [
     ('Foot', 'FreeIK', ['LegIk'], '1-x1'),
     ('Toe', 'RevIK', ['LegIk'], 'x1'),
     ('LegIK', 'DistHip', ['LegStretch'], '1-x1'),
+    ('KneePT', 'Foot', ['KneeFollowsFoot'], 'x1'),
+    ('KneePT', 'Hip', ['KneeFollowsFoot'], '1-x1'),    
 ]
 
 #
