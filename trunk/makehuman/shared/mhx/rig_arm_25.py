@@ -307,7 +307,7 @@ def ArmControlPoses(fp):
 
     addPoseBone(fp, 'Hand_L', 'MHHand', 'FK_L', (0,0,0), (0,1,0), (1,1,1), (1,1,1), CmodHand,
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limHand_L, (True, True, True)]),
-         ('IK', 0, 1, ['FreeIK', None, 2, None, (True, False,True)]),
+         ('IK', 0, 1, ['FreeIK', None, 2, None, (True, False,False)]),
          ('CopyLoc', 0, 0, ['WristLoc', 'Wrist_L', (1,1,1), (0,0,0), 0, False]),
          ('CopyRot', 0, 0, ['WristRot', 'Wrist_L', (1,1,1), (0,0,0), False])
         ])
@@ -343,7 +343,7 @@ def ArmControlPoses(fp):
 
     addPoseBone(fp, 'Hand_R', 'MHHand', 'FK_R', (0,0,0), (0,1,0), (1,1,1), (1,1,1), CmodHand,
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limHand_R, (True, True, True)]),
-         ('IK', 0, 1, ['FreeIK', None, 2, None, (True, False,True)]),
+         ('IK', 0, 1, ['FreeIK', None, 2, None, (True, False,False)]),
          ('CopyLoc', 0, 0, ['WristLoc', 'Wrist_R', (1,1,1), (0,0,0), 0, False]),
          ('CopyRot', 0, 0, ['WristRot', 'Wrist_R', (1,1,1), (0,0,0), False])
         ])

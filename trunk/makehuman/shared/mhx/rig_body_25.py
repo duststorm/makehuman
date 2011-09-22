@@ -168,8 +168,8 @@ BodyArmature = [
 ]
 
 BreastArmature = [
-    ('Breast_L',           -45*D, 'DfmRib', F_DEF+F_WIR, L_DEF+L_TORSO, NoBB),
-    ('Breast_R',           45*D, 'DfmRib', F_DEF+F_WIR, L_DEF+L_TORSO, NoBB),
+    ('Breast_L',           -45*D, 'DfmRib', F_DEF+F_WIR, L_TORSO, NoBB),
+    ('Breast_R',           45*D, 'DfmRib', F_DEF+F_WIR, L_TORSO, NoBB),
 ]
 
 #
@@ -292,7 +292,7 @@ def BodyControlPoses(fp):
 
     #addPoseBone(fp, 'RibTarget', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
     #addPoseBone(fp, 'HipBone', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
-    addPoseBone(fp,  'Breathe', 'MHCube01', None, (1,1,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+    addPoseBone(fp,  'Breathe', 'MHBall025', None, (1,1,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
     addPoseBone(fp,  'Penis', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, [])
 

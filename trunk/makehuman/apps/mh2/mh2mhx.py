@@ -306,20 +306,6 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                         rigDriversEnd(fp)
                     else:
                         raise NameError("rig-drivers: %s" % line)
-
-            elif words[1] == 'rig-process':
-                pass
-                fp.write("Process %s\n" % theHuman)
-                fp.write("\n  ApplyArmature %sMesh ;\n" % theHuman)
-                for proxy in proxyData.values():
-                    if proxy.name and not proxy.rig:
-                        fp.write("  ApplyArmature %sMesh ;\n" % proxy.name)
-                mhx_rig.writeAllProcesses(fp)
-                mhx_rig.reapplyArmature(fp, "%sMesh" % theHuman)
-                for proxy in proxyData.values():
-                    if proxy.name and not proxy.rig:
-                        mhx_rig.reapplyArmature(fp, proxy.name)
-                fp.write("end Process\n")
             elif words[1] == 'rig-correct':
                 fp.write("CorrectRig %s ;\n" % theHuman)
             elif words[1] == 'recalc-roll':
