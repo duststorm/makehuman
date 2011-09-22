@@ -450,7 +450,7 @@ def ArmWriteActions(fp):
 #    ArmFKIKDrivers
 #    (Bone, FK constraint, IK constraint, driver, channel, max)
 #
-
+"""
 ArmFKIKDrivers = [
     ("UpArm_L", True, [], [], "PArmIK_L", "LOC_X", 1.0),
     ("LoArm_L", True, [], ["ArmIK"], "PArmIK_L", "LOC_X", 1.0),
@@ -460,7 +460,7 @@ ArmFKIKDrivers = [
     ("LoArm_R", True, [], ["ArmIK"], "PArmIK_R", "LOC_X", 1.0),
     ("Hand_R", True, ["FreeIK"], ["WristLoc", "WristRot"], "PArmIK_R", "LOC_X", 1.0),
 ]
-
+"""
 #
 #   ArmPropLRDrivers
 #   (Bone, Name, Props, Expr)

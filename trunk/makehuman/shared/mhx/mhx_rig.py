@@ -1827,11 +1827,6 @@ def setupRig(obj):
             rig_panel_25.PanelArmature
         )
 
-        if not mh2mhx.theConfig.propdrivers:
-            Joints += rig_panel_25.SwitchJoints
-            HeadsTails += rig_panel_25.SwitchHeadsTails
-            Armature += rig_panel_25.SwitchArmature
-
     elif mh2mhx.theConfig.useRig == "blenrig":
         BoneGroups = [('GEN', 'THEME13'),
                       ('IK', 'THEME05'),
@@ -1903,14 +1898,6 @@ def writeControlArmature(fp):
     writeArmature(fp, amt, True)
     return
 
-def writeDeformArmature(fp):
-    return
-
-def writeAllCurves(fp):
-    #for (name, hooks) in rig_body_25.BodySpines:
-    #    mhx_spine.addSpine(fp, name, hooks)
-    return 
-
 def writeControlPoses(fp):
     writeBoneGroups(fp)
     if mh2mhx.theConfig.useRig == 'mhx':            
@@ -1922,8 +1909,6 @@ def writeControlPoses(fp):
         #rig_toe_25.ToeControlPoses(fp)
         rig_face_25.FaceControlPoses(fp)
         rig_panel_25.PanelControlPoses(fp)
-        if not mh2mhx.theConfig.propdrivers:
-            rig_panel_25.SwitchControlPoses(fp)
     elif mh2mhx.theConfig.useRig == 'blenrig':
         blenrig_rig.BlenrigWritePoses(fp)
     elif mh2mhx.theConfig.useRig == 'rigify':
@@ -1936,9 +1921,6 @@ def writeControlPoses(fp):
 
     return
 
-def writeDeformPoses(fp):
-    return
-    
 def writeAllActions(fp):
     #rig_arm_25.ArmWriteActions(fp)
     #rig_leg_25.LegWriteActions(fp)
@@ -1947,19 +1929,15 @@ def writeAllActions(fp):
 
 def writeAllDrivers(fp):
     if mh2mhx.theConfig.useRig == 'mhx':      
-        if mh2mhx.theConfig.propdrivers:
-            writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_L")
-            writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_R")
-            writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_L")
-            writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_R")
-            writePropDrivers(fp, rig_body_25.BodyPropDrivers, "")
-            writePropDrivers(fp, rig_face_25.FacePropDrivers, "")
-            fingDrivers = rig_finger_25.getFingerPropDrivers()
-            writePropDrivers(fp, fingDrivers, "_L")            
-            writePropDrivers(fp, fingDrivers, "_R")            
-        else:
-            writeFkIkSwitch(fp, rig_arm_25.ArmFKIKDrivers)
-            writeFkIkSwitch(fp, rig_leg_25.LegFKIKDrivers)
+        writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_L")
+        writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_R")
+        writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_L")
+        writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_R")
+        writePropDrivers(fp, rig_body_25.BodyPropDrivers, "")
+        writePropDrivers(fp, rig_face_25.FacePropDrivers, "")
+        fingDrivers = rig_finger_25.getFingerPropDrivers()
+        writePropDrivers(fp, fingDrivers, "_L")            
+        writePropDrivers(fp, fingDrivers, "_R")            
         #rig_panel_25.FingerControlDrivers(fp)
         writeMuscleDrivers(fp, rig_shoulder_25.ShoulderDeformDrivers, mh2mhx.theHuman)
         writeMuscleDrivers(fp, rig_arm_25.ArmDeformDrivers, mh2mhx.theHuman)

@@ -47,6 +47,9 @@ end Armature
 
   Property LegIk_L 0.0 Left_leg_FK/IK ;
   PropKeys LegIk_L "min":0.0,"max":1.0, ;
+  
+  Property LegIkToAnkle_L 0.0 Left_leg_IK_to_ankle ;
+  PropKeys LegIkToAnkle_L "min":0.0,"max":1.0, ;
 
   Property KneeFollowsFoot_L 1.0 Left_knee_follows_foot ;
   PropKeys KneeFollowsFoot_L "min":0.0,"max":1.0, ;
@@ -71,6 +74,9 @@ end Armature
 
   Property LegIk_R 0.0 Right_leg_FK/IK ;
   PropKeys LegIk_R "min":0.0,"max":1.0, ;
+
+  Property LegIkToAnkle_R 0.0 Right_leg_IK_to_ankle ;
+  PropKeys LegIkToAnkle_R "min":0.0,"max":1.0, ;
 
   Property KneeFollowsFoot_R 1.0 Right_knee_follows_foot ;
   PropKeys KneeFollowsFoot_R "min":0.0,"max":1.0, ;
@@ -104,8 +110,6 @@ end Armature
 
   *** properties Object
 end Object
-
-*** curves
 
 
 

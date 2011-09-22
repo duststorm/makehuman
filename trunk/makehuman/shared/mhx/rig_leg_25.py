@@ -201,7 +201,7 @@ LegArmature = [
     ('LegIK_L',         footCtrlRoll, Master, F_WIR, L_LLEGIK, NoBB),
     ('ToeRev_L',        0, 'LegIK_L', F_WIR, L_LLEGIK, NoBB),
     ('FootRev_L',       0, 'ToeRev_L', F_WIR, L_LLEGIK, NoBB),
-    ('Ankle_L',         0, 'FootRev_L', 0, L_HELP, NoBB),
+    ('Ankle_L',         0, None, F_WIR, L_LTWEAK, NoBB),
     ('LegFK_L',         footCtrlRoll, 'LoLeg_L', 0, L_HELP, NoBB),
 
     ('Hip_R',          0, 'DfmHips', F_WIR, L_RTWEAK, NoBB),
@@ -212,7 +212,7 @@ LegArmature = [
     ('LegIK_R',         -footCtrlRoll, Master, F_WIR, L_RLEGIK, NoBB),
     ('ToeRev_R',        0, 'LegIK_R', F_WIR, L_RLEGIK, NoBB),
     ('FootRev_R',       0, 'ToeRev_R', F_WIR, L_RLEGIK, NoBB),
-    ('Ankle_R',         0, 'FootRev_R', 0, L_HELP, NoBB),
+    ('Ankle_R',         0, None, F_WIR, L_RTWEAK, NoBB),
     ('LegFK_R',         footCtrlRoll, 'LoLeg_R', 0, L_HELP, NoBB),  
     
     # Tweaks
@@ -397,8 +397,11 @@ def LegControlPoses(fp):
     addPoseBone(fp, 'Toe_R', 'MHToe_R', 'FK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), CmodToe, 
         [('IK', 0, 0, ['RevIK', 'ToeRev_R', 1, (90*D, 'ToePT_R'), (1,0,1)])])
     
-    addPoseBone(fp, 'Ankle_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
-    addPoseBone(fp, 'Ankle_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
+    addPoseBone(fp, 'Ankle_L', 'MHBall025', 'IK_L', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('ChildOf', C_CHILDOF, 1, ['Foot', 'LegIK_L', (1,1,1), (1,1,1), (1,1,1)]) ])
+
+    addPoseBone(fp, 'Ankle_R', 'MHBall025', 'IK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('ChildOf', C_CHILDOF, 1, ['Foot', 'LegIK_R', (1,1,1), (1,1,1), (1,1,1)]) ])
 
     addPoseBone(fp, 'LegFK_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
     addPoseBone(fp, 'LegFK_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
@@ -513,7 +516,7 @@ def LegControlPoses(fp):
 #   LegFKIKDrivers
 #   (Bone, cond, FK constraint, IK constraint, driver, channel, max)
 #
-
+"""
 LegFKIKDrivers = [
     ("UpLeg_L", True, [], [], "PLegIK_L", "LOC_X", 1.0),
     ("LoLeg_L", True, [], ["LegIK"], "PLegIK_L", "LOC_X", 1.0),
@@ -525,7 +528,7 @@ LegFKIKDrivers = [
     ("Foot_R", True, ["FreeIK"], ["RevIK"], "PLegIK_R", "LOC_X", 1.0),
     ("Toe_R", True, [], ["RevIK"], "PLegIK_R", "LOC_X", 1.0),
 ]
-
+"""
 #
 #   LegPropLRDrivers
 #   (Bone, Name, Props, Expr)
@@ -533,12 +536,13 @@ LegFKIKDrivers = [
 
 LegPropLRDrivers = [
     ('LoLeg', 'LegIK', ['LegIk'], 'x1'),
-    ('Foot', 'RevIK', ['LegIk'], 'x1'),
+    ('Foot', 'RevIK', ['LegIk', 'LegIkToAnkle'], 'x1*(1-x2)'),
     ('Foot', 'FreeIK', ['LegIk'], '1-x1'),
-    ('Toe', 'RevIK', ['LegIk'], 'x1'),
+    ('Toe', 'RevIK', ['LegIk', 'LegIkToAnkle'], 'x1*(1-x2)'),
     ('LegIK', 'DistHip', ['LegStretch'], '1-x1'),
     ('KneePT', 'Foot', ['KneeFollowsFoot'], 'x1'),
-    ('KneePT', 'Hip', ['KneeFollowsFoot'], '1-x1'),    
+    ('KneePT', 'Hip', ['KneeFollowsFoot'], '1-x1'),  
+    ('Ankle', 'Foot', ['LegIkToAnkle'], '1-x1'),
 ]
 
 #

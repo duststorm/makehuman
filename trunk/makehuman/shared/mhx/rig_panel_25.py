@@ -49,7 +49,7 @@ PanelJoints = [
     ('PTongue',     'o', ('origin', [0.45, -1.5, 0.0])),
     ('PJaw',        'o', ('origin', [0.0, -1.1, 0.0])),
 ]    
-    
+"""    
 SwitchJoints = [
     ('PArmIK_R',        'o', ('origin', [-1.1, 2.0, 0.0])),
     ('PArmIK_L',        'o', ('origin', [0.1, 2.0, 0.0])),
@@ -68,7 +68,7 @@ SwitchJoints = [
     ('PFinger-4_L',     'o', ('origin', [1.2, -0.5, 0.0])),
     ('PFinger-5_L',     'o', ('origin', [1.2, -1.0, 0.0])),
 ]
-
+"""
 PanelHeadsTails = [
     ('PFace',           'PFace', ('PFace', [0,0,-1])),
     ('PFaceDisp',           'origin', ('origin', [0,0,-1])),
@@ -94,7 +94,7 @@ PanelHeadsTails = [
     ('PTongue',         'PTongue', ('PTongue', offs)),
     ('PJaw',            'PJaw', ('PJaw', offs)),
 ]
-
+"""
 SwitchHeadsTails = [
     ('PArmIK_R',            'PArmIK_R', ('PArmIK_R', offs)),
     ('PArmIK_L',            'PArmIK_L', ('PArmIK_L', offs)),
@@ -113,7 +113,7 @@ SwitchHeadsTails = [
     ('PFinger-4_R',         'PFinger-4_R', ('PFinger-4_R', offs)),
     ('PFinger-5_R',         'PFinger-5_R', ('PFinger-5_R', offs)),
 ]
-
+"""
 
 PanelArmature = [
     ('PFace',       pi, Master, F_WIR, L_PANEL, NoBB),
@@ -201,7 +201,7 @@ def PanelControlPoses(fp):
     addCSlider(fp, 'PTongue', MX)
     addYSlider(fp, 'PJaw', MX)
     return
-
+"""
 def SwitchControlPoses(fp):
     addXSlider(fp, 'PArmIK_L', 0.0, 1.0, 0.0)
     addXSlider(fp, 'PArmIK_R', 0.0, 1.0, 0.0)
@@ -220,7 +220,7 @@ def SwitchControlPoses(fp):
     addXSlider(fp, 'PFinger-4_R', 0.0, FMX, FMX)
     addXSlider(fp, 'PFinger-5_R', 0.0, FMX, FMX)
     return
-
+"""
 #
 #   Face representation
 #
@@ -424,7 +424,7 @@ FaceShapeKeyScale = {
 #
 #   FingerWriteDrivers(fp):
 #
-
+"""
 def FingerWriteDrivers(fp):
     drivers = []
     coeff = (0, 1.0/FMX)
@@ -440,5 +440,5 @@ def FingerWriteDrivers(fp):
                 cnsData = ("var", 'TRANSFORMS', [(mh2mhx.theHuman, driver, 'LOC_X', C_LOC)])
                 writeDriver(fp, True, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"Rot\"].influence" % driven, -1, coeff, [cnsData])
     return
-
+"""
 
