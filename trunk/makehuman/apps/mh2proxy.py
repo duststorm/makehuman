@@ -24,7 +24,7 @@ TO DO
 import module3d, aljabr
 import os
 from aljabr import *
-import read_rig, mhx_rig, mh2mhx
+import read_rig, mhx_rig, mhx_main
 
 
 #
@@ -658,7 +658,7 @@ def getMeshInfo(obj, proxy, rawWeights, rawShapes, rigname):
         for v in obj.verts:
             verts.append(v.co)
             vnormals.append(v.no)
-        faces = mh2mhx.loadFacesIndices(obj)
+        faces = mhx_main.loadFacesIndices(obj)
         return (verts, vnormals, obj.uvValues, faces, rawWeights, rawShapes)
 
 #

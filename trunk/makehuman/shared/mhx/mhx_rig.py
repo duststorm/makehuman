@@ -25,7 +25,7 @@ import aljabr
 from aljabr import *
 import math
 import mhxbones
-import mh2mhx
+import mhx_main
 import read_expression
         
 pi = 3.14159
@@ -670,7 +670,7 @@ def addIkConstraint(fp, flags, inf, data, lockLoc, lockRot):
 
         if subtar:
             fp.write(
-"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
+"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ;\n" % targsp +
 "      use_tail True ;\n" +
@@ -699,7 +699,7 @@ def addIkConstraint(fp, flags, inf, data, lockLoc, lockRot):
             fp.write(
 "      pole_angle %.6g ;\n" % angle +
 "      pole_subtarget '%s' ;\n" % ptar +
-"      pole_target Refer Object %s ;\n" % (mh2mhx.theHuman))
+"      pole_target Refer Object %s ;\n" % (mhx_main.theHuman))
 
         fp.write(
 "      is_proxy_local False ;\n" +
@@ -735,7 +735,7 @@ def addActionConstraint(fp, flags, inf, data):
 
     fp.write(
 "    Constraint %s ACTION True\n" % name +
-"      target Refer Object %s ;\n" % (mh2mhx.theHuman)+
+"      target Refer Object %s ;\n" % (mhx_main.theHuman)+
 "      action Refer Action %s ; \n" % action+
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
@@ -781,7 +781,7 @@ def addCopyRotConstraint(fp, flags, inf, data):
     if Mhx25:
         fp.write(
 "    Constraint %s COPY_ROTATION True\n" % name +
-"      target Refer Object %s ;\n" % (mh2mhx.theHuman)+
+"      target Refer Object %s ;\n" % (mhx_main.theHuman)+
 "      invert Array %d %d %d ; \n" % (invertX, invertY, invertZ)+
 "      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
 "      active %s ;\n" % active +
@@ -820,7 +820,7 @@ def addCopyLocConstraint(fp, flags, inf, data):
     if Mhx25:
         fp.write(
 "    Constraint %s COPY_LOCATION True\n" % name +
-"      target Refer Object %s ;\n" % (mh2mhx.theHuman)+
+"      target Refer Object %s ;\n" % (mhx_main.theHuman)+
 "      invert Array %d %d %d ; \n" % (invertX, invertY, invertZ)+
 "      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
 "      active %s ;\n" % active +
@@ -855,7 +855,7 @@ def addCopyScaleConstraint(fp, flags, inf, data):
 
     fp.write(
 "    Constraint %s COPY_SCALE True\n" % name +
-"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
+"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
 "      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
@@ -880,7 +880,7 @@ def addCopyTransConstraint(fp, flags, inf, data):
     
     fp.write(
 "    Constraint %s COPY_TRANSFORMS True\n" % name +
-"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
+"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -1042,7 +1042,7 @@ def addTransformConstraint(fp, flags, inf, data):
 
     fp.write(
 "    Constraint %s TRANSFORM True\n" % name +
-"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
+"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -1083,7 +1083,7 @@ def addDampedTrackConstraint(fp, flags, inf, data):
 
     fp.write(
 "    Constraint %s DAMPED_TRACK True\n" % name +
-"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
+"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -1108,7 +1108,7 @@ def addLockedTrackConstraint(fp, flags, inf, data):
 
     fp.write(
 "    Constraint %s LOCKED_TRACK True\n" % name +
-"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
+"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -1141,7 +1141,7 @@ def addStretchToConstraint(fp, flags, inf, data):
     if Mhx25:
         fp.write(
 "    Constraint %s STRETCH_TO True\n" % name +
-"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
+"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      bulge 1 ;\n" +
@@ -1178,7 +1178,7 @@ def addTrackToConstraint(fp, flags, inf, data):
 
     fp.write(
 "    Constraint %s TRACK_TO True\n" % name +
-"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
+"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      head_tail %s ;\n" % head_tail +
@@ -1206,7 +1206,7 @@ def addLimitDistConstraint(fp, flags, inf, data):
     if Mhx25:
         fp.write(
 "    Constraint %s LIMIT_DISTANCE True\n" % name +
-"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
+"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -1244,7 +1244,7 @@ def addChildOfConstraint(fp, flags, inf, data):
     if Mhx25:
         fp.write(
 "    Constraint %s CHILD_OF True\n" % name +
-"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
+"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -1310,7 +1310,7 @@ def addFloorConstraint(fp, flags, inf, data):
 
     fp.write(
 "    Constraint %s FLOOR True\n" % name +
-"      target Refer Object %s ;\n" % (mh2mhx.theHuman) +
+"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -1401,7 +1401,7 @@ def writeFCurves(fp, name, quats):
 
 def writeFkIkSwitch(fp, drivers):
     for (bone, cond, cnsFK, cnsIK, targ, channel, mx) in drivers:
-        cnsData = ("ik", 'TRANSFORMS', [('OBJECT', mh2mhx.theHuman, targ, channel, C_LOC)])
+        cnsData = ("ik", 'TRANSFORMS', [('OBJECT', mhx_main.theHuman, targ, channel, C_LOC)])
         for cnsName in cnsFK:
             writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (mx,-mx), [cnsData])
         for cnsName in cnsIK:
@@ -1413,7 +1413,7 @@ def writeFkIkSwitch(fp, drivers):
 """
 def writeEnumDrivers(fp, drivers):
     for (bone, cns, targ, channel) in drivers:
-        drvVars = [("x", 'TRANSFORMS', [('OBJECT', mh2mhx.theHuman, targ, channel, C_LOC)])]
+        drvVars = [("x", 'TRANSFORMS', [('OBJECT', mhx_main.theHuman, targ, channel, C_LOC)])]
         for n, cnsName in enumerate(cns):
             expr = '(x>%.1f)*(x<%.1f)' % (n-0.5, n+0.5)
             writeDriver(fp, True, ('SCRIPTED', expr), "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (0,1), drvVars)
@@ -1428,7 +1428,7 @@ def writePropDrivers(fp, drivers, suffix):
         drvVars = []
         n = 1
         for prop in props:
-            drvVars.append( ("x%d" % n, 'SINGLE_PROP', [('OBJECT', mh2mhx.theHuman, '["%s%s"]' % (prop,suffix))]) )
+            drvVars.append( ("x%d" % n, 'SINGLE_PROP', [('OBJECT', mhx_main.theHuman, '["%s%s"]' % (prop,suffix))]) )
             n += 1
         writeDriver(fp, True, ('SCRIPTED', expr), "",
             "pose.bones[\"%s%s\"].constraints[\"%s\"].influence" % (bone, suffix, cns), 
@@ -1441,7 +1441,7 @@ def writePropDrivers(fp, drivers, suffix):
 
 def writeExpressionDrivers(fp, skeys):
     for skey in skeys:
-        drvVar = ("x", 'SINGLE_PROP', [('OBJECT', mh2mhx.theHuman, '["*%s"]' % (skey))])
+        drvVar = ("x", 'SINGLE_PROP', [('OBJECT', mhx_main.theHuman, '["*%s"]' % (skey))])
         writeDriver(fp, True, ('SCRIPTED', "x"), "",
             "key_blocks[\"%s\"].value" % (skey), 
             -1, (0,1), [drvVar])
@@ -1455,7 +1455,7 @@ def writeTextureDrivers(fp, drivers):
     for (tex, vlist) in drivers.items():
         drvVars = []
         (texnum, targ, channel, coeff) = vlist
-        drvVars.append( (targ, 'TRANSFORMS', [('OBJECT', mh2mhx.theHuman, targ, channel, C_LOC)]) )
+        drvVars.append( (targ, 'TRANSFORMS', [('OBJECT', mhx_main.theHuman, targ, channel, C_LOC)]) )
         writeDriver(fp, 'toggle&T_Face', 'AVERAGE', "", "texture_slots[%d].normal_factor" % (texnum), -1, coeff, drvVars)
     return
 
@@ -1466,10 +1466,10 @@ def writeTextureDrivers(fp, drivers):
 
 def writeShapeDrivers(fp, drivers, proxy):
     for (shape, vlist) in drivers.items():
-        if mh2mhx.useThisShape(shape, proxy):
+        if mhx_main.useThisShape(shape, proxy):
             drvVars = []
             (targ, channel, coeff) = vlist
-            drvVars.append( (targ, 'TRANSFORMS', [('OBJECT', mh2mhx.theHuman, targ, channel, C_LOC)]) )
+            drvVars.append( (targ, 'TRANSFORMS', [('OBJECT', mhx_main.theHuman, targ, channel, C_LOC)]) )
             writeDriver(fp, 'toggle&T_Face', 'AVERAGE', "", "key_blocks[\"%s\"].value" % (shape), -1, coeff, drvVars)
     return
 
@@ -1497,11 +1497,11 @@ def writeMuscleDrivers(fp, drivers, rig):
 
 def writeRotDiffDrivers(fp, drivers, proxy):
     for (shape, vlist) in drivers.items():
-        if mh2mhx.useThisShape(shape, proxy):
+        if mhx_main.useThisShape(shape, proxy):
             (targ1, targ2, keypoints) = vlist
             drvVars = [(targ2, 'ROTATION_DIFF', [
-            ('OBJECT', mh2mhx.theHuman, targ1, C_LOC),
-            ('OBJECT', mh2mhx.theHuman, targ2, C_LOC)] )]
+            ('OBJECT', mhx_main.theHuman, targ1, C_LOC),
+            ('OBJECT', mhx_main.theHuman, targ2, C_LOC)] )]
             writeDriver(fp, True, 'MIN', "", "key_blocks[\"%s\"].value" % (shape), -1, keypoints, drvVars)
     return
 
@@ -1771,7 +1771,7 @@ import rigify_rig
 def setupRig(obj):
     global BoneGroups, RecalcRoll, GizmoFiles, VertexGroupFiles, ObjectProps, ArmatureProps, Joints, HeadsTails, Armature, HeadName
 
-    if mh2mhx.theConfig.useRig in ['mhx', 'game']:
+    if mhx_main.theConfig.useRig in ['mhx', 'game']:
         BoneGroups = [
             ('Master', 'THEME13'),
             ('Spine', 'THEME05'),
@@ -1827,7 +1827,7 @@ def setupRig(obj):
             rig_panel_25.PanelArmature
         )
 
-    elif mh2mhx.theConfig.useRig == "blenrig":
+    elif mhx_main.theConfig.useRig == "blenrig":
         BoneGroups = [('GEN', 'THEME13'),
                       ('IK', 'THEME05'),
                       ('FK', 'THEME09'),
@@ -1842,7 +1842,7 @@ def setupRig(obj):
         ObjectProps = blenrig_rig.BlenrigObjectProps + [("MhxRig", '"Blenrig"')]
         ArmatureProps = blenrig_rig.BlenrigArmatureProps
 
-    elif mh2mhx.theConfig.useRig == "rigify":
+    elif mhx_main.theConfig.useRig == "rigify":
         BoneGroups = []
         RecalcRoll = []              
         VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
@@ -1875,7 +1875,7 @@ def setupRig(obj):
         ArmatureProps = rigify_rig.RigifyArmatureProps
 
     else:
-        raise NameError("Unknown rig %s" % mh2mhx.theConfig.useRig)
+        raise NameError("Unknown rig %s" % mhx_main.theConfig.useRig)
 
     newSetupJoints(obj, Joints, HeadsTails, True)
     return
@@ -1893,14 +1893,14 @@ def swapParentName(bones, old, new):
     
 def writeControlArmature(fp):
     amt = Armature    
-    if mh2mhx.theConfig.breasts:
+    if mhx_main.theConfig.breasts:
         amt += rig_body_25.BreastArmature
     writeArmature(fp, amt, True)
     return
 
 def writeControlPoses(fp):
     writeBoneGroups(fp)
-    if mh2mhx.theConfig.useRig == 'mhx':            
+    if mhx_main.theConfig.useRig == 'mhx':            
         rig_body_25.BodyControlPoses(fp)
         rig_shoulder_25.ShoulderControlPoses(fp)
         rig_arm_25.ArmControlPoses(fp)
@@ -1909,14 +1909,14 @@ def writeControlPoses(fp):
         #rig_toe_25.ToeControlPoses(fp)
         rig_face_25.FaceControlPoses(fp)
         rig_panel_25.PanelControlPoses(fp)
-    elif mh2mhx.theConfig.useRig == 'blenrig':
+    elif mhx_main.theConfig.useRig == 'blenrig':
         blenrig_rig.BlenrigWritePoses(fp)
-    elif mh2mhx.theConfig.useRig == 'rigify':
+    elif mhx_main.theConfig.useRig == 'rigify':
         rigify_rig.RigifyWritePoses(fp)
         rig_face_25.FaceControlPoses(fp)
         rig_panel_25.PanelControlPoses(fp)
         
-    if mh2mhx.theConfig.breasts:
+    if mhx_main.theConfig.breasts:
         rig_body_25.BreastControlPoses(fp)
 
     return
@@ -1928,7 +1928,7 @@ def writeAllActions(fp):
     return
 
 def writeAllDrivers(fp):
-    if mh2mhx.theConfig.useRig == 'mhx':      
+    if mhx_main.theConfig.useRig == 'mhx':      
         writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_L")
         writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_R")
         writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_L")
@@ -1939,14 +1939,14 @@ def writeAllDrivers(fp):
         writePropDrivers(fp, fingDrivers, "_L")            
         writePropDrivers(fp, fingDrivers, "_R")            
         #rig_panel_25.FingerControlDrivers(fp)
-        writeMuscleDrivers(fp, rig_shoulder_25.ShoulderDeformDrivers, mh2mhx.theHuman)
-        writeMuscleDrivers(fp, rig_arm_25.ArmDeformDrivers, mh2mhx.theHuman)
-        writeMuscleDrivers(fp, rig_leg_25.LegDeformDrivers, mh2mhx.theHuman)
+        writeMuscleDrivers(fp, rig_shoulder_25.ShoulderDeformDrivers, mhx_main.theHuman)
+        writeMuscleDrivers(fp, rig_arm_25.ArmDeformDrivers, mhx_main.theHuman)
+        writeMuscleDrivers(fp, rig_leg_25.LegDeformDrivers, mhx_main.theHuman)
         rig_face_25.FaceDeformDrivers(fp)
-    elif mh2mhx.theConfig.useRig == 'blenrig':            
+    elif mhx_main.theConfig.useRig == 'blenrig':            
         drivers = blenrig_rig.getBlenrigDrivers()
         writeDrivers(fp, True, drivers)
-    elif mh2mhx.theConfig.useRig == 'rigify':            
+    elif mhx_main.theConfig.useRig == 'rigify':            
         rig_face_25.FaceDeformDrivers(fp)        
     return
 
@@ -1956,7 +1956,7 @@ def writeAllProperties(fp, typ):
     props = ObjectProps
     for (key, val) in props:
         fp.write("  Property %s %s ;\n" % (key, val))
-    if mh2mhx.theConfig.expressions:
+    if mhx_main.theConfig.expressions:
         fp.write("#if toggle&T_Face\n")
         for skey in read_expression.Expressions:
             fp.write(
