@@ -23,8 +23,10 @@ import mhx_rig
 from mhx_rig import *
 
 ShoulderJoints = [
-    ('r-deltoidtrg',        'vl', ((0.5, 3617), (0.5, 3625))),
-    ('l-deltoidtrg',        'vl', ((0.5, 10167), (0.5, 10175))),
+    #('r-deltoidtrg',        'vl', ((0.5, 3617), (0.5, 3625))),
+    #('l-deltoidtrg',        'vl', ((0.5, 10167), (0.5, 10175))),
+    ('r-deltoidtrg',        'l', ((0.5, 'r-uparm0'), (0.5, 'r-elbow'))),
+    ('l-deltoidtrg',        'l', ((0.5, 'l-uparm0'), (0.5, 'l-elbow'))),
     ('r-deltoid',           'vl', ((0.5, 2914), (0.5, 3067))),
     ('l-deltoid',           'vl', ((0.5, 10671), (0.5, 10787))),
 
