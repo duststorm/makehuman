@@ -545,6 +545,14 @@ LegPropLRDrivers = [
     ('Ankle', 'Foot', ['LegIkToAnkle'], '1-x1'),
 ]
 
+LegPropDrivers = [
+    ('UpLeg_L', 'LimitRot', ['RotationLimits'], 'x1'),
+    ('LoLeg_L', 'LimitRot', ['RotationLimits'], 'x1'),    
+
+    ('UpLeg_R', 'LimitRot', ['RotationLimits'], 'x1'),
+    ('LoLeg_R', 'LimitRot', ['RotationLimits'], 'x1'),    
+]
+
 #
 #   LegDeformDrivers
 #   Bone : (constraint, driver, rotdiff, keypoints)

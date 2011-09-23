@@ -341,6 +341,19 @@ BodyPropDrivers = [
     ('Shoulders', 'LimitDist', ['SpineStretch', 'SpineInvert'], '(1-x1)*(1-x2)'),
     
     ('Spine3', 'IK', ['SpineIk', 'SpineInvert'], 'x1*(1-x2)'),
+    
+    ('Hips', 'LimitRot', ['RotationLimits'], 'x1'),    
+    ('Spine1', 'LimitRot', ['RotationLimits'], 'x1'),    
+    ('Spine2', 'LimitRot', ['RotationLimits'], 'x1'),    
+    ('Spine3', 'LimitRot', ['RotationLimits'], 'x1'),    
+    ('Neck', 'LimitRot', ['RotationLimits'], 'x1'),    
+    ('Head', 'LimitRot', ['RotationLimits'], 'x1'),    
+    
+    ('DownHips', 'LimitRot', ['RotationLimits'], 'x1'),    
+    ('DownSpine1', 'LimitRot', ['RotationLimits'], 'x1'),    
+    ('DownSpine2', 'LimitRot', ['RotationLimits'], 'x1'),    
+    ('DownSpine3', 'LimitRot', ['RotationLimits'], 'x1'),    
+    ('DownNeck', 'LimitRot', ['RotationLimits'], 'x1'),    
 ]
 
 #

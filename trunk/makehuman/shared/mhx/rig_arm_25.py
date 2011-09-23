@@ -237,8 +237,8 @@ ArmArmature = [
     ('DfmHand_R',         handRoll, 'DfmLoArm3_R', F_DEF, L_DMAIN, NoBB),
     
     # Muscles
-    ('DfmBiceps_L',       0, 'ArmLoc_L', F_DEF, L_MSCL, NoBB),
-    ('DfmBiceps_R',       0, 'ArmLoc_R', F_DEF, L_MSCL, NoBB),    
+    #('DfmBiceps_L',       0, 'ArmLoc_L', F_DEF, L_MSCL, NoBB),
+    #('DfmBiceps_R',       0, 'ArmLoc_R', F_DEF, L_MSCL, NoBB),    
     ('BicepsTrg_L',       0, 'LoArm_L', 0, L_HELP, NoBB),
     ('BicepsTrg_R',       0, 'LoArm_R', 0, L_HELP, NoBB),
 
@@ -456,6 +456,7 @@ def ArmControlPoses(fp):
     copyDeform(fp, 'DfmHand_R', 'Hand_R', DmodHand, U_LOC+U_ROT, None, [])
     
     # Muscles
+    """
     addPoseBone(fp, 'DfmBiceps_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
         [('StretchTo', C_STRVOL, 1, ['Stretch', 'BicepsTrg_L', 1]),
          #('IK', 0, 1, ['IK', 'BicepsTrg_L', 1, None, (True, False,True)])
@@ -465,6 +466,7 @@ def ArmControlPoses(fp):
         [('StretchTo', C_STRVOL, 1, ['Stretch', 'BicepsTrg_R', 1]),
          #('IK', 0, 1, ['IK', 'BicepsTrg_R', 1, None, (True, False,True)])
         ])
+    """
 
     return
     
@@ -509,6 +511,15 @@ ArmPropLRDrivers = [
     ('Shoulder', 'Root', ['ArmHinge'], 'x1'),
     ('ElbowPT', 'Hand', ['ElbowFollowsWrist'], 'x1'),
     ('ElbowPT', 'Shoulder', ['ElbowFollowsWrist'], '1-x1'),
+]
+
+ArmPropDrivers = [
+    ('UpArm_L', 'LimitRot', ['RotationLimits'], 'x1'),
+    ('LoArm_L', 'LimitRot', ['RotationLimits'], 'x1'),    
+    ('Hand_L', 'LimitRot', ['RotationLimits'], 'x1'),
+    ('UpArm_R', 'LimitRot', ['RotationLimits'], 'x1'),
+    ('LoArm_R', 'LimitRot', ['RotationLimits'], 'x1'),    
+    ('Hand_R', 'LimitRot', ['RotationLimits'], 'x1'),
  ]
 
 #

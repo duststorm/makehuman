@@ -901,7 +901,7 @@ def addLimitRotConstraint(fp, flags, inf, data):
     (xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
     (usex, usey, usez) = data[2]
     (ownsp, targsp, active, expanded) = constraintFlags(flags)
-    ltra = boolString(flags & C_LTRA == 0)
+    ltra = boolString(flags & C_LTRA)
     
     if Mhx25:
         fp.write(    
@@ -1929,8 +1929,10 @@ def writeAllActions(fp):
 
 def writeAllDrivers(fp):
     if mhx_main.theConfig.useRig == 'mhx':      
+        writePropDrivers(fp, rig_arm_25.ArmPropDrivers, "")
         writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_L")
         writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_R")
+        writePropDrivers(fp, rig_leg_25.LegPropDrivers, "")
         writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_L")
         writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_R")
         writePropDrivers(fp, rig_body_25.BodyPropDrivers, "")

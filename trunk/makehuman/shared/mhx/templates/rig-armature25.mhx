@@ -108,6 +108,9 @@ end Armature
   Property LegStretch_R 0.1 Right_leg_stretch_amount ;
   PropKeys LegStretch_R "min":0.0,"max":1.0, ;
 
+  Property RotationLimits 0.8 Influence_of_rotation_limit_constraints ;
+  PropKeys RotationLimits "min":0.0,"max":1.0, ;
+
   *** properties Object
 end Object
 
