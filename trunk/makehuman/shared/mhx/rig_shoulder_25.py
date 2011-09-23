@@ -89,6 +89,8 @@ ShoulderHeadsTails = [
     ('ShoulderEnd_R',       'l-uparm0', ('l-uparm0', yunit)),
     ('Shoulder_L',          'r-uparm0', ('r-uparm0', yunit)),
     ('Shoulder_R',          'l-uparm0', ('l-uparm0', yunit)),
+    ('ArmLoc_L',            'r-uparm0', ('r-uparm0', yunit)),
+    ('ArmLoc_R',            'l-uparm0', ('l-uparm0', yunit)),
 
     # Scapula
     
@@ -146,6 +148,8 @@ ShoulderArmature = [
     ('ShoulderEnd_R',      0, 'Clavicle_R', 0, L_HELP, NoBB),
     ('Shoulder_L',         0, 'ShoulderEnd_L', F_WIR+F_NOROT, L_LARMFK+L_LARMIK, NoBB),
     ('Shoulder_R',         0, 'ShoulderEnd_R', F_WIR+F_NOROT, L_RARMFK+L_RARMIK, NoBB),
+    ('ArmLoc_L',           0, None, 0, L_HELP, NoBB),
+    ('ArmLoc_R',           0, None, 0, L_HELP, NoBB),
 
     # Scapula
     ('ShoulderPivot_L',    0, 'Sternum', 0, L_HELP, NoBB),
@@ -230,6 +234,12 @@ def ShoulderControlPoses(fp):
     addPoseBone(fp, 'Shoulder_R', 'MHBall025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
         [('CopyRot', 0, 1, ['Shoulder', 'ShoulderEnd_R', (1,1,1), (0,0,0), False]),
          ('CopyRot', 0, 0, ['Root', 'BendRoot', (1,1,1), (0,0,0), False])])
+
+    addPoseBone(fp, 'ArmLoc_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+    	[('CopyTrans', 0, 1, ['Shoulder', 'Shoulder_L', 0])])
+
+    addPoseBone(fp, 'ArmLoc_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+    	[('CopyTrans', 0, 1, ['Shoulder', 'Shoulder_R', 0])])
 
     # Muscles
     addPoseBone(fp, 'Deltoid_L', 'MHDeltoid', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
