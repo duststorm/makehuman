@@ -255,43 +255,43 @@ def ShoulderControlPoses(fp):
          [('CopyLoc', 0, 1, ['CopyLoc', 'DeltoidTrg1_R', (1,1,1), (0,0,0), 0, False])])
 
     addPoseBone(fp, 'DfmDeltoid_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Up', 'Deltoid_L', 0])])
+        [('StretchTo', 0, 1, ['Up', 'Deltoid_L', 0, 1])])
 
     addPoseBone(fp, 'DfmDeltoid_R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Up', 'Deltoid_R', 0])])
+        [('StretchTo', 0, 1, ['Up', 'Deltoid_R', 0, 1])])
 
 
     addPoseBone(fp, 'DfmPect1_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_L', 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_L', 1, 1])])
 
     addPoseBone(fp, 'DfmPect1_R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_R', 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_R', 1, 1])])
 
     addPoseBone(fp, 'DfmPect2_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_L', 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_L', 1, 1])])
 
     addPoseBone(fp, 'DfmPect2_R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_R', 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_R', 1, 1])])
 
 
     addPoseBone(fp, 'DfmTrap1_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-         [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_L', 1])])
+         [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_L', 1, 1])])
 
     addPoseBone(fp, 'DfmTrap1_R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_R', 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_R', 1, 1])])
 
     addPoseBone(fp, 'DfmTrap2_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-         [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_L', 1])])
+         [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_L', 1, 1])])
 
     addPoseBone(fp, 'DfmTrap2_R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_R', 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_R', 1, 1])])
 
 
     addPoseBone(fp, 'DfmLat_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_L', 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_L', 1, 1])])
 
     addPoseBone(fp, 'DfmLat_R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_R', 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_R', 1, 1])])
 
 
     # Scapula

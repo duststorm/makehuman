@@ -423,7 +423,7 @@ def addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags, constr
 
 def addStretchBone(fp, bone, target, parent):
     addPoseBone(fp, bone, None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
-        [('StretchTo', 0, 1, ['Stretch', target, 0]),
+        [('StretchTo', 0, 1, ['Stretch', target, 0, 1]),
           ('LimitScale', C_OW_LOCAL, 0, ['LimitScale', (0,0, 0,0, 0,0), (0,1,0)])])
     #addPoseBone(fp, target, None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
      #    [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-deg90,deg90, 0,0, -deg90,deg90), (1,1,1)])])
@@ -1128,6 +1128,7 @@ def addStretchToConstraint(fp, flags, inf, data):
     name = data[0]
     subtar = data[1]
     head_tail = data[2]
+    bulge = data[3]
     (ownsp, targsp, active, expanded) = constraintFlags(flags)
     if flags & C_STRVOL:
         volume = 'VOLUME_XZX'
@@ -1144,7 +1145,7 @@ def addStretchToConstraint(fp, flags, inf, data):
 "      target Refer Object %s ;\n" % (mhx_main.theHuman) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
-"      bulge 1 ;\n" +
+"      bulge %.2f ;\n" % bulge +
 "      head_tail %s ;\n" % head_tail +
 "      influence %s ;\n" % inf +
 "      keep_axis '%s' ;\n" % axis +

@@ -493,40 +493,40 @@ def RigifyWritePoses(fp):
 	mhx_rig.addPoseBone(fp, 'MCH-deltoid_target.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
 	mhx_rig.addPoseBone(fp, 'DEF-pect1.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.L', 0])])
+		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.L', 0, 1])])
 
 	mhx_rig.addPoseBone(fp, 'DEF-pect2.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.L', 0])])
+		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.L', 0, 1])])
 
 	mhx_rig.addPoseBone(fp, 'DEF-pect1.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.R', 0])])
+		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.R', 0, 1])])
 
 	mhx_rig.addPoseBone(fp, 'DEF-pect2.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.R', 0])])
+		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.R', 0, 1])])
 
 	mhx_rig.addPoseBone(fp, 'DEF-lat.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.L', 0])])
+		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.L', 0, 1])])
 
 	mhx_rig.addPoseBone(fp, 'DEF-lat.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.R', 0])])
+		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.R', 0, 1])])
 
 	mhx_rig.addPoseBone(fp, 'DEF-trap.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.L', 0])])
+		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.L', 0, 1])])
 
 	mhx_rig.addPoseBone(fp, 'DEF-trap.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.R', 0])])
+		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.R', 0, 1])])
 
 	mhx_rig.addPoseBone(fp, 'DEF-deltoid.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('StretchTo', 0, 1, ['Stretch_To', 'MCH-deltoid_target.L', 1])])
+		[('StretchTo', 0, 1, ['Stretch_To', 'MCH-deltoid_target.L', 1, 1])])
 
 	mhx_rig.addPoseBone(fp, 'DEF-deltoid.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('StretchTo', 0, 1, ['Stretch_To', 'MCH-deltoid_target.R', 1])])
+		[('StretchTo', 0, 1, ['Stretch_To', 'MCH-deltoid_target.R', 1, 1])])
 
 	mhx_rig.addPoseBone(fp, 'MCH-breast_target', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('CopyRot', 0+C_OW_LOCAL+C_TG_LOCAL, 0.5, ['Copy_Rotation', 'ribs', (1,1,1), (0,0,0), False])])
 
 	mhx_rig.addPoseBone(fp, 'DEF-breast', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('StretchTo', 0, 1, ['Stretch_To', 'MCH-breast_target', 1])])
+		[('StretchTo', 0, 1, ['Stretch_To', 'MCH-breast_target', 1, 1])])
 
 	mhx_rig.addPoseBone(fp, 'thigh.L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
@@ -569,19 +569,19 @@ def RigifyWritePoses(fp):
 	mhx_rig.addPoseBone(fp, 'MCH-stomach_target', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
 	mhx_rig.addPoseBone(fp, 'DEF-stomach', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('StretchTo', 0, 1, ['Stretch_To', 'MCH-stomach_target', 1])])
+		[('StretchTo', 0, 1, ['Stretch_To', 'MCH-stomach_target', 1, 1])])
 
 	mhx_rig.addPoseBone(fp, 'DEF-butt.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('StretchTo', 0, 1, ['Stretch_To', 'thigh.R', 0])])
+		[('StretchTo', 0, 1, ['Stretch_To', 'thigh.R', 0, 1])])
 
 	mhx_rig.addPoseBone(fp, 'DEF-hip.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('StretchTo', 0, 1, ['Stretch_To', 'thigh.R', 0])])
+		[('StretchTo', 0, 1, ['Stretch_To', 'thigh.R', 0, 1])])
 
 	mhx_rig.addPoseBone(fp, 'DEF-butt.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('StretchTo', 0, 1, ['Stretch_To', 'thigh.L', 0])])
+		[('StretchTo', 0, 1, ['Stretch_To', 'thigh.L', 0, 1])])
 
 	mhx_rig.addPoseBone(fp, 'DEF-hip.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
-		[('StretchTo', 0, 1, ['Stretch_To', 'thigh.L', 0])])
+		[('StretchTo', 0, 1, ['Stretch_To', 'thigh.L', 0, 1])])
 
 	return
 
