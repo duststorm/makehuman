@@ -61,25 +61,28 @@ LegJoints = [
     ('l-knee-head',         'v', 6865),
     ('l-knee-tail',         'v', 6779),
 
-    ('r-glutes-head',       'vl', ((0.1, 6564), (0.9, 2119))),
-    ('r-glutes-tail',       'l', ((0.6, 'r-upper-leg'), (0.4, 'r-knee'))),
-    ('l-glutes-head',       'vl', ((0.1, 6748), (0.9, 7482))),
-    ('l-glutes-tail',       'l', ((0.6, 'l-upper-leg'), (0.4, 'l-knee'))),
+    ('r-butt',              'v', 4475),
+    ('l-butt',              'v', 6890),
 
-    ('r-tensor-head',       'vl', ((0.4, 3042), (0.6, 2929))),
-    ('r-tensor-tail',       'l', ((0.8, 'r-upper-leg'), (0.2, 'r-knee'))),
-    ('l-tensor-head',       'vl', ((0.4, 7280), (0.6, 7307))),
-    ('l-tensor-tail',       'l', ((0.8, 'l-upper-leg'), (0.2, 'l-knee'))),
+    ('r-legback-head',      'vl', ((0.1, 6562), (0.9, 2120))),
+    ('r-legback-tail',      'vl', ((0.1, 3942), (0.9, 3841))),
+    ('l-legback-head',      'vl', ((0.1, 6750), (0.9, 7481))),
+    ('l-legback-tail',      'vl', ((0.1, 7067), (0.9, 7168))),
 
-    ('r-rectus-head',       'vl', ((0.8, 6558), (0.2, 4471))),
-    ('r-rectus-tail',       'l', ((0.8, 'r-upper-leg'), (0.2, 'r-knee'))),
-    ('l-rectus-head',       'vl', ((0.8, 6754), (0.2, 6894))),
-    ('l-rectus-tail',       'l', ((0.8, 'l-upper-leg'), (0.2, 'l-knee'))),
+    ('r-legout-head',       'vl', ((0.4, 3042), (0.6, 2929))),
+    ('r-legout-tail',       'vl', ((0.7, 3973), (0.3, 3832))),
+    ('l-legout-head',       'vl', ((0.4, 7280), (0.6, 7307))),
+    ('l-legout-tail',       'vl', ((0.7, 7035), (0.3, 7177))),
+
+    ('r-legfront-head',     'vl', ((0.8, 6558), (0.2, 4471))),
+    ('r-legfront-tail',     'vl', ((0.7, 3942), (0.3, 3841))),
+    ('l-legfront-head',     'vl', ((0.8, 6754), (0.2, 6894))),
+    ('l-legfront-tail',     'vl', ((0.7, 7067), (0.3, 7168))),
     
     ('r-gastro-head',       'vl', ((0.2, 4105), (0.8, 5714))),
-    ('r-gastro-tail',       'l', ((0.2, 'r-upper-leg'), (0.8, 'r-knee'))),
+    ('r-gastro-tail',       'l', ((0.1, 'r-upper-leg'), (0.9, 'r-knee'))),
     ('l-gastro-head',       'vl', ((0.2, 6942), (0.8, 6768))),
-    ('l-gastro-tail',       'l', ((0.2, 'l-upper-leg'), (0.8, 'l-knee'))),
+    ('l-gastro-tail',       'l', ((0.1, 'l-upper-leg'), (0.9, 'l-knee'))),
 ]
 
 LegHeadsTails = [
@@ -109,34 +112,51 @@ LegHeadsTails = [
     ('FootRev_R',       'l-foot-1', 'l-ankle'),
 
     # Deform 
-    ('DfmUpLeg_L',      'r-upper-leg', 'r-knee'),
+    ('UpLeg1_L',        'r-upper-leg', 'r-upleg1'),
+    ('DfmUpLeg2_L',     'r-upleg1', 'r-upleg2'),
+    ('DfmUpLeg3_L',     'r-upleg2', 'r-knee'),
     ('DfmLoLeg_L',      'r-knee', 'r-ankle'),
     ('DfmLoLegFan_L',   'r-knee', 'r-loleg-fan'),
     ('DfmFoot_L',       'r-ankle', 'r-foot-1'),
     ('DfmToe_L',        'r-foot-1', 'r-foot-2'),
 
-    ('DfmUpLeg_R',      'l-upper-leg', 'l-knee'),
+    ('UpLeg1_R',        'l-upper-leg', 'l-upleg1'),
+    ('DfmUpLeg2_R',     'l-upleg1', 'l-upleg2'),
+    ('DfmUpLeg3_R',     'l-upleg2', 'l-knee'),
     ('DfmLoLeg_R',      'l-knee', 'l-ankle'),
     ('DfmLoLegFan_R',   'l-knee', 'l-loleg-fan'),
     ('DfmFoot_R',       'l-ankle', 'l-foot-1'),
     ('DfmToe_R',        'l-foot-1', 'l-foot-2'),
 
+    # Tweaks
+    ('UpLegRot_L',      'r-upper-leg', 'r-legtrg'),
+    ('UpLegRot_R',      'l-upper-leg', 'l-legtrg'),
+    
+    ('DfmButt_L',       'r-upper-leg', 'r-butt'),
+    ('Butt_L',          'r-butt', ('r-butt', yunit)),
+    ('DfmButt_R',       'l-upper-leg', 'l-butt'),
+    ('Butt_R',          'l-butt', ('l-butt', yunit)),
+
+    # Inverse stretching targets
+    ('UpLeg3Inv_L',     'r-knee', 'r-upleg2'),
+    ('UpLeg3Inv_R',     'l-knee', 'l-upleg2'),
+
     # Muscles
-    ('DfmGlutes_L',     'r-glutes-head', 'r-glutes-tail'),
-    ('DfmGlutes_R',     'l-glutes-head', 'l-glutes-tail'),
-    ('DfmTensor_L',     'r-tensor-head', 'r-tensor-tail'),
-    ('DfmTensor_R',     'l-tensor-head', 'l-tensor-tail'),
-    ('DfmRectus_L',     'r-rectus-head', 'r-rectus-tail'),
-    ('DfmRectus_R',     'l-rectus-head', 'l-rectus-tail'),
+    ('DfmLegback_L',    'r-legback-head', 'r-legback-tail'),
+    ('DfmLegback_R',    'l-legback-head', 'l-legback-tail'),
+    ('DfmLegOut_L',     'r-legout-head', 'r-legout-tail'),
+    ('DfmLegOut_R',     'l-legout-head', 'l-legout-tail'),
+    ('DfmLegFront_L',   'r-legfront-head', 'r-legfront-tail'),
+    ('DfmLegFront_R',   'l-legfront-head', 'l-legfront-tail'),
     ('DfmGastro_L',     'r-gastro-head', 'r-gastro-tail'),
     ('DfmGastro_R',     'l-gastro-head', 'l-gastro-tail'),
 
-    ('GlutesTrg_L',     'r-upper-leg', 'r-glutes-tail'),
-    ('GlutesTrg_R',     'l-upper-leg', 'l-glutes-tail'),
-    ('TensorTrg_L',     'r-knee', 'r-tensor-tail'),
-    ('TensorTrg_R',     'l-knee', 'l-tensor-tail'),
-    ('RectusTrg_L',     'r-knee', 'r-rectus-tail'),
-    ('RectusTrg_R',     'l-knee', 'l-rectus-tail'),
+    ('LegbackTrg_L',    'r-upper-leg', 'r-legback-tail'),
+    ('LegbackTrg_R',    'l-upper-leg', 'l-legback-tail'),
+    ('LegOutTrg_L',     'r-knee', 'r-legout-tail'),
+    ('LegOutTrg_R',     'l-knee', 'l-legout-tail'),
+    ('LegFrontTrg_L',   'r-knee', 'r-legfront-tail'),
+    ('LegFrontTrg_R',   'l-knee', 'l-legfront-tail'),
     ('GastroTrg_L',     'r-knee', 'r-gastro-tail'),
     ('GastroTrg_R',     'l-knee', 'l-gastro-tail'),
 
@@ -145,10 +165,6 @@ LegHeadsTails = [
     ('KneeTrg_L',       'r-knee-tail', ('r-knee-tail', yunit)),
     ('DfmKnee_R',       'l-knee-head', 'l-knee-tail'),
     ('KneeTrg_R',       'l-knee-tail', ('l-knee-tail', yunit)),
-
-    # Tweaks
-    ('UpLegRot_L',      'r-upper-leg', 'r-legtrg'),
-    ('UpLegRot_R',      'l-upper-leg', 'l-legtrg'),
 
     # Pole Targets
     ('LegTrg_L',        'r-upper-leg', 'r-legtrg'),
@@ -225,41 +241,55 @@ LegArmature = [
     ('ToePT_R',         0.0, 'ToeRev_R', 0, L_HELP, NoBB),
 
     # Deform
-    ('DfmUpLeg_L',      upLegRoll, 'DfmHips', F_DEF+F_NOSCALE, L_DMAIN, NoBB),
-    ('DfmLoLeg_L',      loLegRoll, 'DfmUpLeg_L', F_DEF+F_NOSCALE, L_DMAIN, NoBB),
-    ('DfmLoLegFan_L',   loLegRoll, 'DfmUpLeg_L', F_DEF, L_DEF, NoBB),
+    ('UpLeg1_L',        upLegRoll, 'DfmHips', F_NOSCALE, L_DMAIN, NoBB),
+    ('DfmUpLeg2_L',     upLegRoll, 'UpLeg1_L', F_DEF+F_CON+F_NOSCALE, L_DMAIN,(0,0,5) ),
+    ('DfmUpLeg3_L',     upLegRoll, 'DfmUpLeg2_L', F_DEF+F_CON+F_NOSCALE, L_DMAIN, NoBB),
+    ('DfmLoLeg_L',      loLegRoll, 'DfmUpLeg3_L', F_DEF+F_NOSCALE, L_DMAIN, NoBB),
+    ('DfmLoLegFan_L',   loLegRoll, 'DfmUpLeg3_L', F_DEF, L_DEF, NoBB),
     ('DfmFoot_L',       footRoll, 'DfmLoLeg_L', F_DEF+F_CON, L_DMAIN, NoBB),
     ('DfmToe_L',        toeRoll, 'DfmFoot_L', F_DEF, L_DMAIN, NoBB),
 
-    ('DfmUpLeg_R',      upLegRoll, 'DfmHips', F_DEF+F_NOSCALE, L_DMAIN, NoBB),
-    ('DfmLoLeg_R',      -loLegRoll, 'DfmUpLeg_R', F_DEF+F_NOSCALE, L_DMAIN, NoBB),
-    ('DfmLoLegFan_R',   -loLegRoll, 'DfmUpLeg_R', F_DEF, L_DEF, NoBB),
+    ('UpLeg1_R',        upLegRoll, 'DfmHips', F_NOSCALE, L_DMAIN, NoBB),
+    ('DfmUpLeg2_R',     upLegRoll, 'UpLeg1_R', F_DEF+F_CON+F_NOSCALE, L_DMAIN,(0,0,5) ),
+    ('DfmUpLeg3_R',     upLegRoll, 'DfmUpLeg2_R', F_DEF+F_CON+F_NOSCALE, L_DMAIN, NoBB),
+    ('DfmLoLeg_R',      -loLegRoll, 'DfmUpLeg3_R', F_DEF+F_NOSCALE, L_DMAIN, NoBB),
+    ('DfmLoLegFan_R',   -loLegRoll, 'DfmUpLeg3_R', F_DEF, L_DEF, NoBB),
     ('DfmFoot_R',       -footRoll, 'DfmLoLeg_R', F_DEF+F_CON, L_DMAIN, NoBB),
     ('DfmToe_R',        -toeRoll, 'DfmFoot_R', F_DEF, L_DMAIN, NoBB),
 
+    # Inverse stretching targets
+    ('UpLeg3Inv_L'  ,   0, 'UpLeg_L', 0, L_HELP, NoBB),
+    ('UpLeg3Inv_R'  ,   0, 'UpLeg_R', 0, L_HELP, NoBB),
+
+    # Butt
+    ('Butt_L',          0.0, 'UpLeg1_L', F_WIR, L_LTWEAK, NoBB),
+    ('DfmButt_L',       0.0, 'Hip_L', F_DEF, L_MSCL, NoBB),
+    ('Butt_R',          0.0, 'UpLeg1_R', F_WIR, L_RTWEAK, NoBB),
+    ('DfmButt_R',       0.0, 'Hip_R', F_DEF, L_MSCL, NoBB),
+
     # Muscles
-    ('DfmGlutes_L',     0, 'DfmHips', F_DEF, L_MSCL, NoBB),
-    ('DfmGlutes_R',     0, 'DfmHips', F_DEF, L_MSCL, NoBB),
-    ('DfmTensor_L',     0, 'DfmHips', F_DEF, L_MSCL, NoBB),
-    ('DfmTensor_R',     0, 'DfmHips', F_DEF, L_MSCL, NoBB),
-    ('DfmRectus_L',     0, 'DfmHips', F_DEF, L_MSCL, NoBB),
-    ('DfmRectus_R',     0, 'DfmHips', F_DEF, L_MSCL, NoBB),
+    ('DfmLegback_L',    0, 'DfmHips', F_DEF, L_MSCL, NoBB),
+    ('DfmLegback_R',    0, 'DfmHips', F_DEF, L_MSCL, NoBB),
+    ('DfmLegOut_L',     0, 'DfmHips', F_DEF, L_MSCL, NoBB),
+    ('DfmLegOut_R',     0, 'DfmHips', F_DEF, L_MSCL, NoBB),
+    ('DfmLegFront_L',   0, 'DfmHips', F_DEF, L_MSCL, NoBB),
+    ('DfmLegFront_R',   0, 'DfmHips', F_DEF, L_MSCL, NoBB),
     ('DfmGastro_L',     0, 'DfmLoLeg_L', F_DEF, L_MSCL, NoBB),
     ('DfmGastro_R',     0, 'DfmLoLeg_R', F_DEF, L_MSCL, NoBB),
 
-    ('GlutesTrg_L',     0, 'UpLeg_L', 0, L_HELP, NoBB),
-    ('GlutesTrg_R',     0, 'UpLeg_R', 0, L_HELP, NoBB),
-    ('TensorTrg_L',     0, 'UpLeg_L', 0, L_HELP, NoBB),
-    ('TensorTrg_R',     0, 'UpLeg_R', 0, L_HELP, NoBB),
-    ('RectusTrg_L',     0, 'UpLeg_L', 0, L_HELP, NoBB),
-    ('RectusTrg_R',     0, 'UpLeg_R', 0, L_HELP, NoBB),
-    ('GastroTrg_L',     0, 'UpLeg_L', 0, L_HELP, NoBB),
-    ('GastroTrg_R',     0, 'UpLeg_R', 0, L_HELP, NoBB),
+    ('LegbackTrg_L',    0, 'UpLeg1_L', 0, L_HELP, NoBB),
+    ('LegbackTrg_R',    0, 'UpLeg1_R', 0, L_HELP, NoBB),
+    ('LegOutTrg_L',     0, 'UpLeg1_L', 0, L_HELP, NoBB),
+    ('LegOutTrg_R',     0, 'UpLeg1_R', 0, L_HELP, NoBB),
+    ('LegFrontTrg_L',   0, 'UpLeg1_L', 0, L_HELP, NoBB),
+    ('LegFrontTrg_R',   0, 'UpLeg1_R', 0, L_HELP, NoBB),
+    ('GastroTrg_L',     0, 'DfmUpLeg3_L', 0, L_HELP, NoBB),
+    ('GastroTrg_R',     0, 'DfmUpLeg3_R', 0, L_HELP, NoBB),
 
     # Knee deform
-    #('DfmKnee_L',       0, 'DfmUpLeg_L', F_DEF, L_DEF, NoBB),
+    #('DfmKnee_L',       0, 'DfmUpLeg3_L', F_DEF, L_DEF, NoBB),
     #('KneeTrg_L',       0, 'LoLeg_L', 0, L_HELP, NoBB),
-    #('DfmKnee_R',       0, 'DfmUpLeg_R', F_DEF, L_DEF, NoBB),
+    #('DfmKnee_R',       0, 'DfmUpLeg3_R', F_DEF, L_DEF, NoBB),
     #('KneeTrg_R',       0, 'LoLeg_R', 0, L_HELP, NoBB),
 
 ]
@@ -390,7 +420,7 @@ def LegControlPoses(fp):
     addPoseBone(fp, 'LegTrg_L', None, 'FK_L', (1,1,1), (1,0,1), (1,1,1), (1,1,1), P_YXZ, 
          [('IK', 0, 1, ['LegIK', 'LoLeg_L', 1, None, (True, False,True)])])
 
-    addPoseBone(fp, 'UpLegRot_L', 'GZM_Circle10', 'IK_L', (1,1,1), (1,0,1), (1,1,1), (1,1,1), P_YXZ, 
+    addPoseBone(fp, 'UpLegRot_L', 'GZM_Circle10', None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), P_YXZ, 
          [('IK', 0, 1, ['LegIK', 'LoLeg_L', 1, None, (True, False,True)])])
 
 
@@ -404,14 +434,20 @@ def LegControlPoses(fp):
     addPoseBone(fp, 'LegTrg_R', None, 'FK_R', (1,1,1), (1,0,1), (1,1,1), (1,1,1), P_YXZ, 
          [('IK', 0, 1, ['LegIK', 'LoLeg_R', 1, None, (True, False,True)])])
 
-    addPoseBone(fp, 'UpLegRot_R', 'GZM_Circle10', 'IK_R', (1,1,1), (1,0,1), (1,1,1), (1,1,1), P_YXZ, 
+    addPoseBone(fp, 'UpLegRot_R', 'GZM_Circle10', None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), P_YXZ, 
          [('IK', 0, 1, ['LegIK', 'LoLeg_R', 1, None, (True, False,True)])])
 
     deltaUpLeg = 0
 
     # Deform 
-    copyDeform(fp, 'DfmUpLeg_L', 'UpLeg_L', DmodUpLeg, U_LOC+U_ROT, None, 
-        [('StretchTo', 0, 1, ['Stretch', 'LoLeg_L', 0, 1])])
+    copyDeformPartial(fp, 'UpLeg1_L', 'UpLeg_L', (1,0,1), DmodUpLeg, U_LOC, None, 
+        [('IK', 0, 1, ['IK', 'LoLeg_L', 1, (90*D-deltaUpLeg, 'UpLeg1PT_L'), (True, False,True)])])
+    
+    copyDeformPartial(fp, 'DfmUpLeg2_L', 'UpLeg_L', (1,1,1), DmodUpLeg, 0, None,
+        [('StretchTo', 0, 1, ['Stretch', 'UpLeg3Inv_L', 1, 1])])
+        
+    copyDeformPartial(fp, 'DfmUpLeg3_L', 'UpLeg_L', (0,1,0), DmodUpLeg, 0, None, 
+        [('IK', 0, 1, ['IK', 'LoLeg_L', 1, (90*D-deltaUpLeg, 'UpLeg2PT_L'), (True, False,True)])])
 
     copyDeform(fp, 'DfmLoLeg_L', 'LoLeg_L', DmodLoLeg, U_LOC+U_ROT, None,
         [('StretchTo', 0, 1, ['Stretch', 'Foot_L', 0, 1])])
@@ -424,8 +460,14 @@ def LegControlPoses(fp):
     copyDeform(fp, 'DfmToe_L', 'Toe_L', DmodToe, U_LOC+U_ROT, None, [])
 
 
-    copyDeform(fp, 'DfmUpLeg_R', 'UpLeg_R', DmodUpLeg, U_LOC+U_ROT, None,
-        [('StretchTo', 0, 1, ['Stretch', 'LoLeg_R', 0, 1])])
+    copyDeformPartial(fp, 'UpLeg1_R', 'UpLeg_R', (1,1,1), DmodUpLeg, U_LOC, None, 
+        [('IK', 0, 1, ['IK', 'LoLeg_R', 1, (90*D+deltaUpLeg, 'UpLeg1PT_R'), (True, False,True)])])
+    
+    copyDeformPartial(fp, 'DfmUpLeg2_R', 'UpLeg_R', (1,1,1), DmodUpLeg, 0, None,
+        [('StretchTo', 0, 1, ['Stretch', 'UpLeg3Inv_R', 1, 1])])
+        
+    copyDeformPartial(fp, 'DfmUpLeg3_R', 'UpLeg_R', (0,1,0), DmodUpLeg, 0, None,
+        [('IK', 0, 1, ['IK', 'LoLeg_R', 1, (90*D+deltaUpLeg, 'UpLeg2PT_R'), (True, False,True)])])
 
     copyDeform(fp, 'DfmLoLeg_R', 'LoLeg_R', DmodLoLeg, U_LOC+U_ROT, None,
         [('StretchTo', 0, 1, ['Stretch', 'Foot_R', 0, 1])])
@@ -437,26 +479,37 @@ def LegControlPoses(fp):
 
     copyDeform(fp, 'DfmToe_R', 'Toe_R', DmodToe, U_LOC+U_ROT, None, [])
 
+    # Tweak
+    
+    addPoseBone(fp, 'DfmButt_L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, 
+    	[('StretchTo', C_STRVOL, 1, ['Stretch', 'Butt_L', 0, 1])])
+
+    addPoseBone(fp, 'Butt_L', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+
+    addPoseBone(fp, 'DfmButt_R', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0,
+    	[('StretchTo', C_STRVOL, 1, ['Stretch', 'Butt_R', 0, 1])])
+
+    addPoseBone(fp, 'Butt_R', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
     # Muscles
 
-    addPoseBone(fp, 'DfmGlutes_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'GlutesTrg_L', 1, 20])])
+    addPoseBone(fp, 'DfmLegback_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegbackTrg_L', 1, 1])])
 
-    addPoseBone(fp, 'DfmGlutes_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'GlutesTrg_R', 1, 20])])
+    addPoseBone(fp, 'DfmLegback_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegbackTrg_R', 1, 1])])
 
-    addPoseBone(fp, 'DfmTensor_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'TensorTrg_L', 1, 10])])
+    addPoseBone(fp, 'DfmLegOut_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegOutTrg_L', 1, 1])])
 
-    addPoseBone(fp, 'DfmTensor_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'TensorTrg_R', 1, 10])])
+    addPoseBone(fp, 'DfmLegOut_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegOutTrg_R', 1, 1])])
 
-    addPoseBone(fp, 'DfmRectus_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'RectusTrg_L', 1, 10])])
+    addPoseBone(fp, 'DfmLegFront_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegFrontTrg_L', 1, 1])])
 
-    addPoseBone(fp, 'DfmRectus_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'RectusTrg_R', 1, 10])])
+    addPoseBone(fp, 'DfmLegFront_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegFrontTrg_R', 1, 1])])
 
     addPoseBone(fp, 'DfmGastro_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', C_STRVOL, 1, ['Stretch', 'GastroTrg_L', 1, 5])])
