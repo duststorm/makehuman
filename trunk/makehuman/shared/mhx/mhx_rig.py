@@ -1437,12 +1437,12 @@ def writePropDrivers(fp, drivers, suffix):
     return            
 
 #
-#   writeExpressionDrivers(fp, skeys):
+#   writeShapePropDrivers(fp, skeys, prefix):
 #
 
-def writeExpressionDrivers(fp, skeys):
+def writeShapePropDrivers(fp, skeys, prefix):
     for skey in skeys:
-        drvVar = ("x", 'SINGLE_PROP', [('OBJECT', mhx_main.theHuman, '["*%s"]' % (skey))])
+        drvVar = ("x", 'SINGLE_PROP', [('OBJECT', mhx_main.theHuman, '["%s%s"]' % (prefix, skey))])
         writeDriver(fp, True, ('SCRIPTED', "x"), "",
             "key_blocks[\"%s\"].value" % (skey), 
             -1, (0,1), [drvVar])

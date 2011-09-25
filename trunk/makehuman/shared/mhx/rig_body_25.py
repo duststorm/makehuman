@@ -383,18 +383,19 @@ def BreastControlPoses(fp):
     return
 
 #
-#    BodyShapeDrivers
-#    Shape : (driver, channel, coeff)
+#	BodyShapes
 #
 
-BodyShapeDrivers = {}
+BodyShapes = [ 
+    'Breathe' 
+]
 
 #
 #    BodyShapeKeyScale = {
 #
 
 BodyShapeKeyScale = {
-    'BreatheIn'            : ('spine1', 'neck', 1.89623),
+    'Breathe'            : ('spine1', 'neck', 1.89623),
     'BicepFlex'            : ('r-uparm-front', 'r-uparm-back', 0.93219),
 }
 

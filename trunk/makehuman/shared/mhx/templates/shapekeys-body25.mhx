@@ -1,4 +1,4 @@
-  ShapeKey BreatheIn Sym True
+  ShapeKey Breathe Sym True
     slider_min 0 ;
     slider_max 1.5 ;
     sv 2543 0.1165 -0.1432 0.0000 ;
