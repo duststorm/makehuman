@@ -36,9 +36,15 @@ BodyJoints = [
     ('neck2',          'vl', ((0.5, 6531), (0.5, 8253))),
     ('rib-top',        'vl', ((0.9, 6857), (0.1, 7457))),
     ('rib-bot',        'vl', ((0.9, 6910), (0.1, 7460))),
-    ('stomach-mid',    'vl', ((0.9, 7315), (0.1, 7489))),
+    #('stomach-mid',    'vl', ((0.9, 7315), (0.1, 7489))),    
     ('stomach-bot',    'vl', ((0.9, 7298), (0.1, 7258))),
     ('stomach-end',    'l', ((0.1, 'rib-bot'), (0.9, 'stomach-bot'))),
+    ('stomach-mid',    'l', ((0.3, 'rib-bot'), (0.7, 'stomach-end'))),
+
+    ('r-waist-up',     'vl', ((0.9, 3408), (0.1, 10356))),
+    ('l-waist-up',     'vl', ((0.1, 3408), (0.9, 10356))),
+    ('r-waist-down',   'vl', ((0.9, 2931), (0.1, 7305))),
+    ('l-waist-down',   'vl', ((0.1, 2931), (0.9, 7305))),
 
     ('penis-tip',      'v', 7415),
     ('penis-root',     'vl', ((0.5, 2792), (0.5, 7448))),
@@ -98,6 +104,14 @@ BodyHeadsTails = [
     ('Stomach',        'stomach-mid', ('stomach-mid', yunit)),
     ('DfmStomach2',    'stomach-mid', 'stomach-bot'),
     ('StomachTrg',     'root-tail', 'stomach-bot'),
+    ('StomachPar',     'rib-bot', 'stomach-mid'),
+    ('StomachStretch', 'rib-bot', 'stomach-bot'),
+
+    ('DfmWaist_L',     'r-waist-up', 'r-waist-down'),
+    ('DfmWaist_R',     'l-waist-up', 'l-waist-down'),
+    ('WaistTrg_L',     'r-waist-down', ('r-waist-down', yunit)),
+    ('WaistTrg_R',     'l-waist-down', ('l-waist-down', yunit)),
+
     ('Breathe',        'rib-bot', ('rib-bot', zunit)),
     ('Breast_L',       'r-breast', 'r-tit'),
     ('Breast_R',       'l-breast', 'l-tit'),
@@ -155,10 +169,16 @@ BodyArmature = [
 
     # Deform torso
     ('DfmRib',             0, 'DfmSpine3', F_DEF, L_DMAIN, NoBB),
+    ('StomachPar',         0, 'DfmRib', 0, L_HELP, NoBB),
     ('DfmStomach1',        0, 'DfmRib', F_DEF+F_CON, L_DMAIN, (1,1,5) ),
-    ('Stomach',            0, 'DfmSpine1', F_WIR, L_TORSO, NoBB),
+    ('Stomach',            0, 'StomachPar', F_WIR, L_TORSO, NoBB),
     ('DfmStomach2',        0, 'DfmStomach1', F_DEF+F_CON, L_DMAIN, (1,1,4) ),
     ('StomachTrg',         0, 'DfmHips', 0, L_HELP, NoBB),
+
+    ('DfmWaist_L',         0, 'DfmRib', F_DEF, L_MSCL, NoBB),
+    ('DfmWaist_R',         0, 'DfmRib', F_DEF, L_MSCL, NoBB),
+    ('WaistTrg_L',         0, 'DfmHips', 0, L_HELP, NoBB),
+    ('WaistTrg_R',         0, 'DfmHips', 0, L_HELP, NoBB),
 
     #('Breathe',            0, 'DfmRib', F_WIR, L_TORSO, NoBB),
 
@@ -297,9 +317,16 @@ def BodyControlPoses(fp):
         [('StretchTo', C_STRVOL, 1, ['Stretch', 'StomachTrg', 1, 1]),
         ])
 
-    #addPoseBone(fp, 'RibTarget', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
-    #addPoseBone(fp, 'HipBone', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
-    #addPoseBone(fp,  'Breathe', 'MHBall025', None, (1,1,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+    addPoseBone(fp,  'StomachPar',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('StretchTo', 0, 0.5, ['Stretch', 'StomachTrg', 1, 1])])
+
+
+    addPoseBone(fp,  'DfmWaist_L',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('StretchTo', C_STRVOL, 1, ['Stretch', 'WaistTrg_L', 0, 1])])
+
+    addPoseBone(fp,  'DfmWaist_R',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('StretchTo', C_STRVOL, 1, ['Stretch', 'WaistTrg_R', 0, 1])])
+
 
     addPoseBone(fp,  'Penis', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, [])
 
@@ -383,7 +410,7 @@ def BreastControlPoses(fp):
     return
 
 #
-#	BodyShapes
+#   BodyShapes
 #
 
 BodyShapes = [ 
