@@ -56,7 +56,7 @@ def exportMhx(human, filename, options):
     (name, ext) = os.path.splitext(filename)
 
     if '24' in theConfig.mhxversion:
-    	mhx_24.exportMhx(human, filename, options)
+        mhx_24.exportMhx(human, filename, options)
    
     if '25' in theConfig.mhxversion:
         theHuman = os.path.basename(name).capitalize().replace(' ','_')
@@ -367,6 +367,9 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                     fp.write("#endif\n")
                     if theConfig.breasts:
                         copyVertGroups("shared/mhx/templates/vertexgroups-breasts25.mhx", fp, proxy)    
+                    for (path, mod) in theConfig.customvertexgroups:
+                        print(path)
+                        copyVertGroups(path, fp, proxy)    
                     copyVertGroups("shared/mhx/templates/vertexgroups-leftright25.mhx", fp, proxy)    
                     if theConfig.cage and not (proxy and proxy.cage):
                         fp.write("#if toggle&T_Cage\n")
@@ -746,6 +749,10 @@ def writeShapeKeys(fp, human, rig, name, proxy):
         fp.write("#if toggle&T_Shape\n")
         copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
         fp.write("#endif\n")
+
+    for (path, mod) in theConfig.customshapes:
+        print(path)
+        copyShapeKeys(path, fp, proxy, True)    
 
     if 0 and rig != 'mhx':
         fp.write(

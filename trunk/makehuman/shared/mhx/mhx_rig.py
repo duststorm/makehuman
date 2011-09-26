@@ -31,6 +31,7 @@ import read_expression
 pi = 3.14159
 D = pi/180
 yunit = [0,1,0]
+ysmall = [0,0.5,0]
 zunit = [0,0,-1]
 ybis = [0,2,0]
 
@@ -1790,10 +1791,16 @@ def setupRig(obj):
         ArmatureProps = []
         HeadName = 'Head'
         
+        if mhx_main.theConfig.malegenitalia:
+            genitalia = "./shared/mhx/templates/vertexgroups-male25.mhx"
+        else:
+            genitalia = "./shared/mhx/templates/vertexgroups-female25.mhx"
+
         VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
                             "./shared/mhx/templates/vertexgroups-bones25.mhx",
-                            #"./shared/mhx/templates/vertexgroups-hand25.mhx", 
+                            genitalia,
                             "./shared/mhx/templates/vertexgroups-palm25.mhx"]
+                                                        
         Joints = (
             rig_joints_25.DeformJoints +
             rig_body_25.BodyJoints +
@@ -1878,6 +1885,13 @@ def setupRig(obj):
     else:
         raise NameError("Unknown rig %s" % mhx_main.theConfig.useRig)
 
+    print(mhx_main.theConfig.customrigs)
+    for (path, mod) in mhx_main.theConfig.customrigs:
+        Joints += eval("%s.Joints" % mod)
+        print(Joints)
+        HeadsTails += eval("%s.HeadsTails" % mod)
+        print(HeadsTails)
+
     newSetupJoints(obj, Joints, HeadsTails, True)
     return
     
@@ -1896,6 +1910,11 @@ def writeControlArmature(fp):
     amt = Armature    
     if mhx_main.theConfig.breasts:
         amt += rig_body_25.BreastArmature
+    if mhx_main.theConfig.malegenitalia:
+        amt += rig_body_25.MaleArmature
+    for (path, mod) in mhx_main.theConfig.customrigs:
+        amt += eval("%s.Armature" % mod)
+        print(amt)
     writeArmature(fp, amt, True)
     return
 
@@ -1919,6 +1938,12 @@ def writeControlPoses(fp):
         
     if mhx_main.theConfig.breasts:
         rig_body_25.BreastControlPoses(fp)
+    if mhx_main.theConfig.malegenitalia:
+        rig_body_25.MaleControlPoses(fp)
+    for (path, mod) in mhx_main.theConfig.customrigs:
+        expr = "%s.ControlPoses(fp)" % mod
+        print(expr)
+        exec(expr)
 
     return
 

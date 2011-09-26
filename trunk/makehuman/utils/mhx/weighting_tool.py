@@ -373,7 +373,7 @@ def symmetrizeShapes(context):
 
     verts = ob.data.vertices
     rverts = rightVerts(factor, ob.data)
-    for key in ob.data.shape_keys.keys:
+    for key in ob.data.shape_keys.keys():
         print(key.name)
         for rv in rverts.values():
             key.data[rv.index].co = rv.co
@@ -517,6 +517,7 @@ def exportVertexGroups(context):
 
         exportList(context, weights, vg.name, fp)
     fp.close()
+    print("Vertex groups exported to %s" % fileName)
     return
 
 class VIEW3D_OT_MhxExportVertexGroupsButton(bpy.types.Operator):
@@ -584,6 +585,46 @@ class VIEW3D_OT_MhxExportSumGroupsButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
+#    exportShapeKeys(filePath)
+#    class VIEW3D_OT_MhxExportShapeKeysButton(bpy.types.Operator):
+#
+
+def exportShapeKeys(context):
+    filePath = context.scene['MhxVertexGroupFile']
+    fileName = os.path.expanduser(filePath)
+    fp = open(fileName, "w")
+    ob = context.object
+    me = ob.data
+    lr = "Sym"
+    for skey in me.shape_keys.key_blocks:
+        name = skey.name.replace(' ','_')    
+        if name == "Basis":
+            continue
+        print(name)
+        fp.write("  ShapeKey %s %s True\n" % (name, lr))
+        fp.write("    slider_min %.2f ;\n" % skey.slider_min)
+        fp.write("    slider_max %.2f ;\n" % skey.slider_max)
+        for (n,pt) in enumerate(skey.data):
+           vert = me.vertices[n]
+           dv = pt.co - vert.co
+           if dv.length > Epsilon:
+               fp.write("    sv %d %.4f %.4f %.4f ;\n" %(n, dv[0], dv[1], dv[2]))
+        fp.write("  end ShapeKey\n")
+        print(skey)
+    fp.close()
+    print("Shape keys exported to %s" % fileName)
+    return
+
+class VIEW3D_OT_MhxExportShapeKeysButton(bpy.types.Operator):
+    bl_idname = "mhx.weight_export_shapekeys"
+    bl_label = "Export shapekeys"
+
+    def execute(self, context):
+        exportShapeKeys(context)
+        return{'FINISHED'}    
+
+
+#
 #    initInterface(context):
 #    class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
 #
@@ -629,7 +670,7 @@ def initInterface(context):
         scn['MhxBone2'] = 'Bone2'
         scn['MhxLeft2Right'] = True
         scn['MhxExportAsWeightFile'] = False
-        scn['MhxVertexGroupFile'] = '~/vgroups.txt'
+        scn['MhxVertexGroupFile'] = '/home/vgroups.txt'
 
     return
 
@@ -683,6 +724,7 @@ class MhxWeightToolsPanel(bpy.types.Panel):
 
         layout.separator()
         layout.operator("mhx.weight_shapekeys_from_objects")    
+        layout.operator("mhx.weight_export_shapekeys")    
 
         layout.label('Weight pair')
         layout.prop(context.scene, 'MhxWeight')

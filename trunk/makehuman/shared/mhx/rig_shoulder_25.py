@@ -89,8 +89,8 @@ ShoulderHeadsTails = [
     # Shoulder
     ('ShoulderEnd_L',       'r-uparm0', ('r-uparm0', yunit)),
     ('ShoulderEnd_R',       'l-uparm0', ('l-uparm0', yunit)),
-    ('Shoulder_L',          'r-uparm0', ('r-uparm0', yunit)),
-    ('Shoulder_R',          'l-uparm0', ('l-uparm0', yunit)),
+    ('Shoulder_L',          'r-uparm0', ('r-uparm0', ysmall)),
+    ('Shoulder_R',          'l-uparm0', ('l-uparm0', ysmall)),
     ('ArmLoc_L',            'r-uparm0', ('r-uparm0', yunit)),
     ('ArmLoc_R',            'l-uparm0', ('l-uparm0', yunit)),
 

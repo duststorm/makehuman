@@ -140,6 +140,10 @@ class CProxyConfig:
         self.bodyshapes = True
         self.cage = False
         self.breasts = False
+        self.malegenitalia = False
+        self.customrigs = []
+        self.customshapes = []
+        self.customvertexgroups = []
 
 #[('mhxversion', ['25']), ('expressions', True), ('useRig', 'mhx')]
 #[('mhxversion', ['24', '25']), ('expressions', False), ('useRig', 'game')]
@@ -194,11 +198,24 @@ def proxyConfig(human, useHair, options=None):
                     exec("cfg.%s = words[2:]" % key)
                 except:
                     pass
-            elif key in ['expressions', 'faceshapes', 'bodyshapes', 'breasts']:
+            elif key in ['expressions', 'faceshapes', 'bodyshapes', 'breasts', 'malegenitalia']:
                 try:
                     exec("cfg.%s = %s" % (key, truthValue(words[2])))
                 except:
                     pass
+            elif key in ['customrig', 'customshape', 'customvertexgroup']:
+                path = os.path.realpath(os.path.expanduser(words[2]))
+                print(path)
+                (dir,fname) = os.path.split(path)
+                print(fname)
+                (modname,ext) = os.path.splitext(fname)
+                print(modname, ext)
+                expr = 'cfg.%ss.append(("%s", "%s"))' % (key, path, modname)
+                print(expr)
+                try:
+                    exec(expr)
+                except:
+                    pass                
             elif key == 'rig':
                 try:
                     cfg.useRig = words[2].lower()

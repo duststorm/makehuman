@@ -92,8 +92,8 @@ LegJoints = [
 
 LegHeadsTails = [
     # Hip = leg location
-    ('Hip_L',           'r-upper-leg', ('r-upper-leg', yunit)),
-    ('Hip_R',           'l-upper-leg', ('l-upper-leg', yunit)),
+    ('Hip_L',           'r-upper-leg', ('r-upper-leg', ysmall)),
+    ('Hip_R',           'l-upper-leg', ('l-upper-leg', ysmall)),
 
     # Leg
     ('UpLeg_L',         'r-upper-leg', 'r-knee'),
@@ -171,9 +171,9 @@ LegHeadsTails = [
 
     # Knee deform
     ('DfmKnee_L',       'r-knee-head', 'r-knee-tail'),
-    ('KneeTrg_L',       'r-knee-tail', ('r-knee-tail', yunit)),
+    ('KneeTrg_L',       'r-knee-tail', ('r-knee-tail', ysmall)),
     ('DfmKnee_R',       'l-knee-head', 'l-knee-tail'),
-    ('KneeTrg_R',       'l-knee-tail', ('l-knee-tail', yunit)),
+    ('KneeTrg_R',       'l-knee-tail', ('l-knee-tail', ysmall)),
 
     # Pole Targets
     ('LegTrg_L',        'r-upper-leg', 'r-legtrg'),
