@@ -187,11 +187,13 @@ def proxyConfig(human, useHair, options=None):
             cfg.proxyList.append(('Proxy', True, True, True, (proxyFile, 'Proxy', 3)))
         return cfg
 
+    status = None
     for line in fp:
         words = line.split()
         if len(words) == 0 or words[0][0] == '#':
             pass
         elif words[0] == '@':
+            status = None
             key = words[1].lower()
             if key in ['mainmesh', 'mhxversion']:
                 try:
@@ -203,19 +205,8 @@ def proxyConfig(human, useHair, options=None):
                     exec("cfg.%s = %s" % (key, truthValue(words[2])))
                 except:
                     pass
-            elif key in ['customrig', 'customshape', 'customvertexgroup']:
-                path = os.path.realpath(os.path.expanduser(words[2]))
-                print(path)
-                (dir,fname) = os.path.split(path)
-                print(fname)
-                (modname,ext) = os.path.splitext(fname)
-                print(modname, ext)
-                expr = 'cfg.%ss.append(("%s", "%s"))' % (key, path, modname)
-                print(expr)
-                try:
-                    exec(expr)
-                except:
-                    pass                
+            elif key in ['customrigs', 'customshapes', 'customvertexgroups']:
+                status = key
             elif key == 'rig':
                 try:
                     cfg.useRig = words[2].lower()
@@ -250,6 +241,23 @@ def proxyConfig(human, useHair, options=None):
                 layer = int(words[2])
             else:
                 raise NameError('Unrecognized command %s in mh_export.config' % words[1])
+        elif status:
+            if status == 'customrigs':
+                path = os.path.realpath(os.path.expanduser(words[0]))
+                print(path)
+                (dirname,fname) = os.path.split(path)
+                print(fname)
+                (modname,ext) = os.path.splitext(fname)
+                print(modname, ext)
+                if ext != ".py":
+                    raise NameError("@CustomRig must be a .py file, not %s" % words[0])
+                cfg.customrigs.append((dirname, modname))
+            elif status == 'customshapes':
+                path = os.path.realpath(os.path.expanduser(words[0]))
+                cfg.customshapes.append(path)
+            elif status == 'customvertexgroups':
+                path = os.path.realpath(os.path.expanduser(words[0]))
+                cfg.customvertexgroups.append(path)
         else:
             proxyFile = os.path.expanduser(words[0])
             if typ == 'Cage':

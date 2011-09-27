@@ -367,8 +367,8 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                     fp.write("#endif\n")
                     if theConfig.breasts:
                         copyVertGroups("shared/mhx/templates/vertexgroups-breasts25.mhx", fp, proxy)    
-                    for (path, mod) in theConfig.customvertexgroups:
-                        print(path)
+                    for path in theConfig.customvertexgroups:
+                        print("    %s" % path)
                         copyVertGroups(path, fp, proxy)    
                     copyVertGroups("shared/mhx/templates/vertexgroups-leftright25.mhx", fp, proxy)    
                     if theConfig.cage and not (proxy and proxy.cage):
@@ -586,7 +586,7 @@ def printProxyVGroup(fp, vgroups):
     return
 
 #
-#    copyShapeKeys(tmplName, fp, proxy):
+#    copyShapeKeys(tmplName, fp, proxy, doScale):
 #
 
 def copyShapeKeys(tmplName, fp, proxy, doScale):
@@ -750,9 +750,9 @@ def writeShapeKeys(fp, human, rig, name, proxy):
         copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
         fp.write("#endif\n")
 
-    for (path, mod) in theConfig.customshapes:
-        print(path)
-        copyShapeKeys(path, fp, proxy, True)    
+    for path in theConfig.customshapes:
+        print("    %s" % path)
+        copyShapeKeys(path, fp, proxy, False)    
 
     if 0 and rig != 'mhx':
         fp.write(
@@ -767,7 +767,7 @@ def writeShapeKeys(fp, human, rig, name, proxy):
         fp.write("#if toggle&T_Shape\n")
         mhx_rig.writeRotDiffDrivers(fp, rig_arm_25.ArmShapeDrivers, proxy)
         mhx_rig.writeRotDiffDrivers(fp, rig_leg_25.LegShapeDrivers, proxy)
-        mhx_rig.writeShapePropDrivers(fp, rig_body_25.BodyShapes, "")
+        mhx_rig.writeShapePropDrivers(fp, rig_body_25.BodyShapes, proxy, "")
         fp.write("#endif\n")
 
     if (not proxy or proxy.type == 'Proxy'):
@@ -779,9 +779,9 @@ def writeShapeKeys(fp, human, rig, name, proxy):
                 mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceShapeDrivers, None)
             fp.write("#endif\n")
 
-        if theConfig.expressions:
+        if theConfig.expressions and not proxy:
             fp.write("#if toggle&T_Face\n")
-            mhx_rig.writeShapePropDrivers(fp, read_expression.Expressions, "*")
+            mhx_rig.writeShapePropDrivers(fp, read_expression.Expressions, proxy, "*")
             fp.write("#endif\n")
 
     fp.write(

@@ -27,6 +27,8 @@ import math
 import mhxbones
 import mhx_main
 import read_expression
+import sys
+import mhx_custom
         
 pi = 3.14159
 D = pi/180
@@ -1438,15 +1440,16 @@ def writePropDrivers(fp, drivers, suffix):
     return            
 
 #
-#   writeShapePropDrivers(fp, skeys, prefix):
+#   writeShapePropDrivers(fp, skeys, proxy, prefix):
 #
 
-def writeShapePropDrivers(fp, skeys, prefix):
+def writeShapePropDrivers(fp, skeys, proxy, prefix):
     for skey in skeys:
-        drvVar = ("x", 'SINGLE_PROP', [('OBJECT', mhx_main.theHuman, '["%s%s"]' % (prefix, skey))])
-        writeDriver(fp, True, ('SCRIPTED', "x"), "",
-            "key_blocks[\"%s\"].value" % (skey), 
-            -1, (0,1), [drvVar])
+        if mhx_main.useThisShape(skey, proxy):
+            drvVar = ("x", 'SINGLE_PROP', [('OBJECT', mhx_main.theHuman, '["%s%s"]' % (prefix, skey))])
+            writeDriver(fp, True, ('SCRIPTED', "x"), "",
+                "key_blocks[\"%s\"].value" % (skey), 
+                -1, (0,1), [drvVar])
     return            
     
 #
@@ -1885,12 +1888,10 @@ def setupRig(obj):
     else:
         raise NameError("Unknown rig %s" % mhx_main.theConfig.useRig)
 
-    print(mhx_main.theConfig.customrigs)
-    for (path, mod) in mhx_main.theConfig.customrigs:
-        Joints += eval("%s.Joints" % mod)
-        print(Joints)
-        HeadsTails += eval("%s.HeadsTails" % mod)
-        print(HeadsTails)
+    (custJoints, custHeadsTails, custArmature) = mhx_custom.setupCustomRig()
+    Joints += custJoints
+    HeadsTails += custHeadsTails
+    Armature += custArmature
 
     newSetupJoints(obj, Joints, HeadsTails, True)
     return
@@ -1912,9 +1913,6 @@ def writeControlArmature(fp):
         amt += rig_body_25.BreastArmature
     if mhx_main.theConfig.malegenitalia:
         amt += rig_body_25.MaleArmature
-    for (path, mod) in mhx_main.theConfig.customrigs:
-        amt += eval("%s.Armature" % mod)
-        print(amt)
     writeArmature(fp, amt, True)
     return
 
@@ -1940,10 +1938,9 @@ def writeControlPoses(fp):
         rig_body_25.BreastControlPoses(fp)
     if mhx_main.theConfig.malegenitalia:
         rig_body_25.MaleControlPoses(fp)
-    for (path, mod) in mhx_main.theConfig.customrigs:
-        expr = "%s.ControlPoses(fp)" % mod
-        print(expr)
-        exec(expr)
+    for (path, modname) in mhx_main.theConfig.customrigs:
+        mod = sys.modules[modname]                
+        mod.ControlPoses(fp)
 
     return
 
