@@ -86,6 +86,7 @@ def setArmature(rig):
     try:
         name = rig['McpArmature']
     except:
+        print("***", rig)
         raise NameError("No armature set")
     the.armature = the.armatures[name]
     print("Set armature %s" % name)

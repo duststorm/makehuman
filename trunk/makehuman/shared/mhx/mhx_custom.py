@@ -31,6 +31,7 @@ def setupCustomRig():
     joints = []
     headsTails = []
     armature = []
+    props = []
     
     for (path, modname) in mhx_main.theConfig.customrigs:
         print("Custom rig %s %s" % (path, modname))
@@ -54,5 +55,8 @@ def setupCustomRig():
         headsTails += mod.HeadsTails
         print("Adding %s.Armature" % modname)
         armature += mod.Armature
+        print("Adding %s.Properties" % modname)
+        props += mod.Properties
         
-    return (joints, headsTails, armature)
+        
+    return (joints, headsTails, armature, props)

@@ -84,9 +84,9 @@ def retargetBone(srcData, trgData, frame):
     if trgParent:    
         trgBone.location = trgData.offset
 
-    load.insertRotationKeyFrame(trgBone, frame)
+    utils.insertRotationKeyFrame(trgBone, frame)
     if not trgParent:
-        trgBone.keyframe_insert("location", group=grp)
+        trgBone.keyframe_insert("location", group=trgBone.name)
     return        
     
 #
@@ -398,9 +398,7 @@ def loadRetargetSimplify(context, filepath):
     print("Load and retarget %s" % filepath)
     time1 = time.clock()
     scn = context.scene
-    trgRig = context.object
-    srcRig = load.readBvhFile(context, filepath, scn, False)
-    print("T", trgRig, "S", srcRig)
+    (srcRig, trgRig) = load.readBvhFile(context, filepath, scn, False)
     load.renameAndRescaleBvh(context, srcRig, trgRig)
     retargetMhxRig(context, srcRig, trgRig)
     scn = context.scene

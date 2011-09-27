@@ -29,10 +29,10 @@
 #
 
 FkBoneList = [
-    'Root', 'Hips', 'Spine1', 'Spine2', 'Spine3', #'Shoulders', 
+    'Root', 'Hips', 'Pelvis', 'Spine1', 'Spine2', 'Spine3', #'Shoulders', 
     'LowerNeck', 'Neck', 'Head', 'Sternum',
-    'Clavicle_L', 'ShoulderEnd_L', 'ArmLoc_L', 'UpArm_L', 'LoArm_L', 'Hand0_L', 'Hand_L',
-    'Clavicle_R', 'ShoulderEnd_R', 'ArmLoc_R', 'UpArm_R', 'LoArm_R', 'Hand0_R', 'Hand_R',
+    'Clavicle_L', 'ShoulderEnd_L', 'Shoulder_L', 'UpArm_L', 'LoArm_L', 'Hand0_L', 'Hand_L',
+    'Clavicle_R', 'ShoulderEnd_R', 'Shoulder_R', 'UpArm_R', 'LoArm_R', 'Hand0_R', 'Hand_R',
     'Hip_L', 'LegLoc_L', 'UpLeg_L', 'LoLeg_L', 'Foot_L', 'Toe_L', 'LegFK_L',
     'Hip_R', 'LegLoc_R', 'UpLeg_R', 'LoLeg_R', 'Foot_R', 'Toe_R', 'LegFK_R',
 ]

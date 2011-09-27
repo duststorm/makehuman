@@ -273,7 +273,11 @@ class VIEW3D_OT_McpUnInitTargetCharacterButton(bpy.types.Operator):
 
 def assocTargetBones(rig, names, xtraAssoc):
     boneAssoc = []
+    print("N", names)
+    print(rig)
+    print("R", rig.keys())
     for bn in names:
+        print("  ", bn)
         if not bn:
             continue
         try:

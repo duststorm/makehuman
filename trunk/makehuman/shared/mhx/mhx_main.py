@@ -752,7 +752,7 @@ def writeShapeKeys(fp, human, rig, name, proxy):
 
     for path in theConfig.customshapes:
         print("    %s" % path)
-        copyShapeKeys(path, fp, proxy, False)    
+        copyShapeKeys(path, fp, proxy, False)   
 
     if 0 and rig != 'mhx':
         fp.write(
@@ -779,10 +779,16 @@ def writeShapeKeys(fp, human, rig, name, proxy):
                 mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceShapeDrivers, None)
             fp.write("#endif\n")
 
+    if not proxy:
         if theConfig.expressions and not proxy:
             fp.write("#if toggle&T_Face\n")
             mhx_rig.writeShapePropDrivers(fp, read_expression.Expressions, proxy, "*")
             fp.write("#endif\n")
+            
+        skeys = []
+        for (skey, val, string, min, max) in  mhx_rig.CustomProps:
+            skeys.append(skey)
+        mhx_rig.writeShapePropDrivers(fp, skeys, proxy, "")
 
     fp.write(
 "  end AnimationData\n" +

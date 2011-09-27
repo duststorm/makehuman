@@ -230,23 +230,24 @@ def insertAnimChildLoc(nameIK, name, animations, locs):
         animIK.heads[frame] = animPar.heads[frame] + anim.offsetRest * parmat
     return
 
-def fixParent(par, animations):
+def fixParent(name, par, animations):
     try:
         animations[par]   
         return par
     except:
         pass
     if not par in animations.keys():
+        #print("fix", par)
         if par[0:3] == 'Dfm':
             return par[3:]
-        elif par == 'Shoulder_L':
-            return 'Clavicle_L'
-        elif par == 'Clavicle_L':
-            return 'Shoulder_L'
-        elif par == 'Shoulder_R':
-            return 'Clavicle_R'
-        elif par == 'Clavicle_R':
-            return 'Shoulder_R'
+        #elif par == 'Shoulder_L':
+        #    return 'Clavicle_L'
+        #elif par == 'Clavicle_L':
+        #    return 'Shoulder_L'
+        #elif par == 'Shoulder_R':
+        #    return 'Clavicle_R'
+        #elif par == 'Clavicle_R':
+        #    return 'Shoulder_R'
         else:
             raise NameError("Could not guess parent %s -> %s" % (name, par))
 
@@ -257,7 +258,7 @@ def insertAnimChild(name, animations, nFrames, times, rots):
         return None
     if nFrames < 0:
         nFrames = len(rots)
-    par = fixParent(anim.parent, animations)
+    par = fixParent(name, anim.parent, animations)
     #print("iAC", name, par)
     animPar = animations[par]   
     anim.nFrames = nFrames
@@ -317,7 +318,7 @@ def poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, srcFixes):
         except:
             animSrc = None
         if (not animTrg) or (not animSrc):
-            print("Fail", nameSrc, nameTrg)
+            #print("Fail", nameSrc, nameTrg)
             pass
         elif (nameTrg in the.GlobalBoneList) or (not pb.bone.use_inherit_rotation):
             print("global", pb)

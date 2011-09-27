@@ -1774,7 +1774,9 @@ import rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
 import rigify_rig
 
 def setupRig(obj):
-    global BoneGroups, RecalcRoll, GizmoFiles, VertexGroupFiles, ObjectProps, ArmatureProps, Joints, HeadsTails, Armature, HeadName
+    global BoneGroups, RecalcRoll, GizmoFiles, VertexGroupFiles
+    global ObjectProps, ArmatureProps, CustomProps
+    global Joints, HeadsTails, Armature, HeadName
 
     if mhx_main.theConfig.useRig in ['mhx', 'game']:
         BoneGroups = [
@@ -1888,11 +1890,11 @@ def setupRig(obj):
     else:
         raise NameError("Unknown rig %s" % mhx_main.theConfig.useRig)
 
-    (custJoints, custHeadsTails, custArmature) = mhx_custom.setupCustomRig()
+    (custJoints, custHeadsTails, custArmature, CustomProps) = mhx_custom.setupCustomRig()
     Joints += custJoints
     HeadsTails += custHeadsTails
     Armature += custArmature
-
+    
     newSetupJoints(obj, Joints, HeadsTails, True)
     return
     
@@ -1978,9 +1980,20 @@ def writeAllDrivers(fp):
 def writeAllProperties(fp, typ):
     if typ != 'Object':
         return
-    props = ObjectProps
-    for (key, val) in props:
-        fp.write("  Property %s %s ;\n" % (key, val))
+    for prop in ObjectProps+CustomProps:
+        try:
+            (key, val) = prop
+            string = None
+        except:
+            (key, val, string, min, max) = prop
+        if string:
+            fp.write(
+'  Property %s %.2f %s ;\n' % (key, val, string) +
+'  PropKeys %s "min":-%.2f,"max":%.2f, ;\n\n' % (key, min, max) )
+        else:
+            fp.write("  Property %s %s ;\n" % (key, val))
+        
+        
     if mhx_main.theConfig.expressions:
         fp.write("#if toggle&T_Face\n")
         for skey in read_expression.Expressions:
