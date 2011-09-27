@@ -1424,15 +1424,15 @@ def writeEnumDrivers(fp, drivers):
 """
 
 #
-#   writePropDrivers(fp, drivers, suffix):
+#   writePropDrivers(fp, drivers, suffix, prefix):
 #
 
-def writePropDrivers(fp, drivers, suffix):
+def writePropDrivers(fp, drivers, suffix, prefix):
     for (bone, cns, props, expr) in drivers:
         drvVars = []
         n = 1
         for prop in props:
-            drvVars.append( ("x%d" % n, 'SINGLE_PROP', [('OBJECT', mhx_main.theHuman, '["%s%s"]' % (prop,suffix))]) )
+            drvVars.append( ("x%d" % n, 'SINGLE_PROP', [('OBJECT', mhx_main.theHuman, '["%s%s%s"]' % (prefix,prop,suffix))]) )
             n += 1
         writeDriver(fp, True, ('SCRIPTED', expr), "",
             "pose.bones[\"%s%s\"].constraints[\"%s\"].influence" % (bone, suffix, cns), 
@@ -1954,17 +1954,17 @@ def writeAllActions(fp):
 
 def writeAllDrivers(fp):
     if mhx_main.theConfig.useRig == 'mhx':      
-        writePropDrivers(fp, rig_arm_25.ArmPropDrivers, "")
-        writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_L")
-        writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_R")
-        writePropDrivers(fp, rig_leg_25.LegPropDrivers, "")
-        writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_L")
-        writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_R")
-        writePropDrivers(fp, rig_body_25.BodyPropDrivers, "")
-        writePropDrivers(fp, rig_face_25.FacePropDrivers, "")
+        writePropDrivers(fp, rig_arm_25.ArmPropDrivers, "", "&")
+        writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_L", "&")
+        writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_R", "&")
+        writePropDrivers(fp, rig_leg_25.LegPropDrivers, "", "&")
+        writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_L", "&")
+        writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_R", "&")
+        writePropDrivers(fp, rig_body_25.BodyPropDrivers, "", "&")
+        writePropDrivers(fp, rig_face_25.FacePropDrivers, "", "&")
         fingDrivers = rig_finger_25.getFingerPropDrivers()
-        writePropDrivers(fp, fingDrivers, "_L")            
-        writePropDrivers(fp, fingDrivers, "_R")            
+        writePropDrivers(fp, fingDrivers, "_L", "&")            
+        writePropDrivers(fp, fingDrivers, "_R", "&")            
         #rig_panel_25.FingerControlDrivers(fp)
         writeMuscleDrivers(fp, rig_shoulder_25.ShoulderDeformDrivers, mhx_main.theHuman)
         writeMuscleDrivers(fp, rig_arm_25.ArmDeformDrivers, mhx_main.theHuman)
@@ -1980,20 +1980,12 @@ def writeAllDrivers(fp):
 def writeAllProperties(fp, typ):
     if typ != 'Object':
         return
-    for prop in ObjectProps+CustomProps:
-        try:
-            (key, val) = prop
-            string = None
-        except:
-            (key, val, string, min, max) = prop
-        if string:
-            fp.write(
-'  Property %s %.2f %s ;\n' % (key, val, string) +
-'  PropKeys %s "min":-%.2f,"max":%.2f, ;\n\n' % (key, min, max) )
-        else:
-            fp.write("  Property %s %s ;\n" % (key, val))
-        
-        
+    for (key, val) in ObjectProps:
+        fp.write("  Property %s %s ;\n" % (key, val))
+    for (key, val, string, min, max) in CustomProps:
+        fp.write(
+'  Property &%s %.2f %s ;\n' % (key, val, string) +
+'  PropKeys &%s "min":-%.2f,"max":%.2f, ;\n\n' % (key, min, max) )        
     if mhx_main.theConfig.expressions:
         fp.write("#if toggle&T_Face\n")
         for skey in read_expression.Expressions:

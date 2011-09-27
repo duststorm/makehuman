@@ -767,7 +767,7 @@ def writeShapeKeys(fp, human, rig, name, proxy):
         fp.write("#if toggle&T_Shape\n")
         mhx_rig.writeRotDiffDrivers(fp, rig_arm_25.ArmShapeDrivers, proxy)
         mhx_rig.writeRotDiffDrivers(fp, rig_leg_25.LegShapeDrivers, proxy)
-        mhx_rig.writeShapePropDrivers(fp, rig_body_25.BodyShapes, proxy, "")
+        mhx_rig.writeShapePropDrivers(fp, rig_body_25.BodyShapes, proxy, "&")
         fp.write("#endif\n")
 
     if (not proxy or proxy.type == 'Proxy'):
@@ -788,7 +788,7 @@ def writeShapeKeys(fp, human, rig, name, proxy):
         skeys = []
         for (skey, val, string, min, max) in  mhx_rig.CustomProps:
             skeys.append(skey)
-        mhx_rig.writeShapePropDrivers(fp, skeys, proxy, "")
+        mhx_rig.writeShapePropDrivers(fp, skeys, proxy, "&")
 
     fp.write(
 "  end AnimationData\n" +
