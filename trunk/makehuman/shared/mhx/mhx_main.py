@@ -367,6 +367,8 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                     fp.write("#endif\n")
                     if theConfig.breasts:
                         copyVertGroups("shared/mhx/templates/vertexgroups-breasts25.mhx", fp, proxy)    
+                    if theConfig.biceps:
+                        copyVertGroups("shared/mhx/templates/vertexgroups-biceps25.mhx", fp, proxy)    
                     for path in theConfig.customvertexgroups:
                         print("    %s" % path)
                         copyVertGroups(path, fp, proxy)    

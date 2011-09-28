@@ -1913,6 +1913,8 @@ def writeControlArmature(fp):
     amt = Armature    
     if mhx_main.theConfig.breasts:
         amt += rig_body_25.BreastArmature
+    if mhx_main.theConfig.biceps:
+        amt += rig_arm_25.BicepsArmature
     if mhx_main.theConfig.malegenitalia:
         amt += rig_body_25.MaleArmature
     writeArmature(fp, amt, True)
@@ -1938,6 +1940,8 @@ def writeControlPoses(fp):
         
     if mhx_main.theConfig.breasts:
         rig_body_25.BreastControlPoses(fp)
+    if mhx_main.theConfig.biceps:
+        rig_arm_25.BicepsControlPoses(fp)
     if mhx_main.theConfig.malegenitalia:
         rig_body_25.MaleControlPoses(fp)
     for (path, modname) in mhx_main.theConfig.customrigs:

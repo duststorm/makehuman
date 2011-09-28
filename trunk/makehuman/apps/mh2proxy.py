@@ -140,6 +140,7 @@ class CProxyConfig:
         self.bodyshapes = True
         self.cage = False
         self.breasts = False
+        self.biceps = False
         self.malegenitalia = False
         self.customrigs = []
         self.customshapes = []
@@ -200,7 +201,7 @@ def proxyConfig(human, useHair, options=None):
                     exec("cfg.%s = words[2:]" % key)
                 except:
                     pass
-            elif key in ['expressions', 'faceshapes', 'bodyshapes', 'breasts', 'malegenitalia']:
+            elif key in ['expressions', 'faceshapes', 'bodyshapes', 'breasts', 'biceps', 'malegenitalia']:
                 try:
                     exec("cfg.%s = %s" % (key, truthValue(words[2])))
                 except:

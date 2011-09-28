@@ -240,10 +240,6 @@ ArmArmature = [
     ('DfmHand_R',         handRoll, 'DfmLoArm3_R', F_DEF, L_DMAIN, NoBB),
     
     # Muscles
-    ('DfmBiceps_L',       0, 'DfmUpArm1_L', F_DEF, L_MSCL, NoBB),
-    ('DfmBiceps_R',       0, 'DfmUpArm1_R', F_DEF, L_MSCL, NoBB),    
-    ('BicepsTrg_L',       0, 'LoArm_L', 0, L_HELP, NoBB),
-    ('BicepsTrg_R',       0, 'LoArm_R', 0, L_HELP, NoBB),
 
     # Inverse stretching targets
     ('UpArm3Inv_L',       F_NOSCALE, 'UpArm_L', 0, L_HELP, NoBB),
@@ -255,6 +251,17 @@ ArmArmature = [
     ('DeltoidTrg1_L',      0, 'UpArm_L', 0, L_HELP, NoBB ),
     ('DeltoidTrg1_R',      0, 'UpArm_R', 0, L_HELP, NoBB ),
 
+]
+
+#
+#   BicepsArmature
+#
+
+BicepsArmature = [
+    ('DfmBiceps_L',       0, 'DfmUpArm1_L', F_DEF, L_MSCL, NoBB),
+    ('DfmBiceps_R',       0, 'DfmUpArm1_R', F_DEF, L_MSCL, NoBB),    
+    ('BicepsTrg_L',       0, 'LoArm_L', 0, L_HELP, NoBB),
+    ('BicepsTrg_R',       0, 'LoArm_R', 0, L_HELP, NoBB),
 ]
 
 #
@@ -452,7 +459,13 @@ def ArmControlPoses(fp):
     
     copyDeform(fp, 'DfmHand_R', 'Hand_R', DmodHand, U_LOC+U_ROT, None, [])
     
-    # Muscles
+    return
+
+#
+#   BicepsControlPoses(fp):
+#
+
+def BicepsControlPoses(fp):
 
     addPoseBone(fp, 'DfmBiceps_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'BicepsTrg_L', 1, 1])])
