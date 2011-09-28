@@ -26,7 +26,7 @@
 """
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 1.8.1
+Version 1.8.2
 
 This script should be distributed with Blender.
 If not, place it in the .blender/scripts/addons dir
@@ -39,7 +39,7 @@ Alternatively, run the script in the script editor (Alt-P), and access from the 
 bl_info = {
     'name': 'Import: MakeHuman (.mhx)',
     'author': 'Thomas Larsson',
-    'version': (1, 8, 1),
+    'version': (1, 8, 2),
     "blender": (2, 5, 9),
     "api": 40335,
     'location': "File > Import > MakeHuman (.mhx)",
@@ -52,7 +52,7 @@ bl_info = {
 
 MAJOR_VERSION = 1
 MINOR_VERSION = 8
-SUB_VERSION = 1
+SUB_VERSION = 2
 BLENDER_VERSION = (2, 59, 2)
 
 #
@@ -98,7 +98,6 @@ todo = []
 T_EnforceVersion = 0x01
 T_Clothes = 0x02
 T_Stretch = 0x04
-T_Limit = 0x08
 
 T_Diamond = 0x10
 T_Replace = 0x20
@@ -115,7 +114,7 @@ T_Opcns = 0x2000
 T_Symm = 0x4000
 
 toggle = (T_EnforceVersion + T_Replace + T_Mesh + T_Armature + 
-        T_Face + T_Shape + T_Proxy + T_Clothes + T_Rigify + T_Limit)
+        T_Face + T_Shape + T_Proxy + T_Clothes + T_Rigify)
 
 #
 #    Blender versions
@@ -2034,9 +2033,6 @@ def correctRig(args):
             if cns.type == 'CHILD_OF':
                 cnslist.append((pb, cns, cns.influence))
                 cns.influence = 0
-            elif ((toggle & T_Limit == 0) and 
-                  (cns.type in ['LIMIT_DISTANCE', 'LIMIT_ROTATION'])):                
-                cns.influence = 0
 
     for (pb, cns, inf) in cnslist:
         amt.bones.active = pb.bone
@@ -2871,7 +2867,6 @@ MhxBoolProps = [
     ("symm", "Symmetric shapes", "Keep shapekeys symmetric", T_Symm),
     ("diamond", "Diamonds", "Keep joint diamonds", T_Diamond),
     ("rigify", "Rigify", "Create rigify control rig", T_Rigify),
-    ("limit", "Limit constraints", "Keep limit constraints", T_Limit),
 ]
 
 class ImportMhx(bpy.types.Operator, ImportHelper):
@@ -3209,6 +3204,7 @@ def setViseme(context, vis, setKey, frame):
         else:
             setBoneLocation(context, pbones[b+'_L'], scale, loc, False, setKey, frame)
             setBoneLocation(context, pbones[b+'_R'], scale, loc, True, setKey, frame)
+    updatePose(rig)
     return
 
 def setBoneLocation(context, pb, scale, loc, mirror, setKey, frame):
@@ -3256,7 +3252,8 @@ def readMoho(context, filepath, offs):
             vis = mohoVisemes[words[1]]
             setViseme(context, vis, True, int(words[0])+offs)
     fp.close()
-    setInterpolation(context.object)
+    setInterpolation(rig)
+    updatePose(rig)
     print("Moho file %s loaded" % filepath)
     return
 
@@ -3273,7 +3270,8 @@ def readMagpie(context, filepath, offs):
             vis = magpieVisemes[words[3]]
             setViseme(context, vis, True, int(words[0])+offs)
     fp.close()
-    setInterpolation(context.object)
+    setInterpolation(rig)
+    updatePose(rig)
     print("Magpie file %s loaded" % filepath)
     return
 
@@ -3348,7 +3346,28 @@ class MhxLipsyncPanel(bpy.types.Panel):
         row = layout.row()
         row.operator("mhx.pose_load_moho")
         row.operator("mhx.pose_load_magpie")
+        layout.operator("mhx.update")
         return
+        
+#
+#   updatePose(rig):
+#   class VIEW3D_OT_MhxUpdateButton(bpy.types.Operator):
+#
+
+def updatePose(rig):
+    pb = rig.pose.bones["PFaceDisp"]
+    pb.location = pb.location
+    return
+
+class VIEW3D_OT_MhxUpdateButton(bpy.types.Operator):
+    bl_idname = "mhx.update"
+    bl_label = "Update"
+
+    def execute(self, context):
+        rig = getMhxRig(context.object)
+        updatePose(rig)
+        return{'FINISHED'}    
+        
 
 ###################################################################################    
 #
@@ -3368,7 +3387,7 @@ class VIEW3D_OT_MhxResetExpressionsButton(bpy.types.Operator):
         props = getShapeProps(rig)
         for (prop, name) in props:
             rig[prop] = 0.0
-        rig.update_tag()
+        updatePose(rig)
         return{'FINISHED'}    
 
 #
@@ -3385,7 +3404,7 @@ class VIEW3D_OT_MhxKeyExpressionsButton(bpy.types.Operator):
         frame = context.scene.frame_current
         for (prop, name) in props:
             rig.keyframe_insert('["%s"]' % prop, frame=frame)
-        rig.update_tag()
+        updatePose(rig)
         return{'FINISHED'}    
 #
 #    class VIEW3D_OT_MhxPinExpressionButton(bpy.types.Operator):
@@ -3415,7 +3434,7 @@ class VIEW3D_OT_MhxPinExpressionButton(bpy.types.Operator):
                     rig[prop] = 1.0
                 else:
                     rig[prop] = 0.0
-        rig.update_tag()
+        updatePose(rig)
         return{'FINISHED'}    
 
 #
@@ -3455,6 +3474,7 @@ class MhxExpressionsPanel(bpy.types.Panel):
         layout.label(text="Expressions")
         layout.operator("mhx.pose_reset_expressions")
         layout.operator("mhx.pose_key_expressions")
+        #layout.operator("mhx.update")
         layout.separator()
         for (prop, name) in props:
             row = layout.split(0.85)
