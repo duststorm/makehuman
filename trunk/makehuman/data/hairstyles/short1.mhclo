@@ -2,6 +2,7 @@
 # license GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 # homepage http://www.makehuman.org/
 # name short1
+# subsurf 1 1
 # material short1
 texture data/hairstyles/short1_texture.tif
 diffuse_intensity 0.8

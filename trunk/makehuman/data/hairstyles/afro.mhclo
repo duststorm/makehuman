@@ -2,6 +2,7 @@
 # license GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 # homepage http://www.makehuman.org/
 # name afro
+# subsurf 1 1
 # material afro
 texture data/hairstyles/afro_texture.tif
 diffuse_intensity 0.8

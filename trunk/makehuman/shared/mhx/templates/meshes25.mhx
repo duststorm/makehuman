@@ -90,6 +90,11 @@ end Mesh
   lock_scale Array 1 1 1  ; 
   Property MhxScale theScale ;
   Property MhxMesh True ;
+  Modifier SubSurf SUBSURF
+    levels 0 ;
+    render_levels 1 ;
+  end Modifier
+  
 end Object
 
 #if toggle&T_Armature

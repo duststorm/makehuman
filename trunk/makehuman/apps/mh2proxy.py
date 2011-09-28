@@ -359,8 +359,12 @@ def readProxyFile(obj, proxyStuff):
             elif words[1] == 'weightfile':
                 proxy.weightfile = (words[2], words[3])
             elif words[1] == 'subsurf':
-                subdiv = int(words[2])
-                proxy.modifiers.append( ['subsurf', subdiv] )
+                levels = int(words[2])
+                if len(words) > 3:
+                    render = int(words[3])
+                else:
+                    render = levels+1
+                proxy.modifiers.append( ['subsurf', levels, render] )
             elif words[1] == 'shrinkwrap':
                 offset = float(words[2])
                 proxy.modifiers.append( ['shrinkwrap', offset] )

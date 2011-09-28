@@ -2,6 +2,7 @@
 # license GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 # homepage http://www.makehuman.org/
 # name curly2
+# subsurf 1 1
 # material curly2
 texture data/hairstyles/curly2_texture.tif
 diffuse_intensity 0.8

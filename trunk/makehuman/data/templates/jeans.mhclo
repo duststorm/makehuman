@@ -4,7 +4,7 @@
 # 
 # name Jeans
 # weightfile Rorkimaru data/templates/jeans.rig
-# subsurf 1
+# subsurf 1 2
 # shrinkwrap 0.06
 # shapekey BendLegForward
 # shapekey BendLegBack

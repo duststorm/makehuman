@@ -412,10 +412,10 @@ def LegControlPoses(fp):
         [('IK', 0, 0, ['RevIK', 'ToeRev_R', 1, (90*D, 'ToePT_R'), (1,0,1)])])
     
     addPoseBone(fp, 'Ankle_L', 'MHBall025', 'IK_L', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('ChildOf', C_CHILDOF, 1, ['Foot', 'LegIK_L', (1,1,1), (1,1,1), (1,1,1)]) ])
+        [('ChildOf', C_CHILDOF, 1, ['Foot', 'FootRev_L', (1,1,1), (1,1,1), (1,1,1)]) ])
 
     addPoseBone(fp, 'Ankle_R', 'MHBall025', 'IK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('ChildOf', C_CHILDOF, 1, ['Foot', 'LegIK_R', (1,1,1), (1,1,1), (1,1,1)]) ])
+        [('ChildOf', C_CHILDOF, 1, ['Foot', 'FootRev_R', (1,1,1), (1,1,1), (1,1,1)]) ])
 
     addPoseBone(fp, 'LegFK_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
     addPoseBone(fp, 'LegFK_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])

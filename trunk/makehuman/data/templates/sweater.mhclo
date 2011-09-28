@@ -4,7 +4,7 @@
 # 
 # name Sweater
 # weightfile Rorkimaru data/templates/sweater.rig
-# subsurf 1
+# subsurf 1 2
 # shapekey BendArmUp
 # shapekey BendArmDown
 # shapekey BreatheIn

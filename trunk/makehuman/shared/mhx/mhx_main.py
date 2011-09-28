@@ -418,11 +418,10 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
             elif words[1] == 'ProxyModifiers':
                 for mod in proxy.modifiers:
                     if mod[0] == 'subsurf':
-                        sslevels = mod[1]
                         fp.write(
 "    Modifier SubSurf SUBSURF\n" +
-"      levels %d ;\n" % sslevels +
-"      render_levels %d ;\n" % (sslevels+1) +
+"      levels %d ;\n" % mod[1] +
+"      render_levels %d ;\n" % mod[2] +
 "    end Modifier\n")
                     elif mod[0] == 'shrinkwrap':
                         offset = mod[1]
