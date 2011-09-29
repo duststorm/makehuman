@@ -322,15 +322,16 @@ limRevToe_R = (-10*D,45*D, 0,0, 0,0)
 #   Cmod = Control rig mode
 #
 
-DmodUpLeg = P_YZX
-DmodLoLeg = P_YZX
-DmodFoot = P_YZX
-DmodToe = P_YZX
 
 CmodUpLeg = 0
 CmodLoLeg = 0
 CmodFoot = 0
 CmodToe = 0
+
+DmodUpLeg = 0
+DmodLoLeg = 0
+DmodFoot = 0
+DmodToe = 0
 
 def LegControlPoses(fp):
 
