@@ -458,7 +458,6 @@ BodyShapes = [
 
 BodyShapeKeyScale = {
     'Breathe'            : ('spine1', 'neck', 1.89623),
-    'BicepFlex'            : ('r-uparm-front', 'r-uparm-back', 0.93219),
 }
 
 BodySpines = [
