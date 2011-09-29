@@ -168,28 +168,14 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
         if len(words) == 0:
             fp.write(line)
         elif words[0] == '***':
-            if ignoreLine:
-                if words[1] == 'EndIgnore':
-                    ignoreLine = False
-            #elif words[1] == 'Bone':
-            #    bone = words[2]
-            #    fp.write("    Bone %s\n" % bone)
-            #elif words[1] == 'Rigify':
-            #    mhxbones_rigify.writeBones(obj, fp)
-            #elif words[1] == 'head':
-            #    (x, y, z) = mhxbones.boneHead[bone]
-            #    fp.write("    head  %.6g %.6g %.6g  ;\n" % (x,-z,y))
-            #elif words[1] == 'tail':
-            #    (x, y, z) = mhxbones.boneTail[bone]
-            #    fp.write("    tail %.6g %.6g %.6g  ;\n" % (x,-z,y))
-            #elif words[1] == 'roll':
-            #    (x, y) = mhxbones.boneRoll[bone]
-            #    fp.write("    roll %.6g ;\n" % (y))
-            elif words[1] == 'refer-human':
+            #if ignoreLine:
+            #    if words[1] == 'EndIgnore':
+            #        ignoreLine = False
+            if words[1] == 'refer-human':
                 if words[3] == 'ControlRig' or theConfig.useRig != 'mhx':
                     fp.write("    %s Refer Object %s ;\n" % (words[2], theHuman))
-                elif words[3] == 'DeformRig':
-                    fp.write("    %s Refer Object %sDeformRig ;\n" % (words[2], theHuman))
+                #elif words[3] == 'DeformRig':
+                #    fp.write("    %s Refer Object %sDeformRig ;\n" % (words[2], theHuman))
                 else:
                     raise NameError("refer-human: %s" % line)
             elif words[1] == 'rig-bones':
@@ -199,10 +185,10 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                         mhx_rig.writeControlArmature(fp)
                     else:
                         mh2proxy.writeRigBones(fp, rig.bones)
-                elif words[2] == 'DeformRig':
-                    fp.write("Armature %sDeformRig %sDeformRig   Normal \n" % (theHuman, theHuman))
-                    if rig == 'mhx':
-                        mhx_rig.writeDeformArmature(fp)
+                #elif words[2] == 'DeformRig':
+                #    fp.write("Armature %sDeformRig %sDeformRig   Normal \n" % (theHuman, theHuman))
+                #    if rig == 'mhx':
+                #        mhx_rig.writeDeformArmature(fp)
                 else:
                     raise NameError("rig-bones: %s" % line)
             elif words[1] == 'human-object':
@@ -214,8 +200,8 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 "  Property MhxOffsetZ %.4f ;\n" % mhx_rig.Origin[2])
                 elif words[2] == 'ControlRig':
                     fp.write("Object %s ARMATURE %s\n"  % (theHuman, theHuman))
-                else:
-                    fp.write("Object %sDeformRig ARMATURE %sDeformRig\n"  % (theHuman, theHuman))
+                #else:
+                #    fp.write("Object %sDeformRig ARMATURE %sDeformRig\n"  % (theHuman, theHuman))
             elif words[1] == 'rig-poses':
                 if words[2] == 'ControlRig':
                     if type(rig) == str:
@@ -224,11 +210,11 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                         fp.write("  ik_solver 'LEGACY' ;\nend Pose\n")
                     else:
                         mh2proxy.writeRigPose(fp, rig.name, rig.bones)
-                elif words[2] == 'DeformRig':
-                    if rig == 'mhx':
-                        fp.write("Pose %sDeformRig\n" % theHuman)
-                        mhx_rig.writeDeformPoses(fp)
-                        fp.write("  ik_solver 'LEGACY' ;\nend Pose\n")
+                #elif words[2] == 'DeformRig':
+                #    if rig == 'mhx':
+                #        fp.write("Pose %sDeformRig\n" % theHuman)
+                #        mhx_rig.writeDeformPoses(fp)
+                #        fp.write("  ik_solver 'LEGACY' ;\nend Pose\n")
             elif words[1] == 'rig-actions':
                 if type(rig) == str:
                     fp.write("Pose %s\nend Pose\n" % theHuman)
@@ -239,10 +225,10 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                         fp.write("AnimationData %s True\n" % theHuman)
                         mhx_rig.writeAllDrivers(fp)
                         rigDriversEnd(fp)
-                    elif words[2] == 'DeformRig':
-                        fp.write("AnimationData %sDeformRig True\n" % theHuman)
-                        mhx_rig.writeDeformDrivers(fp)
-                        rigDriversEnd(fp)
+                    #elif words[2] == 'DeformRig':
+                    #    fp.write("AnimationData %sDeformRig True\n" % theHuman)
+                    #    mhx_rig.writeDeformDrivers(fp)
+                    #    rigDriversEnd(fp)
                     else:
                         raise NameError("rig-drivers: %s" % line)
             elif words[1] == 'rig-correct':
@@ -351,53 +337,9 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                         fp.write(" %.6g %.6g" %(uv[0], uv[1]))
                     fp.write(" ;\n")
             elif words[1] == 'VertexGroup':
-                if proxy and proxy.weights:
-                    mh2proxy.writeRigWeights(fp, proxy.weights)
-                else:
-                    fp.write("#if toggle&T_Armature\n")
-                    if type(rig) == str:
-                        for file in mhx_rig.VertexGroupFiles:
-                            copyVertGroups(file, fp, proxy)
-                    else:
-                        if proxy:
-                            weights = mh2proxy.getProxyWeights(rig.weights, proxy)
-                        else:
-                            weights = rig.weights                    
-                        mh2proxy.writeRigWeights(fp, weights)
-                    fp.write("#endif\n")
-                    if theConfig.breasts:
-                        copyVertGroups("shared/mhx/templates/vertexgroups-breasts25.mhx", fp, proxy)    
-                    if theConfig.biceps:
-                        copyVertGroups("shared/mhx/templates/vertexgroups-biceps25.mhx", fp, proxy)    
-                    for path in theConfig.customvertexgroups:
-                        print("    %s" % path)
-                        copyVertGroups(path, fp, proxy)    
-                    copyVertGroups("shared/mhx/templates/vertexgroups-leftright25.mhx", fp, proxy)    
-                    if theConfig.cage and not (proxy and proxy.cage):
-                        fp.write("#if toggle&T_Cage\n")
-                        copyVertGroups("shared/mhx/templates/vertexgroups-cage25.mhx", fp, proxy)    
-                        fp.write("#endif\n")
+                writeVertexGroups(fp, rig, proxy)
             elif words[1] == 'group':
-                fp.write(
-"PostProcess %sMesh %s 0000003f 00080000 0068056b 0000c000 ;\n" % (theHuman, theHuman) + 
-"Group %s\n"  % theHuman +
-"  Objects\n" +
-"#if toggle&T_Armature\n" +
-"    ob %s ;\n" % theHuman +
-#"    ob %sDeformRig ;\n" % theHuman +
-#"    ob %sSpineCurve ;\n" % theHuman +
-"#endif\n" +
-"#if toggle&T_Mesh\n" +
-"    ob %sMesh ;\n" % theHuman +
-"#endif\n")
-                groupProxy('Cage', fp, proxyData)
-                groupProxy('Proxy', fp, proxyData)
-                groupProxy('Clothes', fp, proxyData)
-                fp.write(
-"    ob CustomShapes ;\n" + 
-"  end Objects\n" +
-"  layers Array 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1  ;\n" +
-"end Group\n")
+                writeGroups(fp, proxyData)
             elif words[1] == 'mesh-shapeKey':
                 pass
                 writeShapeKeys(fp, human, rig, "%sMesh" % theHuman, None)
@@ -418,21 +360,7 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                         if proxy.name:
                             writeAnimationData(fp, proxy.name+"Mesh", proxy)
             elif words[1] == 'ProxyModifiers':
-                for mod in proxy.modifiers:
-                    if mod[0] == 'subsurf':
-                        fp.write(
-"    Modifier SubSurf SUBSURF\n" +
-"      levels %d ;\n" % mod[1] +
-"      render_levels %d ;\n" % mod[2] +
-"    end Modifier\n")
-                    elif mod[0] == 'shrinkwrap':
-                        offset = mod[1]
-                        fp.write(
-"    Modifier ShrinkWrap SHRINKWRAP\n" +
-"      target Refer Object %sMesh ;\n" % theHuman +
-"      offset %.4f ;\n" % offset +
-"      use_keep_above_surface True ;\n" +
-"    end Modifier\n")
+                writeProxyModifiers(fp, proxy)
             elif words[1] == 'curves':
                 mhx_rig.writeAllCurves(fp)
             elif words[1] == 'properties':
@@ -458,6 +386,40 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
     return
 
 #
+#   writeVertexGroups(fp, rig, proxy):                
+#
+
+def writeVertexGroups(fp, rig, proxy):                
+    if proxy and proxy.weights:
+        mh2proxy.writeRigWeights(fp, proxy.weights)
+    else:
+        fp.write("#if toggle&T_Armature\n")
+        if type(rig) == str:
+            for file in mhx_rig.VertexGroupFiles:
+                copyVertGroups(file, fp, proxy)
+        else:
+            if proxy:
+                weights = mh2proxy.getProxyWeights(rig.weights, proxy)
+            else:
+                weights = rig.weights                    
+            mh2proxy.writeRigWeights(fp, weights)
+        fp.write("#endif\n")
+
+        if theConfig.breasts:
+            copyVertGroups("shared/mhx/templates/vertexgroups-breasts25.mhx", fp, proxy)    
+        if theConfig.biceps:
+            copyVertGroups("shared/mhx/templates/vertexgroups-biceps25.mhx", fp, proxy)    
+        for path in theConfig.customvertexgroups:
+            print("    %s" % path)
+            copyVertGroups(path, fp, proxy)    
+        copyVertGroups("shared/mhx/templates/vertexgroups-leftright25.mhx", fp, proxy)    
+        if theConfig.cage and not (proxy and proxy.cage):
+            fp.write("#if toggle&T_Cage\n")
+            copyVertGroups("shared/mhx/templates/vertexgroups-cage25.mhx", fp, proxy)    
+            fp.write("#endif\n")
+    return
+    
+#
 #    rigDriversEnd(fp):                                        
 #
 
@@ -470,9 +432,33 @@ def rigDriversEnd(fp):
 "end AnimationData\n")
 
 #
-#    groupProxy(typ, fp, proxyData):
+#   writeGroups(fp, proxyData):                
+#   groupProxy(typ, fp, proxyData):
 #
 
+def writeGroups(fp, proxyData):                
+    fp.write(
+"PostProcess %sMesh %s 0000003f 00080000 0068056b 0000c000 ;\n" % (theHuman, theHuman) + 
+"Group %s\n"  % theHuman +
+"  Objects\n" +
+"#if toggle&T_Armature\n" +
+"    ob %s ;\n" % theHuman +
+#"    ob %sDeformRig ;\n" % theHuman +
+#"    ob %sSpineCurve ;\n" % theHuman +
+"#endif\n" +
+"#if toggle&T_Mesh\n" +
+"    ob %sMesh ;\n" % theHuman +
+"#endif\n")
+    groupProxy('Cage', fp, proxyData)
+    groupProxy('Proxy', fp, proxyData)
+    groupProxy('Clothes', fp, proxyData)
+    fp.write(
+"    ob CustomShapes ;\n" + 
+"  end Objects\n" +
+"  layers Array 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1  ;\n" +
+"end Group\n")
+    return
+    
 def groupProxy(typ, fp, proxyData):
     fp.write("#if toggle&T_%s\n" % typ)
     for proxy in proxyData.values():
@@ -483,6 +469,28 @@ def groupProxy(typ, fp, proxyData):
     fp.write("#endif\n")
     return
 
+#
+#   writeProxyModifiers(fp, proxy):
+#
+
+def writeProxyModifiers(fp, proxy):
+    for mod in proxy.modifiers:
+        if mod[0] == 'subsurf':
+            fp.write(
+"    Modifier SubSurf SUBSURF\n" +
+"      levels %d ;\n" % mod[1] +
+"      render_levels %d ;\n" % mod[2] +
+"    end Modifier\n")
+        elif mod[0] == 'shrinkwrap':
+            offset = mod[1]
+            fp.write(
+"    Modifier ShrinkWrap SHRINKWRAP\n" +
+"      target Refer Object %sMesh ;\n" % theHuman +
+"      offset %.4f ;\n" % offset +
+"      use_keep_above_surface True ;\n" +
+"    end Modifier\n")
+    return
+    
 #
 #   writeProxyMaterial(fp, mat):
 #

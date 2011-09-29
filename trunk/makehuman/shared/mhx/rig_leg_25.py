@@ -83,11 +83,6 @@ LegJoints = [
     ('r-legin-tail',        'vl', ((0.2, 3973), (0.8, 3832))),
     ('l-legin-head',        'vl', ((0.5, 6733), (0.5, 7464))),
     ('l-legin-tail',        'vl', ((0.2, 7035), (0.8, 7177))),
-
-    ('r-gastro-head',       'vl', ((0.2, 4105), (0.8, 5714))),
-    ('r-gastro-tail',       'l', ((0.1, 'r-upper-leg'), (0.9, 'r-knee'))),
-    ('l-gastro-head',       'vl', ((0.2, 6942), (0.8, 6768))),
-    ('l-gastro-tail',       'l', ((0.1, 'l-upper-leg'), (0.9, 'l-knee'))),
 ]
 
 LegHeadsTails = [
@@ -155,8 +150,6 @@ LegHeadsTails = [
     ('DfmLegFront_R',   'l-legfront-head', 'l-legfront-tail'),
     ('DfmLegIn_L',      'r-legin-head', 'r-legin-tail'),
     ('DfmLegIn_R',      'l-legin-head', 'l-legin-tail'),
-    ('DfmGastro_L',     'r-gastro-head', 'r-gastro-tail'),
-    ('DfmGastro_R',     'l-gastro-head', 'l-gastro-tail'),
 
     ('LegbackTrg_L',    'r-upper-leg', 'r-legback-tail'),
     ('LegbackTrg_R',    'l-upper-leg', 'l-legback-tail'),
@@ -166,8 +159,6 @@ LegHeadsTails = [
     ('LegFrontTrg_R',   'l-knee', 'l-legfront-tail'),
     ('LegInTrg_L',      'r-knee', 'r-legin-tail'),
     ('LegInTrg_R',      'l-knee', 'l-legin-tail'),
-    ('GastroTrg_L',     'r-knee', 'r-gastro-tail'),
-    ('GastroTrg_R',     'l-knee', 'l-gastro-tail'),
 
     # Knee deform
     ('DfmKnee_L',       'r-knee-head', 'r-knee-tail'),
@@ -285,8 +276,6 @@ LegArmature = [
     ('DfmLegFront_R',   0, 'DfmHips', F_DEF, L_MSCL, NoBB),
     ('DfmLegIn_L',      0, 'DfmHips', F_DEF, L_MSCL, NoBB),
     ('DfmLegIn_R',      0, 'DfmHips', F_DEF, L_MSCL, NoBB),
-    ('DfmGastro_L',     0, 'DfmLoLeg_L', F_DEF, L_MSCL, NoBB),
-    ('DfmGastro_R',     0, 'DfmLoLeg_R', F_DEF, L_MSCL, NoBB),
 
     ('LegbackTrg_L',    0, 'UpLeg1_L', 0, L_HELP, NoBB),
     ('LegbackTrg_R',    0, 'UpLeg1_R', 0, L_HELP, NoBB),
@@ -296,8 +285,6 @@ LegArmature = [
     ('LegFrontTrg_R',   0, 'UpLeg1_R', 0, L_HELP, NoBB),
     ('LegInTrg_L',      0, 'UpLeg1_L', 0, L_HELP, NoBB),
     ('LegInTrg_R',      0, 'UpLeg1_R', 0, L_HELP, NoBB),
-    ('GastroTrg_L',     0, 'DfmUpLeg3_L', 0, L_HELP, NoBB),
-    ('GastroTrg_R',     0, 'DfmUpLeg3_R', 0, L_HELP, NoBB),
 
     # Knee deform
     #('DfmKnee_L',       0, 'DfmUpLeg3_L', F_DEF, L_DEF, NoBB),
@@ -529,12 +516,6 @@ def LegControlPoses(fp):
 
     addPoseBone(fp, 'DfmLegIn_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegInTrg_R', 1, 1])])
-
-    addPoseBone(fp, 'DfmGastro_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'GastroTrg_L', 1, 5])])
-
-    addPoseBone(fp, 'DfmGastro_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'GastroTrg_R', 1, 5])])
 
     return
     

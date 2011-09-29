@@ -18,9 +18,6 @@
 
 Abstract
 --------
-MakeHuman to MHX (MakeHuman eXchange format) exporter. MHX files can be loaded into Blender
-
-TO DO
 
 """
 
@@ -60,3 +57,6 @@ def setupCustomRig():
         
         
     return (joints, headsTails, armature, props)
+
+
+

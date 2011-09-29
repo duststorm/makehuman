@@ -776,11 +776,6 @@ def addCopyRotConstraint(fp, flags, inf, data):
     useOffs = data[4]
     (ownsp, targsp, active, expanded) = constraintFlags(flags)
 
-    '''
-    if (useX, useY, useZ) != (1,1,1):
-        print("Warning: partial copy rotation %s" % subtar)
-    '''
-
     if Mhx25:
         fp.write(
 "    Constraint %s COPY_ROTATION True\n" % name +
