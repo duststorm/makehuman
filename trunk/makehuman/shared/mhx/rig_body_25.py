@@ -165,13 +165,13 @@ BodyArmature = [
     #('DownSpineLinkPT',    0, 'DownSpine2', F_RES, L_DNSPNIK, NoBB),
 
     # Deform spine    
-    ('DfmPelvis',          0, None, F_NOSCALE, L_HELP, NoBB),
-    ('DfmHips',            0, 'DfmPelvis', F_DEF+F_NOSCALE, L_DMAIN, NoBB),
-    ('DfmSpine1',          0, 'DfmPelvis', F_DEF+F_CON+F_NOSCALE, L_DMAIN, (1,1,3) ),
-    ('DfmSpine2',          0, 'DfmSpine1', F_DEF+F_CON+F_NOSCALE, L_DMAIN, (1,1,3) ),
-    ('DfmSpine3',          0, 'DfmSpine2', F_DEF+F_CON+F_NOSCALE, L_DMAIN, (1,1,3) ),
-    ('DfmNeck',            0, 'DfmSpine3', F_DEF+F_CON+F_NOSCALE, L_DMAIN, (1,1,3) ),
-    ('Groin',              0, 'DfmHips', F_WIR+F_DEF, L_TORSO+L_MSCL, NoBB ),
+    ('DfmPelvis',          0, None, 0, L_HELP, NoBB),
+    ('DfmHips',            0, 'DfmPelvis', F_DEF, L_DMAIN, NoBB),
+    ('DfmSpine1',          0, 'DfmPelvis', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
+    ('DfmSpine2',          0, 'DfmSpine1', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
+    ('DfmSpine3',          0, 'DfmSpine2', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
+    ('DfmNeck',            0, 'DfmSpine3', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
+    ('Groin',              0, 'DfmHips', F_WIR+F_DEF, L_TWEAK+L_MSCL, NoBB ),
 
     # Head
     ('Head',               0, 'DfmNeck', F_WIR, L_UPSPN+L_DNSPN+L_HEAD, NoBB),
@@ -181,7 +181,7 @@ BodyArmature = [
     ('DfmRib',             0, 'DfmSpine3', F_DEF, L_DMAIN, NoBB),
     ('StomachPar',         0, 'DfmRib', 0, L_HELP, NoBB),
     ('DfmStomach1',        0, 'DfmRib', F_DEF+F_CON, L_DMAIN, (1,1,5) ),
-    ('Stomach',            0, 'StomachPar', F_WIR, L_TORSO, NoBB),
+    ('Stomach',            0, 'StomachPar', F_WIR, L_TWEAK, NoBB),
     ('DfmStomach2',        0, 'DfmStomach1', F_DEF+F_CON, L_DMAIN, (1,1,4) ),
     ('StomachTrg',         0, 'DfmHips', 0, L_HELP, NoBB),
 
@@ -190,22 +190,22 @@ BodyArmature = [
     ('WaistTrg_L',         0, 'DfmHips', 0, L_HELP, NoBB),
     ('WaistTrg_R',         0, 'DfmHips', 0, L_HELP, NoBB),
 
-    #('Breathe',            0, 'DfmRib', F_WIR, L_TORSO, NoBB),
+    #('Breathe',            0, 'DfmRib', F_WIR, L_TWEAK, NoBB),
 
 ]
 
 MaleArmature = [
-    ('Penis1',             0, 'Groin', F_WIR, L_TORSO, (1,5,1) ),
-    ('Penis2',             0, 'Penis1', F_WIR, L_TORSO, (1,5,1) ),
-    ('Scrotum',            0, 'Groin', F_WIR, L_TORSO, NoBB),
+    ('Penis1',             0, 'Groin', F_WIR, L_TWEAK, (1,5,1) ),
+    ('Penis2',             0, 'Penis1', F_WIR, L_TWEAK, (1,5,1) ),
+    ('Scrotum',            0, 'Groin', F_WIR, L_TWEAK, NoBB),
     ('DfmPenis1',          0, 'Groin', F_DEF, L_MSCL, (1,1,3) ),
     ('DfmPenis2',          0, 'DfmPenis1', F_DEF+F_CON, L_MSCL, (1,1,3) ),
     ('DfmScrotum',         0, 'Groin', F_DEF, L_MSCL, NoBB),
 ]
 
 BreastArmature = [
-    ('Breast_L',           -45*D, 'DfmRib', F_DEF+F_WIR, L_TORSO, NoBB),
-    ('Breast_R',           45*D, 'DfmRib', F_DEF+F_WIR, L_TORSO, NoBB),
+    ('Breast_L',           -45*D, 'DfmRib', F_DEF+F_WIR, L_TWEAK, NoBB),
+    ('Breast_R',           45*D, 'DfmRib', F_DEF+F_WIR, L_TWEAK, NoBB),
 ]
 
 #

@@ -67,14 +67,14 @@ L_RHANDIK = 0x00400000
 L_RHANDFK = 0x00800000
 
 L_PANEL =   0x0100
-L_TORSO =   0x0200
+L_TWEAK =   0x0200
 L_TOE =     0x0200
 L_HEAD =    0x0400
 
 L_LPALM =   0x0800
-L_LTWEAK =  0x1000
+L_LEXTRA =  0x1000
 L_RPALM =   0x08000000
-L_RTWEAK =  0x10000000
+L_REXTRA =  0x10000000
 
 L_DNSPNFK = 0x2000
 L_DNSPNIK = 0x20000000
@@ -99,8 +99,9 @@ F_LOCK = 0x0040
 F_HID = 0x0080
 F_NOCYC = 0x0100
 
+F_NOSCALE = 0x0200
 F_NOROT = 0x0400
-F_NOSCALE = 0x0800
+F_SCALE = 0x0800
 
 
 P_LKROT4 = 0x0001
@@ -308,7 +309,9 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 
     if flags & F_NOROT:
         fp.write("    use_inherit_rotation False ; \n")
-    if True or (flags & F_NOSCALE):
+    if flags & F_SCALE:
+        fp.write("    use_inherit_scale True ; \n")
+    else:
         fp.write("    use_inherit_scale False ; \n")
     fp.write("    layers Array ")
 

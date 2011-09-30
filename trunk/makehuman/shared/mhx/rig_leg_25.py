@@ -193,43 +193,43 @@ footCtrlRoll = 0.0
 
 LegArmature = [
     # Leg
-    ('Hip_L',          0, 'DfmHips', F_WIR, L_LTWEAK, NoBB),
+    ('Hip_L',          0, 'DfmHips', F_WIR, L_TWEAK, NoBB),
     ('UpLeg_L',         upLegRoll, 'Hip_L', F_WIR, L_LLEGFK, NoBB),
-    ('LoLeg_L',         loLegRoll, 'UpLeg_L', F_WIR, L_LLEGFK, NoBB),
+    ('LoLeg_L',         loLegRoll, 'UpLeg_L', F_WIR+F_SCALE, L_LLEGFK, NoBB),
     ('Foot_L',          footRoll, 'LoLeg_L', F_WIR+F_CON, L_LLEGFK, NoBB),
     ('Toe_L',           toeRoll, 'Foot_L', F_WIR, L_LLEGFK, NoBB),
     ('LegIK_L',         footCtrlRoll, Master, F_WIR, L_LLEGIK, NoBB),
     ('ToeRev_L',        0, 'LegIK_L', F_WIR, L_LLEGIK, NoBB),
     ('FootRev_L',       0, 'ToeRev_L', F_WIR, L_LLEGIK, NoBB),
-    ('Ankle_L',         0, None, F_WIR, L_LTWEAK, NoBB),
+    ('Ankle_L',         0, None, F_WIR, L_LEXTRA, NoBB),
     ('LegFK_L',         footCtrlRoll, 'LoLeg_L', 0, L_HELP, NoBB),
 
-    ('Hip_R',          0, 'DfmHips', F_WIR, L_RTWEAK, NoBB),
+    ('Hip_R',          0, 'DfmHips', F_WIR, L_TWEAK, NoBB),
     ('UpLeg_R',         -upLegRoll, 'Hip_R', F_WIR, L_RLEGFK, NoBB),
-    ('LoLeg_R',         -loLegRoll, 'UpLeg_R', F_WIR, L_RLEGFK, NoBB),
+    ('LoLeg_R',         -loLegRoll, 'UpLeg_R', F_WIR+F_SCALE, L_RLEGFK, NoBB),
     ('Foot_R',          -footRoll, 'LoLeg_R', F_WIR+F_CON, L_RLEGFK, NoBB),
     ('Toe_R',           -toeRoll, 'Foot_R', F_WIR, L_RLEGFK, NoBB),
     ('LegIK_R',         -footCtrlRoll, Master, F_WIR, L_RLEGIK, NoBB),
     ('ToeRev_R',        0, 'LegIK_R', F_WIR, L_RLEGIK, NoBB),
     ('FootRev_R',       0, 'ToeRev_R', F_WIR, L_RLEGIK, NoBB),
-    ('Ankle_R',         0, None, F_WIR, L_RTWEAK, NoBB),
+    ('Ankle_R',         0, None, F_WIR, L_REXTRA, NoBB),
     ('LegFK_R',         footCtrlRoll, 'LoLeg_R', 0, L_HELP, NoBB),  
     
     # Deform
-    ('UpLegRot_L',      upLegRoll, 'Hip_L', F_WIR+F_NOSCALE, L_LTWEAK, NoBB),
-    ('DfmUpLeg1_L',     upLegRoll, 'UpLegRot_L', F_DEF+F_NOSCALE, L_DMAIN, NoBB),
-    ('DfmUpLeg2_L',     upLegRoll, 'DfmUpLeg1_L', F_DEF, L_DMAIN,(0,0,5) ),
+    ('UpLegRot_L',      upLegRoll, 'Hip_L', F_WIR, L_TWEAK, NoBB),
+    ('DfmUpLeg1_L',     upLegRoll, 'UpLegRot_L', F_DEF, L_DMAIN, NoBB),
+    ('DfmUpLeg2_L',     upLegRoll, 'DfmUpLeg1_L', F_DEF+F_SCALE, L_DMAIN, NoBB),
     ('DfmUpLeg3_L',     upLegRoll, 'UpLeg_L', F_DEF, L_DMAIN, NoBB),
-    ('DfmLoLeg_L',      loLegRoll, 'UpLeg_L', F_DEF+F_NOSCALE, L_DMAIN, NoBB),
+    ('DfmLoLeg_L',      loLegRoll, 'UpLeg_L', F_DEF, L_DMAIN, NoBB),
     ('DfmLoLegFan_L',   loLegRoll, 'UpLeg_L', F_DEF, L_DEF, NoBB),
     ('DfmFoot_L',       footRoll, 'LoLeg_L', F_DEF, L_DMAIN, NoBB),
     ('DfmToe_L',        toeRoll, 'Foot_L', F_DEF, L_DMAIN, NoBB),
 
-    ('UpLegRot_R',      upLegRoll, 'Hip_R', F_WIR+F_NOSCALE, L_RTWEAK, NoBB),
-    ('DfmUpLeg1_R',     upLegRoll, 'UpLegRot_R', F_DEF+F_NOSCALE, L_DMAIN, NoBB),
-    ('DfmUpLeg2_R',     upLegRoll, 'DfmUpLeg1_R', F_DEF, L_DMAIN,(0,0,5) ),
+    ('UpLegRot_R',      upLegRoll, 'Hip_R', F_WIR, L_TWEAK, NoBB),
+    ('DfmUpLeg1_R',     upLegRoll, 'UpLegRot_R', F_DEF, L_DMAIN, NoBB),
+    ('DfmUpLeg2_R',     upLegRoll, 'DfmUpLeg1_R', F_DEF+F_SCALE, L_DMAIN, NoBB),
     ('DfmUpLeg3_R',     upLegRoll, 'UpLeg_R', F_DEF, L_DMAIN, NoBB),
-    ('DfmLoLeg_R',      -loLegRoll, 'UpLeg_R', F_DEF+F_NOSCALE, L_DMAIN, NoBB),
+    ('DfmLoLeg_R',      -loLegRoll, 'UpLeg_R', F_DEF, L_DMAIN, NoBB),
     ('DfmLoLegFan_R',   -loLegRoll, 'UpLeg_R', F_DEF, L_DEF, NoBB),
     ('DfmFoot_R',       -footRoll, 'DfmLoLeg_R', F_DEF, L_DMAIN, NoBB),
     ('DfmToe_R',        -toeRoll, 'DfmFoot_R', F_DEF, L_DMAIN, NoBB),
@@ -252,9 +252,9 @@ LegArmature = [
     ('ToePT_R',         0.0, 'ToeRev_R', 0, L_HELP, NoBB),
 
 
-    ('Butt_L',          0.0, 'DfmUpLeg1_L', F_WIR, L_LTWEAK, NoBB),
+    ('Butt_L',          0.0, 'DfmUpLeg1_L', F_WIR, L_TWEAK, NoBB),
     ('DfmButt_L',       0.0, 'Hip_L', F_DEF, L_MSCL, NoBB),
-    ('Butt_R',          0.0, 'DfmUpLeg1_R', F_WIR, L_RTWEAK, NoBB),
+    ('Butt_R',          0.0, 'DfmUpLeg1_R', F_WIR, L_TWEAK, NoBB),
     ('DfmButt_R',       0.0, 'Hip_R', F_DEF, L_MSCL, NoBB),
 
     # Muscles
@@ -329,23 +329,23 @@ def LegControlPoses(fp):
 
     addPoseBone(fp, 'Hip_R', 'MHBall025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-    addPoseBone(fp, 'UpLeg_L', 'GZM_Circle025', 'FK_L', (1,1,1), (0,0,0), (1,1,1), 
+    addPoseBone(fp, 'UpLeg_L', 'GZM_Circle025', 'FK_L', (1,1,1), (0,0,0), (1,0,1), 
                 ((1,1,1), (0,0,0), 0.05, None), CmodUpLeg, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpLeg_L, (1,1,1)])])
 
-    addPoseBone(fp, 'UpLeg_R', 'GZM_Circle025', 'FK_R', (1,1,1), (0,0,0), (1,1,1), 
+    addPoseBone(fp, 'UpLeg_R', 'GZM_Circle025', 'FK_R', (1,1,1), (0,0,0), (1,0,1), 
                 ((1,1,1), (0,0,0), 0.05, None), CmodUpLeg, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpLeg_R, (1,1,1)])])
 
     deltaKnee = -2.5*D
 
-    addPoseBone(fp, 'LoLeg_L', 'GZM_Circle025', 'FK_L', (1,1,1), (0,0,0), (1,1,1), 
+    addPoseBone(fp, 'LoLeg_L', 'GZM_Circle025', 'FK_L', (1,1,1), (0,0,0), (1,0,1), 
                 ((1,1,1), (0,0,0), 0.05, None), CmodLoLeg, 
         [('IK', 0, 0, ['LegIK', 'Ankle_L', 2, (-90*D+deltaKnee, 'KneePT_L'), (1,0,1)]),
         ('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoLeg_L, (1,1,1)])
         ])
 
-    addPoseBone(fp, 'LoLeg_R', 'GZM_Circle025', 'FK_R', (1,1,1), (0,0,0), (1,1,1), 
+    addPoseBone(fp, 'LoLeg_R', 'GZM_Circle025', 'FK_R', (1,1,1), (0,0,0), (1,0,1), 
                 ((1,1,1), (0,0,0), 0.05, None), CmodLoLeg, 
         [('IK', 0, 0, ['LegIK', 'Ankle_R', 2, (-90*D-deltaKnee, 'KneePT_R'), (1,0,1)]),
         ('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoLeg_R, (1,1,1)])
@@ -431,14 +431,15 @@ def LegControlPoses(fp):
     addPoseBone(fp, 'UpLeg2PT_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('CopyLoc', 0, 0.5, ['UpLeg3', 'UpLeg3PT_L', (1,1,1), (0,0,0), 0, False])])
 
-    copyDeformPartial(fp, 'DfmUpLeg1_L', None, (1,1,1), DmodUpLeg, 0, None, [])
+    copyDeformPartial(fp, 'DfmUpLeg1_L', None, (1,1,1), DmodUpLeg, 0, None,
+        [('CopyScale', C_LOCAL, 1, ['Scale', 'UpLeg_L', (0,1,0), False])])
     
     copyDeformPartial(fp, 'DfmUpLeg2_L', 'UpLeg_L', (1,1,1), DmodUpLeg, 0, None,
         [('IK', 0, 1, ['IK', 'LoLeg_L', 1, (90*D, 'UpLeg2PT_L'), (True, False,True)]),
-        #('StretchTo', 0, 1, ['Stretch', 'DfmUpLeg3_L', 1, 0])
         ])
         
-    copyDeformPartial(fp, 'DfmUpLeg3_L', 'UpLeg_L', (0,1,0), DmodUpLeg, 0, None, [])
+    copyDeformPartial(fp, 'DfmUpLeg3_L', 'UpLeg_L', (0,1,0), DmodUpLeg, 0, None,
+        [('StretchTo', 0, 1, ['Stretch', 'LoLeg_L', 0, 1])])
 
 
     addPoseBone(fp, 'UpLegRot_R', 'GZM_Circle10', None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
@@ -447,14 +448,15 @@ def LegControlPoses(fp):
     addPoseBone(fp, 'UpLeg2PT_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('CopyLoc', 0, 0.5, ['UpLeg3', 'UpLeg3PT_R', (1,1,1), (0,0,0), 0, False])])
 
-    copyDeformPartial(fp, 'DfmUpLeg1_R', 'UpLeg_R', (1,0,1), DmodUpLeg, 0, None, [])
+    copyDeformPartial(fp, 'DfmUpLeg1_R', 'UpLeg_R', (1,0,1), DmodUpLeg, 0, None,
+        [('CopyScale', C_LOCAL, 1, ['Scale', 'UpLeg_R', (0,1,0), False])])
     
     copyDeformPartial(fp, 'DfmUpLeg2_R', 'UpLeg_R', (1,1,1), DmodUpLeg, 0, None,
         [('IK', 0, 1, ['IK', 'LoLeg_R', 1, (90*D, 'UpLeg2PT_R'), (True, False,True)]),
-        #('StretchTo', 0, 1, ['Stretch', 'DfmUpLeg3_R', 1, 0])
         ])
         
-    copyDeformPartial(fp, 'DfmUpLeg3_R', 'UpLeg_R', (0,1,0), DmodUpLeg, 0, None, [])
+    copyDeformPartial(fp, 'DfmUpLeg3_R', 'UpLeg_R', (0,1,0), DmodUpLeg, 0, None,
+        [('StretchTo', 0, 1, ['Stretch', 'LoLeg_R', 0, 1])])
 
 
     # Lower leg deform
