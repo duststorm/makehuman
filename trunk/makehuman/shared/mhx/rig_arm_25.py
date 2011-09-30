@@ -256,7 +256,7 @@ limHand_R = (-90*D,70*D, 0,0, -20*D,20*D)
 #    Cmod = Control rig mode
 #
 
-CmodUpArm = 0   # P_XZY
+CmodUpArm = P_YXZ
 CmodLoArm = P_YZX
 CmodHand = 0
 
@@ -281,7 +281,7 @@ def ArmControlPoses(fp):
         ])
 
     addPoseBone(fp, 'LoArm_L', 'GZM_Circle025', 'FK_L', (1,1,1), (1,0,0), (1,0,1), 
-                ((1,1,1), (0,0,0), 0.05, None), CmodLoArm, 
+                ((0,1,1), (0,0,0), 0.05, None), CmodLoArm, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoArm_L, (True, True, True)]),
          ('IK', 0, 0, ['ArmIK', 'Wrist_L', 2, (pi-deltaElbow, 'ElbowPT_L'), (True, False,True)]),
          ('IK', 0, 0, ['Wrist', 'Wrist_L', 1, None, (True, False,True)]),
@@ -309,7 +309,7 @@ def ArmControlPoses(fp):
         ])
 
     addPoseBone(fp, 'LoArm_R', 'GZM_Circle025', 'FK_R', (1,1,1), (1,0,0), (1,0,1), 
-            ((1,1,1), (0,0,0), 0.05, None), CmodLoArm, 
+            ((0,1,1), (0,0,0), 0.05, None), CmodLoArm, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoArm_R, (True, True, True)]),
          ('IK', 0, 0, ['ArmIK', 'Wrist_R', 2, (deltaElbow, 'ElbowPT_R'), (True, False,True)]),
          ('IK', 0, 0, ['Wrist', 'Wrist_R', 1, None, (True, False,True)]),

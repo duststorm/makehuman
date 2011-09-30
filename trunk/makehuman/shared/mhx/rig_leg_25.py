@@ -313,8 +313,8 @@ limRevToe_R = (-10*D,45*D, 0,0, 0,0)
 #
 
 
-CmodUpLeg = 0
-CmodLoLeg = 0
+CmodUpLeg = P_YZX
+CmodLoLeg = P_ZYX
 CmodFoot = 0
 CmodToe = 0
 
@@ -339,14 +339,14 @@ def LegControlPoses(fp):
 
     deltaKnee = -2.5*D
 
-    addPoseBone(fp, 'LoLeg_L', 'GZM_Circle025', 'FK_L', (1,1,1), (0,0,0), (1,0,1), 
-                ((1,1,1), (0,0,0), 0.05, None), CmodLoLeg, 
+    addPoseBone(fp, 'LoLeg_L', 'GZM_Circle025', 'FK_L', (1,1,1), (0,0,1), (1,0,1), 
+                ((1,1,0), (0,0,0), 0.05, None), CmodLoLeg, 
         [('IK', 0, 0, ['LegIK', 'Ankle_L', 2, (-90*D+deltaKnee, 'KneePT_L'), (1,0,1)]),
         ('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoLeg_L, (1,1,1)])
         ])
 
-    addPoseBone(fp, 'LoLeg_R', 'GZM_Circle025', 'FK_R', (1,1,1), (0,0,0), (1,0,1), 
-                ((1,1,1), (0,0,0), 0.05, None), CmodLoLeg, 
+    addPoseBone(fp, 'LoLeg_R', 'GZM_Circle025', 'FK_R', (1,1,1), (0,0,1), (1,0,1), 
+                ((1,1,0), (0,0,0), 0.05, None), CmodLoLeg, 
         [('IK', 0, 0, ['LegIK', 'Ankle_R', 2, (-90*D-deltaKnee, 'KneePT_R'), (1,0,1)]),
         ('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoLeg_R, (1,1,1)])
         ])
