@@ -237,8 +237,6 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                 fp.write("Object %s ARMATURE %s \n" % (proxy.name, proxy.name))
                 if proxy.rig:
                     fp.write("  Property MhxRigType '%s' ;\n" % proxy.name)
-                if theConfig.clothesvisibilitydrivers:
-                    fp.write("  Property &Hide%s False ;\n" % proxy.name)
             elif words[1] == 'ProxyPose':
                 mh2proxy.writeRigPose(fp, proxy.name, proxy.bones)
             elif words[1] == 'ProxyMesh':
@@ -259,8 +257,10 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                     else:
                         fp.write("0 ")
                 fp.write(";\n")
+            elif words[1] == 'MeshAnimationData':
+                writeHideAnimationData(fp, theHuman)
             elif words[1] == 'ProxyAnimationData':
-                writeProxyAnimationData(fp, proxy)
+                writeHideAnimationData(fp, proxy.name)
             elif words[1] == 'toggleCage':
                 if theConfig.cage and not (proxy and proxy.cage):
                     fp.write("  #if toggle&T_Cage\n")
@@ -336,24 +336,15 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                 fp.write("#endif\n#if toggle&T_Clothes\n")
                 proxyShapes('Clothes', human, rig, proxyData, fp)
                 fp.write("#endif\n")
-            #elif words[1] == 'mesh-animationData':
-            #    if rig == 'mhx':
-            #        writeAnimationData(fp, "%sMesh" % theHuman, None)
-            #elif words[1] == 'proxy-animationData':
-            #    if rig == 'mhx':
-            #        for proxy in proxyData.values():
-            #            if proxy.name:
-            #                writeAnimationData(fp, proxy.name+"Mesh", proxy)
             elif words[1] == 'ProxyModifiers':
                 writeProxyModifiers(fp, proxy)
             elif words[1] == 'curves':
                 mhx_rig.writeAllCurves(fp)
             elif words[1] == 'properties':
                 mhx_rig.writeAllProperties(fp, words[2])
-                if theConfig.clothesvisibilitydrivers:
-                    print("PData", proxyData)
-                    for proxy in proxyData.values():
-                        fp.write("  Property &Hide%s False ;\n" % proxy.name)
+                writeHideProp(fp, theHuman)
+                for proxy in proxyData.values():
+                    writeHideProp(fp, proxy.name)
             elif words[1] == 'material-drivers':
                 if 0 and BODY_LANGUAGE:
                     fp.write("MaterialAnimationData %sMesh (toggle&T_Face==T_Face)and(toggle&T_Symm==0) 0\n" % theHuman)
@@ -469,8 +460,7 @@ def writeProxyObject(fp, proxy):
         fp.write("  parent Refer Object %s ;\n" % proxy.name)
     else:
         fp.write("  parent Refer Object %s ;\n" % theHuman)
-    if theConfig.clothesvisibilitydrivers:
-        fp.write(
+    fp.write(
 "  hide False ;\n" +
 "  hide_render False ;\n")
     fp.write("#endif\n")
@@ -501,17 +491,23 @@ def writeProxyModifiers(fp, proxy):
     return
 
 #
-#   writeProxyAnimationData(fp, proxy):
+#   writeHideProp(fp, name):                
+#   writeHideAnimationData(fp, name):
 #
 
-def writeProxyAnimationData(fp, proxy):
-    if theConfig.clothesvisibilitydrivers:
-        fp.write("AnimationData %sMesh True\n" % proxy.name)
-        mhx_rig.writePropDriver(fp, ["&Hide%s" % proxy.name], "x1", "hide")
-        mhx_rig.writePropDriver(fp, ["&Hide%s" % proxy.name], "x1", "hide_render")
-        fp.write("end AnimationData\n")
+def writeHideProp(fp, name):                
+    fp.write(
+"  Property Hide%s False Control_%s_visibility ;\n" % (name, name) +
+"  PropKeys Hide%s \"type\":'BOOLEAN',\"min\":0,\"max\":1, ;\n" % name)
+    return
+
+def writeHideAnimationData(fp, name):
+    fp.write("AnimationData %sMesh True\n" % name)
+    mhx_rig.writePropDriver(fp, ["Hide%s" % name], "x1", "hide")
+    mhx_rig.writePropDriver(fp, ["Hide%s" % name], "x1", "hide_render")
+    fp.write("end AnimationData\n")
     return    
-    
+       
 #
 #   writeProxyMaterial(fp, mat):
 #

@@ -94,8 +94,9 @@ end Mesh
     levels 0 ;
     render_levels 1 ;
   end Modifier
-  
 end Object
+
+*** MeshAnimationData
 
 #if toggle&T_Armature
 # *** rig-process
