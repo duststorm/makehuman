@@ -1436,7 +1436,6 @@ def writePropDrivers(fp, drivers, suffix, prefix):
             "pose.bones[\"%s%s\"].constraints[\"%s\"].influence" % (bone, suffix, cns), 
             -1, (0,1), drvVars)
     return            
-
 #
 #   writeShapePropDrivers(fp, skeys, proxy, prefix):
 #
@@ -1448,6 +1447,19 @@ def writeShapePropDrivers(fp, skeys, proxy, prefix):
             writeDriver(fp, True, ('SCRIPTED', "x"), "",
                 "key_blocks[\"%s\"].value" % (skey), 
                 -1, (0,1), [drvVar])
+    return            
+    
+#
+#   writePropDriver(fp, props, expr, dataPath):
+#
+
+def writePropDriver(fp, props, expr, dataPath):
+    drvVars = []
+    n = 1
+    for prop in props:
+        drvVars.append( ("x%d" % n, 'SINGLE_PROP', [('OBJECT', mhx_main.theHuman, '["%s"]' % (prop))]) )
+        n += 1
+    writeDriver(fp, True, ('SCRIPTED', expr), "", dataPath, -1, (0,1), drvVars)
     return            
     
 #

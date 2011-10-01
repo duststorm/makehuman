@@ -208,23 +208,23 @@ LegArmature = [
     ('LegFK_L',         footCtrlRoll, 'LoLeg_L', 0, L_HELP, NoBB),
 
     ('Hip_R',          0, 'DfmHips', F_WIR, L_TWEAK, NoBB),
-    ('UpLeg_R',         -upLegRoll, 'Hip_R', F_WIR, L_RLEGIK, NoBB),
-    ('LoLeg_R',         -loLegRoll, 'UpLeg_R', F_WIR+F_SCALE, L_RLEGIK, NoBB),
-    ('Foot_R',          -footRoll, 'LoLeg_R', F_WIR+F_CON, L_RLEGIK, NoBB),
-    ('Toe_R',           -toeRoll, 'Foot_R', F_WIR, L_RLEGIK, NoBB),
+    ('UpLeg_R',         -upLegRoll, 'Hip_R', F_WIR, L_RLEGFK, NoBB),
+    ('LoLeg_R',         -loLegRoll, 'UpLeg_R', F_WIR+F_SCALE, L_RLEGFK, NoBB),
+    ('Foot_R',          -footRoll, 'LoLeg_R', F_WIR+F_CON, L_RLEGFK, NoBB),
+    ('Toe_R',           -toeRoll, 'Foot_R', F_WIR, L_RLEGFK, NoBB),
     ('LegFK_R',         footCtrlRoll, 'LoLeg_R', 0, L_HELP, NoBB),  
     
     # IK Leg
     
-    ('UpLegIK_L',       upLegRoll, 'Hip_L', 0, L_LLEGFK, NoBB),
-    ('LoLegIK_L',       loLegRoll, 'UpLegIK_L', 0, L_LLEGFK, NoBB),
+    ('UpLegIK_L',       upLegRoll, 'Hip_L', 0, L_LLEGIK, NoBB),
+    ('LoLegIK_L',       loLegRoll, 'UpLegIK_L', 0, L_LLEGIK, NoBB),
     ('LegIK_L',         -footCtrlRoll, Master, F_WIR, L_LLEGIK, NoBB),
     ('ToeRev_L',        0, 'LegIK_L', F_WIR, L_LLEGIK, NoBB),
     ('FootRev_L',       0, 'ToeRev_L', F_WIR, L_LLEGIK, NoBB),
     ('Ankle_L',         0, None, F_WIR, L_LEXTRA, NoBB),
 
-    ('UpLegIK_R',       -upLegRoll, 'Hip_R', 0, L_RLEGFK, NoBB),
-    ('LoLegIK_R',       -loLegRoll, 'UpLegIK_R', 0, L_RLEGFK, NoBB),
+    ('UpLegIK_R',       -upLegRoll, 'Hip_R', 0, L_RLEGIK, NoBB),
+    ('LoLegIK_R',       -loLegRoll, 'UpLegIK_R', 0, L_RLEGIK, NoBB),
     ('LegIK_R',         -footCtrlRoll, Master, F_WIR, L_RLEGIK, NoBB),
     ('ToeRev_R',        0, 'LegIK_R', F_WIR, L_RLEGIK, NoBB),
     ('FootRev_R',       0, 'ToeRev_R', F_WIR, L_RLEGIK, NoBB),

@@ -283,7 +283,7 @@ def truthValue(word):
     if word.lower() in ['false', 'no', '0']:
         return False
     return True
-    
+        
 #
 #    readProxyFile(obj, proxyStuff):
 #

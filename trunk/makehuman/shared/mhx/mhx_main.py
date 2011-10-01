@@ -91,6 +91,8 @@ def exportMhx_25(human, fp):
 
     obj = human.meshData
     mhx_rig.setupRig(obj)
+    proxyData = {}
+    scanProxies(obj, proxyData)
 
     fp.write(
 "NoScale True ;\n" +
@@ -102,34 +104,33 @@ def exportMhx_25(human, fp):
         rig = theConfig.useRig
         fp.write("#if toggle&T_Armature\n")
         for fname in mhx_rig.GizmoFiles:
-            copyFile25(human, fname, rig, fp, None, [])    
+            copyFile25(human, fname, rig, fp, None, proxyData)    
         mhx_rig.setupCircles(fp)
-        copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", rig, fp, None, [])    
+        copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", rig, fp, None, proxyData)    
         fp.write("#endif\n")
     elif theConfig.useRig in ['game']:
         rig = mh2proxy.CProxy('Rig', 0)
         rig.name = theHuman
         (locs, rig.bones, rig.weights) = read_rig.readRigFile('./data/templates/%s.rig' % theConfig.useRig, obj)
         fp.write("#if toggle&T_Armature\n")
-        copyFile25(human, "shared/mhx/templates/rig-game25.mhx", rig, fp, None, [])    
+        copyFile25(human, "shared/mhx/templates/rig-game25.mhx", rig, fp, None, proxyData)    
         fp.write("#endif\n")
     else:
         raise NameError("Unknown base rig %s" % rig)
         
     fp.write("\nNoScale False ;\n\n")
 
-    copyFile25(human, "shared/mhx/templates/materials25.mhx", rig, fp, None, [])    
+    copyFile25(human, "shared/mhx/templates/materials25.mhx", rig, fp, None, proxyData)    
 
-    proxyData = {}
-    proxyCopy('Cage', human, rig, theConfig.proxyList, proxyData, fp)
+    proxyCopy('Cage', human, rig, proxyData, fp)
 
     if theConfig.mainmesh:
         fp.write("#if toggle&T_Mesh\n")
         copyFile25(human, "shared/mhx/templates/meshes25.mhx", rig, fp, None, proxyData)    
         fp.write("#endif\n")
 
-    proxyCopy('Proxy', human, rig, theConfig.proxyList, proxyData, fp)
-    proxyCopy('Clothes', human, rig, theConfig.proxyList, proxyData, fp)
+    proxyCopy('Proxy', human, rig, proxyData, fp)
+    proxyCopy('Clothes', human, rig, proxyData, fp)
 
     copyFile25(human, "shared/mhx/templates/rig-poses25.mhx", rig, fp, None, proxyData) 
 
@@ -138,21 +139,32 @@ def exportMhx_25(human, fp):
     return
 
 #
-#    proxyCopy(name, human, rig, proxyList, proxyData, fp)
+#   scanProxies(obj, proxyData)
 #
 
-def proxyCopy(name, human, rig, proxyList, proxyData, fp):
-    for (typ, useObj, useMhx, useDae, proxyStuff) in proxyList:
-        if useMhx and typ == name:
-            fp.write("#if toggle&T_%s\n" % typ)
-            copyFile25(human, "shared/mhx/templates/proxy25.mhx", rig, fp, proxyStuff, proxyData)    
+def scanProxies(obj, proxyData):
+    for (typ, useObj, useMhx, useDae, proxyStuff) in theConfig.proxyList:
+        if useMhx:
+            proxy = mh2proxy.readProxyFile(obj, proxyStuff)
+            proxyData[proxy.name] = proxy        
+    return
+    
+#
+#    proxyCopy(name, human, rig, proxyData, fp)
+#
+
+def proxyCopy(name, human, rig, proxyData, fp):
+    for proxy in proxyData.values():
+        if proxy.type == name:
+            fp.write("#if toggle&T_%s\n" % proxy.type)
+            copyFile25(human, "shared/mhx/templates/proxy25.mhx", rig, fp, proxy, proxyData)    
             fp.write("#endif\n")
         
 #
-#    copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
+#    copyFile25(human, tmplName, rig, fp, proxy, proxyData):
 #
 
-def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
+def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
     tmpl = open(tmplName)
     if tmpl == None:
         print("*** Cannot open "+tmplName)
@@ -160,7 +172,6 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 
     obj = human.meshData
     bone = None
-    proxy = None
     faces = loadFacesIndices(obj)
     ignoreLine = False
     for line in tmpl:
@@ -168,14 +179,9 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
         if len(words) == 0:
             fp.write(line)
         elif words[0] == '***':
-            #if ignoreLine:
-            #    if words[1] == 'EndIgnore':
-            #        ignoreLine = False
             if words[1] == 'refer-human':
                 if words[3] == 'ControlRig' or theConfig.useRig != 'mhx':
                     fp.write("    %s Refer Object %s ;\n" % (words[2], theHuman))
-                #elif words[3] == 'DeformRig':
-                #    fp.write("    %s Refer Object %sDeformRig ;\n" % (words[2], theHuman))
                 else:
                     raise NameError("refer-human: %s" % line)
             elif words[1] == 'rig-bones':
@@ -185,10 +191,6 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                         mhx_rig.writeControlArmature(fp)
                     else:
                         mh2proxy.writeRigBones(fp, rig.bones)
-                #elif words[2] == 'DeformRig':
-                #    fp.write("Armature %sDeformRig %sDeformRig   Normal \n" % (theHuman, theHuman))
-                #    if rig == 'mhx':
-                #        mhx_rig.writeDeformArmature(fp)
                 else:
                     raise NameError("rig-bones: %s" % line)
             elif words[1] == 'human-object':
@@ -200,8 +202,6 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
 "  Property MhxOffsetZ %.4f ;\n" % mhx_rig.Origin[2])
                 elif words[2] == 'ControlRig':
                     fp.write("Object %s ARMATURE %s\n"  % (theHuman, theHuman))
-                #else:
-                #    fp.write("Object %sDeformRig ARMATURE %sDeformRig\n"  % (theHuman, theHuman))
             elif words[1] == 'rig-poses':
                 if words[2] == 'ControlRig':
                     if type(rig) == str:
@@ -210,11 +210,6 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                         fp.write("  ik_solver 'LEGACY' ;\nend Pose\n")
                     else:
                         mh2proxy.writeRigPose(fp, rig.name, rig.bones)
-                #elif words[2] == 'DeformRig':
-                #    if rig == 'mhx':
-                #        fp.write("Pose %sDeformRig\n" % theHuman)
-                #        mhx_rig.writeDeformPoses(fp)
-                #        fp.write("  ik_solver 'LEGACY' ;\nend Pose\n")
             elif words[1] == 'rig-actions':
                 if type(rig) == str:
                     fp.write("Pose %s\nend Pose\n" % theHuman)
@@ -225,10 +220,6 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                         fp.write("AnimationData %s True\n" % theHuman)
                         mhx_rig.writeAllDrivers(fp)
                         rigDriversEnd(fp)
-                    #elif words[2] == 'DeformRig':
-                    #    fp.write("AnimationData %sDeformRig True\n" % theHuman)
-                    #    mhx_rig.writeDeformDrivers(fp)
-                    #    rigDriversEnd(fp)
                     else:
                         raise NameError("rig-drivers: %s" % line)
             elif words[1] == 'rig-correct':
@@ -236,8 +227,6 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
             elif words[1] == 'recalc-roll':
                 fp.write("  RecalcRoll %s ;\n" % mhx_rig.RecalcRoll)
             elif words[1] == 'ProxyRigStart':
-                proxy = mh2proxy.readProxyFile(obj, proxyStuff)
-                proxyData[proxy.name] = proxy
                 if proxy.rig:
                     fp.write("#if True\n")
                     fp.write("Armature %s %s   Normal \n" % (proxy.name, proxy.name))
@@ -248,6 +237,8 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                 fp.write("Object %s ARMATURE %s \n" % (proxy.name, proxy.name))
                 if proxy.rig:
                     fp.write("  Property MhxRigType '%s' ;\n" % proxy.name)
+                if theConfig.clothesvisibilitydrivers:
+                    fp.write("  Property &Hide%s False ;\n" % proxy.name)
             elif words[1] == 'ProxyPose':
                 mh2proxy.writeRigPose(fp, proxy.name, proxy.bones)
             elif words[1] == 'ProxyMesh':
@@ -259,15 +250,7 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                     fp.write("  Material %s ;\n" % mat.name)
 
             elif words[1] == 'ProxyObject':
-                fp.write("Object %sMesh MESH %sMesh \n" % (proxy.name, proxy.name))
-                fp.write("#if toggle&T_Armature\n")
-                if proxy.rig:
-                    fp.write("  parent Refer Object %s ;\n" % proxy.name)
-                else:
-                    fp.write("  parent Refer Object %s ;\n" % theHuman)
-                fp.write("#endif\n")
-                if proxy.wire:
-                    fp.write("  draw_type 'WIRE' ;\n")
+                writeProxyObject(fp, proxy)
             elif words[1] == 'ProxyLayers':
                 fp.write("layers Array ")
                 for n in range(20):
@@ -276,6 +259,8 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                     else:
                         fp.write("0 ")
                 fp.write(";\n")
+            elif words[1] == 'ProxyAnimationData':
+                writeProxyAnimationData(fp, proxy)
             elif words[1] == 'toggleCage':
                 if theConfig.cage and not (proxy and proxy.cage):
                     fp.write("  #if toggle&T_Cage\n")
@@ -351,20 +336,24 @@ def copyFile25(human, tmplName, rig, fp, proxyStuff, proxyData):
                 fp.write("#endif\n#if toggle&T_Clothes\n")
                 proxyShapes('Clothes', human, rig, proxyData, fp)
                 fp.write("#endif\n")
-            elif words[1] == 'mesh-animationData':
-                if rig == 'mhx':
-                    writeAnimationData(fp, "%sMesh" % theHuman, None)
-            elif words[1] == 'proxy-animationData':
-                if rig == 'mhx':
-                    for proxy in proxyData.values():
-                        if proxy.name:
-                            writeAnimationData(fp, proxy.name+"Mesh", proxy)
+            #elif words[1] == 'mesh-animationData':
+            #    if rig == 'mhx':
+            #        writeAnimationData(fp, "%sMesh" % theHuman, None)
+            #elif words[1] == 'proxy-animationData':
+            #    if rig == 'mhx':
+            #        for proxy in proxyData.values():
+            #            if proxy.name:
+            #                writeAnimationData(fp, proxy.name+"Mesh", proxy)
             elif words[1] == 'ProxyModifiers':
                 writeProxyModifiers(fp, proxy)
             elif words[1] == 'curves':
                 mhx_rig.writeAllCurves(fp)
             elif words[1] == 'properties':
                 mhx_rig.writeAllProperties(fp, words[2])
+                if theConfig.clothesvisibilitydrivers:
+                    print("PData", proxyData)
+                    for proxy in proxyData.values():
+                        fp.write("  Property &Hide%s False ;\n" % proxy.name)
             elif words[1] == 'material-drivers':
                 if 0 and BODY_LANGUAGE:
                     fp.write("MaterialAnimationData %sMesh (toggle&T_Face==T_Face)and(toggle&T_Symm==0) 0\n" % theHuman)
@@ -470,6 +459,26 @@ def groupProxy(typ, fp, proxyData):
     return
 
 #
+#   writeProxyObject(fp, proxy):                
+#
+
+def writeProxyObject(fp, proxy):                
+    fp.write("Object %sMesh MESH %sMesh \n" % (proxy.name, proxy.name))
+    fp.write("#if toggle&T_Armature\n")
+    if proxy.rig:
+        fp.write("  parent Refer Object %s ;\n" % proxy.name)
+    else:
+        fp.write("  parent Refer Object %s ;\n" % theHuman)
+    if theConfig.clothesvisibilitydrivers:
+        fp.write(
+"  hide False ;\n" +
+"  hide_render False ;\n")
+    fp.write("#endif\n")
+    if proxy.wire:
+        fp.write("  draw_type 'WIRE' ;\n")    
+    return
+
+#
 #   writeProxyModifiers(fp, proxy):
 #
 
@@ -490,6 +499,18 @@ def writeProxyModifiers(fp, proxy):
 "      use_keep_above_surface True ;\n" +
 "    end Modifier\n")
     return
+
+#
+#   writeProxyAnimationData(fp, proxy):
+#
+
+def writeProxyAnimationData(fp, proxy):
+    if theConfig.clothesvisibilitydrivers:
+        fp.write("AnimationData %sMesh True\n" % proxy.name)
+        mhx_rig.writePropDriver(fp, ["&Hide%s" % proxy.name], "x1", "hide")
+        mhx_rig.writePropDriver(fp, ["&Hide%s" % proxy.name], "x1", "hide_render")
+        fp.write("end AnimationData\n")
+    return    
     
 #
 #   writeProxyMaterial(fp, mat):
