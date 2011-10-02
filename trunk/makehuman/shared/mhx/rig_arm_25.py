@@ -69,6 +69,12 @@ ArmJoints = [
     ('l-biceps-head',       'vl', ((0.7, 10719), (0.3, 10300))),
     ('r-biceps-tail',       'l', ((prcBicepsTail, 'r-hand'), (1-prcBicepsTail, 'r-elbow'))),
     ('l-biceps-tail',       'l', ((prcBicepsTail, 'l-hand'), (1-prcBicepsTail, 'l-elbow'))),
+    
+    ('r-elbow-compress1',     'l', ((0.5, 'r-elbow'), (0.5, 'r-uparm0'))),
+    ('r-elbow-compress2',     'l', ((0.5, 'r-elbow'), (0.5, 'r-hand'))),
+    ('l-elbow-compress1',     'l', ((0.5, 'l-elbow'), (0.5, 'l-uparm0'))),
+    ('l-elbow-compress2',     'l', ((0.5, 'l-elbow'), (0.5, 'l-hand'))),
+    
 ]
 
 ArmHeadsTails = [
@@ -121,6 +127,12 @@ ArmHeadsTails = [
     ('ElbowBendTrg_L',     'r-elbow-tail', ('r-elbow-tail', yunit)),
     ('DfmElbowBend_R',     'l-elbow-head', 'l-elbow-tail'),
     ('ElbowBendTrg_R',     'l-elbow-tail', ('l-elbow-tail', yunit)),
+
+    # Elbow deform
+    ('DfmElbowCompress_L', 'r-elbow-compress1', 'r-elbow-compress2'),
+    ('ElbowCompressTrg_L', 'r-elbow-compress2', ('r-elbow-compress2', yunit)),
+    ('DfmElbowCompress_R', 'l-elbow-compress1', 'l-elbow-compress2'),
+    ('ElbowCompressTrg_R', 'l-elbow-compress2', ('l-elbow-compress2', yunit)),
 
    # Pole Targets
 
@@ -231,6 +243,11 @@ ArmArmature = [
     ('LoArm2PT_R',        0, 'DfmLoArm1_R', 0, L_HELP, NoBB),
     ('LoArm3PT_R',        0, 'LoArm_R', 0, L_HELP, NoBB),
 
+    # Elbow deform
+    ('DfmElbowCompress_L',       0, 'DfmUpArm3_L', F_DEF, L_DEF, NoBB),
+    ('ElbowCompressTrg_L',       0, 'DfmLoArm1_L', 0, L_HELP, NoBB),
+    ('DfmElbowCompress_R',       0, 'DfmUpArm3_R', F_DEF, L_DEF, NoBB),
+    ('ElbowCompressTrg_R',       0, 'DfmLoArm1_R', 0, L_HELP, NoBB),
 ]
 
 #
@@ -461,6 +478,14 @@ def ArmControlPoses(fp):
     
     copyDeform(fp, 'DfmHand_R', 'Hand_R', DmodHand, U_LOC+U_ROT, None, [])
     
+    # Elbow deform
+
+    addPoseBone(fp, 'DfmElbowCompress_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('StretchTo', 0, 1, ['Stretch', 'ElbowCompressTrg_L', 0, 1])])
+
+    addPoseBone(fp, 'DfmElbowCompress_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('StretchTo', 0, 1, ['Stretch', 'ElbowCompressTrg_R', 0, 1])])
+
     return
 
 #
