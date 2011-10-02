@@ -101,9 +101,10 @@ class HairTaskView(gui3d.TaskView):
             # Copy mhclo file into data/hairstyles folder.
             if True:
                 hairName = human.hairObj.meshName.split('.')[0]
-                proxyFile = "data/hairstyles/%s.mhclo" % hairName
-                print("Loading clothes hair %s" % proxyFile)
-                proxy = mh2proxy.readProxyFile(human.meshData, (proxyFile, "Clothes", 0))
+                pfile = mh2proxy.CProxyFile()
+                pfile.file = "data/hairstyles/%s.mhclo" % hairName
+                print("Loading clothes hair %s" % pfile.file)
+                proxy = mh2proxy.readProxyFile(human.meshData, pfile)
                 mesh = human.hairObj.getSeedMesh()
                 for i, v in enumerate(mesh.verts):
                     (x,y,z) = mh2proxy.proxyCoord(proxy.realVerts[i])

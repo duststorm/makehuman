@@ -143,9 +143,9 @@ def exportMhx_25(human, fp):
 #
 
 def scanProxies(obj, proxyData):
-    for (typ, useObj, useMhx, useDae, proxyStuff) in theConfig.proxyList:
-        if useMhx:
-            proxy = mh2proxy.readProxyFile(obj, proxyStuff)
+    for pfile in theConfig.proxyList:
+        if pfile.useMhx:
+            proxy = mh2proxy.readProxyFile(obj, pfile)
             proxyData[proxy.name] = proxy        
     return
     

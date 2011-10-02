@@ -500,9 +500,9 @@ def exportDae(human, fp):
     if useProxy:
         proxyFile = "data/templates/%s.proxy" % useProxy.lower()
         print("Using %s" % proxyFile)
-        proxyStuff = (proxyFile, 'Proxy', 0)
-        proxyList = [('Proxy', False, False, True, proxyStuff)]
-        setupProxies('Proxy', obj, stuffs, amt, rawTargets, proxyList)
+        pfile = mh2proxy.CProxyFile()
+        pfile.set('Proxy', 0, False, False, True)
+        setupProxies('Proxy', obj, stuffs, amt, rawTargets, [pfile])
     else:
         mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
         mesh2 = filterMesh(mesh1)
@@ -589,14 +589,13 @@ def exportDae(human, fp):
 
 def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
     global theStuff
-    for (typ, useObj, useMhx, useDae, proxyStuff) in proxyList:
-        if useDae and typ == typename:
-            proxy = mh2proxy.readProxyFile(obj, proxyStuff)
+    for pfile in proxyList:
+        if pfile.useDae and pfile.type == typename:
+            proxy = mh2proxy.readProxyFile(obj, pfile)
             if proxy.name:
                 stuff = CStuff(proxy.name, proxy)
                 print(proxy.name, proxy.rig, proxy.weightfile)
                 if proxy.rig:
-                    (proxyFile, typ, layer) = proxyStuff
                     amtProxy = getArmatureFromRigFile(proxy.rig, obj)
                     stuff.setBones(amtProxy)
                     if theStuff.verts:
@@ -618,7 +617,7 @@ def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
                     #theStuff.verts = True
                 if stuff:
                     print("Stuff", stuff.name, theStuff.name)
-                    if typ == 'Proxy':
+                    if pfile.type == 'Proxy':
                         theStuff = stuff
                     if theStuff:
                         stuffname = theStuff.name

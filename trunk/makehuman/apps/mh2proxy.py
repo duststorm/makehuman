@@ -147,12 +147,42 @@ class CProxyConfig:
         self.customshapes = []
         self.customvertexgroups = []
 
+#
+#   class CProxyFile:
+#
+
+class CProxyFile:
+    def __init__(self):
+        self.type = 'Clothes'
+        self.layer = 0
+        self.useMhx = True
+        self.useObj = True
+        self.useDae = True
+        self.file = ""
+        self.name = None
+        
+    def set(self, type, layer, mhx, obj, dae):
+        self.type = type
+        self.layer = layer
+        self.useMhx = mhx
+        self.useObj = obj
+        self.useDae = dae
+        
+    def __repr__(self):
+        return (
+"<CProxyFile type %s layer %d\n" % (self.type, self.layer) +
+"    mhx %s obj %s dae %s\n" % (self.useMhx, self.useObj, self.useDae) + 
+"    name %s file \"%s\">" % (self.name, self.file))
+        
+#
+#   proxyConfig(human, useHair, options=None):
+#
 #[('mhxversion', ['25']), ('expressions', True), ('useRig', 'mhx')]
 #[('mhxversion', ['24', '25']), ('expressions', False), ('useRig', 'game')]
 
 def proxyConfig(human, useHair, options=None):
     cfg = CProxyConfig()
-    typ = 'Proxy'
+    type = 'Proxy'
     layer = 2
     useMhx = True
     useObj = True
@@ -176,17 +206,23 @@ def proxyConfig(human, useHair, options=None):
 
     if useHair and human.hairObj:
         words = human.hairObj.meshName.split('.')
-        proxyFile = os.path.expanduser("./data/hairstyles/%s.mhclo" % words[0])
-        cfg.proxyList.append(('Clothes', True, True, True, (proxyFile, 'Clothes', 0)))
+        pfile = CProxyFile()
+        pfile.set('Clothes', 0, useMhx, useObj, useDae)
+        pfile.file = os.path.expanduser("./data/hairstyles/%s.mhclo" % words[0])
+        cfg.proxyList.append(pfile)
 
     if not fp: 
         if useClothes:
             for name in ['sweater', 'jeans']:
-                proxyFile = os.path.expanduser("./data/templates/%s.mhclo" % name)
-                cfg.proxyList.append(('Clothes', True, True, True, (proxyFile, 'Clothes', 4)))
+                pfile = CProxyFile()
+                pfile.set('Clothes', 4, useMhx, useObj, useDae)
+                pfile.file = os.path.expanduser("./data/templates/%s.mhclo" % name)
+                cfg.proxyList.append(pfile)
         if useProxy:
-            proxyFile = os.path.expanduser("./data/templates/%s.proxy" % useProxy)
-            cfg.proxyList.append(('Proxy', True, True, True, (proxyFile, 'Proxy', 3)))
+            pfile = CProxyFile()
+            pfile.set('Proxy', 3, useMhx, useObj, useDae)
+            pfile.file = os.path.expanduser("./data/templates/%s.proxy" % useProxy)
+            cfg.proxyList.append(pfile)
         return cfg
 
     status = None
@@ -235,15 +271,12 @@ def proxyConfig(human, useHair, options=None):
                     pass
             elif key == 'proxy':
                 typ = 'Proxy'
-                typ = key.capitalize()
                 layer = int(words[2])
             elif key == 'cage':
                 typ = 'Cage'
-                typ = key.capitalize()
                 layer = int(words[2])
             elif key == 'clothes':
                 typ = 'Clothes'
-                typ = key.capitalize()
                 layer = int(words[2])
             else:
                 raise NameError('Unrecognized command %s in mh_export.config' % words[1])
@@ -265,10 +298,14 @@ def proxyConfig(human, useHair, options=None):
                 path = os.path.realpath(os.path.expanduser(words[0]))
                 cfg.customvertexgroups.append(path)
         else:
-            proxyFile = os.path.expanduser(words[0])
+            pfile = CProxyFile()
+            pfile.set(typ, layer, useMhx, useObj, useDae)
+            pfile.file = os.path.expanduser(words[0])
+            if len(words) > 1:
+                pfile.name = words[1]
             if typ == 'Cage':
                 cfg.cage = True
-            cfg.proxyList.append((typ, useObj, useMhx, useDae, (proxyFile, typ, layer)))
+            cfg.proxyList.append(pfile)
     fp.close()
     print "Proxy configuration: Use %s" % cfg.mainmesh
     for elt in cfg.proxyList:
@@ -285,26 +322,25 @@ def truthValue(word):
     return True
         
 #
-#    readProxyFile(obj, proxyStuff):
+#    readProxyFile(obj, pfile):
 #
 
-def readProxyFile(obj, proxyStuff):
-    if not proxyStuff:
+def readProxyFile(obj, pfile):
+    if not pfile:
         return CProxy('Proxy', 2)
 
-    (proxyFile, typ, layer) = proxyStuff
     try:
-        tmpl = open(proxyFile, "rU")
+        tmpl = open(pfile.file, "rU")
     except:
         tmpl = None
     if tmpl == None:
-        print("*** Cannot open %s" % proxyFile)
-        return CProxy(typ, layer)
+        print("*** Cannot open %s" % pfile.file)
+        return CProxy(pfile.type, pfile.layer)
 
     verts = obj.verts
     locations = {}
     tails = {}
-    proxy = CProxy(typ, layer)
+    proxy = CProxy(pfile.type, pfile.layer)
     proxy.name = "MyProxy"
 
     useProjection = True
@@ -429,6 +465,8 @@ def readProxyFile(obj, proxyStuff):
             w = float(words[1])
             weights.append((v,w))
 
+    if pfile.name:
+        proxy.name = pfile.name
     return proxy
 
 #
@@ -781,16 +819,18 @@ def fixProxyShape(shape):
 def exportProxyObj(human, name, proxyName):
     obj = human.meshData
     if proxyName:
-        proxyFile = "./data/templates/%s.proxy" % proxyName.lower()
-        proxy = readProxyFile(obj, (proxyFile, 'Proxy', 3))
+        pfile = CProxyFile()
+        pfile.type = 'Proxy'
+        pfile.file = "./data/templates/%s.proxy" % proxyName.lower()
+        proxy = readProxyFile(obj, pfile)
         if proxy.name:
             filename = "%s_%s.obj" % (name.lower(), proxy.name)
             exportProxyObj1(obj, filename, proxy)
     
     cfg = proxyConfig(human, False)
-    for (typ, useObj, useMhx, useDae, proxyStuff) in cfg.proxyList:
-        if useObj and typ != 'Proxy':
-            proxy = readProxyFile(obj, proxyStuff)
+    for pfile in cfg.proxyList:
+        if pfile.useObj and pfile.type != 'Proxy':
+            proxy = readProxyFile(obj, pfile)
             if proxy.name:
                 filename = "%s_%s.obj" % (name.lower(), proxy.name)
                 exportProxyObj1(obj, filename, proxy)
