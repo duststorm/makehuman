@@ -219,12 +219,12 @@ def ShoulderControlPoses(fp):
     addPoseBone(fp, 'SternumTarget', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
     # Clavicle
-    addPoseBone(fp, 'Clavicle_L', 'MHShoulder', 'Spine', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_YXZ,
+    addPoseBone(fp, 'Clavicle_L', 'MHShoulder', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_L, (True, True, True)]),
          ('CopyTrans', 0, 0, ['Elbow', 'ELClavicle_L', 0])
         ])
 
-    addPoseBone(fp, 'Clavicle_R', 'MHShoulder', 'Spine', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_YXZ,
+    addPoseBone(fp, 'Clavicle_R', 'MHShoulder', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_R, (True, True, True)]),
          ('CopyTrans', 0, 0, ['Elbow', 'ELClavicle_R', 0])
         ])
