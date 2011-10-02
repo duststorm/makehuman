@@ -148,10 +148,6 @@ ArmHeadsTails = [
     ('DfmBiceps_R',       'l-uparm1', 'l-biceps-tail'),
     ('BicepsTrg_L',       'r-elbow', 'r-biceps-tail'),
     ('BicepsTrg_R',       'l-elbow', 'l-biceps-tail'),
-    
-    # Shoulder bone with arm parent
-    ('DeltoidTrg1_L',     'r-deltoidtrg', ('r-deltoidtrg', yunit)),
-    ('DeltoidTrg1_R',     'l-deltoidtrg', ('l-deltoidtrg', yunit)),
 ]
 
 """
@@ -235,10 +231,6 @@ ArmArmature = [
     ('LoArm2PT_R',        0, 'DfmLoArm1_R', 0, L_HELP, NoBB),
     ('LoArm3PT_R',        0, 'LoArm_R', 0, L_HELP, NoBB),
 
-    # Shoulder bone with arm parent
-    ('DeltoidTrg1_L',      0, 'UpArm_L', 0, L_HELP, NoBB ),
-    ('DeltoidTrg1_R',      0, 'UpArm_R', 0, L_HELP, NoBB ),
-
 ]
 
 #
@@ -259,8 +251,8 @@ BicepsArmature = [
 limUpArm_L = (-90*D,90*D, -100*D,45*D, -90*D,90*D)
 limUpArm_R = (-90*D,90*D, -45*D,100*D, -90*D,90*D)
 
-limLoArm_L = (-90*D,90*D, -225*D,60*D, -135*D,10*D)
-limLoArm_R = (-90*D,90*D, -60*D,225*D, 10*D,135*D)
+limLoArm_L = (-0*D,0*D, -178*D,150*D, -175*D,10*D)
+limLoArm_R = (-0*D,0*D, -150*D,178*D, 10*D,175*D)
 
 limHand_L = (-90*D,70*D, 0,0, -20*D,20*D)
 limHand_R = (-90*D,70*D, 0,0, -20*D,20*D)
@@ -271,7 +263,7 @@ limHand_R = (-90*D,70*D, 0,0, -20*D,20*D)
 #    Cmod = Control rig mode
 #
 
-CmodUpArm = P_YXZ
+CmodUpArm = 0 # P_YXZ
 CmodLoArm = P_YZX
 CmodHand = 0
 
@@ -338,10 +330,10 @@ def ArmControlPoses(fp):
     # IK arm
     
     addPoseBone(fp, 'UpArmIK_L', None, 'IK_L', (1,1,1), (0,0,0), (1,1,1), 
-            ((1,1,1), (0,0,0), 0.05, None), CmodUpArm, [])
+            ((1,1,1), (0,0,0), 0.05, limUpArm_L), CmodUpArm, [])
 
     addPoseBone(fp, 'LoArmIK_L', None, 'IK_L', (1,1,1), (1,0,0), (1,1,1), 
-                ((0,1,1), (0,0,0), 0.05, None), CmodLoArm, 
+                ((0,1,1), (0,0,0), 0.05, limLoArm_L), CmodLoArm, 
         [('IK', 0, 1, ['ArmIK', 'Wrist_L', 2, (pi-deltaElbow, 'ElbowPT_L'), (True, False,True)]),
         ])
 
@@ -353,10 +345,10 @@ def ArmControlPoses(fp):
         ])
 
     addPoseBone(fp, 'UpArmIK_R', None, 'IK_R', (1,1,1), (0,0,0), (1,1,1), 
-            ((1,1,1), (0,0,0), 0.05, None), CmodUpArm, [])
+            ((1,1,1), (0,0,0), 0.05, limUpArm_R), CmodUpArm, [])
 
     addPoseBone(fp, 'LoArmIK_R', None, 'IK_R', (1,1,1), (1,0,0), (1,1,1), 
-            ((0,1,1), (0,0,0), 0.05, None), CmodLoArm, 
+            ((0,1,1), (0,0,0), 0.05, limLoArm_R), CmodLoArm, 
         [('IK', 0, 1, ['ArmIK', 'Wrist_R', 2, (deltaElbow, 'ElbowPT_R'), (True, False,True)]),
         ])
 

@@ -23,15 +23,8 @@ import mhx_rig
 from mhx_rig import *
 
 ShoulderJoints = [
-    #('r-deltoidtrg',        'vl', ((0.5, 3617), (0.5, 3625))),
-    #('l-deltoidtrg',        'vl', ((0.5, 10167), (0.5, 10175))),
-    ('r-deltoidtrg',        'l', ((0.5, 'r-uparm0'), (0.5, 'r-elbow'))),
-    ('l-deltoidtrg',        'l', ((0.5, 'l-uparm0'), (0.5, 'l-elbow'))),
-    ('r-deltoid',           'vl', ((0.5, 2914), (0.5, 3067))),
-    ('l-deltoid',           'vl', ((0.5, 10671), (0.5, 10787))),
-
-    ('r-pect1',             'v', 2909),
-    ('l-pect1',             'v', 10792),
+    ('r-pect1',             'vl', ((0.96, 2870), (0.04, 2591))),
+    ('l-pect1',             'vl', ((0.96, 10804), (0.04, 11017))),
     ('r-pect2',             'v', 3535),
     ('l-pect2',             'v', 10257),
 
@@ -99,13 +92,6 @@ ShoulderHeadsTails = [
 
     # Muscles
     
-    ('DeltoidTrg2_L',        'r-deltoidtrg', ('r-deltoidtrg', yunit)),
-    ('DeltoidTrg2_R',        'l-deltoidtrg', ('l-deltoidtrg', yunit)),
-    ('Deltoid_L',            'r-deltoidtrg', ('r-deltoidtrg', yunit)),
-    ('Deltoid_R',            'l-deltoidtrg', ('l-deltoidtrg', yunit)),
-    ('DfmDeltoid_L',         'r-deltoid', 'r-deltoidtrg'),
-    ('DfmDeltoid_R',         'l-deltoid', 'l-deltoidtrg'),
-
     ('DfmPect1_L',           'r-pect1', 'r-armtrg'),
     ('DfmPect1_R',           'l-pect1', 'l-armtrg'),
     ('DfmPect2_L',           'r-pect2', 'r-armtrg'),
@@ -176,13 +162,6 @@ ShoulderArmature = [
     ('DfmScapula_R',       0, 'ShoulderAim_R', F_DEF, L_DMAIN, NoBB),
 
     # Muscles
-    ('DeltoidTrg2_L',      0, 'Clavicle_L', 0, L_HELP, NoBB ),
-    ('DeltoidTrg2_R',      0, 'Clavicle_R', 0, L_HELP, NoBB ),
-    ('Deltoid_L',          pi, 'DeltoidTrg2_L', F_WIR, L_TWEAK, NoBB ),
-    ('Deltoid_R',          0, 'DeltoidTrg2_R', F_WIR, L_TWEAK, NoBB ),
-    ('DfmDeltoid_L',       0, 'DfmClavicle_L', F_DEF, L_MSCL, NoBB ),
-    ('DfmDeltoid_R',       0, 'DfmClavicle_R', F_DEF, L_MSCL, NoBB ),
-    
     ('DfmPect1_L',         0, 'DfmRib', F_DEF, L_MSCL, NoBB ),
     ('DfmPect1_R',         0, 'DfmRib', F_DEF, L_MSCL, NoBB ),
     ('DfmPect2_L',         0, 'DfmRib', F_DEF, L_MSCL, NoBB ),
@@ -240,12 +219,12 @@ def ShoulderControlPoses(fp):
     addPoseBone(fp, 'SternumTarget', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
     # Clavicle
-    addPoseBone(fp, 'Clavicle_L', 'MHShoulder', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+    addPoseBone(fp, 'Clavicle_L', 'MHShoulder', 'Spine', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_YXZ,
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_L, (True, True, True)]),
          ('CopyTrans', 0, 0, ['Elbow', 'ELClavicle_L', 0])
         ])
 
-    addPoseBone(fp, 'Clavicle_R', 'MHShoulder', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+    addPoseBone(fp, 'Clavicle_R', 'MHShoulder', 'Spine', (1,1,1), (0,1,0), (1,1,1), (1,1,1), P_YXZ,
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_R, (True, True, True)]),
          ('CopyTrans', 0, 0, ['Elbow', 'ELClavicle_R', 0])
         ])
@@ -265,23 +244,6 @@ def ShoulderControlPoses(fp):
          ('CopyRot', 0, 0, ['Root', 'BendRoot', (1,1,1), (0,0,0), False])])
 
     # Muscles
-    addPoseBone(fp, 'Deltoid_L', 'MHDeltoid', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
-
-    addPoseBone(fp, 'Deltoid_R', 'MHDeltoid', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
-
-    addPoseBone(fp, 'DeltoidTrg2_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-         [('CopyLoc', 0, 1, ['CopyLoc', 'DeltoidTrg1_L', (1,1,1), (0,0,0), 0, False])])
-
-    addPoseBone(fp, 'DeltoidTrg2_R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-         [('CopyLoc', 0, 1, ['CopyLoc', 'DeltoidTrg1_R', (1,1,1), (0,0,0), 0, False])])
-
-    addPoseBone(fp, 'DfmDeltoid_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Up', 'Deltoid_L', 0, 1])])
-
-    addPoseBone(fp, 'DfmDeltoid_R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Up', 'Deltoid_R', 0, 1])])
-
-
     addPoseBone(fp, 'DfmPect1_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_L', 1, 1])])
 
@@ -378,12 +340,4 @@ def ShoulderControlPoses(fp):
 #    (Bone, constraint, driver, rotdiff, keypoints)
 #
 
-ShoulderDeformDrivers = [
-    ("DeltoidTrg2_L", "CopyLoc", "u", 
-        [("u", "ArmTrg_L", "BendArmUp_L")], 
-        [(0,1), (70*D,1), (90*D,0)]),
-
-    ("DeltoidTrg2_R", "CopyLoc", "u", 
-        [("u", "ArmTrg_R", "BendArmUp_R")], 
-        [(0,1), (70*D,1), (90*D,0)]),
-]
+ShoulderDeformDrivers = []

@@ -328,7 +328,7 @@ limRevToe_R = (-10*D,45*D, 0,0, 0,0)
 #
 
 
-CmodUpLeg = P_YZX
+CmodUpLeg = 0 # P_YZX
 CmodLoLeg = P_ZYX
 CmodFoot = 0
 CmodToe = 0
@@ -387,17 +387,17 @@ def LegControlPoses(fp):
     # Leg IK
 
     addPoseBone(fp, 'UpLegIK_L', None, 'IK_L', (1,1,1), (0,0,0), (1,0,1), 
-                ((1,1,1), (0,0,0), 0.05, None), CmodUpLeg, [])
+                ((1,1,1), (0,0,0), 0.05, limUpLeg_L), CmodUpLeg, [])
 
     addPoseBone(fp, 'UpLegIK_R', None, 'IK_R', (1,1,1), (0,0,0), (1,0,1), 
-                ((1,1,1), (0,0,0), 0.05, None), CmodUpLeg, [])
+                ((1,1,1), (0,0,0), 0.05, limUpLeg_R), CmodUpLeg, [])
 
     addPoseBone(fp, 'LoLegIK_L', None, 'IK_L', (1,1,1), (0,0,1), (1,0,1), 
-                ((1,1,0), (0,0,0), 0.05, None), CmodLoLeg, 
+                ((1,1,0), (0,0,0), 0.05, limLoLeg_L), CmodLoLeg, 
         [('IK', 0, 1, ['LegIK', 'Ankle_L', 2, (-90*D+deltaKnee, 'KneePT_L'), (1,0,1)])])
 
     addPoseBone(fp, 'LoLegIK_R', None, 'IK_R', (1,1,1), (0,0,1), (1,0,1), 
-                ((1,1,0), (0,0,0), 0.05, None), CmodLoLeg, 
+                ((1,1,0), (0,0,0), 0.05, limLoLeg_R), CmodLoLeg, 
         [('IK', 0, 1, ['LegIK', 'Ankle_R', 2, (-90*D-deltaKnee, 'KneePT_R'), (1,0,1)])])
 
     addPoseBone(fp, 'LegIK_L', 'MHFootCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
@@ -435,7 +435,7 @@ def LegControlPoses(fp):
         [('ChildOf', C_CHILDOF, 1, ['Foot', 'LegIK_L', (1,1,1), (1,1,1), (1,1,1)]),
          ('ChildOf', C_CHILDOF, 0, ['Hip', 'Hip_L', (1,1,1), (1,1,1), (1,1,1)]) ])
 
-    addPoseBone(fp, 'KneeLinkPT_L', None, 'IK_L', (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
+    addPoseBone(fp, 'KneeLinkPT_L', None, 'IK_L', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'KneePT_L', 0, 1])])
 
     addPoseBone(fp, 'LegTrg_L', None, 'FK_L', (1,1,1), (1,0,1), (1,1,1), (1,1,1), P_YXZ, 
@@ -446,7 +446,7 @@ def LegControlPoses(fp):
         [('ChildOf', C_CHILDOF, 1, ['Foot', 'LegIK_R', (1,1,1), (1,1,1), (1,1,1)]),
          ('ChildOf', C_CHILDOF, 0, ['Hip', 'Hip_R', (1,1,1), (1,1,1), (1,1,1)]) ])
 
-    addPoseBone(fp, 'KneeLinkPT_R', None, 'IK_R', (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
+    addPoseBone(fp, 'KneeLinkPT_R', None, 'IK_R', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'KneePT_R', 0, 1])])
 
     addPoseBone(fp, 'LegTrg_R', None, 'FK_R', (1,1,1), (1,0,1), (1,1,1), (1,1,1), P_YXZ, 
@@ -554,10 +554,10 @@ def LegControlPoses(fp):
     
     # Knee deform
 
-    addPoseBone(fp, 'DfmKnee_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
+    addPoseBone(fp, 'DfmKnee_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', C_DEFRIG, 1, ['Stretch', 'KneeTrg_L', 0, 1])])
 
-    addPoseBone(fp, 'DfmKnee_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
+    addPoseBone(fp, 'DfmKnee_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', C_DEFRIG, 1, ['Stretch', 'KneeTrg_R', 0, 1])])
 
     return

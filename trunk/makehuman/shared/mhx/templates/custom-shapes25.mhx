@@ -301,35 +301,6 @@ end Object
 
 # ----------------------------- MESH --------------------- # 
 
-Mesh MHDeltoid MHDeltoid 
-  Verts
-    v 0.500 0.729 -0.097 ;
-    v 0.500 -0.099 -0.508 ;
-    v 0.500 0.729 0.097 ;
-    v 0.500 -0.099 0.508 ;
-    v 0.500 0.460 -0.290 ;
-    v 0.500 0.460 0.290 ;
-    v 0.500 0.180 -0.416 ;
-    v 0.500 0.180 0.416 ;
-  end Verts
-  Edges
-    e 0 2 ;
-    e 0 4 ;
-    e 2 5 ;
-    e 1 6 ;
-    e 4 6 ;
-    e 3 7 ;
-    e 5 7 ;
-  end Edges
-end Mesh
-
-Object MHDeltoid MESH MHDeltoid
-  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;
-  parent Refer Object CustomShapes ;
-end Object
-
-# ----------------------------- MESH --------------------- # 
-
 Mesh MHHand MHHand 
   Verts
     v 0.296403 0.132076 0.444902 ;

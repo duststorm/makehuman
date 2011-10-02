@@ -108,7 +108,6 @@ P_LKROT4 = 0x0001
 P_LKROTW = 0x0002
 P_IKLIN = 0x0004
 P_IKROT = 0x0008
-P_STRETCH = 0x0010
 P_HID = 0x0020
 
 P_ROTMODE = 0x0f00
@@ -404,11 +403,6 @@ def addDeformYBone(fp, bone, ikBone, fkBone, cflags, pflags):
         ('CopyRot', space, 1, ['RotFKXZ', fkBone, (1,0,1), (0,0,0), False]),
         ('CopyRot', space, 1, ['RotFKY', fkBone, (0,1,0), (0,0,0), False])
         ]
-    if pflags & P_STRETCH:
-        constraints += [
-        ('CopyScale', 0, 0, ['StretchIK', ikBone, (0,1,0), False]),
-        ('CopyScale', 0, 1, ['StretchFK', fkBone, (0,1,0), False]),
-        ]        
     addPoseBone(fp, bone, None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), pflags, constraints)
     return
 
@@ -418,17 +412,12 @@ def addDeformLimb(fp, bone, ikBone, ikRot, fkBone, fkRot, cflags, pflags, constr
         ('CopyRot', space, 0, ['RotIK', ikBone, ikRot, (0,0,0), False]),
         ('CopyRot', space, 1, ['RotFK', fkBone, fkRot, (0,0,0), False])
         ]
-    if pflags & P_STRETCH:
-        constraints += [
-        ('CopyScale', 0, 0, ['StretchIK', ikBone, (0,1,0), False]),
-        ('CopyScale', 0, 1, ['StretchFK', fkBone, (0,1,0), False]),
-        ]        
     (fX,fY,fZ) = fkRot
     addPoseBone(fp, bone, None, None, (1,1,1), (1-fX,1-fY,1-fZ), (0,0,0), (1,1,1), pflags, constraints)
     return
 
 def addStretchBone(fp, bone, target, parent):
-    addPoseBone(fp, bone, None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), P_STRETCH,
+    addPoseBone(fp, bone, None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', target, 0, 1]),
           ('LimitScale', C_OW_LOCAL, 0, ['LimitScale', (0,0, 0,0, 0,0), (0,1,0)])])
     #addPoseBone(fp, target, None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
@@ -524,40 +513,38 @@ def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik
         index = boneGroupIndex(boneGroup)
         fp.write("    bone_group Refer BoneGroup %s ;\n" % boneGroup)
 
-    (uses, mins, maxs) = addConstraints(fp, bone, constraints, lockLoc, lockRot)
-    (usex,usey,usez) = uses
-    (xmin, ymin, zmin) = mins
-    (xmax, ymax, zmax) = maxs
+    addConstraints(fp, bone, constraints, lockLoc, lockRot)
 
     if not Mhx25:
         fp.write("\tend posebone\n")
         return
     
+    ik_stretch = None
+    ik_stiff = None
+    ik_lim = None
     try:
         (ik_dof_x, ik_dof_y, ik_dof_z) = ik_dof
-        ik_stretch = None
-        useStiff = False
     except:
-        (ik_dof1, ik_stiff, ik_stretch, more) = ik_dof
+        (ik_dof1, ik_stiff, ik_stretch, ik_lim) = ik_dof
         (ik_dof_x, ik_dof_y, ik_dof_z) = ik_dof1
-        (ik_stiff_x, ik_stiff_y, ik_stiff_z) = ik_stiff
-        useStiff = True
    
-    ikLockX = 1-ik_dof_x
-    ikLockY = 1-ik_dof_y
-    ikLockZ = 1-ik_dof_z
-
     fp.write(
-"    lock_ik_x %d ;\n" % ikLockX +
-"    lock_ik_y %d ;\n" % ikLockY +
-"    lock_ik_z %d ;\n" % ikLockZ +
-"    use_ik_limit_x %d ;\n" % usex +
-"    use_ik_limit_y %d ;\n" % usey +
-"    use_ik_limit_z %d ;\n" % usez +
+"    lock_ik_x %d ;\n" % (1-ik_dof_x) +
+"    lock_ik_y %d ;\n" % (1-ik_dof_y) +
+"    lock_ik_z %d ;\n" % (1-ik_dof_z))
+
+
+    if ik_lim:
+        (xmin,xmax, ymin,ymax, zmin,zmax) = ik_lim
+        fp.write(
+"    use_ik_limit_x True ;\n" +
+"    use_ik_limit_y True ;\n" +
+"    use_ik_limit_z True ;\n" +
 "    ik_max Array %.4f %.4f %.4f ; \n" % (xmax, ymax, zmax) +
 "    ik_min Array %.4f %.4f %.4f ; \n" % (xmin, ymin, zmin))
 
-    if useStiff:
+    if ik_stiff:
+        (ik_stiff_x, ik_stiff_y, ik_stiff_z) = ik_stiff
         fp.write("    ik_stiffness  Array %.4f %.4f %.4f ;\n" % (ik_stiff_x, ik_stiff_y, ik_stiff_z))
     else:
         fp.write("    ik_stiffness Array 0.0 0.0 0.0  ; \n")
@@ -577,11 +564,6 @@ def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik
     
     if ik_stretch:
         fp.write("    ik_stretch %.3f ; \n" % ik_stretch)
-    elif flags & P_STRETCH:
-        fp.write(
-"#if toggle&T_STRETCH\n" +
-"    ik_stretch 0.1 ; \n" +
-"#endif\n")
     else:
         fp.write("    ik_stretch 0 ; \n")
 

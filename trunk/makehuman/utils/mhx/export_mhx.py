@@ -882,8 +882,10 @@ def exportMTex(index, mtex, use, fp):
     return
 
 def exportTexture(tex, fp):
+    if not tex:
+        return
     fp.write("Texture %s %s\n" % (tex.name.replace(' ', '_'), tex.type))
-    if tex.type == 'IMAGE':
+    if tex.type == 'IMAGE' and tex.image:
         fp.write("  Image %s ;\n" % tex.image.name.replace(' ', '_'))
         fp.write("end Texture\n\n")
         return
