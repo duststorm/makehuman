@@ -70,6 +70,7 @@ LockZ = 0x20
 #	Those are the diamonds in the MH mesh
 #
 
+locations = {}
 joints = [
 	"pelvis",
 	"spine3",

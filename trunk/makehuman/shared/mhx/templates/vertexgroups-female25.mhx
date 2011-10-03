@@ -1,4 +1,4 @@
-  VertexGroup Groin
+  VertexGroup Pubis
     wv 2786 0.614 ;
     wv 2787 0.54 ;
     wv 2788 0.572 ;
@@ -282,5 +282,5 @@
     wv 7452 0.572 ;
     wv 7453 0.54 ;
     wv 7454 0.614 ;
-  end VertexGroup Groin
+  end VertexGroup Pubis
 

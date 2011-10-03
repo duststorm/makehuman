@@ -567,7 +567,7 @@ def LegControlPoses(fp):
         [('StretchTo', 0, 1, ['Stretch', 'KneeCompressTrg_L', 0, 1])])
 
     addPoseBone(fp, 'DfmKneeCompress_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'KneeCompressTrg_R', 0, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'KneeCompressTrg_R', 0, 1])])                
 
     return
 

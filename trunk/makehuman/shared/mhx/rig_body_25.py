@@ -49,7 +49,7 @@ BodyJoints = [
     ('penis-top',      'vl', ((0.5, 2791), (0.5, 7449))),
     ('penis-mid',      'vl', ((0.5, 2844), (0.5, 7369))),
     ('penis-tip',      'v', 7415),
-    ('groin',          'l', ((1.5, 'penis-top'), (-0.5, 'penis-mid'))),
+    ('pubis',          'l', ((1.5, 'penis-top'), (-0.5, 'penis-mid'))),
     ('scrotum-tip',    'v', 7444),
     ('scrotum-root',   'vl', ((0.5, 2807), (0.5, 7425))),
 
@@ -117,14 +117,14 @@ BodyHeadsTails = [
     ('Breast_L',       'r-breast', 'r-tit'),
     ('Breast_R',       'l-breast', 'l-tit'),
 
-    ('Groin',          'groin', ['groin', ysmall]),
+    ('Pubis',          'pubis', ['pubis', ysmall]),
 
     # Male genitalia
-    ('Penis1',         'groin', 'penis-mid'),
+    ('Penis1',         'pubis', 'penis-mid'),
     ('Penis2',         'penis-mid', 'penis-tip'),
     ('Scrotum',        'scrotum-root', 'scrotum-tip'),
 
-    ('DfmPenis1',       'groin', 'penis-mid'),
+    ('DfmPenis1',       'pubis', 'penis-mid'),
     ('DfmPenis2',       'penis-mid', 'penis-tip'),
     ('DfmScrotum',     'scrotum-root', 'scrotum-tip'),
 ]
@@ -171,7 +171,7 @@ BodyArmature = [
     ('DfmSpine2',          0, 'DfmSpine1', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
     ('DfmSpine3',          0, 'DfmSpine2', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
     ('DfmNeck',            0, 'DfmSpine3', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
-    ('Groin',              0, 'DfmHips', F_WIR+F_DEF, L_TWEAK+L_MSCL, NoBB ),
+    ('Pubis',              0, 'DfmHips', F_WIR+F_DEF, L_TWEAK+L_MSCL, NoBB ),
 
     # Head
     ('Head',               0, 'DfmNeck', F_WIR, L_UPSPN+L_DNSPN+L_HEAD, NoBB),
@@ -195,12 +195,12 @@ BodyArmature = [
 ]
 
 MaleArmature = [
-    ('Penis1',             0, 'Groin', F_WIR, L_TWEAK, (1,5,1) ),
+    ('Penis1',             0, 'Pubis', F_WIR, L_TWEAK, (1,5,1) ),
     ('Penis2',             0, 'Penis1', F_WIR, L_TWEAK, (1,5,1) ),
-    ('Scrotum',            0, 'Groin', F_WIR, L_TWEAK, NoBB),
-    ('DfmPenis1',          0, 'Groin', F_DEF, L_MSCL, (1,1,3) ),
+    ('Scrotum',            0, 'Pubis', F_WIR, L_TWEAK, NoBB),
+    ('DfmPenis1',          0, 'Pubis', F_DEF, L_MSCL, (1,1,3) ),
     ('DfmPenis2',          0, 'DfmPenis1', F_DEF+F_CON, L_MSCL, (1,1,3) ),
-    ('DfmScrotum',         0, 'Groin', F_DEF, L_MSCL, NoBB),
+    ('DfmScrotum',         0, 'Pubis', F_DEF, L_MSCL, NoBB),
 ]
 
 BreastArmature = [
@@ -344,7 +344,18 @@ def BodyControlPoses(fp):
     addPoseBone(fp,  'DfmWaist_R',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', C_STRVOL, 1, ['Stretch', 'WaistTrg_R', 0, 1])])
 
-    addPoseBone(fp,  'Groin', 'MHBall025', None, (0,0,0), (1,1,1), (0,0,0), (1,1,1), 0, [])
+    # Pubis
+    
+    #print(mhx_rig.locations.keys())
+    r0 = mhx_rig.locations['r-upper-leg']
+    r1 = mhx_rig.locations['r-upleg1']
+    p = mhx_rig.locations['pubis']
+    eps = (p[1]-r0[1])/(r1[1]-r0[1])
+    addPoseBone(fp,  'Pubis', 'MHBall025', None, (0,0,0), (1,1,1), (0,0,0), (1,1,1), 0, 
+        [('CopyLoc', 0, 1, ['Left', 'DfmUpLeg1_L', (1,1,1), (0,0,0), eps, False]),
+         ('CopyLoc', 0, 0.5, ['Right', 'DfmUpLeg1_R', (1,1,1), (0,0,0), eps, False]),
+        ])
+
     return
 
 #
@@ -442,6 +453,9 @@ BodyPropDrivers = [
     ('DownSpine2', 'LimitRot', ['RotationLimits'], 'x1'),    
     ('DownSpine3', 'LimitRot', ['RotationLimits'], 'x1'),    
     ('DownNeck', 'LimitRot', ['RotationLimits'], 'x1'),    
+    
+    ('Pubis', 'Left', ['FreePubis'], '1-x1'),
+    ('Pubis', 'Right', ['FreePubis'], '0.5*(1-x1)'),
 ]
 
 #
