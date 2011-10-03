@@ -320,8 +320,8 @@ limUpLeg_R = (-110*D,90*D, -90*D,90*D, -40*D,110*D)
 limLoLeg_L = (-20*D,170*D,-40*D,40*D, -40*D,40*D)
 limLoLeg_R = (-20*D,170*D,-40*D,40*D, -40*D,40*D)
 
-limFoot_L = (-50*D,50*D, -40*D,40*D, -40*D,40*D)
-limFoot_R = (-50*D,50*D, -40*D,40*D, -40*D,40*D)
+limFoot_L = (-90*D,45*D, -30*D,15*D, 0*D,0*D)
+limFoot_R = (-90*D,45*D, -15*D,30*D, 0*D,0*D)
 
 limToe_L = (-20*D,60*D, 0,0, 0,0)
 limToe_R = (-20*D,60*D, 0,0, 0,0)
@@ -341,7 +341,7 @@ limRevToe_R = (-10*D,45*D, 0,0, 0,0)
 
 CmodUpLeg = 0 # P_YZX
 CmodLoLeg = P_ZYX
-CmodFoot = 0
+CmodFoot = P_ZYX
 CmodToe = 0
 
 DmodUpLeg = 0
@@ -377,12 +377,14 @@ def LegControlPoses(fp):
          ('CopyTrans', 0, 0, ['LegIK', 'LoLegIK_R', 0])
         ])
 
-    addPoseBone(fp, 'Foot_L', 'MHFoot', 'FK_L', (0,0,0), (0,1,1), (1,1,1), (1,1,1), CmodFoot, 
-        [('IK', 0, 0, ['RevIK', 'FootRev_L', 1, (90*D, 'FootPT_L'), (1,0,1)]),
+    addPoseBone(fp, 'Foot_L', 'MHFoot', 'FK_L', (0,0,0), (0,0,1), (1,1,1), (1,1,1), CmodFoot, 
+        [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limFoot_L, (1,1,1)]),
+         ('IK', 0, 0, ['RevIK', 'FootRev_L', 1, (90*D, 'FootPT_L'), (1,0,1)]),
          ('IK', 0, 1, ['FreeIK', None, 2, None, (True, False,True)])])
 
-    addPoseBone(fp, 'Foot_R', 'MHFoot', 'FK_R', (0,0,0), (0,1,1), (1,1,1), (1,1,1), CmodFoot, 
-        [('IK', 0, 0, ['RevIK', 'FootRev_R', 1, (90*D, 'FootPT_R'), (1,0,1)]),
+    addPoseBone(fp, 'Foot_R', 'MHFoot', 'FK_R', (0,0,0), (0,0,1), (1,1,1), (1,1,1), CmodFoot, 
+        [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limFoot_R, (1,1,1)]),
+         ('IK', 0, 0, ['RevIK', 'FootRev_R', 1, (90*D, 'FootPT_R'), (1,0,1)]),
          ('IK', 0, 1, ['FreeIK', None, 2, None, (True, False,True)])])
 
     addPoseBone(fp, 'Toe_L', 'MHToe_L', 'FK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), CmodToe, 
@@ -591,9 +593,11 @@ LegPropLRDrivers = [
 LegPropDrivers = [
     ('UpLeg_L', 'LimitRot', ['RotationLimits'], 'x1'),
     ('LoLeg_L', 'LimitRot', ['RotationLimits'], 'x1'),    
+    ('Foot_L', 'LimitRot', ['RotationLimits'], 'x1'),    
 
     ('UpLeg_R', 'LimitRot', ['RotationLimits'], 'x1'),
     ('LoLeg_R', 'LimitRot', ['RotationLimits'], 'x1'),    
+    ('Foot_R', 'LimitRot', ['RotationLimits'], 'x1'),    
 ]
 
 #
