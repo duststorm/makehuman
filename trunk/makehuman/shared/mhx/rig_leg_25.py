@@ -307,6 +307,10 @@ LegArmature = [
     ('KneeCompressTrg_L',       0, 'LoLeg_L', 0, L_HELP, NoBB),
     ('DfmKneeCompress_R',       0, 'DfmUpLeg3_R', F_DEF, L_DEF, NoBB),
     ('KneeCompressTrg_R',       0, 'LoLeg_R', 0, L_HELP, NoBB),
+    
+    # Pubis
+    ('Pubis_L',            0, 'DfmUpLeg1_L', 0, L_HELP, NoBB),
+    ('Pubis_R',            0, 'DfmUpLeg1_R', 0, L_HELP, NoBB),
 
 ]
 

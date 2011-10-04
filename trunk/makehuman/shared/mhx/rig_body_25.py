@@ -117,7 +117,9 @@ BodyHeadsTails = [
     ('Breast_L',       'r-breast', 'r-tit'),
     ('Breast_R',       'l-breast', 'l-tit'),
 
-    ('Pubis',          'pubis', ['pubis', ysmall]),
+    ('Pubis',          'pubis', ('pubis', ysmall)),
+    ('Pubis_L',        'r-pubis', ('r-pubis', yunit)),
+    ('Pubis_R',        'l-pubis', 'r-pubis'),
 
     # Male genitalia
     ('Penis1',         'pubis', 'penis-mid'),
@@ -171,8 +173,7 @@ BodyArmature = [
     ('DfmSpine2',          0, 'DfmSpine1', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
     ('DfmSpine3',          0, 'DfmSpine2', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
     ('DfmNeck',            0, 'DfmSpine3', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
-    ('Pubis',              0, 'DfmHips', F_WIR+F_DEF, L_TWEAK+L_MSCL, NoBB ),
-
+    
     # Head
     ('Head',               0, 'DfmNeck', F_WIR, L_UPSPN+L_DNSPN+L_HEAD, NoBB),
     ('DfmHead',            0, 'DfmNeck', F_DEF+F_CON, L_DMAIN, NoBB),
@@ -190,8 +191,7 @@ BodyArmature = [
     ('WaistTrg_L',         0, 'DfmHips', 0, L_HELP, NoBB),
     ('WaistTrg_R',         0, 'DfmHips', 0, L_HELP, NoBB),
 
-    #('Breathe',            0, 'DfmRib', F_WIR, L_TWEAK, NoBB),
-
+    ('Pubis',              0, 'DfmHips', F_WIR+F_DEF, L_TWEAK+L_MSCL, NoBB ),
 ]
 
 MaleArmature = [
@@ -346,16 +346,31 @@ def BodyControlPoses(fp):
 
     # Pubis
     
+    addPoseBone(fp,  'Pubis_R',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('StretchTo', 0, 1, ['Stretch', 'Pubis_L', 0, 1]),
+        ])
     #print(mhx_rig.locations.keys())
-    r0 = mhx_rig.locations['r-upper-leg']
-    r1 = mhx_rig.locations['r-upleg1']
-    p = mhx_rig.locations['pubis']
-    eps = (p[1]-r0[1])/(r1[1]-r0[1])
     addPoseBone(fp,  'Pubis', 'MHBall025', None, (0,0,0), (1,1,1), (0,0,0), (1,1,1), 0, 
-        [('CopyLoc', 0, 1, ['Left', 'DfmUpLeg1_L', (1,1,1), (0,0,0), eps, False]),
-         ('CopyLoc', 0, 0.5, ['Right', 'DfmUpLeg1_R', (1,1,1), (0,0,0), eps, False]),
+        [('CopyLoc', 0, 1, ['MidPoint', 'Pubis_R', (1,1,1), (0,0,0), 0.5, False]),
         ])
 
+    return
+
+#
+#   BodyDynamicLocations():    
+#
+
+def BodyDynamicLocations():    
+    locs = mhx_rig.locations
+    p = locs['pubis']
+    x0 = locs['r-upper-leg']
+    x1 = locs['r-upleg1']
+    eps = (p[1]-x0[1])/(x1[1]-x0[1])
+    locs['r-pubis'] = [ (1-eps)*x0[0]+eps*x1[0], p[1], p[2] ]
+    x0 = locs['l-upper-leg']
+    x1 = locs['l-upleg1']
+    eps = (p[1]-x0[1])/(x1[1]-x0[1])
+    locs['l-pubis'] = [ (1-eps)*x0[0]+eps*x1[0], p[1], p[2] ]
     return
 
 #
@@ -454,8 +469,7 @@ BodyPropDrivers = [
     ('DownSpine3', 'LimitRot', ['RotationLimits'], 'x1'),    
     ('DownNeck', 'LimitRot', ['RotationLimits'], 'x1'),    
     
-    ('Pubis', 'Left', ['FreePubis'], '1-x1'),
-    ('Pubis', 'Right', ['FreePubis'], '0.5*(1-x1)'),
+    ('Pubis', 'MidPoint', ['FreePubis'], '1-x1'),
 ]
 
 #

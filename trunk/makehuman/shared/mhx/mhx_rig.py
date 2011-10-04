@@ -162,10 +162,12 @@ rootChildOfConstraints = []
 Origin = [0,0,0]
 
 #
-#    newSetupJoints (obj, joints, headTails, moveOrigin):
+#    newSetupJoints (obj, joints, moveOrigin):
+#    setupHeadsTails(headsTails):
+#    findLocation(joint):
 #
-def newSetupJoints (obj, joints, headTails, moveOrigin):
-    global rigHead, rigTail, locations, Origin
+def newSetupJoints (obj, joints, moveOrigin):
+    global locations, Origin
     locations = {}
     for (key, typ, data) in joints:
         #print(key)
@@ -230,10 +232,13 @@ def newSetupJoints (obj, joints, headTails, moveOrigin):
         Origin = locations['floor']
         for key in locations.keys():
             locations[key] = aljabr.vsub(locations[key], Origin)
+    return
 
+def setupHeadsTails(headsTails):
+    global rigHead, rigTail
     rigHead = {}
     rigTail = {}
-    for (bone, head, tail) in headTails:
+    for (bone, head, tail) in headsTails:
         rigHead[bone] = findLocation(head)
         rigTail[bone] = findLocation(tail)
     return 
@@ -1887,7 +1892,10 @@ def setupRig(obj):
     HeadsTails += custHeadsTails
     Armature += custArmature
     
-    newSetupJoints(obj, Joints, HeadsTails, True)
+    newSetupJoints(obj, Joints, True)
+    if mhx_main.theConfig.useRig == 'mhx':
+        rig_body_25.BodyDynamicLocations()
+    setupHeadsTails(HeadsTails)
     return
     
         

@@ -122,9 +122,9 @@ def copyMeshFile249(obj, tmpl, fp):
                 fp.write("#endif\n")
                 mainMesh = False
                 fp.write("#if useProxy\n")
-                for (typ, useObj, useMhx, useDae, proxyStuff) in mhx_main.theConfig.proxyList:
-                    if useMhx:
-                        exportProxy24(obj, proxyStuff, fp)
+                for plist in mhx_main.theConfig.proxyList:
+                    if plist.useMhx:
+                        exportProxy24(obj, plist, fp)
                 fp.write("#endif\n")
             elif words[1] == 'mesh' and mainMesh:
                 fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
@@ -165,11 +165,11 @@ def copyMeshFile249(obj, tmpl, fp):
     return
 
 #
-#    exportProxy24(obj, proxyStuff, fp):
+#    exportProxy24(obj, plist, fp):
 #
 
-def exportProxy24(obj, proxyStuff, fp):
-    proxy = mh2proxy.readProxyFile(obj, proxyStuff)
+def exportProxy24(obj, plist, fp):
+    proxy = mh2proxy.readProxyFile(obj, plist)
     faces = mhx_main.loadFacesIndices(obj)
     tmpl = open("shared/mhx/templates/proxy24.mhx", "rU")
     for line in tmpl:
@@ -288,8 +288,9 @@ def oldExportArmature24(obj, fp):
 #    newExportArmature4(obj, fp):
 #
 def newExportArmature24(obj, fp):
-    mhx_rig.newSetupJoints(obj, classic_bones.ClassicJoints, classic_bones.ClassicHeadsTails, False)
-
+    mhx_rig.newSetupJoints(obj, classic_bones.ClassicJoints, False)
+    mhx_rig.setupHeadsTails(classic_bones.ClassicHeadsTails)
+    
     fp.write(
 "\n#if useArmature\n" +
 "armature Human Human\n")

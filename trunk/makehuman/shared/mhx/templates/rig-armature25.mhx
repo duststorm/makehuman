@@ -110,7 +110,7 @@ end Armature
   Property &RotationLimits 0.8 Influence_of_rotation_limit_constraints ;
   PropKeys &RotationLimits "min":0.0,"max":1.0, ;
 
-  Property &FreePubis 0.84 Pubis_moves_freely ;
+  Property &FreePubis 0.5 Pubis_moves_freely ;
   PropKeys &FreePubis "min":0.0,"max":1.0, ;
 
   Property &Breathe 0.0 Breathe ;
