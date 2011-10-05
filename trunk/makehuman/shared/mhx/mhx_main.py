@@ -338,6 +338,11 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                 fp.write("#endif\n")
             elif words[1] == 'ProxyModifiers':
                 writeProxyModifiers(fp, proxy)
+            elif words[1] == 'MTex':
+                n = nMasks + int(words[2])
+                fp.write("  MTex %d %s %s %s\n" % (n+1, words[3], words[4], words[5]))
+            elif words[1] == 'SkinStart':
+                nMasks = writeSkinStart(fp, proxy, proxyData)
             elif words[1] == 'curves':
                 mhx_rig.writeAllCurves(fp)
             elif words[1] == 'properties':
@@ -346,10 +351,16 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                 for proxy in proxyData.values():
                     writeHideProp(fp, proxy.name)
             elif words[1] == 'material-drivers':
-                if 0 and BODY_LANGUAGE:
-                    fp.write("MaterialAnimationData %sMesh (toggle&T_Face==T_Face)and(toggle&T_Symm==0) 0\n" % theHuman)
-                    mhx_rig.writeTextureDrivers(fp, rig_panel_25.BodyLanguageTextureDrivers)
-                    fp.write("end MaterialAnimationData\n")
+                fp.write("  use_textures Array 0")
+                for n in range(nMasks):
+                    fp.write(" 0")
+                for n in range(3):
+                    fp.write(" 1")
+                fp.write(" ;\n")
+                fp.write("  AnimationData %sMesh True\n" % theHuman)
+                #mhx_rig.writeTextureDrivers(fp, rig_panel_25.BodyLanguageTextureDrivers)
+                writeMaskDrivers(fp, proxyData)
+                fp.write("  end AnimationData\n")
             elif words[1] == 'Filename':
                 path1 = os.path.expanduser(words[3])
                 (path, filename) = os.path.split(words[2])
@@ -365,6 +376,66 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
 
     return
 
+#
+#   writeSkinStart(fp, proxy, proxyData)
+#
+
+def writeSkinStart(fp, proxy, proxyData):
+    if proxy:
+        fp.write("Material Skin\n")
+        return 0
+    nMasks = 0
+    prxList = list(proxyData.values())
+    
+    for prx in prxList:
+        if prx.mask:
+            (dir, file) = prx.mask
+            nMasks += 1
+            fp.write(
+"Image %s\n" % file +
+"  Filename %s/%s.png ;\n" % (dir, file) +
+"  use_premultiply True ;\n" +
+"end Image\n\n" +
+"Texture %s IMAGE\n" % file  +
+"  Image %s ;\n" % file +
+"end Texture\n\n")
+
+    fp.write("Material Skin\n" +
+"  MTex 0 diffuse UV COLOR\n" +
+#"    texture Refer Texture diffuse ;\n" +
+"  end MTex\n")
+
+    n = 0    
+    for prx in prxList:
+        if prx.mask:
+            (dir, file) = prx.mask
+            fp.write(
+"  MTex %d %s UV ALPHA\n" % (n+1, file) +
+"    texture Refer Texture %s ;\n" % file +
+"    use_map_alpha True ;\n" +
+"    use_map_color_diffuse False ;\n" +
+"    alpha_factor 1 ;\n" +
+"    blend_type 'MULTIPLY' ;\n" +
+"    mapping 'FLAT' ;\n" +
+"    invert True ;\n" +
+"    use_stencil True ;\n" +
+"    use_rgb_to_intensity True ;\n" +
+"  end MTex\n")
+            n += 1
+            
+    return nMasks
+               
+def writeMaskDrivers(fp, proxyData):
+    fp.write("#if toggle&T_Clothes\n")
+    n = 0
+    for prx in proxyData.values():
+        if prx.mask:
+            (dir, file) = prx.mask
+            mhx_rig.writePropDriver(fp, ["Hide%s" % prx.name], "x1", 'use_textures', n+1)
+            n += 1            
+    fp.write("#endif\n")
+    return
+    
 #
 #   writeVertexGroups(fp, rig, proxy):                
 #
@@ -503,8 +574,8 @@ def writeHideProp(fp, name):
 
 def writeHideAnimationData(fp, name):
     fp.write("AnimationData %sMesh True\n" % name)
-    mhx_rig.writePropDriver(fp, ["Hide%s" % name], "x1", "hide")
-    mhx_rig.writePropDriver(fp, ["Hide%s" % name], "x1", "hide_render")
+    mhx_rig.writePropDriver(fp, ["Hide%s" % name], "x1", "hide", -1)
+    mhx_rig.writePropDriver(fp, ["Hide%s" % name], "x1", "hide_render", -1)
     fp.write("end AnimationData\n")
     return    
        

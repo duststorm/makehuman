@@ -158,7 +158,7 @@ def findClothes(context, bob, pob, log):
         if pindex < 0:
             vn = pv.index
             selectVert(context, vn, pob)
-            raise NameError("Clothes vert %d not member of any group" % vn)
+            raise NameError("Clothes %s vert %d not member of any group" % (pob.name, vn))
 
         name = pob.vertex_groups[pindex].name
         bindex = None
@@ -600,8 +600,8 @@ def initInterface(scn):
         name="Directory", 
         description="Directory", 
         maxlen=1024)
-    scn['MakeClothesDirectory'] = "/home/svn/makehuman/data/hairstyles"
-
+    #scn['MakeClothesDirectory'] = "/home/svn/makehuman/data/hairstyles"
+    scn['MakeClothesDirectory'] = "~/documents/makehuman/clothes"
     bpy.types.Scene.MakeClothesMaterials = BoolProperty(
         name="Materials", 
         description="Use materials")

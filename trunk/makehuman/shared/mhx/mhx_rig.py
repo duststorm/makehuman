@@ -1437,16 +1437,16 @@ def writeShapePropDrivers(fp, skeys, proxy, prefix):
     return            
     
 #
-#   writePropDriver(fp, props, expr, dataPath):
+#   writePropDriver(fp, props, expr, dataPath, index):
 #
 
-def writePropDriver(fp, props, expr, dataPath):
+def writePropDriver(fp, props, expr, dataPath, index):
     drvVars = []
     n = 1
     for prop in props:
         drvVars.append( ("x%d" % n, 'SINGLE_PROP', [('OBJECT', mhx_main.theHuman, '["%s"]' % (prop))]) )
         n += 1
-    writeDriver(fp, True, ('SCRIPTED', expr), "", dataPath, -1, (0,1), drvVars)
+    writeDriver(fp, True, ('SCRIPTED', expr), "", dataPath, index, (0,1), drvVars)
     return            
     
 #

@@ -70,8 +70,9 @@ end Texture
 
 # --------------- Materials ----------------------------- # 
 
-Material Skin
-  MTex 0 diffuse UV COLOR
+*** SkinStart
+
+  *** MTex 0 diffuse UV COLOR
     texture Refer Texture diffuse ;
     use_map_color_diffuse True ;
     use_map_alpha True ;
@@ -114,7 +115,7 @@ Material Skin
     mapping_z 'Z' ;
   end MTex
 
-  MTex 1 specularity UV SPECULAR_COLOR
+  *** MTex 1 specularity UV SPECULAR_COLOR
     texture Refer Texture specularity ;
     use_map_color_diffuse False ;
     use_map_specular True ;
@@ -157,7 +158,7 @@ Material Skin
     mapping_z 'Z' ;
   end MTex
 
-  MTex 2 ambient UV AMBIENT_COLOR
+  *** MTex 2 ambient UV AMBIENT_COLOR
     texture Refer Texture ambient ;
     use_map_color_diffuse False ;
     use_map_ambient True ;
@@ -165,7 +166,7 @@ Material Skin
   end MTex
 
 #if False
-  MTex 3 browsMidDown UV NORMAL
+  *** MTex 3 browsMidDown UV NORMAL
     texture Refer Texture browsMidDown ;
     use_map_color_diffuse False ;
     use_map_normal True ;
@@ -174,7 +175,7 @@ Material Skin
     use_stencil False ;
   end MTex
 
-  MTex 4 browsSqueeze UV NORMAL
+  *** MTex 4 browsSqueeze UV NORMAL
     texture Refer Texture browsSqueeze ;
     use_map_color_diffuse False ;
     use_map_normal True ;
@@ -183,7 +184,7 @@ Material Skin
     use_stencil False ;
   end MTex
 
-  MTex 5 squint_L UV NORMAL
+  *** MTex 5 squint_L UV NORMAL
     texture Refer Texture squint_L ;
     use_map_color_diffuse False ;
     use_map_normal True ;
@@ -191,8 +192,8 @@ Material Skin
     use_rgb_to_intensity True ;
     use_stencil False ;
   end MTex
-
-  MTex 6 squint_R UV NORMAL
+  
+  *** MTex 6 squint_R UV NORMAL
     texture Refer Texture squint_R ;
     use_map_color_diffuse False ;
     use_map_normal True ;
@@ -282,6 +283,9 @@ Material Skin
   use_vertex_color_light False ;
   use_vertex_color_paint False ;
   offset_z 0 ;
+
+*** material-drivers
+
 end Material
 
 Material Mouth

@@ -66,6 +66,7 @@ class CProxy:
         self.faces = []
         self.texFaces = []
         self.texVerts = []
+        self.mask = None
         self.materials = []
         self.constraints = []
         self.wire = False
@@ -300,7 +301,7 @@ def proxyConfig(human, useHair, options=None):
         else:
             pfile = CProxyFile()
             pfile.set(typ, layer, useMhx, useObj, useDae)
-            pfile.file = os.path.expanduser(words[0])
+            pfile.file = os.path.realpath(os.path.expanduser(words[0]))
             if len(words) > 1:
                 pfile.name = words[1]
             if typ == 'Cage':
@@ -400,6 +401,8 @@ def readProxyFile(obj, pfile):
                 useProjection = int(words[2])
             elif words[1] == 'weightfile':
                 proxy.weightfile = (words[2], words[3])
+            elif words[1] == 'mask':
+                proxy.mask = (os.path.dirname(pfile.file), words[2])
             elif words[1] == 'subsurf':
                 levels = int(words[2])
                 if len(words) > 3:
