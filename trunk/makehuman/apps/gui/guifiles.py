@@ -232,6 +232,7 @@ class GuiProxy():
         self.rorkimaru = gui3d.RadioButton(options, proxies, "Rorkimaru proxy");y+=24
         self.ascottk = gui3d.RadioButton(options, proxies, "Ascottk proxy");y+=24
         self.forsaken = gui3d.RadioButton(options, proxies, "Forsaken proxy");y+=24
+        self.new_male = gui3d.RadioButton(options, proxies, "New male mesh");y+=24
         
     def getName(self):
     
@@ -241,6 +242,8 @@ class GuiProxy():
             return'ascottk'
         elif self.forsaken.selected:
             return'forsaken'
+        elif self.new_male.selected:
+            return'new_male'
         else:
             return None
 

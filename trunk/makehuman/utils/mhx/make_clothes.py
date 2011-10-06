@@ -103,7 +103,7 @@ A new .mhclo file is created for the offset clothes in the specified directory.
 bl_addon_info = {
     "name": "Make clothes to MakeHuman",
     "author": "Thomas Larsson",
-    "version": 0.2,
+    "version": 0.3,
     "blender": (2, 5, 4),
     "api": 31913,
     "location": "View3D > Properties > Make MH clothes",
@@ -115,7 +115,8 @@ bl_addon_info = {
 import bpy, os, mathutils
 
 theThreshold = -0.2
-theListLength = 2
+theListLength = 3
+Epsilon = 1e-4
 
 
 #
@@ -172,12 +173,19 @@ def findClothes(context, bob, pob, log):
         for n in range(theListLength):
             mverts.append((None, 1e6))
 
+        exact = False
         for bv in base.vertices:
+            if exact:
+                break
             for grp in bv.groups:
                 if grp.group == bindex:
                     vec = pv.co - bv.co
                     n = 0
                     for (mv,mdist) in mverts:
+                        if vec.length < Epsilon:
+                            mverts[0] = (bv, -1)
+                            exact = True
+                            break
                         if vec.length < mdist:
                             for k in range(n+1, theListLength):
                                 j = theListLength-k+n
@@ -190,44 +198,65 @@ def findClothes(context, bob, pob, log):
 
         (mv, mindist) = mverts[0]
         if mv:
-            print(pv.index, mv.index, mindist, name, pindex, bindex)
-            log.write("%d %d %.5f %s %d %d\n" % (pv.index, mv.index, mindist, name, pindex, bindex))
+            if pv.index % 10 == 0:
+                print(pv.index, mv.index, mindist, name, pindex, bindex)
+            #log.write("%d %d %.5f %s %d %d\n" % (pv.index, mv.index, mindist, name, pindex, bindex))
             #printMverts("  ", mverts)
         else:
             raise NameError("Failed to find vert %d in group %s %d %d" % (pv.index, name, pindex, bindex))
         if mindist > 5:
             raise NameError("Minimal distance %f > 5.0. Check base and proxy scales." % mindist)
 
-        bestVerts.append((pv, mverts, []))
+        bestVerts.append((pv, exact, mverts, []))
 
     print("Setting up face table")
     vfaces = {}
+    for v in base.vertices:
+        vfaces[v.index] = []            
     for f in base.faces:
-        for v in f.vertices:
-            try:
-                vfaces[v].append(f)
-            except:
-                vfaces[v] = [f]
+        v0 = f.vertices[0]
+        v1 = f.vertices[1]
+        v2 = f.vertices[2]
+        if len(f.vertices) == 4:
+            v3 = f.vertices[3]
+            t0 = [v0,v1,v2]
+            t1 = [v1,v2,v3]
+            t2 = [v2,v3,v0]
+            t3 = [v3,v0,v1]
+            vfaces[v0].extend( [t0,t2,t3] )
+            vfaces[v1].extend( [t0,t1,t3] )
+            vfaces[v2].extend( [t0,t1,t2] )
+            vfaces[v3].extend( [t1,t2,t3] )
+        else:
+            t = [v0,v1,v2]
+            vfaces[v0].append(t)
+            vfaces[v1].append(t)
+            vfaces[v2].append(t)
     
     print("Finding weights")
-    for (pv, mverts, fcs) in bestVerts:
+    for (pv, exact, mverts, fcs) in bestVerts:
         print(pv.index)
+        if exact:
+            continue
         for (bv,mdist) in mverts:
             if bv:
                 for f in vfaces[bv.index]:
-                    verts = []
-                    for v in f.vertices:
-                        verts.append(base.vertices[v].co)
-                    wts = cornerWeights(pv, verts, pob)
-                    fcs.append((f.vertices, wts))
+                    r0 = base.vertices[f[0]].co
+                    r1 = base.vertices[f[1]].co
+                    r2 = base.vertices[f[2]].co
+                    wts = cornerWeights(pv, r0, r1, r2, pob)
+                    fcs.append((f, wts))
 
     print("Finding best weights")
     alwaysOutside = scn['MakeClothesOutside']
     minOffset = scn['MakeClothesMinOffset']
     useProjection = scn['MakeClothesUseProjection']
     bestFaces = []
-    for (pv, mverts, fcs) in bestVerts:
+    for (pv, exact, mverts, fcs) in bestVerts:
         #print(pv.index)
+        if exact:
+            bestFaces.append((pv, True, mverts, 0, 0))
+            continue
         minmax = -1e6
         for (fverts, wts) in fcs:
             w = minWeight(wts)
@@ -236,6 +265,11 @@ def findClothes(context, bob, pob, log):
                 bWts = wts
                 bVerts = fverts
         if minmax < theThreshold:
+            if scn['MakeClothesForbidFailures']:
+                vn = pv.index
+                selectVert(context, vn, pob)
+                print("Tried", mverts)
+                raise NameError("Did not find optimal triangle for %s vert %d" % (pob.name, pv))
             (mv, mdist) = mverts[0]
             bVerts = [mv.index,0,1]
             bWts = [1,0,0]
@@ -251,9 +285,9 @@ def findClothes(context, bob, pob, log):
             proj = diff.dot(norm)
             if alwaysOutside and proj < minOffset:
                 proj = minOffset
-            bestFaces.append((pv, bVerts, bWts, proj))    
+            bestFaces.append((pv, False, bVerts, bWts, proj))    
         else:
-            bestFaces.append((pv, bVerts, bWts, diff))    
+            bestFaces.append((pv, False, bVerts, bWts, diff))    
 
     print("Done")
     return bestFaces
@@ -270,7 +304,7 @@ def minWeight(wts):
     return best
 
 #
-#    cornerWeights(pv, verts, pob):
+#    cornerWeights(pv, r0, r1, r2, pob):
 #
 #    px = w0*x0 + w1*x1 + w2*x2
 #    py = w0*y0 + w1*y1 + w2*y2
@@ -290,11 +324,7 @@ def minWeight(wts):
 #    det*w1 = -a10*b0 + a00*b1
 #
 
-def cornerWeights(pv, verts, pob):
-    r0 = verts[0]
-    r1 = verts[1]
-    r2 = verts[2]
-
+def cornerWeights(pv, r0, r1, r2, pob):
     u01 = r1-r0
     u02 = r2-r0
     n = u01.cross(u02)
@@ -419,13 +449,21 @@ def printClothes(context, path, bob, pob, data):
     fp.write("# use_projection %d\n" % useProjection)
     fp.write("# verts\n")
     if useProjection:
-        for (pv, verts, wts, proj) in data:
-            fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f\n" % (
-                verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], proj))
+        for (pv, exact, verts, wts, proj) in data:
+            if exact:
+                (bv, dist) = verts[0]
+                fp.write("%5d\n" % bv.index)
+            else:
+                fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f\n" % (
+                    verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], proj))
     else:                
-        for (pv, verts, wts, diff) in data:
-            fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f %.5f %.5f\n" % (
-                verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], diff[0], diff[2], -diff[1]))
+        for (pv, exact, verts, wts, diff) in data:
+            if exact:
+                (bv, dist) = verts[0]
+                fp.write("%5d\n" % bv.index)
+            else:
+                fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f %.5f %.5f\n" % (
+                    verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], diff[0], diff[2], -diff[1]))
 
     fp.write("# obj_data\n")
     if me.uv_textures:
@@ -643,6 +681,11 @@ def initInterface(scn):
         description="Max number of verts considered")
     scn['MakeClothesListLength'] = theListLength
 
+    bpy.types.Scene.MakeClothesForbidFailures = BoolProperty(
+        name="Forbid failures", 
+        description="Raise error if not found optimal triangle")
+    scn['MakeClothesForbidFailures'] = True
+
     bpy.types.Scene.MakeClothesX1 = IntProperty(
         name="X1", 
         description="First X vert for clothes rescaling")
@@ -700,7 +743,9 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.prop(scn, "MakeClothesMinOffset")
         layout.prop(scn, "MakeClothesThreshold")
         layout.prop(scn, "MakeClothesListLength")
+        layout.prop(scn, "MakeClothesForbidFailures")
         layout.operator("mhclo.make_clothes")
+        layout.separator()
         layout.label("Scaling verts")
         layout.prop(scn, "MakeClothesX1")
         layout.prop(scn, "MakeClothesX2")

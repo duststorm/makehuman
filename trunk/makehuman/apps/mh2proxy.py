@@ -345,6 +345,7 @@ def readProxyFile(obj, pfile):
     proxy.name = "MyProxy"
 
     useProjection = True
+    ignoreOffset = False
     xScale = 1.0
     yScale = 1.0
     zScale = 1.0
@@ -399,6 +400,8 @@ def readProxyFile(obj, pfile):
                 zScale = getScale(words, verts, 2)                
             elif words[1] == 'use_projection':
                 useProjection = int(words[2])
+            elif words[1] == 'ignoreOffset':
+                ignoreOffset = int(words[2])
             elif words[1] == 'weightfile':
                 proxy.weightfile = (words[2], words[3])
             elif words[1] == 'mask':
@@ -425,37 +428,42 @@ def readProxyFile(obj, pfile):
             elif words[0] == 'g':
                 theGroup = words[1]
         elif status == doVerts:
-            v0 = int(words[0])
-            v1 = int(words[1])
-            v2 = int(words[2])
-            w0 = float(words[3])
-            w1 = float(words[4])
-            w2 = float(words[5])            
-            try:
-                proj = float(words[6])
-            except:
-                proj = 0
+            if len(words) == 1:
+                v = int(words[0])
+                proxy.realVerts.append(verts[v])
+                addProxyVert(v, vn, 1, proxy)
+            else:                
+                v0 = int(words[0])
+                v1 = int(words[1])
+                v2 = int(words[2])
+                w0 = float(words[3])
+                w1 = float(words[4])
+                w2 = float(words[5])            
+                try:
+                    proj = float(words[6])
+                except:
+                    proj = 0
 
-            if not proj:
-                (d0, d1, d2) = (0, 0, 0)
-            elif useProjection:
-                n0 = aljabr.vmul(verts[v0].no, w0)
-                n1 = aljabr.vmul(verts[v1].no, w1)
-                n2 = aljabr.vmul(verts[v2].no, w2)
-                norm = aljabr.vadd(n0, n1)
-                norm = aljabr.vadd(norm, n2)
-                d0 = proj * norm[0] * xScale
-                d1 = proj * norm[1] * yScale
-                d2 = proj * norm[2] * zScale
-            else:
-                d0 = float(words[6]) * xScale
-                d1 = float(words[7]) * yScale
-                d2 = float(words[8]) * zScale
+                if (not proj) or ignoreOffset:
+                    (d0, d1, d2) = (0, 0, 0)
+                elif useProjection:
+                    n0 = aljabr.vmul(verts[v0].no, w0)
+                    n1 = aljabr.vmul(verts[v1].no, w1)
+                    n2 = aljabr.vmul(verts[v2].no, w2)
+                    norm = aljabr.vadd(n0, n1)
+                    norm = aljabr.vadd(norm, n2)
+                    d0 = proj * norm[0] * xScale
+                    d1 = proj * norm[1] * yScale
+                    d2 = proj * norm[2] * zScale
+                else:
+                    d0 = float(words[6]) * xScale
+                    d1 = float(words[7]) * yScale
+                    d2 = float(words[8]) * zScale
 
-            proxy.realVerts.append((verts[v0], verts[v1], verts[v2], w0, w1, w2, d0, d1, d2))
-            addProxyVert(v0, vn, w0, proxy)
-            addProxyVert(v1, vn, w1, proxy)
-            addProxyVert(v2, vn, w2, proxy)
+                proxy.realVerts.append((verts[v0], verts[v1], verts[v2], w0, w1, w2, d0, d1, d2))
+                addProxyVert(v0, vn, w0, proxy)
+                addProxyVert(v1, vn, w1, proxy)
+                addProxyVert(v2, vn, w2, proxy)
             vn += 1
         elif status == doFaces:
             newFace(0, words, theGroup, proxy)
@@ -685,11 +693,14 @@ def addProxyVert(v, vn, w, proxy):
 #
 
 def proxyCoord(barycentric):
-    (v0, v1, v2, w0, w1, w2, d0, d1, d2) = barycentric
-    x = w0*v0.co[0] + w1*v1.co[0] + w2*v2.co[0] + d0
-    y = w0*v0.co[1] + w1*v1.co[1] + w2*v2.co[1] + d1
-    z = w0*v0.co[2] + w1*v1.co[2] + w2*v2.co[2] + d2
-    return [x,y,z]
+    if type(barycentric) == tuple:
+        (v0, v1, v2, w0, w1, w2, d0, d1, d2) = barycentric
+        x = w0*v0.co[0] + w1*v1.co[0] + w2*v2.co[0] + d0
+        y = w0*v0.co[1] + w1*v1.co[1] + w2*v2.co[1] + d1
+        z = w0*v0.co[2] + w1*v1.co[2] + w2*v2.co[2] + d2
+        return [x,y,z]
+    else:
+        return barycentric.co
 
 #
 #    getMeshInfo(obj, proxy, rawWeights, rawShapes, rigname):
