@@ -8,7 +8,7 @@
 # subsurf 1 2
 # shrinkwrap 0.03
 # shapekey Breathe
-# mask bikini_mask
+# mask bikini_mask png
 # material Bikini
 diffuse_color 0.8000 0.0319 0.0421
 diffuse_shader LAMBERT

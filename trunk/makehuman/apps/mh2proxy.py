@@ -45,6 +45,7 @@ class CProxy:
         self.texFaces = []
         self.texVerts = []
         self.mask = None
+        self.material_file = None
         self.materials = []
         self.constraints = []
         self.wire = False
@@ -170,6 +171,8 @@ def readProxyFile(obj, file):
                 proxy.weightfile = (words[2], words[3])
             elif words[1] == 'mask':
                 proxy.mask = (os.path.dirname(pfile.file), words[2])
+            elif words[1] == 'material_file':
+                proxy.material_file = (os.path.dirname(pfile.file), words[2])
             elif words[1] == 'subsurf':
                 levels = int(words[2])
                 if len(words) > 3:
@@ -593,7 +596,7 @@ def fixProxyShape(shape):
 #    exportProxyObj(human, filename, proxyName):    
 #    exportProxyObj1(obj, filename, proxy):
 #
-
+"""
 def exportProxyObj(human, name, proxyName):
     obj = human.meshData
     if proxyName:
@@ -652,5 +655,5 @@ def exportProxyObj1(obj, filename, proxy):
         fn += 1
     fp.close()
     return
-    
+"""    
 

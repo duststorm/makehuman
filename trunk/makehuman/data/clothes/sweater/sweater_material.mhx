@@ -1,0 +1,57 @@
+
+Texture SweaterClouds CLOUDS
+  cloud_type 'GREYSCALE' ;
+  contrast 1.000 ;
+  factor_blue 1.000 ;
+  factor_green 1.000 ;
+  factor_red 1.000 ;
+  intensity 1.000 ;
+  nabla 0.025 ;
+  noise_basis 'BLENDER_ORIGINAL' ;
+  noise_depth 2 ;
+  noise_scale 0.102 ;
+  noise_type 'HARD_NOISE' ;
+  saturation 1.000 ;
+  use_color_ramp False ;
+end Texture
+
+Material Sweater 
+  MTex 0 SweaterClouds UV NORMAL
+    use_map_normal True ;
+    use_map_color_diffuse True ;
+    alpha_factor 1.000 ;
+    blend_type 'MIX' ;
+    bump_method 'BUMP_DEFAULT' ;
+    bump_objectspace 'BUMP_OBJECTSPACE' ;
+    color Array 0.01 0.08 0.0064  ;
+    mapping 'TUBE' ;
+    mapping_x 'X' ;
+    mapping_y 'Y' ;
+    mapping_z 'Z' ;
+    normal_factor -0.098 ;
+    normal_map_space 'TANGENT' ;
+    scale (36.000,36.000,36.000) ;
+    use_from_dupli False ;
+    use_from_original False ;
+    use_rgb_to_intensity False ;
+    use_stencil False ;
+    warp_factor 0.000 ;
+  end MTex
+
+  diffuse_color Array 0.1680506318807602 0.6382604837417603 0.11635927855968475  ;
+  diffuse_shader 'LAMBERT' ;
+  diffuse_intensity 0.467 ;
+  specular_color Array 1.0 1.0 1.0  ;
+  specular_shader 'COOKTORR' ;
+  specular_intensity 0.220 ;
+  specular_alpha 1.000 ;
+  specular_hardness 7 ;
+  translucency 0.000 ;
+  transparency_method 'Z_TRANSPARENCY' ;
+  use_raytrace True ;
+  use_shadeless False ;
+  use_shadows True ;
+  use_textures Array 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1  ;
+  use_transparency False ;
+  use_transparent_shadows False ;
+end Material

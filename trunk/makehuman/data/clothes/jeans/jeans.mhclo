@@ -7,7 +7,7 @@
 # y_scale 8289 8223 1.8023
 # subsurf 1 2
 # shrinkwrap 0.03
-# mask jeans_mask
+# mask jeans_mask png
 # material Jeans
 diffuse_color 0.1638 0.2143 0.8000
 diffuse_shader LAMBERT
@@ -15,6 +15,7 @@ diffuse_intensity 0.4667
 specular_color 1.0000 1.0000 1.0000
 specular_shader COOKTORR
 specular_intensity 0.2204
+# material_file jeans_material.mhx
 # use_projection 0
 # verts
  7314  7313  6852 -0.03292 0.80878 0.22413 0.00127 0.00098 0.05193

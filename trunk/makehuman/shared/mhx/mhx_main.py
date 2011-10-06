@@ -227,25 +227,21 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                 fp.write("  RecalcRoll %s ;\n" % mhx_rig.RecalcRoll)
             elif words[1] == 'ProxyRigStart':
                 if proxy.rig:
+                    name = theHuman + proxy.name
                     fp.write("#if True\n")
-                    fp.write("Armature %s %s   Normal \n" % (proxy.name, proxy.name))
+                    fp.write("Armature %s %s   Normal \n" % (name, name))
                     mh2proxy.writeProxyArmature(fp, obj, proxy)
                 else:
                     fp.write("#if False\n")
             elif words[1] == 'ProxyRigObject':
-                fp.write("Object %s ARMATURE %s \n" % (proxy.name, proxy.name))
+                name = theHuman + proxy.name
+                fp.write("Object %s ARMATURE %s \n" % (name, name))
                 if proxy.rig:
-                    fp.write("  Property MhxRigType '%s' ;\n" % proxy.name)
+                    fp.write("  Property MhxRigType '%s' ;\n" % name)
             elif words[1] == 'ProxyPose':
-                mh2proxy.writeRigPose(fp, proxy.name, proxy.bones)
+                mh2proxy.writeRigPose(fp, theHuman + proxy.name, proxy.bones)
             elif words[1] == 'ProxyMesh':
-                mat = proxy.material
-                if mat:
-                    writeProxyMaterial(fp, mat)
-                fp.write("Mesh %sMesh %sMesh \n" % (proxy.name, proxy.name))
-                if mat:
-                    fp.write("  Material %s ;\n" % mat.name)
-
+                writeProxyMesh(fp, proxy)
             elif words[1] == 'ProxyObject':
                 writeProxyObject(fp, proxy)
             elif words[1] == 'ProxyLayers':
@@ -257,9 +253,9 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                         fp.write("0 ")
                 fp.write(";\n")
             elif words[1] == 'MeshAnimationData':
-                writeHideAnimationData(fp, theHuman)
+                writeHideAnimationData(fp, "", theHuman)
             elif words[1] == 'ProxyAnimationData':
-                writeHideAnimationData(fp, proxy.name)
+                writeHideAnimationData(fp, theHuman, proxy.name)
             elif words[1] == 'toggleCage':
                 if theConfig.cage and not (proxy and proxy.cage):
                     fp.write("  #if toggle&T_Cage\n")
@@ -493,8 +489,6 @@ def writeGroups(fp, proxyData):
 "  Objects\n" +
 "#if toggle&T_Armature\n" +
 "    ob %s ;\n" % theHuman +
-#"    ob %sDeformRig ;\n" % theHuman +
-#"    ob %sSpineCurve ;\n" % theHuman +
 "#endif\n" +
 "#if toggle&T_Mesh\n" +
 "    ob %sMesh ;\n" % theHuman +
@@ -513,21 +507,40 @@ def groupProxy(typ, fp, proxyData):
     fp.write("#if toggle&T_%s\n" % typ)
     for proxy in proxyData.values():
         if proxy.type == typ:
-            fp.write("    ob %sMesh ;\n" % proxy.name)
+            name = theHuman + proxy.name
+            fp.write("    ob %sMesh ;\n" % name)
             if proxy.rig:
-                fp.write("    ob %s ;\n" % proxy.name)
+                fp.write("    ob %s ;\n" % name)
     fp.write("#endif\n")
+    return
+
+#
+#   writeProxyMesh(fp, proxy):                
+#
+
+def writeProxyMesh(fp, proxy):                
+    mat = proxy.material
+    if mat:
+        if proxy.material_file:
+            copyProxyMaterialFile(proxy.material_file, proxy, fp)
+        else:
+            writeProxyMaterial(fp, mat)
+    name = theHuman + proxy.name
+    fp.write("Mesh %sMesh %sMesh \n" % (name, name))
+    if mat:
+        fp.write("  Material %s%s ;\n" % (theHuman, mat.name))
     return
 
 #
 #   writeProxyObject(fp, proxy):                
 #
 
-def writeProxyObject(fp, proxy):                
-    fp.write("Object %sMesh MESH %sMesh \n" % (proxy.name, proxy.name))
+def writeProxyObject(fp, proxy): 
+    name = theHuman + proxy.name
+    fp.write("Object %sMesh MESH %sMesh \n" % (name, name))
     fp.write("#if toggle&T_Armature\n")
     if proxy.rig:
-        fp.write("  parent Refer Object %s ;\n" % proxy.name)
+        fp.write("  parent Refer Object %s ;\n" % name)
     else:
         fp.write("  parent Refer Object %s ;\n" % theHuman)
     fp.write(
@@ -562,7 +575,7 @@ def writeProxyModifiers(fp, proxy):
 
 #
 #   writeHideProp(fp, name):                
-#   writeHideAnimationData(fp, name):
+#   writeHideAnimationData(fp, prefix, name):
 #
 
 def writeHideProp(fp, name):                
@@ -571,12 +584,45 @@ def writeHideProp(fp, name):
 "  PropKeys Hide%s \"type\":'BOOLEAN',\"min\":0,\"max\":1, ;\n" % name)
     return
 
-def writeHideAnimationData(fp, name):
-    fp.write("AnimationData %sMesh True\n" % name)
+def writeHideAnimationData(fp, prefix, name):
+    fp.write("AnimationData %s%sMesh True\n" % (prefix, name))
     mhx_rig.writePropDriver(fp, ["Hide%s" % name], "x1", "hide", -1)
     mhx_rig.writePropDriver(fp, ["Hide%s" % name], "x1", "hide_render", -1)
     fp.write("end AnimationData\n")
     return    
+       
+#
+#    copyProxyMaterialFile(pair, proxy, fp):
+#
+
+def copyProxyMaterialFile(pair, proxy, fp):
+    (dir, file) = pair
+    infile = os.path.realpath(os.path.expanduser("%s/%s" % (dir, file)))
+    print("Pxmat", infile)
+    tmpl = open(infile, "rU")
+    for line in tmpl:
+        words= line.split()
+        if len(words) == 0:
+            fp.write(line)
+        elif words[0] in ['Texture', 'Material']:
+            words[1] = theHuman + words[1]
+            for word in words:
+                fp.write("%s " % word)
+            fp.write("\n")
+        elif words[0] == 'MTex':
+            words[2] = theHuman + words[2]
+            for word in words:
+                fp.write("%s " % word)
+            fp.write("\n")                
+        elif words[0] == 'filename':
+            path1 = os.path.expanduser("./data/clothes/")
+            (path, filename) = os.path.split(words[1])
+            file1 = os.path.realpath(path1+filename)
+            fp.write("  filename %s ;\n" % file1)
+        else:
+            fp.write(line)
+    tmpl.close()
+    return
        
 #
 #   writeProxyMaterial(fp, mat):
@@ -585,23 +631,23 @@ def writeHideAnimationData(fp, name):
 def writeProxyMaterial(fp, mat):
     tex = mat.texture
     if tex:
-        name = os.path.basename(tex)
+        texname = theHuman + os.path.basename(tex)
         fp.write(
-"Image %s\n" % name +
+"Image %s\n" % texname +
 "  Filename %s ;\n" % os.path.realpath(tex) +
 "  use_premultiply True ;\n" +
 "end Image\n\n" +
-"Texture %s IMAGE\n" % name +
-"  Image %s ;\n" % name)
+"Texture %s IMAGE\n" % texname +
+"  Image %s ;\n" % texname)
         writeProxyMaterialSettings(fp, mat.textureSettings)             
         fp.write("end Texture\n")
 
-    fp.write("Material %s \n" % mat.name)
+    fp.write("Material %s%s \n" % (theHuman, mat.name))
     writeProxyMaterialSettings(fp, mat.settings)            
     if tex:
         fp.write(
 "  MTex 0 diffuse UV COLOR\n" +
-"    texture Refer Texture %s ;\n" % name)
+"    texture Refer Texture %s ;\n" % texname)
         writeProxyMaterialSettings(fp, mat.mtexSettings)             
         fp.write("  end MTex\n")
     if mat.mtexSettings == []:
@@ -900,7 +946,7 @@ def proxyShapes(typ, human, rig, proxyData, fp):
     fp.write("#if toggle&T_%s\n" % typ)
     for proxy in proxyData.values():
         if proxy.name and proxy.type == typ and not proxy.rig:
-            writeShapeKeys(fp, human, rig, proxy.name+"Mesh", proxy)
+            writeShapeKeys(fp, human, rig, theHuman+proxy.name+"Mesh", proxy)
     fp.write("#endif\n")
         
 #

@@ -15,6 +15,7 @@ diffuse_intensity 0.6348
 specular_color 1.0000 1.0000 1.0000
 specular_shader COOKTORR
 specular_intensity 0.1240
+# material_file sweater_material.mhx
 # use_projection 0
 # verts
  7311  6911  4403 0.12147 0.73311 0.14542 -0.01015 0.07308 0.06146
