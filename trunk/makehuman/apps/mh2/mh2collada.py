@@ -33,6 +33,7 @@ import mh2bvh
 import os, time
 import shutil
 import mh2proxy, mh2mhx
+import export_config
 import mhx_rig, rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
 from mhx_rig import *
 import read_rig
@@ -65,13 +66,13 @@ def exportCollada(human, name, options=None):
     time1 = time.clock()
     try:
         fp = open(filename, 'w')
-        mh2proxy.safePrint("Writing Collada file", filename)
+        export_config.safePrint("Writing Collada file", filename)
     except:
-        mh2proxy.safePrint("Unable to open file for writing", filename)
+        export_config.safePrint("Unable to open file for writing", filename)
     exportDae(human, fp)
     fp.close()
     time2 = time.clock()
-    mh2proxy.safePrint("Wrote Collada file in %g s:" % (time2-time1), filename)
+    export_config.safePrint("Wrote Collada file in %g s:" % (time2-time1), filename)
     return
 
 #
@@ -479,7 +480,7 @@ def filterMesh(mesh1):
 
 def exportDae(human, fp):
     global theStuff, Root, useRotate90, useProxy, useRig
-    cfg = mh2proxy.proxyConfig(human, True)
+    cfg = export_config.exportConfig(human, True)
     obj = human.meshData
     if useRig == "game":
         amt = getArmatureFromRigFile('data/templates/game.rig', obj)
@@ -500,7 +501,7 @@ def exportDae(human, fp):
     if useProxy:
         proxyFile = "data/templates/%s.proxy" % useProxy.lower()
         print("Using %s" % proxyFile)
-        pfile = mh2proxy.CProxyFile()
+        pfile = export_config.CProxyFile()
         pfile.set('Proxy', 0, False, False, True)
         setupProxies('Proxy', obj, stuffs, amt, rawTargets, [pfile])
     else:

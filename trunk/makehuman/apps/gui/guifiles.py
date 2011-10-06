@@ -37,7 +37,7 @@ import os
 import mh2obj
 import mh2bvh
 import mh2mhx
-import mh2proxy
+import mh2obj_proxy
 import mh2collada
 import mh2md5
 import mh2stl
@@ -409,7 +409,7 @@ class ExportTaskView(gui3d.TaskView):
                     self.exportGroups.selected,
                     filter)
                 proxy = self.objProxy.getName()
-                mh2proxy.exportProxyObj(human, os.path.join(exportPath, filename), proxy)
+                mh2obj_proxy.exportProxyObj(human, os.path.join(exportPath, filename), proxy)
                 
                 if self.exportSkeleton.selected:
                     mh2bvh.exportSkeleton(human.meshData, os.path.join(exportPath, filename + ".bvh"))

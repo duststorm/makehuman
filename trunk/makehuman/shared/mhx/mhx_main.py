@@ -20,8 +20,6 @@ Abstract
 --------
 MakeHuman to MHX (MakeHuman eXchange format) exporter. MHX files can be loaded into Blender
 
-TO DO
-
 """
 
 MAJOR_VERSION = 1
@@ -37,6 +35,7 @@ import os
 import time
 
 import mh2proxy
+import export_config
 import mhx_24
 import mhx_rig
 import rig_panel_25
@@ -52,7 +51,7 @@ import read_rig
 
 def exportMhx(human, filename, options):    
     global theConfig, theHuman
-    theConfig = mh2proxy.proxyConfig(human, True, options)
+    theConfig = export_config.exportConfig(human, True, options)
     (name, ext) = os.path.splitext(filename)
 
     if '24' in theConfig.mhxversion:
@@ -64,15 +63,15 @@ def exportMhx(human, filename, options):
         filename = name+"-25"+ext
         try:
             fp = open(filename, 'w')
-            mh2proxy.safePrint("Writing MHX 2.5x file",  filename )
+            export_config.safePrint("Writing MHX 2.5x file",  filename )
         except:
-            mh2proxy.safePrint("Unable to open file for writing", filename)
+            export_config.safePrint("Unable to open file for writing", filename)
             fp = 0
         if fp:
             exportMhx_25(human, fp)
             fp.close()
             time2 = time.clock()
-            mh2proxy.safePrint("Wrote MHX 2.5x file in %g s:" % (time2-time1), filename)
+            export_config.safePrint("Wrote MHX 2.5x file in %g s:" % (time2-time1), filename)
 
     return
 
