@@ -1891,7 +1891,7 @@ class FileChooserRectangle(View):
         self.preview = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
         
         # Label
-        self.label = TextObject(self, [self.style.left, self.style.top + self.style.height, self.style.zIndex], file)
+        self.label = TextObject(self, [self.style.left, self.style.top + self.style.height, self.style.zIndex], label)
         
         self.file = file
         
@@ -2006,9 +2006,9 @@ class FileChooser(View):
         preview = filename
         
         if self.previewExtension:
-            preview = os.path.join(self.path, filename.replace(os.path.splitext(filename)[-1], '.' + self.previewExtension))
+            preview = filename.replace(os.path.splitext(filename)[-1], '.' + self.previewExtension)
         else:
-            preview = os.path.join(self.path, filename)
+            preview = filename
             
         if not os.path.exists(preview) and self.notFoundImage:
             preview = os.path.join(self.path, self.notFoundImage)
@@ -2036,14 +2036,16 @@ class FileChooser(View):
         
         # Filter
         if isinstance(self.extension, str):
-            for f in os.listdir(self.path):
-                if f.endswith('.' + self.extension):
-                    self.files.append(f)
+            for root, dirs, files in os.walk(self.path):
+                for f in files:
+                    if f.endswith('.' + self.extension):
+                        self.files.append(os.path.join(root, f))
         elif isinstance(self.extension, list):
-            for f in os.listdir(self.path):
-                for ext in self.extension:
-                    if f.endswith('.' + ext):
-                        self.files.append(f)
+            for root, dirs, files in os.walk(self.path):
+                for f in files:
+                    for ext in self.extension:
+                        if f.endswith('.' + ext):
+                            self.files.append(os.path.join(root, f))
         
         # Sort         
         self.files = self.sort.sort(self.sortBy, self.path, self.files)
@@ -2053,8 +2055,9 @@ class FileChooser(View):
             
             label = None
             if isinstance(self.extension, str):
-                label = file.replace(os.path.splitext(file)[-1], '')
-            FileChooserRectangle(self, file, label or file, FileChooserRectangleStyle._replace(normal=self.getPreview(file)))
+                label = os.path.basename(file.replace(os.path.splitext(file)[-1], ''))
+            
+            FileChooserRectangle(self, file, label or os.path.basename(file), FileChooserRectangleStyle._replace(normal=self.getPreview(file)))
                 
         self.__updateScrollBar()
             
