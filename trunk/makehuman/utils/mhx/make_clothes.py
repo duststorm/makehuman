@@ -142,6 +142,14 @@ def selectVert(context, vn, ob):
     return    
 
 #
+#   goodName(name):    
+#
+
+def goodName(name):    
+    newName = name.replace('-','_')
+    return newName.lower()
+    
+#
 #    findClothes(context, bob, pob, log):
 #
 
@@ -391,11 +399,10 @@ def proxyFilePtr(name):
     return None
 
 #
-#    printClothes(context, path, bob, pob, data):    
+#    printClothes(context, path, file, bob, pob, data):    
 #
         
-def printClothes(context, path, bob, pob, data):
-    file = os.path.expanduser(path)
+def printClothes(context, path, file, bob, pob, data):
     scn = context.scene
     fp= open(file, "w")
 
@@ -435,15 +442,21 @@ def printClothes(context, path, bob, pob, data):
 
     me = pob.data
 
-    if me.materials and scn['MakeClothesMaterials']:
+    useMats = scn['MakeClothesMaterials']
+    useBlender = scn['MakeClothesBlenderMaterials']
+    if me.materials and (useMats or useBlender):
         mat = me.materials[0]
         fp.write("# material %s\n" % mat.name)
-        writeColor(fp, 'diffuse_color', mat.diffuse_color)
-        fp.write('diffuse_shader %s\n' % mat.diffuse_shader)
-        fp.write('diffuse_intensity %.4f\n' % mat.diffuse_intensity)
-        writeColor(fp, 'specular_color', mat.specular_color)
-        fp.write('specular_shader %s\n' % mat.specular_shader)
-        fp.write('specular_intensity %.4f\n' % mat.specular_intensity)
+        if useMats:
+            writeColor(fp, 'diffuse_color', mat.diffuse_color)
+            fp.write('diffuse_shader %s\n' % mat.diffuse_shader)
+            fp.write('diffuse_intensity %.4f\n' % mat.diffuse_intensity)
+            writeColor(fp, 'specular_color', mat.specular_color)
+            fp.write('specular_shader %s\n' % mat.specular_shader)
+            fp.write('specular_intensity %.4f\n' % mat.specular_intensity)
+        if useBlender:
+            mhxfile = exportBlenderMaterial(me, path)
+            fp.write("# material_file %s\n" % mhxfile)
 
     useProjection = scn['MakeClothesUseProjection']
     fp.write("# use_projection %d\n" % useProjection)
@@ -516,19 +529,52 @@ def printScale(fp, bob, scn, name, index, prop1, prop2):
 
 def makeClothes(context):
     bob = context.object
+    checkObjectOK(bob)
     for pob in context.selected_objects:
         if pob.type == 'MESH' and bob.type == 'MESH' and pob != bob:
-            outpath = '%s/%s.mhclo' % (context.scene['MakeClothesDirectory'], pob.name.lower())
-            outfile = os.path.realpath(os.path.expanduser(outpath))
+            checkObjectOK(pob)
+            name = goodName(pob.name)
+            outpath = '%s/%s' % (context.scene['MakeClothesDirectory'], name)
+            outpath = os.path.realpath(os.path.expanduser(outpath))
+            outfile = "%s/%s.mhclo" % (outpath, name)
             print("Creating clothes file %s" % outfile)
-            logpath = '%s/clothes.log' % context.scene['MakeClothesDirectory']
-            logfile = os.path.realpath(os.path.expanduser(logpath))
+            logfile = '%s/clothes.log' % outpath
             log = open(logfile, "w")
             data = findClothes(context, bob, pob, log)
             log.close()
-            printClothes(context, outpath, bob, pob, data)
-            print("%s done" % outpath)
-        
+            printClothes(context, outpath, outfile, bob, pob, data)
+            print("%s done" % outfile)
+
+#
+#   checkObjectOK(ob):
+#
+
+def checkObjectOK(ob):
+    word = None
+    if ob.location.length > Epsilon:
+        word = "object translation"
+    eu = ob.rotation_euler
+    if abs(eu.x) + abs(eu.y) + abs(eu.z) > Epsilon:
+        word = "object rotation"
+    vec = ob.scale - mathutils.Vector((1,1,1))
+    if vec.length > Epsilon:
+        word = "object scaling"
+    if ob.constraints:
+        word = "constraints"
+    for mod in ob.modifiers:
+        if mod.type in ['CHILD_OF', 'ARMATURE']:
+            word = "a %s modifier" % mod.type
+    if ob.parent:
+        word = "parent"
+    if word:
+        msg = (
+            "Object %s can not be used for clothes creation because it has %s.\n" +
+            "Apply or delete before continuing." % (ob.name, word)
+            )
+        print(msg)
+        raise NameError(msg)
+    return    
+
 #
 #   offsetClothes(context):
 #   offsetCloth(bob, pob, context):
@@ -624,12 +670,286 @@ def writeVertexGroups(pob, fp):
                     fp.write(" %d %.4g \n" % (v.index, g.weight))
     return
 
+###################################################################################    
+#
+#   Export of clothes material
+#
+###################################################################################    
+
+def exportBlenderMaterial(me, path):
+    mats = []
+    texs = []
+    for mat in me.materials:
+        if mat:
+            mats.append(mat)
+            for mtex in mat.texture_slots:
+                if mtex:
+                    tex = mtex.texture
+                    if tex and (tex not in texs):
+                        texs.append(tex)
+    
+    matname = goodName(mats[0].name)
+    mhxfile = "%s_material.mhx" % matname
+    mhxpath = "%s/%s" % (path, mhxfile)
+    print("Open %s" % mhxpath)
+    fp = open(mhxpath, "w")
+    for tex in texs:
+        exportTexture(tex, matname, fp)
+    for mat in mats:
+        exportMaterial(mat, fp)
+    fp.close()
+    return "%s" % mhxfile
+
+#
+#    exportMaterial(mat, fp):
+#    exportMTex(index, mtex, use, fp):
+#    exportTexture(tex, fp):
+#    exportImage(img, fp)
+#
+
+def exportMaterial(mat, fp):
+    fp.write("Material %s \n" % mat.name)
+    for (n,mtex) in enumerate(mat.texture_slots):
+        if mtex:
+            exportMTex(n, mtex, mat.use_textures[n], fp)
+    prio = ['diffuse_color', 'diffuse_shader', 'diffuse_intensity', 
+        'specular_color', 'specular_shader', 'specular_intensity']
+    writePrio(mat, prio, "  ", fp)
+    exportRamp(mat.diffuse_ramp, 'diffuse_ramp', fp)
+    exportRamp(mat.specular_ramp, 'specular_ramp', fp)
+    exportDefault("Halo", mat.halo, [], [], [], [], '  ', fp)
+    exportDefault("RaytraceTransparency", mat.raytrace_transparency, [], [], [], [], '  ', fp)
+    exclude = ['use_surface_diffuse']
+    exportDefault("SSS", mat.subsurface_scattering, [], [], exclude, [], '  ', fp)
+    exportDefault("Strand", mat.strand, [], [], [], [], '  ', fp)
+    writeDir(mat, prio+['texture_slots', 'volume', 'node_tree',
+        'diffuse_ramp', 'specular_ramp', 'use_diffuse_ramp', 'use_specular_ramp', 
+        'halo', 'raytrace_transparency', 'subsurface_scattering', 'strand'], "  ", fp)
+    fp.write("end Material\n\n")
+    return
+
+MapToTypes = {
+    'use_map_alpha' : 'ALPHA',
+    'use_map_ambient' : 'AMBIENT',
+    'use_map_color_diffuse' : 'COLOR',
+    'use_map_color_emission' : 'COLOR_EMISSION',
+    'use_map_color_reflection' : 'COLOR_REFLECTION',
+    'use_map_color_spec' : 'COLOR_SPEC',
+    'use_map_color_transmission' : 'COLOR_TRANSMISSION',
+    'use_map_density' : 'DENSITY',
+    'use_map_diffuse' : 'DIFFUSE',
+    'use_map_displacement' : 'DISPLACEMENT',
+    'use_map_emission' : 'EMISSION',
+    'use_map_emit' : 'EMIT', 
+    'use_map_hardness' : 'HARDNESS',
+    'use_map_mirror' : 'MIRROR',
+    'use_map_normal' : 'NORMAL',
+    'use_map_raymir' : 'RAYMIR',
+    'use_map_reflect' : 'REFLECTION',
+    'use_map_scatter' : 'SCATTERING',
+    'use_map_specular' : 'SPECULAR_COLOR', 
+    'use_map_translucency' : 'TRANSLUCENCY',
+    'use_map_warp' : 'WARP',
+}
+
+def exportMTex(index, mtex, use, fp):
+    tex = mtex.texture
+    texname = tex.name.replace(' ','_')
+    mapto = None
+    prio = []
+    for ext in MapToTypes.keys():
+        if eval("mtex.%s" % ext):
+            if mapto == None:
+                mapto = MapToTypes[ext]
+            prio.append(ext)    
+            print("Mapto", ext, mapto)
+            
+    fp.write("  MTex %d %s %s %s\n" % (index, texname, mtex.texture_coords, mapto))
+    writePrio(mtex, ['texture']+prio, "    ", fp)
+    writeDir(mtex, list(MapToTypes.keys()) + ['texture', 'type', 'texture_coords', 'offset'], "    ", fp)
+    fp.write("  end MTex\n\n")
+    return
+
+def exportTexture(tex, matname, fp):
+    if not tex:
+        return
+    if tex.type == 'IMAGE' and tex.image:
+        exportImage(tex.image, matname, fp)
+        fp.write("Texture %s %s\n" % (tex.name, tex.type))
+        fp.write("  Image %s ;\n" % tex.image.name)
+    else:
+        fp.write("Texture %s %s\n" % (tex.name, tex.type))
+
+    exportRamp(tex.color_ramp, "color_ramp", fp)
+    writeDir(tex, ['color_ramp', 'node_tree', 'image_user', 'use_nodes', 'use_textures', 'type', 'users_material'], "  ", fp)
+    fp.write("end Texture\n\n")
+
+def exportImage(img, matname, fp):
+    imgName = img.name
+    if imgName == 'Render_Result':
+        return
+    fp.write("Image %s\n" % imgName)
+    fp.write("  Filename %s ;\n" % os.path.basename(img.filepath))
+    writeDir(img, ['bindcode', 'filename','filepath', 'filepath_raw', 'is_dirty'], "  ", fp)
+    fp.write("end Image\n\n")
+
+def exportRamp(ramp, name, fp):
+    if ramp == None:
+        return
+    print(ramp)
+    fp.write("  Ramp %s\n" % name)
+
+    for elt in ramp.elements:
+        col = elt.color
+        fp.write("    Element (%.3f,%.3f,%.3f,%.3f) %.3f ;\n" % (col[0], col[1], col[2], col[3], elt.position))
+    writeDir(ramp, ['elements'], "    ", fp)
+    fp.write("  end Ramp\n")
+
+
+#
+#    writePrio(data, prio, pad, fp):
+#    writeDir(data, exclude, pad, fp):
+#
+
+def writePrio(data, prio, pad, fp):
+    for ext in prio:
+        writeExt(ext, "data", [], pad, 0, fp, globals(), locals())
+
+def writeDir(data, exclude, pad, fp):
+    for ext in dir(data):
+        writeExt(ext, "data", exclude, pad, 0, fp, globals(), locals())
+
+def writeQuoted(arg, fp):
+    typ = type(arg)
+    if typ == int or typ == float or typ == bool:
+        fp.write("%s" % arg)
+    elif typ == str:
+        fp.write("'%s'"% stringQuote(arg))
+    elif len(arg) > 1:
+        c = '['
+        for elt in arg:
+            fp.write(c)
+            writeQuoted(elt, fp)
+            c = ','
+        fp.write("]")
+    else:
+        raise NameError("Unknown property %s %s" % (arg, typ))
+        fp.write('%s' % arg)
+
+def stringQuote(string):
+    s = ""
+    for c in string:
+        if c == '\\':
+            s += "\\\\"
+        elif c == '\"':
+            s += "\\\""
+        elif c == '\'':
+            s += "\\\'"
+        else:
+            s += c
+    return s
+        
+            
+#
+#    writeExt(ext, name, exclude, pad, depth, fp, globals, locals):        
+#
+
+def writeExt(ext, name, exclude, pad, depth, fp, globals, locals):        
+    expr = name+"."+ext
+    try:
+        arg = eval(expr, globals, locals)
+        success = True
+    except:
+        success = False
+        arg = None
+    if success:
+        writeValue(ext, arg, exclude, pad, depth, fp)
+    return
+
+#
+#    writeValue(ext, arg, exclude, pad, depth, fp):
+#
+
+excludeList = [
+    'bl_rna', 'fake_user', 'id_data', 'rna_type', 'name', 'tag', 'users', 'type'
+]
+
+def writeValue(ext, arg, exclude, pad, depth, fp):
+    if (len(str(arg)) == 0 or
+        arg == None or
+        arg == [] or
+        ext[0] == '_' or
+        ext in excludeList or
+        ext in exclude):
+        return
+        
+    if ext == 'end':
+        print("RENAME end", arg)
+        ext = '\\ end'
+
+    typ = type(arg)
+    if typ == int:
+        fp.write("%s%s %d ;\n" % (pad, ext, arg))
+    elif typ == float:
+        fp.write("%s%s %.3f ;\n" % (pad, ext, arg))
+    elif typ == bool:
+        fp.write("%s%s %s ;\n" % (pad, ext, arg))
+    elif typ == str:
+        fp.write("%s%s '%s' ;\n" % (pad, ext, stringQuote(arg.replace(' ','_'))))
+    elif typ == list:
+        fp.write("%s%s List\n" % (pad, ext))
+        n = 0
+        for elt in arg:
+            writeValue("[%d]" % n, elt, [], pad+"  ", depth+1, fp)
+            n += 1
+        fp.write("%send List\n" % pad)
+    elif typ == mathutils.Vector:
+        c = '('
+        fp.write("%s%s " % (pad, ext))
+        for elt in arg:
+            fp.write("%s%.3f" % (c,elt))
+            c = ','
+        fp.write(") ;\n")
+    return 
+
+#
+#    exportDefault(typ, data, header, prio, exclude, arrays, pad, fp):
+#
+
+def exportDefault(typ, data, header, prio, exclude, arrays, pad, fp):
+    if not data:
+        return
+    try:
+        if not data.enabled:
+            return
+    except:
+        pass
+    try:
+        name = data.name
+    except:
+        name = ''
+
+    fp.write("%s%s %s" % (pad, typ, name))
+    for val in header:
+        fp.write(" %s" % val)
+    fp.write("\n")
+    writePrio(data, prio, pad+"  ", fp)
+
+    for (arrname, arr) in arrays:
+        #fp.write(%s%s\n" % (pad, arrname))
+        for elt in arr:
+            exportDefault(arrname, elt, [], [], [], [], pad+'  ', fp)
+
+    writeDir(data, prio+exclude+arrays, pad+"  ", fp)
+    fp.write("%send %s\n" % (pad,typ))
+    return
 
 ###################################################################################    
 #    User interface
 #
 #    initInterface()
 #
+###################################################################################    
 
 from bpy.props import *
 
@@ -639,11 +959,16 @@ def initInterface(scn):
         description="Directory", 
         maxlen=1024)
     #scn['MakeClothesDirectory'] = "/home/svn/makehuman/data/hairstyles"
-    scn['MakeClothesDirectory'] = "~/documents/makehuman/clothes"
+    scn['MakeClothesDirectory'] = "/home/svn/makehuman/data/clothes"
     bpy.types.Scene.MakeClothesMaterials = BoolProperty(
         name="Materials", 
         description="Use materials")
     scn['MakeClothesMaterials'] = False
+
+    bpy.types.Scene.MakeClothesBlenderMaterials = BoolProperty(
+        name="Blender materials", 
+        description="Save materials as mhx file")
+    scn['MakeClothesBlenderMaterials'] = False
 
     bpy.types.Scene.MakeClothesHairMaterial = BoolProperty(
         name="Hair material", 
@@ -737,6 +1062,7 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.operator("mhclo.init_interface")
         layout.prop(scn, "MakeClothesDirectory")
         layout.prop(scn, "MakeClothesMaterials")
+        layout.prop(scn, "MakeClothesBlenderMaterials")
         layout.prop(scn, "MakeClothesHairMaterial")
         layout.prop(scn, "MakeClothesUseProjection")
         layout.prop(scn, "MakeClothesOutside")

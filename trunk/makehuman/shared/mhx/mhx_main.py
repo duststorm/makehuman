@@ -615,7 +615,7 @@ def copyProxyMaterialFile(pair, proxy, fp):
                 fp.write("%s " % word)
             fp.write("\n")                
         elif words[0] == 'filename':
-            path1 = os.path.expanduser("./data/clothes/")
+            path1 = os.path.expanduser("./data/clothes/%s/" % proxy.name.lower())
             (path, filename) = os.path.split(words[1])
             file1 = os.path.realpath(path1+filename)
             fp.write("  filename %s ;\n" % file1)
