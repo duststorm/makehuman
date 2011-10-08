@@ -68,50 +68,45 @@ class HairTaskView(gui3d.TaskView):
 
     def setHair(self, human, filename):
 
-		#obj = os.path.join('data/hairstyles', filename)
-		#TL: path now included in filename?
-		obj = filename
-		tif = obj.replace('.obj', '_texture.tif')
-		
-		if human.hairObj:
-			self.app.scene3d.delete(human.hairObj.mesh)
-			human.hairObj = None
+        #obj = os.path.join('data/hairstyles', filename)
+        #TL: path now included in filename?
+        obj = filename
+        tif = obj.replace('.obj', '_texture.tif')
+        
+        if human.hairObj:
+            self.app.scene3d.delete(human.hairObj.mesh)
+            human.hairObj = None
+            human.hairProxy = None
 
-		mesh = files3d.loadMesh(self.app.scene3d, obj)
-		mesh.setTexture(tif)
-		
-		human.hairObj = gui3d.Object(self.app, human.getPosition(), mesh)
-		human.hairObj.setRotation(human.getRotation())
-		human.hairObj.mesh.setCameraProjection(0)
-		human.hairObj.mesh.setSolid(human.mesh.solid)
-		human.hairObj.mesh.setTransparentPrimitives(len(human.hairObj.mesh.faces))
-		human.hairObj.mesh.originalHairVerts = [v.co[:] for v in human.hairObj.mesh.verts]
-		self.app.scene3d.update()
-		self.adaptHairToHuman(human)
-		human.hairObj.setSubdivided(human.isSubdivided())
-		
-		self.hairButton.setTexture(obj.replace('.obj', '.png'))
+        mesh = files3d.loadMesh(self.app.scene3d, obj)
+        mesh.setTexture(tif)
+        
+        human.hairObj = gui3d.Object(self.app, human.getPosition(), mesh)
+        human.hairObj.setRotation(human.getRotation())
+        human.hairObj.mesh.setCameraProjection(0)
+        human.hairObj.mesh.setSolid(human.mesh.solid)
+        human.hairObj.mesh.setTransparentPrimitives(len(human.hairObj.mesh.faces))
+        human.hairObj.mesh.originalHairVerts = [v.co[:] for v in human.hairObj.mesh.verts]
+                
+        hairName = human.hairObj.meshName.split('.')[0]
+        file = "data/hairstyles/%s.mhclo" % hairName
+        print("Loading clothes hair %s" % file)
+        human.hairProxy = mh2proxy.readProxyFile(human.meshData, file, False)
+
+        self.app.scene3d.update()
+        self.adaptHairToHuman(human)
+        human.hairObj.setSubdivided(human.isSubdivided())
+        
+        self.hairButton.setTexture(obj.replace('.obj', '.png'))
 
     def adaptHairToHuman(self, human):
 
         if human.hairObj:
             
-            # TL: Treating hair as clothes.
-            # To create the mhclo file from obj, use utils/mhx/make_clothes.py in Blender 2.57
-            # Load obj file (single mesh, keep vert order, no groups) into Blender. Also load base.obj.
-            # Select all hair meshes, then shift-select base mesh, then press Make Clothes.
-            # Copy mhclo file into data/hairstyles folder.
-            if True:
-                hairName = human.hairObj.meshName.split('.')[0]
-                file = "data/hairstyles/%s.mhclo" % hairName
-                print("Loading clothes hair %s" % file)
-                proxy = mh2proxy.readProxyFile(human.meshData, file, False)
-                mesh = human.hairObj.getSeedMesh()
-                for i, v in enumerate(mesh.verts):
-                    (x,y,z) = mh2proxy.proxyCoord(proxy.realVerts[i])
-                    v.co = [x,y,z]
-                print("Hair loaded")
-            else:
+            mesh = human.hairObj.getSeedMesh()
+            human.hairProxy.update(mesh, human.meshData)
+            
+            """
                 headNames = [group.name for group in human.meshData.faceGroups if ("head" in group.name or "jaw" in group.name or "nose" in group.name or "mouth" in group.name or "ear" in group.name or "eye" in group.name)]
                 headVertices = human.meshData.getVerticesAndFacesForGroups(headNames)[0]
                 headBBox = calcBBox(headVertices)
@@ -130,7 +125,8 @@ class HairTaskView(gui3d.TaskView):
                     co[1] *= sy
                     co[2] *= sz
                     v.co = vadd(vadd(co, headCentroid), delta)
-
+            """
+            
             mesh.update()
             if human.hairObj.isSubdivided():
                 human.hairObj.getSubdivisionMesh()
@@ -156,6 +152,7 @@ class HairTaskView(gui3d.TaskView):
             if human.hairObj:
                 self.app.scene3d.delete(human.hairObj.mesh)
                 human.hairObj = None
+                human.hairProxy = None
             self.hairButton.setTexture('data/hairstyles/clear.png')
         def updateClosure():
             self.adaptHairToHuman(human)

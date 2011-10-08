@@ -51,6 +51,7 @@ class ClothesTaskView(gui3d.TaskView):
         if clo:
             self.app.scene3d.delete(clo.mesh)
             human.clothesObjs[name] = None
+            human.clothesObjs[name] = None
 
         mesh = files3d.loadMesh(self.app.scene3d, obj)
         #mesh.setTexture(tif)
@@ -62,6 +63,11 @@ class ClothesTaskView(gui3d.TaskView):
         clo.mesh.setTransparentPrimitives(len(clo.mesh.faces))
         clo.mesh.originalClothesVerts = [v.co[:] for v in clo.mesh.verts]
         human.clothesObjs[name] = clo
+        
+        file = "data/clothes/%s/%s.mhclo" % (name,name)
+        print("Loading %s" % file)
+        human.clothesProxies[name] = mh2proxy.readProxyFile(human.meshData, file, False)
+
         self.app.scene3d.update()
         self.adaptClothesToHuman(human)
         clo.setSubdivided(human.isSubdivided())
@@ -71,14 +77,8 @@ class ClothesTaskView(gui3d.TaskView):
     def adaptClothesToHuman(self, human):
 
         for (name,clo) in human.clothesObjs.items():            
-            file = "data/clothes/%s/%s.mhclo" % (name,name)
-            print("Loading %s" % file)
-            proxy = mh2proxy.readProxyFile(human.meshData, file, False)
             mesh = clo.getSeedMesh()
-            for i, v in enumerate(mesh.verts):
-                (x,y,z) = mh2proxy.proxyCoord(proxy.realVerts[i])
-                v.co = [x,y,z]
-            print("%s loaded" % file)
+            human.clothesProxies[name].update(mesh, human.meshData)
             mesh.update()
             if clo.isSubdivided():
                 clo.getSubdivisionMesh()
@@ -103,6 +103,7 @@ class ClothesTaskView(gui3d.TaskView):
             for (name,clo) in human.clothesObjs.items():            
                 self.app.scene3d.delete(clo.mesh)
                 human.clothesObjs[name] = None
+                human.clothesProxies[name] = None
             # self.clothesButton.setTexture('data/clothes/clear.png')
         def updateClosure():
             self.adaptClothesToHuman(human)

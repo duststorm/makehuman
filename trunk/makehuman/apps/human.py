@@ -52,7 +52,9 @@ class Human(gui3d.Object):
 
         self.hairModelling = False #temporary variable for easier integration of makehair, will be cleaned later.
         self.hairObj = hairObj
+        self.hairProxy = None
         self.clothesObjs = clothesObjs
+        self.clothesProxies = {}
         self.targetsDetailStack = {}  # All details targets applied, with their values
         self.symmetryModeEnabled = False
 

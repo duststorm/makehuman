@@ -27,7 +27,6 @@ from aljabr import *
 import export_config
 import read_rig, mhx_rig, mhx_main
 
-
 #
 #    class CProxy
 #
@@ -56,7 +55,26 @@ class CProxy:
         self.shapekeys = []
         self.bones = []
         self.weights = None
+        self.refVerts = []
         return
+        
+    def update(self, mesh, parent):
+        rlen = len(self.refVerts)
+        mlen = len(mesh.verts)
+        if rlen != mlen:
+            raise NameError( "Bug: %d refVerts != %d meshVerts" % (rlen, mlen) )
+        for n,vert in enumerate(mesh.verts):
+            refVert = self.refVerts[n]
+            if type(refVert) == tuple:
+                (rv0, rv1, rv2, w0, w1, w2, d0, d1, d2) = refVert
+                v0 = parent.verts[rv0]
+                v1 = parent.verts[rv1]
+                v2 = parent.verts[rv2]
+                vert.co[0] = w0*v0.co[0] + w1*v1.co[0] + w2*v2.co[0] + d0
+                vert.co[1] = w0*v0.co[1] + w1*v1.co[1] + w2*v2.co[1] + d1
+                vert.co[2] = w0*v0.co[2] + w1*v1.co[2] + w2*v2.co[2] + d2
+            else:
+                vert.co = parent.verts[refVert].co
 
 #
 #    class CMaterial
@@ -84,10 +102,10 @@ class CMaterial:
         """
 
 #
-#    readProxyFile(obj, file, needObj):
+#    readProxyFile(obj, file, evalOnLoad):
 #
 
-def readProxyFile(obj, file, needObj):
+def readProxyFile(obj, file, evalOnLoad):
     if not file:
         return CProxy('Proxy', 2)
     elif type(file) == str:
@@ -126,6 +144,7 @@ def readProxyFile(obj, file, needObj):
     doTexVerts = 4
     doObjData = 5
     doWeights = 6
+    doRefVerts = 7
 
     vn = 0
     for line in tmpl:
@@ -137,7 +156,10 @@ def readProxyFile(obj, file, needObj):
             if len(words) == 1:
                 pass
             elif words[1] == 'verts':
-                status = doVerts
+                if evalOnLoad:
+                    status = doVerts
+                else:
+                    status = doRefVerts
             elif words[1] == 'faces':
                 status = doFaces
             elif words[1] == 'weights':
@@ -201,6 +223,21 @@ def readProxyFile(obj, file, needObj):
                 newFace(1, words, theGroup, proxy)
             elif words[0] == 'g':
                 theGroup = words[1]
+        elif status == doRefVerts:
+            if len(words) == 1:
+                v = int(words[0])
+                proxy.refVerts.append(v)
+            else:                
+                v0 = int(words[0])
+                v1 = int(words[1])
+                v2 = int(words[2])
+                w0 = float(words[3])
+                w1 = float(words[4])
+                w2 = float(words[5])            
+                d0 = float(words[6]) * xScale
+                d1 = float(words[7]) * yScale
+                d2 = float(words[8]) * zScale
+                proxy.refVerts.append( (v0,v1,v2,w0,w1,w2,d0,d1,d2) )
         elif status == doVerts:
             if len(words) == 1:
                 v = int(words[0])
@@ -250,7 +287,7 @@ def readProxyFile(obj, file, needObj):
             w = float(words[1])
             weights.append((v,w))
             
-    if needObj and objfile:
+    if evalOnLoad and objfile:
         if not copyObjFile(folder, objfile, proxy):
             return None
 
@@ -521,14 +558,17 @@ def getMeshInfo(obj, proxy, rawWeights, rawShapes, rigname):
             vnormals.append(v)
 
         faces = []
-        fn = 0
-        for (f,g) in proxy.faces:
-            texFace = proxy.texFaces[fn]
-            face = []
-            for (vn,v) in enumerate(f):
-                face.append((v, texFace[vn]))
-            faces.append(face)
-            fn += 1
+        if proxy.texVerts:
+            fn = 0
+            for (f,g) in proxy.faces:
+                texFace = proxy.texFaces[fn]
+                face = []
+                for (vn,v) in enumerate(f):
+                    face.append((v, texFace[vn]))
+                faces.append(face)
+                fn += 1
+        else:
+            faces = proxy.faces
 
         weights = None
         shapes = []
