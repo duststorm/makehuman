@@ -68,7 +68,9 @@ class HairTaskView(gui3d.TaskView):
 
     def setHair(self, human, filename):
 
-		obj = os.path.join('data/hairstyles', filename)
+		#obj = os.path.join('data/hairstyles', filename)
+		#TL: path now included in filename?
+		obj = filename
 		tif = obj.replace('.obj', '_texture.tif')
 		
 		if human.hairObj:
@@ -103,7 +105,7 @@ class HairTaskView(gui3d.TaskView):
                 hairName = human.hairObj.meshName.split('.')[0]
                 file = "data/hairstyles/%s.mhclo" % hairName
                 print("Loading clothes hair %s" % file)
-                proxy = mh2proxy.readProxyFile(human.meshData, file)
+                proxy = mh2proxy.readProxyFile(human.meshData, file, False)
                 mesh = human.hairObj.getSeedMesh()
                 for i, v in enumerate(mesh.verts):
                     (x,y,z) = mh2proxy.proxyCoord(proxy.realVerts[i])

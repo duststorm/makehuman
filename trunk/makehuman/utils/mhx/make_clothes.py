@@ -143,21 +143,21 @@ def selectVert(context, vn, ob):
 
 #
 #   goodName(name):    
-#   getClothesFile(pob, context):            
+#   getFileName(pob, context, ext):            
 #
 
 def goodName(name):    
     newName = name.replace('-','_')
     return newName.lower()
     
-def getClothesFile(pob, context):            
+def getFileName(pob, context, ext):            
     name = goodName(pob.name)
     outpath = '%s/%s' % (context.scene['MakeClothesDirectory'], name)
     outpath = os.path.realpath(os.path.expanduser(outpath))
     if not os.path.exists(outpath):
         print("Creating directory %s" % outpath)
         os.mkdir(outpath)
-    outfile = "%s/%s.mhclo" % (outpath, name)
+    outfile = os.path.join(outpath, "%s.%s" % (name, ext))
     return (outpath, outfile)
     
 #
@@ -441,6 +441,7 @@ def printClothes(context, path, file, bob, pob, data):
 "# homepage http://www.makehuman.org/\n")
 
     fp.write("# name %s\n" % pob.name)
+    fp.write("# obj_file %s.obj\n" % goodName(pob.name))
     
     for mod in pob.modifiers:
         if mod.type == 'SHRINKWRAP':
@@ -515,11 +516,30 @@ def printClothes(context, path, file, bob, pob, data):
             else:
                 fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f %.5f %.5f\n" % (
                     verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], diff[0], diff[2], -diff[1]))
+    fp.write('\n')
+    fp.close()
+    return
 
-    fp.write("# obj_data\n")
-    if me.uv_textures:
+#
+#   exportObjFile(ob, context):
+#
+
+def exportObjFile(ob, context):
+    (objpath, objfile) = getFileName(ob, context, "obj")
+    print("Open", objfile)
+    fp = open(objfile, "w")
+    fp.write("# Exported from make_clothes.py\n")
+    
+    scn = context.scene
+    me = ob.data
+    for v in me.vertices:
+        fp.write("v %.4f %.4f %.4f\n" % (v.co[0], v.co[2], -v.co[1]))
+        
+    for v in me.vertices:
+        fp.write("vn %.4f %.4f %.4f\n" % (v.normal[0], v.normal[2], -v.normal[1]))
+        
+    if scn['MakeClothesUVs'] and me.uv_textures:
         uvtex = me.uv_textures[0]
-        #fp.write("# texverts\n")
         fn = 0
         for uvdata in uvtex.data.values():
             uv = uvdata.uv_raw
@@ -527,9 +547,6 @@ def printClothes(context, path, file, bob, pob, data):
             for n in range(len(f.vertices)):
                 fp.write("vt %.4f %.4f\n" % (uv[2*n], uv[2*n+1]))
 
-    #fp.write("# faces\n")
-
-    if me.uv_textures:
         n = 1
         for f in me.faces:
             fp.write("f ")
@@ -544,8 +561,8 @@ def printClothes(context, path, file, bob, pob, data):
                 fp.write("%d " % (v+1))
             fp.write("\n")
 
-    fp.write('\n')
     fp.close()
+    print(objfile, "closed")
     return
 
 def writeColor(fp, string, color):
@@ -574,7 +591,7 @@ def makeClothes(context):
         if pob.type == 'MESH' and bob.type == 'MESH' and pob != bob:
             nobjects += 1
             checkObjectOK(pob)
-            (outpath, outfile) = getClothesFile(pob, context)
+            (outpath, outfile) = getFileName(pob, context, "mhclo")
             print("Creating clothes file %s" % outfile)
             if scn['MakeClothesLogging']:
                 logfile = '%s/clothes.log' % scn['MakeClothesDirectory']
@@ -734,7 +751,7 @@ def exportBlenderMaterial(me, path):
     
     matname = goodName(mats[0].name)
     mhxfile = "%s_material.mhx" % matname
-    mhxpath = "%s/%s" % (path, mhxfile)
+    mhxpath = os.path.join(path, mhxfile)
     print("Open %s" % mhxpath)
     fp = open(mhxpath, "w")
     for tex in texs:
@@ -1075,6 +1092,16 @@ def initInterface(scn):
         description="Save materials as mhx file")
     scn['MakeClothesBlenderMaterials'] = False
 
+    bpy.types.Scene.MakeClothesObjFile = BoolProperty(
+        name="Object file", 
+        description="Also export object file")
+    scn['MakeClothesObjFile'] = False
+
+    bpy.types.Scene.MakeClothesUVs = BoolProperty(
+        name="Export UVs", 
+        description="Export UVs to obj if exist")
+    scn['MakeClothesUVs'] = False
+
     bpy.types.Scene.MakeClothesHairMaterial = BoolProperty(
         name="Hair material", 
         description="Fill in hair material")
@@ -1193,6 +1220,8 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.prop(scn, "MakeClothesDirectory")
         layout.prop(scn, "MakeClothesMaterials")
         layout.prop(scn, "MakeClothesBlenderMaterials")
+        layout.prop(scn, "MakeClothesObjFile")
+        layout.prop(scn, "MakeClothesUVs")
         layout.prop(scn, "MakeClothesHairMaterial")
         layout.prop(scn, "MakeClothesUseProjection")
         layout.prop(scn, "MakeClothesOutside")
@@ -1206,6 +1235,7 @@ class MakeClothesPanel(bpy.types.Panel):
         
         layout.separator()
         layout.operator("mhclo.make_clothes")
+        layout.operator("mhclo.export_obj_file")
         layout.operator("mhclo.export_blender_material")
         
         layout.label("Shapekeys")
@@ -1251,6 +1281,20 @@ class OBJECT_OT_MakeClothesButton(bpy.types.Operator):
 
     def execute(self, context):
         makeClothes(context)
+        if context.scene['MakeClothesObjFile']:
+            exportObjFile(context.object, context)
+        return{'FINISHED'}    
+        
+#
+#   class OBJECT_OT_ExportObjFileButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_ExportObjFileButton(bpy.types.Operator):
+    bl_idname = "mhclo.export_obj_file"
+    bl_label = "Export Obj file"
+
+    def execute(self, context):
+        exportObjFile(context.object, context)
         return{'FINISHED'}    
 
 #
@@ -1263,7 +1307,7 @@ class OBJECT_OT_ExportBlenderMaterialButton(bpy.types.Operator):
 
     def execute(self, context):
         pob = context.object
-        (outpath, outfile) = getClothesFile(pob, context)
+        (outpath, outfile) = getFileName(pob, context, "mhx")
         exportBlenderMaterial(pob.data, outpath)
         return{'FINISHED'}    
 

@@ -45,6 +45,7 @@ class CProxy:
         self.texFaces = []
         self.texVerts = []
         self.mask = None
+        self.obj_file = None
         self.material_file = None
         self.materials = []
         self.constraints = []
@@ -83,10 +84,10 @@ class CMaterial:
         """
 
 #
-#    readProxyFile(obj, file):
+#    readProxyFile(obj, file, needObj):
 #
 
-def readProxyFile(obj, file):
+def readProxyFile(obj, file, needObj):
     if not file:
         return CProxy('Proxy', 2)
     elif type(file) == str:
@@ -94,7 +95,9 @@ def readProxyFile(obj, file):
         pfile.file = file
     else:
         pfile = file
-
+    folder = os.path.dirname(pfile.file)
+    objfile = None
+    
     try:
         tmpl = open(pfile.file, "rU")
     except:
@@ -171,9 +174,11 @@ def readProxyFile(obj, file):
             elif words[1] == 'weightfile':
                 proxy.weightfile = (words[2], words[3])
             elif words[1] == 'mask':
-                proxy.mask = (os.path.dirname(pfile.file), words[2])
+                proxy.mask = (folder, words[2])
             elif words[1] == 'material_file':
-                proxy.material_file = (os.path.dirname(pfile.file), words[2])
+                proxy.material_file = (folder, words[2])
+            elif words[1] == 'obj_file':
+                objfile = words[2]
             elif words[1] == 'subsurf':
                 levels = int(words[2])
                 if len(words) > 3:
@@ -244,11 +249,42 @@ def readProxyFile(obj, file):
             v = int(words[0])
             w = float(words[1])
             weights.append((v,w))
+            
+    if needObj and objfile:
+        if not copyObjFile(folder, objfile, proxy):
+            return None
 
     if pfile.name:
         proxy.name = pfile.name
     return proxy
 
+#
+#
+#
+
+def copyObjFile(folder, objfile, proxy):
+    objpath = os.path.join(folder, objfile)
+    print("cof %s %s %s" %  (folder, objfile, objpath))
+    try:
+        tmpl = open(objpath, "rU")
+    except:
+        print("*** Cannot open %s" % pfile.file)
+        return False
+
+    theGroup = None    
+    for line in tmpl:
+        words= line.split()        
+        if len(words) == 0:
+            pass
+        elif words[0] == 'vt':
+            newTexVert(1, words, proxy)
+        elif words[0] == 'f':
+            newFace(1, words, theGroup, proxy)
+        elif words[0] == 'g':
+            theGroup = words[1]
+    tmpl.close()            
+    return True            
+    
 #
 #   getScale(words, verts, index):                
 #
@@ -593,3 +629,4 @@ def fixProxyShape(shape):
     if pv >= 0 and (dx > 1e-4 or dy > 1e-4 or dz > 1e-4):
         fixedShape.append((pv, dx, dy, dz))
     return fixedShape
+    

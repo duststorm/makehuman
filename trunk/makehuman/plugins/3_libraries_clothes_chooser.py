@@ -22,7 +22,6 @@ TO DO
 
 import gui3d, mh, os
 import files3d
-# TL: import mh2proxy for treating polygon hair as clothes
 import mh2proxy
 
 class ClothesTaskView(gui3d.TaskView):
@@ -30,13 +29,60 @@ class ClothesTaskView(gui3d.TaskView):
     def __init__(self, category):
         
         gui3d.TaskView.__init__(self, category, 'Clothes')
-        self.filechooser = gui3d.FileChooser(self, 'data/clothes', 'mhclo', 'png', 'notfound.png')
+        self.filechooser = gui3d.FileChooser(self, 'data/clothes', 'obj', 'png', 'notfound.png')
 
         @self.filechooser.event
         def onFileSelected(filename):
             
+            self.setClothes(self.app.selectedHuman, filename)
+
             self.app.switchCategory('Modelling')
         
+    def setClothes(self, human, obj):
+
+        print("Clothes file", obj)
+        (name, ext) = os.path.splitext(os.path.basename(obj))
+        tif = None
+
+        try:
+            clo = human.clothesObjs[name]
+        except:
+            clo = None
+        if clo:
+            self.app.scene3d.delete(clo.mesh)
+            human.clothesObjs[name] = None
+
+        mesh = files3d.loadMesh(self.app.scene3d, obj)
+        #mesh.setTexture(tif)
+        
+        clo = gui3d.Object(self.app, human.getPosition(), mesh)
+        clo.setRotation(human.getRotation())
+        clo.mesh.setCameraProjection(0)
+        clo.mesh.setSolid(human.mesh.solid)
+        clo.mesh.setTransparentPrimitives(len(clo.mesh.faces))
+        clo.mesh.originalClothesVerts = [v.co[:] for v in clo.mesh.verts]
+        human.clothesObjs[name] = clo
+        self.app.scene3d.update()
+        self.adaptClothesToHuman(human)
+        clo.setSubdivided(human.isSubdivided())
+        
+        #self.clothesButton.setTexture(obj.replace('.obj', '.png'))
+    
+    def adaptClothesToHuman(self, human):
+
+        for (name,clo) in human.clothesObjs.items():            
+            file = "data/clothes/%s/%s.mhclo" % (name,name)
+            print("Loading %s" % file)
+            proxy = mh2proxy.readProxyFile(human.meshData, file, False)
+            mesh = clo.getSeedMesh()
+            for i, v in enumerate(mesh.verts):
+                (x,y,z) = mh2proxy.proxyCoord(proxy.realVerts[i])
+                v.co = [x,y,z]
+            print("%s loaded" % file)
+            mesh.update()
+            if clo.isSubdivided():
+                clo.getSubdivisionMesh()
+
     def onShow(self, event):
         # When the task gets shown, set the focus to the file chooser
         self.app.selectedHuman.hide()
@@ -50,6 +96,27 @@ class ClothesTaskView(gui3d.TaskView):
     def onResized(self, event):
         self.filechooser.onResized(event)
 
+    def onHumanChanged(self, event):
+        
+        human = event.human
+        if event.change == 'reset':
+            for (name,clo) in human.clothesObjs.items():            
+                self.app.scene3d.delete(clo.mesh)
+                human.clothesObjs[name] = None
+            # self.clothesButton.setTexture('data/clothes/clear.png')
+        def updateClosure():
+            self.adaptClothesToHuman(human)
+        mh.callAsync(updateClosure)
+
+    def loadHandler(self, human, values):
+        
+        self.setClothes(human, values[1])
+        
+    def saveHandler(self, human, file):
+        
+        for clo in human.clothesObjs:            
+            file.write('clothes %s\n' % clo.mesh.name)
+
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
 
@@ -57,6 +124,9 @@ class ClothesTaskView(gui3d.TaskView):
 def load(app):
     category = app.getCategory('Library')
     taskview = ClothesTaskView(category)
+
+    app.addLoadHandler('clothes', taskview.loadHandler)
+    app.addSaveHandler(taskview.saveHandler)
 
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
