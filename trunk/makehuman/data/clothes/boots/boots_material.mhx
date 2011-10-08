@@ -1,72 +1,8 @@
-Texture JeansClouds CLOUDS
-  cloud_type 'GREYSCALE' ;
-  contrast 1.000 ;
-  factor_blue 1.000 ;
-  factor_green 1.000 ;
-  factor_red 1.000 ;
-  intensity 1.000 ;
-  nabla 0.025 ;
-  noise_basis 'BLENDER_ORIGINAL' ;
-  noise_depth 2 ;
-  noise_scale 0.070 ;
-  noise_type 'HARD_NOISE' ;
-  saturation 1.000 ;
-  use_color_ramp False ;
-  use_fake_user False ;
-  use_preview_alpha False ;
-end Texture
-
-Material Jeans 
-  MTex 0 JeansClouds UV NORMAL
-    use_map_normal True ;
-    use_map_color_emission True ;
-    use_map_color_diffuse True ;
-    alpha_factor 1.000 ;
-    ambient_factor 1.000 ;
-    blend_type 'MIX' ;
-    bump_method 'BUMP_DEFAULT' ;
-    bump_objectspace 'BUMP_OBJECTSPACE' ;
-    color (0.0099,0.0138,0.0732) ;
-    default_value 1.000 ;
-    density_factor 1.000 ;
-    diffuse_color_factor 0.393 ;
-    diffuse_factor 1.000 ;
-    displacement_factor 0.200 ;
-    emission_color_factor 1.000 ;
-    emission_factor 1.000 ;
-    emit_factor 1.000 ;
-    hardness_factor 1.000 ;
-    invert False ;
-    mapping 'TUBE' ;
-    mapping_x 'X' ;
-    mapping_y 'Y' ;
-    mapping_z 'Z' ;
-    mirror_factor 1.000 ;
-    normal_factor -0.053 ;
-    normal_map_space 'TANGENT' ;
-    raymir_factor 1.000 ;
-    reflection_color_factor 1.000 ;
-    reflection_factor 1.000 ;
-    scale (6.000,6.000,6.000) ;
-    scattering_factor 1.000 ;
-    specular_color_factor 1.000 ;
-    specular_factor 1.000 ;
-    translucency_factor 1.000 ;
-    transmission_color_factor 1.000 ;
-    use True ;
-    use_from_dupli False ;
-    use_from_original False ;
-    use_rgb_to_intensity False ;
-    use_stencil False ;
-    warp_factor 0.000 ;
-  end MTex
-
-  diffuse_color (0.0426,0.0557,0.2079) ;
+Material Boots 
   diffuse_shader 'LAMBERT' ;
-  diffuse_intensity 0.467 ;
-  specular_color (1.0000,1.0000,1.0000) ;
+  diffuse_intensity 0.800 ;
   specular_shader 'COOKTORR' ;
-  specular_intensity 0.098 ;
+  specular_intensity 0.956 ;
   Halo 
     add 0.000 ;
     flare_boost 1.000 ;
@@ -74,7 +10,7 @@ Material Jeans
     flare_size 1.000 ;
     flare_subflare_count 1 ;
     flare_subflare_size 1.000 ;
-    hardness 7 ;
+    hardness 212 ;
     line_count 12 ;
     ring_count 4 ;
     seed 0 ;
@@ -104,12 +40,10 @@ Material Jeans
   end RaytraceTransparency
   SSS 
     back 1.000 ;
-    color (1.0000,1.0000,1.0000) ;
     color_factor 1.000 ;
     error_threshold 0.050 ;
     front 1.000 ;
     ior 1.300 ;
-    radius (1.0000,1.0000,1.0000) ;
     scale 0.100 ;
     texture_factor 0.000 ;
     use False ;
@@ -121,11 +55,12 @@ Material Jeans
     size_min 0.000 ;
     tip_size 1.000 ;
     use_blender_units False ;
+    use_surface_diffuse False ;
     use_tangent_shading True ;
     width_fade 0.000 ;
   end Strand
-  active_texture_index 1 ;
-  alpha 1.000 ;
+  active_texture_index 0 ;
+  alpha 0.278 ;
   ambient 1.000 ;
   darkness 1.000 ;
   diffuse_fresnel 0.100 ;
@@ -137,17 +72,16 @@ Material Jeans
   diffuse_toon_smooth 0.100 ;
   emit 0.000 ;
   invert_z False ;
-  mirror_color (1.0000,1.0000,1.0000) ;
   offset_z 0.000 ;
   pass_index 0 ;
-  preview_render_type 'FLAT' ;
+  preview_render_type 'SPHERE' ;
   roughness 0.500 ;
   shadow_buffer_bias 0.000 ;
   shadow_cast_alpha 1.000 ;
   shadow_only_type 'SHADOW_ONLY_OLD' ;
   shadow_ray_bias 0.000 ;
-  specular_alpha 1.000 ;
-  specular_hardness 7 ;
+  specular_alpha 0.000 ;
+  specular_hardness 212 ;
   specular_ior 4.000 ;
   specular_ramp_blend 'MIX' ;
   specular_ramp_factor 1.000 ;
@@ -173,11 +107,11 @@ Material Jeans
   use_ray_shadow_bias True ;
   use_raytrace True ;
   use_shadeless False ;
-  use_shadows True ;
+  use_shadows False ;
   use_sky False ;
   use_tangent_shading False ;
   use_transparency False ;
-  use_transparent_shadows False ;
+  use_transparent_shadows True ;
   use_vertex_color_light False ;
   use_vertex_color_paint False ;
 end Material

@@ -34,7 +34,7 @@ def exportProxyObj(human, name, proxyName):
         pfile.type = 'Proxy'
         pfile.file = "./data/templates/%s.proxy" % proxyName.lower()
         proxy = mh2proxy.readProxyFile(obj, pfile)
-        if proxy.name:
+        if proxy and proxy.name:
             filename = "%s_%s.obj" % (name.lower(), proxy.name)
             exportProxyObj1(obj, filename, proxy)
     
@@ -42,7 +42,7 @@ def exportProxyObj(human, name, proxyName):
     for pfile in cfg.proxyList:
         if pfile.useObj and pfile.type != 'Proxy':
             proxy = mh2proxy.readProxyFile(obj, pfile)
-            if proxy.name:
+            if proxy and proxy.name:
                 filename = "%s_%s.obj" % (name.lower(), proxy.name)
                 exportProxyObj1(obj, filename, proxy)
     return

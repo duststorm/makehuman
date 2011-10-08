@@ -69,7 +69,7 @@ class CMaterial:
         self.textureSettings = []
         self.mtexSettings = []
         return
-"""
+        """
         self.diffuse_color = None
         self.diffuse_intensity = None
         self.diffuse_shader = None
@@ -80,7 +80,7 @@ class CMaterial:
         self.ambient_color = None
         self.emit_color = None
         return
-"""
+        """
 
 #
 #    readProxyFile(obj, file):
@@ -101,6 +101,7 @@ def readProxyFile(obj, file):
         tmpl = None
     if tmpl == None:
         print("*** Cannot open %s" % pfile.file)
+        return None
         return CProxy(pfile.type, pfile.layer)
 
     verts = obj.verts
@@ -186,7 +187,8 @@ def readProxyFile(obj, file):
             elif words[1] == 'shapekey':
                 proxy.shapekeys.append( words[2] )
             else:
-                print("Ignored proxy keyword " + words[1])
+                pass
+                #print("Ignored proxy keyword " + words[1])
         elif status == doObjData:
             if words[0] == 'vt':
                 newTexVert(1, words, proxy)
@@ -591,69 +593,3 @@ def fixProxyShape(shape):
     if pv >= 0 and (dx > 1e-4 or dy > 1e-4 or dz > 1e-4):
         fixedShape.append((pv, dx, dy, dz))
     return fixedShape
-
-#
-#    exportProxyObj(human, filename, proxyName):    
-#    exportProxyObj1(obj, filename, proxy):
-#
-"""
-def exportProxyObj(human, name, proxyName):
-    obj = human.meshData
-    if proxyName:
-        pfile = CProxyFile()
-        pfile.type = 'Proxy'
-        pfile.file = "./data/templates/%s.proxy" % proxyName.lower()
-        proxy = readProxyFile(obj, pfile)
-        if proxy.name:
-            filename = "%s_%s.obj" % (name.lower(), proxy.name)
-            exportProxyObj1(obj, filename, proxy)
-    
-    cfg = export_config.exportConfig(human, False)
-    for pfile in cfg.proxyList:
-        if pfile.useObj and pfile.type != 'Proxy':
-            proxy = readProxyFile(obj, pfile)
-            if proxy.name:
-                filename = "%s_%s.obj" % (name.lower(), proxy.name)
-                exportProxyObj1(obj, filename, proxy)
-    return
-
-def exportProxyObj1(obj, filename, proxy):
-    fp = open(filename, 'w')
-    fp.write(
-"# MakeHuman exported OBJ for proxy mesh\n" +
-"# www.makehuman.org\n\n")
-
-    for bary in proxy.realVerts:
-        (x,y,z) = proxyCoord(bary)
-        fp.write("v %.4f %.4f %.4f\n" % (x, y, z))
-
-    for uv in proxy.texVerts:
-        fp.write("vt %s %s\n" % (uv[0], uv[1]))
-
-    mat = -1
-    fn = 0
-    grp = None
-    for (f,g) in proxy.faces:
-        if proxy.materials and proxy.materials[fn] != mat:
-            mat = proxy.materials[fn]
-            fp.write("usemtl %s\n" % matNames[mat])
-        if g != grp:
-            fp.write("g %s\n" % g)
-            grp = g
-        fp.write("f")
-        if proxy.texFaces:
-            ft = proxy.texFaces[fn]
-            vn = 0
-            for v in f:
-                vt = ft[vn]
-                fp.write(" %d/%d" % (v+1, vt+1))
-                vn += 1
-        else:
-            for v in f:
-                fp.write(" %d" % (v+1))
-        fp.write("\n")
-        fn += 1
-    fp.close()
-    return
-"""    
-

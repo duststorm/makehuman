@@ -593,7 +593,7 @@ def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
     for pfile in proxyList:
         if pfile.useDae and pfile.type == typename:
             proxy = mh2proxy.readProxyFile(obj, pfile)
-            if proxy.name:
+            if proxy and proxy.name:
                 stuff = CStuff(proxy.name, proxy)
                 print(proxy.name, proxy.rig, proxy.weightfile)
                 if proxy.rig:

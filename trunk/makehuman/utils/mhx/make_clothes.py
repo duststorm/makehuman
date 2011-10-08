@@ -143,12 +143,31 @@ def selectVert(context, vn, ob):
 
 #
 #   goodName(name):    
+#   getClothesFile(pob, context):            
 #
 
 def goodName(name):    
     newName = name.replace('-','_')
     return newName.lower()
     
+def getClothesFile(pob, context):            
+    name = goodName(pob.name)
+    outpath = '%s/%s' % (context.scene['MakeClothesDirectory'], name)
+    outpath = os.path.realpath(os.path.expanduser(outpath))
+    if not os.path.exists(outpath):
+        print("Creating directory %s" % outpath)
+        os.mkdir(outpath)
+    outfile = "%s/%s.mhclo" % (outpath, name)
+    return (outpath, outfile)
+    
+#
+#
+#
+
+ShapeKeys = [
+    'Breathe',
+    ]
+
 #
 #    findClothes(context, bob, pob, log):
 #
@@ -208,7 +227,8 @@ def findClothes(context, bob, pob, log):
         if mv:
             if pv.index % 10 == 0:
                 print(pv.index, mv.index, mindist, name, pindex, bindex)
-            #log.write("%d %d %.5f %s %d %d\n" % (pv.index, mv.index, mindist, name, pindex, bindex))
+            if log:
+                log.write("%d %d %.5f %s %d %d\n" % (pv.index, mv.index, mindist, name, pindex, bindex))
             #printMverts("  ", mverts)
         else:
             raise NameError("Failed to find vert %d in group %s %d %d" % (pv.index, name, pindex, bindex))
@@ -243,7 +263,7 @@ def findClothes(context, bob, pob, log):
     
     print("Finding weights")
     for (pv, exact, mverts, fcs) in bestVerts:
-        print(pv.index)
+        #print(pv.index)
         if exact:
             continue
         for (bv,mdist) in mverts:
@@ -260,6 +280,7 @@ def findClothes(context, bob, pob, log):
     minOffset = scn['MakeClothesMinOffset']
     useProjection = scn['MakeClothesUseProjection']
     bestFaces = []
+    print("Optimal triangles not found for the following verts")
     for (pv, exact, mverts, fcs) in bestVerts:
         #print(pv.index)
         if exact:
@@ -273,11 +294,15 @@ def findClothes(context, bob, pob, log):
                 bWts = wts
                 bVerts = fverts
         if minmax < theThreshold:
+            print(pv.index)
             if scn['MakeClothesForbidFailures']:
                 vn = pv.index
                 selectVert(context, vn, pob)
                 print("Tried", mverts)
-                raise NameError("Did not find optimal triangle for %s vert %d" % (pob.name, pv))
+                msg = (
+                "Did not find optimal triangle for %s vert %d.\n" % (pob.name, vn) +
+                "Avoid the message by unchecking Forbid failures.")
+                raise NameError(msg)
             (mv, mdist) = mverts[0]
             bVerts = [mv.index,0,1]
             bWts = [1,0,0]
@@ -387,9 +412,8 @@ def highlight(pv, ob):
 #
 
 def proxyFilePtr(name):
-    for path in ['~/makehuman/', '/']:
-        path1 = os.path.expanduser(path+name)
-        fileName = os.path.realpath(path1)
+    for path in ['~/makehuman/', '~/documents/makehuman/', '/']:
+        fileName = os.path.realpath(os.path.expanduser(path+name))
         try:
             fp = open(fileName, "r")
             print("Using header file %s" % fileName)
@@ -417,6 +441,20 @@ def printClothes(context, path, file, bob, pob, data):
 "# homepage http://www.makehuman.org/\n")
 
     fp.write("# name %s\n" % pob.name)
+    
+    for mod in pob.modifiers:
+        if mod.type == 'SHRINKWRAP':
+            fp.write("# shrinkwrap %.3f\n" % (mod.offset))
+        elif mod.type == 'SUBSURF':
+            fp.write("# subsurf %d %d\n" % (mod.levels, mod.render_levels))
+            
+    for skey in ShapeKeys:            
+        if scn['MakeClothes' + skey]:
+            fp.write("# shapekey %s\n" % skey)
+            
+    if scn['MakeClothesMask']:
+        fp.write("# mask %s_mask\n" % pob.name.lower())
+           
     if scn['MakeClothesHairMaterial']:
         fp.write(
 "# material %s\n" % pob.name +
@@ -529,21 +567,27 @@ def printScale(fp, bob, scn, name, index, prop1, prop2):
 
 def makeClothes(context):
     bob = context.object
+    scn = context.scene
     checkObjectOK(bob)
+    nobjects = 0
     for pob in context.selected_objects:
         if pob.type == 'MESH' and bob.type == 'MESH' and pob != bob:
+            nobjects += 1
             checkObjectOK(pob)
-            name = goodName(pob.name)
-            outpath = '%s/%s' % (context.scene['MakeClothesDirectory'], name)
-            outpath = os.path.realpath(os.path.expanduser(outpath))
-            outfile = "%s/%s.mhclo" % (outpath, name)
+            (outpath, outfile) = getClothesFile(pob, context)
             print("Creating clothes file %s" % outfile)
-            logfile = '%s/clothes.log' % outpath
-            log = open(logfile, "w")
+            if scn['MakeClothesLogging']:
+                logfile = '%s/clothes.log' % scn['MakeClothesDirectory']
+                log = open(logfile, "w")
+            else:
+                log = None
             data = findClothes(context, bob, pob, log)
-            log.close()
             printClothes(context, outpath, outfile, bob, pob, data)
+            if log:
+                log.close()
             print("%s done" % outfile)
+    if nobjects == 0:
+        raise NameError("No clothes mesh selected")
 
 #
 #   checkObjectOK(ob):
@@ -562,14 +606,14 @@ def checkObjectOK(ob):
     if ob.constraints:
         word = "constraints"
     for mod in ob.modifiers:
-        if mod.type in ['CHILD_OF', 'ARMATURE']:
-            word = "a %s modifier" % mod.type
+        if (mod.type in ['CHILD_OF', 'ARMATURE']) and mod.show_viewport:
+            word = "an enabled %s modifier" % mod.type
     if ob.parent:
         word = "parent"
     if word:
         msg = (
-            "Object %s can not be used for clothes creation because it has %s.\n" +
-            "Apply or delete before continuing." % (ob.name, word)
+            "Object %s can not be used for clothes creation because it has %s.\n" % (ob.name, word) +
+            "Apply or delete before continuing.\n" 
             )
         print(msg)
         raise NameError(msg)
@@ -717,11 +761,14 @@ def exportMaterial(mat, fp):
     writePrio(mat, prio, "  ", fp)
     exportRamp(mat.diffuse_ramp, 'diffuse_ramp', fp)
     exportRamp(mat.specular_ramp, 'specular_ramp', fp)
-    exportDefault("Halo", mat.halo, [], [], [], [], '  ', fp)
-    exportDefault("RaytraceTransparency", mat.raytrace_transparency, [], [], [], [], '  ', fp)
-    exclude = ['use_surface_diffuse']
+    exclude = []
+    exportDefault("Halo", mat.halo, [], [], exclude, [], '  ', fp)
+    exclude = []
+    exportDefault("RaytraceTransparency", mat.raytrace_transparency, [], [], exclude, [], '  ', fp)
+    exclude = []
     exportDefault("SSS", mat.subsurface_scattering, [], [], exclude, [], '  ', fp)
-    exportDefault("Strand", mat.strand, [], [], [], [], '  ', fp)
+    exclude = ['use_surface_diffuse']
+    exportDefault("Strand", mat.strand, [], [], exclude, [], '  ', fp)
     writeDir(mat, prio+['texture_slots', 'volume', 'node_tree',
         'diffuse_ramp', 'specular_ramp', 'use_diffuse_ramp', 'use_specular_ramp', 
         'halo', 'raytrace_transparency', 'subsurface_scattering', 'strand'], "  ", fp)
@@ -762,8 +809,6 @@ def exportMTex(index, mtex, use, fp):
             if mapto == None:
                 mapto = MapToTypes[ext]
             prio.append(ext)    
-            print("Mapto", ext, mapto)
-            
     fp.write("  MTex %d %s %s %s\n" % (index, texname, mtex.texture_coords, mapto))
     writePrio(mtex, ['texture']+prio, "    ", fp)
     writeDir(mtex, list(MapToTypes.keys()) + ['texture', 'type', 'texture_coords', 'offset'], "    ", fp)
@@ -910,6 +955,16 @@ def writeValue(ext, arg, exclude, pad, depth, fp):
             fp.write("%s%.3f" % (c,elt))
             c = ','
         fp.write(") ;\n")
+    else:
+        try:
+            r = arg[0]
+            g = arg[1]
+            b = arg[2]
+        except:
+            return
+        if (type(r) == float) and (type(g) == float) and (type(b) == float):
+            fp.write("%s%s (%.4f,%.4f,%.4f) ;\n" % (pad, ext, r, g, b))
+            print(ext, arg)
     return 
 
 #
@@ -945,6 +1000,45 @@ def exportDefault(typ, data, header, prio, exclude, arrays, pad, fp):
     return
 
 ###################################################################################    
+#
+#   Boundary parts
+#
+###################################################################################    
+
+BodyPartVerts = [
+    ((4302, 8697), (8208, 8220), (8223, 6827)), # Head
+    ((3464, 10305), (6930, 7245), (14022, 14040)), # Torso
+    ((14058, 14158), (4550, 4555), (4543, 4544)), # Arm
+    ((14058, 15248), (3214, 3264), (4629, 5836)), # Hand
+    ((3936, 3972), (3840, 3957), (14165, 14175)), # Leg
+    ((4909, 4943), (5728, 12226), (4684, 5732)), # Foot
+    ]
+
+def setBoundaryVerts(scn):
+    (x, y, z) = BodyPartVerts[scn['MakeClothesBodyPart']]
+    setAxisVerts(scn, 'MakeClothesX1', 'MakeClothesX2', x)
+    setAxisVerts(scn, 'MakeClothesY1', 'MakeClothesY2', y)
+    setAxisVerts(scn, 'MakeClothesZ1', 'MakeClothesZ2', z)
+    
+def setAxisVerts(scn, prop1, prop2, x):
+    (x1, x2) = x
+    scn[prop1] = x1
+    scn[prop2] = x2
+    
+def selectBoundary(ob, scn):
+    verts = ob.data.vertices
+    bpy.ops.object.mode_set(mode='OBJECT')
+    for v in verts:
+        v.select = False
+    for xyz in ['X','Y','Z']:
+        for n in [1,2]:
+            n = scn['MakeClothes%s%d' % (xyz, n)]
+            print(n)
+            verts[n].select = True
+    bpy.ops.object.mode_set(mode='EDIT')
+    return                    
+
+###################################################################################    
 #    User interface
 #
 #    initInterface()
@@ -954,12 +1048,23 @@ def exportDefault(typ, data, header, prio, exclude, arrays, pad, fp):
 from bpy.props import *
 
 def initInterface(scn):
+
+    for skey in ShapeKeys:
+        expr = (
+    'bpy.types.Scene.MakeClothes%s = BoolProperty(\n' % skey +
+    '   name="%s", \n' % skey +
+    '   description="Shapekey %s affects clothes")' % skey)
+        #print(expr)
+        exec(expr)
+        scn['MakeClothes%s' % skey] = False
+
     bpy.types.Scene.MakeClothesDirectory = StringProperty(
         name="Directory", 
         description="Directory", 
         maxlen=1024)
     #scn['MakeClothesDirectory'] = "/home/svn/makehuman/data/hairstyles"
     scn['MakeClothesDirectory'] = "/home/svn/makehuman/data/clothes"
+    
     bpy.types.Scene.MakeClothesMaterials = BoolProperty(
         name="Materials", 
         description="Use materials")
@@ -1006,10 +1111,20 @@ def initInterface(scn):
         description="Max number of verts considered")
     scn['MakeClothesListLength'] = theListLength
 
+    bpy.types.Scene.MakeClothesMask = BoolProperty(
+        name="Mask", 
+        description="Clothing has a mask")
+    scn['MakeClothesMask'] = False
+
     bpy.types.Scene.MakeClothesForbidFailures = BoolProperty(
         name="Forbid failures", 
         description="Raise error if not found optimal triangle")
     scn['MakeClothesForbidFailures'] = True
+
+    bpy.types.Scene.MakeClothesLogging = BoolProperty(
+        name="Log", 
+        description="Write a log file for debugging")
+    scn['MakeClothesLogging'] = False
 
     bpy.types.Scene.MakeClothesX1 = IntProperty(
         name="X1", 
@@ -1039,10 +1154,24 @@ def initInterface(scn):
     bpy.types.Scene.MakeClothesZ2 = IntProperty(
         name="Z2", 
         description="Second Z vert for clothes rescaling")
-    scn['MakeClothesZ2'] = 8223
+    
+    bpy.types.Scene.MakeClothesExamineBoundary = BoolProperty(
+        name="Examine", 
+        description="Examine boundary when set")
+    scn['MakeClothesExamineBoundary'] = False
 
+    bpy.types.Scene.MakeClothesBodyPart = EnumProperty(
+        items = [('Head', 'Head', 'Head'),
+                 ('Torso', 'Torso', 'Torso'),
+                 ('Arm', 'Arm', 'Arm'),
+                 ('Hand', 'Hand', 'Hand'),
+                 ('Leg', 'Leg', 'Leg'),
+                 ('Foot', 'Foot', 'Foot')]
+        )
+    scn['MakeClothesBodyPart'] = 0
+    setBoundaryVerts(scn)
     return
-
+    
 #
 #    class MakeClothesPanel(bpy.types.Panel):
 #
@@ -1060,6 +1189,7 @@ class MakeClothesPanel(bpy.types.Panel):
         layout = self.layout
         scn = context.scene
         layout.operator("mhclo.init_interface")
+        layout.label("Make clothes")
         layout.prop(scn, "MakeClothesDirectory")
         layout.prop(scn, "MakeClothesMaterials")
         layout.prop(scn, "MakeClothesBlenderMaterials")
@@ -1070,15 +1200,29 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.prop(scn, "MakeClothesThreshold")
         layout.prop(scn, "MakeClothesListLength")
         layout.prop(scn, "MakeClothesForbidFailures")
-        layout.operator("mhclo.make_clothes")
+        layout.prop(scn, "MakeClothesLogging")
+        
+        layout.prop(scn, "MakeClothesMask")        
+        
         layout.separator()
-        layout.label("Scaling verts")
+        layout.operator("mhclo.make_clothes")
+        layout.operator("mhclo.export_blender_material")
+        
+        layout.label("Shapekeys")
+        for skey in ShapeKeys:
+            layout.prop(scn, "MakeClothes%s" % skey)   
+        
+        layout.label("Boundary")
+        layout.prop(scn, "MakeClothesBodyPart")   
         layout.prop(scn, "MakeClothesX1")
         layout.prop(scn, "MakeClothesX2")
         layout.prop(scn, "MakeClothesY1")
         layout.prop(scn, "MakeClothesY2")
         layout.prop(scn, "MakeClothesZ1")
-        layout.prop(scn, "MakeClothesZ2")        
+        layout.prop(scn, "MakeClothesZ2")   
+        layout.prop(scn, "MakeClothesExamineBoundary")           
+        layout.operator("mhclo.set_boundary")        
+        return
         layout.separator()
         layout.prop(scn, "MakeClothesVertexGroups")
         layout.operator("mhclo.offset_clothes")
@@ -1093,7 +1237,6 @@ class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
     bl_label = "Initialize"
 
     def execute(self, context):
-        import bpy
         initInterface(context.scene)
         print("Interface initialized")
         return{'FINISHED'}    
@@ -1107,8 +1250,36 @@ class OBJECT_OT_MakeClothesButton(bpy.types.Operator):
     bl_label = "Make clothes"
 
     def execute(self, context):
-        import bpy, mathutils
         makeClothes(context)
+        return{'FINISHED'}    
+
+#
+#    class OBJECT_OT_ExportBlenderMaterialsButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_ExportBlenderMaterialButton(bpy.types.Operator):
+    bl_idname = "mhclo.export_blender_material"
+    bl_label = "Export Blender material"
+
+    def execute(self, context):
+        pob = context.object
+        (outpath, outfile) = getClothesFile(pob, context)
+        exportBlenderMaterial(pob.data, outpath)
+        return{'FINISHED'}    
+
+#
+#    class OBJECT_OT_SetBoundaryButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_SetBoundaryButton(bpy.types.Operator):
+    bl_idname = "mhclo.set_boundary"
+    bl_label = "Set boundary"
+
+    def execute(self, context):
+        scn = context.scene
+        setBoundaryVerts(scn)
+        if scn['MakeClothesExamineBoundary']:
+            selectBoundary(context.object, scn)
         return{'FINISHED'}    
 
 #
@@ -1120,7 +1291,6 @@ class OBJECT_OT_OffsetClothesButton(bpy.types.Operator):
     bl_label = "Offset clothes"
 
     def execute(self, context):
-        import bpy, mathutils
         offsetClothes(context)
         return{'FINISHED'}    
 

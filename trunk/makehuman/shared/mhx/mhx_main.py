@@ -145,7 +145,8 @@ def scanProxies(obj, proxyData):
     for pfile in theConfig.proxyList:
         if pfile.useMhx:
             proxy = mh2proxy.readProxyFile(obj, pfile)
-            proxyData[proxy.name] = proxy        
+            if proxy:
+            	proxyData[proxy.name] = proxy        
     return
     
 #
@@ -614,11 +615,11 @@ def copyProxyMaterialFile(pair, proxy, fp):
             for word in words:
                 fp.write("%s " % word)
             fp.write("\n")                
-        elif words[0] == 'filename':
+        elif words[0] == 'Filename':
             path1 = os.path.expanduser("./data/clothes/%s/" % proxy.name.lower())
             (path, filename) = os.path.split(words[1])
             file1 = os.path.realpath(path1+filename)
-            fp.write("  filename %s ;\n" % file1)
+            fp.write("  Filename %s ;\n" % file1)
         else:
             fp.write(line)
     tmpl.close()

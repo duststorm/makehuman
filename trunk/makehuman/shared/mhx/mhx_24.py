@@ -32,6 +32,7 @@ import sys
 import time
 
 import mh2proxy
+import export_config
 import mhxbones 
 import mhx_main
 
@@ -48,15 +49,15 @@ def exportMhx(human, filename, options):
     filename = name+"-24"+ext
     try:
         fp = open(filename, 'w')
-        mh2proxy.safePrint("Writing MHX 2.4x file",  filename )
+        export_config.safePrint("Writing MHX 2.4x file",  filename )
     except:
-        mh2proxy.safePrint("Unable to open file for writing", filename)
+        export_config.safePrint("Unable to open file for writing", filename)
         fp = 0
     if fp:
         exportMhx_24(human.meshData, fp)
         fp.close()
         time2 = time.clock()
-        mh2proxy.safePrint("Wrote MHX 2.4x file in %g s:" % (time2-time1), filename)
+        export_config.safePrint("Wrote MHX 2.4x file in %g s:" % (time2-time1), filename)
     return
  
  #
@@ -170,6 +171,8 @@ def copyMeshFile249(obj, tmpl, fp):
 
 def exportProxy24(obj, plist, fp):
     proxy = mh2proxy.readProxyFile(obj, plist)
+    if not proxy:
+    	return
     faces = mhx_main.loadFacesIndices(obj)
     tmpl = open("shared/mhx/templates/proxy24.mhx", "rU")
     for line in tmpl:
