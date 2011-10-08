@@ -170,7 +170,7 @@ def povrayExportArray(obj, camera, resolution, path):
         try:
             os.makedirs(outputDirectory)
         except:
-            print 'Error creating export directory ', outputDirectory, '.'
+            print 'Error creating export directory.'
             return 0
 
   # Open the output file in Write mode
@@ -178,7 +178,7 @@ def povrayExportArray(obj, camera, resolution, path):
     try:
         outputFileDescriptor = open(path, 'w')
     except:
-        print 'Error opening file ', path, ' to write data.'
+        print 'Error opening file to write data.'
         return 0
 
   # Write the file name into the top of the comment block that starts the file.
@@ -191,7 +191,7 @@ def povrayExportArray(obj, camera, resolution, path):
     try:
         headerFileDescriptor = open(headerFile, 'r')
     except:
-        print 'Error opening file ', headerFile, ' to read standard headers.'
+        print 'Error opening file to read standard headers.'
         return 0
     headerLines = headerFileDescriptor.read()
     outputFileDescriptor.write(headerLines)
@@ -344,7 +344,7 @@ def povrayExportArray(obj, camera, resolution, path):
     try:
         staticContentFileDescriptor = open(staticFile, 'r')
     except:
-        print 'Error opening file ', staticFile, ' to read static content.'
+        print 'Error opening file to read static content.'
         return 0
     staticContentLines = staticContentFileDescriptor.read()
     outputFileDescriptor.write(staticContentLines)
@@ -354,19 +354,19 @@ def povrayExportArray(obj, camera, resolution, path):
   # The POV-Ray include file is complete
 
     outputFileDescriptor.close()
-    print "POV-Ray '#include' file generated: ", path
+    print "POV-Ray '#include' file generated."
 
   # Copy a sample scene file across to the output directory
 
     try:
         sceneFileDescriptor = open(sceneFile, 'r')
     except:
-        print 'Error opening file ', sceneFile, ' to read standard scene file.'
+        print 'Error opening file to read standard scene file.'
         return 0
     try:
         outputSceneFileDescriptor = open(outputSceneFile, 'w')
     except:
-        print 'Error opening file ', outputSceneFile, ' to write standard scene file.'
+        print 'Error opening file to write standard scene file.'
         return 0
     sceneLines = sceneFileDescriptor.read()
     sceneLines = string.replace(sceneLines, 'xxFileNamexx', nameOnly)
@@ -379,20 +379,20 @@ def povrayExportArray(obj, camera, resolution, path):
     try:
         shutil.copy(pigmentMap, outputDirectory)
     except (IOError, os.error), why:
-        print "Can't copy %s to %s: %s" % (`pigmentMap`, `outputDirectory`, str(why))
+        print "Can't copy %s" % str(why)
 
   # Copy the makehuman_groupings.inc file into the output directory
 
     try:
         shutil.copy(groupingsFile, outputDirectory)
     except (IOError, os.error), why:
-        print "Can't copy %s to %s: %s" % (`groupingsFile`, `outputDirectory`, str(why))
+        print "Can't copy %s" % str(why)
 
   # Job done
 
     outputSceneFileDescriptor.close()
     sceneFileDescriptor.close()
-    print 'Sample POV-Ray scene file generated: ', outputSceneFile
+    print 'Sample POV-Ray scene file generated.'
 
 
 def povrayExportMesh2(obj, camera, resolution, path):
@@ -436,7 +436,7 @@ def povrayExportMesh2(obj, camera, resolution, path):
         try:
             os.makedirs(outputDirectory)
         except:
-            print 'Error creating export directory ', outputDirectory, '.'
+            print 'Error creating export directory.'
             return 0
 
   # Open the output file in Write mode
@@ -444,7 +444,7 @@ def povrayExportMesh2(obj, camera, resolution, path):
     try:
         outputFileDescriptor = open(path, 'w')
     except:
-        print 'Error opening file ', path, ' to write data.'
+        print 'Error opening file to write data.'
         return 0
 
   # Write the file name into the top of the comment block that starts the file.
@@ -457,7 +457,7 @@ def povrayExportMesh2(obj, camera, resolution, path):
     try:
         headerFileDescriptor = open(headerFile, 'r')
     except:
-        print 'Error opening file ', headerFile, ' to read standard headers.'
+        print 'Error opening file to read standard headers.'
         return 0
     headerLines = headerFileDescriptor.read()
     outputFileDescriptor.write(headerLines)
@@ -562,7 +562,7 @@ def povrayExportMesh2(obj, camera, resolution, path):
     try:
         staticContentFileDescriptor = open(staticFile, 'r')
     except:
-        print 'Error opening file ', staticFile, ' to read static content.'
+        print 'Error opening file to read static content.'
         return 0
     staticContentLines = staticContentFileDescriptor.read()
     outputFileDescriptor.write(staticContentLines)
@@ -572,19 +572,19 @@ def povrayExportMesh2(obj, camera, resolution, path):
   # The POV-Ray include file is complete
 
     outputFileDescriptor.close()
-    print "POV-Ray '#include' file generated: ", path
+    print "POV-Ray '#include' file generated."
 
   # Copy a sample scene file across to the output directory
 
     try:
         sceneFileDescriptor = open(sceneFile, 'r')
     except:
-        print 'Error opening file ', sceneFile, ' to read standard scene file.'
+        print 'Error opening file to read standard scene file.'
         return 0
     try:
         outputSceneFileDescriptor = open(outputSceneFile, 'w')
     except:
-        print 'Error opening file ', outputSceneFile, ' to write standard scene file.'
+        print 'Error opening file to write standard scene file.'
         return 0
     sceneLines = sceneFileDescriptor.read()
     sceneLines = string.replace(sceneLines, 'xxFileNamexx', nameOnly)
@@ -597,13 +597,13 @@ def povrayExportMesh2(obj, camera, resolution, path):
     try:
         shutil.copy(pigmentMap, outputDirectory)
     except (IOError, os.error), why:
-        print "Can't copy %s to %s: %s" % (`pigmentMap`, `outputDirectory`, str(why))
+        print "Can't copy %s" % str(why)
 
   # Job done
 
     outputSceneFileDescriptor.close()
     sceneFileDescriptor.close()
-    print 'Sample POV-Ray scene file generated: ', outputSceneFile
+    print 'Sample POV-Ray scene file generated'
 
 
 def povrayCameraData(camera, resolution, outputFileDescriptor):
