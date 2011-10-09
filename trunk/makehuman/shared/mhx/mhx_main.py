@@ -349,7 +349,7 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
             elif words[1] == 'material-drivers':
                 fp.write("  use_textures Array 0")
                 for n in range(nMasks):
-                    fp.write(" 0")
+                    fp.write(" 1")
                 for n in range(3):
                     fp.write(" 1")
                 fp.write(" ;\n")
@@ -385,11 +385,11 @@ def writeSkinStart(fp, proxy, proxyData):
     
     for prx in prxList:
         if prx.mask:
-            (dir, file) = prx.mask
+            (folder, file) = prx.mask
             nMasks += 1
             fp.write(
 "Image %s\n" % file +
-"  Filename %s/%s.png ;\n" % (dir, file) +
+"  Filename %s/%s.png ;\n" % (os.path.realpath(folder), file) +
 "  use_premultiply True ;\n" +
 "end Image\n\n" +
 "Texture %s IMAGE\n" % file  +

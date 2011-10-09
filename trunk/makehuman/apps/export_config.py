@@ -138,7 +138,7 @@ def exportConfig(human, useHair, options=None):
     useMhx = True
     useObj = True
     useDae = True
-    useClothes = True
+    #useClothes = False
     useProxy = 'Rorkimaru'
 
     if options:
@@ -149,7 +149,7 @@ def exportConfig(human, useHair, options=None):
         cfg.bodyshapes = options['bodyshapes']
         cfg.cage = options['cage']
         cfg.useRig = options['useRig']
-        useClothes = options['clothes']
+        #useClothes = options['clothes']
         useProxy = options['useProxy']
         fp = 0
     else:    
@@ -162,13 +162,21 @@ def exportConfig(human, useHair, options=None):
         pfile.file = os.path.expanduser("./data/hairstyles/%s.mhclo" % words[0])
         cfg.proxyList.append(pfile)
 
+    for name in human.clothesObjs.keys():
+        pfile = CProxyFile()
+        pfile.set('Clothes', 0, useMhx, useObj, useDae)
+        pfile.file = os.path.expanduser("./data/clothes/%s/%s.mhclo" % (name, name))
+        cfg.proxyList.append(pfile)
+
     if not fp: 
+        """
         if useClothes:
             for name in ['sweater', 'jeans']:
                 pfile = CProxyFile()
                 pfile.set('Clothes', 4, useMhx, useObj, useDae)
                 pfile.file = os.path.expanduser("./data/clothes/%s/%s.mhclo" % (name,name))
                 cfg.proxyList.append(pfile)
+        """
         if useProxy:
             pfile = CProxyFile()
             pfile.set('Proxy', 3, useMhx, useObj, useDae)
@@ -248,7 +256,7 @@ def exportConfig(human, useHair, options=None):
             elif status == 'customvertexgroups':
                 path = os.path.realpath(os.path.expanduser(words[0]))
                 cfg.customvertexgroups.append(path)
-        else:
+        elif typ != 'Clothes':
             pfile = CProxyFile()
             pfile.set(typ, layer, useMhx, useObj, useDae)
             pfile.file = os.path.realpath(os.path.expanduser(words[0]))
