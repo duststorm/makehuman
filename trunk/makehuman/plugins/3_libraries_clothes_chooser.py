@@ -50,8 +50,8 @@ class ClothesTaskView(gui3d.TaskView):
             clo = None
         if clo:
             self.app.scene3d.delete(clo.mesh)
-            human.clothesObjs[name] = None
-            human.clothesObjs[name] = None
+            del human.clothesObjs[name]
+            return
 
         mesh = files3d.loadMesh(self.app.scene3d, obj)
         #mesh.setTexture(tif)
@@ -77,11 +77,12 @@ class ClothesTaskView(gui3d.TaskView):
     def adaptClothesToHuman(self, human):
 
         for (name,clo) in human.clothesObjs.items():            
-            mesh = clo.getSeedMesh()
-            human.clothesProxies[name].update(mesh, human.meshData)
-            mesh.update()
-            if clo.isSubdivided():
-                clo.getSubdivisionMesh()
+            if clo:
+                mesh = clo.getSeedMesh()
+                human.clothesProxies[name].update(mesh, human.meshData)
+                mesh.update()
+                if clo.isSubdivided():
+                    clo.getSubdivisionMesh()
 
     def onShow(self, event):
         # When the task gets shown, set the focus to the file chooser
@@ -100,10 +101,11 @@ class ClothesTaskView(gui3d.TaskView):
         
         human = event.human
         if event.change == 'reset':
-            for (name,clo) in human.clothesObjs.items():            
-                self.app.scene3d.delete(clo.mesh)
-                human.clothesObjs[name] = None
-                human.clothesProxies[name] = None
+            for (name,clo) in human.clothesObjs.items():
+                if clo:
+                    self.app.scene3d.delete(clo.mesh)
+                del human.clothesObjs[name]
+                del human.clothesProxies[name]
             # self.clothesButton.setTexture('data/clothes/clear.png')
         def updateClosure():
             self.adaptClothesToHuman(human)
@@ -115,8 +117,9 @@ class ClothesTaskView(gui3d.TaskView):
         
     def saveHandler(self, human, file):
         
-        for clo in human.clothesObjs:            
-            file.write('clothes %s\n' % clo.mesh.name)
+        for clo in human.clothesObjs.values():
+            if clo:
+                file.write('clothes %s\n' % clo.mesh.name)
 
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements

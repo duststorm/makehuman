@@ -162,11 +162,12 @@ def exportConfig(human, useHair, options=None):
         pfile.file = os.path.expanduser("./data/hairstyles/%s.mhclo" % words[0])
         cfg.proxyList.append(pfile)
 
-    for name in human.clothesObjs.keys():
-        pfile = CProxyFile()
-        pfile.set('Clothes', 0, useMhx, useObj, useDae)
-        pfile.file = os.path.expanduser("./data/clothes/%s/%s.mhclo" % (name, name))
-        cfg.proxyList.append(pfile)
+    for (name,clo) in human.clothesObjs.items():
+        if clo:
+            pfile = CProxyFile()
+            pfile.set('Clothes', 0, useMhx, useObj, useDae)
+            pfile.file = os.path.expanduser("./data/clothes/%s/%s.mhclo" % (name, name))
+            cfg.proxyList.append(pfile)
 
     if not fp: 
         """

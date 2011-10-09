@@ -79,25 +79,25 @@ class HairTaskView(gui3d.TaskView):
             human.hairProxy = None
 
         mesh = files3d.loadMesh(self.app.scene3d, obj)
-        mesh.setTexture(tif)
-        
-        human.hairObj = gui3d.Object(self.app, human.getPosition(), mesh)
-        human.hairObj.setRotation(human.getRotation())
-        human.hairObj.mesh.setCameraProjection(0)
-        human.hairObj.mesh.setSolid(human.mesh.solid)
-        human.hairObj.mesh.setTransparentPrimitives(len(human.hairObj.mesh.faces))
-        human.hairObj.mesh.originalHairVerts = [v.co[:] for v in human.hairObj.mesh.verts]
+        if mesh:
+            mesh.setTexture(tif)        
+            human.hairObj = gui3d.Object(self.app, human.getPosition(), mesh)
+            human.hairObj.setRotation(human.getRotation())
+            human.hairObj.mesh.setCameraProjection(0)
+            human.hairObj.mesh.setSolid(human.mesh.solid)
+            human.hairObj.mesh.setTransparentPrimitives(len(human.hairObj.mesh.faces))
+            human.hairObj.mesh.originalHairVerts = [v.co[:] for v in human.hairObj.mesh.verts]
                 
-        hairName = human.hairObj.meshName.split('.')[0]
-        file = "data/hairstyles/%s.mhclo" % hairName
-        print("Loading clothes hair %s" % file)
-        human.hairProxy = mh2proxy.readProxyFile(human.meshData, file, False)
+            hairName = human.hairObj.meshName.split('.')[0]
+            file = "data/hairstyles/%s.mhclo" % hairName
+            print("Loading clothes hair %s" % file)
+            human.hairProxy = mh2proxy.readProxyFile(human.meshData, file, False)
 
-        self.app.scene3d.update()
-        self.adaptHairToHuman(human)
-        human.hairObj.setSubdivided(human.isSubdivided())
-        
-        self.hairButton.setTexture(obj.replace('.obj', '.png'))
+            self.app.scene3d.update()
+            self.adaptHairToHuman(human)
+            human.hairObj.setSubdivided(human.isSubdivided())
+            
+            self.hairButton.setTexture(obj.replace('.obj', '.png'))
 
     def adaptHairToHuman(self, human):
 

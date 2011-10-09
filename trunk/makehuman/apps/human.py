@@ -42,7 +42,7 @@ class HumanEvent(events3d.Event):
 
 class Human(gui3d.Object):
 
-    def __init__(self, view, mesh, hairObj=None, clothesObjs={}):
+    def __init__(self, view, mesh, hairObj=None):
 
         mesh = files3d.loadMesh(view.app.scene3d, mesh)
         gui3d.Object.__init__(self, view, [0, 0, 0], mesh, True)
@@ -53,7 +53,7 @@ class Human(gui3d.Object):
         self.hairModelling = False #temporary variable for easier integration of makehair, will be cleaned later.
         self.hairObj = hairObj
         self.hairProxy = None
-        self.clothesObjs = clothesObjs
+        self.clothesObjs = {}
         self.clothesProxies = {}
         self.targetsDetailStack = {}  # All details targets applied, with their values
         self.symmetryModeEnabled = False
@@ -107,7 +107,8 @@ class Human(gui3d.Object):
         if self.hairObj:
             self.hairObj.show()
         for obj in self.clothesObjs.values():
-            obj.show()
+            if obj:
+                obj.show()
         self.setVisibility(True)
 
     def hide(self):
@@ -116,7 +117,8 @@ class Human(gui3d.Object):
         if self.hairObj:
             self.hairObj.hide()
         for obj in self.clothesObjs.values():
-            obj.hide()
+            if obj:
+                obj.hide()
         self.setVisibility(False)
 
     # Overriding methods to account for both hair and base object
@@ -127,28 +129,32 @@ class Human(gui3d.Object):
         if self.hairObj:
             self.hairObj.setPosition([x+y for x, y in zip(self.hairObj.getPosition(), dv)])
         for obj in self.clothesObjs.values():
-            obj.setPosition([x+y for x, y in zip(obj.getPosition(), dv)])
+            if obj:
+                obj.setPosition([x+y for x, y in zip(obj.getPosition(), dv)])
 
     def setRotation(self, rotation):
         gui3d.Object.setRotation(self, rotation)
         if self.hairObj:
             self.hairObj.setRotation(rotation)
         for obj in self.clothesObjs.values():
-            obj.setRotation(rotation)
+            if obj:
+                obj.setRotation(rotation)
             
     def setSolid(self, *args, **kwargs):
         gui3d.Object.setSolid(self, *args, **kwargs)
         if self.hairObj:
             self.hairObj.setSolid(*args, **kwargs)
         for obj in self.clothesObjs.values():
-            obj.setSolid(*args, **kwargs)
+            if obj:
+                obj.setSolid(*args, **kwargs)
             
     def setSubdivided(self, *args, **kwargs):
         gui3d.Object.setSubdivided(self, *args, **kwargs)
         if self.hairObj:
             self.hairObj.setSubdivided(*args, **kwargs)
         for obj in self.clothesObjs.values():
-            obj.setSubdivided(*args, **kwargs)
+            if obj:
+                obj.setSubdivided(*args, **kwargs)
 
     def setGender(self, gender):
         """
