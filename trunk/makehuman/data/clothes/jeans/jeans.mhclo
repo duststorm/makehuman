@@ -3,6 +3,7 @@
 # homepage http://www.makehuman.org/
 # name Jeans
 # obj_file jeans.obj
+# z_depth 40
 # subsurf 1 2
 # shrinkwrap 0.030
 # mask jeans_mask

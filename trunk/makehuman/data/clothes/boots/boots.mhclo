@@ -3,6 +3,7 @@
 # homepage http://www.makehuman.org/
 # name Boots
 # obj_file boots.obj
+# z_depth 70
 # subsurf 1 2
 # mask boots_mask
 # x_scale 4909 4943 0.8168

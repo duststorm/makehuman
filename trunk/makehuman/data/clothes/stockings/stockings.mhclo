@@ -3,6 +3,7 @@
 # homepage http://www.makehuman.org/
 # name Stockings
 # obj_file stockings.obj
+# z_depth 30
 # subsurf 1 2
 # shrinkwrap 0.030
 # shapekey Breathe

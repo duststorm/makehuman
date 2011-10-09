@@ -3,6 +3,7 @@
 # homepage http://www.makehuman.org/
 # name Sweater
 # obj_file sweater.obj
+# z_depth 50
 # subsurf 1 2
 # shapekey Breathe
 # mask sweater_mask

@@ -3,6 +3,7 @@
 # homepage http://www.makehuman.org/
 # name DiverSuit
 # obj_file diversuit.obj
+# z_depth 80
 # subsurf 1 2
 # shrinkwrap 0.030
 # shapekey Breathe

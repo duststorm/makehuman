@@ -35,6 +35,7 @@ class CProxy:
     def __init__(self, typ, layer):
         self.name = None
         self.type = typ
+        self.z_depth = 50
         self.rig = None
         self.layer = layer
         self.material = None
@@ -177,6 +178,8 @@ def readProxyFile(obj, file, evalOnLoad):
                 status = doObjData
             elif words[1] == 'name':
                 proxy.name = words[2]
+            elif words[1] == 'z_depth':
+                proxy.z_depth = int(words[2])
             elif words[1] == 'rig':
                 proxy.rig = words[2]
             elif words[1] == 'wire':

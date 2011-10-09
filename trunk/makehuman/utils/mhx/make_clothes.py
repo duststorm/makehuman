@@ -442,6 +442,7 @@ def printClothes(context, path, file, bob, pob, data):
 
     fp.write("# name %s\n" % pob.name)
     fp.write("# obj_file %s.obj\n" % goodName(pob.name))
+    fp.write("# z_depth %d\n" % scn["MakeClothesZDepth"])
     
     for mod in pob.modifiers:
         if mod.type == 'SHRINKWRAP':
@@ -451,7 +452,7 @@ def printClothes(context, path, file, bob, pob, data):
             
     for skey in ShapeKeys:            
         if scn['MakeClothes' + skey]:
-            fp.write("# shapekey %s\n" % skey)
+            fp.write("# shapekey %s\n" % skey)            
             
     if scn['MakeClothesMask']:
         fp.write("# mask %s_mask\n" % pob.name.lower())
@@ -586,6 +587,7 @@ def makeClothes(context):
     bob = context.object
     scn = context.scene
     checkObjectOK(bob)
+    checkAndVertexDiamonds(bob)
     nobjects = 0
     for pob in context.selected_objects:
         if pob.type == 'MESH' and bob.type == 'MESH' and pob != bob:
@@ -1056,6 +1058,122 @@ def selectBoundary(ob, scn):
     return                    
 
 ###################################################################################    
+#
+#   Z depth
+#
+###################################################################################    
+
+#
+#   getZDepthItems():
+#   setZDepth(scn):    
+#    class OBJECT_OT_SetZDepthButton(bpy.types.Operator):
+#
+
+ZDepth = {
+    "Body" : 0,
+    "Underwear and lingerie" : 20,
+    "Socks and stockings" : 30,
+    "Shirt and trousers" : 40,
+    "Sweater" : 50,
+    "Indoor jacket" : 60,
+    "Shoes and boots" : 70,
+    "Coat" : 80,
+    "Backpack" : 100,
+    }
+    
+def setZDepthItems():
+    global ZDepthItems
+    zlist = sorted(list(ZDepth.items()), key=lambda z: z[1])
+    ZDepthItems = []
+    for (name, val) in zlist:
+        ZDepthItems.append((name,name,name))
+    return            
+
+def setZDepth(scn):    
+    global ZDepthItems
+    (name1, name2, name3) = ZDepthItems[scn["MakeClothesZDepthName"]]
+    print(name1)
+    scn["MakeClothesZDepth"] = ZDepth[name1]
+    return
+    
+class OBJECT_OT_SetZDepthButton(bpy.types.Operator):
+    bl_idname = "mhclo.set_zdepth"
+    bl_label = "Set Z depth"
+
+    def execute(self, context):
+        setZDepth(context.scene)
+        return{'FINISHED'}    
+    
+###################################################################################    
+#
+#   Utilities
+#
+###################################################################################    
+#
+#    printVertNums(context):
+#    class VIEW3D_OT_MhxPrintVnumsButton(bpy.types.Operator):
+#
+ 
+def printVertNums(context):
+    ob = context.object
+    print("Verts in ", ob)
+    for v in ob.data.vertices:
+        if v.select:
+            print(v.index)
+    print("End verts")
+
+class VIEW3D_OT_MhxPrintVnumsButton(bpy.types.Operator):
+    bl_idname = "mhclo.print_vnums"
+    bl_label = "Print vertex numbers"
+
+    def execute(self, context):
+        printVertNums(context)
+        return{'FINISHED'}    
+
+#
+#    removeVertexGroups(context):
+#    class VIEW3D_OT_MhxRemoveVertexGroupsButton(bpy.types.Operator):
+#
+
+def removeVertexGroups(context):
+    ob = context.object
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.vertex_group_remove(all=True)
+    return
+
+class VIEW3D_OT_MhxRemoveVertexGroupsButton(bpy.types.Operator):
+    bl_idname = "mhclo.remove_vertex_groups"
+    bl_label = "Remove vertex groups"
+
+    def execute(self, context):
+        removeVertexGroups(context)
+        print("All vertex groups removed")
+        return{'FINISHED'}    
+
+#
+#   checkAndVertexDiamonds(ob):
+#
+
+def checkAndVertexDiamonds(ob):
+    print("Unvertex diamonds in %s" % ob)
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='DESELECT')
+    bpy.ops.object.mode_set(mode='OBJECT')
+    me = ob.data
+    hasDiamonds = False
+    for f in me.faces:        
+        if len(f.vertices) < 4:
+            hasDiamonds = True
+            for vn in f.vertices:
+                me.vertices[vn].select = True
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.object.vertex_group_remove_from(all=True)
+    bpy.ops.object.mode_set(mode='OBJECT')
+    if not hasDiamonds:
+        raise NameError("Base object %s does not have any joint diamonds" % ob.name)
+    return
+
+###################################################################################    
 #    User interface
 #
 #    initInterface()
@@ -1065,6 +1183,7 @@ def selectBoundary(ob, scn):
 from bpy.props import *
 
 def initInterface(scn):
+    global ZDepthItems
 
     for skey in ShapeKeys:
         expr = (
@@ -1080,7 +1199,8 @@ def initInterface(scn):
         description="Directory", 
         maxlen=1024)
     #scn['MakeClothesDirectory'] = "/home/svn/makehuman/data/hairstyles"
-    scn['MakeClothesDirectory'] = "/home/svn/makehuman/data/clothes"
+    #scn['MakeClothesDirectory'] = "/home/svn/makehuman/data/clothes"
+    scn['MakeClothesDirectory'] = "~/documents/makehuman/clothes"
     
     bpy.types.Scene.MakeClothesMaterials = BoolProperty(
         name="Materials", 
@@ -1197,6 +1317,59 @@ def initInterface(scn):
         )
     scn['MakeClothesBodyPart'] = 0
     setBoundaryVerts(scn)
+
+    setZDepthItems()
+    bpy.types.Scene.MakeClothesZDepthName = EnumProperty(
+        items = ZDepthItems)
+    scn['MakeClothesZDepthName'] = 4
+
+    bpy.types.Scene.MakeClothesZDepth = IntProperty(
+        name="Z depth", 
+        description="Location in the Z buffer")
+    setZDepth(scn)
+
+    return
+
+#
+#   readDefaultSettings(context):
+#   saveDefaultSettings(context):
+#
+
+def readDefaultSettings(context):
+    fname = os.path.realpath(os.path.expanduser("~/make_clothes.settings"))
+    try:
+        fp = open(fname, "rU")
+    except:
+        print("Did not find %s. Using default settings" % fname)
+        return
+    
+    scn = context.scene
+    for line in fp:
+        words = line.split()
+        prop = words[0]
+        type = words[1]        
+        if type == "int":
+            scn[prop] = int(words[2])
+        elif type == "float":
+            scn[prop] = float(words[2])
+        elif type == "str":
+            scn[prop] = words[2]
+    fp.close()
+    return
+    
+def saveDefaultSettings(context):
+    fname = os.path.realpath(os.path.expanduser("~/make_clothes.settings"))
+    fp = open(fname, "w")
+    scn = context.scene
+    for (prop, value) in scn.items():
+        if prop[0:11] == "MakeClothes":
+            if type(value) == int:
+                fp.write("%s int %s\n" % (prop, value))
+            elif type(value) == float:
+                fp.write("%s float %.4f\n" % (prop, value))
+            elif type(value) == str:
+                fp.write("%s str %s\n" % (prop, value))
+    fp.close()
     return
     
 #
@@ -1215,7 +1388,12 @@ class MakeClothesPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         scn = context.scene
+        layout.label("Initialization")
         layout.operator("mhclo.init_interface")
+        layout.operator("mhclo.save_settings")
+        layout.label("Utilities")
+        layout.operator("mhclo.print_vnums")
+        layout.operator("mhclo.remove_vertex_groups")
         layout.label("Make clothes")
         layout.prop(scn, "MakeClothesDirectory")
         layout.prop(scn, "MakeClothesMaterials")
@@ -1242,16 +1420,22 @@ class MakeClothesPanel(bpy.types.Panel):
         for skey in ShapeKeys:
             layout.prop(scn, "MakeClothes%s" % skey)   
         
+        layout.label("Z depth")
+        layout.prop(scn, "MakeClothesZDepthName")   
+        layout.operator("mhclo.set_zdepth")
+        layout.prop(scn, "MakeClothesZDepth")   
+
+
         layout.label("Boundary")
         layout.prop(scn, "MakeClothesBodyPart")   
+        layout.prop(scn, "MakeClothesExamineBoundary")           
+        layout.operator("mhclo.set_boundary")        
         layout.prop(scn, "MakeClothesX1")
         layout.prop(scn, "MakeClothesX2")
         layout.prop(scn, "MakeClothesY1")
         layout.prop(scn, "MakeClothesY2")
         layout.prop(scn, "MakeClothesZ1")
         layout.prop(scn, "MakeClothesZ2")   
-        layout.prop(scn, "MakeClothesExamineBoundary")           
-        layout.operator("mhclo.set_boundary")        
         return
         layout.separator()
         layout.prop(scn, "MakeClothesVertexGroups")
@@ -1264,11 +1448,24 @@ class MakeClothesPanel(bpy.types.Panel):
 
 class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
     bl_idname = "mhclo.init_interface"
-    bl_label = "Initialize"
+    bl_label = "Reinitialize"
 
     def execute(self, context):
         initInterface(context.scene)
+        readDefaultSettings(context)
         print("Interface initialized")
+        return{'FINISHED'}    
+
+#
+#    class OBJECT_OT_SaveSettingsButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_SaveSettingsButton(bpy.types.Operator):
+    bl_idname = "mhclo.save_settings"
+    bl_label = "Save settings"
+
+    def execute(self, context):
+        saveDefaultSettings(context)
         return{'FINISHED'}    
 
 #
@@ -1342,9 +1539,10 @@ class OBJECT_OT_OffsetClothesButton(bpy.types.Operator):
 #    Init and register
 #
 
-initInterface(bpy.context.scene)
 
 def register():
+    initInterface(bpy.context.scene)
+    readDefaultSettings(bpy.context)
     bpy.utils.register_module(__name__)
     pass
 

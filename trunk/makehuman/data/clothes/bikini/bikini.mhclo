@@ -3,6 +3,7 @@
 # homepage http://www.makehuman.org/
 # name Bikini
 # obj_file bikini.obj
+# z_depth 25
 # subsurf 1 2
 # shrinkwrap 0.030
 # shapekey Breathe
