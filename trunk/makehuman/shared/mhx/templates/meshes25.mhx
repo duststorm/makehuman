@@ -44,14 +44,9 @@
     active True ;
     active_clone True ;
     active_render True ;
-  end MeshTextureFaceLayer
-  Material Skin ;
-  Material Invisio ;
-  Material Hair ;
-  Material Mouth ;
-  Material Eye ;
-  Material Brows ;
-    *** VertexGroup
+  end MeshTextureFaceLayer  
+  *** Materials
+  *** VertexGroup
 end Mesh
 
 *** human-object Mesh

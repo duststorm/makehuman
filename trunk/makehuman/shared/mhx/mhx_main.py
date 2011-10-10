@@ -146,7 +146,7 @@ def scanProxies(obj, proxyData):
         if pfile.useMhx:
             proxy = mh2proxy.readProxyFile(obj, pfile, True)
             if proxy:
-            	proxyData[proxy.name] = proxy        
+                proxyData[proxy.name] = proxy        
     return
     
 #
@@ -291,8 +291,11 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                     for v in f:
                         fp.write(" %s" % v)
                     fp.write(" ;\n")
-                for mat in proxy.materials:
-                    fp.write("    ft %d 1 ;\n" % mat)
+                if proxy.faceNumbers:
+                    for ftn in proxy.faceNumbers:
+                        fp.write(ftn)
+                else:
+                    fp.write("    ftall 0 1 ;\n")
             elif words[1] == 'Faces':
                 for f in faces:
                     fp.write("    f")
@@ -317,6 +320,13 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                         uv = obj.uvValues[v[1]]
                         fp.write(" %.6g %.6g" %(uv[0], uv[1]))
                     fp.write(" ;\n")
+            elif words[1] == 'Material':
+                fp.write("Material %s%s\n" % (theHuman, words[2]))
+            elif words[1] == 'Materials':
+                writeBaseMaterials(fp)
+            elif words[1] == 'ProxyMaterials':
+                if proxy.useBaseMaterials:
+                    writeBaseMaterials(fp)
             elif words[1] == 'VertexGroup':
                 writeVertexGroups(fp, rig, proxy)
             elif words[1] == 'group':
@@ -373,12 +383,25 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
     return
 
 #
+#   writeBaseMaterials(fp):                    
+#
+
+def writeBaseMaterials(fp):                    
+    fp.write(
+"  Material %sSkin ;\n" % theHuman +
+"  Material %sInvisio ;\n" % theHuman +
+"  Material %sHair ;\n" % theHuman +
+"  Material %sMouth ;\n" % theHuman +
+"  Material %sEye ;\n" % theHuman +
+"  Material %sBrows ;\n" % theHuman)
+    
+#
 #   writeSkinStart(fp, proxy, proxyData)
 #
 
 def writeSkinStart(fp, proxy, proxyData):
     if proxy:
-        fp.write("Material Skin\n")
+        fp.write("Material %s%sSkin\n" % (theHuman, proxy.name))
         return 0
     nMasks = 0
     prxList = list(proxyData.values())
@@ -396,7 +419,7 @@ def writeSkinStart(fp, proxy, proxyData):
 "  Image %s ;\n" % file +
 "end Texture\n\n")
 
-    fp.write("Material Skin\n" +
+    fp.write("Material %sSkin\n" % theHuman +
 "  MTex 0 diffuse UV COLOR\n" +
 #"    texture Refer Texture diffuse ;\n" +
 "  end MTex\n")

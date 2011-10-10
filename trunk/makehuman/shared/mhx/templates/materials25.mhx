@@ -288,7 +288,7 @@ end Texture
 
 end Material
 
-Material Mouth
+*** Material Mouth
   MTex 0 diffuse UV COLOR
     texture Refer Texture diffuse ;
     use_map_density True ;
@@ -368,7 +368,7 @@ Material Mouth
   use_transparent_shadows True ;
 end Material
 
-Material Eye
+*** Material Eye
   MTex 0 diffuse UV COLOR
     texture Refer Texture diffuse ;
     use_map_density True ;
@@ -445,7 +445,7 @@ Material Eye
   use_transparent_shadows True ;
 end Material
 
-Material Brows
+*** Material Brows
   MTex 0 diffuse UV COLOR
     texture Refer Texture diffuse ;
     use_map_density True ;
@@ -520,7 +520,7 @@ Material Brows
 end Material
 
 
-Material Hair 
+*** Material Hair 
   diffuse_color Array 0.04 0.04 0.04  ;
   diffuse_intensity 0.5 ;
   diffuse_shader 'LAMBERT' ;
@@ -594,7 +594,7 @@ Material Hair
   offset_z 0 ;
 end Material
 
-Material Invisio 
+*** Material Invisio 
   diffuse_color Array 1.0 1.0 1.0  ;
   diffuse_shader 'LAMBERT' ;
   specular_color Array 1.0 1.0 1.0  ;

@@ -16,96 +16,16 @@
 Abstract
 Utility for making clothes to MH characters.
 
-Used to be called defineProxy.py, because a proxy is just a full-body
-dress. Below the word clothes refers both to proxies, make-deform
-cages, and proper clothes.
-
-Import a MH character *with the joint diamonds present*. In the MHX
-importer the Diamonds option must be selected; the OBJ file is
-probably useless, because I think that the diamonds have been filtered
-out.
-
-Model your clothes over the reference character. It does not really
-matter which character you use as reference, but the final result will
-probably look better on characters which do not deviate too much from
-the reference. The clothing may optionally be UV-unwrapped.
-
-Both the clothes and the character must be given vertex groups with
-the same names. If the character has been brought into Blender with
-the mhx importer, it is a good idea to first delete all bone groups.
-Each clothing vertex must belong to a single group (more precisely,
-any additional group is ignored), whereas character verts can belong
-to several groups. The character mesh, but not the clothes, should
-also be triangulated (Ctrl-T in Edit mode) for best results.
-
-The algorithm assigns each clothing vertex to the "best" triangle in
-the character mesh. The face number and the verts barycentric
-coordinates (a weighted sum of the corner coordinates) are stored in
-the mhclo file. The best triangle is charactized by a small distance
-between the vert and face, and that the projection onto the
-face falls within the face (all weights lie between 0 and 1), or
-almost so. The normal distance between the vertex and the face is
-also recorded.
-
-Finding the best face for each vertex is sometimes difficult in
-regions where separate parts of the character mesh are very close or
-overlap. The mouth area is especially tricky, for proxy meshes with
-articulate tongue, teeth, and inner mouth wall. For trousers it can be
-difficult to distinguish between the groin area and the left and right
-inner thighs. You can help the script distinguish between different
-body parts by assigning vertex groups. The algorithm only looks for
-the best triangle within the given vertex group.
-
-At the very least the mesh should be divided into a Left, Right and
-Mid (with x = 0) group. Joint diamonds should not be assigned to any
-group at all, to ensure that the clothing does not follow the
-diamonds.
-
-Vertex groups can also be used to prune the search tree and speed
-up the program. 
-
--------
-
-Access this script from the UI panel (N-key).
-
-Assign vertex groups to the main character and to all clothes or
-proxies. The name of the vertex groups must match exactly.
-
-Select all clothes or proxies that you want to export, then select the
-character to make it active.
-
-Press the Make clothes button.
-
-A separate .mhclo file for each piece of clothing will now be created
-in the specified directory.
-
-The file proxy.cfg defines which clothes will be exported with the
-character. This file is located in the MakeHuman's main program
-directory, but MH will first look for this files in the ~/makehuman/
-and C:/ folders. In this way you can keep your own private version of
-proxy.cfg. The syntax is described in the beginning of the file.
-
-------
-Making clothes with offset.
-
-Make a copy of the clothe and shrinkwrap it to the base mesh. 
-
-Make a clothes file for the shrinked copy as above.
-
-Select offset clothes, then shift select the shrinked copy to make it active.
-
-Press Make offset button.
-
-A new .mhclo file is created for the offset clothes in the specified directory.
+For more info see: http://sites.google.com/site/makehumandocs/blender-export-and-mhx/making-clothes
 
 """
 
 bl_addon_info = {
     "name": "Make clothes to MakeHuman",
     "author": "Thomas Larsson",
-    "version": 0.3,
-    "blender": (2, 5, 4),
-    "api": 31913,
+    "version": 0.4,
+    "blender": (2, 5, 9),
+    "api": 40000,
     "location": "View3D > Properties > Make MH clothes",
     "description": "Make clothes for MakeHuman characters",
     "warning": "",
@@ -580,6 +500,124 @@ def printScale(fp, bob, scn, name, index, prop1, prop2):
     return
 
 #
+#   projectUVs(bob, pob, data):
+#   setUvLoc(pv, puv, table):
+#   getUvLoc(v, f, uvface):
+#
+
+def projectUVs(bob, pob, data):
+    #if len(bob.data.vertices > 14000):
+    #    raise NameError("Are you trying to project *to* the human?")
+    
+    faceTable = createFaceTable(bob.data.vertices, bob.data.faces)
+    table = {}
+    for pv in pob.data.vertices:
+        table[pv.index] = []
+    buvtex = bob.data.uv_textures[0].data
+    for (pv, exact, verts, wts, diff) in data:
+        if exact:
+            v0 = verts[0]
+            for f0 in faceTable[v0]:
+                uv0 = getUvLoc(v0, f0.vertices, buvtex[f.index])
+                table[pv.index].append((exact, uv0, 1))
+                break
+        else:
+            v0 = verts[0]
+            v1 = verts[1]
+            v2 = verts[2]
+            for f0 in faceTable[v0]:
+                for f1 in faceTable[v1]:
+                    if (f1 == f0):
+                        for f2 in faceTable[v2]:
+                            if (f2 == f0):
+                                uv0 = getUvLoc(v0, f0.vertices, buvtex[f.index])
+                                uv1 = getUvLoc(v1, f0.vertices, buvtex[f.index])
+                                uv2 = getUvLoc(v2, f0.vertices, buvtex[f.index])
+                                table[pv.index].append((exact, [uv0,uv1,uv2], wts))
+    
+    try:
+        puvtex = pob.data.uv_textures[0]
+    except:
+        puvtex = pob.data.uv_textures.new()
+    puvtex.active = True
+    for fn,pface in enumerate(pob.data.faces):
+        puvface = puvtex.data[fn]
+        pfverts = pface.vertices
+        puvface.uv1 = setUvLoc(pfverts[0], table)
+        puvface.uv2 = setUvLoc(pfverts[1], table)
+        puvface.uv3 = setUvLoc(pfverts[2], table)
+        if len(pfverts) > 3:
+            puvface.uv4 = setUvLoc(pfverts[3], table)
+    return
+    
+def createFaceTable(verts, faces):
+    table = {}
+    for v in verts:
+        table[v.index] = []
+    for f in faces:
+        for v in f.vertices:
+            table[v].append(f)
+    return table            
+
+def setUvLoc(pv, table):
+    (exact, buvs, wts) = table[pv][0]
+    if exact:
+        return buvs
+    else:
+        return buvs[0]*wts[0] + buvs[1]*wts[1] + buvs[2]*wts[2]
+ 
+def getUvLoc(v, f, uvface):
+    if v == f[0]:
+        return uvface.uv1
+    if v == f[1]:
+        return uvface.uv2
+    if v == f[2]:
+        return uvface.uv3
+    if v == f[3]:
+        return uvface.uv4
+    raise NameError("Vertex %d not in face %d??" % (v,f))
+
+#
+#   recoverSeams(ob):
+#
+
+def recoverSeams(ob):
+    uvtex = ob.data.uv_textures[0]
+    faceTable = createFaceTable(ob.data.vertices, ob.data.faces)
+    onEdges = {}
+    for v in ob.data.vertices:
+        onEdges[v.index] = False
+    for v in ob.data.vertices:
+        if isOnEdge(v, faceTable, uvtex):
+            onEdges[v.index] = True
+    for e in ob.data.edges:
+        e.use_seam = (onEdges[e.vertices[0]] and onEdges[e.vertices[1]])
+    print("Seams recovered for object %s\n" % ob.name)
+    return    
+            
+def isOnEdge(v, faceTable, uvtex):            
+    uvloc = None
+    for f in faceTable[v.index]:
+        uvface = uvtex.data[f.index]
+        for n,vn in enumerate(f.vertices):
+            if vn == v.index:
+                if n == 0:
+                    uvnloc = uvface.uv1
+                elif n == 1:
+                    uvnloc = uvface.uv2
+                elif n == 2:
+                    uvnloc = uvface.uv3
+                elif n == 3:
+                    uvnloc = uvface.uv4
+                if uvloc:
+                    dist = uvnloc - uvloc
+                    if dist.length > Epsilon:
+                        return True
+                else:
+                    uvloc = uvnloc
+    return False                            
+
+#
 #    makeClothes(context):
 #
 
@@ -601,6 +639,8 @@ def makeClothes(context):
             else:
                 log = None
             data = findClothes(context, bob, pob, log)
+            if scn['MakeClothesProjectUVs']:
+                projectUVs(bob, pob, data)
             printClothes(context, outpath, outfile, bob, pob, data)
             if log:
                 log.close()
@@ -1171,7 +1211,7 @@ def checkAndVertexDiamonds(ob):
     bpy.ops.object.mode_set(mode='OBJECT')
     if not hasDiamonds:
         raise NameError("Base object %s does not have any joint diamonds" % ob.name)
-    return
+    return            
 
 ###################################################################################    
 #    User interface
@@ -1221,6 +1261,12 @@ def initInterface(scn):
         name="Export UVs", 
         description="Export UVs to obj if exist")
     scn['MakeClothesUVs'] = False
+
+    bpy.types.Scene.MakeClothesProjectUVs = BoolProperty(
+        name="Project UVs", 
+        description="Project UVs from base mesh")
+    scn['MakeClothesProjectUVs'] = False
+
 
     bpy.types.Scene.MakeClothesHairMaterial = BoolProperty(
         name="Hair material", 
@@ -1394,17 +1440,19 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.label("Utilities")
         layout.operator("mhclo.print_vnums")
         layout.operator("mhclo.remove_vertex_groups")
+        layout.operator("mhclo.recover_seams")
         layout.label("Make clothes")
         layout.prop(scn, "MakeClothesDirectory")
         layout.prop(scn, "MakeClothesMaterials")
         layout.prop(scn, "MakeClothesBlenderMaterials")
         layout.prop(scn, "MakeClothesObjFile")
         layout.prop(scn, "MakeClothesUVs")
+        layout.prop(scn, "MakeClothesProjectUVs")
         layout.prop(scn, "MakeClothesHairMaterial")
         layout.prop(scn, "MakeClothesUseProjection")
-        layout.prop(scn, "MakeClothesOutside")
-        layout.prop(scn, "MakeClothesMinOffset")
-        layout.prop(scn, "MakeClothesThreshold")
+        #layout.prop(scn, "MakeClothesOutside")
+        #layout.prop(scn, "MakeClothesMinOffset")
+        #layout.prop(scn, "MakeClothesThreshold")
         layout.prop(scn, "MakeClothesListLength")
         layout.prop(scn, "MakeClothesForbidFailures")
         layout.prop(scn, "MakeClothesLogging")
@@ -1466,6 +1514,18 @@ class OBJECT_OT_SaveSettingsButton(bpy.types.Operator):
 
     def execute(self, context):
         saveDefaultSettings(context)
+        return{'FINISHED'}    
+
+#
+#    class OBJECT_OT_RecoverSeamsButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_RecoverSeamsButton(bpy.types.Operator):
+    bl_idname = "mhclo.recover_seams"
+    bl_label = "Recover seams"
+
+    def execute(self, context):
+        recoverSeams(context.object)
         return{'FINISHED'}    
 
 #

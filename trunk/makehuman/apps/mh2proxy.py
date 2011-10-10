@@ -44,6 +44,8 @@ class CProxy:
         self.faces = []
         self.texFaces = []
         self.texVerts = []
+        self.useBaseMaterials = False
+        self.faceNumbers = []
         self.mask = None
         self.texture = None
         self.obj_file = None
@@ -147,6 +149,7 @@ def readProxyFile(obj, file, evalOnLoad):
     doObjData = 5
     doWeights = 6
     doRefVerts = 7
+    doFaceNumbers = 8
 
     vn = 0
     for line in tmpl:
@@ -173,6 +176,10 @@ def readProxyFile(obj, file, evalOnLoad):
             elif words[1] == 'material':
                 status = doMaterial
                 proxy.material = CMaterial(words[2])
+            elif words[1] == 'useBaseMaterials':
+                proxy.useBaseMaterials = True
+            elif words[1] == 'faceNumbers':
+                status = doFaceNumbers
             elif words[1] == 'texVerts':
                 status = doTexVerts
             elif words[1] == 'obj_data':
@@ -229,6 +236,8 @@ def readProxyFile(obj, file, evalOnLoad):
                 newFace(1, words, theGroup, proxy)
             elif words[0] == 'g':
                 theGroup = words[1]
+        elif status == doFaceNumbers:
+            proxy.faceNumbers.append(line)
         elif status == doRefVerts:
             if len(words) == 1:
                 v = int(words[0])
