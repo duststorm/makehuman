@@ -29,7 +29,7 @@ class ClothesTaskView(gui3d.TaskView):
     def __init__(self, category):
         
         gui3d.TaskView.__init__(self, category, 'Clothes')
-        self.filechooser = gui3d.FileChooser(self, 'data/clothes', 'obj', 'png', 'notfound.png')
+        self.filechooser = gui3d.FileChooser(self, 'data/clothes', 'mhclo', 'png', 'notfound.png')
 
         @self.filechooser.event
         def onFileSelected(filename):
@@ -38,23 +38,29 @@ class ClothesTaskView(gui3d.TaskView):
 
             self.app.switchCategory('Modelling')
         
-    def setClothes(self, human, obj):
+    def setClothes(self, human, mhclo):
 
-        print("Clothes file", obj)
-        (name, ext) = os.path.splitext(os.path.basename(obj))
-        tif = None
+        print("Clothes file", mhclo)
+        proxy = mh2proxy.readProxyFile(human.meshData, mhclo, False)
+        folder = os.path.dirname(mhclo)
+        obj = os.path.join(folder, proxy.obj_file)
 
         try:
-            clo = human.clothesObjs[name]
+            clo = human.clothesObjs[proxy.name]
         except:
             clo = None
         if clo:
             self.app.scene3d.delete(clo.mesh)
-            del human.clothesObjs[name]
+            del human.clothesObjs[proxy.name]
             return
 
         mesh = files3d.loadMesh(self.app.scene3d, obj)
-        #mesh.setTexture(tif)
+        if proxy.texture:
+            (dir, name) = proxy.texture
+            tif = os.path.join(folder, name)
+            mesh.setTexture(tif)
+        else:
+            pass
         
         clo = gui3d.Object(self.app, human.getPosition(), mesh)
         clo.setRotation(human.getRotation())
@@ -62,11 +68,9 @@ class ClothesTaskView(gui3d.TaskView):
         clo.mesh.setSolid(human.mesh.solid)
         clo.mesh.setTransparentPrimitives(len(clo.mesh.faces))
         clo.mesh.originalClothesVerts = [v.co[:] for v in clo.mesh.verts]
-        human.clothesObjs[name] = clo
+        human.clothesObjs[proxy.name] = clo
         
-        file = "data/clothes/%s/%s.mhclo" % (name,name)
-        print("Loading %s" % file)
-        human.clothesProxies[name] = mh2proxy.readProxyFile(human.meshData, file, False)
+        human.clothesProxies[proxy.name] = proxy
 
         self.app.scene3d.update()
         self.adaptClothesToHuman(human)

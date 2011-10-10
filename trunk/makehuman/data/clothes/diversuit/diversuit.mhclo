@@ -7,7 +7,8 @@
 # subsurf 1 2
 # shrinkwrap 0.030
 # shapekey Breathe
-# mask diversuit_mask
+# mask diversuit_mask.png
+# texture diversuit_texture.tif
 # x_scale 3464 10305 2.7039
 # z_scale 6930 7245 2.0360
 # y_scale 14022 14040 4.5597

@@ -3,6 +3,8 @@
 # homepage http://www.makehuman.org/
 # name Gloves
 # obj_file gloves.obj
+# mask gloves_mask.png
+# texture gloves_texture.tif
 # z_depth 45
 # subsurf 1 2
 # shrinkwrap 0.030

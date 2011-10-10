@@ -5,7 +5,8 @@
 # obj_file boots.obj
 # z_depth 70
 # subsurf 1 2
-# mask boots_mask
+# mask boots_mask.png
+# texture boots_texture.tif
 # x_scale 4909 4943 0.8168
 # z_scale 5728 12226 2.0109
 # y_scale 4684 5732 0.5911

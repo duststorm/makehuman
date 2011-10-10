@@ -45,6 +45,7 @@ class CProxy:
         self.texFaces = []
         self.texVerts = []
         self.mask = None
+        self.texture = None
         self.obj_file = None
         self.material_file = None
         self.materials = []
@@ -200,10 +201,12 @@ def readProxyFile(obj, file, evalOnLoad):
                 proxy.weightfile = (words[2], words[3])
             elif words[1] == 'mask':
                 proxy.mask = (folder, words[2])
+            elif words[1] == 'texture':
+                proxy.texture = (folder, words[2])
             elif words[1] == 'material_file':
                 proxy.material_file = (folder, words[2])
             elif words[1] == 'obj_file':
-                objfile = words[2]
+                proxy.obj_file = words[2]
             elif words[1] == 'subsurf':
                 levels = int(words[2])
                 if len(words) > 3:
@@ -290,8 +293,8 @@ def readProxyFile(obj, file, evalOnLoad):
             w = float(words[1])
             weights.append((v,w))
             
-    if evalOnLoad and objfile:
-        if not copyObjFile(folder, objfile, proxy):
+    if evalOnLoad and proxy.obj_file:
+        if not copyObjFile(folder, proxy.obj_file, proxy):
             return None
 
     if pfile.name:

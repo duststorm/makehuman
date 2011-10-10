@@ -7,7 +7,8 @@
 # subsurf 1 2
 # shrinkwrap 0.030
 # shapekey Breathe
-# mask stockings_mask
+# mask stockings_mask.png
+# texture stockings_texture.tif
 # x_scale 3936 3972 1.4342
 # z_scale 3840 3957 1.5772
 # y_scale 14165 14175 8.0271
