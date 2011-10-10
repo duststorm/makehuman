@@ -36,14 +36,33 @@ class CustomTargetsTaskView(gui3d.TaskView):
 
     def __init__(self, category, app):
         self.app = app
-        gui3d.TaskView.__init__(self, category, 'Custom targets')
-        targetsPath = os.path.join(mh.getPath(''), 'custom')
-        if not os.path.exists(targetsPath):
-            os.makedirs(targetsPath)
-        slidersBox = gui3d.GroupBox(self, label = 'Targets', position=[10, 80, 9.0], style=gui3d.GroupBoxStyle._replace(height=320))
+        gui3d.TaskView.__init__(self, category, 'Custom')
+        self.targetsPath = os.path.join(mh.getPath(''), 'custom')
+        if not os.path.exists(self.targetsPath):
+            os.makedirs(self.targetsPath)
         
-        for i in os.listdir(targetsPath):
-            self.createTargetControls(slidersBox, targetsPath ,i)
+        optionsBox = gui3d.GroupBox(self, label = 'Options', position=[650, 80, 9.0], style=gui3d.GroupBoxStyle._replace(margin=[10,0,0,10]))
+        rescanButton = gui3d.Button(optionsBox, label='Rescan targets folder')
+        @rescanButton.event
+        def onClicked(event):
+            del self.targetsBox
+            self.searchTargets()
+            
+        baseMeshToogle = gui3d.ToggleButton(optionsBox, label='Apply to base mesh')
+            
+        self.searchTargets()
+        
+    def searchTargets(self):
+        targets = os.listdir(self.targetsPath)
+        
+        if len(targets) == 0:
+            self.targetsBox = gui3d.TextView(self, label = 'No custom targets found.\nTo add a custom target, place the file in ' + self.targetsPath,\
+            style=gui3d.TextViewStyle._replace(left=10, top=80, width=320))
+        else:
+            self.targetsBox = gui3d.GroupBox(self, label = 'Targets', position=[10, 80, 9.0], style=gui3d.GroupBoxStyle._replace(height=320))
+            
+            for i in targets:
+                self.createTargetControls(self.targetsBox, self.targetsPath, i)
         
     def createTargetControls(self, box, targetPath, targetFile):
         # When the slider is dragged and released, an onChange event is fired
