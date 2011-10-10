@@ -159,21 +159,30 @@ def createSubdivisionObject(scene, object, progressCallback=None):
             v3.data[2].add(e2)
             v3.data[2].add(e3)
             
-            uv0 = object.uvValues[f.uv[0]]
-            uv1 = object.uvValues[f.uv[1]]
-            uv2 = object.uvValues[f.uv[2]]
-            uv3 = object.uvValues[f.uv[3]]
+            if object.uvValues:
             
-            uvc = vavg2d4(uv0, uv1, uv2, uv3)
-            uve0 = vavg2d(uv0, uv1)
-            uve1 = vavg2d(uv1, uv2)
-            uve2 = vavg2d(uv2, uv3)
-            uve3 = vavg2d(uv3, uv0)
+                uv0 = object.uvValues[f.uv[0]]
+                uv1 = object.uvValues[f.uv[1]]
+                uv2 = object.uvValues[f.uv[2]]
+                uv3 = object.uvValues[f.uv[3]]
+                
+                uvc = vavg2d4(uv0, uv1, uv2, uv3)
+                uve0 = vavg2d(uv0, uv1)
+                uve1 = vavg2d(uv1, uv2)
+                uve2 = vavg2d(uv2, uv3)
+                uve3 = vavg2d(uv3, uv0)
+                
+                fg.createFace((v0, e0, c, e3), (uv0, uve0, uvc, uve3))
+                fg.createFace((e0, v1, e1, c), (uve0, uv1, uve1, uvc))
+                fg.createFace((e3, c, e2, v3), (uve3, uvc, uve2, uv3))
+                fg.createFace((c, e1, v2, e2), (uvc, uve1, uv2, uve2))
+                
+            else:
             
-            fg.createFace((v0, e0, c, e3), (uv0, uve0, uvc, uve3))
-            fg.createFace((e0, v1, e1, c), (uve0, uv1, uve1, uvc))
-            fg.createFace((e3, c, e2, v3), (uve3, uvc, uve2, uv3))
-            fg.createFace((c, e1, v2, e2), (uvc, uve1, uv2, uve2))
+                fg.createFace((v0, e0, c, e3))
+                fg.createFace((e0, v1, e1, c))
+                fg.createFace((e3, c, e2, v3))
+                fg.createFace((c, e1, v2, e2))
             
         if progressCallback:
             groups += 1
