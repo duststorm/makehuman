@@ -374,8 +374,9 @@ def printClothes(context, path, file, bob, pob, data):
         if scn['MakeClothes' + skey]:
             fp.write("# shapekey %s\n" % skey)            
             
+    fp.write("# texture %s_texture.png\n" % pob.name.lower())
     if scn['MakeClothesMask']:
-        fp.write("# mask %s_mask\n" % pob.name.lower())
+        fp.write("# mask %s_mask.png\n" % pob.name.lower())
            
     if scn['MakeClothesHairMaterial']:
         fp.write(
@@ -461,10 +462,9 @@ def exportObjFile(ob, context):
         
     if scn['MakeClothesUVs'] and me.uv_textures:
         uvtex = me.uv_textures[0]
-        fn = 0
-        for uvdata in uvtex.data.values():
+        for fn,f in enumerate(me.faces):
+            uvdata = uvtex.data[fn]
             uv = uvdata.uv_raw
-            f = me.faces[fn]
             for n in range(len(f.vertices)):
                 fp.write("vt %.4f %.4f\n" % (uv[2*n], uv[2*n+1]))
 
@@ -530,24 +530,30 @@ def projectUVs(bob, pob, data):
                     if (f1 == f0):
                         for f2 in faceTable[v2]:
                             if (f2 == f0):
-                                uv0 = getUvLoc(v0, f0.vertices, buvtex[f.index])
-                                uv1 = getUvLoc(v1, f0.vertices, buvtex[f.index])
-                                uv2 = getUvLoc(v2, f0.vertices, buvtex[f.index])
+                                uv0 = getUvLoc(v0, f0.vertices, buvtex[f0.index])
+                                uv1 = getUvLoc(v1, f0.vertices, buvtex[f0.index])
+                                uv2 = getUvLoc(v2, f0.vertices, buvtex[f0.index])
                                 table[pv.index].append((exact, [uv0,uv1,uv2], wts))
     
-    try:
-        puvtex = pob.data.uv_textures[0]
-    except:
-        puvtex = pob.data.uv_textures.new()
-    puvtex.active = True
+    puvtex = pob.data.uv_textures[0]
     for fn,pface in enumerate(pob.data.faces):
         puvface = puvtex.data[fn]
         pfverts = pface.vertices
-        puvface.uv1 = setUvLoc(pfverts[0], table)
-        puvface.uv2 = setUvLoc(pfverts[1], table)
-        puvface.uv3 = setUvLoc(pfverts[2], table)
+        uv0 = getSingleUvLoc(pfverts[0], table)
+        uv1 = getSingleUvLoc(pfverts[1], table)
+        uv2 = getSingleUvLoc(pfverts[2], table)
         if len(pfverts) > 3:
-            puvface.uv4 = setUvLoc(pfverts[3], table)
+            uv3 = getSingleUvLoc(pfverts[3], table)
+            if uv0 and uv1 and uv2 and uv3:
+                puvface.uv1 = uv0
+                puvface.uv2 = uv1
+                puvface.uv3 = uv2
+                puvface.uv4 = uv3
+        else:
+            if uv0 and uv1 and uv2:
+                puvface.uv1 = uv0
+                puvface.uv2 = uv1
+                puvface.uv3 = uv2
     return
     
 def createFaceTable(verts, faces):
@@ -559,12 +565,14 @@ def createFaceTable(verts, faces):
             table[v].append(f)
     return table            
 
-def setUvLoc(pv, table):
+def getSingleUvLoc(pv, table):
+    if len(table[pv]) != 1:
+        return None
     (exact, buvs, wts) = table[pv][0]
     if exact:
         return buvs
     else:
-        return buvs[0]*wts[0] + buvs[1]*wts[1] + buvs[2]*wts[2]
+        return buvs[0]*wts[0] + buvs[1]*wts[1] + buvs[2]*wts[2] 
  
 def getUvLoc(v, f, uvface):
     if v == f[0]:
@@ -578,20 +586,39 @@ def getUvLoc(v, f, uvface):
     raise NameError("Vertex %d not in face %d??" % (v,f))
 
 #
-#   recoverSeams(ob):
+#   recoverSeams(ob, scn):
 #
 
-def recoverSeams(ob):
+def recoverSeams(ob, scn):
+    verts = ob.data.vertices
     uvtex = ob.data.uv_textures[0]
     faceTable = createFaceTable(ob.data.vertices, ob.data.faces)
     onEdges = {}
-    for v in ob.data.vertices:
+    for v in verts:
         onEdges[v.index] = False
     for v in ob.data.vertices:
         if isOnEdge(v, faceTable, uvtex):
             onEdges[v.index] = True
+
+    vertList = []
+    edgeList = []
+    n = 0
     for e in ob.data.edges:
-        e.use_seam = (onEdges[e.vertices[0]] and onEdges[e.vertices[1]])
+        v0 = e.vertices[0]
+        v1 = e.vertices[1]
+        e.use_seam = (onEdges[v0] and onEdges[v1])
+        if e.use_seam:
+            vertList += [verts[v0].co, verts[v1].co]
+            edgeList.append((n,n+1))
+            n += 2
+        
+    sme = bpy.data.meshes.new("Seams")
+    sme.from_pydata(vertList, edgeList, [])
+    sme.update(calc_edges=True)
+    sob = bpy.data.objects.new("Seams", sme)
+    sob.show_x_ray = True
+    scn.objects.link(sob)
+            
     print("Seams recovered for object %s\n" % ob.name)
     return    
             
@@ -618,10 +645,10 @@ def isOnEdge(v, faceTable, uvtex):
     return False                            
 
 #
-#    makeClothes(context):
+#    makeClothes(context, justProject):
 #
 
-def makeClothes(context):
+def makeClothes(context, justProject):
     bob = context.object
     scn = context.scene
     checkObjectOK(bob)
@@ -631,16 +658,19 @@ def makeClothes(context):
         if pob.type == 'MESH' and bob.type == 'MESH' and pob != bob:
             nobjects += 1
             checkObjectOK(pob)
-            (outpath, outfile) = getFileName(pob, context, "mhclo")
-            print("Creating clothes file %s" % outfile)
+            if not justProject:
+                (outpath, outfile) = getFileName(pob, context, "mhclo")
+                print("Creating clothes file %s" % outfile)
             if scn['MakeClothesLogging']:
                 logfile = '%s/clothes.log' % scn['MakeClothesDirectory']
                 log = open(logfile, "w")
             else:
                 log = None
             data = findClothes(context, bob, pob, log)
-            if scn['MakeClothesProjectUVs']:
+            if justProject:
                 projectUVs(bob, pob, data)
+                print("UVs projected")
+                return
             printClothes(context, outpath, outfile, bob, pob, data)
             if log:
                 log.close()
@@ -1262,12 +1292,6 @@ def initInterface(scn):
         description="Export UVs to obj if exist")
     scn['MakeClothesUVs'] = False
 
-    bpy.types.Scene.MakeClothesProjectUVs = BoolProperty(
-        name="Project UVs", 
-        description="Project UVs from base mesh")
-    scn['MakeClothesProjectUVs'] = False
-
-
     bpy.types.Scene.MakeClothesHairMaterial = BoolProperty(
         name="Hair material", 
         description="Fill in hair material")
@@ -1441,13 +1465,13 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.operator("mhclo.print_vnums")
         layout.operator("mhclo.remove_vertex_groups")
         layout.operator("mhclo.recover_seams")
+        layout.operator("mhclo.project_uvs")
         layout.label("Make clothes")
         layout.prop(scn, "MakeClothesDirectory")
         layout.prop(scn, "MakeClothesMaterials")
         layout.prop(scn, "MakeClothesBlenderMaterials")
         layout.prop(scn, "MakeClothesObjFile")
         layout.prop(scn, "MakeClothesUVs")
-        layout.prop(scn, "MakeClothesProjectUVs")
         layout.prop(scn, "MakeClothesHairMaterial")
         layout.prop(scn, "MakeClothesUseProjection")
         #layout.prop(scn, "MakeClothesOutside")
@@ -1525,7 +1549,7 @@ class OBJECT_OT_RecoverSeamsButton(bpy.types.Operator):
     bl_label = "Recover seams"
 
     def execute(self, context):
-        recoverSeams(context.object)
+        recoverSeams(context.object, context.scene)
         return{'FINISHED'}    
 
 #
@@ -1537,9 +1561,21 @@ class OBJECT_OT_MakeClothesButton(bpy.types.Operator):
     bl_label = "Make clothes"
 
     def execute(self, context):
-        makeClothes(context)
+        makeClothes(context, False)
         if context.scene['MakeClothesObjFile']:
             exportObjFile(context.object, context)
+        return{'FINISHED'}    
+        
+#
+#    class OBJECT_OT_ProjectUVsButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_ProjectUVsButton(bpy.types.Operator):
+    bl_idname = "mhclo.project_uvs"
+    bl_label = "Project UVs"
+
+    def execute(self, context):
+        makeClothes(context, True)
         return{'FINISHED'}    
         
 #
