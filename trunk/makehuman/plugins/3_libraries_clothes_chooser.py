@@ -42,8 +42,9 @@ class ClothesTaskView(gui3d.TaskView):
 
         print("Clothes file", mhclo)
         proxy = mh2proxy.readProxyFile(human.meshData, mhclo, False)
-        folder = os.path.dirname(mhclo)
-        obj = os.path.join(folder, proxy.obj_file)
+        #folder = os.path.dirname(mhclo)
+        (folder, name) = proxy.obj_file
+        obj = os.path.join(folder, name)
 
         try:
             clo = human.clothesObjs[proxy.name]

@@ -242,7 +242,7 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
             elif words[1] == 'ProxyPose':
                 mh2proxy.writeRigPose(fp, theHuman + proxy.name, proxy.bones)
             elif words[1] == 'ProxyMesh':
-                writeProxyMesh(fp, proxy)
+                writeProxyMesh(fp, proxy, proxyData)
             elif words[1] == 'ProxyObject':
                 writeProxyObject(fp, proxy)
             elif words[1] == 'ProxyLayers':
@@ -395,6 +395,34 @@ def writeBaseMaterials(fp):
 "  Material %sEye ;\n" % theHuman +
 "  Material %sBrows ;\n" % theHuman)
     
+def addMaskImage(fp, mask):            
+    (folder, file) = mask
+    fp.write(
+"Image %s\n" % file +
+"  Filename %s/%s ;\n" % (folder, file) +
+"  use_premultiply True ;\n" +
+"end Image\n\n" +
+"Texture %s IMAGE\n" % file  +
+"  Image %s ;\n" % file +
+"end Texture\n\n")
+    return
+    
+def addMaskMTex(fp, mask, blendtype, n):            
+    (dir, file) = mask
+    fp.write(
+"  MTex %d %s UV ALPHA\n" % (n+1, file) +
+"    texture Refer Texture %s ;\n" % file +
+"    use_map_alpha True ;\n" +
+"    use_map_color_diffuse False ;\n" +
+"    alpha_factor 1 ;\n" +
+"    blend_type '%s' ;\n" % blendtype +
+"    mapping 'FLAT' ;\n" +
+"    invert True ;\n" +
+"    use_stencil True ;\n" +
+"    use_rgb_to_intensity True ;\n" +
+"  end MTex\n")
+    return
+
 #
 #   writeSkinStart(fp, proxy, proxyData)
 #
@@ -408,17 +436,8 @@ def writeSkinStart(fp, proxy, proxyData):
     
     for prx in prxList:
         if prx.mask:
-            (folder, file) = prx.mask
+            addMaskImage(fp, prx.mask)
             nMasks += 1
-            fp.write(
-"Image %s\n" % file +
-"  Filename %s/%s.png ;\n" % (os.path.realpath(folder), file) +
-"  use_premultiply True ;\n" +
-"end Image\n\n" +
-"Texture %s IMAGE\n" % file  +
-"  Image %s ;\n" % file +
-"end Texture\n\n")
-
     fp.write("Material %sSkin\n" % theHuman +
 "  MTex 0 diffuse UV COLOR\n" +
 #"    texture Refer Texture diffuse ;\n" +
@@ -427,19 +446,7 @@ def writeSkinStart(fp, proxy, proxyData):
     n = 0    
     for prx in prxList:
         if prx.mask:
-            (dir, file) = prx.mask
-            fp.write(
-"  MTex %d %s UV ALPHA\n" % (n+1, file) +
-"    texture Refer Texture %s ;\n" % file +
-"    use_map_alpha True ;\n" +
-"    use_map_color_diffuse False ;\n" +
-"    alpha_factor 1 ;\n" +
-"    blend_type 'MULTIPLY' ;\n" +
-"    mapping 'FLAT' ;\n" +
-"    invert True ;\n" +
-"    use_stencil True ;\n" +
-"    use_rgb_to_intensity True ;\n" +
-"  end MTex\n")
+            addMaskMTex(fp, prx.mask, 'MULTIPLY', n)
             n += 1
             
     return nMasks
@@ -539,16 +546,16 @@ def groupProxy(typ, fp, proxyData):
     return
 
 #
-#   writeProxyMesh(fp, proxy):                
+#   writeProxyMesh(fp, proxy, proxyData):                
 #
 
-def writeProxyMesh(fp, proxy):                
+def writeProxyMesh(fp, proxy, proxyData):                
     mat = proxy.material
     if mat:
         if proxy.material_file:
             copyProxyMaterialFile(proxy.material_file, proxy, fp)
         else:
-            writeProxyMaterial(fp, mat)
+            writeProxyMaterial(fp, mat, proxy, proxyData)
     name = theHuman + proxy.name
     fp.write("Mesh %sMesh %sMesh \n" % (name, name))
     if mat:
@@ -649,31 +656,47 @@ def copyProxyMaterialFile(pair, proxy, fp):
     return
        
 #
-#   writeProxyMaterial(fp, mat):
+#   writeProxyMaterial(fp, mat, proxy, proxyData):
 #
 
-def writeProxyMaterial(fp, mat):
+def writeProxyMaterial(fp, mat, proxy, proxyData):
     tex = mat.texture
     if tex:
+        #print(theHuman)
         texname = theHuman + os.path.basename(tex)
+        #print("Proxy mat %s %s" % (tex, texname))
         fp.write(
-"Image %s\n" % texname +
+"Image %s%s\n" % (theHuman,texname) +
 "  Filename %s ;\n" % os.path.realpath(tex) +
 "  use_premultiply True ;\n" +
 "end Image\n\n" +
-"Texture %s IMAGE\n" % texname +
-"  Image %s ;\n" % texname)
+"Texture %s%s IMAGE\n" % (theHuman, texname) +
+"  Image %s%s ;\n" % (theHuman, texname))
         writeProxyMaterialSettings(fp, mat.textureSettings)             
         fp.write("end Texture\n")
-
+    
+    prxList = sortedMasks(proxyData)
+    nMasks = countMasks(proxy, prxList)
+    
     fp.write("Material %s%s \n" % (theHuman, mat.name))
-    writeProxyMaterialSettings(fp, mat.settings)            
+    if tex:
+        lastBlend = 'MULTIPLY'
+    else:
+        lastBlend = 'MIX'
+    addProxyMaskMTexs(fp, mat, proxy, prxList, lastBlend)
+    writeProxyMaterialSettings(fp, mat.settings)   
     if tex:
         fp.write(
-"  MTex 0 diffuse UV COLOR\n" +
-"    texture Refer Texture %s ;\n" % texname)
+"  MTex %d diffuse UV COLOR\n" % nMasks +
+"    texture Refer Texture %s%s ;\n" % (theHuman, texname))
         writeProxyMaterialSettings(fp, mat.mtexSettings)             
         fp.write("  end MTex\n")
+    if nMasks > 0:
+        fp.write(
+"  use_transparency True ;\n" +
+"  transparency_method 'Z_TRANSPARENCY' ;\n" +
+"  alpha 0 ;\n" +
+"  specular_alpha 0 ;\n")
     if mat.mtexSettings == []:
         fp.write(
 "  use_shadows True ;\n" +
@@ -690,6 +713,34 @@ def writeProxyMaterialSettings(fp, settings):
             fp.write("  %s %d ;\n" % (key, value))
         else:
             fp.write("  %s '%s' ;\n" % (key, value))
+
+def addProxyMaskMTexs(fp, mat, proxy, prxList, lastBlend):
+    n = 0  
+    m = len(prxList)
+    blendtype = 'MULTIPLY'
+    for (zdepth, prx) in prxList:
+        m -= 1
+        if zdepth > proxy.z_depth:
+            if m == 0:
+                blendtype = lastBlend
+            addMaskMTex(fp, prx.mask, blendtype, n)
+            n += 1
+    return   
+    
+def sortedMasks(proxyData):
+    prxList = []
+    for prx in proxyData.values():
+        if prx.mask:
+            prxList.append((prx.z_depth, prx))
+    prxList.sort()
+    return prxList
+    
+def countMasks(proxy, prxList):
+    n = 0
+    for (zdepth, prx) in prxList:
+        if zdepth > proxy.z_depth:
+            n += 1
+    return n            
 
 #
 #    copyVertGroups(tmplName, fp, proxy):

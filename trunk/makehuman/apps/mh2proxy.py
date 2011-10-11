@@ -105,6 +105,14 @@ class CMaterial:
         return
         """
 
+def getFileName(folder, file, suffix):
+    folder = os.path.realpath(os.path.expanduser(folder))
+    (name, ext) = os.path.split(file)
+    if ext:
+        return (folder, file)
+    else:
+        return (folder, file+suffix)
+
 #
 #    readProxyFile(obj, file, evalOnLoad):
 #
@@ -207,13 +215,13 @@ def readProxyFile(obj, file, evalOnLoad):
             elif words[1] == 'weightfile':
                 proxy.weightfile = (words[2], words[3])
             elif words[1] == 'mask':
-                proxy.mask = (folder, words[2])
+                proxy.mask = getFileName(folder, words[2], ".png")
             elif words[1] == 'texture':
-                proxy.texture = (folder, words[2])
+                proxy.texture = getFileName(folder, words[2], ".tif")
             elif words[1] == 'material_file':
-                proxy.material_file = (folder, words[2])
+                proxy.material_file = getFileName(folder, words[2], ".mhx")
             elif words[1] == 'obj_file':
-                proxy.obj_file = words[2]
+                proxy.obj_file = getFileName(folder, words[2], ".obj")
             elif words[1] == 'subsurf':
                 levels = int(words[2])
                 if len(words) > 3:
@@ -303,7 +311,7 @@ def readProxyFile(obj, file, evalOnLoad):
             weights.append((v,w))
             
     if evalOnLoad and proxy.obj_file:
-        if not copyObjFile(folder, proxy.obj_file, proxy):
+        if not copyObjFile(proxy):
             return None
 
     if pfile.name:
@@ -314,13 +322,14 @@ def readProxyFile(obj, file, evalOnLoad):
 #
 #
 
-def copyObjFile(folder, objfile, proxy):
-    objpath = os.path.join(folder, objfile)
-    print("cof %s %s %s" %  (folder, objfile, objpath))
+def copyObjFile(proxy):
+    (folder, name) = proxy.obj_file
+    objpath = os.path.join(folder, name)
+    print("cof", objpath)
     try:
         tmpl = open(objpath, "rU")
     except:
-        print("*** Cannot open %s" % pfile.file)
+        print("*** Cannot open %s" % objpath)
         return False
 
     theGroup = None    

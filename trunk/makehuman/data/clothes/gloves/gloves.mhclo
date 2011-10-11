@@ -11,7 +11,7 @@
 # x_scale 14058 14158 4.5797
 # z_scale 4550 4555 0.7497
 # y_scale 4543 4544 0.7808
-# material Material
+# material Gloves
 diffuse_color 0.2395 0.0941 0.1155
 diffuse_shader LAMBERT
 diffuse_intensity 0.4022
