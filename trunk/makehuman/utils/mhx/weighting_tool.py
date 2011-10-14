@@ -39,7 +39,6 @@ class VIEW3D_OT_MhxPrintVnumsButton(bpy.types.Operator):
     bl_label = "Print vnums"
 
     def execute(self, context):
-        import bpy
         printVertNums(context)
         return{'FINISHED'}    
 
@@ -67,8 +66,28 @@ class VIEW3D_OT_MhxSelectVnumButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
+#    printEdgeNums(context):
+#    class VIEW3D_OT_MhxPrintEnumsButton(bpy.types.Operator):
+#
+ 
+def printEdgeNums(context):
+    ob = context.object
+    print("Edges in ", ob)
+    for e in ob.data.edges:
+        if e.select:
+            print(e.index)
+    print("End")
+
+class VIEW3D_OT_MhxPrintEnumsButton(bpy.types.Operator):
+    bl_idname = "mhx.weight_print_enums"
+    bl_label = "Print enums"
+
+    def execute(self, context):
+        printEdgeNums(context)
+        return{'FINISHED'}    
+#
 #    printFaceNums(context):
-#    class VIEW3D_OT_MhxPrintVnumsButton(bpy.types.Operator):
+#    class VIEW3D_OT_MhxPrintFnumsButton(bpy.types.Operator):
 #
  
 def printFaceNums(context):
@@ -84,7 +103,6 @@ class VIEW3D_OT_MhxPrintFnumsButton(bpy.types.Operator):
     bl_label = "Print fnums"
 
     def execute(self, context):
-        import bpy
         printFaceNums(context)
         return{'FINISHED'}    
 
@@ -700,6 +718,7 @@ class MhxWeightToolsPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         layout.operator("mhx.weight_print_vnums")
+        layout.operator("mhx.weight_print_enums")
         layout.operator("mhx.weight_print_fnums")
         layout.operator("mhx.weight_select_quads")
         layout.operator("mhx.weight_remove_vertex_groups")
