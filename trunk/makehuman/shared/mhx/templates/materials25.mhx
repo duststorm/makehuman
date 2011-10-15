@@ -28,6 +28,9 @@ Texture ambient IMAGE
   Image ambient.tif ;
 end Texture
 
+Texture white IMAGE
+end Texture
+
 # --------------- Textures for facial morphs  ----------------------------- # 
 
 #if False

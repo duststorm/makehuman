@@ -717,14 +717,12 @@ def writeProxyMaterialSettings(fp, settings):
 def addProxyMaskMTexs(fp, mat, proxy, prxList, lastBlend):
     n = 0  
     m = len(prxList)
-    blendtype = 'MULTIPLY'
     for (zdepth, prx) in prxList:
         m -= 1
         if zdepth > proxy.z_depth:
-            if m == 0:
-                blendtype = lastBlend
-            addMaskMTex(fp, prx.mask, blendtype, n)
+            addMaskMTex(fp, prx.mask, 'MULTIPLY', n)
             n += 1
+    addMaskMTex(fp, (None,'white'), 'MIX', n)
     return   
     
 def sortedMasks(proxyData):
