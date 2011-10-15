@@ -3,15 +3,16 @@
 # homepage http://www.makehuman.org/
 # name Gloves
 # obj_file gloves.obj
-# texture gloves_texture.tif
-# z_depth 70
+# z_depth 45
 # subsurf 1 2
 # shrinkwrap 0.030
+# shapekey Breathe
+# texture gloves_texture.tif
 # mask gloves_mask.png
 # x_scale 14058 14158 4.5797
 # z_scale 4550 4555 0.7497
 # y_scale 4543 4544 0.7808
-# material Gloves
+# material Material
 diffuse_color 0.2395 0.0941 0.1155
 diffuse_shader LAMBERT
 diffuse_intensity 0.4022

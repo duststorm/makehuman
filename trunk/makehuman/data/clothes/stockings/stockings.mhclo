@@ -3,10 +3,11 @@
 # homepage http://www.makehuman.org/
 # name Stockings
 # obj_file stockings.obj
-# texture stockings_texture.tif
 # z_depth 20
 # subsurf 1 2
 # shrinkwrap 0.030
+# shapekey Breathe
+# texture stockings_texture.tif
 # mask stockings_mask.png
 # x_scale 3936 3972 1.4342
 # z_scale 3840 3957 1.5772

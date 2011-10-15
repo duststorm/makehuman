@@ -199,9 +199,15 @@ def findClothes(context, bob, pob, log):
                     fcs.append((f, wts))
 
     print("Finding best weights")
+    """
     alwaysOutside = scn['MakeClothesOutside']
     minOffset = scn['MakeClothesMinOffset']
     useProjection = scn['MakeClothesUseProjection']
+    """
+    alwaysOutside = False
+    minOffset = 0.0
+    useProjection = False
+    
     bestFaces = []
     print("Optimal triangles not found for the following verts")
     for (pv, exact, mverts, fcs) in bestVerts:
@@ -228,7 +234,7 @@ def findClothes(context, bob, pob, log):
                 raise NameError(msg)
             (mv, mdist) = mverts[0]
             bVerts = [mv.index,0,1]
-            bWts = [1,0,0]
+            bWts = (1,0,0)
 
         v0 = base.vertices[bVerts[0]]
         v1 = base.vertices[bVerts[1]]
@@ -377,9 +383,9 @@ def printClothes(context, path, file, bob, pob, data):
         if scn['MakeClothes' + skey]:
             fp.write("# shapekey %s\n" % skey)            
             
-    fp.write("# texture %s_texture.png\n" % pob.name.lower())
-    if scn['MakeClothesMask']:
-        fp.write("# mask %s_mask.png\n" % pob.name.lower())
+    fp.write("# texture %s_texture.tif\n" % pob.name.lower())
+    #if scn['MakeClothesMask']:
+    fp.write("# mask %s_mask.png\n" % pob.name.lower())
            
     if scn['MakeClothesHairMaterial']:
         fp.write(
@@ -464,8 +470,7 @@ def exportObjFile(ob, context):
         fp.write("vn %.4f %.4f %.4f\n" % (v.normal[0], v.normal[2], -v.normal[1]))
         
     if me.uv_textures:
-        (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVerts, texVerts) = setupTexVerts(ob)
-        nTexVerts = len(texVerts.values())
+        (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVerts, texVerts, nTexVerts) = setupTexVerts(ob)
         for vtn in range(nTexVerts):
                 vt = texVerts[vtn]
                 fp.write("vt %.4f %.4f\n" % (vt[0], vt[1]))
@@ -555,7 +560,7 @@ def setupTexVerts(ob):
         vtn = findTexVert(uvf.uv3, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
         if len(f.vertices) > 3:
             vtn = findTexVert(uvf.uv4, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
-    return (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVerts, texVerts)     
+    return (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVerts, texVerts, vtn)     
 
 def findTexVert(uv, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob):
     for (e,f1) in faceNeighbors[f.index]:
@@ -569,30 +574,31 @@ def findTexVert(uv, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob):
     return vtn+1
 
 #
-#   storeData(bob, data):
+#   storeData(pob, bob, data):
 #   restoreData(context):    
 #
 
-def storeData(bob, data):
-    fname = os.path.realpath(os.path.expanduser("~/documents/makehuman/makeclo_stored.txt"))
+def storeData(pob, bob, data):
+    fname = os.path.realpath(os.path.expanduser("~/mh_makeclo_stored.txt"))
     fp = open(fname, "w")
+    fp.write("%s\n" % pob.name)
     fp.write("%s\n" % bob.name)
     for (pv, exact, verts, wts, diff) in data:
-        print(pv,exact)
+        #print(pv,exact)
         fp.write("%d %d\n" % (pv.index, exact))
-        print(verts)
+        #print(verts)
         fp.write("%s\n" % verts)
         if not exact:
-            print(wts)
+            #print(wts)
             fp.write("(%s,%s,%s)\n" % wts)
-            print(diff)
+            #print(diff)
             fp.write("(%s,%s,%s)\n" % (diff[0],diff[1],diff[2]))
     fp.close()
     return
     
 def restoreData(context):    
     pob = context.object
-    fname = os.path.realpath(os.path.expanduser("~/documents/makehuman/makeclo_stored.txt"))
+    fname = os.path.realpath(os.path.expanduser("~/mh_makeclo_stored.txt"))
     fp = open(fname, "rU")
     status = 0
     data = []
@@ -600,6 +606,13 @@ def restoreData(context):
         #print(line)
         words = line.split()
         if status == 0:
+            pname = words[0]
+            if pname != pob.name:
+                raise NameError(
+                "Restore error: stored data for %s does not match active object %s\n" % (pname, pob.name) +
+                "Make clothes for %s first\n" % pob.name)
+            status = 10
+        elif status == 10:
             bname = words[0]
             status = 1
         elif status == 1:
@@ -631,8 +644,11 @@ def unwrapObject(ob, context):
     scn = context.scene
     old = scn.objects.active
     scn.objects.active = ob
+    
     bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='SELECT')
     bpy.ops.uv.unwrap(method='ANGLE_BASED', fill_holes=True, correct_aspect=True)
+    bpy.ops.mesh.select_all(action='DESELECT')
     bpy.ops.object.mode_set(mode='OBJECT')
     scn.objects.active = old
     return
@@ -648,142 +664,226 @@ def projectUVs(context):
     pob = context.object
     print("Projecting %s => %s" % (bob.name, pob.name))
 
-    for pv in pob.data.vertices:
-        pv.select = False
-        
-    bVertFaces = createFaceTable(bob.data.vertices, bob.data.faces)
+    (bVertEdges, bVertFaces, bEdgeFaces, bFaceEdges, bFaceNeighbors, bUvFaceVerts, bTexVerts, bNTexVerts) = setupTexVerts(bob)
     table = {}
-    #for pv in pob.data.vertices:
-    #    print(pv.index)
-    #    table[pv.index] = []
-    buvtex = bob.data.uv_textures[0].data
+    bUvTex = bob.data.uv_textures[0].data
     for (pv, exact, verts, wts, diff) in data:
         if exact:
+            print("Exact", pv.index)
             vn0 = verts[0]
             for f0 in bVertFaces[vn0]:
-                uv0 = getUvLoc(v0, f0.vertices, buvtex[f.index])
-                table[pv.index] = (exact, uv0, 1)
+                uv0 = getUvLoc(v0, f0.vertices, bUvTex[f.index])
+                table[pv.index] = (1, uv0, 1)
+                print(pv.index, table[pv.index])
                 break
         else:
             vn0 = verts[0]
             vn1 = verts[1]
             vn2 = verts[2]
+            if (vn1 == 0) and (vn2 == 1) and (abs(wts[0]-1) < Epsilon):
+                uvVerts = []
+                for f0 in bVertFaces[vn0]:
+                    uv0 = getUvLoc(vn0, f0.vertices, bUvTex[f0.index])
+                    uvVerts.append(uv0)
+                table[pv.index] = (2, uvVerts, wts)
+                continue
             for f0 in bVertFaces[vn0]:
                 for f1 in bVertFaces[vn1]:
                     if (f1 == f0):
                         for f2 in bVertFaces[vn2]:
                             if (f2 == f0):
-                                uv0 = getUvLoc(vn0, f0.vertices, buvtex[f0.index])
-                                uv1 = getUvLoc(vn1, f0.vertices, buvtex[f0.index])
-                                uv2 = getUvLoc(vn2, f0.vertices, buvtex[f0.index])
-                                table[pv.index] = (exact, [uv0,uv1,uv2], wts)
+                                uv0 = getUvLoc(vn0, f0.vertices, bUvTex[f0.index])
+                                uv1 = getUvLoc(vn1, f0.vertices, bUvTex[f0.index])
+                                uv2 = getUvLoc(vn2, f0.vertices, bUvTex[f0.index])
+                                table[pv.index] = (0, [uv0,uv1,uv2], wts)
         
-    (pVertEdges, pVertFaces, pEdgeFaces, pFaceEdges, pFaceNeighbors, uvFaceVerts, texVerts) = setupTexVerts(pob)
+    (pVertEdges, pVertFaces, pEdgeFaces, pFaceEdges, pFaceNeighbors, pUvFaceVerts, pTexVerts, pNTexVerts) = setupTexVerts(pob)
+    (pSeamEdgeFaces, pSeamVertEdges, pBoundaryVertEdges, pVertTexVerts) = getSeamData(pob.data, pUvFaceVerts, pEdgeFaces)
+    pTexVertUv = {}
+    for vtn in range(pNTexVerts):
+        pTexVertUv[vtn] = None
 
-    seams = {}
-    boundaries = {}
-    for e in pob.data.edges:
-        fcs = pEdgeFaces[e.index]
-        if len(fcs) < 2:
-            print("Edge", e.index)
-            seams[e] = False
-            boundaries[e] = True
-        else:        
-            seams[e] = isSeam(fcs[0], fcs[1], uvFaceVerts)
-            boundaries[e] = False
-               
-    uvtex = pob.data.uv_textures[0]
+    pUvtex = pob.data.uv_textures[0]
     pverts = pob.data.vertices
+    bverts = bob.data.vertices
+    bedges = bob.data.edges
     remains = {}
     zero = (0,0)
     for pf in pob.data.faces:
-        remains[pf.index] = []
-    for pf in pob.data.faces:
+        fn = pf.index
+        rmd = {}
+        rmd[0] = None
+        rmd[1] = None
+        rmd[2] = None
+        rmd[3] = None
+        remains[fn] = rmd
+        
         pvn0 = pf.vertices[0]
         pvn1 = pf.vertices[1]
         pvn2 = pf.vertices[2]    
-        pv0 = pverts[pvn0]
-        pv1 = pverts[pvn1]
-        pv2 = pverts[pvn2]
-        pvn_1 = pvn2
         uv0 = getSingleUvLoc(pvn0, table)
         uv1 = getSingleUvLoc(pvn1, table)
         uv2 = getSingleUvLoc(pvn2, table)
         if len(pf.vertices) > 3:
             pvn3 = pf.vertices[3]
-            pv3 = pverts[pvn3]
-            pvn_1 = pvn3
             uv3 = getSingleUvLoc(pvn3, table)
+        else:
+            uv3 = zero
             
-        uvf = uvtex.data[pf.index]
-        uvf.uv1 = zero
-        uvf.uv2 = zero
-        uvf.uv3 = zero
-        uvf.uv4 = zero
-        edges = pFaceEdges[pf.index]
-        if inBulk(pv0, pvn_1, pvn0, pvn1, seams, boundaries, edges, pob):
-            uvf.uv1 = uv0
-        else:
-            remains[pf.index].append((pv0, uvf, 0))
-        if inBulk(pv1, pvn0, pvn1, pvn2, seams, boundaries, edges, pob):
-            uvf.uv2 = uv1
-        else:
-            remains[pf.index].append((pv1, uvf, 1))
-        if inBulk(pv2, pvn1, pvn2, pvn_1, seams, boundaries, edges, pob):
-            uvf.uv3 = uv2
-        else:
-            remains[pf.index].append((pv2, uvf, 2))
-        if len(pf.vertices) > 3:
-            if inBulk(pv3, pvn2, pvn3, pvn0, seams, boundaries, edges, pob):
-                uvf.uv4 = uv3
-            else:
-                remains[pf.index].append((pv3, uvf, 3))
-                
-    (bVertList, bEdgeList) = getSeams(bob, context.scene)  
-    bverts = bob.data.vertices
-    for pf in pob.data.faces:    
-        for (pv, uvf, index) in remains[pf.index]:            
-            bv = findClosestVert(pv, bVertList, bverts)
-            mindist = 1e6
-            best = None
-            second = None
-            #print("P", pv.index, pv.co)
-            #print("B", bv.index, bv.co)
-            for bf in bVertFaces[bv.index]:   
-                buvf = buvtex[bf.index]
-                nverts = len(bf.vertices)
-                dist = distUvVertFace(uvf.uv1, buvf, nverts)
-                dist += distUvVertFace(uvf.uv2, buvf, nverts)
-                dist += distUvVertFace(uvf.uv3, buvf, nverts)
-                dist += distUvVertFace(uvf.uv4, buvf, nverts)
-                if dist < mindist:
-                    mindist = dist
-                    best = (bf, buvf)
-            
-            (bf1,buvf1) = best
-            for n1,bv1 in enumerate(bf1.vertices):
-                if bv == bv1:
-                    break
-            buv = getUvVert(buvf1, n1)                                
-            k = 0.001
-            buv += mathutils.Vector((k*random.random(), k*random.random()))
-            setUvVert(uvf, index, buv)
-    return
+        uvf = pUvtex.data[fn]
 
-def distUvVertFace(uv, buvf, nverts):
-    if uv.length < Epsilon:
-        return 0
-    vec = uv-buvf.uv1
-    dist = vec.length
-    vec = uv-buvf.uv2
-    dist += vec.length
-    vec = uv-buvf.uv3
-    dist += vec.length
-    if nverts > 3:
-        vec = uv-buvf.uv4
-        dist += vec.length
-    return dist        
+        uv0 = trySetUv(pvn0, fn, uvf, rmd, 0, uv0, pVertTexVerts, pTexVertUv, pSeamVertEdges)
+        if uv0: 
+            uvf.uv1 = uv0
+            
+        uv1 = trySetUv(pvn1, fn, uvf, rmd, 1, uv1, pVertTexVerts, pTexVertUv, pSeamVertEdges)
+        if uv1: 
+            uvf.uv2 = uv1
+
+        uv2 = trySetUv(pvn2, fn, uvf, rmd, 2, uv2, pVertTexVerts, pTexVertUv, pSeamVertEdges)
+        if uv2:
+            uvf.uv3 = uv2
+
+        if len(pf.vertices) > 3:
+            uv3 = trySetUv(pvn3, fn, uvf, rmd, 3, uv3, pVertTexVerts, pTexVertUv, pSeamVertEdges)
+            if uv3:
+                uvf.uv4 = uv3
+
+    #(bSeamEdgeFaces, bSeamVertEdges, bBoundaryVertEdges) = getSeamData(bob.data, bUvFaceVerts, bEdgeFaces)
+    (bVertList, bPairList, bEdgeList) = getSeams(bob, context.scene)  
+    for (en,fcs) in pSeamEdgeFaces.items():
+        pe = pob.data.edges[en]
+        for m in range(2):
+            pv = pverts[pe.vertices[m]]
+            be = findClosestEdge(pv, bEdgeList, bverts, bedges)
+            for pf in fcs:
+                fn = pf.index
+                for (n, rmd) in remains[fn].items():
+                    if rmd:
+                        (uvf, pvn, vt, uv0) = rmd
+                        if pv.index == pvn:
+                            if pTexVertUv[vt]:
+                                uv = pTexVertUv[vt]
+                            else:
+                                uv = getSeamVertFaceUv(pv, pe, pf, pVertTexVerts, pTexVertUv, be, bEdgeFaces, bUvTex, pverts, bverts)
+                                pTexVertUv[vt] = uv
+                            setUvVert(uvf, n, uv)
+                            remains[fn][n] = None
+                            #pverts[pvn].select = True
     
+    for pf in pob.data.faces:
+        rmd = remains[pf.index]
+        for n in range(4):
+            if rmd[n]:
+                (uvf, pvn, vt, uv) = rmd[n]
+                pverts[pvn].select = True
+                if pTexVertUv[vt]:
+                    uv = pTexVertUv[vt]
+                else:
+                    pTexVertUv[vt] = uv
+                setUvVert(uvf, n, uv)
+    
+    print("Projection %s => %s done" % (bob.name, pob.name))
+    return
+ 
+#
+#   trySetUv(pv, fn, uvf, rmd, n, uv, vertTexVerts, texVertUv, seamVertEdges):        
+#
+
+def trySetUv(pvn, fn, uvf, rmd, n, uv, vertTexVerts, texVertUv, seamVertEdges):        
+    (vt, uv_old) = vertTexVerts[pvn][fn]
+    if texVertUv[vt]:
+        return texVertUv[vt]
+    elif not seamVertEdges[pvn]:
+        texVertUv[vt] = uv
+        return uv
+    else:
+        rmd[n] = (uvf, pvn, vt, uv)
+        return None
+
+#
+#   findClosestEdge(pv, edgeList, verts, edges):
+#
+
+def findClosestEdge(pv, edgeList, verts, edges):
+    mindist = 1e6
+    for e in edgeList:
+        vec0 = pv.co - verts[e.vertices[0]].co
+        vec1 = pv.co - verts[e.vertices[1]].co
+        dist = vec0.length + vec1.length
+        if dist < mindist:
+            mindist = dist
+            best = e
+    return best
+        
+
+#
+#   getSeamVertFaceUv(pv, pe, pf, pVertTexVerts, pTexVertUv, be, bEdgeFaces, bUvTex, pverts, bverts):       
+#
+
+def getSeamVertFaceUv(pv, pe, pf, pVertTexVerts, pTexVertUv, be, bEdgeFaces, bUvTex, pverts, bverts):
+    dist = {}
+    for bf in bEdgeFaces[be.index]:
+        dist[bf.index] = 0
+    for pvn in pf.vertices:
+        (vt, uv_old) = pVertTexVerts[pvn][pf.index]
+        puv = pTexVertUv[vt]
+        if puv:
+            for bf in bEdgeFaces[be.index]:
+                for n,bvn in enumerate(bf.vertices):
+                    buvf = bUvTex[bf.index]
+                    buv = getUvVert(buvf, n)
+                    duv = buv - puv
+                    dist[bf.index] += duv.length
+
+    mindist = 1e6
+    for bf in bEdgeFaces[be.index]:
+        if dist[bf.index] < mindist:
+            mindist = dist[bf.index]
+            best = bf
+            
+    bv0 = bverts[be.vertices[0]]
+    bv1 = bverts[be.vertices[1]]
+    m0 = getFaceIndex(bv0.index, best)
+    m1 = getFaceIndex(bv1.index, best)
+    buvf = bUvTex[best.index]
+    buv0 = getUvVert(buvf, m0)
+    buv1 = getUvVert(buvf, m1)
+    vec0 = pv.co - bv0.co
+    vec1 = pv.co - bv1.co
+    vec = bv0.co - bv1.co
+    dist0 = abs(vec.dot(vec0))
+    dist1 = abs(vec.dot(vec1))
+    eps = dist1/(dist0+dist1)    
+    uv = eps*buv0 + (1-eps)*buv1
+    return uv
+    
+    best.select = True
+    pf.select = True
+    bv0.select = True
+    bv1.select = True
+    pv.select = True
+    print(uv)
+    print("  ", buv0)
+    print("  ", buv1)
+    foo
+    
+    return uv
+    
+def getFaceIndex(vn, f):
+    n = 0
+    for vn1 in f.vertices:
+        if vn1 == vn:
+            #print(v.index, n, list(f.vertices))            
+            return n
+        n += 1
+    raise NameError("Vert %d not in face %d %s" % (vn, f.index, list(f.vertices)))
+
+#
+#   setUvVert(uvf, n, uv):                
+#   getUvVert(uvf, n):   
+#
+
 def setUvVert(uvf, n, uv):                
     if n == 0:
         uvf.uv1 = uv
@@ -806,50 +906,73 @@ def getUvVert(uvf, n):
         return uvf.uv4
     return
     
-def findClosestVert(pv, vertList, verts):
-    mindist = 1e6
-    for vn in vertList:
-        vec = pv.co - verts[vn].co
-        dist = vec.length
-        if dist < mindist:
-            mindist = dist
-            best = vn
-    return verts[best]
-    
-def distFaces(f1, f2, verts):
-    dist = 0
-    for vn1 in f1.vertices:
-        v1 = verts[vn1]
-        v2 = findClosestVert(v1, f2.vertices, verts)
-        vec = v1.co - v2.co
-        dist += vec.length
-    return dist        
+#
+#   getSeamData(me, uvFaceVerts, edgeFaces):    
+#
 
-def isSeam(f0, f1, uvFaceVerts):    
-    hits = 0
-    for (vt0,uv0) in uvFaceVerts[f0.index]:
-        for (vt1,uv1) in uvFaceVerts[f1.index]:
-            if vt0 == vt1:
-                hits += 1
-    if hits < 0:                
-        print(hits, f0.index, f1.index, list(f0.vertices), list(f1.vertices))        
-    return (hits < 2)                
-    
-def inBulk(pv, vn1, vn2, vn3, seams, boundaries, edges, pob):        
-    for e in edges:
-        everts = e.vertices
-        if (vn2 in everts) and ((vn1 in everts) or (vn3 in everts)):
-            if seams[e]:
-                print("Seam", vn2)
-                return False
-    for e in edges:
-        everts = e.vertices
-        if (vn2 in everts) and ((vn1 in everts) or (vn3 in everts)):
-            if boundaries[e]:
-                print("Bound", vn2)
-                pv.select = True
-                return True
-    return True                
+def getSeamData(me, uvFaceVerts, edgeFaces):    
+    seamEdgeFaces = {}
+    seamVertEdges = {}
+    boundaryEdges = {}
+    vertTexVerts = {}
+    verts = me.vertices
+
+    for v in me.vertices:
+        vn = v.index
+        seamVertEdges[vn] = []
+        vertTexVerts[vn] = {}
+        v.select = False
+
+    for f in me.faces:
+        fn = f.index
+        for vn in f.vertices:
+            n = getFaceIndex(vn, f)
+            uvf = uvFaceVerts[fn]
+            vertTexVerts[vn][fn]= uvf[n]
+
+    for e in me.edges:
+        en = e.index
+        fcs = edgeFaces[en]
+        if len(fcs) < 2:
+            boundaryEdges[en] = True
+            e.select = False
+        else:
+            vn0 = e.vertices[0]
+            vn1 = e.vertices[1]
+            if isSeam(vn0, vn1, fcs[0], fcs[1], vertTexVerts):
+                #e.select = True
+                seamEdgeFaces[en] = fcs
+                seamVertEdges[vn0].append(e)
+                seamVertEdges[vn1].append(e)
+            else:
+                e.select = False
+    return (seamEdgeFaces, seamVertEdges, boundaryEdges, vertTexVerts)            
+
+def isSeam(vn0, vn1, f0, f1, vertTexVerts):
+    (vt00, uv00) = vertTexVerts[vn0][f0.index]
+    (vt01, uv01) = vertTexVerts[vn1][f0.index]
+    (vt10, uv10) = vertTexVerts[vn0][f1.index]
+    (vt11, uv11) = vertTexVerts[vn1][f1.index]
+    d00 = uv00-uv10
+    d11 = uv01-uv11
+    d01 = uv00-uv11
+    d10 = uv01-uv10
+    #test1 = ((vt00 == vt10) and (vt01 == vt11))
+    #test2 = ((vt00 == vt11) and (vt01 == vt10))
+    test1 = ((d00.length < Epsilon) and (d11.length < Epsilon))
+    test2 = ((d01.length < Epsilon) and (d10.length < Epsilon))
+    if (test1 or test2):
+        return False
+    else:
+        return True
+        print("%d %s" % (vt00, uv00))
+        print("%d %s" % (vt01, uv01))
+        print("%d %s" % (vt10, uv10))
+        print("%d %s" % (vt11, uv11))
+
+#
+#
+#
 
 def createFaceTable(verts, faces):
     table = {}
@@ -862,8 +985,10 @@ def createFaceTable(verts, faces):
 
 def getSingleUvLoc(vn, table):
     (exact, buvs, wts) = table[vn]
-    if exact:
+    if exact == 1:
         return buvs
+    elif exact == 2:
+        return buvs[0]
     else:
         return buvs[0]*wts[0] + buvs[1]*wts[1] + buvs[2]*wts[2] 
  
@@ -884,10 +1009,10 @@ def getUvLoc(v, f, uvface):
 #
 
 def recoverSeams(ob, scn):
-    (vertList, edgeList) = getSeams(ob, scn)
+    (vertList, pairList, edgeList) = getSeams(ob, scn)
     vcoList = coordList(vertList, ob.data.vertices)
     sme = bpy.data.meshes.new("Seams")
-    sme.from_pydata(vcoList, edgeList, [])
+    sme.from_pydata(vcoList, pairList, [])
     sme.update(calc_edges=True)
     sob = bpy.data.objects.new("Seams", sme)
     sob.show_x_ray = True
@@ -914,6 +1039,7 @@ def getSeams(ob, scn):
 
     vertList = []
     edgeList = []
+    pairList = []
     n = 0
     for e in ob.data.edges:
         v0 = e.vertices[0]
@@ -921,9 +1047,10 @@ def getSeams(ob, scn):
         e.use_seam = (onEdges[v0] and onEdges[v1])
         if e.use_seam:
             vertList += [v0, v1]
-            edgeList.append((n,n+1))
+            pairList.append((n,n+1))            
             n += 2
-    return (vertList, edgeList)            
+            edgeList.append(e)
+    return (vertList, pairList, edgeList)            
         
 def isOnEdge(v, faceTable, uvtex):            
     uvloc = None
@@ -941,7 +1068,7 @@ def isOnEdge(v, faceTable, uvtex):
                     uvnloc = uvface.uv4
                 if uvloc:
                     dist = uvnloc - uvloc
-                    if dist.length > Epsilon:
+                    if dist.length > 0.01:
                         return True
                 else:
                     uvloc = uvnloc
@@ -969,7 +1096,7 @@ def makeClothes(context):
             else:
                 log = None
             data = findClothes(context, bob, pob, log)
-            storeData(bob, data)
+            storeData(pob, bob, data)
             printClothes(context, outpath, outfile, bob, pob, data)
             if log:
                 log.close()
@@ -1581,15 +1708,21 @@ def initInterface(scn):
         description="Save materials as mhx file")
     scn['MakeClothesBlenderMaterials'] = False
 
+    bpy.types.Scene.MakeClothesHairMaterial = BoolProperty(
+        name="Hair material", 
+        description="Fill in hair material")
+    scn['MakeClothesHairMaterial'] = False
+
+    """
     bpy.types.Scene.MakeClothesObjFile = BoolProperty(
         name="Object file", 
         description="Also export object file")
     scn['MakeClothesObjFile'] = False
 
-    bpy.types.Scene.MakeClothesHairMaterial = BoolProperty(
-        name="Hair material", 
-        description="Fill in hair material")
-    scn['MakeClothesHairMaterial'] = False
+    bpy.types.Scene.MakeClothesMask = BoolProperty(
+        name="Mask", 
+        description="Clothing has a mask")
+    scn['MakeClothesMask'] = False
 
     bpy.types.Scene.MakeClothesUseProjection = BoolProperty(
         name="Use projection", 
@@ -1605,6 +1738,7 @@ def initInterface(scn):
         name="Min offset", 
         description="Mininum offset from base mesh")
     scn['MakeClothesMinOffset'] = 0.0
+    """
 
     bpy.types.Scene.MakeClothesVertexGroups = BoolProperty(
         name="Save vertex groups", 
@@ -1621,11 +1755,6 @@ def initInterface(scn):
         name="List length", 
         description="Max number of verts considered")
     scn['MakeClothesListLength'] = theListLength
-
-    bpy.types.Scene.MakeClothesMask = BoolProperty(
-        name="Mask", 
-        description="Clothing has a mask")
-    scn['MakeClothesMask'] = False
 
     bpy.types.Scene.MakeClothesForbidFailures = BoolProperty(
         name="Forbid failures", 
@@ -1758,15 +1887,16 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.label("Utilities")
         layout.operator("mhclo.print_vnums")
         layout.operator("mhclo.remove_vertex_groups")
+        layout.label("UVs")
         layout.operator("mhclo.recover_seams")
         layout.operator("mhclo.project_uvs")
+        layout.operator("mhclo.copy_vert_locs")
         layout.label("Make clothes")
         layout.prop(scn, "MakeClothesDirectory")
         layout.prop(scn, "MakeClothesMaterials")
         layout.prop(scn, "MakeClothesBlenderMaterials")
-        layout.prop(scn, "MakeClothesObjFile")
         layout.prop(scn, "MakeClothesHairMaterial")
-        layout.prop(scn, "MakeClothesUseProjection")
+        #layout.prop(scn, "MakeClothesUseProjection")
         #layout.prop(scn, "MakeClothesOutside")
         #layout.prop(scn, "MakeClothesMinOffset")
         #layout.prop(scn, "MakeClothesThreshold")
@@ -1774,7 +1904,8 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.prop(scn, "MakeClothesForbidFailures")
         layout.prop(scn, "MakeClothesLogging")
         
-        layout.prop(scn, "MakeClothesMask")        
+        #layout.prop(scn, "MakeClothesObjFile")
+        #layout.prop(scn, "MakeClothesMask")        
         
         layout.separator()
         layout.operator("mhclo.make_clothes")
@@ -1855,8 +1986,8 @@ class OBJECT_OT_MakeClothesButton(bpy.types.Operator):
 
     def execute(self, context):     
         makeClothes(context)
-        if context.scene['MakeClothesObjFile']:
-            exportObjFile(context.object, context)
+        #if context.scene['MakeClothesObjFile']:
+        #    exportObjFile(context.object, context)
         return{'FINISHED'}    
         
 #
@@ -1871,6 +2002,26 @@ class OBJECT_OT_ProjectUVsButton(bpy.types.Operator):
         unwrapObject(context.object, context)
         projectUVs(context)
         return{'FINISHED'}    
+        
+#
+#   class OBJECT_OT_CopyVertLocsButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_CopyVertLocsButton(bpy.types.Operator):
+    bl_idname = "mhclo.copy_vert_locs"
+    bl_label = "Copy vertex locations"
+
+    def execute(self, context):
+        src = context.object
+        for trg in context.scene.objects:
+            if trg != src and trg.select and trg.type == 'MESH':
+                print("Copy vertex locations from %s to %s" % (src.name, trg.name))
+                for n,sv in enumerate(src.data.vertices):
+                    tv = trg.data.vertices[n]
+                    tv.co = sv.co
+                print("Vertex locations copied")
+        return{'FINISHED'}    
+
         
 #
 #   class OBJECT_OT_ExportObjFileButton(bpy.types.Operator):
