@@ -29,6 +29,7 @@ import module3d
 import mh
 import os
 import font3d
+import weakref
 from catmull_clark_subdivision import createSubdivisionObject, updateSubdivisionObject
 
 defaultFontSize = 12
@@ -79,7 +80,7 @@ class Object(events3d.EventHandler):
 
     def __init__(self, view, position, mesh, visible=True):
         
-        if hasattr(mesh, 'object') and mesh.object:
+        if mesh.object:
             raise RuntimeException('This mesh is already attached to an object')
                 
         self.app = view.app
@@ -102,6 +103,15 @@ class Object(events3d.EventHandler):
         
         self.__seedMesh = self.mesh
         self.__subdivisionMesh = None
+        
+    def __del__(self):
+    
+        self.__seedMesh = None
+        self.__subdivisionMesh = None
+        
+        self.mesh.object = None
+        
+        self.app.scene3d.delete(self.mesh)
 
     def show(self):
         
@@ -424,7 +434,7 @@ class View(events3d.EventHandler):
             raise RuntimeError('A view needs a parent')
                 
         self.app = parent.app
-        self.parent = parent
+        self.__parent = weakref.ref(parent)
         self.children = []
         self.objects = []
         self.style = Style(parent=(style if style else ViewStyle))
@@ -432,9 +442,24 @@ class View(events3d.EventHandler):
         self.__visible = visible
         self.__totalVisibility = parent.isVisible() and visible
 
-        parent.children.append(self)
+        self.parent.children.append(self)
         if self.parent.layout:
             self.parent.layout.onChildAdded(self)
+
+    def __del__(self):
+    
+        del self.children[:]
+        del self.objects[:]
+        
+    @property
+    def parent(self):
+        return self.__parent();
+        
+    def remove(self):
+    
+        self.parent.children.remove(self)
+        if self.parent.layout:
+            self.parent.layout.rebuild()
         
     def show(self):
         self.__visible = True

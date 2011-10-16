@@ -284,6 +284,15 @@ class MHApplication(gui3d.Application):
                 for task in category.tasks:
                     
                     task.callEvent('onHumanChanged', event)
+                    
+        @self.selectedHuman.event
+        def onTargetsReapplied(event):
+            
+            for category in self.categories.itervalues():
+                
+                for task in category.tasks:
+                    
+                    task.callEvent('onHumanTargetsReapplied', event)
 
         # Set up categories and tasks
         

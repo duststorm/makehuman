@@ -301,6 +301,9 @@ class Vert:
             index will be calculated based on the index of the vertex.
 
         """
+        
+        if not self.object.object3d:
+            return
 
         if updateCoo:
             for i in self.indicesInFullVertArray:
@@ -660,6 +663,19 @@ class Object3D:
         self.uvValues = None
         self.uvMap = {}
         
+        self.__object = None
+    
+    @property
+    def object(self):
+        if self.__object:
+            return self.__object()
+        else:
+            return None
+            
+    @object.setter
+    def object(self, value):
+        self.__object = weakref.ref(value)
+    
     @property
     def faceGroups(self):
         return iter(self.__faceGroups)

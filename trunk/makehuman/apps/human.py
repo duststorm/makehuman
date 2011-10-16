@@ -394,6 +394,8 @@ class Human(gui3d.Object):
                 
         if progressCallback:
             progressCallback(1.0)
+            
+        self.callEvent('onTargetsReapplied', HumanEvent(self, 'targets'))
 
     def getPartNameForGroupName(self, groupName):
         for k in self.bodyZones:

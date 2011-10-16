@@ -1298,14 +1298,25 @@ void mhGetPickedColor(int x, int y)
  */
 PyObject *Camera_convertToScreen(Camera *camera, PyObject *args)
 {
+	Object3D *obj = NULL;
     GLint viewport[4];
     GLdouble modelview[16], projection[16];
     double world[3], screen[3];
 
-    if (!PyArg_ParseTuple(args, "ddd", world, world + 1, world + 2))
+    if (!PyArg_ParseTuple(args, "ddd|O", world, world + 1, world + 2, &obj))
         return NULL;
 
     mhCameraPosition(camera, 0);
+
+	if (obj && PyObject_TypeCheck(obj, &Object3DType))
+	{    
+		glPushMatrix();
+		glTranslatef(obj->x, obj->y, obj->z);
+		glRotatef(obj->rx, 1, 0, 0);
+		glRotatef(obj->ry, 0, 1, 0);
+		glRotatef(obj->rz, 0, 0, 1);
+		glScalef(obj->sx, obj->sy, obj->sz);
+	}
 
     glGetIntegerv(GL_VIEWPORT, viewport);
     glGetDoublev(GL_PROJECTION_MATRIX, projection);
