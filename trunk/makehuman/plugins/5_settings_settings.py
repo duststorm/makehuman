@@ -10,21 +10,21 @@ class SettingsTaskView(gui3d.TaskView):
 
         self.shaderGroup = []
         y = 80
-        shaderBox = gui3d.GroupBox(self, [10, y, 9.0], 'Shader', gui3d.GroupBoxStyle._replace(height=25+24*4+6));y+=25
+        shaderBox = gui3d.GroupBox(self, [10, y, 9.0], 'Shader');y+=25
         self.shaderNo = gui3d.RadioButton(shaderBox, self.shaderGroup, "No shader", True);y+=24
         self.shaderPhong = gui3d.RadioButton(shaderBox, self.shaderGroup, "Phong shader");y+=24
         self.shaderToon = gui3d.RadioButton(shaderBox, self.shaderGroup, "Toon shader");y+=24
         self.shaderSkin = gui3d.RadioButton(shaderBox, self.shaderGroup, "Skin shader");y+=24
         y+=16
         
-        sliderBox = gui3d.GroupBox(self, [10, y, 9.0], 'Slider behavior', gui3d.GroupBoxStyle._replace(height=25+24*2+6));y+=25
+        sliderBox = gui3d.GroupBox(self, [10, y, 9.0], 'Slider behavior');y+=25
         self.realtimeUpdates = gui3d.CheckBox(sliderBox, "Update real-time",
             self.app.settings.get('realtimeUpdates', True));y+=24
         self.realtimeNormalUpdates = gui3d.CheckBox(sliderBox, "Update normals",
             self.app.settings.get('realtimeNormalUpdates', True));y+=24
         y+=16
             
-        mouseBox = gui3d.GroupBox(self, [10, y, 9.0], 'Mouse behavior', gui3d.GroupBoxStyle._replace(height=25+36*2+6));y+=25
+        mouseBox = gui3d.GroupBox(self, [10, y, 9.0], 'Mouse behavior');y+=25
         self.normal = gui3d.Slider(mouseBox,
             self.app.settings.get('lowspeed', 1), 1, 10,
             "Normal: %d");y+=36
@@ -35,14 +35,14 @@ class SettingsTaskView(gui3d.TaskView):
             
         modes = [] 
                
-        unitBox = self.unitsBox = gui3d.GroupBox(self, [10, y, 9.0], 'Units', gui3d.GroupBoxStyle._replace(height=25+24*2+6));y += 25
+        unitBox = self.unitsBox = gui3d.GroupBox(self, [10, y, 9.0], 'Units');y += 25
         metric = gui3d.RadioButton(unitBox, modes, 'Metric', self.app.settings.get('units', 'metric') == 'metric');y += 24
         imperial = gui3d.RadioButton(unitBox, modes, 'Imperial', self.app.settings.get('units', 'metric') == 'imperial');y += 24
         y+=16
         
         fonts = []
         
-        unitBox = self.unitsBox = gui3d.GroupBox(self, [650, 80, 9.0], 'Font', gui3d.GroupBoxStyle._replace())
+        unitBox = self.unitsBox = gui3d.GroupBox(self, [650, 80, 9.0], 'Font')
         arial = gui3d.RadioButton(unitBox, fonts, 'Arial', self.app.settings.get('font', 'arial') == 'arial', style=gui3d.RadioButtonStyle._replace(fontFamily='arial'))
         courier = gui3d.RadioButton(unitBox, fonts, 'Courier', self.app.settings.get('font', 'arial') == 'courier', style=gui3d.RadioButtonStyle._replace(fontFamily='courier'))
         ubuntu = gui3d.RadioButton(unitBox, fonts, 'Ubuntu', self.app.settings.get('font', 'arial') == 'ubuntu', style=gui3d.RadioButtonStyle._replace(fontFamily='ubuntu'))

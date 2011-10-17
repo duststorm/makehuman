@@ -7,6 +7,18 @@ import gui3d
 import os
 import humanmodifier
 import aljabr
+import mh
+
+class GroupBoxRadioButton(gui3d.RadioButton):
+    def __init__(self, parent, group, label, groupBox, selected=False):
+        gui3d.RadioButton.__init__(self, parent, group, label, selected, style=gui3d.ButtonStyle)
+        self.groupBox = groupBox
+        
+    def onClicked(self, event):
+        gui3d.RadioButton.onClicked(self, event)
+        self.parent.parent.hideAllBoxes()
+        self.groupBox.show()
+        self.groupBox.children[0].setFocus()
 
 class MeasureSlider(humanmodifier.ModifierSlider):
     def __init__(self, parent, template, measure, modifier):
@@ -23,6 +35,9 @@ class MeasureSlider(humanmodifier.ModifierSlider):
     def onChange(self, value):
         humanmodifier.ModifierSlider.onChange(self, value)
         self.parent.parent.syncSliderLabels()
+        
+    def onFocus(self, event):
+        self.parent.parent.onSliderFocus(self, self.modifier)
         
     def updateLabel(self):
         self.label.setText(self.template + self.parent.parent.getMeasure(self.measure))
@@ -72,16 +87,23 @@ class MeasureTaskView(gui3d.TaskView):
         }
         
         self.groupBoxes = {}
+        self.radioButtons = []
         self.sliders = []
         
         self.modifiers = {}
         
         measureDataPath = "data/targets/measure/"
+        
+        y = 80
+        self.categoryBox = gui3d.GroupBox(self, [650, y, 9.0], 'Category');y += 25
 
         for name, subnames in measurements:
             # Create box
             box = gui3d.GroupBox(self, [10, 80, 9.0], name.capitalize(), gui3d.GroupBoxStyle._replace(height=25+36*len(subnames)+6))
             self.groupBoxes[name] = box
+            
+            # Create radiobutton
+            radio = GroupBoxRadioButton(self.categoryBox, self.radioButtons, name, box, selected=len(self.radioButtons) == 0);y += 24
             
             # Create sliders
             for subname in subnames:
@@ -92,19 +114,24 @@ class MeasureTaskView(gui3d.TaskView):
                 slider = MeasureSlider(box, sliderLabel[subname], subname, modifier)
                 self.sliders.append(slider)
                
-        y = 80
-        self.statsBox = gui3d.GroupBox(self, [650, y, 9.0], 'Statistics', gui3d.GroupBoxStyle._replace(height=25+22*4+6));y += 25
-        self.height = gui3d.TextView(self.statsBox, 'Height: ');y += 22
-        self.chest = gui3d.TextView(self.statsBox, 'Chest: ');y += 22
-        self.waist = gui3d.TextView(self.statsBox, 'Waist: ');y += 22
-        self.hips = gui3d.TextView(self.statsBox, 'Hips: ');y += 22
         y+=16
-        self.braBox = gui3d.GroupBox(self, [650, y, 9.0], 'Brassiere size', gui3d.GroupBoxStyle._replace(height=25+22*4+6));y += 25
-        self.eu = gui3d.TextView(self.braBox, 'EU: ');y += 22
-        self.jp = gui3d.TextView(self.braBox, 'JP: ');y += 22
-        self.us = gui3d.TextView(self.braBox, 'US: ');y += 22
-        self.uk = gui3d.TextView(self.braBox, 'UK: ');y += 22
+        self.statsBox = gui3d.GroupBox(self, [650, y, 9.0], 'Statistics');y += 25
+        self.height = gui3d.TextView(self.statsBox, 'Height: ');y += 20
+        self.chest = gui3d.TextView(self.statsBox, 'Chest: ');y += 20
+        self.waist = gui3d.TextView(self.statsBox, 'Waist: ');y += 20
+        self.hips = gui3d.TextView(self.statsBox, 'Hips: ');y += 20
         y+=16
+        self.braBox = gui3d.GroupBox(self, [650, y, 9.0], 'Brassiere size');y += 25
+        self.eu = gui3d.TextView(self.braBox, 'EU: ');y += 20
+        self.jp = gui3d.TextView(self.braBox, 'JP: ');y += 20
+        self.us = gui3d.TextView(self.braBox, 'US: ');y += 20
+        self.uk = gui3d.TextView(self.braBox, 'UK: ');y += 20
+        y+=16
+        
+        mesh = gui3d.RectangleMesh(100, 100)
+        self.measureLine = gui3d.Object(self, [0, 0, 8.9], mesh)
+        mesh.setColor([0, 0, 0, 32])
+        mesh.setPickable(0)
             
     def getMeasure(self, measure):
         
@@ -114,17 +141,52 @@ class MeasureTaskView(gui3d.TaskView):
             return '%.1f cm' % measure
         else:
             return '%.1f in' % measure
+            
+    def hideAllBoxes(self):
+        
+        for box in self.groupBoxes.values():
+            box.hide()
 
     def onShow(self, event):
 
         gui3d.TaskView.onShow(self, event)
-        self.groupBoxes['torso'].children[0].setFocus()
+        self.groupBoxes['neck'].children[0].setFocus()
         self.syncSliders()
         
     def onResized(self, event):
         
+        self.categoryBox.setPosition([event.width - 150, self.categoryBox.getPosition()[1], 9.0])
         self.statsBox.setPosition([event.width - 150, self.statsBox.getPosition()[1], 9.0])
         self.braBox.setPosition([event.width - 150, self.braBox.getPosition()[1], 9.0])
+        
+    def onSliderFocus(self, slider, modifier):
+        
+        human = self.app.selectedHuman
+        
+        # Force caching of vert indices if they don't exist yet
+        if not modifier.verts:
+            modifier.updateValue(human, modifier.getValue(human), 0)
+            
+        vmin, vmax = aljabr.calcBBox([human.mesh.verts[i] for i in modifier.verts])
+        
+        box = [
+            vmin,
+            [vmax[0], vmin[1], vmin[2]],
+            [vmax[0], vmax[1], vmin[2]],
+            [vmin[0], vmax[1], vmin[2]],
+            [vmin[0], vmin[1], vmax[2]],
+            [vmax[0], vmin[1], vmax[2]],
+            vmax,
+            [vmin[0], vmax[1], vmax[2]]
+        ]
+        
+        for i, v in enumerate(box):
+            box[i] = mh.cameras[0].convertToScreen(v[0], v[1], v[2], human.mesh.object3d)
+            
+        x1, y1, x2, y2 = min([v[0] for v in box]), min([v[1] for v in box]), max([v[0] for v in box]), max([v[1] for v in box])
+        
+        self.measureLine.setPosition([x1, y1, 8.9])
+        self.measureLine.mesh.resize(x2 - x1, y2 - y1)
         
     def hideAllSliders(self):
         for group in self.groupBoxes.itervalues():
@@ -227,32 +289,40 @@ def load(app):
             if bodyZone == "neck":
                 taskview.hideAllSliders()
                 taskview.groupBoxes['neck'].show()
+                taskview.groupBoxes['neck'].children[0].setFocus()
             elif (bodyZone == "r-upperarm") or (bodyZone == "l-upperarm"):
                 taskview.hideAllSliders()
                 taskview.groupBoxes['upperarm'].show()
+                taskview.groupBoxes['upperarm'].children[0].setFocus()
             elif (bodyZone == "r-lowerarm") or (bodyZone == "l-lowerarm"):
                 taskview.hideAllSliders()
                 taskview.groupBoxes['lowerarm'].show()
+                taskview.groupBoxes['lowerarm'].children[0].setFocus()
             elif (bodyZone == "torso") or (bodyZone == "pelvis"):
                 taskview.hideAllSliders()
-                taskview.groupBoxes['torso'].show()              
+                taskview.groupBoxes['torso'].show()
+                taskview.groupBoxes['torso'].children[0].setFocus()
             elif bodyZone == "hip":
                 taskview.hideAllSliders()
-                taskview.groupBoxes['hips'].show()   
+                taskview.groupBoxes['hips'].show()
+                taskview.groupBoxes['hips'].children[0].setFocus()
             elif (bodyZone == "l-upperleg") or (bodyZone == "r-upperleg"):
                 taskview.hideAllSliders()
-                taskview.groupBoxes['upperleg'].show()   
+                taskview.groupBoxes['upperleg'].show()
+                taskview.groupBoxes['upperleg'].children[0].setFocus()
             elif (bodyZone == "l-lowerleg") or (bodyZone == "r-lowerleg"):
                 taskview.hideAllSliders()
-                taskview.groupBoxes['lowerleg'].show() 
+                taskview.groupBoxes['lowerleg'].show()
+                taskview.groupBoxes['lowerleg'].children[0].setFocus()
             elif (bodyZone == "l-foot") or (bodyZone == "r-foot"):
                 taskview.hideAllSliders()
-                taskview.groupBoxes['ankle'].show() 
+                taskview.groupBoxes['ankle'].show()
+                taskview.groupBoxes['ankle'].children[0].setFocus()
             else:
                 taskview.hideAllSliders()
                 
     taskview.hideAllSliders()
-    taskview.groupBoxes['torso'].show()
+    taskview.groupBoxes['neck'].show()
     
 def unload(app):
     print 'Measurement unloaded'

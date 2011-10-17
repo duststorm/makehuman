@@ -865,7 +865,7 @@ class Object3D:
         self.pickable = pickable
         try:
             self.object3d.pickable = pickable
-        except IndexError, text:
+        except AttributeError, text:
             pass
 
     def setTexture(self, path, cache=None):

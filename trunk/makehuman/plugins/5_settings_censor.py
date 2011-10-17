@@ -21,11 +21,13 @@ class CensorTaskView(gui3d.TaskView):
         mesh = gui3d.RectangleMesh(100, 100)
         self.breastCensorship = gui3d.Object(self.app, [0, 0, 9], mesh)
         mesh.setColor([0, 0, 0, 255])
+        mesh.setPickable(0)
         
         self.genitalbreastVertices, _ = human.mesh.getVerticesAndFacesForGroups(['pelvis-genital-area'])
         mesh = gui3d.RectangleMesh(100, 100)
         self.genitalCensorship = gui3d.Object(self.app, [0, 0, 9], mesh)
         mesh.setColor([0, 0, 0, 255])
+        mesh.setPickable(0)
         
         if self.app.settings.get('censor', False):
             self.updateCensor()
