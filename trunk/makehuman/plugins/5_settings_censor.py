@@ -95,7 +95,7 @@ class CensorTaskView(gui3d.TaskView):
         if self.app.settings.get('censor', False):
             mh.callAsync(lambda:self.updateCensor())
         
-    def onTargetsReapplied(self, event):
+    def onHumanTargetsReapplied(self, event):
     
         if self.app.settings.get('censor', False):
             mh.callAsync(lambda:self.updateCensor())
