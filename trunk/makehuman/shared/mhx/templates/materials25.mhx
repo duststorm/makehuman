@@ -11,10 +11,10 @@ Image texture_ref.tif
   use_premultiply True ;
 end Image
 
-Image ambient.tif
-  *** Filename female_young.tif /data/textures/ ;
-  use_premultiply True ;
-end Image
+#Image ambient.tif
+#  *** Filename female_young.tif /data/textures/ ;
+#  use_premultiply True ;
+#end Image
 
 Texture diffuse IMAGE
   Image texture.tif ;
@@ -24,52 +24,12 @@ Texture specularity IMAGE
   Image texture_ref.tif ;
 end Texture
 
-Texture ambient IMAGE
-  Image ambient.tif ;
+#Texture ambient IMAGE
+#  Image ambient.tif ;
+#end Texture
+
+Texture solid IMAGE
 end Texture
-
-Texture white IMAGE
-end Texture
-
-# --------------- Textures for facial morphs  ----------------------------- # 
-
-#if False
-Image brows_mid_down.png
-  *** Filename brows_mid_down.png ./shared/mhx/textures/ ;
-  use_premultiply True ;
-end Image
-
-Image brows_squeeze.png
-  *** Filename brows_squeeze.png ./shared/mhx/textures/ ;
-  use_premultiply True ;
-end Image
-
-Image squint_left.png
-  *** Filename squint_left.png ./shared/mhx/textures/ ;
-  use_premultiply True ;
-end Image
-
-Image squint_right.png
-  *** Filename squint_right.png ./shared/mhx/textures/ ;
-  use_premultiply True ;
-end Image
-
-Texture browsMidDown IMAGE
-  Image brows_mid_down.png ;
-end Texture
-
-Texture browsSqueeze IMAGE
-  Image brows_squeeze.png ;
-end Texture
-
-Texture squint_L IMAGE
-  Image squint_left.png ;
-end Texture
-
-Texture squint_R IMAGE
-  Image squint_right.png ;
-end Texture
-#endif
 
 # --------------- Materials ----------------------------- # 
 
@@ -161,6 +121,7 @@ end Texture
     mapping_z 'Z' ;
   end MTex
 
+#if False
   *** MTex 2 ambient UV AMBIENT_COLOR
     texture Refer Texture ambient ;
     use_map_color_diffuse False ;
@@ -168,7 +129,6 @@ end Texture
     ambient_factor 1 ;
   end MTex
 
-#if False
   *** MTex 3 browsMidDown UV NORMAL
     texture Refer Texture browsMidDown ;
     use_map_color_diffuse False ;

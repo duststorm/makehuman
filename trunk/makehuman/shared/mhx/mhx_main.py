@@ -50,30 +50,52 @@ import read_rig
 #
 
 def exportMhx(human, filename, options):    
-    global theConfig, theHuman
+    global theConfig, theHuman, theCopiedFiles
     theConfig = export_config.exportConfig(human, True, options)
-    (name, ext) = os.path.splitext(filename)
+    (fpath, ext) = os.path.splitext(filename)
 
     if '24' in theConfig.mhxversion:
         mhx_24.exportMhx(human, filename, options)
    
     if '25' in theConfig.mhxversion:
-        theHuman = os.path.basename(name).capitalize().replace(' ','_')
+        fname = os.path.basename(fpath)
+        theHuman = fname.capitalize().replace(' ','_')
+        fname = theHuman.lower()
         time1 = time.clock()
-        filename = name+"-25"+ext
+        if theConfig.separatefolder:
+            theConfig.outFolder = getSubFolder(os.path.dirname(filename), fname)
+            if theConfig.outFolder:
+                outfile = os.path.join(theConfig.outFolder, "%s%s" % (fname, ext)) 
+            theConfig.texFolder = getSubFolder(theConfig.outFolder, "textures")
+            theCopiedFiles = {}
+        if not theConfig.texFolder:
+            outfile = fpath+"-25"+ext
         try:
-            fp = open(filename, 'w')
-            export_config.safePrint("Writing MHX 2.5x file",  filename )
+            fp = open(outfile, 'w')
+            export_config.safePrint("Writing MHX 2.5x file",  outfile )
         except:
-            export_config.safePrint("Unable to open file for writing", filename)
+            export_config.safePrint("Unable to open file for writing", outfile)
             fp = 0
         if fp:
             exportMhx_25(human, fp)
             fp.close()
             time2 = time.clock()
-            export_config.safePrint("Wrote MHX 2.5x file in %g s:" % (time2-time1), filename)
+            export_config.safePrint("Wrote MHX 2.5x file in %g s:" % (time2-time1), outfile)
 
     return
+
+def getSubFolder(path, name):
+    folder = os.path.join(path, name)
+    print(path, name)
+    print("Using folder", folder)
+    if not os.path.exists(folder):
+        print("Creating folder", folder)
+        try:
+            os.mkdir(folder)
+        except:
+            print("Unable to create separate folder %s" % folder)
+            return None
+    return folder            
 
 #
 #    exportMhx_25(human, fp):
@@ -368,10 +390,8 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                 writeMaskDrivers(fp, proxyData)
                 fp.write("  end AnimationData\n")
             elif words[1] == 'Filename':
-                path1 = os.path.expanduser(words[3])
-                (path, filename) = os.path.split(words[2])
-                file1 = os.path.realpath(path1+filename)
-                fp.write("  Filename %s ;\n" % file1)
+                file = getOutFileName(words[2], words[3], True)
+                fp.write("  Filename %s ;\n" % file)
             else:
                 raise NameError("Unknown *** %s" % words[1])
         else:
@@ -397,9 +417,10 @@ def writeBaseMaterials(fp):
     
 def addMaskImage(fp, mask):            
     (folder, file) = mask
+    path = getOutFileName(file, folder, True)
     fp.write(
 "Image %s\n" % file +
-"  Filename %s/%s ;\n" % (folder, file) +
+"  Filename %s ;\n" % path +
 "  use_premultiply True ;\n" +
 "end Image\n\n" +
 "Texture %s IMAGE\n" % file  +
@@ -646,14 +667,38 @@ def copyProxyMaterialFile(pair, proxy, fp):
                 fp.write("%s " % word)
             fp.write("\n")                
         elif words[0] == 'Filename':
-            path1 = os.path.expanduser("./data/clothes/%s/" % proxy.name.lower())
-            (path, filename) = os.path.split(words[1])
-            file1 = os.path.realpath(path1+filename)
-            fp.write("  Filename %s ;\n" % file1)
+            file = getOutFileName(words[1], "./data/clothes/%s/" % proxy.name.lower(), False)
+            fp.write("  Filename %s ;\n" % file)
         else:
             fp.write(line)
     tmpl.close()
     return
+ 
+#
+#   getOutFileName(filePath, fromDir, isTexture):
+#
+
+import shutil
+
+def getOutFileName(filePath, fromDir, isTexture):
+    srcDir = os.path.realpath(os.path.expanduser(fromDir))
+    filename = os.path.basename(filePath)
+    fromPath = os.path.join(srcDir, filename)
+    if theConfig.separatefolder:
+        if isTexture:
+            toPath = os.path.join(theConfig.texFolder, filename)
+        else:
+            toPath = os.path.join(theConfig.outFolder, filename)
+        try:
+            theCopiedFiles[fromPath]
+        except:
+            print("Copy", fromPath, toPath)
+            shutil.copyfile(fromPath, toPath)
+            theCopiedFiles[fromPath] = True
+        return toPath
+    else:
+        return os.path.join(fromPath, filename)
+
        
 #
 #   writeProxyMaterial(fp, mat, proxy, proxyData):
@@ -663,11 +708,14 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
     tex = mat.texture
     if tex:
         #print(theHuman)
+        
         texname = theHuman + os.path.basename(tex)
+        fromDir = os.path.dirname(tex)
+        texfile = getOutFileName(tex, fromDir, True)
         #print("Proxy mat %s %s" % (tex, texname))
         fp.write(
 "Image %s%s\n" % (theHuman,texname) +
-"  Filename %s ;\n" % os.path.realpath(tex) +
+"  Filename %s ;\n" % texfile +
 "  use_premultiply True ;\n" +
 "end Image\n\n" +
 "Texture %s%s IMAGE\n" % (theHuman, texname) +
@@ -722,7 +770,7 @@ def addProxyMaskMTexs(fp, mat, proxy, prxList, lastBlend):
         if zdepth > proxy.z_depth:
             addMaskMTex(fp, prx.mask, 'MULTIPLY', n)
             n += 1
-    addMaskMTex(fp, (None,'white'), 'MIX', n)
+    addMaskMTex(fp, (None,'solid'), 'MIX', n)
     return   
     
 def sortedMasks(proxyData):

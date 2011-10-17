@@ -79,6 +79,9 @@ class CExportConfig:
         self.mainmesh = ['obj', 'mhx', 'dae']
         self.useRig = 'mhx'
         self.mhxversion = ['24', '25']
+        self.separatefolder = False
+        self.outFolder = None
+        self.texFolder = None
         self.proxyList = []
         self.expressions = True
         self.faceshapes = True
@@ -199,6 +202,7 @@ def exportConfig(human, useHair, options=None):
                 except:
                     pass
             elif key in [
+                'separatefolder',
                 'expressions', 'faceshapes', 'bodyshapes', 
                 'breasts', 'biceps', 'malegenitalia',
                 'clothesvisibilitydrivers'
