@@ -84,10 +84,16 @@ def exportMhx(human, filename, options):
 
     return
 
+#
+#   getSubFolder(path, name):
+#   goodName(name)
+#   getOutFileName(filePath, fromDir, isTexture):
+#
+
 def getSubFolder(path, name):
     folder = os.path.join(path, name)
-    print(path, name)
-    print("Using folder", folder)
+    #print(path, name)
+    #print("Using folder", folder)
     if not os.path.exists(folder):
         print("Creating folder", folder)
         try:
@@ -95,7 +101,36 @@ def getSubFolder(path, name):
         except:
             print("Unable to create separate folder %s" % folder)
             return None
-    return folder            
+    return folder        
+    
+def goodName(name):    
+    name = name.replace('- ','_')
+    name = name.replace(' ','_')
+    return name.lower()    
+
+import shutil
+
+def getOutFileName(filePath, fromDir, isTexture):
+    #print("Out", filePath, fromDir)
+    srcDir = os.path.realpath(os.path.expanduser(fromDir))
+    filename = goodName(os.path.basename(filePath))
+    fromPath = os.path.join(srcDir, filename)
+    if theConfig.separatefolder:
+        if isTexture:
+            toPath = os.path.join(theConfig.texFolder, filename)
+        else:
+            toPath = os.path.join(theConfig.outFolder, filename)
+        try:
+            theCopiedFiles[fromPath]
+        except:
+            print("Copy", fromPath, toPath)
+            shutil.copyfile(fromPath, toPath)
+            theCopiedFiles[fromPath] = True
+        #print("To", toPath)
+        return toPath
+    else:
+        #print("To", fromPath)
+        return fromPath
 
 #
 #    exportMhx_25(human, fp):
@@ -667,38 +702,12 @@ def copyProxyMaterialFile(pair, proxy, fp):
                 fp.write("%s " % word)
             fp.write("\n")                
         elif words[0] == 'Filename':
-            file = getOutFileName(words[1], "./data/clothes/%s/" % proxy.name.lower(), False)
+            file = getOutFileName(words[1], "./data/clothes/%s/" % goodName(proxy.name), False)
             fp.write("  Filename %s ;\n" % file)
         else:
             fp.write(line)
     tmpl.close()
     return
- 
-#
-#   getOutFileName(filePath, fromDir, isTexture):
-#
-
-import shutil
-
-def getOutFileName(filePath, fromDir, isTexture):
-    srcDir = os.path.realpath(os.path.expanduser(fromDir))
-    filename = os.path.basename(filePath)
-    fromPath = os.path.join(srcDir, filename)
-    if theConfig.separatefolder:
-        if isTexture:
-            toPath = os.path.join(theConfig.texFolder, filename)
-        else:
-            toPath = os.path.join(theConfig.outFolder, filename)
-        try:
-            theCopiedFiles[fromPath]
-        except:
-            print("Copy", fromPath, toPath)
-            shutil.copyfile(fromPath, toPath)
-            theCopiedFiles[fromPath] = True
-        return toPath
-    else:
-        return os.path.join(fromPath, filename)
-
        
 #
 #   writeProxyMaterial(fp, mat, proxy, proxyData):
