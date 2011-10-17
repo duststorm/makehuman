@@ -90,7 +90,7 @@ class CensorTaskView(gui3d.TaskView):
         
     def onResized(self, event):
         
-        pass
+        self.updateCensor()
         
     def onHumanChanged(self, event):
     
