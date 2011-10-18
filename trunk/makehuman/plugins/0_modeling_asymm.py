@@ -82,7 +82,7 @@ class AsymmTaskView(gui3d.TaskView):
             
             after = self.getTargetsAndValues(bodyPartName)
             
-            self.app.did(humanmodifier.Action(self.human, self.before, after, self.syncSliders))
+            self.app.did(humanmodifier.DetailAction(self.human, self.before, after, self.syncSliders))
             
             self.before = None
 
