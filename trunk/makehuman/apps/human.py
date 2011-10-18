@@ -131,6 +131,8 @@ class Human(gui3d.Object):
         for obj in self.clothesObjs.values():
             if obj:
                 obj.setPosition([x+y for x, y in zip(obj.getPosition(), dv)])
+                
+        self.callEvent('onTranslated', self)
 
     def setRotation(self, rotation):
         gui3d.Object.setRotation(self, rotation)
@@ -139,6 +141,8 @@ class Human(gui3d.Object):
         for obj in self.clothesObjs.values():
             if obj:
                 obj.setRotation(rotation)
+                
+        self.callEvent('onRotated', self)
             
     def setSolid(self, *args, **kwargs):
         gui3d.Object.setSolid(self, *args, **kwargs)

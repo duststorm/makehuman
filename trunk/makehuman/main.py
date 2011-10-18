@@ -83,6 +83,122 @@ from aljabr import centroid
 import algos3d
 #import font3d
 
+class Camera(events3d.EventHandler):
+
+    def __init__(self):
+    
+        self.camera = mh.Camera();
+        self.changedPending = False;
+        
+    @property
+    def projection(self):
+    
+        return self.camera.projection
+
+    @projection.setter
+    def projection(self, value):
+    
+        self.camera.projection = value
+        self.changed()
+        
+    @property
+    def fovAngle(self):
+    
+        return self.camera.fovAngle
+
+    @fovAngle.setter
+    def fovAngle(self, value):
+    
+        self.camera.fovAngle = value
+        self.changed()
+    
+    @property
+    def eyeX(self):
+    
+        return self.camera.eyeX
+
+    @eyeX.setter
+    def eyeX(self, value):
+    
+        self.camera.eyeX = value
+        self.changed()
+        
+    @property
+    def eyeY(self):
+    
+        return self.camera.eyeY
+
+    @eyeY.setter
+    def eyeY(self, value):
+    
+        self.camera.eyeY = value
+        self.changed()
+    
+    @property
+    def eyeZ(self):
+    
+        return self.camera.eyeZ
+
+    @eyeZ.setter
+    def eyeZ(self, value):
+    
+        self.camera.eyeZ = value
+        self.changed()
+        
+    @property
+    def focusX(self):
+    
+        return self.camera.focusX
+
+    @focusX.setter
+    def focusX(self, value):
+    
+        self.camera.focusX = value
+        self.changed()
+        
+    @property
+    def focusY(self):
+    
+        return self.camera.focusY
+
+    @focusY.setter
+    def focusY(self, value):
+    
+        self.camera.focusY = value
+        self.changed()
+    
+    @property
+    def focusZ(self):
+    
+        return self.camera.focusZ
+
+    @focusZ.setter
+    def focusZ(self, value):
+    
+        self.camera.focusZ = value
+        self.changed()
+        
+    def convertToScreen(self, x, y, z, obj=None):
+    
+        return self.camera.convertToScreen(x, y, z, obj)
+        
+    def convertToWorld3D(self, x, y, z):
+    
+        return self.camera.convertToWorld3D(x, y, z)
+        
+    def changed(self):
+        
+        if self.changedPending:
+            return
+            
+        self.changedPending = True
+        mh.callAsync(self.callChanged)
+        
+    def callChanged(self):
+    
+        self.callEvent('onChanged', self)
+        self.changedPending = False
+
 class PluginCheckBox(gui3d.CheckBox):
 
     def __init__(self, parent, module):
@@ -114,15 +230,23 @@ class MHApplication(gui3d.Application):
     def __init__(self):
         gui3d.Application.__init__(self)
 
-        self.modelCamera = mh.Camera()
+        self.modelCamera = Camera()
+        
+        @self.modelCamera.event
+        def onChanged(event):
+            for category in self.categories.itervalues():
+                
+                for task in category.tasks:
+                    
+                    task.callEvent('onCameraChanged', event)
 
-        mh.cameras.append(self.modelCamera)
+        mh.cameras.append(self.modelCamera.camera)
 
-        self.guiCamera = mh.Camera()
+        self.guiCamera = Camera()
         self.guiCamera.fovAngle = 45
         self.guiCamera.eyeZ = 10
         self.guiCamera.projection = 0
-        mh.cameras.append(self.guiCamera)
+        mh.cameras.append(self.guiCamera.camera)
 
         self.setTheme("default")
         #self.setTheme("3d")
@@ -293,6 +417,24 @@ class MHApplication(gui3d.Application):
                 for task in category.tasks:
                     
                     task.callEvent('onHumanTargetsReapplied', event)
+                    
+        @self.selectedHuman.event
+        def onTranslated(event):
+            
+            for category in self.categories.itervalues():
+                
+                for task in category.tasks:
+                    
+                    task.callEvent('onHumanTranslated', event)
+                    
+        @self.selectedHuman.event
+        def onRotated(event):
+            
+            for category in self.categories.itervalues():
+                
+                for task in category.tasks:
+                    
+                    task.callEvent('onHumanRotated', event)
 
         # Set up categories and tasks
         
@@ -815,11 +957,11 @@ class MHApplication(gui3d.Application):
         self.switchCategory("Help")
           
     def toggleStereo(self):
-        stereoMode = mh.cameras[0].stereoMode
+        stereoMode = self.modelCamera.stereoMode
         stereoMode += 1
         if stereoMode > 2:
             stereoMode = 0
-        mh.cameras[0].stereoMode = stereoMode
+        self.modelCamera.stereoMode = stereoMode
 
         # We need a black background for stereo
         if stereoMode:
@@ -918,12 +1060,12 @@ class MHApplication(gui3d.Application):
         
     def zoomOut(self):
         speed = self.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.KMOD_SHIFT else self.app.settings.get('lowspeed', 1)
-        mh.cameras[0].eyeZ += 0.65 * speed
+        self.modelCamera.eyeZ += 0.65 * speed
         self.redraw()
         
     def zoomIn(self):
         speed = self.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.KMOD_SHIFT else self.app.settings.get('lowspeed', 1)
-        mh.cameras[0].eyeZ -= 0.65 * speed
+        self.modelCamera.eyeZ -= 0.65 * speed
         self.redraw()
         
     def frontView(self):
@@ -980,7 +1122,7 @@ class MHApplication(gui3d.Application):
         if self.app.settings.get('invertMouseWheel', False):
             speed *= -1
         
-        mh.cameras[0].eyeZ -= 0.05 * event.dy * speed
+        self.modelCamera.eyeZ -= 0.05 * event.dy * speed
         
     def promptAndExit(self):
         if self.undoStack:

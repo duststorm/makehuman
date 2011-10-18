@@ -101,6 +101,21 @@ class CensorTaskView(gui3d.TaskView):
     
         if self.app.settings.get('censor', False):
             mh.callAsync(lambda:self.updateCensor())
+            
+    def onHumanTranslated(self, event):
+    
+        if self.app.settings.get('censor', False):
+            mh.callAsync(lambda:self.updateCensor())
+            
+    def onHumanRotated(self, event):
+    
+        if self.app.settings.get('censor', False):
+            mh.callAsync(lambda:self.updateCensor())
+
+    def onCameraChanged(self, event):
+    
+        if self.app.settings.get('censor', False):
+            mh.callAsync(lambda:self.updateCensor())
 
 def load(app):
     category = app.getCategory('Settings')

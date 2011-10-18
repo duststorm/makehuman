@@ -93,7 +93,7 @@ class ResizeEvent(Event):
         return 'ResizeEvent(%d, %d, %s, %d, %d)' % (self.width, self.height, self.fullscreen, self.dx, self.dy)
         
 
-class EventHandler:
+class EventHandler(object):
 
     def __init__(self):
         pass
