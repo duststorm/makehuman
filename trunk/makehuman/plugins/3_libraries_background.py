@@ -27,7 +27,7 @@ __docformat__ = 'restructuredtext'
 
 import gui3d
 import mh
-
+import os
 
 class BackgroundTaskView(gui3d.TaskView):
 
@@ -57,15 +57,15 @@ class BackgroundTaskView(gui3d.TaskView):
                 self.app.switchCategory('Library')
                 self.app.switchTask('Background')
                 
-        self.filechooser = gui3d.FileChooser(self, 'backgrounds', ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None)
+        self.filechooser = gui3d.FileChooser(self, os.path.join(mh.getPath(''), 'backgrounds'), ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None)
 
         @self.filechooser.event
         def onFileSelected(filename):
             print 'Loading %s' % filename
-            self.texture.loadImage('backgrounds/' + filename)
+            self.texture.loadImage(os.path.join(mh.getPath(''), 'backgrounds', filename))
 
             bg = self.backgroundImage
-            bg.mesh.setTexture('backgrounds/' + filename)
+            bg.mesh.setTexture(os.path.join(mh.getPath(''), 'backgrounds', filename))
             bg.mesh.setColor([255, 255, 255, self.opacity])
             if self.texture.width > self.texture.height:
                 bg.setScale(1.0, float(self.texture.height) / float(self.texture.width))
@@ -81,7 +81,7 @@ class BackgroundTaskView(gui3d.TaskView):
         
         gui3d.TaskView.onShow(self, event)
         self.app.selectedHuman.hide()
-        self.app.prompt('Info', 'Images which are placed in your personal makehuman backgrounds folder will show up here. Usually your personal makehuman folder is in My Documents on windows and in your home folder on linux.',
+        self.app.prompt('Info', u'Images which are placed in %s will show up here.' % os.path.join(mh.getPath(''), u'backgrounds'),
             'OK', helpId='backgroundHelp')
         self.filechooser.setFocus()
 

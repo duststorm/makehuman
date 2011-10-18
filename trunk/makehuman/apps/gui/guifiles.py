@@ -473,7 +473,7 @@ class ExportTaskView(gui3d.TaskView):
                 else:
                     mh2stl.exportStlBinary(mesh, os.path.join(exportPath, filename + ".stl"))
                     
-            self.app.prompt('Info', 'The mesh has been exported to the exports folder in your personal makehuman folder. Usually your personal makehuman folder is in My Documents on windows and in your home folder on linux.', 'OK', helpId='infoExport')
+            self.app.prompt('Info', u'The mesh has been exported to %s.' % os.path.join(mh.getPath(''), u'exports'), 'OK', helpId='exportHelp')
 
             self.app.switchCategory('Modelling')
             
