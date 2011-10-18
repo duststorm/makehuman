@@ -48,6 +48,7 @@ import aljabr
 import time
 from types import *
 import os
+import weakref
 from fastmath import vnorm3d
 
 textureCache = {}
@@ -576,7 +577,7 @@ class FaceGroup:
         for f in self.__faces:
             f.setColor(color)
 
-class Object3D:
+class Object3D(object):
 
     """
     A 3D object, made up of faces and vertices (i.e. containing Face objects and Vert objects).
