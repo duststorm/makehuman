@@ -76,7 +76,10 @@ class Font:
         # print(self.charMap)
 
     def getAbsoluteCoordsForChar(self, char):
-        charRecord = self.charMap[ord(char)]
+        try:
+            charRecord = self.charMap[ord(char)]
+        except:
+            charRecord = self.charMap[ord('?')]
         x1 = charRecord['xoffset']
         y1 = charRecord['yoffset']
         x2 = charRecord['xoffset'] + charRecord['width']
@@ -85,7 +88,10 @@ class Font:
         return (x1, y1, x2, y2, advance)
 
     def getRelativeSizesForChar(self, char):
-        charRecord = self.charMap[ord(char)]
+        try:
+            charRecord = self.charMap[ord(char)]
+        except:
+            charRecord = self.charMap[ord('?')]
         x1 = float(charRecord['xoffset']) / float(self.width)
         y1 = float(charRecord['yoffset']) / float(self.height)
         x2 = float(charRecord['xoffset'] + charRecord['width']) / float(self.width)
@@ -94,7 +100,10 @@ class Font:
         return (x1, y1, x2, y2, advance)
 
     def getTextureCoordinatesForChar(self, char):
-        charRecord = self.charMap[ord(char)]
+        try:
+            charRecord = self.charMap[ord(char)]
+        except:
+            charRecord = self.charMap[ord('?')]
         u1 = float(charRecord['x']) / float(self.width)
         v1 = 1.0 - float(charRecord['y']) / float(self.height)
         u2 = float(charRecord['x'] + charRecord['width']) / float(self.width)
