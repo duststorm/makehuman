@@ -188,17 +188,17 @@ class LoadTaskView(gui3d.TaskView):
 
             human = self.app.selectedHuman
 
-            human.load(os.path.join(modelPath, filename), True, self.app.progress)
+            human.load(filename, True, self.app.progress)
 
             del self.app.undoStack[:]
             del self.app.redoStack[:]
             
-            name = filename.replace('.mhm', '')
+            name = os.path.basename(filename).replace('.mhm', '')
 
             self.parent.tasksByName['Save'].fileentry.text = name
             self.parent.tasksByName['Save'].fileentry.edit.setText(name)
             
-            mh.setCaption("MakeHuman - [%s]" % name)
+            mh.setCaption(("MakeHuman - [%s]" % name).encode("utf8"))
 
             self.app.switchCategory('Modelling')
 
