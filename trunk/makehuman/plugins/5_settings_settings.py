@@ -14,8 +14,8 @@ class LanguageRadioButton(gui3d.RadioButton):
     def onClicked(self, event):
     
         gui3d.RadioButton.onClicked(self, event)
-        self.app.settings['language'] = language
-        self.app.setLanguage(language)
+        self.app.settings['language'] = self.language
+        self.app.setLanguage(self.language)
         self.app.prompt('Info', 'You need to restart for your language changes to be applied.', 'OK', helpId='languageHelp')  
 
 class SettingsTaskView(gui3d.TaskView):
@@ -67,7 +67,7 @@ class SettingsTaskView(gui3d.TaskView):
         
         languages = []
         
-        languageBox = self.languageBox = gui3d.GroupBox(self, [650, y, 9.0], 'Font');y += 25
+        languageBox = self.languageBox = gui3d.GroupBox(self, [650, y, 9.0], 'Language');y += 25
         LanguageRadioButton(languageBox, languages, 'english');y += 24
         
         languageFiles = [os.path.basename(filename).replace('.ini', '') for filename in os.listdir('data/languages') if filename.split(os.extsep)[-1] == "ini"]

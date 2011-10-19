@@ -606,7 +606,7 @@ class MHApplication(gui3d.Application):
         
         self.saveSettings()
         self.unloadPlugins()
-        
+        self.dumpMissingStrings()
         
     def onQuit(self, event):
         
@@ -817,9 +817,24 @@ class MHApplication(gui3d.Application):
             try:
                 return self.languageStrings[string]
             except:
+                if not hasattr(self, 'missingStrings'):
+                    self.missingStrings = set();
+                self.missingStrings.add(string)
                 return string
         else:
             return string
+            
+    def dumpMissingStrings(self):
+    
+        if not hasattr(self, 'missingStrings'):
+            return
+            
+        f = open(os.path.join("data/languages/", self.settings['language'] + ".missing"), 'w')
+        for string in self.missingStrings:
+            f.write("'")
+            f.write(string.encode('utf8'))
+            f.write("':'',\n")
+        f.close()
       
     # Font resources
     def getFont(self, fontFamily):
