@@ -108,7 +108,6 @@ class CMaterial:
 def getFileName(folder, file, suffix):
     folder = os.path.realpath(os.path.expanduser(folder))
     folder = folder.lower()
-    #print("GetFolder", folder)
     (name, ext) = os.path.split(file)
     if ext:
         return (folder, file)
@@ -327,7 +326,6 @@ def readProxyFile(obj, file, evalOnLoad):
 def copyObjFile(proxy):
     (folder, name) = proxy.obj_file
     objpath = os.path.join(folder, name)
-    print("cof", objpath)
     try:
         tmpl = open(objpath, "rU")
     except:

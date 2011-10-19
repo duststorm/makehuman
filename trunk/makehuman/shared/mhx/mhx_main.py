@@ -111,9 +111,8 @@ def goodName(name):
 import shutil
 
 def getOutFileName(filePath, fromDir, isTexture):
-    #print("Out", filePath, fromDir)
     srcDir = os.path.realpath(os.path.expanduser(fromDir))
-    filename = goodName(os.path.basename(filePath))
+    filename = os.path.basename(filePath)
     fromPath = os.path.join(srcDir, filename)
     if theConfig.separatefolder:
         if isTexture:
@@ -123,13 +122,10 @@ def getOutFileName(filePath, fromDir, isTexture):
         try:
             theCopiedFiles[fromPath]
         except:
-            print("Copy", fromPath, toPath)
             shutil.copyfile(fromPath, toPath)
             theCopiedFiles[fromPath] = True
-        #print("To", toPath)
         return toPath
     else:
-        #print("To", fromPath)
         return fromPath
 
 #
@@ -685,7 +681,6 @@ def writeHideAnimationData(fp, prefix, name):
 def copyProxyMaterialFile(pair, proxy, fp):
     (dir, file) = pair
     infile = os.path.realpath(os.path.expanduser("%s/%s" % (dir, file)))
-    print("Pxmat", infile)
     tmpl = open(infile, "rU")
     for line in tmpl:
         words= line.split()
@@ -702,7 +697,7 @@ def copyProxyMaterialFile(pair, proxy, fp):
                 fp.write("%s " % word)
             fp.write("\n")                
         elif words[0] == 'Filename':
-            file = getOutFileName(words[1], "./data/clothes/%s/" % goodName(proxy.name), False)
+            file = getOutFileName(words[1], "./data/clothes/%s/" % proxy.name, False)
             fp.write("  Filename %s ;\n" % file)
         else:
             fp.write(line)
@@ -721,7 +716,6 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
         texname = theHuman + os.path.basename(tex)
         fromDir = os.path.dirname(tex)
         texfile = getOutFileName(tex, fromDir, True)
-        #print("Proxy mat %s %s" % (tex, texname))
         fp.write(
 "Image %s%s\n" % (theHuman,texname) +
 "  Filename %s ;\n" % texfile +
@@ -935,7 +929,6 @@ def useThisShape(name, proxy):
         return True
     if name[:-2] in proxy.shapekeys:
         return True
-    #print('IGN', name, proxy.name)
     return False
 
 #

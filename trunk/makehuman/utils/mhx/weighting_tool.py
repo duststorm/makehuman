@@ -181,6 +181,37 @@ class VIEW3D_OT_MhxUnvertexDiamondsButton(bpy.types.Operator):
         print("Diamonds unvertexed")
         return{'FINISHED'}    
 
+#
+#    deleteDiamonds(context)
+#    Delete joint diamonds in main mesh
+#    class VIEW3D_OT_MhxDeleteDiamondsButton(bpy.types.Operator):
+#
+
+def deleteDiamonds(context):
+    ob = context.object
+    print("Delete diamonds in %s" % bpy.context.object)
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='DESELECT')
+    bpy.ops.object.mode_set(mode='OBJECT')
+    me = ob.data
+    for f in me.faces:        
+        if len(f.vertices) < 4:
+            for vn in f.vertices:
+                me.vertices[vn].select = True
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.delete(type='VERT')
+    bpy.ops.object.mode_set(mode='OBJECT')
+    return
+    
+class VIEW3D_OT_MhxDeleteDiamondsButton(bpy.types.Operator):
+    bl_idname = "mhx.weight_delete_diamonds"
+    bl_label = "Delete diamonds"
+
+    def execute(self, context):
+        deleteDiamonds(context)
+        print("Diamonds deleted")
+        return{'FINISHED'}    
+    
 
 #
 #    pairWeight(context):
@@ -723,6 +754,7 @@ class MhxWeightToolsPanel(bpy.types.Panel):
         layout.operator("mhx.weight_select_quads")
         layout.operator("mhx.weight_remove_vertex_groups")
         layout.operator("mhx.weight_unvertex_diamonds")
+        layout.operator("mhx.weight_delete_diamonds")
         layout.operator("mhx.weight_recover_diamonds")
 
         layout.separator()
