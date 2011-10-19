@@ -1864,6 +1864,10 @@ def floatValidator(text):
     
     return not text or (text.replace('.', '').isdigit() and text.count('.') <= 1) or (text[0] == '-' and (len(text) == 1 or text[1:].replace('.', '').isdigit()) and text.count('.') <= 1) # Negative sign and optionally digits with optionally 1 decimal point
 
+def filenameValidator(text):
+
+    return not text or len(set(text) & set('\\/:*?"<>|')) == 0
+
 # FileEntryView widget
 
 
@@ -1876,7 +1880,7 @@ class FileEntryView(View):
     def __init__(self, parent, buttonLabel):
         View.__init__(self, parent)
 
-        self.edit = TextEdit(self, style=TextEditStyle._replace(left=200, top=90, zIndex=9.5))
+        self.edit = TextEdit(self, style=TextEditStyle._replace(left=200, top=90, zIndex=9.5), validator=filenameValidator)
         self.bConfirm = Button(self, buttonLabel, style=ButtonStyle._replace(width=40, height=20, left=610, top=90, zIndex=9.1))
 
         @self.bConfirm.event
