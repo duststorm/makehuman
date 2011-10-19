@@ -806,6 +806,9 @@ class MHApplication(gui3d.Application):
             try:
                 self.languageStrings = eval(f.read(), {"__builtins__":None}, {'True':True, 'False':False})
             except:
+                import traceback
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                print ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback))
                 print('Error in language file %s' % language)
                 self.languageStrings = None
             f.close()

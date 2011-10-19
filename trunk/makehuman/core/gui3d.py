@@ -2413,7 +2413,7 @@ class GroupBox(View):
             font = self.app.getFont(self.style.fontFamily)
             self.label = TextObject(self,
                 [position[0]+self.style.padding[0],position[1]+self.style.padding[1]/2-font.lineHeight/2,position[2]+0.001],
-                label,
+                self.app.getLanguageString(label),
                 fontSize = self.style.fontSize)
     
     def getPosition(self):
