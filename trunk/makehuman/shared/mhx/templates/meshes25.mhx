@@ -55,13 +55,13 @@ end Mesh
   *** toggleCage
     Modifier MeshDeform MESH_DEFORM
       invert_vertex_group False ;
-      object Refer Object CageMesh ;
+      *** refer-human object CageMesh ;
       precision 5 ;
       use_dynamic_bind True ;
     end Modifier
     Modifier Armature ARMATURE
       invert_vertex_group False ;
-      *** refer-human object ControlRig
+      *** refer-human object
       use_bone_envelopes False ;
       use_deform_preserve_volume False ;
       use_multi_modifier True ;
@@ -70,12 +70,12 @@ end Mesh
     end Modifier
   #else
     Modifier Armature ARMATURE
-      *** refer-human object ControlRig
+      *** refer-human object
       use_bone_envelopes False ;
       use_vertex_groups True ;
     end Modifier
   #endif
-  *** refer-human parent ControlRig
+  *** refer-human parent
   parent_type 'OBJECT' ;
 #endif
   color Array 1.0 1.0 1.0 1.0  ;

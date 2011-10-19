@@ -212,6 +212,7 @@ def findClothes(context, bob, pob, log):
     print("Optimal triangles not found for the following verts")
     for (pv, exact, mverts, fcs) in bestVerts:
         #print(pv.index)
+        pv.select = False
         if exact:
             bestFaces.append((pv, True, mverts, 0, 0))
             continue
@@ -224,6 +225,7 @@ def findClothes(context, bob, pob, log):
                 bVerts = fverts
         if minmax < theThreshold:
             print(pv.index)
+            pv.select = True
             if scn['MakeClothesForbidFailures']:
                 vn = pv.index
                 selectVert(context, vn, pob)

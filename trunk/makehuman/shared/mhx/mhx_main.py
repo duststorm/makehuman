@@ -233,19 +233,17 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
             fp.write(line)
         elif words[0] == '***':
             if words[1] == 'refer-human':
-                if words[3] == 'ControlRig' or theConfig.useRig != 'mhx':
-                    fp.write("    %s Refer Object %s ;\n" % (words[2], theHuman))
+                if len(words) > 3:
+                    suffix = words[3]
                 else:
-                    raise NameError("refer-human: %s" % line)
+                    suffix = ""
+                fp.write("    %s Refer Object %s%s ;\n" % (words[2], theHuman, suffix))
             elif words[1] == 'rig-bones':
-                if words[2] == 'ControlRig':
-                    fp.write("Armature %s %s   Normal \n" % (theHuman, theHuman))
-                    if type(rig) == str:
-                        mhx_rig.writeControlArmature(fp)
-                    else:
-                        mh2proxy.writeRigBones(fp, rig.bones)
+                fp.write("Armature %s %s   Normal \n" % (theHuman, theHuman))
+                if type(rig) == str:
+                    mhx_rig.writeControlArmature(fp)
                 else:
-                    raise NameError("rig-bones: %s" % line)
+                    mh2proxy.writeRigBones(fp, rig.bones)
             elif words[1] == 'human-object':
                 if words[2] == 'Mesh':
                     fp.write(
@@ -256,25 +254,21 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                 elif words[2] == 'ControlRig':
                     fp.write("Object %s ARMATURE %s\n"  % (theHuman, theHuman))
             elif words[1] == 'rig-poses':
-                if words[2] == 'ControlRig':
-                    if type(rig) == str:
-                        fp.write("Pose %s\n" % theHuman)
-                        mhx_rig.writeControlPoses(fp)
-                        fp.write("  ik_solver 'LEGACY' ;\nend Pose\n")
-                    else:
-                        mh2proxy.writeRigPose(fp, rig.name, rig.bones)
+                if type(rig) == str:
+                    fp.write("Pose %s\n" % theHuman)
+                    mhx_rig.writeControlPoses(fp)
+                    fp.write("  ik_solver 'LEGACY' ;\nend Pose\n")
+                else:
+                    mh2proxy.writeRigPose(fp, rig.name, rig.bones)
             elif words[1] == 'rig-actions':
                 if type(rig) == str:
                     fp.write("Pose %s\nend Pose\n" % theHuman)
                     mhx_rig.writeAllActions(fp)
             elif words[1] == 'rig-drivers':
                 if type(rig) == str:
-                    if words[2] == 'ControlRig':
-                        fp.write("AnimationData %s True\n" % theHuman)
-                        mhx_rig.writeAllDrivers(fp)
-                        rigDriversEnd(fp)
-                    else:
-                        raise NameError("rig-drivers: %s" % line)
+                    fp.write("AnimationData %s True\n" % theHuman)
+                    mhx_rig.writeAllDrivers(fp)
+                    rigDriversEnd(fp)
             elif words[1] == 'rig-correct':
                 fp.write("CorrectRig %s ;\n" % theHuman)
             elif words[1] == 'recalc-roll':

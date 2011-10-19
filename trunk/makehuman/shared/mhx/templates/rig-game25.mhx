@@ -2,7 +2,7 @@
 
 NoScale False ;
 
-  *** rig-bones ControlRig
+  *** rig-bones
 
   use_deform_envelopes False ;
   use_deform_vertex_groups True ;

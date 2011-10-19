@@ -9,8 +9,8 @@
 
 #if toggle&T_Armature
 # *** rig-actions
-*** rig-poses ControlRig
-*** rig-drivers ControlRig
+*** rig-poses
+*** rig-drivers
 *** rig-correct
 #endif 
 

@@ -60,7 +60,7 @@ end Mesh
    *** toggleCage
     Modifier MeshDeform MESH_DEFORM
       invert_vertex_group False ;
-      object Refer Object CageMesh ;
+      *** refer-human object CageMesh ;
       precision 5 ;
       use_dynamic_bind True ;
     end Modifier
