@@ -2,7 +2,22 @@
 # -*- coding: utf-8 -*-
 # We need this for gui controls
 
-import gui3d, mh
+import gui3d, mh, os
+
+class LanguageRadioButton(gui3d.RadioButton):
+
+    def __init__(self, parent, group, language):
+    
+        gui3d.RadioButton.__init__(self, parent, group, language.capitalize(), parent.app.settings.get('language', 'english') == language)
+        self.language = language
+        
+    def onClicked(self, event):
+    
+        gui3d.RadioButton.onClicked(self, event)
+        self.app.settings['language'] = language
+        self.app.setLanguage(language)
+        self.app.prompt('Info', 'You need to restart for your language changes to be applied.', 'OK', helpId='languageHelp')  
+
 class SettingsTaskView(gui3d.TaskView):
 
     def __init__(self, category):
@@ -53,8 +68,11 @@ class SettingsTaskView(gui3d.TaskView):
         languages = []
         
         languageBox = self.languageBox = gui3d.GroupBox(self, [650, y, 9.0], 'Font');y += 25
-        english = gui3d.RadioButton(languageBox, languages, 'English', self.app.settings.get('language', 'english') == 'english');y += 24
-        japanese = gui3d.RadioButton(languageBox, languages, 'Japanese', self.app.settings.get('language', 'japanese') == 'japanese');y += 24
+        LanguageRadioButton(languageBox, languages, 'english');y += 24
+        
+        languageFiles = [os.path.basename(filename).replace('.ini', '') for filename in os.listdir('data/languages') if filename.split(os.extsep)[-1] == "ini"]
+        for language in languageFiles:
+            LanguageRadioButton(languageBox, languages, language);y += 24
         
         @self.shaderNo.event
         def onClicked(event):
@@ -133,22 +151,6 @@ class SettingsTaskView(gui3d.TaskView):
             gui3d.RadioButton.onClicked(verdana, event)
             self.app.settings['font'] = 'verdana'
             self.app.prompt('Info', 'You need to restart for your font changes to be applied.',
-                'OK', helpId='fontHelp')
-                
-        @english.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(english, event)
-            self.app.settings['language'] = 'english'
-            self.app.setLanguage('english')
-            self.app.prompt('Info', 'You need to restart for your language changes to be applied.',
-                'OK', helpId='fontHelp')
-            
-        @japanese.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(japanese, event)
-            self.app.settings['language'] = 'japanese'
-            self.app.setLanguage('japanese')
-            self.app.prompt('Info', 'You need to restart for your language changes to be applied.',
                 'OK', helpId='fontHelp')
                 
     def setShader(self, vertex, fragment):
