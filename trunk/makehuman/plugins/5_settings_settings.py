@@ -1,4 +1,4 @@
-#!/usr/bin/python
+﻿#!/usr/bin/python
 # -*- coding: utf-8 -*-
 # We need this for gui controls
 
@@ -42,11 +42,19 @@ class SettingsTaskView(gui3d.TaskView):
         
         fonts = []
         
-        unitBox = self.unitsBox = gui3d.GroupBox(self, [650, 80, 9.0], 'Font')
-        arial = gui3d.RadioButton(unitBox, fonts, 'Arial', self.app.settings.get('font', 'arial') == 'arial', style=gui3d.RadioButtonStyle._replace(fontFamily='arial'))
-        courier = gui3d.RadioButton(unitBox, fonts, 'Courier', self.app.settings.get('font', 'arial') == 'courier', style=gui3d.RadioButtonStyle._replace(fontFamily='courier'))
-        ubuntu = gui3d.RadioButton(unitBox, fonts, 'Ubuntu', self.app.settings.get('font', 'arial') == 'ubuntu', style=gui3d.RadioButtonStyle._replace(fontFamily='ubuntu'))
-        verdana = gui3d.RadioButton(unitBox, fonts, 'Verdana', self.app.settings.get('font', 'arial') == 'verdana', style=gui3d.RadioButtonStyle._replace(fontFamily='verdana'))
+        y = 80
+        unitBox = self.unitsBox = gui3d.GroupBox(self, [650, y, 9.0], 'Font');y += 25
+        arial = gui3d.RadioButton(unitBox, fonts, 'Arial', self.app.settings.get('font', 'arial') == 'arial', style=gui3d.RadioButtonStyle._replace(fontFamily='arial'));y += 24
+        courier = gui3d.RadioButton(unitBox, fonts, 'Courier', self.app.settings.get('font', 'arial') == 'courier', style=gui3d.RadioButtonStyle._replace(fontFamily='courier'));y += 24
+        ubuntu = gui3d.RadioButton(unitBox, fonts, 'Ubuntu', self.app.settings.get('font', 'arial') == 'ubuntu', style=gui3d.RadioButtonStyle._replace(fontFamily='ubuntu'));y += 24
+        verdana = gui3d.RadioButton(unitBox, fonts, 'Verdana', self.app.settings.get('font', 'arial') == 'verdana', style=gui3d.RadioButtonStyle._replace(fontFamily='verdana'));y += 24
+        y+=16
+        
+        languages = []
+        
+        languageBox = self.languageBox = gui3d.GroupBox(self, [650, y, 9.0], 'Font');y += 25
+        english = gui3d.RadioButton(languageBox, languages, 'English', self.app.settings.get('language', 'english') == 'english');y += 24
+        japanese = gui3d.RadioButton(languageBox, languages, 'Japanese', self.app.settings.get('language', 'japanese') == 'japanese');y += 24
         
         @self.shaderNo.event
         def onClicked(event):
@@ -125,6 +133,22 @@ class SettingsTaskView(gui3d.TaskView):
             gui3d.RadioButton.onClicked(verdana, event)
             self.app.settings['font'] = 'verdana'
             self.app.prompt('Info', 'You need to restart for your font changes to be applied.',
+                'OK', helpId='fontHelp')
+                
+        @english.event
+        def onClicked(event):
+            gui3d.RadioButton.onClicked(english, event)
+            self.app.settings['language'] = 'english'
+            self.app.setLanguage('english')
+            self.app.prompt('Info', 'You need to restart for your language changes to be applied.',
+                'OK', helpId='fontHelp')
+            
+        @japanese.event
+        def onClicked(event):
+            gui3d.RadioButton.onClicked(japanese, event)
+            self.app.settings['language'] = 'japanese'
+            self.app.setLanguage('japanese')
+            self.app.prompt('Info', 'You need to restart for your language changes to be applied.',
                 'OK', helpId='fontHelp')
                 
     def setShader(self, vertex, fragment):

@@ -250,6 +250,7 @@ class MHApplication(gui3d.Application):
 
         self.setTheme("default")
         #self.setTheme("3d")
+        self.setLanguage("english")
         
         self.fonts = {}
         
@@ -262,6 +263,7 @@ class MHApplication(gui3d.Application):
             'units':'metric',
             'invertMouseWheel':False,
             'font':'arial',
+            'language':'english',
             'excludePlugins':[]
         }
         
@@ -716,6 +718,9 @@ class MHApplication(gui3d.Application):
             settings = eval(f.read(), {"__builtins__":None}, {'True':True, 'False':False})
             self.settings.update(settings)
             f.close()
+            
+        if 'language' in self.app.settings:
+            self.setLanguage(self.app.settings['language'])
         
         if os.path.isfile(os.path.join(mh.getPath(''), "shortcuts.ini")):
             self.shortcuts = {}
@@ -769,7 +774,8 @@ class MHApplication(gui3d.Application):
 
     # Themes
     def setTheme(self, theme):
-        f = open("data/themes/" + theme + ".mht", 'r')
+    
+        f = open(os.path.join("data/themes/", theme + ".mht"), 'r')
 
         for data in f.readlines():
             lineData = data.split()
@@ -786,10 +792,34 @@ class MHApplication(gui3d.Application):
     def getThemeResource(self, folder, id):
         if '/' in id:
             return id
-        if os.path.exists("data/themes/" + self.theme + "/" + folder + "/"+ id):
-            return "data/themes/" + self.theme + "/" + folder + "/"+ id
+        path = os.path.join("data/themes/", self.theme, folder, id)
+        if os.path.exists(path):
+            return path
         else:
-            return "data/themes/default/" + folder + "/"+ id
+            return os.path.join("data/themes/default/", folder, id)
+            
+    def setLanguage(self, language):
+        
+        path = os.path.join("data/languages/", language + ".ini")
+        if os.path.isfile(path):
+            f = open(path, 'r')
+            try:
+                self.languageStrings = eval(f.read(), {"__builtins__":None}, {'True':True, 'False':False})
+            except:
+                print('Error in language file %s' % language)
+                self.languageStrings = None
+            f.close()
+        else:
+            self.languageStrings = None
+            
+    def getLanguageString(self, string):
+        if self.languageStrings:
+            try:
+                return self.languageStrings[string]
+            except:
+                return string
+        else:
+            return string
       
     # Font resources
     def getFont(self, fontFamily):

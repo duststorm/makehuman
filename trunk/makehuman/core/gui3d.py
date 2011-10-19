@@ -1114,7 +1114,7 @@ class Slider(View):
             
         if isinstance(label, str):
             font = self.app.getFont(style.fontFamily)
-            self.label = TextObject(self, [style.left, style.top + style.height / 4 - font.lineHeight / 2, style.zIndex + 0.2], label, fontSize = style.fontSize)
+            self.label = TextObject(self, [style.left, style.top + style.height / 4 - font.lineHeight / 2, style.zIndex + 0.2], self.app.getLanguageString(label), fontSize = style.fontSize)
             if '%' in label:
                 self.labelFormat = label
                 self.edit = TextEdit(self, '',
@@ -1372,7 +1372,7 @@ class Button(View):
             wrapWidth = (width - self.style.padding[0] - self.style.padding[2] if self.style.padding else width) if textAlign else 0
             self.label = TextObject(self, [self.style.left + (self.style.padding[0] if self.style.padding else 0), 
                 self.style.top + height/2.0-font.lineHeight/2.0, self.style.zIndex + 0.001],
-                label, wrapWidth, textAlign, fontSize = self.style.fontSize, fontFamily = self.style.fontFamily)
+                self.app.getLanguageString(label), wrapWidth, textAlign, fontSize = self.style.fontSize, fontFamily = self.style.fontFamily)
             
         self.selected = selected
         
