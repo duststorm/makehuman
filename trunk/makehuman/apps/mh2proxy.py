@@ -274,14 +274,11 @@ def readProxyFile(obj, file, evalOnLoad):
                 w0 = float(words[3])
                 w1 = float(words[4])
                 w2 = float(words[5])            
-                try:
-                    proj = float(words[6])
-                except:
-                    proj = 0
 
-                if (not proj) or ignoreOffset:
+                if len(words) < 7 or ignoreOffset:
                     (d0, d1, d2) = (0, 0, 0)
                 elif useProjection:
+                    proj = float(words[6])
                     n0 = aljabr.vmul(verts[v0].no, w0)
                     n1 = aljabr.vmul(verts[v1].no, w1)
                     n2 = aljabr.vmul(verts[v2].no, w2)

@@ -1649,6 +1649,35 @@ class VIEW3D_OT_MhxRemoveVertexGroupsButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
+#   autoVertexGroups(context):
+#   class VIEW3D_OT_MhxAutoVertexGroupsButton(bpy.types.Operator):
+#
+
+def autoVertexGroups(context):
+    ob = context.object
+    mid = ob.vertex_groups.new("Mid")
+    left = ob.vertex_groups.new("Left")
+    right = ob.vertex_groups.new("Right")
+    for v in ob.data.vertices:
+        if v.co[0] > 0.01:
+            left.add([v.index], 1.0, 'REPLACE')
+        elif v.co[0] < -0.01:
+            right.add([v.index], 1.0, 'REPLACE')
+        else:
+            mid.add([v.index], 1.0, 'REPLACE')
+    return
+
+class VIEW3D_OT_MhxAutoVertexGroupsButton(bpy.types.Operator):
+    bl_idname = "mhclo.auto_vertex_groups"
+    bl_label = "Auto vertex groups"
+
+    def execute(self, context):
+        removeVertexGroups(context)
+        autoVertexGroups(context)
+        print("Vertex groups auto assigned")
+        return{'FINISHED'}    
+
+#
 #   checkAndVertexDiamonds(ob):
 #
 
@@ -1889,6 +1918,7 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.label("Utilities")
         layout.operator("mhclo.print_vnums")
         layout.operator("mhclo.remove_vertex_groups")
+        layout.operator("mhclo.auto_vertex_groups")
         layout.operator("mhclo.copy_vert_locs")
         layout.label("UVs")
         layout.operator("mhclo.recover_seams")
