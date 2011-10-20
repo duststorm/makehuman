@@ -2005,7 +2005,8 @@ class FileChooser(View):
         self.path = path
         self.extension = extension
         self.previewExtension = previewExtension
-        self.slider = Slider(self, 0, 0, 0, style=SliderStyle._replace(left=10, top=585-20, zIndex=9.1))
+        self.slider = Slider(self, 0, 0, 0, style=SliderStyle._replace(left=10, top=600-35, zIndex=9.1))
+        self.location = TextView(self.slider, os.path.abspath(path), style=TextViewStyle._replace(left=10 + 112 + 10, top=600-15, zIndex=9.1))
         self.sortBox = GroupBox(self.slider, [10, 80, 9.0], 'Sort')
         sortgroup = []
         self.sort = sort
@@ -2051,7 +2052,7 @@ class FileChooser(View):
         if len(self.children) > 1:
             self.slider.setValue(0)
             for child in self.children:
-                if isinstance(child, Slider) or isinstance(child, GroupBox):
+                if isinstance(child, Slider) or isinstance(child, GroupBox) or isinstance(child, TextView):
                     continue
                 self.app.scene3d.delete(child.preview.mesh)
                 self.app.scene3d.delete(child.label.mesh)
@@ -2176,6 +2177,7 @@ class FileChooser(View):
         self.style.width, self.style.height = event.width, event.height
         self.__updateScrollBar()
         self.slider.setPosition([10, event.height-35, 9.1])
+        self.location.setPosition([10 + 112 + 10, event.height-15, 9.1])
                
 class FileChooser2(View):
     
