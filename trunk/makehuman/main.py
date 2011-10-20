@@ -503,6 +503,8 @@ class MHApplication(gui3d.Application):
     def loadGui(self):
         
         self.progressBar.setProgress(0.9)
+                    
+        PluginsTaskView(self.app.getCategory('Settings'))
           
         # Exit button
         category = gui3d.Category(self, "Exit", tabStyle=gui3d.CategoryButtonStyle)
@@ -591,8 +593,6 @@ class MHApplication(gui3d.Application):
             if self.dialog.helpId and self.dialog.check.selected:
                 self.helpIds.append(self.dialog.helpId)
             self.dialog.hide()
-            
-        PluginsTaskView(self.app.getCategory('Settings'))
         
         mh.updatePickingBuffer();
         self.redraw()
