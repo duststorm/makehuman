@@ -32,6 +32,11 @@ class HelpTaskView(gui3d.TaskView):
         @self.donateButton.event
         def onClicked(event):
             webbrowser.open('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=34KYQRLBE2K3N');
+            
+    def onShow(self, event):
+    
+        gui3d.TaskView.onShow(self, event)
+        self.manualButton.setFocus()
 
 def load(app):
     category = app.getCategory('Help')

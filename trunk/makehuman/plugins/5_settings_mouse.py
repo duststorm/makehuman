@@ -34,6 +34,7 @@ class MouseActionsTaskView(gui3d.TaskView):
     def onShow(self, event):
         
         gui3d.TaskView.onShow(self, event)
+        self.mouseBox.children[1].setFocus()
         self.app.prompt('Info', 'Click and drag on a mouse action box while holding down the modifiers and buttons which you would like to assign to the given action.',
             'OK', helpId='mouseActionHelp')
             

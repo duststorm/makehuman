@@ -82,6 +82,7 @@ class CensorTaskView(gui3d.TaskView):
     def onShow(self, event):
         
         gui3d.TaskView.onShow(self, event)
+        self.enableCensor.setFocus()
     
     def onHide(self, event):
 

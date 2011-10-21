@@ -4,6 +4,19 @@
 
 import gui3d, mh, os
 
+class FontRadioButton(gui3d.RadioButton):
+
+    def __init__(self, parent, group, font):
+    
+        gui3d.RadioButton.__init__(self, parent, group, font.capitalize(), parent.app.settings.get('font', 'arial') == font, style=gui3d.RadioButtonStyle._replace(fontFamily=font))
+        self.font = font
+        
+    def onClicked(self, event):
+    
+        gui3d.RadioButton.onClicked(self, event)
+        self.app.settings['font'] = self.font
+        self.app.prompt('Info', 'You need to restart for your font changes to be applied.', 'OK', helpId='fontHelp')
+        
 class LanguageRadioButton(gui3d.RadioButton):
 
     def __init__(self, parent, group, language):
@@ -59,10 +72,10 @@ class SettingsTaskView(gui3d.TaskView):
         
         y = 80
         unitBox = self.unitsBox = gui3d.GroupBox(self, [650, y, 9.0], 'Font');y += 25
-        arial = gui3d.RadioButton(unitBox, fonts, 'Arial', self.app.settings.get('font', 'arial') == 'arial', style=gui3d.RadioButtonStyle._replace(fontFamily='arial'));y += 24
-        courier = gui3d.RadioButton(unitBox, fonts, 'Courier', self.app.settings.get('font', 'arial') == 'courier', style=gui3d.RadioButtonStyle._replace(fontFamily='courier'));y += 24
-        ubuntu = gui3d.RadioButton(unitBox, fonts, 'Ubuntu', self.app.settings.get('font', 'arial') == 'ubuntu', style=gui3d.RadioButtonStyle._replace(fontFamily='ubuntu'));y += 24
-        verdana = gui3d.RadioButton(unitBox, fonts, 'Verdana', self.app.settings.get('font', 'arial') == 'verdana', style=gui3d.RadioButtonStyle._replace(fontFamily='verdana'));y += 24
+        arial = FontRadioButton(unitBox, fonts, 'arial');y += 24
+        courier = FontRadioButton(unitBox, fonts, 'courier');y += 24
+        ubuntu = FontRadioButton(unitBox, fonts, 'ubuntu');y += 24
+        verdana = FontRadioButton(unitBox, fonts, 'verdana');y += 24
         y+=16
         
         languages = []
@@ -124,34 +137,6 @@ class SettingsTaskView(gui3d.TaskView):
         def onClicked(event):
             gui3d.RadioButton.onClicked(imperial, event)
             self.app.settings['units'] = 'imperial'
-            
-        @arial.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(arial, event)
-            self.app.settings['font'] = 'arial'
-            self.app.prompt('Info', 'You need to restart for your font changes to be applied.',
-                'OK', helpId='fontHelp')
-            
-        @courier.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(courier, event)
-            self.app.settings['font'] = 'courier'
-            self.app.prompt('Info', 'You need to restart for your font changes to be applied.',
-                'OK', helpId='fontHelp')
-            
-        @ubuntu.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(ubuntu, event)
-            self.app.settings['font'] = 'ubuntu'
-            self.app.prompt('Info', 'You need to restart for your font changes to be applied.',
-                'OK', helpId='fontHelp')
-            
-        @verdana.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(verdana, event)
-            self.app.settings['font'] = 'verdana'
-            self.app.prompt('Info', 'You need to restart for your font changes to be applied.',
-                'OK', helpId='fontHelp')
                 
     def setShader(self, vertex, fragment):
             human = self.app.selectedHuman
@@ -162,7 +147,12 @@ class SettingsTaskView(gui3d.TaskView):
                 human.mesh.setShader(human.shader_program)
             except Exception, e:
                 print "No shader support: " + str(e)
-                
+    
+    def onShow(self, event):
+    
+        gui3d.TaskView.onShow(self, event)
+        self.shaderNo.setFocus()
+    
     def onHide(self, event):
 
         gui3d.TaskView.onHide(self, event)
