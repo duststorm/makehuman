@@ -67,7 +67,7 @@ class KeyEvent(Event):
         self.modifiers = modifiers
 
     def __repr__(self):
-        return 'KeyEvent(%d, %s, %d)' % (self.key, self.character, self.modifiers)
+        return 'KeyEvent(%d, %04x %s, %d)' % (self.key, ord(self.character), self.character, self.modifiers)
 
 
 class FocusEvent(Event):

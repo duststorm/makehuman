@@ -59,7 +59,6 @@ class SaveTaskView(gui3d.TaskView):
                 os.makedirs(modelPath)
 
             tags = filename
-            filename = filename.split()[0]
 
             # Save the thumbnail
 
@@ -72,7 +71,7 @@ class SaveTaskView(gui3d.TaskView):
             human = self.app.selectedHuman
             human.save(os.path.join(modelPath, filename + '.mhm'), tags)
             
-            mh.setCaption("MakeHuman - [%s]" % filename)
+            self.app.setCaption("MakeHuman - [%s]" % filename)
 
             self.app.switchCategory('Modelling')
 
@@ -198,7 +197,7 @@ class LoadTaskView(gui3d.TaskView):
             self.parent.tasksByName['Save'].fileentry.text = name
             self.parent.tasksByName['Save'].fileentry.edit.setText(name)
             
-            mh.setCaption(("MakeHuman - [%s]" % name).encode("utf8"))
+            self.app.setCaption(("MakeHuman - [%s]" % name).encode("utf8"))
 
             self.app.switchCategory('Modelling')
 

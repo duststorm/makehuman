@@ -1826,7 +1826,7 @@ class TextEdit(View):
                 self.__hideCursor()
                 self.__position -= 1
                 self.__showCursor()
-        elif key < 256:
+        elif ord(event.character) and key < 256:
             self.__addText(event.character)
 
         self.__updateTextObject()

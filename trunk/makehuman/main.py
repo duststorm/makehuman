@@ -845,6 +845,10 @@ class MHApplication(gui3d.Application):
             self.fonts[fontFamily] = font3d.Font("data/fonts/%s.fnt" % fontFamily)
             
         return self.fonts[fontFamily]
+        
+    # Caption
+    def setCaption(self, caption):
+        mh.setCaption(caption.encode('utf8'))
 
     # Global progress bar
     def progress(self, value, text=None):
