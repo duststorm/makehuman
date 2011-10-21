@@ -603,11 +603,11 @@ static PyObject* mh_getPath(PyObject *self, PyObject *type)
     {
         HRESULT hr;
 
-#ifdef CSIDL_MYDOCUMENTS
-        hr = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, 0, path);
-#else
+//#ifdef CSIDL_MYDOCUMENTS
+//        hr = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, 0, path);
+//#else
         hr = SHGetFolderPathW(NULL, CSIDL_PERSONAL, NULL, 0, path);
-#endif
+//#endif
 
         if (FAILED(hr))
         {

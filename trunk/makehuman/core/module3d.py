@@ -665,17 +665,17 @@ class Object3D(object):
         self.uvMap = {}
         
         self.__object = None
-    
-    @property
-    def object(self):
+        
+    def getObject(self):
         if self.__object:
             return self.__object()
         else:
             return None
-            
-    @object.setter
-    def object(self, value):
+        
+    def setObject(self, value):
         self.__object = weakref.ref(value)
+    
+    object = property(getObject, setObject)
     
     @property
     def faceGroups(self):

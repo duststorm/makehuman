@@ -90,93 +90,93 @@ class Camera(events3d.EventHandler):
         self.camera = mh.Camera();
         self.changedPending = False;
         
-    @property
-    def projection(self):
+    def getProjection(self):
     
         return self.camera.projection
 
-    @projection.setter
-    def projection(self, value):
+    def setProjection(self, value):
     
         self.camera.projection = value
         self.changed()
         
-    @property
-    def fovAngle(self):
+    projection = property(getProjection, setProjection)
+        
+    def getFovAngle(self):
     
         return self.camera.fovAngle
 
-    @fovAngle.setter
-    def fovAngle(self, value):
+    def setFovAngle(self, value):
     
         self.camera.fovAngle = value
         self.changed()
+        
+    fovAngle = property(getFovAngle, setFovAngle)
     
-    @property
-    def eyeX(self):
+    def getEyeX(self):
     
         return self.camera.eyeX
 
-    @eyeX.setter
-    def eyeX(self, value):
+    def setEyeX(self, value):
     
         self.camera.eyeX = value
         self.changed()
         
-    @property
-    def eyeY(self):
+    eyeX = property(getEyeX, setEyeX)
+        
+    def getEyeY(self):
     
         return self.camera.eyeY
 
-    @eyeY.setter
-    def eyeY(self, value):
+    def setEyeY(self, value):
     
         self.camera.eyeY = value
         self.changed()
+        
+    eyeY = property(getEyeY, setEyeY)
     
-    @property
-    def eyeZ(self):
+    def getEyeZ(self):
     
         return self.camera.eyeZ
 
-    @eyeZ.setter
-    def eyeZ(self, value):
+    def setEyeZ(self, value):
     
         self.camera.eyeZ = value
         self.changed()
         
-    @property
-    def focusX(self):
+    eyeZ = property(getEyeZ, setEyeZ)
+        
+    def getFocusX(self):
     
         return self.camera.focusX
 
-    @focusX.setter
-    def focusX(self, value):
+    def setFocusX(self, value):
     
         self.camera.focusX = value
         self.changed()
         
-    @property
-    def focusY(self):
+    focusX = property(getFocusX, setFocusX)
+        
+    def getFocusY(self):
     
         return self.camera.focusY
 
-    @focusY.setter
-    def focusY(self, value):
+    def setFocusY(self, value):
     
         self.camera.focusY = value
         self.changed()
+        
+    focusY = property(getFocusY, setFocusY)
     
-    @property
-    def focusZ(self):
+    def getFocusZ(self):
     
         return self.camera.focusZ
 
-    @focusZ.setter
-    def focusZ(self, value):
+    def setFocusZ(self, value):
     
         self.camera.focusZ = value
         self.changed()
+        
+    focusZ = property(getFocusZ, setFocusZ)
         
     def convertToScreen(self, x, y, z, obj=None):
     
