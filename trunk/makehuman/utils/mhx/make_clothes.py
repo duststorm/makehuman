@@ -111,13 +111,13 @@ def findClothes(context, bob, pob, log):
             selectVert(context, vn, pob)
             raise NameError("Clothes %s vert %d not member of any group" % (pob.name, vn))
 
-        name = pob.vertex_groups[pindex].name
+        gname = pob.vertex_groups[pindex].name
         bindex = None
         for bvg in bob.vertex_groups:
-            if bvg.name == name:
+            if bvg.name == gname:
                 bindex = bvg.index
         if bindex == None:
-            raise NameError("Did not find vertex group %s in base mesh" % name)
+            raise NameError("Did not find vertex group %s in base mesh" % gname)            
 
         mverts = []
         for n in range(theListLength):
@@ -149,16 +149,18 @@ def findClothes(context, bob, pob, log):
         (mv, mindist) = mverts[0]
         if mv:
             if pv.index % 10 == 0:
-                print(pv.index, mv.index, mindist, name, pindex, bindex)
+                print(pv.index, mv.index, mindist, gname, pindex, bindex)
             if log:
-                log.write("%d %d %.5f %s %d %d\n" % (pv.index, mv.index, mindist, name, pindex, bindex))
+                log.write("%d %d %.5f %s %d %d\n" % (pv.index, mv.index, mindist, gname, pindex, bindex))
             #printMverts("  ", mverts)
         else:
-            raise NameError("Failed to find vert %d in group %s %d %d" % (pv.index, name, pindex, bindex))
+            raise NameError("Failed to find vert %d in group %s %d %d" % (pv.index, gname, pindex, bindex))
         if mindist > 5:
             raise NameError("Minimal distance %f > 5.0. Check base and proxy scales." % mindist)
 
-        bestVerts.append((pv, exact, mverts, []))
+        if gname[0:3] != "Mid":
+            bindex = -1
+        bestVerts.append((pv, bindex, exact, mverts, []))
 
     print("Setting up face table")
     vfaces = {}
@@ -185,17 +187,19 @@ def findClothes(context, bob, pob, log):
             vfaces[v2].append(t)
     
     print("Finding weights")
-    for (pv, exact, mverts, fcs) in bestVerts:
-        #print(pv.index)
+    for (pv, bindex, exact, mverts, fcs) in bestVerts:
         if exact:
             continue
         for (bv,mdist) in mverts:
             if bv:
                 for f in vfaces[bv.index]:
-                    r0 = base.vertices[f[0]].co
-                    r1 = base.vertices[f[1]].co
-                    r2 = base.vertices[f[2]].co
-                    wts = cornerWeights(pv, r0, r1, r2, pob)
+                    v0 = base.vertices[f[0]]
+                    v1 = base.vertices[f[1]]
+                    v2 = base.vertices[f[2]]
+                    if (bindex >= 0) and (pv.co[0] < 0.01) and (pv.co[0] > -0.01):
+                        wts = midWeights(pv, bindex, v0, v1, v2, pob)    
+                    else:
+                        wts = cornerWeights(pv, v0.co, v1.co, v2.co, pob)
                     fcs.append((f, wts))
 
     print("Finding best weights")
@@ -210,7 +214,7 @@ def findClothes(context, bob, pob, log):
     
     bestFaces = []
     print("Optimal triangles not found for the following verts")
-    for (pv, exact, mverts, fcs) in bestVerts:
+    for (pv, bindex, exact, mverts, fcs) in bestVerts:
         #print(pv.index)
         pv.select = False
         if exact:
@@ -326,6 +330,44 @@ def cornerWeights(pv, r0, r1, r2, pob):
     w1 = (-a10*b0 + a00*b1)/det
     
     return (w0, w1, 1-w0-w1)
+
+#
+#   midWeights(pv, bindex, v0, v1, v2, pob):
+#
+
+def midWeights(pv, bindex, v0, v1, v2, pob):
+    #print("Mid", pv.index, bindex)
+    pv.select = True
+    if isInGroup(v0, bindex):
+        v0.select = True
+        if isInGroup(v1, bindex):
+            v1.select = True    
+            return midWeight(pv, v0.co, v1.co)
+        elif isInGroup(v2, bindex):
+            (w1, w0, w2) = midWeight(pv, v0.co, v2.co)
+            v2.select = True
+            return (w0, w1, w2)
+    elif isInGroup(v1, bindex) and isInGroup(v2, bindex):            
+        (w1, w2, w0) = midWeight(pv, v1.co, v2.co)
+        v1.select = True
+        v2.select = True
+        return (w0, w1, w2)
+    #print("  Failed mid")
+    return cornerWeights(pv, v0.co, v1.co, v2.co, pob)
+    
+def isInGroup(v, bindex):
+    for g in v.groups:
+        if g.group == bindex:
+            return True
+    return False            
+    
+def midWeight(pv, r0, r1):
+    u01 = r1-r0    
+    d01 = u01.length
+    u = pv.co-r0
+    s = u.dot(u01)
+    w = s/(d01*d01)
+    return (1-w, w, 0)
 
 #
 #    highlight(pv, ob):
