@@ -623,14 +623,19 @@ def getProxyWeights(rawWeights, proxy):
     weights = {}
     for key in rawWeights.keys():
         vgroup = []
+        empty = True
         for (v,wt) in rawWeights[key]:
             try:
                 vlist = proxy.verts[v]
             except:
                 vlist = []
             for (pv, w) in vlist:
-                vgroup.append((pv, w*wt))
-        weights[key] = fixProxyVGroup(vgroup)
+                pw = w*wt
+                if (pw > 1e-4):
+                    vgroup.append((pv, pw))
+                    empty = False
+        if not empty:
+            weights[key] = fixProxyVGroup(vgroup)
     return weights
 
 def fixProxyVGroup(vgroup):

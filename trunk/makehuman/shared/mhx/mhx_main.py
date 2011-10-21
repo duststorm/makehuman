@@ -815,11 +815,18 @@ def copyVertGroups(tmplName, fp, proxy):
                 except:
                     vlist = []
                 for (pv, w) in vlist:
-                    vgroups.append((pv, w*wt))
-            elif vgroups:
-                printProxyVGroup(fp, vgroups)
+                    pw = w*wt
+                    if pw > 1e-4:
+                        vgroups.append((pv, pw))
+            elif words[0] == 'VertexGroup':
+                gname = words[1]
                 vgroups = []
-                fp.write(line)
+            elif words[0] == 'end':
+                if vgroups:
+                    fp.write("  VertexGroup %s\n" % gname)
+                    printProxyVGroup(fp, vgroups)
+                    vgroups = []
+                    fp.write(line)
             else:    
                 fp.write(line)
     print("    %s copied" % tmplName)
