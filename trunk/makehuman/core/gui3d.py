@@ -1403,7 +1403,7 @@ class Button(View):
         else:
             return ''
             
-    def setLabel(self, text):
+    def setLabel(self, label):
         if self.label:
             font = self.app.getFont(self.style.fontFamily)
             translatedLabel = self.app.getLanguageString(label) if label else ''
