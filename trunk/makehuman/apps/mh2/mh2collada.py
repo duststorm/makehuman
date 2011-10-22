@@ -499,10 +499,10 @@ def exportDae(human, fp):
     stuff.setBones(amt)
     theStuff = stuff
     if useProxy:
-        proxyFile = "data/templates/%s.proxy" % useProxy.lower()
-        print("Using %s" % proxyFile)
         pfile = export_config.CProxyFile()
         pfile.set('Proxy', 0, False, False, True)
+        pfile.file = "data/templates/%s.proxy" % useProxy.lower()
+        print("Using %s" % pfile.file)
         setupProxies('Proxy', obj, stuffs, amt, rawTargets, [pfile])
     else:
         mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
