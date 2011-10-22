@@ -690,8 +690,8 @@ def storeData(pob, bob, data):
     fp.close()
     return
     
-def restoreData(context):    
-    pob = context.object
+def restoreData(context): 
+    (bob, pob) = getObjectPair(context)
     fname = os.path.realpath(os.path.expanduser("~/mh_makeclo_stored.txt"))
     fp = open(fname, "rU")
     status = 0
@@ -703,11 +703,15 @@ def restoreData(context):
             pname = words[0]
             if pname != pob.name:
                 raise NameError(
-                "Restore error: stored data for %s does not match active object %s\n" % (pname, pob.name) +
+                "Restore error: stored data for %s does not match selected object %s\n" % (pname, pob.name) +
                 "Make clothes for %s first\n" % pob.name)
             status = 10
         elif status == 10:
             bname = words[0]
+            if bname != bob.name:
+                raise NameError(
+                "Restore error: stored human %s does not match selected human %s\n" % (bname, bob.name) +
+                "Make clothes for %s first\n" % pob.name)
             status = 1
         elif status == 1:
             pv = pob.data.vertices[int(words[0])]
@@ -755,8 +759,6 @@ def unwrapObject(ob, context):
 
 def projectUVs(bob, pob, context):
     (bob1, data) = restoreData(context)
-    if bob != bob1:
-        raise NameError("Current human %s differs from store human %s" % (bob.name, bob1.name))
     print("Projecting %s => %s" % (bob.name, pob.name))
 
     (bVertEdges, bVertFaces, bEdgeFaces, bFaceEdges, bFaceNeighbors, bUvFaceVerts, bTexVerts, bNTexVerts) = setupTexVerts(bob)
@@ -1838,6 +1840,13 @@ def saveDefaultSettings(context):
     fp.close()
     return
     
+def isInited(scn):
+    try:
+        scn["MakeClothesDirectory"]
+        return True
+    except:
+        return False
+    
 ###################################################################################    
 #    User interface
 #
@@ -2052,6 +2061,8 @@ class MakeClothesPanel(bpy.types.Panel):
         scn = context.scene
         layout.label("Initialization")
         layout.operator("mhclo.init_interface")
+        if not isInited(scn):
+            return
         layout.operator("mhclo.save_settings")
         layout.label("Utilities")
         layout.operator("mhclo.print_vnums")
