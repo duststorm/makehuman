@@ -71,11 +71,11 @@ class SettingsTaskView(gui3d.TaskView):
         fonts = []
         
         y = 80
-        unitBox = self.unitsBox = gui3d.GroupBox(self, [650, y, 9.0], 'Font');y += 25
-        arial = FontRadioButton(unitBox, fonts, 'arial');y += 24
-        courier = FontRadioButton(unitBox, fonts, 'courier');y += 24
-        ubuntu = FontRadioButton(unitBox, fonts, 'ubuntu');y += 24
-        verdana = FontRadioButton(unitBox, fonts, 'verdana');y += 24
+        fontsBox = self.fontsBox = gui3d.GroupBox(self, [650, y, 9.0], 'Font');y += 25
+        
+        fontFiles = [os.path.basename(filename).replace('.fnt', '') for filename in os.listdir('data/fonts') if filename.split(os.extsep)[-1] == "fnt"]
+        for font in fontFiles:
+            FontRadioButton(fontsBox, fonts, font);y += 24
         y+=16
         
         languages = []
