@@ -44,14 +44,12 @@ class ModellingCategory(gui3d.Category):
     def __init__(self, parent):
         gui3d.Category.__init__(self, parent, 'Modelling')
               
-        y = 600-110
-        self.viewBox = gui3d.GroupBox(self, [10, y, 9.0], 'View settings', gui3d.GroupBoxStyle._replace(height=25+24*2+6))
+        y = 600-155
+        self.viewBox = gui3d.GroupBox(self, [10, y, 9.0], 'View settings')
         
-        modifierStyle = gui3d.ButtonStyle._replace(width=(112-4)/2.0, height=20)
-        
-        self.anaglyphsButton = gui3d.ToggleButton(self.viewBox, 'Anaglyphs', style=modifierStyle)
-        self.wireButton = gui3d.ToggleButton(self.viewBox, 'Wireframe', style=modifierStyle)
-        self.subdivisionButton = gui3d.ToggleButton(self.viewBox, 'Smooth', style=modifierStyle)
+        self.anaglyphsButton = gui3d.ToggleButton(self.viewBox, 'Anaglyphs')
+        self.wireButton = gui3d.ToggleButton(self.viewBox, 'Wireframe')
+        self.subdivisionButton = gui3d.ToggleButton(self.viewBox, 'Smooth')
 
         @self.anaglyphsButton.event
         def onClicked(event):
@@ -71,10 +69,9 @@ class ModellingCategory(gui3d.Category):
         guimacromodelling.MacroModelingTaskView(self)
         guidetailmodelling.DetailModelingTaskView(self)
 
-
     def onResized(self, event):
         gui3d.Category.onResized(self, event)
-        self.viewBox.setPosition([10, event.height-110, 9.0])
+        self.viewBox.setPosition([10, event.height-155, 9.0])
 
 
 

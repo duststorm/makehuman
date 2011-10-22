@@ -177,6 +177,17 @@ class Camera(events3d.EventHandler):
         self.changed()
         
     focusZ = property(getFocusZ, setFocusZ)
+    
+    def getStereoMode(self):
+    
+        return self.camera.stereoMode
+
+    def setStereoMode(self, value):
+    
+        self.camera.stereoMode = value
+        self.changed()
+        
+    stereoMode = property(getStereoMode, setStereoMode)
         
     def convertToScreen(self, x, y, z, obj=None):
     

@@ -574,7 +574,7 @@ TaskTabStyle = Style(**{
     'fontSize':defaultFontSize,
     'textAlign':AlignCenter,
     'border':[7,7,7,7],
-    'padding':[0,0,0,0],
+    'padding':[2,0,2,0],
     'margin':[0,0,2,0]
     })
 
@@ -623,7 +623,7 @@ CategoryTabStyle = Style(**{
     'textAlign':AlignCenter, 
     'border':[7,7,7,7],
     'margin':[0,0,2,0],
-    'padding':[0,0,0,0]
+    'padding':[2,0,2,0]
     })
     
 CategoryButtonStyle = Style(**{
@@ -640,7 +640,7 @@ CategoryButtonStyle = Style(**{
     'textAlign':AlignCenter, 
     'border':[7,7,7,7],
     'margin':[0,0,0,0],
-    'padding':[0,0,0,0]
+    'padding':[2,0,2,0]
     })
 
 class Category(View):
@@ -1345,6 +1345,13 @@ class Button(View):
         @type style: L{Style}
         """
         
+        font = parent.app.getFont(style.fontFamily)
+        translatedLabel = parent.app.getLanguageString(label) if label else ''
+        labelWidth = font.stringWidth(translatedLabel) if translatedLabel else 0
+        
+        if labelWidth > style.width:
+            style = Style(parent=style, width=labelWidth + (style.padding[0] + style.padding[2] if style.padding else 0))
+        
         View.__init__(self, parent, style)
         
         self.label = None
@@ -1357,7 +1364,7 @@ class Button(View):
             t = self.selectedTexture
         else:
             t = self.texture
-            
+         
         width = self.style.width
         height = self.style.height
             
@@ -1368,11 +1375,11 @@ class Button(View):
         self.button = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
         if isinstance(label, str):
             textAlign = self.style.textAlign
-            font = self.app.getFont(self.style.fontFamily)
+            font = font
             wrapWidth = (width - self.style.padding[0] - self.style.padding[2] if self.style.padding else width) if textAlign else 0
             self.label = TextObject(self, [self.style.left + (self.style.padding[0] if self.style.padding else 0), 
                 self.style.top + height/2.0-font.lineHeight/2.0, self.style.zIndex + 0.001],
-                self.app.getLanguageString(label), wrapWidth, textAlign, fontSize = self.style.fontSize, fontFamily = self.style.fontFamily)
+                translatedLabel, wrapWidth, textAlign, fontSize = self.style.fontSize, fontFamily = self.style.fontFamily)
             
         self.selected = selected
         
@@ -1398,7 +1405,12 @@ class Button(View):
             
     def setLabel(self, text):
         if self.label:
-            self.label.setText(text)
+            font = self.app.getFont(self.style.fontFamily)
+            translatedLabel = self.app.getLanguageString(label) if label else ''
+            labelWidth = font.stringWidth(translatedLabel) if translatedLabel else 0
+            if labelWidth > self.style.width:
+                self.style.width = labelWidth + (self.style.padding[0] + self.style.padding[2] if self.style.padding else 0)
+            self.label.setText(translatedLabel)
 
     def onMouseDown(self, event):
         self.setSelected(True)

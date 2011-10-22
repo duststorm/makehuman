@@ -40,10 +40,7 @@ class BackgroundTaskView(gui3d.TaskView):
         self.backgroundImage = gui3d.Object(self.app.categories['Modelling'], [190, 90, 1], mesh, visible=False)
         self.opacity = 100
         
-        modifierStyle = gui3d.ButtonStyle._replace(width=(112-4)/2.0, height=20)
-        
-        self.backgroundImageToggle = gui3d.ToggleButton(self.app.categories['Modelling'].viewBox, 'Background',
-            style=modifierStyle);
+        self.backgroundImageToggle = gui3d.ToggleButton(self.app.categories['Modelling'].viewBox, 'Background');
             
         @self.backgroundImageToggle.event
         def onClicked(event):
