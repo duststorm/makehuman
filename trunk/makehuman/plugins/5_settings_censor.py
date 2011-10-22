@@ -65,7 +65,7 @@ class CensorTaskView(gui3d.TaskView):
         ]
         
         for i, v in enumerate(box):
-            box[i] = mh.cameras[0].convertToScreen(v[0], v[1], v[2], human.mesh.object3d)
+            box[i] = self.app.modelCamera.convertToScreen(v[0], v[1], v[2], human.mesh.object3d)
             
         return min([v[0] for v in box]), min([v[1] for v in box]), max([v[0] for v in box]), max([v[1] for v in box])
         
