@@ -41,6 +41,55 @@ theThreshold = -0.2
 theListLength = 3
 Epsilon = 1e-4
 
+#
+#   isHuman(ob):
+#   isClothing(ob):
+#   getHuman(context):
+#   getClothing(context):
+#   getObjectPair(context):
+#
+
+def isHuman(ob):
+    try:
+        return ob["MhxMesh"]
+    except:
+        return False
+        
+def isClothing(ob):
+    return ((ob.type == 'MESH') and (not isHuman(ob)))
+    
+def getHuman(context):
+    ob = context.object
+    if not isHuman(ob):
+        raise NameError("Object %s is not human" % ob.name)
+    return ob
+        
+def getClothing(context):        
+    ob = context.object
+    if isHuman(ob):
+        raise NameError("Object %s is a human, not a clothing" % ob.name)
+    return ob
+    
+def getObjectPair(context):
+    human = None
+    clothing = None
+    for ob in context.scene.objects:
+        if ob.select:
+            if isHuman(ob):
+                if human:
+                    raise NameError("Two humans selected: %s and %s" % (human.name, ob.name))
+                else:
+                    human = ob
+            elif ob.type == 'MESH':
+                if clothing:
+                    raise NameError("Two pieces of clothing selected: %s and %s" % (clothing.name, ob.name))
+                else:
+                    clothing = ob
+    if not human:
+        raise NameError("No human selected")
+    if not clothing:
+        raise NameError("No clothing selected")
+    return (human, clothing)        
 
 #
 #    printMverts(stuff, mverts):
@@ -496,10 +545,11 @@ def printClothes(context, path, file, bob, pob, data):
     return
 
 #
-#   exportObjFile(ob, context):
+#   exportObjFile(context):
 #
 
-def exportObjFile(ob, context):
+def exportObjFile(context):
+    ob = getClothing(context)
     (objpath, objfile) = getFileName(ob, context, "obj")
     print("Open", objfile)
     fp = open(objfile, "w")
@@ -698,14 +748,15 @@ def unwrapObject(ob, context):
     return
 
 #
-#   projectUVs(context):
+#   projectUVs(bob, pob, context):
 #   setUvLoc(pv, puv, table):
 #   getUvLoc(v, f, uvface):
 #
 
-def projectUVs(context):
-    (bob, data) = restoreData(context)
-    pob = context.object
+def projectUVs(bob, pob, context):
+    (bob1, data) = restoreData(context)
+    if bob != bob1:
+        raise NameError("Current human %s differs from store human %s" % (bob.name, bob1.name))
     print("Projecting %s => %s" % (bob.name, pob.name))
 
     (bVertEdges, bVertFaces, bEdgeFaces, bFaceEdges, bFaceNeighbors, bUvFaceVerts, bTexVerts, bNTexVerts) = setupTexVerts(bob)
@@ -1049,10 +1100,12 @@ def getUvLoc(v, f, uvface):
 
 
 #
-#   recoverSeams(ob, scn):
+#   recoverSeams(context):
 #
 
-def recoverSeams(ob, scn):
+def recoverSeams(context):
+    ob = getHuman(context)
+    scn = context.scene
     (vertList, pairList, edgeList) = getSeams(ob, scn)
     vcoList = coordList(vertList, ob.data.vertices)
     sme = bpy.data.meshes.new("Seams")
@@ -1123,31 +1176,26 @@ def isOnEdge(v, faceTable, uvtex):
 #
 
 def makeClothes(context):
-    bob = context.object
+    (bob, pob) = getObjectPair(context)
     scn = context.scene
     checkObjectOK(bob)
     checkAndVertexDiamonds(bob)
-    nobjects = 0
-    for pob in context.selected_objects:
-        if pob.type == 'MESH' and bob.type == 'MESH' and pob != bob:
-            nobjects += 1
-            checkObjectOK(pob)
-            (outpath, outfile) = getFileName(pob, context, "mhclo")
-            print("Creating clothes file %s" % outfile)
-            if scn['MakeClothesLogging']:
-                logfile = '%s/clothes.log' % scn['MakeClothesDirectory']
-                log = open(logfile, "w")
-            else:
-                log = None
-            data = findClothes(context, bob, pob, log)
-            storeData(pob, bob, data)
-            printClothes(context, outpath, outfile, bob, pob, data)
-            if log:
-                log.close()
-            print("%s done" % outfile)
-    if nobjects == 0:
-        raise NameError("No clothes mesh selected")
-
+    checkObjectOK(pob)
+    (outpath, outfile) = getFileName(pob, context, "mhclo")
+    print("Creating clothes file %s" % outfile)
+    if scn['MakeClothesLogging']:
+        logfile = '%s/clothes.log' % scn['MakeClothesDirectory']
+        log = open(logfile, "w")
+    else:
+        log = None
+    data = findClothes(context, bob, pob, log)
+    storeData(pob, bob, data)
+    printClothes(context, outpath, outfile, bob, pob, data)
+    if log:
+        log.close()
+    print("%s done" % outfile)
+    return
+    
 #
 #   checkObjectOK(ob):
 #
@@ -1179,18 +1227,11 @@ def checkObjectOK(ob):
     return    
 
 #
-#   offsetClothes(context):
-#   offsetCloth(bob, pob, context):
+#   offsetCloth(context):
 #
 
-def offsetClothes(context):
-    bob = context.object
-    for pob in context.selected_objects:
-        if pob.type == 'MESH' and bob.type == 'MESH' and pob != bob:
-            offsetCloth(bob, pob, context)
-    return
-
-def offsetCloth(bob, pob, context):
+def offsetCloth(context):
+    (bob, pob) = getObjectPair(context)
     bverts = bob.data.vertices
     pverts = pob.data.vertices    
     print("Offset %s to %s" % (bob.name, pob.name))
@@ -1697,6 +1738,7 @@ class VIEW3D_OT_MhxRemoveVertexGroupsButton(bpy.types.Operator):
 
 def autoVertexGroups(context):
     ob = context.object
+    ishuman = isHuman(ob)
     mid = ob.vertex_groups.new("Mid")
     left = ob.vertex_groups.new("Left")
     right = ob.vertex_groups.new("Right")
@@ -1707,6 +1749,9 @@ def autoVertexGroups(context):
             right.add([v.index], 1.0, 'REPLACE')
         else:
             mid.add([v.index], 1.0, 'REPLACE')
+            if ishuman:
+                left.add([v.index], 1.0, 'REPLACE')
+                right.add([v.index], 1.0, 'REPLACE')
     return
 
 class VIEW3D_OT_MhxAutoVertexGroupsButton(bpy.types.Operator):
@@ -1742,6 +1787,57 @@ def checkAndVertexDiamonds(ob):
         raise NameError("Base object %s does not have any joint diamonds" % ob.name)
     return            
 
+###################################################################################    
+#    User interface
+#
+#    initInterface()
+#
+###################################################################################    
+
+from bpy.props import *
+
+#
+#   readDefaultSettings(context):
+#   saveDefaultSettings(context):
+#
+
+def readDefaultSettings(context):
+    fname = os.path.realpath(os.path.expanduser("~/make_clothes.settings"))
+    try:
+        fp = open(fname, "rU")
+    except:
+        print("Did not find %s. Using default settings" % fname)
+        return
+    
+    scn = context.scene
+    for line in fp:
+        words = line.split()
+        prop = words[0]
+        type = words[1]        
+        if type == "int":
+            scn[prop] = int(words[2])
+        elif type == "float":
+            scn[prop] = float(words[2])
+        elif type == "str":
+            scn[prop] = words[2]
+    fp.close()
+    return
+    
+def saveDefaultSettings(context):
+    fname = os.path.realpath(os.path.expanduser("~/make_clothes.settings"))
+    fp = open(fname, "w")
+    scn = context.scene
+    for (prop, value) in scn.items():
+        if prop[0:11] == "MakeClothes":
+            if type(value) == int:
+                fp.write("%s int %s\n" % (prop, value))
+            elif type(value) == float:
+                fp.write("%s float %.4f\n" % (prop, value))
+            elif type(value) == str:
+                fp.write("%s str %s\n" % (prop, value))
+    fp.close()
+    return
+    
 ###################################################################################    
 #    User interface
 #
@@ -2047,7 +2143,7 @@ class OBJECT_OT_RecoverSeamsButton(bpy.types.Operator):
     bl_label = "Recover seams"
 
     def execute(self, context):
-        recoverSeams(context.object, context.scene)
+        recoverSeams(context)
         return{'FINISHED'}    
 
 #
@@ -2060,8 +2156,6 @@ class OBJECT_OT_MakeClothesButton(bpy.types.Operator):
 
     def execute(self, context):     
         makeClothes(context)
-        #if context.scene['MakeClothesObjFile']:
-        #    exportObjFile(context.object, context)
         return{'FINISHED'}    
         
 #
@@ -2073,8 +2167,9 @@ class OBJECT_OT_ProjectUVsButton(bpy.types.Operator):
     bl_label = "Project UVs"
 
     def execute(self, context):
-        unwrapObject(context.object, context)
-        projectUVs(context)
+        (human, clothing) = getObjectPair(context)
+        unwrapObject(clothing, context)
+        projectUVs(human, clothing, context)
         return{'FINISHED'}    
         
 #
@@ -2106,7 +2201,7 @@ class OBJECT_OT_ExportObjFileButton(bpy.types.Operator):
     bl_label = "Export Obj file"
 
     def execute(self, context):
-        exportObjFile(context.object, context)
+        exportObjFile(context)
         return{'FINISHED'}    
 
 #
@@ -2118,7 +2213,7 @@ class OBJECT_OT_ExportBlenderMaterialButton(bpy.types.Operator):
     bl_label = "Export Blender material"
 
     def execute(self, context):
-        pob = context.object
+        pob = getClothing(context)
         (outpath, outfile) = getFileName(pob, context, "mhx")
         exportBlenderMaterial(pob.data, outpath)
         return{'FINISHED'}    
@@ -2135,7 +2230,8 @@ class OBJECT_OT_SetBoundaryButton(bpy.types.Operator):
         scn = context.scene
         setBoundaryVerts(scn)
         if scn['MakeClothesExamineBoundary']:
-            selectBoundary(context.object, scn)
+            ob = getHuman(context)
+            selectBoundary(ob, scn)
         return{'FINISHED'}    
 
 #
@@ -2146,8 +2242,8 @@ class OBJECT_OT_OffsetClothesButton(bpy.types.Operator):
     bl_idname = "mhclo.offset_clothes"
     bl_label = "Offset clothes"
 
-    def execute(self, context):
-        offsetClothes(context)
+    def execute(self, context):     
+        offsetCloth(context)
         return{'FINISHED'}    
 
 #
