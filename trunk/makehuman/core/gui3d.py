@@ -408,7 +408,7 @@ ViewStyle = Style(**{
     'fontFamily':defaultFontFamily,
     'fontSize':defaultFontSize,
     'textAlign':AlignLeft,
-    'border':[0,0,0,0],
+    'border':None,
     'margin':[0,0,0,0],
     'padding':[0,0,0,0]
     })
