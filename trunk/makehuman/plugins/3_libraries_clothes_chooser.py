@@ -118,7 +118,7 @@ class ClothesTaskView(gui3d.TaskView):
 
     def loadHandler(self, human, values):
         
-        self.setClothes(human, values[1])
+        self.setClothes(human, os.path.join('data/clothes', values[1].replace('.obj', ''), values[1].replace('.obj', '.mhclo')))
         
     def saveHandler(self, human, file):
         
