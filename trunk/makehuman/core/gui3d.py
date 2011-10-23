@@ -1725,7 +1725,8 @@ class TextEdit(View):
         mesh = NineSliceMesh(self.style.width, self.style.height, self.texture, self.style.border)
         self.background = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
             
-        self.textObject = TextObject(self, [self.style.left + 10.0, self.style.top + self.style.height / 2 - 6, self.style.zIndex + 0.1], fontSize = self.style.fontSize)
+        font = self.app.getFont(self.style.fontFamily)
+        self.textObject = TextObject(self, [self.style.left + 10.0, self.style.top + self.style.height / 2 - font.lineHeight / 2, self.style.zIndex + 0.1], fontSize = self.style.fontSize)
 
         self.text = text
         self.__position = len(self.text)
@@ -2017,7 +2018,8 @@ class FileChooser(View):
         self.extension = extension
         self.previewExtension = previewExtension
         self.slider = Slider(self, 0, 0, 0, style=SliderStyle._replace(left=10, top=600-35, zIndex=9.1))
-        self.location = TextView(self.slider, os.path.abspath(path), style=TextViewStyle._replace(left=10 + 112 + 10, top=600-15, zIndex=9.1))
+        font = self.app.getFont(TextViewStyle.fontFamily)
+        self.location = TextView(self.slider, os.path.abspath(path), style=TextViewStyle._replace(left=10 + 112 + 10, top=600-2-font.lineHeight, zIndex=9.1))
         self.sortBox = GroupBox(self.slider, [10, 80, 9.0], 'Sort')
         sortgroup = []
         self.sort = sort
@@ -2188,7 +2190,8 @@ class FileChooser(View):
         self.style.width, self.style.height = event.width, event.height
         self.__updateScrollBar()
         self.slider.setPosition([10, event.height-35, 9.1])
-        self.location.setPosition([10 + 112 + 10, event.height-15, 9.1])
+        font = self.app.getFont(TextViewStyle.fontFamily)
+        self.location.setPosition([10 + 112 + 10, event.height-2-font.lineHeight, 9.1])
                
 class FileChooser2(View):
     

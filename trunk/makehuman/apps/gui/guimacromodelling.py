@@ -30,7 +30,8 @@ class MacroModelingTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Macro modelling', label='Macro')
 
-        self.status = gui3d.TextView(self, style=gui3d.TextViewStyle._replace(width=800-20, left=10, top=585, zIndex=9.1))
+        font = self.app.getFont(gui3d.TextViewStyle.fontFamily)
+        self.status = gui3d.TextView(self, style=gui3d.TextViewStyle._replace(width=800-20, left=10, top=600-2-font.lineHeight, zIndex=9.1))
 
         self.macroBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Main', style=gui3d.GroupBoxStyle._replace(height=25+36*5+6))\
        
@@ -149,5 +150,6 @@ class MacroModelingTaskView(gui3d.TaskView):
             self.syncStatus()
 
     def onResized(self, event):
-        self.status.setPosition([10, event.height-15, 9.1])
+        font = self.app.getFont(gui3d.TextViewStyle.fontFamily)
+        self.status.setPosition([10, event.height-2-font.lineHeight, 9.1])
         self.radialBox.setPosition([event.width - 210, self.radialBox.getPosition()[1], 9.0])
