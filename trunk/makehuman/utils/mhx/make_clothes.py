@@ -252,11 +252,6 @@ def findClothes(context, bob, pob, log):
                     fcs.append((f, wts))
 
     print("Finding best weights")
-    """
-    alwaysOutside = scn['MakeClothesOutside']
-    minOffset = scn['MakeClothesMinOffset']
-    useProjection = scn['MakeClothesUseProjection']
-    """
     alwaysOutside = False
     minOffset = 0.0
     useProjection = False
@@ -279,6 +274,7 @@ def findClothes(context, bob, pob, log):
         if minmax < theThreshold:
             print(pv.index)
             pv.select = True
+            """
             if scn['MakeClothesForbidFailures']:
                 vn = pv.index
                 selectVert(context, vn, pob)
@@ -287,6 +283,7 @@ def findClothes(context, bob, pob, log):
                 "Did not find optimal triangle for %s vert %d.\n" % (pob.name, vn) +
                 "Avoid the message by unchecking Forbid failures.")
                 raise NameError(msg)
+            """
             (mv, mdist) = mverts[0]
             bVerts = [mv.index,0,1]
             bWts = (1,0,0)
@@ -521,7 +518,7 @@ def printClothes(context, path, file, bob, pob, data):
             mhxfile = exportBlenderMaterial(me, path)
             fp.write("# material_file %s\n" % mhxfile)
 
-    useProjection = scn['MakeClothesUseProjection']
+    useProjection = False
     fp.write("# use_projection %d\n" % useProjection)
     fp.write("# verts\n")
     if useProjection:
@@ -1180,9 +1177,10 @@ def isOnEdge(v, faceTable, uvtex):
 def makeClothes(context):
     (bob, pob) = getObjectPair(context)
     scn = context.scene
-    checkObjectOK(bob)
+    checkObjectOK(bob, context)
     checkAndVertexDiamonds(bob)
-    checkObjectOK(pob)
+    checkObjectOK(pob, context)
+    checkSingleVGroups(pob)
     (outpath, outfile) = getFileName(pob, context, "mhclo")
     print("Creating clothes file %s" % outfile)
     if scn['MakeClothesLogging']:
@@ -1199,35 +1197,62 @@ def makeClothes(context):
     return
     
 #
-#   checkObjectOK(ob):
+#   checkObjectOK(ob, context):
 #
 
-def checkObjectOK(ob):
+def checkObjectOK(ob, context):
+    old = context.object
+    context.scene.objects.active = ob
     word = None
+    error = False
     if ob.location.length > Epsilon:
         word = "object translation"
+        bpy.ops.object.transform_apply(location=True, rotation=False, scale=False)
     eu = ob.rotation_euler
     if abs(eu.x) + abs(eu.y) + abs(eu.z) > Epsilon:
         word = "object rotation"
+        bpy.ops.object.transform_apply(location=False, rotation=True, scale=False)
     vec = ob.scale - mathutils.Vector((1,1,1))
     if vec.length > Epsilon:
         word = "object scaling"
+        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
     if ob.constraints:
         word = "constraints"
+        error = True
     for mod in ob.modifiers:
         if (mod.type in ['CHILD_OF', 'ARMATURE']) and mod.show_viewport:
             word = "an enabled %s modifier" % mod.type
+            mod.show_viewport = False
     if ob.parent:
         word = "parent"
+        ob.parent = None
     if word:
-        msg = (
-            "Object %s can not be used for clothes creation because it has %s.\n" % (ob.name, word) +
-            "Apply or delete before continuing.\n" 
-            )
-        print(msg)
-        raise NameError(msg)
+        msg = "Object %s can not be used for clothes creation because it has %s.\n" % (ob.name, word)
+        if error:
+            msg +=  "Apply or delete before continuing.\n"
+            print(msg)
+            raise NameError(msg)
+        else:
+            print(msg)
+            print("Fixed automatically")
+    context.scene.objects.active = old
     return    
 
+#
+#   checkSingleVGroups(pob):
+#
+
+def checkSingleVGroups(pob):
+    for v in pob.data.vertices:
+        n = 0
+        for g in v.groups:
+            #print("Key", g.group, g.weight)
+            n += 1
+        if n != 1:
+            v.select = True
+            raise NameError("Vertex %d in %s belongs to %d groups. Must be exactly one" % (v.index, pob.name, n))
+    return            
+        
 #
 #   offsetCloth(context):
 #
@@ -1872,9 +1897,7 @@ def initInterface(scn):
         name="Directory", 
         description="Directory", 
         maxlen=1024)
-    #scn['MakeClothesDirectory'] = "/home/svn/makehuman/data/hairstyles"
-    #scn['MakeClothesDirectory'] = "/home/svn/makehuman/data/clothes"
-    scn['MakeClothesDirectory'] = "~/documents/makehuman/clothes"
+    scn['MakeClothesDirectory'] = "~"
     
     bpy.types.Scene.MakeClothesMaterials = BoolProperty(
         name="Materials", 
@@ -1890,33 +1913,6 @@ def initInterface(scn):
         name="Hair material", 
         description="Fill in hair material")
     scn['MakeClothesHairMaterial'] = False
-
-    """
-    bpy.types.Scene.MakeClothesObjFile = BoolProperty(
-        name="Object file", 
-        description="Also export object file")
-    scn['MakeClothesObjFile'] = False
-
-    bpy.types.Scene.MakeClothesMask = BoolProperty(
-        name="Mask", 
-        description="Clothing has a mask")
-    scn['MakeClothesMask'] = False
-
-    bpy.types.Scene.MakeClothesUseProjection = BoolProperty(
-        name="Use projection", 
-        description="Vert normal to face")
-    scn['MakeClothesUseProjection'] = False
-
-    bpy.types.Scene.MakeClothesOutside = BoolProperty(
-        name="Always outside", 
-        description="Invert projection if negative")
-    scn['MakeClothesOutside'] = True
-
-    bpy.types.Scene.MakeClothesMinOffset = FloatProperty(
-        name="Min offset", 
-        description="Mininum offset from base mesh")
-    scn['MakeClothesMinOffset'] = 0.0
-    """
 
     bpy.types.Scene.MakeClothesVertexGroups = BoolProperty(
         name="Save vertex groups", 
@@ -1934,11 +1930,13 @@ def initInterface(scn):
         description="Max number of verts considered")
     scn['MakeClothesListLength'] = theListLength
 
+    """
     bpy.types.Scene.MakeClothesForbidFailures = BoolProperty(
         name="Forbid failures", 
         description="Raise error if not found optimal triangle")
     scn['MakeClothesForbidFailures'] = True
-
+    """
+    
     bpy.types.Scene.MakeClothesLogging = BoolProperty(
         name="Log", 
         description="Write a log file for debugging")
@@ -2077,16 +2075,8 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.prop(scn, "MakeClothesMaterials")
         layout.prop(scn, "MakeClothesBlenderMaterials")
         layout.prop(scn, "MakeClothesHairMaterial")
-        #layout.prop(scn, "MakeClothesUseProjection")
-        #layout.prop(scn, "MakeClothesOutside")
-        #layout.prop(scn, "MakeClothesMinOffset")
-        #layout.prop(scn, "MakeClothesThreshold")
         layout.prop(scn, "MakeClothesListLength")
-        layout.prop(scn, "MakeClothesForbidFailures")
         layout.prop(scn, "MakeClothesLogging")
-        
-        #layout.prop(scn, "MakeClothesObjFile")
-        #layout.prop(scn, "MakeClothesMask")        
         
         layout.separator()
         layout.operator("mhclo.make_clothes")
