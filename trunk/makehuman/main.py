@@ -524,11 +524,11 @@ class MHApplication(gui3d.Application):
             self.promptAndExit()
           
         self.undoButton = gui3d.Button(self, "Undo",
-            style=gui3d.ButtonStyle._replace(width=40, height=16, left=650, top=508, zIndex=9.1))
+            style=gui3d.ButtonStyle._replace(width=40, left=650, top=505, zIndex=9.1))
         self.redoButton = gui3d.Button(self, "Redo",
-            style=gui3d.ButtonStyle._replace(width=40, height=16, left=694, top=508, zIndex=9.1))
+            style=gui3d.ButtonStyle._replace(width=40, left=694, top=505, zIndex=9.1))
         self.resetButton = gui3d.Button(self, "Reset",
-            style=gui3d.ButtonStyle._replace(width=40, height=16, left=738, top=508, zIndex=9.1))
+            style=gui3d.ButtonStyle._replace(width=40, left=738, top=505, zIndex=9.1))
                                         
         @self.undoButton.event
         def onClicked(event):
