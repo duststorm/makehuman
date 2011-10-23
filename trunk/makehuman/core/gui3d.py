@@ -169,9 +169,7 @@ class Object(events3d.EventHandler):
             if self.__subdivisionMesh:
                 self.__subdivisionMesh.setTexture(texture)
         else:
-            self.__seedMesh.clearTexture()
-            if self.__subdivisionMesh:
-                self.__subdivisionMesh.clearTexture()
+            self.clearTexture()
             
     def getTexture(self):
         return self.__seedMesh.texture
@@ -1726,7 +1724,7 @@ class TextEdit(View):
         self.background = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
             
         font = self.app.getFont(self.style.fontFamily)
-        self.textObject = TextObject(self, [self.style.left + 10.0, self.style.top + self.style.height / 2 - font.lineHeight / 2, self.style.zIndex + 0.1], fontSize = self.style.fontSize)
+        self.textObject = TextObject(self, [self.style.left + 10.0, self.style.top + self.style.height / 2 - font.lineHeight / 2 - 1, self.style.zIndex + 0.1], fontSize = self.style.fontSize)
 
         self.text = text
         self.__position = len(self.text)
