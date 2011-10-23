@@ -157,6 +157,11 @@ class SettingsTaskView(gui3d.TaskView):
 
         gui3d.TaskView.onHide(self, event)
         self.app.saveSettings()
+        
+    def onResized(self, event):
+        
+        self.fontsBox.setPosition([event.width - 150, self.fontsBox.getPosition()[1], 9.0])
+        self.languageBox.setPosition([event.width - 150, self.languageBox.getPosition()[1], 9.0])
 
 def load(app):
     category = app.getCategory('Settings')

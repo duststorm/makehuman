@@ -338,34 +338,34 @@ class BoxLayout(Layout):
 
     def onChildAdded(self, child, init=True):
 
-        childWidth = child.style.width + (child.style.margin[0] + child.style.margin[2] if child.style.margin else 0)
-        childHeight = child.style.height + (child.style.margin[1] + child.style.margin[3] if child.style.margin else 0)
+        childWidth = child.style.width + child.style.margin[0] + child.style.margin[2]
+        childHeight = child.style.height + child.style.margin[1] + child.style.margin[3]
         
         if not self.nextPosition or childWidth > self.spaceAvailable:
             
             if not self.nextPosition:
                 #self.nextPosition = [self.view.style.left, self.view.style.top, self.view.style.zIndex]
                 self.nextPosition = self.view.getPosition()
-                self.nextPosition[0] += self.view.style.padding[0] if self.view.style.padding else 0
-                self.nextPosition[1] += self.view.style.padding[1] if self.view.style.padding else 0
+                self.nextPosition[0] += self.view.style.padding[0]
+                self.nextPosition[1] += self.view.style.padding[1]
                 self.nextPosition[2] += 0.01
             else:
-                self.nextPosition[0] = self.view.getPosition()[0] + (self.view.style.padding[0] if self.view.style.padding else 0)
+                self.nextPosition[0] = self.view.getPosition()[0] + self.view.style.padding[0]
                 self.nextPosition[1] += self.rowHeight
                 
-            self.spaceAvailable = self.view.style.width - (self.view.style.padding[0] + self.view.style.padding[2] if self.view.style.padding else 0)
+            self.spaceAvailable = self.view.style.width - (self.view.style.padding[0] + self.view.style.padding[2])
             self.rowHeight = 0
             
         self.spaceAvailable -= childWidth
 
         # Add left margin
-        self.nextPosition[0] += (child.style.margin[0] if child.style.margin else 0)
+        self.nextPosition[0] += child.style.margin[0]
             
         # Make copy because the top margin is only for the child
         position = self.nextPosition[:]
         
         # Add top margin
-        position[1] += (child.style.margin[1] if child.style.margin else 0)
+        position[1] += child.style.margin[1]
         
         # Add child
         if init:
@@ -377,7 +377,7 @@ class BoxLayout(Layout):
         self.rowHeight = max(self.rowHeight, childHeight)
         
         # Add widht and right margin
-        self.nextPosition[0] += child.style.width + (child.style.margin[2] if child.style.margin else 0)
+        self.nextPosition[0] += child.style.width + child.style.margin[2]
         
     def rebuild(self):
 
@@ -391,9 +391,9 @@ class BoxLayout(Layout):
     def height(self):
         
         if self.nextPosition:
-            return self.nextPosition[1] - self.view.getPosition()[1] + self.rowHeight + (self.view.style.padding[3] if self.view.style.padding else 0)
+            return self.nextPosition[1] - self.view.getPosition()[1] + self.rowHeight + self.view.style.padding[3]
         else:
-            return (self.view.style.padding[1] + self.view.style.padding[3]) if self.view.style.padding else 0
+            return self.view.style.padding[1] + self.view.style.padding[3]
 
 # Generic view
 ViewStyle = Style(**{
@@ -574,7 +574,7 @@ TaskTabStyle = Style(**{
     'fontSize':defaultFontSize,
     'textAlign':AlignCenter,
     'border':[7,7,7,7],
-    'padding':[2,0,2,0],
+    'padding':[4,0,4,0],
     'margin':[0,0,2,0]
     })
 
@@ -623,7 +623,7 @@ CategoryTabStyle = Style(**{
     'textAlign':AlignCenter, 
     'border':[7,7,7,7],
     'margin':[0,0,2,0],
-    'padding':[2,0,2,0]
+    'padding':[4,0,4,0]
     })
     
 CategoryButtonStyle = Style(**{
@@ -640,7 +640,7 @@ CategoryButtonStyle = Style(**{
     'textAlign':AlignCenter, 
     'border':[7,7,7,7],
     'margin':[0,0,0,0],
-    'padding':[2,0,2,0]
+    'padding':[4,0,4,0]
     })
 
 class Category(View):
@@ -1349,8 +1349,8 @@ class Button(View):
         translatedLabel = parent.app.getLanguageString(label) if label else ''
         labelWidth = font.stringWidth(translatedLabel) if translatedLabel else 0
         
-        if labelWidth > style.width:
-            style = Style(parent=style, width=labelWidth + (style.padding[0] + style.padding[2] if style.padding else 0))
+        if labelWidth > style.width - style.padding[0] - style.padding[2]:
+            style = Style(parent=style, width=labelWidth + style.padding[0] + style.padding[2])
         
         View.__init__(self, parent, style)
         
@@ -1375,9 +1375,8 @@ class Button(View):
         self.button = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
         if isinstance(label, str):
             textAlign = self.style.textAlign
-            font = font
-            wrapWidth = (width - self.style.padding[0] - self.style.padding[2] if self.style.padding else width) if textAlign else 0
-            self.label = TextObject(self, [self.style.left + (self.style.padding[0] if self.style.padding else 0), 
+            wrapWidth = width - self.style.padding[0] - self.style.padding[2] if textAlign else 0
+            self.label = TextObject(self, [self.style.left + self.style.padding[0], 
                 self.style.top + height/2.0-font.lineHeight/2.0, self.style.zIndex + 0.001],
                 translatedLabel, wrapWidth, textAlign, fontSize = self.style.fontSize, fontFamily = self.style.fontFamily)
             
@@ -1390,7 +1389,7 @@ class Button(View):
         self.button.setPosition(position)
         if getattr(self, 'label'):
             font = self.app.getFont(self.style.fontFamily)
-            self.label.setPosition([position[0] + (self.style.padding[0] if self.style.padding else 0), 
+            self.label.setPosition([position[0] + self.style.padding[0], 
                 position[1] + self.style.height/2.0-font.lineHeight/2.0, position[2] + 0.001])
 
     def setTexture(self, texture):
@@ -1409,7 +1408,7 @@ class Button(View):
             translatedLabel = self.app.getLanguageString(label) if label else ''
             labelWidth = font.stringWidth(translatedLabel) if translatedLabel else 0
             if labelWidth > self.style.width:
-                self.style.width = labelWidth + (self.style.padding[0] + self.style.padding[2] if self.style.padding else 0)
+                self.style.width = labelWidth + self.style.padding[0] + self.style.padding[2]
             self.label.setText(translatedLabel)
 
     def onMouseDown(self, event):
@@ -1967,30 +1966,30 @@ class FileSort():
         
         return ("name", "created", "modified", "size")
         
-    def sort(self, by, path, filenames):
+    def sort(self, by, filenames):
     
         method = getattr(self, "sort%s" % by.capitalize())
-        return method(path, filenames)
+        return method(filenames)
         
-    def sortName(self, path, filenames):
+    def sortName(self, filenames):
         
         return sorted(filenames)
         
-    def sortModified(self, path, filenames):
+    def sortModified(self, filenames):
         
-        decorated = [(os.path.getmtime(os.path.join(path, filename)), i, filename) for i, filename in enumerate(filenames)]
+        decorated = [(os.path.getmtime(filename), i, filename) for i, filename in enumerate(filenames)]
         decorated.sort()
         return [filename for modified, i, filename in decorated]
         
-    def sortCreated(self, path, filenames):
+    def sortCreated(self, filenames):
         
-        decorated = [(os.path.getctime(os.path.join(path, filename)), i, filename) for i, filename in enumerate(filenames)]
+        decorated = [(os.path.getctime(filename), i, filename) for i, filename in enumerate(filenames)]
         decorated.sort()
         return [filename for created, i, filename in decorated]
     
-    def sortSize(self, path, filenames):
+    def sortSize(self, filenames):
         
-        decorated = [(os.path.getsize(os.path.join(path, filename)), i, filename) for i, filename in enumerate(filenames)]
+        decorated = [(os.path.getsize(filename), i, filename) for i, filename in enumerate(filenames)]
         decorated.sort()
         return [filename for size, i, filename in decorated]
 
@@ -2048,7 +2047,7 @@ class FileChooser(View):
         preview = filename
         
         if self.previewExtension:
-            preview = filename.replace(os.path.splitext(filename)[-1], '.' + self.previewExtension)
+            preview = filename.replace('.' + self.extension, '.' + self.previewExtension)
         else:
             preview = filename
             
@@ -2090,7 +2089,7 @@ class FileChooser(View):
                             self.files.append(os.path.join(root, f))
         
         # Sort         
-        self.files = self.sort.sort(self.sortBy, self.path, self.files)
+        self.files = self.sort.sort(self.sortBy, self.files)
         
         # Create icons
         for file in self.files:
@@ -2421,6 +2420,10 @@ class GroupBox(View):
         @type style: L{Style}
         """
         
+        font = parent.app.getFont(style.fontFamily)
+        translatedLabel = parent.app.getLanguageString(label) if label else ''
+        labelWidth = font.stringWidth(translatedLabel) if translatedLabel else 0
+        
         View.__init__(self, parent, style, BoxLayout(self))
         
         texture = self.app.getThemeResource('images', style.normal)
@@ -2428,11 +2431,9 @@ class GroupBox(View):
         self.box = Object(self, position, mesh)
         
         if isinstance(label, str):
-            font = self.app.getFont(self.style.fontFamily)
             self.label = TextObject(self,
-                [position[0]+self.style.padding[0],position[1]+self.style.padding[1]/2-font.lineHeight/2,position[2]+0.001],
-                self.app.getLanguageString(label),
-                fontSize = self.style.fontSize)
+                [position[0]+self.style.padding[0],position[1]+self.style.padding[1]/2-font.lineHeight/2-2,position[2]+0.001],
+                translatedLabel, alignment = self.style.textAlign, fontSize = self.style.fontSize, fontFamily = self.style.fontFamily)
     
     def getPosition(self):
         return self.box.getPosition()
@@ -2445,7 +2446,10 @@ class GroupBox(View):
         dz = position[2] - dz
         
         self.box.setPosition(position)
-        self.label.setPosition([position[0]+self.style.border[0],position[1]+self.style.border[1]/2-6,position[2]+0.001])
+        
+        font = self.app.getFont(self.style.fontFamily)
+        
+        self.label.setPosition([position[0]+self.style.padding[0],position[1]+self.style.padding[1]/2-font.lineHeight/2-2,position[2]+0.001])
         
         for child in self.children:
             x, y, z = child.getPosition()

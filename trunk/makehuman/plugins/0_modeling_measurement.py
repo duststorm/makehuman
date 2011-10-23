@@ -103,7 +103,7 @@ class MeasureTaskView(gui3d.TaskView):
             self.groupBoxes[name] = box
             
             # Create radiobutton
-            radio = GroupBoxRadioButton(self.categoryBox, self.radioButtons, name, box, selected=len(self.radioButtons) == 0);y += 24
+            radio = GroupBoxRadioButton(self.categoryBox, self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0);y += 24
             
             # Create sliders
             for subname in subnames:

@@ -52,15 +52,9 @@ class Action:
         return True
 
 HumanTextureButtonStyle = gui3d.Style(**{
+    'parent':gui3d.ViewStyle,
     'width':32,
-    'height':32,
-    'mesh':None,
-    'normal':None,
-    'selected':None,
-    'focused':None,
-    'fontFamily':gui3d.defaultFontFamily,
-    'fontSize':gui3d.defaultFontSize,
-    'border':None
+    'height':32
     })
 
 class HumanTextureTaskView(gui3d.TaskView):

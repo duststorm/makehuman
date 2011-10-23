@@ -117,54 +117,54 @@ class HumanFileSort(gui3d.FileSort):
         
         return list(gui3d.FileSort.fields(self)) + ["gender", "age", "muscle", "weight"]
         
-    def sortGender(self, path, filenames):
+    def sortGender(self, filenames):
         
-        self.updateMeta(path, filenames)
+        self.updateMeta(filenames)
         decorated = [(self.meta[filename]['gender'], i, filename) for i, filename in enumerate(filenames)]
         decorated.sort()
         return [filename for gender, i, filename in decorated]
         
-    def sortAge(self, path, filenames):
+    def sortAge(self, filenames):
         
-        self.updateMeta(path, filenames)
+        self.updateMeta(filenames)
         decorated = [(self.meta[filename]['age'], i, filename) for i, filename in enumerate(filenames)]
         decorated.sort()
         return [filename for age, i, filename in decorated]
 
-    def sortMuscle(self, path, filenames):
+    def sortMuscle(self, filenames):
         
-        self.updateMeta(path, filenames)
+        self.updateMeta(filenames)
         decorated = [(self.meta[filename]['muscle'], i, filename) for i, filename in enumerate(filenames)]
         decorated.sort()
         return [filename for muscle, i, filename in decorated]
        
-    def sortWeight(self, path, filenames):
+    def sortWeight(self, filenames):
         
-        self.updateMeta(path, filenames)
+        self.updateMeta(filenames)
         decorated = [(self.meta[filename]['weight'], i, filename) for i, filename in enumerate(filenames)]
         decorated.sort()
         return [filename for weight, i, filename in decorated]
         
-    def updateMeta(self, path, filenames):
+    def updateMeta(self, filenames):
         
         for filename in filenames:
             
             if filename in self.meta:
                 
-                if self.meta[filename]['modified'] < os.path.getmtime(os.path.join(path, filename)):
+                if self.meta[filename]['modified'] < os.path.getmtime(filename):
                 
-                    self.meta[filename] = self.getMeta(path, filename)
+                    self.meta[filename] = self.getMeta(filename)
                 
             else:
                 
-                self.meta[filename] = self.getMeta(path, filename)
+                self.meta[filename] = self.getMeta(filename)
                 
-    def getMeta(self, path, filename):
+    def getMeta(self, filename):
         
         meta = {}
                 
-        meta['modified'] = os.path.getmtime(os.path.join(path, filename))
-        f = open(os.path.join(path, filename))
+        meta['modified'] = os.path.getmtime(filename)
+        f = open(filename)
         for line in f:
             lineData = line.split()
             field = lineData[0]

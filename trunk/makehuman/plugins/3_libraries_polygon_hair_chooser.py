@@ -27,18 +27,9 @@ from aljabr import in2pts, vadd, vsub, calcBBox
 import mh2proxy
 
 HairButtonStyle = gui3d.Style(**{
+    'parent':gui3d.ViewStyle,
     'width':32,
-    'height':32,
-    'left':0,
-    'top':0,
-    'zIndex':0,
-    'mesh':None,
-    'normal':None,
-    'selected':None,
-    'focused':None,
-    'fontFamily':gui3d.defaultFontFamily,
-    'fontSize':gui3d.defaultFontSize,
-    'border':None
+    'height':32
 })
 
 class HairTaskView(gui3d.TaskView):
