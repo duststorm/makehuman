@@ -113,7 +113,7 @@ class HumanTextureTaskView(gui3d.TaskView):
         self.filechooser.onResized(event)
         self.currentTexture.setPosition([event.width-252, event.height-36, 9.2])
         
-    def onHumanChanged(self, event):
+    def onHumanChanging(self, event):
 
         if event.change == 'reset':
             self.syncTexture()

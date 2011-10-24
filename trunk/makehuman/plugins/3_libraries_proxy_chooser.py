@@ -55,14 +55,15 @@ class ProxyTaskView(gui3d.TaskView):
     def onResized(self, event):
         self.filechooser.onResized(event)
 
-    def onHumanChanged(self, event):
+    def onHumanChanging(self, event):
         
         human = event.human
         if event.change == 'reset':
             pass
-        def updateClosure():
-            pass
-        mh.callAsync(updateClosure)
+            
+    def onHumanChanged(self, event):
+        
+        human = event.human
 
     def loadHandler(self, human, values):
         

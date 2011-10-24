@@ -174,7 +174,7 @@ class Human(gui3d.Object):
 
         gender = min(max(gender, 0.0), 1.0)
         self._setGenderVals(gender)
-        self.callEvent('onChanged', HumanEvent(self, 'gender'))
+        self.callEvent('onChanging', HumanEvent(self, 'gender'))
 
     def getGender(self):
         return self.maleVal
@@ -200,7 +200,7 @@ class Human(gui3d.Object):
 
         age = min(max(age, 0.0), 1.0)
         self._setAgeVals(-1 + 2 * age)
-        self.callEvent('onChanged', HumanEvent(self, 'age'))
+        self.callEvent('onChanging', HumanEvent(self, 'age'))
 
     def getAge(self):
         if self.oldVal:
@@ -237,7 +237,7 @@ class Human(gui3d.Object):
 
         weight = min(max(weight, 0.0), 1.0)
         self._setWeightVals(-1 + 2 * weight)
-        self.callEvent('onChanged', HumanEvent(self, 'weight'))
+        self.callEvent('onChanging', HumanEvent(self, 'weight'))
 
     def getWeight(self):
         if self.overweightVal:
@@ -273,7 +273,7 @@ class Human(gui3d.Object):
 
         muscle = min(max(muscle, 0.0), 1.0)
         self._setMuscleVals(-1 + 2 * muscle)
-        self.callEvent('onChanged', HumanEvent(self, 'muscle'))
+        self.callEvent('onChanging', HumanEvent(self, 'muscle'))
 
     def getMuscle(self):
         if self.muscleVal:
@@ -299,7 +299,7 @@ class Human(gui3d.Object):
 
         african = min(max(african, 0.0), 1.0)
         self.africanVal = african
-        self.callEvent('onChanged', HumanEvent(self, 'african'))
+        self.callEvent('onChanging', HumanEvent(self, 'african'))
         
     def getAfrican(self):
 
@@ -309,7 +309,7 @@ class Human(gui3d.Object):
 
         asian = min(max(asian, 0.0), 1.0)
         self.asianVal = asian
-        self.callEvent('onChanged', HumanEvent(self, 'asian'))
+        self.callEvent('onChanging', HumanEvent(self, 'asian'))
         
     def getAsian(self):
 
@@ -320,7 +320,7 @@ class Human(gui3d.Object):
             'data/targets/macrodetails/universal-stature-dwarf.target',
             'data/targets/macrodetails/universal-stature-giant.target')
         modifier.setValue(self, height, 0)
-        self.callEvent('onChanged', HumanEvent(self, 'height'))
+        self.callEvent('onChanging', HumanEvent(self, 'height'))
         
     def getHeight(self):
         modifier = humanmodifier.Modifier(
@@ -399,7 +399,7 @@ class Human(gui3d.Object):
         if progressCallback:
             progressCallback(1.0)
             
-        self.callEvent('onTargetsReapplied', HumanEvent(self, 'targets'))
+        self.callEvent('onChanged', HumanEvent(self, 'targets'))
 
     def getPartNameForGroupName(self, groupName):
         for k in self.bodyZones:
@@ -538,7 +538,7 @@ class Human(gui3d.Object):
         
         self.setTexture("data/textures/texture.png")
         
-        self.callEvent('onChanged', HumanEvent(self, 'reset'))
+        self.callEvent('onChanging', HumanEvent(self, 'reset'))
 
     def load(self, filename, update=True, progressCallback=None):
         

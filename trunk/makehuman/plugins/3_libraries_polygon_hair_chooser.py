@@ -136,7 +136,7 @@ class HairTaskView(gui3d.TaskView):
         self.hairButton.setPosition([event.width-216, event.height-36, 9.2])
         self.filechooser.onResized(event)
         
-    def onHumanChanged(self, event):
+    def onHumanChanging(self, event):
         
         human = event.human
         if event.change == 'reset':
@@ -145,9 +145,11 @@ class HairTaskView(gui3d.TaskView):
                 human.hairObj = None
                 human.hairProxy = None
             self.hairButton.setTexture('data/hairstyles/clear.png')
-        def updateClosure():
-            self.adaptHairToHuman(human)
-        mh.callAsync(updateClosure)
+        
+    def onHumanChanged(self, event):
+        
+        human = event.human
+        self.adaptHairToHuman(human)
 
     def loadHandler(self, human, values):
         

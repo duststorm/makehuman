@@ -414,6 +414,15 @@ class MHApplication(gui3d.Application):
             self.currentTask.callEvent("onMouseExited", event)
             
         @self.selectedHuman.event
+        def onChanging(event):
+            
+            for category in self.categories.itervalues():
+                
+                for task in category.tasks:
+                    
+                    task.callEvent('onHumanChanging', event)
+                    
+        @self.selectedHuman.event
         def onChanged(event):
             
             for category in self.categories.itervalues():
@@ -421,15 +430,6 @@ class MHApplication(gui3d.Application):
                 for task in category.tasks:
                     
                     task.callEvent('onHumanChanged', event)
-                    
-        @self.selectedHuman.event
-        def onTargetsReapplied(event):
-            
-            for category in self.categories.itervalues():
-                
-                for task in category.tasks:
-                    
-                    task.callEvent('onHumanTargetsReapplied', event)
                     
         @self.selectedHuman.event
         def onTranslated(event):

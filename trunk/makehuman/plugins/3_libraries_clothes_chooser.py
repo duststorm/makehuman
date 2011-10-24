@@ -101,20 +101,23 @@ class ClothesTaskView(gui3d.TaskView):
         
     def onResized(self, event):
         self.filechooser.onResized(event)
-
-    def onHumanChanged(self, event):
+        
+    def onHumanChanging(self, event):
         
         human = event.human
         if event.change == 'reset':
+            print 'deleting clothes'
             for (name,clo) in human.clothesObjs.items():
                 if clo:
                     self.app.scene3d.delete(clo.mesh)
                 del human.clothesObjs[name]
                 del human.clothesProxies[name]
             # self.clothesButton.setTexture('data/clothes/clear.png')
-        def updateClosure():
-            self.adaptClothesToHuman(human)
-        mh.callAsync(updateClosure)
+
+    def onHumanChanged(self, event):
+        
+        human = event.human
+        self.adaptClothesToHuman(human)
 
     def loadHandler(self, human, values):
         

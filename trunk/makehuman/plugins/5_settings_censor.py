@@ -95,13 +95,7 @@ class CensorTaskView(gui3d.TaskView):
         
     def onHumanChanged(self, event):
     
-        if self.app.settings.get('censor', False):
-            mh.callAsync(lambda:self.updateCensor())
-        
-    def onHumanTargetsReapplied(self, event):
-    
-        if self.app.settings.get('censor', False):
-            mh.callAsync(lambda:self.updateCensor())
+        self.updateCensor()
             
     def onHumanTranslated(self, event):
     
