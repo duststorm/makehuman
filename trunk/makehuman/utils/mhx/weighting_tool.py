@@ -672,7 +672,56 @@ class VIEW3D_OT_MhxExportShapeKeysButton(bpy.types.Operator):
         exportShapeKeys(context)
         return{'FINISHED'}    
 
+#
+#   listVertPairs(context):
+#   class VIEW3D_OT_MhxListVertPairsButton(bpy.types.Operator):
+#
 
+def listVertPairs(context):
+    filePath = context.scene['MhxVertexGroupFile']
+    fileName = os.path.expanduser(filePath)
+    print("Open %s" % fileName)
+    fp = open(fileName, "w")
+    ob = context.object
+    verts = []
+    for v in ob.data.vertices:
+        if v.select:
+            verts.append((v.co[2], v.index))
+    verts.sort()
+    nmax = int(len(verts)/2)
+    fp.write("Pairs = (\n")
+    for n in range(nmax):
+        (z1, vn1) = verts[2*n]
+        (z2, vn2) = verts[2*n+1]
+        v1 = ob.data.vertices[vn1]
+        v2 = ob.data.vertices[vn2]
+        x1 = v1.co[0]
+        y1 = v1.co[1]
+        x2 = v2.co[0]
+        y2 = v2.co[1]
+        print("%d (%.4f %.4f %.4f)" % (v1.index, x1,y1,z1))
+        print("%d (%.4f %.4f %.4f)\n" % (v2.index, x2,y2,z2))
+        if ((abs(z1-z2) > Epsilon) or
+            (abs(x1+x2) > Epsilon) or
+            (abs(y1-y2) > Epsilon)):
+            raise NameError("Verts %d and %d not a pair:\n  %s\n  %s\n" % (v1.index, v2.index, v1.co, v2.co))
+        if x1 > x2:
+            fp.write("    (%d, %d),\n" % (v1.index, v2.index))            
+        else:
+            fp.write("    (%d, %d),\n" % (v2.index, v1.index))            
+    fp.write(")\n")
+    fp.close()
+    print("Wrote %s" % fileName)
+    return
+
+class VIEW3D_OT_MhxListVertPairsButton(bpy.types.Operator):
+    bl_idname = "mhx.weight_list_vert_pairs"
+    bl_label = "List vert pairs"
+
+    def execute(self, context):
+        listVertPairs(context)
+        return{'FINISHED'}    
+                   
 #
 #    initInterface(context):
 #    class VIEW3D_OT_MhxInitInterfaceButton(bpy.types.Operator):
@@ -772,6 +821,8 @@ class MhxWeightToolsPanel(bpy.types.Panel):
         layout.prop(context.scene, 'MhxExportAsWeightFile')
         layout.operator("mhx.weight_export_vertex_groups")    
         layout.operator("mhx.weight_export_sum_groups")    
+        
+        layout.operator("mhx.weight_list_vert_pairs")            
 
         layout.separator()
         layout.operator("mhx.weight_shapekeys_from_objects")    

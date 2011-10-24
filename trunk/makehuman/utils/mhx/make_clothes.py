@@ -42,6 +42,136 @@ theListLength = 3
 Epsilon = 1e-4
 
 #
+#
+#
+
+SkirtFrontPairs = [
+    (4684, 13975),
+    (4081, 13983),
+    (4109, 6938),
+    (4108, 6939),
+    (3873, 7136),
+    (3860, 7149),
+    (3865, 7144),
+    (3868, 7141),
+    (3880, 7129),
+    (3896, 7113),
+    (3897, 7112),
+    (3886, 7123),
+    (3882, 7127),
+    (3793, 7218),
+    (3799, 7212),
+    (3983, 7026),
+    (6582, 6727),
+    (6499, 6761),
+    (3985, 7024),
+    (3957, 7052),
+    (3781, 7230),
+    (3782, 7229),
+    (3777, 7234),
+    (3776, 7235),
+    (6563, 6749),
+    (6566, 6746),
+    (6571, 6741),
+    (6576, 6736),
+]
+
+SkirtBackPairs = [
+    (4711, 13948),
+    (4074, 13990),
+    (4073, 13991),
+    (4093, 6954),
+    (4094, 6953),
+    (4014, 7015),
+    (4047, 6982),
+    (4048, 6981),
+    (4029, 7000),
+    (4030, 6999),
+    (4023, 7006),
+    (4061, 6968),
+    (4062, 6967),
+    (3845, 7164),
+    (4498, 6867),
+    (4495, 6870),
+    (3857, 7152),
+    (3794, 7217),
+    (3840, 7169),
+    (3841, 7168),
+    (3837, 7172),
+    (3917, 7092),
+    (3920, 7089),
+    (4476, 6889),
+    (4475, 6890),
+    (4474, 6891),
+    (4505, 6860),
+    (4200, 6914),
+    (2116, 7485),
+]
+
+ChestPairs = [
+    (6563, 6749),
+    (6560, 6752),
+    (6558, 6754),
+    (6559, 6753),
+    (6562, 6750),
+    (6561, 6751),
+    (3700, 7242),
+    (3701, 10131),
+    (3702, 10130),
+    (3703, 10129),
+    (4446, 9981),
+    (4156, 10069),
+    (3400, 10361),
+    (3705, 10127),
+    (3706, 10126),
+    (3707, 10125),
+    (3708, 10124),
+    (3709, 10123),
+    (3710, 10122),
+    (4171, 10058),
+    (3711, 10121),
+    (4188, 10041),
+    (3712, 10120),
+    (3718, 10115),
+    (3719, 10114),
+    (3720, 10113),
+    (4187, 10042),
+    (3721, 10112),
+    (4166, 10063),
+    (3722, 10111),
+    (3723, 10110),
+    (3724, 10109),
+    (3725, 10108),
+    (3726, 10107),
+    (3727, 10106),
+    (4673, 9800),
+]
+
+BackPairs = [
+    (4505, 6860),
+    (4473, 6892),
+    (4472, 6893),
+    (2118, 7483),
+    (4137, 6927),
+    (2120, 7481),
+    (2128, 7473),
+    (2113, 7488),
+    (4139, 10086),
+    (4141, 10084),
+    (4144, 10081),
+    (4433, 9994),
+    (2610, 11000),
+    (2609, 11001),
+    (2625, 10985),
+    (3632, 10160),
+    (2626, 10984),
+    (2630, 10980),
+    (3046, 10685),
+    (3494, 10287),
+    (2598, 11068),
+]
+
+#
 #   isHuman(ob):
 #   isClothing(ob):
 #   getHuman(context):
@@ -1899,6 +2029,21 @@ def initInterface(scn):
         maxlen=1024)
     scn['MakeClothesDirectory'] = "~"
     
+    bpy.types.Scene.MakeClothesSkirt = BoolProperty(
+        name="Skirt", 
+        description="Skirt")
+    scn['MakeClothesSkirt'] = False
+
+    bpy.types.Scene.MakeClothesFlatChest = BoolProperty(
+        name="Flat chest", 
+        description="Flat chest")
+    scn['MakeClothesFlatChest'] = False
+
+    bpy.types.Scene.MakeClothesFlatBack = BoolProperty(
+        name="Flat back", 
+        description="Flat back")
+    scn['MakeClothesFlatBack'] = False
+
     bpy.types.Scene.MakeClothesMaterials = BoolProperty(
         name="Materials", 
         description="Use materials")
@@ -2077,6 +2222,11 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.prop(scn, "MakeClothesHairMaterial")
         layout.prop(scn, "MakeClothesListLength")
         layout.prop(scn, "MakeClothesLogging")
+        
+        layout.separator()
+        layout.prop(scn, "MakeClothesSkirt")
+        layout.prop(scn, "MakeClothesFlatChest")
+        layout.prop(scn, "MakeClothesFlatBack")
         
         layout.separator()
         layout.operator("mhclo.make_clothes")
