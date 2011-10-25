@@ -41,14 +41,18 @@ class CustomTargetsTaskView(gui3d.TaskView):
         if not os.path.exists(self.targetsPath):
             os.makedirs(self.targetsPath)
         
+        self.msg = gui3d.TextView(self, label='No custom targets found.\nTo add a custom target, place the file in ' + self.targetsPath, \
+                                            style=gui3d.TextViewStyle._replace(left=10, top=80, width=320))
+        self.targetsBox = gui3d.GroupBox(self, label = 'Targets',position = [10, 80, 9.0])
+        
         optionsBox = gui3d.GroupBox(self, label = 'Options', position=[650, 80, 9.0], style=gui3d.GroupBoxStyle._replace(margin=[10,0,0,10]))
-        rescanButton = gui3d.Button(optionsBox, label='Rescan targets folder')
+        rescanButton = gui3d.Button(optionsBox, label="Rescan targets' folder")
         @rescanButton.event
         def onClicked(event):
-            del self.targetsBox
+            #TODO: undo any applied change here
             self.searchTargets()
             
-        baseMeshToogle = gui3d.ToggleButton(optionsBox, label='Apply to base mesh')
+        #baseMeshToogle = gui3d.ToggleButton(optionsBox, label='Apply to base mesh')
             
         self.searchTargets()
         
@@ -56,13 +60,22 @@ class CustomTargetsTaskView(gui3d.TaskView):
         targets = os.listdir(self.targetsPath)
         
         if len(targets) == 0:
-            self.targetsBox = gui3d.TextView(self, label = 'No custom targets found.\nTo add a custom target, place the file in ' + self.targetsPath,\
-            style=gui3d.TextViewStyle._replace(left=10, top=80, width=320))
+            self.msg.show()
+            self.targetsBox.hide()
         else:
-            self.targetsBox = gui3d.GroupBox(self, label = 'Targets', position=[10, 80, 9.0], style=gui3d.GroupBoxStyle._replace(height=320))
+            self.msg.hide()
             
+            for i in self.targetsBox.children:
+                #This is a hack to ensure a deleted object doesn't show up even if there still is a reference somewhere
+                i.hide()
+                del i
+                
             for i in targets:
                 self.createTargetControls(self.targetsBox, self.targetsPath, i)
+            
+            self.targetsBox.show()
+            #This is a hack to rebuild the layout
+            self.targetsBox.onShow(None)
         
     def createTargetControls(self, box, targetPath, targetFile):
         # When the slider is dragged and released, an onChange event is fired
