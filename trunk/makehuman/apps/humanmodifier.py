@@ -96,7 +96,10 @@ class ModifierSlider(Slider):
             if self.value is None:
                 self.value = self.modifier.getValue(human)
                 if human.isSubdivided():
-                    human.meshData.setVisibility(1)
+                    if human.isProxied():
+                        human.getProxyMesh().setVisibility(1)
+                    else:
+                        human.getSeedMesh().setVisibility(1)
                     human.getSubdivisionMesh(False).setVisibility(0)
             self.modifier.updateValue(human, value, self.app.settings.get('realtimeNormalUpdates', True))
             human.updateProxyMesh()
@@ -107,7 +110,11 @@ class ModifierSlider(Slider):
         if self.value != value:
             self.app.do(ModifierAction(human, self.modifier, self.value, value, self.update))
         if human.isSubdivided():
-            human.meshData.setVisibility(0)
+            human.updateProxyMesh()
+            if human.isProxied():
+                human.getProxyMesh().setVisibility(0)
+            else:
+                human.getSeedMesh().setVisibility(0)
             human.getSubdivisionMesh(False).setVisibility(1)
         self.value = None
         

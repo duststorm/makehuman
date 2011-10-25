@@ -241,7 +241,7 @@ class Object(events3d.EventHandler):
         
     def isProxied(self):
     
-        return self.mesh == self.__proxyMesh
+        return self.mesh == self.__proxyMesh or self.mesh == self.__proxySubdivisionMesh
         
     def setProxy(self, proxy):
     
