@@ -229,29 +229,39 @@ class Object(events3d.EventHandler):
         
     def setProxy(self, proxy):
     
-        self.proxy = proxy
+        if proxy:
         
-        (folder, name) = proxy.obj_file
+            self.proxy = proxy
+            
+            (folder, name) = proxy.obj_file
+            
+            self.__proxyMesh = files3d.loadMesh(self.app.scene3d, os.path.join(folder, name))
+            self.__proxyMesh.x, self.__proxyMesh.y, self.__proxyMesh.z = self.mesh.x, self.mesh.y, self.mesh.z
+            self.__proxyMesh.rx, self.__proxyMesh.ry, self.__proxyMesh.rz = self.mesh.rx, self.mesh.ry, self.mesh.rz
+            self.__proxyMesh.sx, self.__proxyMesh.sy, self.__proxyMesh.sz = self.mesh.sx, self.mesh.sy, self.mesh.sz
+            self.__proxyMesh.visibility = self.mesh.visibility
+            self.__proxyMesh.shadeless = self.mesh.shadeless
+            self.__proxyMesh.pickable = self.mesh.pickable
+            self.__proxyMesh.cameraMode = self.mesh.cameraMode
+            self.__proxyMesh.texture = self.mesh.texture
+            
+            self.__proxyMesh.object = self.mesh.object
+            
+            self.proxy.update(self.__proxyMesh, self.__seedMesh)
+            
+            self.app.scene3d.update()
+            
+            self.mesh.setVisibility(0)
+            self.mesh = self.__proxyMesh
+            self.mesh.setVisibility(1)
+            
+        else:
         
-        self.__proxyMesh = files3d.loadMesh(self.app.scene3d, os.path.join(folder, name))
-        self.__proxyMesh.x, self.__proxyMesh.y, self.__proxyMesh.z = self.mesh.x, self.mesh.y, self.mesh.z
-        self.__proxyMesh.rx, self.__proxyMesh.ry, self.__proxyMesh.rz = self.mesh.rx, self.mesh.ry, self.mesh.rz
-        self.__proxyMesh.sx, self.__proxyMesh.sy, self.__proxyMesh.sz = self.mesh.sx, self.mesh.sy, self.mesh.sz
-        self.__proxyMesh.visibility = self.mesh.visibility
-        self.__proxyMesh.shadeless = self.mesh.shadeless
-        self.__proxyMesh.pickable = self.mesh.pickable
-        self.__proxyMesh.cameraMode = self.mesh.cameraMode
-        self.__proxyMesh.texture = self.mesh.texture
-        
-        self.__proxyMesh.object = self.mesh.object
-        
-        self.proxy.update(self.__proxyMesh, self.__seedMesh)
-        
-        self.app.scene3d.update()
-        
-        self.mesh.setVisibility(0)
-        self.mesh = self.__proxyMesh
-        self.mesh.setVisibility(1)
+            self.proxy = None
+            self.app.scene3d.delete(self.__proxyMesh)
+            self.__proxyMesh = None
+            self.mesh = self.__seedMesh
+            self.mesh.setVisibility(1)
             
     def getSubdivisionMesh(self, update=True, progressCallback=None):
         

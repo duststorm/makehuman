@@ -59,7 +59,7 @@ class ProxyTaskView(gui3d.TaskView):
         
         human = event.human
         if event.change == 'reset':
-            pass
+            human.setProxy(None)
             
     def onHumanChanged(self, event):
         
