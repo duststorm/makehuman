@@ -110,6 +110,7 @@ class Human(gui3d.Object):
             if obj:
                 obj.show()
         self.setVisibility(True)
+        self.callEvent('onShown', self)
 
     def hide(self):
 
@@ -120,6 +121,7 @@ class Human(gui3d.Object):
             if obj:
                 obj.hide()
         self.setVisibility(False)
+        self.callEvent('onHidden', self)
 
     # Overriding methods to account for both hair and base object
 

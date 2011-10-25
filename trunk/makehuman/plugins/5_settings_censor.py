@@ -106,6 +106,18 @@ class CensorTaskView(gui3d.TaskView):
     
         if self.app.settings.get('censor', False):
             mh.callAsync(lambda:self.updateCensor())
+            
+    def onHumanShown(self, event):
+    
+        if self.app.settings.get('censor', False):
+            self.breastCensorship.show();
+            self.genitalCensorship.show();
+            
+    def onHumanHidden(self, event):
+    
+        if self.app.settings.get('censor', False):
+            self.breastCensorship.hide();
+            self.genitalCensorship.hide();
 
     def onCameraChanged(self, event):
     

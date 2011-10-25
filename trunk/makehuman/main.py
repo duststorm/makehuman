@@ -448,6 +448,24 @@ class MHApplication(gui3d.Application):
                 for task in category.tasks:
                     
                     task.callEvent('onHumanRotated', event)
+                    
+        @self.selectedHuman.event
+        def onShown(event):
+            
+            for category in self.categories.itervalues():
+                
+                for task in category.tasks:
+                    
+                    task.callEvent('onHumanShown', event)
+                    
+        @self.selectedHuman.event
+        def onHidden(event):
+            
+            for category in self.categories.itervalues():
+                
+                for task in category.tasks:
+                    
+                    task.callEvent('onHumanHidden', event)
 
         # Set up categories and tasks
         
