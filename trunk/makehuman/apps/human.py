@@ -383,6 +383,7 @@ class Human(gui3d.Object):
                 progressCallback(progressVal)
 
         # Update all verts
+        self.updateProxyMesh()
         if self.isSubdivided():
             self.getSubdivisionMesh()
             if progressCallback:
@@ -397,8 +398,6 @@ class Human(gui3d.Object):
                 progressCallback(0.8)
             if update:
                 self.meshData.update()
-                
-        self.updateProxyMesh()
                 
         if progressCallback:
             progressCallback(1.0)
@@ -481,11 +480,10 @@ class Human(gui3d.Object):
 
                 algos3d.loadTranslationTarget(self.meshData, targetSym, targetSymVal, None, 1, 1)
                 self.targetsDetailStack[targetSym] = targetSymVal
-                
+        
+        self.updateProxyMesh()        
         if self.isSubdivided():
             self.getSubdivisionMesh()
-            
-        self.updateProxyMesh()
 
         self.app.redraw()
 
