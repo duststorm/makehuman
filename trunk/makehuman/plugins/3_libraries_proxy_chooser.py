@@ -40,7 +40,7 @@ class ProxyTaskView(gui3d.TaskView):
         
     def setProxy(self, human, proxy):
 
-        print("Proxy file", proxy)
+        human.setProxy(mh2proxy.readProxyFile(human.getSeedMesh(), proxy, False))
 
     def onShow(self, event):
         # When the task gets shown, set the focus to the file chooser

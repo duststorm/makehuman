@@ -29,6 +29,7 @@ import module3d
 import mh
 import os
 import font3d
+import files3d
 import weakref
 from catmull_clark_subdivision import createSubdivisionObject, updateSubdivisionObject
 
@@ -101,17 +102,21 @@ class Object(events3d.EventHandler):
         self.visible = visible
         self.mesh.object = self
         
+        self.proxy = None
+        
         self.__seedMesh = self.mesh
+        self.__proxyMesh = None
         self.__subdivisionMesh = None
+        self.__proxySubdivisionMesh = None
         
     def __del__(self):
     
+        self.proxy
+        
         self.__seedMesh = None
+        self.__proxyMesh = None
         self.__subdivisionMesh = None
-        
-        self.mesh.object = None
-        
-        self.app.scene3d.delete(self.mesh)
+        self.__proxySubdivisionMesh = None
 
     def show(self):
         
@@ -138,6 +143,8 @@ class Object(events3d.EventHandler):
 
     def setPosition(self, position):
         self.__seedMesh.setLoc(position[0], position[1], position[2])
+        if self.__proxyMesh:
+            self.__proxyMesh.setLoc(position[0], position[1], position[2])
         if self.__subdivisionMesh:
             self.__subdivisionMesh.setLoc(position[0], position[1], position[2])
 
@@ -146,26 +153,36 @@ class Object(events3d.EventHandler):
 
     def setRotation(self, rotation):
         self.__seedMesh.setRot(rotation[0], rotation[1], rotation[2])
+        if self.__proxyMesh:
+            self.__proxyMesh.setRot(rotation[0], rotation[1], rotation[2])
         if self.__subdivisionMesh:
             self.__subdivisionMesh.setRot(rotation[0], rotation[1], rotation[2])
             
     def setScale(self, scale, scaleY=None, scaleZ=None):
         if scaleZ:
             self.__seedMesh.setScale(scale, scaleY, scaleZ)
+            if self.__proxyMesh:
+                self.__proxyMesh.setScale(scale, scaleY, scaleZ)
             if self.__subdivisionMesh:
                 self.__subdivisionMesh.setScale(scale, scaleY, scaleZ)
         elif scaleY:
             self.__seedMesh.setScale(scale, scaleY, 1)
+            if self.__proxyMesh:
+                self.__proxyMesh.setScale(scale, scaleY, 1)
             if self.__subdivisionMesh:
                 self.__subdivisionMesh.setScale(scale, scaleY, 1)
         else:
             self.__seedMesh.setScale(scale, scale, 1)
+            if self.__proxyMesh:
+                self.__proxyMesh.setScale(scale, scale, 1)
             if self.__subdivisionMesh:
                 self.__subdivisionMesh.setScale(scale, scale, 1)
 
     def setTexture(self, texture):
         if texture:
             self.__seedMesh.setTexture(texture)
+            if self.__proxyMesh:
+                self.__proxyMesh.setTexture(texture)
             if self.__subdivisionMesh:
                 self.__subdivisionMesh.setTexture(texture)
         else:
@@ -176,6 +193,8 @@ class Object(events3d.EventHandler):
 
     def clearTexture(self):
         self.__seedMesh.clearTexture()
+        if self.__proxyMesh:
+            self.__proxyMesh.clearTexture()
         if self.__subdivisionMesh:
             self.__subdivisionMesh.clearTexture()
             
@@ -184,6 +203,8 @@ class Object(events3d.EventHandler):
         
     def setSolid(self, solid):
         self.__seedMesh.setSolid(solid)
+        if self.__proxyMesh:
+            self.__proxyMesh.setSolid(solid)
         if self.__subdivisionMesh:
             self.__subdivisionMesh.setSolid(solid)
             
@@ -192,6 +213,45 @@ class Object(events3d.EventHandler):
         
     def getSeedMesh(self):
         return self.__seedMesh
+        
+    def getProxyMesh(self):
+        return self.__proxyMesh
+        
+    def updateProxyMesh(self):
+    
+        if self.proxy and self.__proxyMesh:
+            self.proxy.update(self.__proxyMesh, self.__seedMesh)
+            self.__proxyMesh.update()
+        
+    def hasProxy(self):
+    
+        return self.mesh == self.__proxyMesh
+        
+    def setProxy(self, proxy):
+    
+        self.proxy = proxy
+        
+        (folder, name) = proxy.obj_file
+        
+        self.__proxyMesh = files3d.loadMesh(self.app.scene3d, os.path.join(folder, name))
+        self.__proxyMesh.x, self.__proxyMesh.y, self.__proxyMesh.z = self.mesh.x, self.mesh.y, self.mesh.z
+        self.__proxyMesh.rx, self.__proxyMesh.ry, self.__proxyMesh.rz = self.mesh.rx, self.mesh.ry, self.mesh.rz
+        self.__proxyMesh.sx, self.__proxyMesh.sy, self.__proxyMesh.sz = self.mesh.sx, self.mesh.sy, self.mesh.sz
+        self.__proxyMesh.visibility = self.mesh.visibility
+        self.__proxyMesh.shadeless = self.mesh.shadeless
+        self.__proxyMesh.pickable = self.mesh.pickable
+        self.__proxyMesh.cameraMode = self.mesh.cameraMode
+        self.__proxyMesh.texture = self.mesh.texture
+        
+        self.__proxyMesh.object = self.mesh.object
+        
+        self.proxy.update(self.__proxyMesh, self.__seedMesh)
+        
+        self.app.scene3d.update()
+        
+        self.mesh.setVisibility(0)
+        self.mesh = self.__proxyMesh
+        self.mesh.setVisibility(1)
             
     def getSubdivisionMesh(self, update=True, progressCallback=None):
         

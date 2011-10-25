@@ -99,6 +99,7 @@ class ModifierSlider(Slider):
                     human.meshData.setVisibility(1)
                     human.getSubdivisionMesh(False).setVisibility(0)
             self.modifier.updateValue(human, value, self.app.settings.get('realtimeNormalUpdates', True))
+            human.updateProxyMesh()
             
     def onChange(self, value):
         

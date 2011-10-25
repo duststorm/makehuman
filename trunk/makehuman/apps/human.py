@@ -396,6 +396,8 @@ class Human(gui3d.Object):
             if update:
                 self.meshData.update()
                 
+        self.updateProxyMesh()
+                
         if progressCallback:
             progressCallback(1.0)
             
@@ -480,6 +482,8 @@ class Human(gui3d.Object):
                 
         if self.isSubdivided():
             self.getSubdivisionMesh()
+            
+        self.updateProxyMesh()
 
         self.app.redraw()
 
