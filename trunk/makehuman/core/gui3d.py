@@ -147,6 +147,8 @@ class Object(events3d.EventHandler):
             self.__proxyMesh.setLoc(position[0], position[1], position[2])
         if self.__subdivisionMesh:
             self.__subdivisionMesh.setLoc(position[0], position[1], position[2])
+        if self.__proxySubdivisionMesh:
+            self.__proxySubdivisionMesh.setLoc(position[0], position[1], position[2])
 
     def getRotation(self):
         return [self.mesh.rx, self.mesh.ry, self.mesh.rz]
@@ -157,6 +159,8 @@ class Object(events3d.EventHandler):
             self.__proxyMesh.setRot(rotation[0], rotation[1], rotation[2])
         if self.__subdivisionMesh:
             self.__subdivisionMesh.setRot(rotation[0], rotation[1], rotation[2])
+        if self.__proxySubdivisionMesh:
+            self.__proxySubdivisionMesh.setRot(rotation[0], rotation[1], rotation[2])
             
     def setScale(self, scale, scaleY=None, scaleZ=None):
         if scaleZ:
@@ -165,18 +169,24 @@ class Object(events3d.EventHandler):
                 self.__proxyMesh.setScale(scale, scaleY, scaleZ)
             if self.__subdivisionMesh:
                 self.__subdivisionMesh.setScale(scale, scaleY, scaleZ)
+            if self.__proxySubdivisionMesh:
+                self.__proxySubdivisionMesh.setScale(scale, scaleY, scaleZ)
         elif scaleY:
             self.__seedMesh.setScale(scale, scaleY, 1)
             if self.__proxyMesh:
                 self.__proxyMesh.setScale(scale, scaleY, 1)
             if self.__subdivisionMesh:
                 self.__subdivisionMesh.setScale(scale, scaleY, 1)
+            if self.__proxySubdivisionMesh:
+                self.__proxySubdivisionMesh.setScale(scale, scaleY, 1)
         else:
             self.__seedMesh.setScale(scale, scale, 1)
             if self.__proxyMesh:
                 self.__proxyMesh.setScale(scale, scale, 1)
             if self.__subdivisionMesh:
                 self.__subdivisionMesh.setScale(scale, scale, 1)
+            if self.__proxySubdivisionMesh:
+                self.__proxySubdivisionMesh.setScale(scale, scale, 1)
 
     def setTexture(self, texture):
         if texture:
@@ -185,6 +195,8 @@ class Object(events3d.EventHandler):
                 self.__proxyMesh.setTexture(texture)
             if self.__subdivisionMesh:
                 self.__subdivisionMesh.setTexture(texture)
+            if self.__proxySubdivisionMesh:
+                self.__proxySubdivisionMesh.setTexture(texture)
         else:
             self.clearTexture()
             
@@ -197,6 +209,8 @@ class Object(events3d.EventHandler):
             self.__proxyMesh.clearTexture()
         if self.__subdivisionMesh:
             self.__subdivisionMesh.clearTexture()
+        if self.__proxySubdivisionMesh:
+            self.__proxySubdivisionMesh.clearTexture()
             
     def hasTexture(self):
         return self.__seedMesh.hasTexture()
@@ -207,6 +221,8 @@ class Object(events3d.EventHandler):
             self.__proxyMesh.setSolid(solid)
         if self.__subdivisionMesh:
             self.__subdivisionMesh.setSolid(solid)
+        if self.__proxySubdivisionMesh:
+            self.__proxySubdivisionMesh.setSolid(solid)
             
     def isSolid(self):
         return self.__seedMesh.solid
@@ -223,7 +239,7 @@ class Object(events3d.EventHandler):
             self.proxy.update(self.__proxyMesh, self.__seedMesh)
             self.__proxyMesh.update()
         
-    def hasProxy(self):
+    def isProxied(self):
     
         return self.mesh == self.__proxyMesh
         
@@ -255,26 +271,37 @@ class Object(events3d.EventHandler):
             self.mesh = self.__proxyMesh
             self.mesh.setVisibility(1)
             
-        else:
+        elif self.proxy:
         
             self.proxy = None
             self.app.scene3d.delete(self.__proxyMesh)
             self.__proxyMesh = None
+            if self.__proxySubdivisionMesh:
+                self.app.scene3d.delete(self.__proxySubdivisionMesh)
+                self.__proxySubdivisionMesh = None
             self.mesh = self.__seedMesh
             self.mesh.setVisibility(1)
             
     def getSubdivisionMesh(self, update=True, progressCallback=None):
         
-        if not self.__subdivisionMesh:
-            self.__subdivisionMesh = createSubdivisionObject(self.app.scene3d, self.mesh, progressCallback)
-        elif update:
-            updateSubdivisionObject(self.__subdivisionMesh, progressCallback)
-            
-        return self.__subdivisionMesh
+        if self.isProxied():
+            if not self.__proxySubdivisionMesh:
+                self.__proxySubdivisionMesh = createSubdivisionObject(self.app.scene3d, self.__proxyMesh, progressCallback)
+            elif update:
+                updateSubdivisionObject(self.__proxySubdivisionMesh, progressCallback)
+                
+            return self.__proxySubdivisionMesh
+        else:
+            if not self.__subdivisionMesh:
+                self.__subdivisionMesh = createSubdivisionObject(self.app.scene3d, self.__seedMesh, progressCallback)
+            elif update:
+                updateSubdivisionObject(self.__subdivisionMesh, progressCallback)
+                
+            return self.__subdivisionMesh
 
     def isSubdivided(self):
 
-        return self.mesh == self.__subdivisionMesh
+        return self.mesh == self.__subdivisionMesh or self.mesh == self.__proxySubdivisionMesh
             
     def setSubdivided(self, flag, update=True, progressCallback=None):
 
@@ -282,15 +309,15 @@ class Object(events3d.EventHandler):
             return
             
         if flag:
+            self.mesh.setVisibility(0)
             self.mesh = self.getSubdivisionMesh(update, progressCallback)
-            self.__seedMesh.setVisibility(0)
             self.mesh.setVisibility(1)
         else:
-            self.mesh = self.__seedMesh
+            self.mesh.setVisibility(0)
+            self.mesh = self.__seedMesh if self.mesh == self.__subdivisionMesh else self.__proxyMesh
             if update:
                 self.mesh.calcNormals()
                 self.mesh.update()
-            self.__subdivisionMesh.setVisibility(0)
             self.mesh.setVisibility(1)
             
     def getBBox(self):
