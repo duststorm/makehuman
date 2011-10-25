@@ -110,7 +110,6 @@ class ModifierSlider(Slider):
         if self.value != value:
             self.app.do(ModifierAction(human, self.modifier, self.value, value, self.update))
         if human.isSubdivided():
-            human.updateProxyMesh()
             if human.isProxied():
                 human.getProxyMesh().setVisibility(0)
             else:
