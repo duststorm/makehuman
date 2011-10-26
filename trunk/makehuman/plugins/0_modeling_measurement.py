@@ -38,6 +38,7 @@ class MeasureSlider(humanmodifier.ModifierSlider):
         self.parent.parent.syncSliderLabels()
         
     def onFocus(self, event):
+        humanmodifier.ModifierSlider.onFocus(self, event)
         self.parent.parent.onSliderFocus()
         
     def updateLabel(self):
@@ -54,10 +55,12 @@ class MeasureTaskView(gui3d.TaskView):
 
         self.ruler = Ruler()
         
+        """
         mesh = gui3d.RectangleMesh(100, 100)
         self.influenceMesh = gui3d.Object(self, [0, 0, 8.9], mesh)
         mesh.setColor([0, 0, 0, 32])
         mesh.setPickable(0)
+        """
         
         self.measureMesh = module3d.Object3D('measure', 2)
         self.measureMesh.uvValues = []
@@ -192,9 +195,8 @@ class MeasureTaskView(gui3d.TaskView):
  
         if (isinstance(slider, MeasureSlider)):
         
+            """
             # InfluenceMesh
-            human = self.app.selectedHuman
-        
             # Force caching of vert indices if they don't exist yet
             if not slider.modifier.verts:
                 slider.modifier.updateValue(human, slider.modifier.getValue(human), 0)
@@ -219,6 +221,7 @@ class MeasureTaskView(gui3d.TaskView):
             
             self.influenceMesh.setPosition([x1, y1, 8.9])
             self.influenceMesh.mesh.resize(x2 - x1, y2 - y1)
+            """
         
             # MeasureMesh
             vertidx = self.ruler.Measures[slider.measure]
