@@ -4,6 +4,7 @@ import os.path
 # We need this for gui controls
 
 import gui3d
+import module3d
 import os
 import humanmodifier
 import aljabr
@@ -37,7 +38,7 @@ class MeasureSlider(humanmodifier.ModifierSlider):
         self.parent.parent.syncSliderLabels()
         
     def onFocus(self, event):
-        self.parent.parent.onSliderFocus(self, self.modifier)
+        self.parent.parent.onSliderFocus()
         
     def updateLabel(self):
         self.label.setText(self.template + self.parent.parent.getMeasure(self.measure))
@@ -52,6 +53,32 @@ class MeasureTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Measure')
 
         self.ruler = Ruler()
+        
+        mesh = gui3d.RectangleMesh(100, 100)
+        self.influenceMesh = gui3d.Object(self, [0, 0, 8.9], mesh)
+        mesh.setColor([0, 0, 0, 32])
+        mesh.setPickable(0)
+        
+        self.measureMesh = module3d.Object3D('measure', 2)
+        self.measureMesh.uvValues = []
+        self.measureMesh.indexBuffer = []
+        
+        fg = self.measureMesh.createFaceGroup('measure')
+        
+        count = max([len(vertIdx) for vertIdx in self.ruler.Measures.values()])
+        
+        v = [self.measureMesh.createVertex([0.0, 0.0, 0.0]) for i in xrange(count)]
+        
+        for i in xrange(count-1):
+            fg.createFace((v[i], v[i+1]))
+        
+        self.measureMesh.setCameraProjection(1)
+        self.measureMesh.setShadeless(1)
+        self.measureMesh.setColor([255, 0, 0, 255])
+        self.measureMesh.setPickable(0)
+        self.measureMesh.updateIndexBuffer()
+        
+        self.measureObject = gui3d.Object(self.app, [0, 0, 9], self.measureMesh)
 
         measurements = [
             ('neck', ['neckcirc', 'neckheight']),
@@ -127,11 +154,6 @@ class MeasureTaskView(gui3d.TaskView):
         self.us = gui3d.TextView(self.braBox, 'US: ');y += 20
         self.uk = gui3d.TextView(self.braBox, 'UK: ');y += 20
         y+=16
-        
-        mesh = gui3d.RectangleMesh(100, 100)
-        self.measureLine = gui3d.Object(self, [0, 0, 8.9], mesh)
-        mesh.setColor([0, 0, 0, 32])
-        mesh.setPickable(0)
             
     def getMeasure(self, measure):
         
@@ -159,34 +181,66 @@ class MeasureTaskView(gui3d.TaskView):
         self.statsBox.setPosition([event.width - 150, self.statsBox.getPosition()[1], 9.0])
         self.braBox.setPosition([event.width - 150, self.braBox.getPosition()[1], 9.0])
         
-    def onSliderFocus(self, slider, modifier):
+    def onSliderFocus(self):
         
+        self.updateMeshes()
+        
+    def updateMeshes(self):
+    
         human = self.app.selectedHuman
+        slider = self.app.focusView
+ 
+        if (isinstance(slider, MeasureSlider)):
         
-        # Force caching of vert indices if they don't exist yet
-        if not modifier.verts:
-            modifier.updateValue(human, modifier.getValue(human), 0)
+            # InfluenceMesh
+            human = self.app.selectedHuman
+        
+            # Force caching of vert indices if they don't exist yet
+            if not slider.modifier.verts:
+                slider.modifier.updateValue(human, slider.modifier.getValue(human), 0)
+                
+            vmin, vmax = aljabr.calcBBox([human.mesh.verts[i] for i in slider.modifier.verts])
             
-        vmin, vmax = aljabr.calcBBox([human.mesh.verts[i] for i in modifier.verts])
-        
-        box = [
-            vmin,
-            [vmax[0], vmin[1], vmin[2]],
-            [vmax[0], vmax[1], vmin[2]],
-            [vmin[0], vmax[1], vmin[2]],
-            [vmin[0], vmin[1], vmax[2]],
-            [vmax[0], vmin[1], vmax[2]],
-            vmax,
-            [vmin[0], vmax[1], vmax[2]]
-        ]
-        
-        for i, v in enumerate(box):
-            box[i] = mh.cameras[0].convertToScreen(v[0], v[1], v[2], human.mesh.object3d)
+            box = [
+                vmin,
+                [vmax[0], vmin[1], vmin[2]],
+                [vmax[0], vmax[1], vmin[2]],
+                [vmin[0], vmax[1], vmin[2]],
+                [vmin[0], vmin[1], vmax[2]],
+                [vmax[0], vmin[1], vmax[2]],
+                vmax,
+                [vmin[0], vmax[1], vmax[2]]
+            ]
             
-        x1, y1, x2, y2 = min([v[0] for v in box]), min([v[1] for v in box]), max([v[0] for v in box]), max([v[1] for v in box])
+            for i, v in enumerate(box):
+                box[i] = self.app.modelCamera.convertToScreen(v[0], v[1], v[2], human.mesh.object3d)
+                
+            x1, y1, x2, y2 = min([v[0] for v in box]), min([v[1] for v in box]), max([v[0] for v in box]), max([v[1] for v in box])
+            
+            self.influenceMesh.setPosition([x1, y1, 8.9])
+            self.influenceMesh.mesh.resize(x2 - x1, y2 - y1)
         
-        self.measureLine.setPosition([x1, y1, 8.9])
-        self.measureLine.mesh.resize(x2 - x1, y2 - y1)
+            # MeasureMesh
+            vertidx = self.ruler.Measures[slider.measure]
+            for i, j in enumerate(vertidx):
+                self.measureMesh.verts[i].co = self.app.modelCamera.convertToScreen(*human.mesh.verts[j].co, obj=human.mesh.object3d)
+                self.measureMesh.verts[i].co[2] = 0.0
+            for i in xrange(len(vertidx), len(self.measureMesh.verts)):
+                self.measureMesh.verts[i].co = self.measureMesh.verts[len(vertidx)-1].co[:]
+             
+            self.measureMesh.update()
+            
+    def onHumanTranslated(self, event):
+    
+        self.updateMeshes()
+            
+    def onHumanRotated(self, event):
+    
+        self.updateMeshes()
+        
+    def onCameraChanged(self, event):
+    
+        self.updateMeshes()
         
     def hideAllSliders(self):
         for group in self.groupBoxes.itervalues():
@@ -340,27 +394,27 @@ class Ruler:
         self.Measures = {}
         self.Measures['thighcirc'] = [7066,7205,7204,7192,7179,7176,7166,6886,7172,6813,7173,7101,7033,7032,7041,7232,7076,7062,7063,7229,7066]
         self.Measures['neckcirc'] = [3131,3236,3058,3059,2868,2865,3055,3137,5867,2857,3483,2856,3382,2916,2915,3417,8186,10347,10786,
-                                    10785,10373,10818,10288,10817,9674,10611,10809,10806,10674,10675,10515,10614]
+                                    10785,10373,10818,10288,10817,9674,10611,10809,10806,10674,10675,10515,10614,3131]
         self.Measures['neckheight'] = [8184,8185,8186,8187,7463]
-        self.Measures['upperarm']=[10701,10700,10699,10678,10337,10334,10333,10330,10280,10331,10702,10708,9671,10709,10329,10328]
-        self.Measures['wrist']=[9894,9895,9607,9606,9806,10512,10557,9807,9808,9809,9810,10565,9653,9682,9681,9832,10507]
+        self.Measures['upperarm']=[10701,10700,10699,10678,10337,10334,10333,10330,10280,10331,10702,10708,9671,10709,10329,10328,10701]
+        self.Measures['wrist']=[9894,9895,9607,9606,9806,10512,10557,9807,9808,9809,9810,10565,9653,9682,9681,9832,10507,9894]
         self.Measures['frontchest']=[2961,10764]
         self.Measures['bust']=[6908,3559,3537,3556,3567,3557,4178,3558,4193,3561,3566,3565,3718,3563,2644,4185,2554,4169,2553,3574,2634,2653,3466,3392,
                 2942,3387,4146,4433,2613,10997,9994,10078,10368,10364,10303,10380,10957,10976,10218,11055,10060,11054,10044,10966,10229,10115,
-                10227,10226,10231,10036,10234,10051,10235,10225,10236,10255,10233]
+                10227,10226,10231,10036,10234,10051,10235,10225,10236,10255,10233,6908]
         self.Measures['napetowaist']=[7463,7472]
         self.Measures['waisttohip']=[4681,6575]
         self.Measures['shoulder'] = [10819,10816,10021,10821,10822,10693,10697]
-        self.Measures['underbust'] = [7245,3583,6580,3582,3705,3581,3411,3401,3467,4145,2612,10998,10080,10302,10366,10356,10352,10362,10361,10350,10260,10349,7259]
-        self.Measures['waist'] = [6853,4682,3529,2950,3702,3594,3405,5689,3587,4466,6898,9968,10086,9970,10359,10197,10198,10130,10771,10263,6855]
+        self.Measures['underbust'] = [7245,3583,6580,3582,3705,3581,3411,3401,3467,4145,2612,10998,10080,10302,10366,10356,10352,10362,10361,10350,10260,10349,7259,7245]
+        self.Measures['waist'] = [6853,4682,3529,2950,3702,3594,3405,5689,3587,4466,6898,9968,10086,9970,10359,10197,10198,10130,10771,10263,6855,6853]
         self.Measures['upperlegheight'] = [6755,7026]
         self.Measures['lowerlegheight'] = [6866,13338]
-        self.Measures['calf'] = [7141,7142,7137,6994,6989,6988,6995,6997,6774,6775,6999,6803,6974,6972,6971,7002,7140,7139]
-        self.Measures['ankle'] = [6938,6937,6944,6943,6948,6784,6935,6766,6767,6954,6799,6955,6958,6949,6952,6941]
+        self.Measures['calf'] = [7141,7142,7137,6994,6989,6988,6995,6997,6774,6775,6999,6803,6974,6972,6971,7002,7140,7139,7141]
+        self.Measures['ankle'] = [6938,6937,6944,6943,6948,6784,6935,6766,6767,6954,6799,6955,6958,6949,6952,6941,6938]
         self.Measures['upperarmlenght'] = [9945,10696]
         self.Measures['lowerarmlenght'] = [9696,9945]
         self.Measures['hips'] = [7298,2936,3527,2939,2940,3816,3817,3821,4487,3822,3823,3913,3915,4506,5688,4505,4504,4503,6858,6862,6861,6860,
-                                            6785,6859,7094,7096,7188,7189,6878,7190,7194,7195,7294,7295,7247,7300]
+                                            6785,6859,7094,7096,7188,7189,6878,7190,7194,7195,7294,7295,7247,7300,7298]
 
     def getMeasure(self, human, measurementname, mode):
         measure = 0

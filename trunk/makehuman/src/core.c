@@ -243,13 +243,11 @@ PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
  */
 int Object3D_init(Object3D *self, PyObject *args, PyObject *kwds)
 {
-    int numVerts, numPrimitives;
+    int numVerts;
     PyObject *indexBuffer;
 
     if (!PyArg_ParseTuple(args, "iO", &numVerts, &indexBuffer) || !PyList_Check(indexBuffer))
         return -1;
-
-    numPrimitives = (int)PyList_Size(indexBuffer) / self->vertsPerPrimitive;
 
     // Allocate arrays
     self->verts = makeFloatArray(numVerts * 3);
@@ -260,9 +258,10 @@ int Object3D_init(Object3D *self, PyObject *args, PyObject *kwds)
 
     self->nVerts = numVerts;
 
-    self->primitives = makeIntArray(numPrimitives * self->vertsPerPrimitive);
+    self->primitivesSize = (int)PyList_Size(indexBuffer);
+    self->primitives = makeIntArray(self->primitivesSize);
     self->nNorms = numVerts * 3;
-    self->nPrimitives = numPrimitives;
+    self->nPrimitives = self->primitivesSize / self->vertsPerPrimitive;
     self->nColors = numVerts * 3;
     self->nColors2 = numVerts * 4;
 
@@ -619,6 +618,7 @@ int Object3D_setVertsPerPrimitive( Object3D *self, PyObject *value)
     }
 
     self->vertsPerPrimitive = vertsPerPrimitive;
+    self->nPrimitives = self->primitivesSize / self->vertsPerPrimitive;
 
     return 0;
 }

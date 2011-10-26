@@ -85,6 +85,7 @@ extern "C"
                 <b>EDITORIAL NOTE: One of these may be for 'false' colors. Find out which.</b>  */
         int *primitives;              /**< \brief The indices of elements in this object.                                     */
         /**<        Three integers for each triangular face in this object.                     */
+        int primitivesSize;
         float *verts;               /**< \brief Pointer to the start of the list of vertex coordinates.                     */
         /**<        A pointer to an array of floats containing the list of vertex coordinates
                     for each of the vertices defined for this object.
