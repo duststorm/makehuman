@@ -225,6 +225,7 @@ PyObject *Object3D_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         self->colors2 = NULL;
 
         self->nPrimitives = 0;
+        self->primitivesSize = 0;
         self->nTransparentPrimitives = 0;
         self->nVerts = 0;
         self->nNorms = 0;
