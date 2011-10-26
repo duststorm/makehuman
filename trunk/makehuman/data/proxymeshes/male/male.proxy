@@ -7,7 +7,7 @@
 # z_scale 8208 8220 1.9504
 # y_scale 8289 8223 1.8690
 # use_projection 0
-# texture ../data/textures/texture.tif
+# texture ./data/textures/texture.tif
 # useBaseMaterials
 # faceNumbers
 ftn 427 0 1 ;

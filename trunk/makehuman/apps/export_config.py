@@ -153,7 +153,7 @@ def exportConfig(human, useHair, options=None):
         cfg.cage = options['cage']
         cfg.useRig = options['useRig']
         #useClothes = options['clothes']
-        useProxy = options['useProxy']
+        #useProxy = options['useProxy']
         fp = 0
     else:    
         fp = proxyFilePtr('mh_export.config')
@@ -161,7 +161,7 @@ def exportConfig(human, useHair, options=None):
     if useHair and human.hairObj:
         words = human.hairObj.meshName.split('.')
         pfile = CProxyFile()
-        pfile.set('Clothes', 0, useMhx, useObj, useDae)
+        pfile.set('Clothes', 2, useMhx, useObj, useDae)
         pfile.file = os.path.expanduser("./data/hairstyles/%s.mhclo" % words[0].lower())
         cfg.proxyList.append(pfile)
 
@@ -169,9 +169,16 @@ def exportConfig(human, useHair, options=None):
         if clo:
             name = name.lower()
             pfile = CProxyFile()
-            pfile.set('Clothes', 0, useMhx, useObj, useDae)
+            pfile.set('Clothes', 3, useMhx, useObj, useDae)
             pfile.file = os.path.expanduser("./data/clothes/%s/%s.mhclo" % (name, name))
             cfg.proxyList.append(pfile)
+            
+    if human.proxy:
+        name = human.proxy.name.lower()
+        pfile = CProxyFile()
+        pfile.set('Proxy', 4, useMhx, useObj, useDae)
+        pfile.file = os.path.expanduser("./data/proxymeshes/%s/%s.proxy" % (name, name))
+        cfg.proxyList.append(pfile)    
 
     if not fp: 
         """
@@ -262,7 +269,7 @@ def exportConfig(human, useHair, options=None):
             elif status == 'customvertexgroups':
                 path = os.path.realpath(os.path.expanduser(words[0]))
                 cfg.customvertexgroups.append(path)
-        elif typ != 'Clothes':
+        elif typ == 'Cage':
             pfile = CProxyFile()
             pfile.set(typ, layer, useMhx, useObj, useDae)
             pfile.file = os.path.realpath(os.path.expanduser(words[0]))
