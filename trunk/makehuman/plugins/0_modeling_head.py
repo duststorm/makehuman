@@ -20,7 +20,7 @@ class GroupBoxRadioButton(gui3d.RadioButton):
 class HeadSlider(humanmodifier.ModifierSlider):
     def __init__(self, parent, modifier, image, view):
         
-        humanmodifier.ModifierSlider.__init__(self, parent, min=-1.0, max=1.0, modifier=modifier, style=gui3d.SliderStyle._replace(height=56, normal=image))
+        humanmodifier.ModifierSlider.__init__(self, parent, min=-1.0, max=1.0, modifier=modifier, style=gui3d.SliderStyle._replace(height=56, normal=image), thumbStyle=gui3d.SliderThumbStyle._replace(height = 32, normal="slider2.png", focused="slider2_focused.png"))
         
         self.view = getattr(self.app, view)
         
@@ -38,13 +38,13 @@ class HeadTaskView(gui3d.TaskView):
             ('head', [('data/targets/head/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/head/images/', i[3]) for i in
                 [   
                     ('head-age', 'less', 'more', 'frontView'),
-                    ('head-angle', 'in', 'out', 'leftView'), 
-                    ('head-scale-depth', 'less', 'more', 'leftView'),
+                    ('head-angle', 'in', 'out', 'rightView'), 
+                    ('head-scale-depth', 'less', 'more', 'rightView'),
                     ('head-scale-horiz', 'less', 'more', 'frontView'),
                     ('head-scale-vert', 'more', 'less', 'frontView'),
                     ('head-trans', 'in', 'out', 'frontView'),
                     ('head-trans', 'down', 'up', 'frontView'),
-                    ('head-trans', 'forward', 'backward', 'leftView'),
+                    ('head-trans', 'forward', 'backward', 'rightView'),
                           
                                                       
                 ]]),                 
