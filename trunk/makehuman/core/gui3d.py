@@ -245,6 +245,17 @@ class Object(events3d.EventHandler):
         
     def setProxy(self, proxy):
     
+        if self.proxy:
+        
+            self.proxy = None
+            self.app.scene3d.delete(self.__proxyMesh)
+            self.__proxyMesh = None
+            if self.__proxySubdivisionMesh:
+                self.app.scene3d.delete(self.__proxySubdivisionMesh)
+                self.__proxySubdivisionMesh = None
+            self.mesh = self.__seedMesh
+            self.mesh.setVisibility(1)
+    
         if proxy:
         
             self.proxy = proxy
@@ -269,17 +280,6 @@ class Object(events3d.EventHandler):
             
             self.mesh.setVisibility(0)
             self.mesh = self.__proxyMesh
-            self.mesh.setVisibility(1)
-            
-        elif self.proxy:
-        
-            self.proxy = None
-            self.app.scene3d.delete(self.__proxyMesh)
-            self.__proxyMesh = None
-            if self.__proxySubdivisionMesh:
-                self.app.scene3d.delete(self.__proxySubdivisionMesh)
-                self.__proxySubdivisionMesh = None
-            self.mesh = self.__seedMesh
             self.mesh.setVisibility(1)
             
     def getSubdivisionMesh(self, update=True, progressCallback=None):
