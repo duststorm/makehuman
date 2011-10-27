@@ -53,7 +53,18 @@ class HeadTaskView(gui3d.TaskView):
                     ('head-trans', 'forward', 'backward', 'rightView'),
                           
                                                       
-                ]]),                 
+                ]]), 
+            ('neck', [('data/targets/neck/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/neck/images/', i[3]) for i in
+                [  
+                    ('neck-scale-depth', 'less', 'more', 'rightView'),
+                    ('neck-scale-horiz', 'less', 'more', 'frontView'),
+                    ('neck-scale-vert', 'more', 'less', 'frontView'),
+                    ('neck-trans', 'in', 'out', 'frontView'),
+                    ('neck-trans', 'down', 'up', 'frontView'),
+                    ('neck-trans', 'forward', 'backward', 'rightView'),
+                          
+                                                      
+                ]]),
             ]
 
         y = 80
