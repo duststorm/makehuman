@@ -20,7 +20,7 @@ class GroupBoxRadioButton(gui3d.RadioButton):
 class FaceSlider(humanmodifier.ModifierSlider):
     def __init__(self, parent, modifier, image, view):
         
-        humanmodifier.ModifierSlider.__init__(self, parent, min=-1.0, max=1.0, modifier=modifier, style=gui3d.SliderStyle._replace(height=56, normal=image), thumbStyle=gui3d.SliderThumbStyle._replace(height = 32, normal="slider2.png", focused="slider2_focused.png"))
+        humanmodifier.ModifierSlider.__init__(self, parent, min=-1.0, max=1.0, modifier=modifier, style=gui3d.SliderStyle._replace(height=56, normal=image), thumbStyle=gui3d.SliderThumbStyle._replace(width = 32, height = 32, normal="slider2.png", focused="slider2_focused.png"))
         
         self.view = getattr(self.app, view)
         
