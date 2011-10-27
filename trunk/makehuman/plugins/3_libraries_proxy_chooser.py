@@ -67,12 +67,12 @@ class ProxyTaskView(gui3d.TaskView):
 
     def loadHandler(self, human, values):
         
-        self.setProxy(human, values[1])
+        self.setProxy(human, os.path.join("data", "proxymeshes", values[1], values[1] + ".proxy"))
         
     def saveHandler(self, human, file):
         
-        pass
-        #file.write('proxy %s\n' % human.proxy)
+        if human.proxy:
+            file.write('proxy %s\n' % human.proxy.name.lower())
 
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
