@@ -38,7 +38,15 @@ class HeadTaskView(gui3d.TaskView):
             ('head', [('data/targets/head/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/head/images/', i[3]) for i in
                 [   
                     ('head-age', 'less', 'more', 'frontView'),
-                    ('head-angle', 'in', 'out', 'leftView')                                     
+                    ('head-angle', 'in', 'out', 'leftView'), 
+                    ('head-scale-depth', 'less', 'more', 'leftView'),
+                    ('head-scale-horiz', 'less', 'more', 'frontView'),
+                    ('head-scale-vert', 'more', 'less', 'frontView'),
+                    ('head-trans', 'in', 'out', 'frontView'),
+                    ('head-trans', 'down', 'up', 'frontView'),
+                    ('head-trans', 'forward', 'backward', 'leftView'),
+                          
+                                                      
                 ]]),                 
             ]
 
