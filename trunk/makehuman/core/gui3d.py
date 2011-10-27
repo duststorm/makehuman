@@ -1297,7 +1297,7 @@ class Slider(View):
         
     def setPosition(self, position):
         self.background.setPosition(position)
-        self.thumb.setPosition([position[0], position[1] + 16, position[2] + 0.01])
+        self.thumb.setPosition([position[0], position[1] + self.style.height / 2, position[2] + 0.01])
         self.thumbMinX = position[0]
         self.thumbMaxX = position[0] + self.style.width - self.thumbStyle.width
         self.setValue(self.getValue())

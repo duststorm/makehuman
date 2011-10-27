@@ -28,6 +28,12 @@ class FaceSlider(humanmodifier.ModifierSlider):
         
         humanmodifier.ModifierSlider.onFocus(self, event)
         self.view()
+        
+    def setPosition(self, position):
+        
+        humanmodifier.ModifierSlider.setPosition(self, position)
+        self.thumb.setPosition([position[0], position[1], position[2] + 0.01])
+        self.setValue(self.getValue())
 
 class FaceTaskView(gui3d.TaskView):
 
