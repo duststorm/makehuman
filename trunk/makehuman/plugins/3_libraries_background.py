@@ -80,6 +80,7 @@ class BackgroundTaskView(gui3d.TaskView):
             bg.show()
             self.backgroundImageToggle.setSelected(True)
             self.app.switchCategory('Modelling')
+            self.app.switchTask('Background')
             self.app.redraw()
             
     def fixateBackground(self):
