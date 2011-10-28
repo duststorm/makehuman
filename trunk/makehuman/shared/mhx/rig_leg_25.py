@@ -278,10 +278,10 @@ LegArmature = [
     ('ToePT_R',         0.0, 'ToeRev_R', 0, L_HELP, NoBB),
 
 
-    ('Butt_L',          0.0, 'DfmUpLeg1_L', F_WIR, L_TWEAK, NoBB),
-    ('DfmButt_L',       0.0, 'Hip_L', F_DEF, L_MSCL, NoBB),
-    ('Butt_R',          0.0, 'DfmUpLeg1_R', F_WIR, L_TWEAK, NoBB),
-    ('DfmButt_R',       0.0, 'Hip_R', F_DEF, L_MSCL, NoBB),
+    #('Butt_L',          0.0, 'DfmUpLeg1_L', F_WIR, L_TWEAK, NoBB),
+    #('DfmButt_L',       0.0, 'Hip_L', F_DEF, L_MSCL, NoBB),
+    #('Butt_R',          0.0, 'DfmUpLeg1_R', F_WIR, L_TWEAK, NoBB),
+    #('DfmButt_R',       0.0, 'Hip_R', F_DEF, L_MSCL, NoBB),
 
     # Muscles
     ('DfmLegback_L',    0, 'DfmHips', F_DEF, L_MSCL, NoBB),
@@ -530,7 +530,7 @@ def LegControlPoses(fp):
     copyDeform(fp, 'DfmToe_R', 'Toe_R', DmodToe, U_LOC+U_ROT, None, [])
 
     # Tweak
-    
+    """
     addPoseBone(fp, 'DfmButt_L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, 
         [('StretchTo', C_STRVOL, 1, ['Stretch', 'Butt_L', 0, 1])])
 
@@ -540,7 +540,7 @@ def LegControlPoses(fp):
         [('StretchTo', C_STRVOL, 1, ['Stretch', 'Butt_R', 0, 1])])
 
     addPoseBone(fp, 'Butt_R', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
-
+    """
     # Muscles
 
     addPoseBone(fp, 'DfmLegback_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
