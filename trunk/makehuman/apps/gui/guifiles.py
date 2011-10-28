@@ -102,10 +102,10 @@ class SaveTaskView(gui3d.TaskView):
         leftTop = self.app.modelCamera.convertToScreen(-10, 9, 0)
         rightBottom = self.app.modelCamera.convertToScreen(10, -10, 0)
         
-        self.selection.setPosition(leftTop)
-        self.selection.width = rightBottom[0] - leftTop[0]
-        self.selection.height = rightBottom[1] - leftTop[1]
-        self.selection.mesh.resize(rightBottom[0] - leftTop[0], rightBottom[1] - leftTop[1])
+        self.selection.setPosition([int(leftTop[0]) + 0.5, int(leftTop[1]) + 0.5, 9])
+        self.selection.width = int(rightBottom[0] - leftTop[0])
+        self.selection.height = int(rightBottom[1] - leftTop[1])
+        self.selection.mesh.resize(self.selection.width, self.selection.height)
         self.selection.show()
 
     def onHide(self, event):
@@ -120,6 +120,16 @@ class SaveTaskView(gui3d.TaskView):
         self.app.modelCamera.focusZ = self.focusZ
         self.app.selectedHuman.setRotation(self.rotation)
         self.selection.hide()
+        
+    def onResized(self, event):
+    
+        leftTop = self.app.modelCamera.convertToScreen(-10, 9, 0)
+        rightBottom = self.app.modelCamera.convertToScreen(10, -10, 0)
+        
+        self.selection.setPosition([int(leftTop[0]) + 0.5, int(leftTop[1]) + 0.5, 9])
+        self.selection.width = int(rightBottom[0] - leftTop[0])
+        self.selection.height = int(rightBottom[1] - leftTop[1])
+        self.selection.mesh.resize(self.selection.width, self.selection.height)
         
 class HumanFileSort(gui3d.FileSort):
     
