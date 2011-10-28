@@ -118,6 +118,8 @@ class BackgroundTaskView(gui3d.TaskView):
         self.filechooser.setFocus()
 
     def onHide(self, event):
+        
+        gui3d.TaskView.onHide(self, event)
         self.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
         
@@ -206,3 +208,13 @@ class settingsTaskView(gui3d.TaskView) :
         def onClicked(event):
             gui3d.ToggleButton.onClicked(self.dragButton, event)
             self.backgroundImage.mesh.setPickable(self.dragButton.selected)
+
+    def onShow(self, event):
+        
+        gui3d.TaskView.onShow(self, event)
+        self.backgroundImage.mesh.setPickable(self.dragButton.selected)
+
+    def onHide(self, event):
+        
+        gui3d.TaskView.onHide(self, event)
+        self.backgroundImage.mesh.setPickable(0)
