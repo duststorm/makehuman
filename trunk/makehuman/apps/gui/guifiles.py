@@ -50,6 +50,12 @@ class SaveTaskView(gui3d.TaskView):
         
         gui3d.TaskView.__init__(self, category, 'Save')
         self.fileentry = gui3d.FileEntryView(self, 'Save')
+        
+        mesh = gui3d.FrameMesh(100, 100)
+        self.selection = gui3d.Object(self.app, [0, 0, 9], mesh)
+        mesh.setColor([0, 0, 0, 255])
+        mesh.setPickable(0)
+        self.selection.hide()
 
         @self.fileentry.event
         def onFileSelected(filename):
@@ -62,9 +68,8 @@ class SaveTaskView(gui3d.TaskView):
 
             # Save the thumbnail
 
-            leftTop = mh.cameras[0].convertToScreen(-10, 9, 0)
-            rightBottom = mh.cameras[0].convertToScreen(10, -10, 0)
-            self.app.scene3d.grabScreen(int(leftTop[0]), int(leftTop[1]), int(rightBottom[0] - leftTop[0]), int(rightBottom[1] - leftTop[1]), os.path.join(modelPath, filename + '.bmp'))
+            leftTop = self.selection.getPosition()
+            self.app.scene3d.grabScreen(int(leftTop[0]+1), int(leftTop[1]+1), int(self.selection.width-1), int(self.selection.height-1), os.path.join(modelPath, filename + '.bmp'))
 
             # Save the model
 
@@ -82,29 +87,39 @@ class SaveTaskView(gui3d.TaskView):
         gui3d.TaskView.onShow(self, event)
         self.fileentry.setFocus()
         self.pan = self.app.selectedHuman.getPosition()
-        self.eyeX = mh.cameras[0].eyeX
-        self.eyeY = mh.cameras[0].eyeY
-        self.eyeZ = mh.cameras[0].eyeZ
-        self.focusX = mh.cameras[0].focusX
-        self.focusY = mh.cameras[0].focusY
-        self.focusZ = mh.cameras[0].focusZ
+        self.eyeX = self.app.modelCamera.eyeX
+        self.eyeY = self.app.modelCamera.eyeY
+        self.eyeZ = self.app.modelCamera.eyeZ
+        self.focusX = self.app.modelCamera.focusX
+        self.focusY = self.app.modelCamera.focusY
+        self.focusZ = self.app.modelCamera.focusZ
         self.rotation = self.app.selectedHuman.getRotation()
         self.app.selectedHuman.setPosition([0, -1, 0])
         self.app.setGlobalCamera();
-        mh.cameras[0].eyeZ = 70
+        self.app.modelCamera.eyeZ = 70
         self.app.selectedHuman.setRotation([0.0, 0.0, 0.0])
+        
+        leftTop = self.app.modelCamera.convertToScreen(-10, 9, 0)
+        rightBottom = self.app.modelCamera.convertToScreen(10, -10, 0)
+        
+        self.selection.setPosition(leftTop)
+        self.selection.width = rightBottom[0] - leftTop[0]
+        self.selection.height = rightBottom[1] - leftTop[1]
+        self.selection.mesh.resize(rightBottom[0] - leftTop[0], rightBottom[1] - leftTop[1])
+        self.selection.show()
 
     def onHide(self, event):
         
         gui3d.TaskView.onHide(self, event)
         self.app.selectedHuman.setPosition(self.pan)
-        mh.cameras[0].eyeX = self.eyeX
-        mh.cameras[0].eyeY = self.eyeY
-        mh.cameras[0].eyeZ = self.eyeZ
-        mh.cameras[0].focusX = self.focusX
-        mh.cameras[0].focusY = self.focusY
-        mh.cameras[0].focusZ = self.focusZ
+        self.app.modelCamera.eyeX = self.eyeX
+        self.app.modelCamera.eyeY = self.eyeY
+        self.app.modelCamera.eyeZ = self.eyeZ
+        self.app.modelCamera.focusX = self.focusX
+        self.app.modelCamera.focusY = self.focusY
+        self.app.modelCamera.focusZ = self.focusZ
         self.app.selectedHuman.setRotation(self.rotation)
+        self.selection.hide()
         
 class HumanFileSort(gui3d.FileSort):
     

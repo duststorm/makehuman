@@ -2910,7 +2910,53 @@ class RectangleMesh(module3d.Object3D):
         self.verts[2].co[1] = height
         self.verts[3].co[1] = height
         self.update()     
+       
+class FrameMesh(module3d.Object3D):
+            
+    def __init__(self, width, height):
         
+        
+        """
+        This is the constructor for the FrameMesh class.
+
+        @param width: The width.
+        @type width: C{int} or C{float}
+        @param height: The height.
+        @type height: C{int} or C{float}
+        """
+        
+        module3d.Object3D.__init__(self, 'frame', 2)
+        
+        self.uvValues = []
+        self.indexBuffer = []
+        
+        # create group
+        fg = self.createFaceGroup('frame')
+        
+        # The 4 vertices
+        v = []
+        v.append(self.createVertex([0.0, 0.0, 0.0]))
+        v.append(self.createVertex([width, 0.0, 0.0]))
+        v.append(self.createVertex([width, height, 0.0]))
+        v.append(self.createVertex([0.0, height, 0.0]))
+        
+        # The face
+        fg.createFace((v[3], v[2]))
+        fg.createFace((v[2], v[1]))
+        fg.createFace((v[1], v[0]))
+        fg.createFace((v[0], v[3]))
+        
+        self.setCameraProjection(1)
+        self.setShadeless(1)
+        self.updateIndexBuffer()
+        
+    def resize(self, width, height):
+        
+        self.verts[1].co[0] = width
+        self.verts[2].co[0] = width
+        self.verts[2].co[1] = height
+        self.verts[3].co[1] = height
+        self.update()     
 
 # Radial widget
 RadialStyle = Style(**{
