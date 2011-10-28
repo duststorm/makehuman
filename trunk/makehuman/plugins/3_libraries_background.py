@@ -26,8 +26,10 @@ TO DO
 __docformat__ = 'restructuredtext'
 
 import gui3d
+import events3d
 import mh
 import os
+import aljabr
 
 class BackgroundTaskView(gui3d.TaskView):
 
@@ -39,6 +41,8 @@ class BackgroundTaskView(gui3d.TaskView):
         mesh = gui3d.RectangleMesh(420, 420)
         self.backgroundImage = gui3d.Object(self.app.categories['Modelling'], [190, 90, 1], mesh, visible=False)
         self.opacity = 100
+        mesh.setColor([255, 255, 255, self.opacity])
+        mesh.setPickable(0)
         
         self.backgroundImageToggle = gui3d.ToggleButton(self.app.categories['Modelling'].viewBox, 'Background');
             
@@ -58,21 +62,52 @@ class BackgroundTaskView(gui3d.TaskView):
 
         @self.filechooser.event
         def onFileSelected(filename):
-            print 'Loading %s' % filename
+        
+            self.reference = self.app.selectedHuman.getPosition()
+            
             self.texture.loadImage(os.path.join(mh.getPath(''), 'backgrounds', filename))
 
             bg = self.backgroundImage
             bg.mesh.setTexture(os.path.join(mh.getPath(''), 'backgrounds', filename))
-            bg.mesh.setColor([255, 255, 255, self.opacity])
-            if self.texture.width > self.texture.height:
-                bg.setScale(1.0, float(self.texture.height) / float(self.texture.width))
-            else:
-                bg.setScale(float(self.texture.width) / float(self.texture.height), 1.0)
-            bg.mesh.setPickable(0)
+            
+            bg.setPosition([80, 80, 8])
+            bg.mesh.resize(self.texture.width, self.texture.height)
+            self.backgroundWidth = self.texture.width
+            self.backgroundHeight = self.texture.height
+
+            self.fixateBackground()
+
             bg.show()
             self.backgroundImageToggle.setSelected(True)
             self.app.switchCategory('Modelling')
             self.app.redraw()
+            
+    def fixateBackground(self):
+    
+        self.reference = self.app.selectedHuman.getPosition()
+        _, _, z = self.app.modelCamera.convertToScreen(*self.reference)
+        x, y, _ = self.backgroundImage.getPosition()
+        self.leftTop = self.app.modelCamera.convertToWorld3D(x, y, z)
+        self.rightBottom = self.app.modelCamera.convertToWorld3D(x + self.backgroundWidth, y + self.backgroundHeight, z)
+            
+    def updateBackground(self):
+    
+        if self.backgroundImage.hasTexture():
+        
+            reference = self.app.selectedHuman.getPosition()
+            diff = aljabr.vsub(reference, self.reference)
+            self.leftTop = aljabr.vadd(self.leftTop, diff)
+            self.rightBottom = aljabr.vadd(self.rightBottom, diff)
+            
+            leftTop = self.app.modelCamera.convertToScreen(*self.leftTop)
+            rightBottom = self.app.modelCamera.convertToScreen(*self.rightBottom)
+            
+            self.backgroundImage.setPosition([leftTop[0], leftTop[1], 8])
+            self.backgroundWidth = rightBottom[0]-leftTop[0]
+            self.backgroundHeight = rightBottom[1]-leftTop[1]
+            self.backgroundImage.mesh.resize(self.backgroundWidth, self.backgroundHeight)
+            
+            self.reference = reference
 
     def onShow(self, event):
         
@@ -88,6 +123,18 @@ class BackgroundTaskView(gui3d.TaskView):
         
     def onResized(self, event):
         self.filechooser.onResized(event)
+        
+    def onHumanTranslated(self, event):
+    
+        self.updateBackground()
+        
+    def onCameraChanged(self, event):
+    
+        self.updateBackground()
+        
+    def onResized(self, event):
+        
+        self.updateBackground()
 
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
@@ -125,81 +172,37 @@ class settingsTaskView(gui3d.TaskView) :
         self.backgroundBox = gui3d.GroupBox(self, [10, y, 9], 'Background settings', gui3d.GroupBoxStyle._replace(height=25+36*3+24*1+6));y+=25
         
         # sliders
-        self.zoomSlider = gui3d.Slider(self.backgroundBox, value=1, min=0.0,max=4, label = "Zoom background")
-        self.panXSlider = gui3d.Slider(self.backgroundBox, value=self.backgroundImage.getPosition()[0], min=0.0,max=500, label = "Pan X background")
-        self.panYSlider = gui3d.Slider(self.backgroundBox, value=self.backgroundImage.getPosition()[1], min=0.0,max=500, label = "Pan Y background")
-        self.OpacitySlider = gui3d.Slider(self.backgroundBox, value=taskview.opacity, min=0,max=255, label = "Opacity")
+        self.opacitySlider = gui3d.Slider(self.backgroundBox, value=taskview.opacity, min=0,max=255, label = "Opacity")
         
         # toggle button
-        modifierStyle = gui3d.ButtonStyle._replace(width=(112-4)/2, height=20)
-        self.pickableButton = gui3d.ToggleButton(self.backgroundBox, 'Drag', style=modifierStyle)
-        
-        @self.zoomSlider.event
-        def onChanging(value):
-            self.changeZoom(value)
-        @self.zoomSlider.event
-        def onChange(value):
-            self.changeZoom(value)
-        
-        @self.panXSlider.event
-        def onChanging(value):
-            self.changePanX(value)
-        @self.panXSlider.event
-        def onChange(value):
-            self.changePanX(value)
-        
-        @self.panYSlider.event
-        def onChanging(value):
-            self.changePanY(value)
-        @self.panYSlider.event
-        def onChange(value):
-            self.changePanY(value)
+        self.dragButton = gui3d.ToggleButton(self.backgroundBox, 'Move & Resize')
             
-        @self.OpacitySlider.event
+        @self.opacitySlider.event
         def onChanging(value):
             self.backgroundImage.mesh.setColor([255, 255, 255, value])
-        @self.OpacitySlider.event
+        @self.opacitySlider.event
         def onChange(value):
             taskview.opacity = value
-            self.backgroundImage.mesh.setColor([255, 255, 255, self.opacity])
+            self.backgroundImage.mesh.setColor([255, 255, 255, value])
             
-        @self.backgroundImage.event
-        def onMouseDown(event):
-            self.lastPos=[event.x, event.y]
         @self.backgroundImage.event
         def onMouseDragged(event):
-            self.backgroundImage.setPosition([self.backgroundImage.getPosition()[0]+event.x-self.lastPos[0], self.backgroundImage.getPosition()[1]+event.y-self.lastPos[1], 1.0])
-            self.lastPos = [event.x, event.y]            
         
-        @self.pickableButton.event
+            if event.button == events3d.SDL_BUTTON_LEFT_MASK:
+                x, y, z = self.backgroundImage.getPosition()
+                self.backgroundImage.setPosition([x + event.dx, y + event.dy, z])
+                taskview.fixateBackground()
+            elif event.button == events3d.SDL_BUTTON_RIGHT_MASK:
+                if abs(event.dx) > abs(event.dy):
+                    taskview.backgroundHeight = taskview.backgroundHeight * (taskview.backgroundWidth + event.dx) / taskview.backgroundWidth
+                    taskview.backgroundWidth += event.dx
+                else:
+                    taskview.backgroundWidth = taskview.backgroundWidth * (taskview.backgroundHeight + event.dy) / taskview.backgroundHeight
+                    taskview.backgroundHeight += event.dy
+                self.backgroundImage.mesh.resize(taskview.backgroundWidth, taskview.backgroundHeight)
+                taskview.fixateBackground()
+        
+        @self.dragButton.event
         def onClicked(event):
-            gui3d.ToggleButton.onClicked(self.pickableButton, event)
-            self.backgroundImage.mesh.setPickable(self.pickableButton.selected)
-            
-    def changeZoom(self, zoom):
-        #self.backgroundImage.mesh.resize(self.backgroundImage.mesh.getSize()[0]*zoom/100 +self.backgroundImage.mesh.getSize()[0], self.backgroundImage.mesh.getSize()[1]*zoom/100 +self.backgroundImage.mesh.getSize()[1])
-        #texture = self.backgroundImage.getTexture()
-        if self.texture.width > self.texture.height:
-            self.backgroundImage.setScale(zoom, float(self.texture.height) / float(self.texture.width)*zoom)
-        else:
-            self.backgroundImage.setScale(float(self.texture.height) / float(self.texture.width)*zoom, zoom)
-        #print self.backgroundImage.mesh.getSize(), ' bbox : ', self.backgroundImage.getBBox()
-        self.app.redraw()
-            
-    def changePanX(self, panX):
-        x, y, z = self.backgroundImage.getPosition()
-        self.backgroundImage.setPosition([panX, y, z])
-        self.app.redraw()
-        
-    def changePanY(self, panY):
-        x, y, z = self.backgroundImage.getPosition()
-        self.backgroundImage.setPosition([x, panY, z])
-        self.app.redraw()
-
-    def onResized(self, event):
-        x, y, z = self.backgroundImage.getPosition()
-        scale = (float(event.height) / float(event.height - event.dy))
-        print event
-        print scale
-        print x, y, x * scale, y * scale
-        self.backgroundImage.setPosition([x * scale, y * scale, z])
+            gui3d.ToggleButton.onClicked(self.dragButton, event)
+            self.backgroundImage.mesh.setPickable(self.dragButton.selected)

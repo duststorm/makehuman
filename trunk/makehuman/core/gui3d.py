@@ -1068,6 +1068,7 @@ TabViewStyle = Style(**{
     'parent':ViewStyle,
     'width':800,
     'height':32,
+    'zIndex':9,
     'normal':'upperbar.png',
     'padding':[2,6,0,0],
 })
