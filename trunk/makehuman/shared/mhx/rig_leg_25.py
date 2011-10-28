@@ -61,11 +61,6 @@ LegJoints = [
     ('l-knee-head',         'v', 6865),
     ('l-knee-tail',         'v', 6779),
     
-    ('r-knee-compress1',     'l', ((0.5, 'r-knee'), (0.5, 'r-upper-leg'))),
-    ('r-knee-compress2',     'l', ((0.5, 'r-knee'), (0.5, 'r-ankle'))),
-    ('l-knee-compress1',     'l', ((0.5, 'l-knee'), (0.5, 'l-upper-leg'))),
-    ('l-knee-compress2',     'l', ((0.5, 'l-knee'), (0.5, 'l-ankle'))),
-
     ('r-butt',              'v', 4475),
     ('l-butt',              'v', 6890),
 
@@ -173,12 +168,6 @@ LegHeadsTails = [
     ('KneeTrg_L',       'r-knee-tail', ('r-knee-tail', ysmall)),
     ('DfmKnee_R',       'l-knee-head', 'l-knee-tail'),
     ('KneeTrg_R',       'l-knee-tail', ('l-knee-tail', ysmall)),
-
-    ('DfmKneeCompress_L', 'r-knee-compress1', 'r-knee-compress2'),
-    ('KneeCompressTrg_L', 'r-knee-compress2', ('r-knee-compress2', yunit)),
-    ('DfmKneeCompress_R', 'l-knee-compress1', 'l-knee-compress2'),
-    ('KneeCompressTrg_R', 'l-knee-compress2', ('l-knee-compress2', yunit)),
-    
 
     # Pole Targets
     ('LegTrg_L',        'r-upper-leg', 'r-legtrg'),
@@ -301,12 +290,6 @@ LegArmature = [
     ('LegFrontTrg_R',   0, 'DfmUpLeg1_R', 0, L_HELP, NoBB),
     ('LegInTrg_L',      0, 'DfmUpLeg1_L', 0, L_HELP, NoBB),
     ('LegInTrg_R',      0, 'DfmUpLeg1_R', 0, L_HELP, NoBB),
-
-    # Knee deform
-    ('DfmKneeCompress_L',       0, 'DfmUpLeg3_L', F_DEF, L_DEF, NoBB),
-    ('KneeCompressTrg_L',       0, 'LoLeg_L', 0, L_HELP, NoBB),
-    ('DfmKneeCompress_R',       0, 'DfmUpLeg3_R', F_DEF, L_DEF, NoBB),
-    ('KneeCompressTrg_R',       0, 'LoLeg_R', 0, L_HELP, NoBB),
     
     # Pubis
     ('Pubis_L',            0, 'DfmUpLeg1_L', 0, L_HELP, NoBB),
@@ -566,14 +549,6 @@ def LegControlPoses(fp):
 
     addPoseBone(fp, 'DfmLegIn_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegInTrg_R', 1, 1])])
-
-    # Knee deform
-
-    addPoseBone(fp, 'DfmKneeCompress_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'KneeCompressTrg_L', 0, 1])])
-
-    addPoseBone(fp, 'DfmKneeCompress_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'KneeCompressTrg_R', 0, 1])])                
 
     return
 
