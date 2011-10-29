@@ -36,6 +36,10 @@ class BackgroundTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Background')
         
+        self.backgroundsFolder = os.path.join(mh.getPath(''), 'backgrounds')
+        if not os.path.exists(self.backgroundsFolder):
+            os.makedirs(self.backgroundsFolder)
+        
         self.texture = mh.Texture()
         
         mesh = gui3d.RectangleMesh(420, 420)
@@ -58,17 +62,17 @@ class BackgroundTaskView(gui3d.TaskView):
                 self.app.switchCategory('Library')
                 self.app.switchTask('Background')
                 
-        self.filechooser = gui3d.FileChooser(self, os.path.join(mh.getPath(''), 'backgrounds'), ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None)
+        self.filechooser = gui3d.FileChooser(self, self.backgroundsFolder, ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None)
 
         @self.filechooser.event
         def onFileSelected(filename):
         
             self.reference = self.app.selectedHuman.getPosition()
             
-            self.texture.loadImage(os.path.join(mh.getPath(''), 'backgrounds', filename))
+            self.texture.loadImage(os.path.join(self.backgroundsFolder, filename))
 
             bg = self.backgroundImage
-            bg.mesh.setTexture(os.path.join(mh.getPath(''), 'backgrounds', filename))
+            bg.mesh.setTexture(os.path.join(self.backgroundsFolder, filename))
             
             bg.setPosition([80, 80, 8])
             bg.mesh.resize(self.texture.width, self.texture.height)
@@ -114,8 +118,7 @@ class BackgroundTaskView(gui3d.TaskView):
         
         gui3d.TaskView.onShow(self, event)
         self.app.selectedHuman.hide()
-        self.app.prompt('Info', u'Images which are placed in %s will show up here.' % os.path.join(mh.getPath(''), u'backgrounds'),
-            'OK', helpId='backgroundHelp')
+        self.app.prompt('Info', u'Images which are placed in %s will show up here.' % self.backgroundsFolder, 'OK', helpId='backgroundHelp')
         self.filechooser.setFocus()
 
     def onHide(self, event):
