@@ -41,6 +41,10 @@ class MeasureSlider(humanmodifier.ModifierSlider):
         humanmodifier.ModifierSlider.onFocus(self, event)
         self.parent.parent.onSliderFocus()
         
+    def onBlur(self, event):
+        humanmodifier.ModifierSlider.onBlur(self, event)
+        self.parent.parent.onSliderBlur()
+        
     def updateLabel(self):
         self.label.setText(self.template + self.parent.parent.getMeasure(self.measure))
         
@@ -54,13 +58,6 @@ class MeasureTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Measure')
 
         self.ruler = Ruler()
-        
-        """
-        mesh = gui3d.RectangleMesh(100, 100)
-        self.influenceMesh = gui3d.Object(self, [0, 0, 8.9], mesh)
-        mesh.setColor([0, 0, 0, 32])
-        mesh.setPickable(0)
-        """
         
         self.measureMesh = module3d.Object3D('measure', 2)
         self.measureMesh.uvValues = []
@@ -77,7 +74,7 @@ class MeasureTaskView(gui3d.TaskView):
         
         self.measureMesh.setCameraProjection(1)
         self.measureMesh.setShadeless(1)
-        self.measureMesh.setColor([255, 0, 0, 255])
+        self.measureMesh.setColor([255, 255, 255, 255])
         self.measureMesh.setPickable(0)
         self.measureMesh.updateIndexBuffer()
         
@@ -187,6 +184,11 @@ class MeasureTaskView(gui3d.TaskView):
     def onSliderFocus(self):
         
         self.updateMeshes()
+        self.measureObject.show()
+        
+    def onSliderBlur(self):
+    
+        self.measureObject.hide()
         
     def updateMeshes(self):
     
