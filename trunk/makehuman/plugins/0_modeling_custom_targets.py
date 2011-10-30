@@ -31,6 +31,7 @@ import gui3d
 import mh
 import algos3d
 import os
+import humanmodifier
 
 class CustomTargetsTaskView(gui3d.TaskView):
 
@@ -45,8 +46,8 @@ class CustomTargetsTaskView(gui3d.TaskView):
                                             style=gui3d.TextViewStyle._replace(left=10, top=80, width=320))
         self.targetsBox = gui3d.GroupBox(self, label = 'Targets',position = [10, 80, 9.0])
         
-        optionsBox = gui3d.GroupBox(self, label = 'Options', position=[650, 80, 9.0], style=gui3d.GroupBoxStyle._replace(margin=[10,0,0,10]))
-        rescanButton = gui3d.Button(optionsBox, label="Rescan targets' folder")
+        self.optionsBox = gui3d.GroupBox(self, label = 'Options', position=[650, 80, 9.0], style=gui3d.GroupBoxStyle._replace(margin=[10,0,0,10]))
+        rescanButton = gui3d.Button(self.optionsBox, label="Rescan targets' folder")
         @rescanButton.event
         def onClicked(event):
             #TODO: undo any applied change here
@@ -57,6 +58,9 @@ class CustomTargetsTaskView(gui3d.TaskView):
         self.searchTargets()
         
     def searchTargets(self):
+    
+        self.sliders = []
+        self.modifiers = {}
         targets = os.listdir(self.targetsPath)
         
         if len(targets) == 0:
@@ -83,13 +87,39 @@ class CustomTargetsTaskView(gui3d.TaskView):
 
         # We want the slider to start from the middle
         targetName = os.path.splitext(targetFile)[0]
-        slider = gui3d.Slider(box, value=0, label=targetName)
         
-        @slider.event
-        def onChange(value):
-            human = self.app.selectedHuman
-            algos3d.loadTranslationTarget(human.meshData, os.path.join(targetPath, targetFile), value - human.getDetail(targetName)) 
-            human.setDetail(os.path.join(targetPath, targetFile), value)
+        modifier = humanmodifier.SimpleModifier(os.path.join(targetPath, targetFile))
+        self.modifiers[targetName] = modifier
+        self.sliders.append(humanmodifier.ModifierSlider(box, value=0, label=targetName, modifier=modifier))
+        
+    def syncSliders(self):
+        
+        for slider in self.sliders:
+            slider.update()
+        
+    def onResized(self, event):
+        
+        self.optionsBox.setPosition([event.width - 150, self.optionsBox.getPosition()[1], 9.0])
+        
+    def onShow(self, event):
+
+        gui3d.TaskView.onShow(self, event)
+        if len(self.targetsBox.children):
+            self.targetsBox.children[0].setFocus()
+        self.syncSliders()
+        
+    def loadHandler(self, human, values):
+        
+        modifier = self.modifiers.get(values[1], None)
+        if modifier:
+            modifier.setValue(human, float(values[2]))
+       
+    def saveHandler(self, human, file):
+        
+        for name, modifier in self.modifiers.iteritems():
+            value = modifier.getValue(human)
+            if value:
+                file.write('custom %s %f\n' % (name, value))
 
 category = None
 taskview = None
@@ -101,6 +131,9 @@ taskview = None
 def load(app):
     category = app.getCategory('Modelling')
     taskview = CustomTargetsTaskView(category, app)
+    
+    app.addLoadHandler('custom', taskview.loadHandler)
+    app.addSaveHandler(taskview.saveHandler)
 
     print 'Custom targets plugin loaded'
 

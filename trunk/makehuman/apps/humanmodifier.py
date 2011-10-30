@@ -243,6 +243,30 @@ class GenericModifier:
             human.meshData.calcNormals(1, 1, vertices, faces)
         human.meshData.update(vertices)
 
+class SimpleModifier(GenericModifier):
+
+    def __init__(self, template):
+        
+        GenericModifier.__init__(self, template)
+        
+    # overrides
+    def expandTemplate(self, targets):
+        
+        targets = [(target[0], target[1] + ['dummy']) for target in targets]
+        
+        return targets
+    
+    def getFactors(self, human, value):
+        
+        factors = {
+            'dummy': 1.0
+        }
+        
+        return factors
+    
+    def clampValue(self, value):
+        return max(0.0, min(1.0, value))
+
 class AgeModifier(GenericModifier):
 
     def __init__(self, template):
