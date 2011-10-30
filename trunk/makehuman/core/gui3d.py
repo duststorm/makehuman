@@ -1208,7 +1208,7 @@ class Slider(View):
         mesh = RectangleMesh(thumbStyle.width, thumbStyle.height, self.thumbTexture)
         self.thumb = Object(self, [style.left, style.top + style.height / 2, style.zIndex + 0.01], mesh)
             
-        if isinstance(label, str):
+        if isinstance(label, str) or isinstance(label, unicode):
             font = self.app.getFont(style.fontFamily)
             self.label = TextObject(self, [style.left, style.top + style.height / 4 - font.lineHeight / 2, style.zIndex + 0.2], self.app.getLanguageString(label), fontSize = style.fontSize)
             if '%' in label:

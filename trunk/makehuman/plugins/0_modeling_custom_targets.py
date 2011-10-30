@@ -74,8 +74,8 @@ class CustomTargetsTaskView(gui3d.TaskView):
                 self.createTargetControls(self.targetsBox, self.targetsPath, i)
             
             self.targetsBox.show()
-            #This is a hack to rebuild the layout
-            self.targetsBox.onShow(None)
+            self.targetsBox.layout.rebuild()
+            self.app.scene3d.update()
         
     def createTargetControls(self, box, targetPath, targetFile):
         # When the slider is dragged and released, an onChange event is fired
@@ -83,7 +83,7 @@ class CustomTargetsTaskView(gui3d.TaskView):
 
         # We want the slider to start from the middle
         targetName = os.path.splitext(targetFile)[0]
-        slider = gui3d.Slider(box, value=0, label='%s %%.2f' % targetName)
+        slider = gui3d.Slider(box, value=0, label=targetName)
         
         @slider.event
         def onChange(value):
