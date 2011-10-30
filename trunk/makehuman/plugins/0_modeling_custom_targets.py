@@ -89,7 +89,7 @@ class CustomTargetsTaskView(gui3d.TaskView):
         def onChange(value):
             human = self.app.selectedHuman
             algos3d.loadTranslationTarget(human.meshData, os.path.join(targetPath, targetFile), value - human.getDetail(targetName)) 
-            human.setDetail(targetName, value)
+            human.setDetail(os.path.join(targetPath, targetFile), value)
 
 category = None
 taskview = None
