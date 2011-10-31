@@ -2177,13 +2177,13 @@ class FileChooser(View):
         if isinstance(self.extension, str):
             for root, dirs, files in os.walk(self.path):
                 for f in files:
-                    if f.endswith('.' + self.extension):
+                    if f.lower().endswith('.' + self.extension):
                         self.files.append(os.path.join(root, f))
         elif isinstance(self.extension, list):
             for root, dirs, files in os.walk(self.path):
                 for f in files:
                     for ext in self.extension:
-                        if f.endswith('.' + ext):
+                        if f.lower().endswith('.' + ext):
                             self.files.append(os.path.join(root, f))
         
         # Sort         
@@ -2352,12 +2352,12 @@ class FileChooser2(View):
         self.files = []
         if isinstance(self.extension, str):
             for f in os.listdir(self.path):
-                if f.endswith('.' + self.extension):
+                if f.lower().endswith('.' + self.extension):
                     self.files.append(f)
         elif isinstance(self.extension, list):
             for f in os.listdir(self.path):
                 for ext in self.extension:
-                    if f.endswith('.' + ext):
+                    if f.lower().endswith('.' + ext):
                         self.files.append(f)
         """				
         if self.selectedFile > len(self.files) or self.selectedFile < 0:

@@ -105,7 +105,7 @@ def load_base(base_file):
             - the lookup table associating vertex indices to target
               indices
     """
-    if not base_file.endswith("_base.dat") :
+    if not base_file.lower().endswith("_base.dat") :
         base_file += "_base.dat"
     base = read_target_base(base_file)
     vlist,lookup = read_vertex_list(base_file.replace("_base","_vertices"))

@@ -6,7 +6,7 @@ def load_targets(directory,vertices,lookup):
 	""" Load all targets from a directory and returns an array
 	    of size (ntargets,3*nvertices).
 	"""
-	files = [f for f in os.listdir(directory) if f.endswith(".target")]
+	files = [f for f in os.listdir(directory) if f.lower().endswith(".target")]
 	files.sort()
 	ntargets = len(files)
 	nvertices = len(vertices)
