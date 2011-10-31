@@ -831,7 +831,7 @@ class MHApplication(gui3d.Application):
         
         path = os.path.join("data/languages/", language + ".ini")
         if os.path.isfile(path):
-            f = open(path, 'r')
+            f = open(path, 'rU')
             try:
                 self.languageStrings = eval(f.read(), {"__builtins__":None}, {'True':True, 'False':False})
             except:
