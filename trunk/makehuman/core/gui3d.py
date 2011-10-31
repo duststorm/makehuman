@@ -1212,7 +1212,7 @@ class Slider(View):
             font = self.app.getFont(style.fontFamily)
             self.label = TextObject(self, [style.left, style.top + style.height / 4 - font.lineHeight / 2, style.zIndex + 0.2], self.app.getLanguageString(label), fontSize = style.fontSize)
             if '%' in label:
-                self.labelFormat = label
+                self.labelFormat = self.app.getLanguageString(label)
                 self.edit = TextEdit(self, '',
                     TextEditStyle._replace(width=self.style.width, height=16,
                     left=style.left, top=style.top, zIndex=style.zIndex + 0.3),
