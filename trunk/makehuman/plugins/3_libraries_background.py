@@ -127,9 +127,6 @@ class BackgroundTaskView(gui3d.TaskView):
         self.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
         
-    def onResized(self, event):
-        self.filechooser.onResized(event)
-        
     def onHumanTranslated(self, event):
     
         self.updateBackground()
@@ -140,6 +137,7 @@ class BackgroundTaskView(gui3d.TaskView):
         
     def onResized(self, event):
         
+        self.filechooser.onResized(event)
         self.updateBackground()
 
 # This method is called when the plugin is loaded into makehuman
