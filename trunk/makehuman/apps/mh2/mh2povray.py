@@ -47,6 +47,11 @@ import mh2povray_ini
 import random
 import mh
 
+def downloadPovRay():
+    
+    import webbrowser
+    webbrowser.open('http://www.povray.org/download/')
+
 # Create an instance of the Hairgenerator class with a global context.
 
 def povrayExport(obj, app, settings):
@@ -70,21 +75,22 @@ def povrayExport(obj, app, settings):
 
     print 'POV-Ray Export of object: ', obj.name
 
-  # Read settings from an ini file. This reload enables the settings to be
-  # changed dynamically without forcing the user to restart the MH
-  # application for the changes to take effect.
+    # Read settings from an ini file. This reload enables the settings to be
+    # changed dynamically without forcing the user to restart the MH
+    # application for the changes to take effect.
   
     camera = app.modelCamera
     resolution = (app.settings.get('rendering_width', 800), app.settings.get('rendering_height', 600))
 
     reload(mh2povray_ini)
+    
     path = os.path.join(mh.getPath('render'), mh2povray_ini.outputpath)
     
     format = mh2povray_ini.format if settings['source'] == 'ini' else settings['format']
     action = mh2povray_ini.action if settings['source'] == 'ini' else settings['action']
 
-  # The ini format option defines whether a simple mesh2 object is to be generated
-  # or the more flexible but slower array and macro combo is to be generated.
+    # The ini format option defines whether a simple mesh2 object is to be generated
+    # or the more flexible but slower array and macro combo is to be generated.
 
     if format == 'array':
         povrayExportArray(obj, camera, resolution, path)
@@ -93,30 +99,37 @@ def povrayExport(obj, app, settings):
 
     outputDirectory = os.path.dirname(path)
 
-  # Export the hair model as a set of spline definitions.
-  # Load the test hair dataand write it out in POV-Ray format.
+    # Export the hair model as a set of spline definitions.
+    # Load the test hair dataand write it out in POV-Ray format.
   
     #still unsupported
     #povrayLoadHairsFile('data/hairs/test.hair')
     #povrayWriteHairs(outputDirectory, obj)
 
-  # The ini action option defines whether or not to attempt to render the file once
-  # it's been written.
+    # The ini action option defines whether or not to attempt to render the file once
+    # it's been written.
 
     if action == 'render':
+       
+        if not os.path.isfile(mh2povray_ini.povray_path):
+            app.prompt('POV-Ray not found', 'You don\'t seem to have POV-Ray installed or the path in mh2povray_ini.py is incorrect.', 'Download', 'Cancel', downloadPovRay)
+            return
+    
         if mh2povray_ini.renderscenefile == '':
             outputSceneFile = path.replace('.inc', '.pov')
             baseName = os.path.basename(outputSceneFile)
         else:
             baseName = mh2povray_ini.renderscenefile
-        cmdLineOpt = '+I'
+        cmdLineOpt = ' +I%s' % baseName
         if os.name == 'nt':
-            cmdLineOpt = '/RENDER '
+            cmdLineOpt = ' /RENDER %s' % baseName
+        cmdLineOpt += ' +W%d +H%d' % resolution
 
-    # pathHandle = subprocess.Popen(cwd = outputDirectory, args = mh2povray_ini.povray_path + " /RENDER " + baseName)
+        # pathHandle = subprocess.Popen(cwd = outputDirectory, args = mh2povray_ini.povray_path + " /RENDER " + baseName)
+    
+        print mh2povray_ini.povray_path + cmdLineOpt
 
-        pathHandle = subprocess.Popen(cwd=outputDirectory, args=mh2povray_ini.povray_path + ' ' + cmdLineOpt + baseName)
-
+        pathHandle = subprocess.Popen(cwd=outputDirectory, args=mh2povray_ini.povray_path + cmdLineOpt)
 
 def povrayExportArray(obj, camera, resolution, path):
     """
