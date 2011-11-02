@@ -22,6 +22,7 @@ class TextureToolTaskView(gui3d.TaskView):
         group = []
         self.model = gui3d.RadioButton(self.box, group, "Model", True)
         self.texture = gui3d.RadioButton(self.box, group, "Texture")
+        self.textured = gui3d.CheckBox(self.box, "Textured", True)
         
         @self.model.event
         def onClicked(event):
@@ -32,6 +33,14 @@ class TextureToolTaskView(gui3d.TaskView):
         def onClicked(event):
             gui3d.RadioButton.onClicked(self.texture, event)
             self.switchToTexture()
+            
+        @self.textured.event
+        def onClicked(event):
+            gui3d.CheckBox.onClicked(self.textured, event)
+            if self.textured.selected:
+                self.object.setTexture(self.app.selectedHuman.mesh.texture)
+            else:
+                self.object.clearTexture()
             
     def switchToModel(self):
     
@@ -76,8 +85,12 @@ class TextureToolTaskView(gui3d.TaskView):
                 self.mesh.area += face.area
                 
             for f in self.mesh.faces:
-                index = min(255, max(0, int(f.uvArea*255.0/(f.area/self.mesh.area))))
-                f.setColor([index, index, index, 255])
+                index = min(510, max(0, int(f.uvArea*510.0/(f.area/self.mesh.area))))
+                if index > 255:
+                    f.setColor([255 - (index - 255), 255 - (index - 255), 255, 255])
+                else:
+                    f.setColor([255, index, index, 255])
+                
                     
             self.mesh.texture = human.mesh.texture
             self.mesh.setCameraProjection(0)
@@ -99,11 +112,15 @@ class TextureToolTaskView(gui3d.TaskView):
                 self.mesh.area += f.area
         
             for f in self.mesh.faces:
-                index = min(255, max(0, int(f.uvArea*255.0/(f.area/self.mesh.area))))
-                f.setColor([index, index, index, 255])
+                index = min(510, max(0, int(f.uvArea*510.0/(f.area/self.mesh.area))))
+                if index > 255:
+                    f.setColor([255 - (index - 255), 255 - (index - 255), 255, 255])
+                else:
+                    f.setColor([255, index, index, 255])
         
             self.mesh.update()
-            self.object.setTexture(human.mesh.texture)
+            if self.textured.selected:
+                self.object.setTexture(human.mesh.texture)
 
     def onHide(self, event):
     
