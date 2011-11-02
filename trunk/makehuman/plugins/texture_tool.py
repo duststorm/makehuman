@@ -87,6 +87,23 @@ class TextureToolTaskView(gui3d.TaskView):
             self.object = gui3d.Object(self, [0, 0, 0], self.mesh, True)
         
             self.app.scene3d.update()
+            
+        else:
+        
+            self.mesh.area = 0.0
+            for f in self.mesh.faces:
+                for i, v in enumerate(f.verts):
+                    v.co = human.mesh.faces[f.idx].verts[i].co[:]
+                verts = f.verts
+                f.area = vlen(vcross(vsub(verts[2].co, verts[0].co), vsub(verts[3].co, verts[1].co))) / 2.0
+                self.mesh.area += f.area
+        
+            for f in self.mesh.faces:
+                index = min(255, max(0, int(f.uvArea*255.0/(f.area/self.mesh.area))))
+                f.setColor([index, index, index, 255])
+        
+            self.mesh.update()
+            self.object.setTexture(human.mesh.texture)
 
     def onHide(self, event):
     
