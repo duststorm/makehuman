@@ -2,32 +2,21 @@
 # -*- coding: utf-8 -*-
 
 """
-Common 3D Algebric functions.
+:Authors:
+    Manuel Bastioni,
+    Marc Flerackers
 
-B{Project Name:}      MakeHuman
+:Version: 1.0
+:Copyright: MakeHuman Team 2001-2011
+:License: GPL3 
 
-B{Product Home Page:} U{http://www.makehuman.org/}
-
-B{Code Home Page:}    U{http://code.google.com/p/makehuman/}
-
-B{Authors:}           Manuel Bastioni, Marc Flerackers
-
-B{Copyright(c):}      MakeHuman Team 2001-2011
-
-B{Licensing:}         GPL3 (see also U{http://sites.google.com/site/makehumandocs/licensing})
-
-B{Coding Standards:}  See U{http://sites.google.com/site/makehumandocs/developers-guide}
-
-Abstract
-========
-
-This module contains the most common 3D algebraic operations used in MakeHuman.
+This module contains the most common 3D algebraic operations used in MakeHuman (http://www.makehuman.org/).
 These are mostly the vector and matrix operations core to any 3D application. For efficiency and speed, all matrix
 operation will be done thru flat arrays. Function with matrices as flat arrays are written with underscore "_", whilst
 functions with matrices as list of lists will have the same name without the underscore.
 
-The name is a tribute to I{"Al-jabr wa'l muqabalah"} the most important paper of Mohammed ibn-Musa al-Khuwarizmi (VII - VIII sec d.C.)
-The paper was so important that Al-jabr is the root of modern word I{algebra} and al-Khuwarizmi is the root of word I{algorithm}.
+The name is a tribute to *Al-jabr wa'l muqabalah* the most important paper of Mohammed ibn-Musa al-Khuwarizmi (VII - VIII sec d.C.)
+The paper was so important that Al-jabr is the root of modern word *algebra* and al-Khuwarizmi is the root of word *algorithm*.
 """
 
 from math import sqrt, cos, sin, tan, atan2, fabs, acos, pi, exp
@@ -37,21 +26,24 @@ machine_epsilon = 1.0e-16
 degree2rad = pi/180.0
 
 """
-A triple of Euler angles can be applied/interpreted in 24 ways, which can
-be specified using a 4 character string or encoded 4-tuple:
 
-  *Axes 4-string*: e.g. 'sxyz' or 'ryxy'
+.. note::
 
-  - first character : rotations are applied to 's'tatic or 'r'otating frame
-  - remaining characters : successive rotation axis 'x', 'y', or 'z'
+    A triple of Euler angles can be applied/interpreted in 24 ways, which can
+    be specified using a 4 character string or encoded 4-tuple:
 
-  *Axes 4-tuple*: e.g. (0, 0, 0, 0) or (1, 1, 1, 1)
+      *Axes 4-string*: e.g. 'sxyz' or 'ryxy'
 
-  - inner axis: code of axis ('x':0, 'y':1, 'z':2) of rightmost matrix.
-  - parity : even (0) if inner axis 'x' is followed by 'y', 'y' is followed
-    by 'z', or 'z' is followed by 'x'. Otherwise odd (1).
-  - repetition : first and last axis are same (1) or different (0).
-  - frame : rotations are applied to static (0) or rotating (1) frame.
+      - first character : rotations are applied to 's'tatic or 'r'otating frame
+      - remaining characters : successive rotation axis 'x', 'y', or 'z'
+
+      *Axes 4-tuple*: e.g. (0, 0, 0, 0) or (1, 1, 1, 1)
+
+      - inner axis: code of axis ('x':0, 'y':1, 'z':2) of rightmost matrix.
+      - parity : even (0) if inner axis 'x' is followed by 'y', 'y' is followed
+        by 'z', or 'z' is followed by 'x'. Otherwise odd (1).
+      - repetition : first and last axis are same (1) or different (0).
+      - frame : rotations are applied to static (0) or rotating (1) frame.
 """
 _NEXT_AXIS = [1, 2, 0, 1]
 _AXES2TUPLE = {
@@ -64,20 +56,19 @@ _AXES2TUPLE = {
     'rzxy': (1, 1, 0, 1), 'ryxy': (1, 1, 1, 1), 'ryxz': (2, 0, 0, 1),
     'rzxz': (2, 0, 1, 1), 'rxyz': (2, 1, 0, 1), 'rzyz': (2, 1, 1, 1)}
 
-"""
-Vector Operations
-"""
+#Vector Operations
 
 def vsub(u, v):
     """
     This function returns the difference between two vectors of the same dimension. Works also for flat matrices
-
-    @rtype: double array
-    @return: The resulting vector M{vect1-vect2}
-    @type  u: float iterable
-    @param u: the subrahend
-    @type  v: float iterable
-    @param v: the minuend
+    
+    :param u: the subrahend
+    :param v: the minuend
+    :type u: float iterable
+    :type v: float iterable
+    :return: The resulting vector, vect1-vect2
+    :rtype: double array
+    
     """
     ret = []
     for i in xrange(len(u)):
@@ -88,11 +79,12 @@ def vadd(*vlist):
     """
     This function sums several vectors of the same dimension. If for instance one has vectors v1,v2,v3,v4 all four having dimension n, then one can use
     vadd(v1,v2,v3,v4). This works for arbitrary number of vectors (with the same dimension), vadd(v1) is also valid. Works also for flat matrices
+         
+    :param vlist: the sequence without paranthesis, that determines all the vectors to be added together.
+    :type vlist: a sequence of list of integers of doubles
+    :return: the sum of vectors to be added
+    :rtype: double or integer array
 
-    @rtype:       double or integer array
-    @return:      the sum of vectors to be added
-    @type  vlist: a sequence of list of integers of doubles
-    @param vlist: the sequence without paranthesis, that determines all the vectors to be added together. See above for usage.
     """
     returnValue=[]
     for i in xrange(len(vlist[0])):
@@ -105,13 +97,14 @@ def vadd(*vlist):
 def vmul(vect, s):
     """
     This function returns the vector result of multiplying each entries of a vector by a scalar. Works also for flat matrices
+    
+    :param vect: the vector to be multiplied with the scalar value
+    :param s: the scalar value
+    :type vect: double or integer iterable
+    :type s: double or integer
+    :return: The resulting vector s(vect1)
+    :rtype: double iterable
 
-    @rtype:       double iterable
-    @return:      The resulting vector M{s(vect1)}
-    @type     s: double or integer
-    @param    s: the scalar value
-    @type  vect: double or integer iterable
-    @param vect: the vector to be multiplied with the scalar value
     """
     ret=[]
     for x in vect:
@@ -121,13 +114,13 @@ def vmul(vect, s):
 def vdot(u, v):
     """
     This function returns the dot product between two vectors of the same dimension
-
-    @rtype:  double or integer
-    @return: dot-Product of X{u} and X{v}
-    @type  u: float or integer iterable
-    @param u: The first vector
-    @type  v: float or integer iterable
-    @param v: The second vector
+    
+    :param u: The first vector
+    :param v: The second vector
+    :type u: float or integer iterable
+    :type v: float or integer iterable
+    :return: dot-Product of u and v
+    :rtype: double or integer
     """
     a=0
     for i in xrange(len(u)):
@@ -138,10 +131,10 @@ def vlen(v):
     """
     This function returns the norm (length) of a vector (as a float).
 
-    @rtype:       double
-    @return:      euclidean norm of X{v}
-    @type  vect: float or integer iterable
-    @param vect: The vector
+    :rtype: double
+    :return: euclidean norm of v
+    :type  vect: float or integer iterable
+    :param vect: The vector
     """
     return sqrt(vdot(v,v))
 
@@ -153,10 +146,10 @@ def vnorm(vect):
     essentially the same function as vunit(vect) except that this function
     handles potential zero length vectors.
 
-    @rtype:       double array
-    @return:      normalized form of X{vect}
-    @type  vect: double iterable
-    @param vect: The vector - in the format [x,y,z]
+    :rtype: double array
+    :return: normalized form of  vect 
+    :type  vect: double iterable
+    :param vect: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
 
@@ -183,13 +176,13 @@ def vdist(vect1, vect2):
     between two vector coordinates.
     The distance between two points is the length of the vector joining them.
 
-    @rtype:       double
-    @return:      euclidean distance between X{vect1} and X{vect2} in 3D space
-    @type  vect1: double iterable
-    @param vect1: The vector - in the format [x,y,z]
+    :rtype: double
+    :return: euclidean distance between  vect1  and  vect2  in 3D space
+    :type  vect1: double iterable
+    :param vect1: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
-    @type  vect2: double iterable
-    @param vect2: The vector - in the format [x,y,z]
+    :type  vect2: double iterable
+    :param vect2: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
     return vlen(vsub(vect1,vect2))
@@ -199,24 +192,30 @@ def vcross(vect1, vect2):
     """
     This function returns the cross product of two vectors.
 
-    @rtype:       double list
-    @return:      cross product M{vect1 S{times} vect2}
-    @type  vect1: double list
-    @param vect1: The vector - in the format [x,y,z]
+    :rtype: double list
+    :return: cross product M{vect1 S{times} vect2}
+    :type  vect1: double list
+    :param vect1: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
-    @type  vect2: double list
-    @param vect2: The vector - in the format [x,y,z]
+    :type  vect2: double list
+    :param vect2: The vector - in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
 
     return [vect1[1] * vect2[2] - vect1[2] * vect2[1], vect1[2] * vect2[0] - vect1[0] * vect2[2], vect1[0] * vect2[1] - vect1[1] * vect2[0]]
 
 
-"""
-Matrix Operations
-"""
+
+#Matrix Operations
+
 
 def mmul(m2, m1):
+    """
+    .. todo::
+    
+        Still to comment.
+    
+    """
     
     return [m1[0] * m2[0]  + m1[4] * m2[1]  + m1[8]  * m2[2] ,
             m1[1] * m2[0]  + m1[5] * m2[1]  + m1[9]  * m2[2] ,
@@ -236,6 +235,11 @@ def flatten(M):
     """
     For readability it is easier to write matrices as list of list of doubles. In most cases we do this. But for speed and efficiency,
     we it is best to have these matrices as an (flattened matrix) array. This function converts a list of list into an array.
+    
+    :rtype: array
+    :return: an array object
+    :type  M: double iterable
+    :param M: Matrix to convert
     """
     N=array('d')
     for i in xrange(len(M)):
@@ -258,10 +262,10 @@ def zeros(*shape):
     This function returns an multidimensional zero-matrix (row-major, list of lists) or zero-vector (list of doubles). For instance: If you want to have a zero-vector of 3-dimensions you type
     zeros(3). If you want a 2x3 zero-matrix, we write zeros(2,3).
 
-    @rtype:    list of double lists
-    @return:   a matrix represented as list of lists. Each entry of the list represents a row of the matrix (if this is a nxm matrix). The representation is a row-major order.
-    @type  shape:  sequence of integers (e.g. 2,3 or 2)
-    @param shape:  this represent the dimensions (in integer tuples) of the output matrix (e.g. for 2x3 matrix shape is 2,2)
+    :rtype:    list of double lists
+    :return:   a matrix represented as list of lists. Each entry of the list represents a row of the matrix (if this is a nxm matrix). The representation is a row-major order.
+    :type  shape:  sequence of integers (e.g. 2,3 or 2)
+    :param shape:  this represent the dimensions (in integer tuples) of the output matrix (e.g. for 2x3 matrix shape is 2,2)
     """
     if len(shape) == 0:
         return 0.0
@@ -273,10 +277,10 @@ def _unitMatrix(n):
     """
     This function returns an nxn unit matrix of doubles.
 
-    @rtype:    array of doubles
-    @return:   an nxn flat unit-matrix, row-major order.
-    @type  n:  integer
-    @param n:  the size of the row of the unit-matrix
+    :rtype:    array of doubles
+    :return:   an nxn flat unit-matrix, row-major order.
+    :type  n:  integer
+    :param n:  the size of the row of the unit-matrix
     """
     M=array('d')
     for i in xrange(n):
@@ -289,14 +293,14 @@ def _transpose(M,rows=0,cols=0):
     """
     This function returns the transpose of a flat matrix
 
-    @rtype:    double array
-    @return:   a matrix that is the transpose of the input matrix (row-major)
-    @type  M:  iterable of doubles or integers
-    @param M:  the input flat matrix (row-major) that we want to transpose
-    @type  rows:  integer
-    @param rows:  number of rows that M has (as a row-major matrix)
-    @type  cols:  integer
-    @param colss: number of columns that M has (as a row-major matrix)
+    :rtype:    double array
+    :return:   a matrix that is the transpose of the input matrix (row-major)
+    :type  M:  iterable of doubles or integers
+    :param M:  the input flat matrix (row-major) that we want to transpose
+    :type  rows:  integer
+    :param rows:  number of rows that M has (as a row-major matrix)
+    :type  cols:  integer
+    :param colss: number of columns that M has (as a row-major matrix)
 
     """
     #ret = array('d')
@@ -308,14 +312,14 @@ def _transpose(M,rows=0,cols=0):
 
 def _vmulv(u,v):
     """
-    This function returns the matrix B{uv^T} (where T here means transpose).
+    This function returns the matrix uv^T (where T here means transpose).
 
-    @rtype:    array of doubles
-    @return:   flat matrix B{uv^T} (row-major)
-    @type  u:  double iterable
-    @param u:  the vector multiplied from left
-    @type  v:  double iterable
-    @param v:  the vector multiplied whose adjoint is multiplied from right
+    :rtype:    array of doubles
+    :return:   flat matrix uv^T (row-major)
+    :type  u:  double iterable
+    :param u:  the vector multiplied from left
+    :type  v:  double iterable
+    :param v:  the vector multiplied whose adjoint is multiplied from right
     """
     #M=array('d')
     M=[]
@@ -327,14 +331,19 @@ def _vmulv(u,v):
 # Warning: Unfinished! 
 def _QR(M,n):
     """
-    QR-Decomposition of a flat singular square matrix using Householder transformations. WARNING: Unfinished!
+    
+    .. warning::
+    
+        **Unfinished!**
+        
+    QR-Decomposition of a flat singular square matrix using Householder transformations. 
 
-    @rtype:    tuple of array of doubles
-    @return:   a tuple of flat matrices first matrix is an array representing Q, second matrix represents R for the QR-decomposition of M
-    @type  M:  array of doubles
-    @param M:  flat square matrix (row-major) that we want to take the QR-decomposition
-    @type  n:  integer
-    @param n:  dimension of the square matrix M
+    :rtype:    tuple of array of doubles
+    :return:   a tuple of flat matrices first matrix is an array representing Q, second matrix represents R for the QR-decomposition of M
+    :type  M:  array of doubles
+    :param M:  flat square matrix (row-major) that we want to take the QR-decomposition
+    :type  n:  integer
+    :param n:  dimension of the square matrix M
     """
     A=M[:] #deep copy for a flat iterable. warning [:] does shallow copy for multidimensional iterables
     R=n*n*array('d',[0]) #zero matrix
@@ -372,21 +381,21 @@ def _QR(M,n):
 def _mmul(M,N,rowsM,colsM,colsN):
     """
     This is the naive matrix multiplication. There are faster matrix multiplication algorithms (like those by
-    U{Strassen <http://en.wikipedia.org/wiki/Strassen_algorithm>} or
-    U{Coppersmith-Winograd <http://en.wikipedia.org/wiki/Coppersmith-Winograd_algorithm>}. But fast algorithms will make our
+    Strassen (http://en.wikipedia.org/wiki/Strassen_algorithm) or
+    Coppersmith-Winograd (http://en.wikipedia.org/wiki/Coppersmith-Winograd_algorithm. But fast algorithms will make our
     code uneccessarily long and complicated and for small sized matrix (in 3D programming most matrix
     operation are limited to 3x3 matrices) the performance improvement is insignifcant.
 
-    @rtype:    array of doubles
-    @return:   a flat mxp matrix reprenting the product of M and N
-    @type  M:  array of doubles
-    @param M:  flat mxn matrix (row-major), that is supposed to be the left-multiplier
-    @type  rowsM:  integer
-    @param rowsM:  number of rows of M
-    @type  colsM:  integer
-    @param colsM:  number of columns of M = number of rows of N
-    @type  colsN:  integer
-    @param colsN:  number of columns of N
+    :rtype:    array of doubles
+    :return:   a flat mxp matrix reprenting the product of M and N
+    :type  M:  array of doubles
+    :param M:  flat mxn matrix (row-major), that is supposed to be the left-multiplier
+    :type  rowsM:  integer
+    :param rowsM:  number of rows of M
+    :type  colsM:  integer
+    :param colsM:  number of columns of M = number of rows of N
+    :type  colsN:  integer
+    :param colsN:  number of columns of N
     """
     #P=array('d')
     P=[]
@@ -400,9 +409,9 @@ def _mmul(M,N,rowsM,colsM,colsN):
     return P
 
     
-"""
-Quaternions
-"""
+
+#Quaternions
+
 # Quaternions are of the form (x,y,z,w)
 def qmul(q1, q2):
   return [q1[1]*q2[2] - q1[2]*q2[1] + q1[0]*q2[3] + q2[0]*q1[3], 
@@ -568,16 +577,15 @@ def mulmatvec3x3(m, vect):
     """
     This function returns a 3D vector which consists of the 3D input
     vector multiplied by a 3x3 matrix.
-
-    Parameters
-    ----------
-
-    m:
-        *float list*. List of list. The 3x3 matrix.
-
-    vect:
-        *float list*. The vector - in the format[x,y,z]
-        (or [x,y,z,0] for affine transformations in an homogeneous space).
+    
+    :rtype:    double iterable
+    :return:   3D vector
+    :type  m:  double iterable
+    :param m:  The matrix to multiply
+    :type  vect:  double iterable
+    :param vect:  The vector - in the format[x,y,z]
+        (or [x,y,z,0] for affine transformations in an homogeneous space)
+  
     """
 
 
@@ -592,18 +600,16 @@ def makeRotEulerMtx3D(rx, ry, rz):
     """
     This function returns a 3x3 euler rotation matrix based on the 3 angles
     rx, ry and rz.
+    
+    :rtype:    double iterable
+    :return:   3x3 euler rotation matrix
+    :type  rx:  float
+    :param rx:  The angle of rotation (in radians) around the x-axis
+    :type  ry:  float
+    :param ry:  The angle of rotation (in radians) around the x-axis
+    :type  rz:  float
+    :param rz:  The angle of rotation (in radians) around the x-axis
 
-    Parameters
-    ----------
-
-    rx:
-        *float*. The angle of rotation (in radians) around the x-axis
-
-    ry:
-        *float*. The angle of rotation (in radians) around the y-axis
-
-    rz:
-        *float*. The angle of rotation (in radians) around the z-axis
     """
 
     SRX = sin(rx)
@@ -618,7 +624,15 @@ def makeRotEulerMtx3D(rx, ry, rz):
 
 def makeTransform(Rxyz, Txyz):
     """
-    makes a flat 4x4 homogenous transform matrix (row-major). Using xyz rotations and position
+    Makes a flat 4x4 homogenous transform matrix (row-major). Using xyz rotations and position
+    
+    :rtype:    double iterable
+    :return:   4x4 roto-translation matrix
+    :type  Rxyz:  double iterable
+    :param Rxyz:  A list or rotations around X,Y and Z axis, in radians.
+    :type  Txyz:  double iterable
+    :param Txyz:  The translation vector along X,Y and Z axis.
+    
     """
    
     sx = sin(Rxyz[0])
@@ -639,14 +653,13 @@ def makeRotEulerMtx2D(theta, rotAxe):
     This function returns a 3x3 euler matrix that rotates a point on
     a plane perpendicular to a specified rotational axis.
 
-    Parameters
-    ----------
-
-    theta:
-        *float*. The angle of rotation (in radians).
-
-    rotAxe:
-        *string*. The axis of rotation, which can be \"X\", \"Y\" or \"Z\".
+    :rtype:    double iterable
+    :return:   3x3 euler rotation matrix
+    :type  theta:  float
+    :param theta:  The angle of rotation (in radians)
+    :type  rotAxe:  string
+    :param rotAxe:  The axis of rotation, which can be "X", "Y" or "Z".
+ 
     """
 
     if rotAxe == 'X':
@@ -665,15 +678,14 @@ def makeRotMatrix(angle, axis):
     This matrix is presented in Graphics Gems (Glassner, Academic Press, 1990),
     and discussed here: http://www.gamedev.net/reference/programming/features/whyquats/
 
-    Parameters
-    ----------
+    :rtype:    double iterable
+    :return:   3x3 euler matrix
+    :type  angle: float
+    :param angle: The angle of rotation (rad) around the specified axis
+    :type  axis: double iterable
+    :param axis: A 3d vector [x,y,z] defining the axis of rotation
+        (this should already be normalized to avoid strange results)
 
-    angle:
-        *float*. The angle of rotation (rad) around the specified axis
-
-    axis:
-        *float list*. A 3d vector [x,y,z] defining the axis of rotation
-        (this should already be normalized to avoid strange results).
     """
 
     a = angle
@@ -725,7 +737,8 @@ def makeRotation(axis, angle):
             x*z * t - y*s, y*z * t + x*s, z*z * t + c,   0.0,
             0.0,           0.0,           0.0,           1.0]
 
-def makeScale(scale):    
+def makeScale(scale):
+        
     if type(scale) is float:
       scale = [scale,scale,scale]
     
@@ -734,15 +747,24 @@ def makeScale(scale):
             0.0, 0.0, scale[2],   0.0,
             0.0, 0.0, 0.0, 1.0]
             
-def mtransform(m, v):         
+def mtransform(m, v):  
+       
     return[m[0]*v[0] + m[1]*v[1] + m[2]*v[2]  + m[3],
            m[4]*v[0] + m[5]*v[1] + m[6]*v[2]  + m[7],
            m[8]*v[0] + m[9]*v[1] + m[10]*v[2] + m[11]]
 
 
-# a fast way to inverse a homogenous 4x4 flat row-major transformation matix
-# we use the fact that rotations are orthogonal (note: there shouldnt be scaling in the matrix)
+
 def invTransform(m):
+    """
+    A fast way to inverse a homogenous 4x4 flat row-major transformation matix
+    we use the fact that rotations are orthogonal 
+    
+    .. note::
+    
+        there shouldnt be scaling in the matrix)
+    
+    """
     rinv =   [m[0], m[4], m[8], 0,
               m[1], m[5], m[9], 0,
               m[2], m[6], m[10],0,
@@ -756,7 +778,7 @@ def invTransform(m):
 # uses flat row-major 4x4 transformation matrices. Returned angles are in radians            
 def matrix2euler(m, axes='sxyz'):
     """
-    see: U{http://www.lfd.uci.edu/~gohlke/code/transformations.py.html}
+    See: http://www.lfd.uci.edu/~gohlke/code/transformations.py.html
     """
     _NEXT_AXIS = [1, 2, 0, 1]
     firstaxis, parity, repetition, frame = _AXES2TUPLE[axes.lower()]
@@ -795,7 +817,8 @@ def matrix2euler(m, axes='sxyz'):
 def euler2matrix(rotation, axes='sxyz'):
     """
     Return homogeneous rotation matrix from Euler angles and axis sequence.
-    see: U{http://www.lfd.uci.edu/~gohlke/code/transformations.py.html}
+    see: http://www.lfd.uci.edu/~gohlke/code/transformations.py.html
+    
     """
     ai, aj, ak = rotation[0], rotation[1], rotation[2]
     firstaxis, parity, repetition, frame = _AXES2TUPLE[axes]
@@ -850,10 +873,10 @@ def centroid(vertsList):
     formatted as a double list [double X,double Y, double Z].
     This is the sum of all of the vectors divided by the number of vectors.
 
-    @rtype:       double list
-    @return:      the centroid of the convex hull of all the vertices in M(vertsList)
-    @type  vertsList: list of double lists
-    @param vertsList: each vector in the list is in the format [x,y,z]
+    :rtype:       double iterable
+    :return:      the centroid of the convex hull of all the vertices in M(vertsList)
+    :type  vertsList: list of double lists
+    :param vertsList: each vector in the list is in the format [x,y,z]
         (or [x,y,z,0] for affine transformations in an homogeneous space).
     """
 
@@ -881,31 +904,25 @@ def rotatePoint(center, vect, rotMatrix):
     vector rotated around a specified centre point using a
     3x3 rotation matrix.
 
-    Parameters
-    ----------
-
-    center:
-        *float list*. A 3D vector - in the format[x,y,z] containing the
+    :rtype:       Double iterable
+    :return:      Rotated point
+    :type  center: Double iterable
+    :param center: A 3D vector - in the format[x,y,z] containing the
         coordinates of the center of rotation.
-
-    vect:
-        *float list*. A 3D vector - in the format[x,y,z] containing the
+    :type vect: Double iterable
+    :param vect: A 3D vector - in the format[x,y,z] containing the
         coordinates of the point to be rotated.
+    :type rotMatrix: Double iterable
+    :param rotMatrix: A 3x3 rotation matrix.
 
-    rotMatrix:
-        *float list of lists*. A 3x3 rotation matrix.
     """
-
     # subtract rotation point
-
     tv = vsub(vect, center)
 
     # rotate
-
     nv = mulmatvec3x3(rotMatrix, tv)
 
     # add the rotation point back again
-
     nv = vadd(nv, center)
     return nv
 
@@ -916,31 +933,26 @@ def scalePoint(center, vect, scale, axis=None):
     coordinate vector scaled relative to a specified centre point using a
     scalar value.
 
-    Parameters
-    ----------
-
-    center:
-        *float list*. A 3D vector - in the format[x,y,z] containing the
-        coordinates of the center point.
-
-    vect:
-        *float list*. A 3D vector - in the format[x,y,z] containing the
+    :rtype:       Double iterable
+    :return:      Scaled point
+    :type  center: Double iterable
+    :param center: A 3D vector - in the format[x,y,z] containing the
+        coordinates of the center of rotation.
+    :type vect: Double iterable
+    :param vect: A 3D vector - in the format[x,y,z] containing the
         coordinates of the point to be scaled.
-
-    scale:
-        *float*. Scale factor.
-
-    axis:
-        *string*. An optional axis to constrain scaling (\"X\", \"Y\", \"Z\" or None).
+    :type scale: Float
+    :param scale: Scale factor.
+    :type axis: String
+    :param axis: An optional axis to constrain scaling ("X", "Y", "Z" or None).
         If an axis is specified then no scaling takes place along that axis.
+
     """
 
     # subtract centre point
-
     tv = vsub(vect, center)
 
     # scale
-
     if axis == 'X':
         nv = [tv[0], tv[1] * scale, tv[2] * scale]
     elif axis == 'Y':
@@ -951,7 +963,6 @@ def scalePoint(center, vect, scale, axis=None):
         nv = [tv[0] * scale, tv[1] * scale, tv[2] * scale]
 
     # add the centre point back again
-
     nv = vadd(nv, center)
     return nv
 
@@ -966,23 +977,21 @@ def planeNorm(vect1, vect2, vect3):
     This function assumes that the input coordinate vectors
     do not all lie on the same straight line.
 
-    Parameters
-    ----------
-
-    vect1:
-        *float list*. A 3D vector - in the format[x,y,z] containing the
+    :rtype:       Double iterable
+    :return:      The plane normal
+    :type  vect1: Double iterable
+    :param vect1: A 3D vector - in the format[x,y,z] containing the
         coordinates of the first point.
-        (or [x,y,z,0] for affine transformations in an homogeneous space).
-
-    vect2:
-        *float list*. A 3D vector - in the format[x,y,z] containing the
-        coordinates of the second point.
-        (or [x,y,z,0] for affine transformations in an homogeneous space).
-
-    vect3:
-        *float list*. A 3D vector - in the format[x,y,z] containing the
-        coordinates of the third point.
-        (or [x,y,z,0] for affine transformations in an homogeneous space).
+        (or [x,y,z,0] for affine transformations in an homogeneous space)
+    :type  vect2: Double iterable
+    :param vect2: A 3D vector - in the format[x,y,z] containing the
+        coordinates of the first point.
+        (or [x,y,z,0] for affine transformations in an homogeneous space)
+    :type  vect3: Double iterable
+    :param vect3: A 3D vector - in the format[x,y,z] containing the
+        coordinates of the first point.
+        (or [x,y,z,0] for affine transformations in an homogeneous space)
+    
     """
 
     # Calculate two vectors from the three points
@@ -1020,24 +1029,21 @@ def in2pts(point1, point2, t):
     This function returns a vector that lies on the directed line between points, given
     a parameter t. The paraemeter t is between 0 and 1 and it parametrizes our directed line
     between point1 and point2
-
-
-    Parameters
-    ----------
-
-    point1:
-        *float list*. A 3D vector - in the format[x,y,z] containing the
+    
+    :rtype:       Double iterable
+    :return:      A vector that lies on the directed line between points
+    :type  point1: Double iterable
+    :param point1: A 3D vector - in the format[x,y,z] containing the
         coordinates of the first point (i.e. starting point) of a directed line.
-
-    point2:
-        *float list*. A 3D vector - in the format[x,y,z] containing the
-        coordinates of the second point (i.e. endpoint) of a directed line.
-
-    t:
-        *float*. A real number between 0 and 1, that linearly parametrizes
+    :type  point2: Double iterable
+    :param point2: A 3D vector - in the format[x,y,z] containing the
+        coordinates of the first point (i.e. starting point) of a directed line.
+    :type  t: Float
+    :param t: A real number between 0 and 1, that linearly parametrizes
         the directed line between point1 and point2. In other words, when t is 0 the
         return value for this function is point1 and when t is 1 the return value
         for this function is point2.
+
     """
 
     return vadd(vmul(point1, 1 - t), vmul(point2, t))
@@ -1047,12 +1053,12 @@ def vectorsToRotMatrix(v1,v2):
     Given two points v1 and v2 in 3D space. Suppose furthermore that v2 is generated by v1 
     multiplied by a rotation matrix over the origin. We will determine this rotation matrix using this method
     
-    @rtype:    float list
-    @return:   Rotation matrix (unhomegenized) in 3D space that rotated v1 to v2 (center at origin)
-    @type  v1: float list
-    @param v1: original point in 3D 
-    @type  v2: float list
-    @param v2: the point for which v1 has rotated to
+    :rtype:    float list
+    :return:   Rotation matrix (unhomegenized) in 3D space that rotated v1 to v2 (center at origin)
+    :type  v1: float list
+    :param v1: original point in 3D 
+    :type  v2: float list
+    :param v2: the point for which v1 has rotated to
     """
     normal = vcross(v1,v2)
     normal = vnorm(normal)
@@ -1080,16 +1086,16 @@ def convexQuadrilateralArea(v1,v2,v3,v4):
     """
     This function returns the area of a Quadrilateral. See U{http://mathworld.wolfram.com/Quadrilateral.html}.
 
-    @rtype:    float
-    @return:   The area of a Quadrilateral determined by v1 to v4 (clockwise or counterclockwise order)
-    @type  v1: float list
-    @param v1: first vertex of a parallelogram - in the format [x,y,z]
-    @type  v2: float list
-    @param v2: second vertex of a parallelogram - in the format [x,y,z]
-    @type  v3: float list
-    @param v3: third vertex of a parallelogram - in the format [x,y,z]
-    @type  v4: float list
-    @param v4: fourth vertex of a parallelogram - in the format [x,y,z]
+    :rtype:    float
+    :return:   The area of a Quadrilateral determined by v1 to v4 (clockwise or counterclockwise order)
+    :type  v1: float list
+    :param v1: first vertex of a parallelogram - in the format [x,y,z]
+    :type  v2: float list
+    :param v2: second vertex of a parallelogram - in the format [x,y,z]
+    :type  v3: float list
+    :param v3: third vertex of a parallelogram - in the format [x,y,z]
+    :type  v4: float list
+    :param v4: fourth vertex of a parallelogram - in the format [x,y,z]
     """
     #a=vdist(v2,v1)
     #b=vdist(v3,v2)
@@ -1143,9 +1149,9 @@ def quadPrismPseudoVol(p1,p2,p3,p4):
   U{http://www-ljk.imag.fr/membres/Stefanie.Hahmann/PUBLICATIONS/RHC09/}.
   
   
-  @return:   the value of the unit "volume"
-  @type  pi:  list of doubles
-  @param pi:  coordinate values of the base of the rectangular prism
+  :return:   the value of the unit "volume"
+  :type  pi:  list of doubles
+  :param pi:  coordinate values of the base of the rectangular prism
   """
   M = [4.0, 2.0, 2.0, 1.0, 2.0, 4.0, 1.0, 2.0, 2.0, 1.0, 4.0, 2.0, 1.0, 2.0, 2.0, 4.0]
   M = vmul(M, 1.0/36)
@@ -1156,21 +1162,21 @@ def quadPrismPseudoVol(p1,p2,p3,p4):
        (p4[0]-p3[0])*(p4[1]-p2[1]) - (p4[1]-p3[1])*(p4[0]-p2[0])]
   return _vmulv(z,_mmul(M, k, 4,4,1))
   
-"""
-### Various Functions
-"""
+
+#Various Functions
+
     
 def bump(x, width=1.0):
     """
     This is the bump function (see U<Wikipedia - Bump Function>{http://en.wikipedia.org/wiki/Bump_function}). Height is always 1, if we 
     need higher bump we just scale it
 
-    @rtype:    double
-    @return:   the bump function scaked to have height of 1 
-    @type  x:  double
-    @param x:  the value of the function at x (>= 0)
-    @type  width:  double
-    @param width:  radius of the bump
+    :rtype:    double
+    :return:   the bump function scaked to have height of 1 
+    :type  x:  double
+    :param x:  the value of the function at x (>= 0)
+    :type  width:  double
+    :param width:  radius of the bump
     """
     if (x < width):
       return exp(-width*width/(width*width - x*x) + 1.0)
@@ -1181,10 +1187,10 @@ def sign(x):
     """
     The sign function
 
-    @rtype:    integer
-    @return:   the sign of x
-    @type  x:  double or integer
-    @param x:  any arbitrary real number
+    :rtype:    integer
+    :return:   the sign of x
+    :type  x:  double or integer
+    :param x:  any arbitrary real number
     """
     if (x<0): return -1
     elif (x>0): return 1
@@ -1199,15 +1205,13 @@ def jacobianEllipticFunction(u,m):
     This function returns a triple consisting of the Jacobian elliptic functions, namely the
     Jacobian sine (sn), Jacobian cosine (cn), Jacobian *TODO.. dn*, angle (in radians)
 
-    Parameters
-    ----------
-
-    u:
-        *float*. A 3D vector - in the format[x,y,z] containing the
+    :rtype:    Double iterable
+    :return:   A triple consisting of the Jacobian elliptic functions
+    :type  u:  float
+    :param u:  A 3D vector - in the format[x,y,z] containing the
         coordinates of the first point (i.e. starting point) of a directed line.
-
-    k:
-        *float* a value between 0 and 1 which represent the modulus of the Jacobian elliptic function
+    :type  m:  float
+    :param m:  A value between 0 and 1 which represent the modulus of the Jacobian elliptic function
 
     """
     if (m< 0) or (m >1):
@@ -1265,8 +1269,10 @@ def jacobianEllipticFunction(u,m):
 
 
 def newton_raphson(f, f_diff, value, start, iterations=4, epsilon = 1e-4):
-    """ Returns a root of the polynomial, with a starting value.
-    To get both roots in a quadratic, try using with n = 1 and n = -1."""
+    """ 
+    Returns a root of the polynomial, with a starting value.
+    To get both roots in a quadratic, try using with n = 1 and n = -1.
+    """
 
     x = start - (float(f(start)-value) / f_diff(start))
 
