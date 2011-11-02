@@ -50,7 +50,7 @@ class RandomTaskView(gui3d.TaskView):
             human.applyAllTargets(self.app.progress)
 
 def load(app):
-    category = app.getCategory('Experiments')
+    category = app.getCategory('Modelling')
     taskview = RandomTaskView(category)
     print 'Random imported'
 
