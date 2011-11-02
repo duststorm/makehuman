@@ -770,6 +770,7 @@ class RenderThread(Thread):
         for filename, status in self.filenames:
 
             command = '%s "%s"' % ('aqsis -progress -progressformat="progress %f %p %s %S" -v 0', filename)
+            print command
             renderProc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
 
             mh.callAsync(lambda:self.app.progress(0.0, status))
