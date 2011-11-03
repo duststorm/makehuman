@@ -88,11 +88,15 @@ class FaceTaskView(gui3d.TaskView):
             ('mouth', [('data/targets/mouth/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/mouth/images/', i[3]) for i in
                 [
                     ('mouth-lowerlip-ext', 'up', 'down', 'frontView'),
+                    ('mouth-angles', 'up', 'down', 'frontView'),
                     ('mouth-lowerlip-height', 'min', 'max', 'frontView'),
                     ('mouth-lowerlip-middle', 'up', 'down', 'frontView'),
                     ('mouth-lowerlip-width', 'min', 'max', 'frontView'),
+                    ('mouth-lowerlip', 'deflate', 'inflate', 'rightView'),
                     ('mouth-philtrum', 'up', 'down', 'frontView'),
+                    ('mouth-philtrum', 'increase', 'decrease', 'rightView'),
                     ('mouth', 'up', 'down', 'frontView'),
+                    ('mouth-upperlip', 'deflate', 'inflate', 'rightView'),
                     ('mouth-upperlip-ext', 'up', 'down', 'frontView'),
                     ('mouth-upperlip-height', 'min', 'max', 'frontView'),
                     ('mouth-upperlip-middle', 'up', 'down', 'frontView'),
