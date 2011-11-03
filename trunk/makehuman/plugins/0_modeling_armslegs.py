@@ -97,6 +97,54 @@ class HeadTaskView(gui3d.TaskView):
                     ('l-upperarm-trans', 'forward', 'backward', 'rightView'),                          
                                                       
                 ]]), 
+            ('right arm', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/head/images/', i[3]) for i in
+                [                     
+                    ('r-lowerarm-scale-depth', 'decr', 'incr', 'rightView'),
+                    ('r-lowerarm-scale-horiz', 'decr', 'incr', 'frontView'),
+                    ('r-lowerarm-scale-vert', 'decr', 'incr', 'frontView'),
+                    ('r-lowerarm-trans', 'in', 'out', 'frontView'),
+                    ('r-lowerarm-trans', 'down', 'up', 'frontView'),
+                    ('r-lowerarm-trans', 'forward', 'backward', 'rightView'), 
+                    ('r-upperarm-scale-depth', 'decr', 'incr', 'rightView'),
+                    ('r-upperarm-scale-horiz', 'decr', 'incr', 'frontView'),
+                    ('r-upperarm-scale-vert', 'decr', 'incr', 'frontView'),
+                    ('r-upperarm-trans', 'in', 'out', 'frontView'),
+                    ('r-upperarm-trans', 'down', 'up', 'frontView'),
+                    ('r-upperarm-trans', 'forward', 'backward', 'rightView'),                          
+                                                      
+                ]]), 
+            ('left leg', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/head/images/', i[3]) for i in
+                [                     
+                    ('l-lowerleg-scale-depth', 'decr', 'incr', 'rightView'),
+                    ('l-lowerleg-scale-horiz', 'decr', 'incr', 'frontView'),
+                    ('l-lowerleg-scale-vert', 'decr', 'incr', 'frontView'),
+                    ('l-lowerleg-trans', 'in', 'out', 'frontView'),
+                    ('l-lowerleg-trans', 'down', 'up', 'frontView'),
+                    ('l-lowerleg-trans', 'forward', 'backward', 'rightView'), 
+                    ('l-upperleg-scale-depth', 'decr', 'incr', 'rightView'),
+                    ('l-upperleg-scale-horiz', 'decr', 'incr', 'frontView'),
+                    ('l-upperleg-scale-vert', 'decr', 'incr', 'frontView'),
+                    ('l-upperleg-trans', 'in', 'out', 'frontView'),
+                    ('l-upperleg-trans', 'down', 'up', 'frontView'),
+                    ('l-upperleg-trans', 'forward', 'backward', 'rightView'),                          
+                                                      
+                ]]), 
+            ('right leg', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/head/images/', i[3]) for i in
+                [                     
+                    ('r-lowerleg-scale-depth', 'decr', 'incr', 'rightView'),
+                    ('r-lowerleg-scale-horiz', 'decr', 'incr', 'frontView'),
+                    ('r-lowerleg-scale-vert', 'decr', 'incr', 'frontView'),
+                    ('r-lowerleg-trans', 'in', 'out', 'frontView'),
+                    ('r-lowerleg-trans', 'down', 'up', 'frontView'),
+                    ('r-lowerleg-trans', 'forward', 'backward', 'rightView'), 
+                    ('r-upperleg-scale-depth', 'decr', 'incr', 'rightView'),
+                    ('r-upperleg-scale-horiz', 'decr', 'incr', 'frontView'),
+                    ('r-upperleg-scale-vert', 'decr', 'incr', 'frontView'),
+                    ('r-upperleg-trans', 'in', 'out', 'frontView'),
+                    ('r-upperleg-trans', 'down', 'up', 'frontView'),
+                    ('r-upperleg-trans', 'forward', 'backward', 'rightView'),                          
+                                                      
+                ]]), 
             ]
 
         y = 80
