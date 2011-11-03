@@ -38,7 +38,7 @@ class FaceSlider(humanmodifier.ModifierSlider):
 class FaceTaskView(gui3d.TaskView):
 
     def __init__(self, category):
-        gui3d.TaskView.__init__(self, category, 'Face2')
+        gui3d.TaskView.__init__(self, category, 'Face')
 
         features = [
             ('right eye', [('data/targets/eyes/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/eyes/images/', i[3]) for i in
