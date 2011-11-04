@@ -157,7 +157,7 @@ def load(app):
 
 
 def unload(app):
-    print 'Hair chooser unloaded'
+    print 'Background chooser unloaded'
     
     
 class settingsTaskView(gui3d.TaskView) :
