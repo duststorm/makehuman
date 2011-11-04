@@ -42,6 +42,8 @@ class BackgroundTaskView(gui3d.TaskView):
         
         self.texture = mh.Texture()
         
+        self.filenames = {}
+
         mesh = gui3d.RectangleMesh(420, 420)
         self.backgroundImage = gui3d.Object(self.app.categories['Modelling'], [190, 90, 1], mesh, visible=False)
         self.opacity = 100
@@ -49,6 +51,16 @@ class BackgroundTaskView(gui3d.TaskView):
         mesh.setPickable(0)
         
         self.backgroundImageToggle = gui3d.ToggleButton(self.app.categories['Modelling'].viewBox, 'Background');
+        y = 280
+        self.backgroundBox = gui3d.GroupBox(self, [10, y, 9], 'Background 2 settings', gui3d.GroupBoxStyle._replace(height=25+36*3+24*1+6));y+=25
+
+        self.radioButtonGroup = []
+        self.bgImageFrontRadioButton = gui3d.RadioButton(self.backgroundBox, self.radioButtonGroup, selected=True, label='Front')
+        self.bgImageBackRadioButton = gui3d.RadioButton(self.backgroundBox, self.radioButtonGroup, selected=False, label='Back')
+        self.bgImageLeftRadioButton = gui3d.RadioButton(self.backgroundBox, self.radioButtonGroup, selected=False, label='Left')
+        self.bgImageRightRadioButton = gui3d.RadioButton(self.backgroundBox, self.radioButtonGroup, selected=False, label='Right')
+        self.bgImageTopRadioButton = gui3d.RadioButton(self.backgroundBox, self.radioButtonGroup, selected=False, label='Top')
+        self.bgImageBottomRadioButton = gui3d.RadioButton(self.backgroundBox, self.radioButtonGroup, selected=False, label='Bottom')
             
         @self.backgroundImageToggle.event
         def onClicked(event):
@@ -68,7 +80,20 @@ class BackgroundTaskView(gui3d.TaskView):
         def onFileSelected(filename):
         
             self.reference = self.app.selectedHuman.getPosition()
-            
+
+            if self.bgImageFrontRadioButton.selected:
+                self.filenames['front'] = filename
+            elif self.bgImageBackRadioButton.selected:
+                self.filenames['back'] = filename
+            elif self.bgImageLeftRadioButton.selected:
+                self.filenames['left'] = filename
+            elif self.bgImageRightRadioButton.selected:
+                self.filenames['right'] = filename
+            elif self.bgImageTopRadioButton.selected:
+                self.filenames['top'] = filename
+            elif self.bgImageBottomRadioButton.selected:
+                self.filenames['bottom'] = filename
+
             self.texture.loadImage(os.path.join(self.backgroundsFolder, filename))
 
             bg = self.backgroundImage
@@ -129,6 +154,28 @@ class BackgroundTaskView(gui3d.TaskView):
         
     def onHumanTranslated(self, event):
     
+        self.updateBackground()
+
+    def setBackgroundImage(self, side):
+        filename = self.filenames.get(side)
+        if filename:
+            self.backgroundImage.mesh.setTexture(os.path.join(self.backgroundsFolder, filename))
+	 
+    def onHumanRotated(self, event):
+        rot = self.app.selectedHuman.getRotation()
+        if rot==[0,0,0]:
+            self.setBackgroundImage('front')
+        elif rot==[0,180,0]:
+            self.setBackgroundImage('back')
+        elif rot==[0,-90,0]:
+            self.setBackgroundImage('left')
+        elif rot==[0,90,0]:
+            self.setBackgroundImage('right')
+        elif rot==[90,0,0]:
+            self.setBackgroundImage('top')
+        elif rot==[-90,0,0]:
+            self.setBackgroundImage('bottom')
+         
         self.updateBackground()
         
     def onCameraChanged(self, event):
