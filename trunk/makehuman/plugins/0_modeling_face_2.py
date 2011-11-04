@@ -78,7 +78,7 @@ class FaceTaskView(gui3d.TaskView):
                     ('nose-nostrils', 'up', 'down', 'rightView'),
                     ('nose-point', 'up', 'down', 'rightView'),
                 ]]),
-            ('nose size', [('data/targets/nose/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/nose/images/', i[3]) for i in
+            ('nose size details', [('data/targets/nose/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/nose/images/', i[3]) for i in
                 [
                     ('nose-nostril-width', 'min', 'max', 'frontView'), 
                     ('nose-height', 'min', 'max', 'rightView'),                   
@@ -86,7 +86,16 @@ class FaceTaskView(gui3d.TaskView):
                     ('nose-width2', 'min', 'max', 'frontView'),
                     ('nose-width3', 'min', 'max', 'frontView'),
                     ('nose-width', 'min', 'max', 'frontView'),
-                    ('nose', 'long', 'short', 'rightView'),
+                                        
+                ]]),
+            ('nose size', [('data/targets/nose/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/nose/images/', i[3]) for i in
+                [
+                    ('nose-trans', 'up', 'down', 'frontView'),
+                    ('nose-trans', 'forward', 'backward', 'rightView'),
+                    ('nose-trans', 'in', 'out', 'frontView'),
+                    ('nose-scale-vert', 'incr', 'decr', 'frontView'),
+                    ('nose-scale-horiz', 'incr', 'decr', 'frontView'),
+                    ('nose-scale-depth', 'incr', 'decr', 'rightView'),
                 ]]),
             ('mouth size', [('data/targets/mouth/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/mouth/images/', i[3]) for i in
                 [
