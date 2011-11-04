@@ -99,12 +99,20 @@ class FaceTaskView(gui3d.TaskView):
                 ]]),
             ('mouth size', [('data/targets/mouth/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/mouth/images/', i[3]) for i in
                 [
+                    ('mouth-scale-horiz', 'incr', 'decr', 'frontView'),
+                    ('mouth-scale-vert', 'incr', 'decr', 'frontView'),
+                    ('mouth-scale-depth', 'incr', 'decr', 'rightView'),
+                    ('mouth-trans', 'in', 'out', 'frontView'),
+                    ('mouth-trans', 'up', 'down', 'frontView'),
+                    ('mouth-trans', 'forward', 'backward', 'rightView'),
+                ]]),
+            ('mouth size details', [('data/targets/mouth/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/mouth/images/', i[3]) for i in
+                [
                     ('mouth-lowerlip-height', 'min', 'max', 'frontView'),
                     ('mouth-lowerlip-middle', 'up', 'down', 'frontView'),
                     ('mouth-lowerlip-width', 'min', 'max', 'frontView'),            
                     ('mouth-upperlip-height', 'min', 'max', 'frontView'),              
-                    ('mouth-upperlip-width', 'min', 'max', 'frontView'),
-                    ('mouth-width', 'min', 'max', 'frontView'),
+                    ('mouth-upperlip-width', 'min', 'max', 'frontView'),        
                 ]]),
             ('mouth features', [('data/targets/mouth/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/mouth/images/', i[3]) for i in
                 [
