@@ -67,41 +67,48 @@ class FaceTaskView(gui3d.TaskView):
                     ('l-eye-corner1', 'up', 'down', 'frontView'),
                     ('l-eye-corner2', 'up', 'down', 'frontView'),
                 ]]),
-            ('nose', [('data/targets/nose/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/nose/images/', i[3]) for i in
+            ('nose features', [('data/targets/nose/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/nose/images/', i[3]) for i in
                 [
                     ('nose', 'compress', 'uncompress', 'rightView'),
                     ('nose', 'convex', 'concave', 'rightView'),
-                    ('nose', 'greek', 'ungreek', 'rightView'),
-                    ('nose-height', 'min', 'max', 'rightView'),
+                    ('nose', 'greek', 'ungreek', 'rightView'),                    
                     ('nose', 'hump', 'unhump', 'rightView'),
-                    ('nose', 'potato', 'point', 'rightView'),
-                    ('nose', 'long', 'short', 'rightView'),
+                    ('nose', 'potato', 'point', 'rightView'),                    
                     ('nose-nostrils', 'point', 'unpoint', 'frontView'),
                     ('nose-nostrils', 'up', 'down', 'rightView'),
-                    ('nose-nostril-width', 'min', 'max', 'frontView'),
                     ('nose-point', 'up', 'down', 'rightView'),
+                ]]),
+            ('nose size', [('data/targets/nose/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/nose/images/', i[3]) for i in
+                [
+                    ('nose-nostril-width', 'min', 'max', 'frontView'), 
+                    ('nose-height', 'min', 'max', 'rightView'),                   
                     ('nose-width1', 'min', 'max', 'frontView'),
                     ('nose-width2', 'min', 'max', 'frontView'),
                     ('nose-width3', 'min', 'max', 'frontView'),
-                    ('nose-width', 'min', 'max', 'frontView')
+                    ('nose-width', 'min', 'max', 'frontView'),
+                    ('nose', 'long', 'short', 'rightView'),
                 ]]),
-            ('mouth', [('data/targets/mouth/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/mouth/images/', i[3]) for i in
+            ('mouth size', [('data/targets/mouth/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/mouth/images/', i[3]) for i in
                 [
-                    ('mouth-lowerlip-ext', 'up', 'down', 'frontView'),
-                    ('mouth-angles', 'up', 'down', 'frontView'),
                     ('mouth-lowerlip-height', 'min', 'max', 'frontView'),
                     ('mouth-lowerlip-middle', 'up', 'down', 'frontView'),
-                    ('mouth-lowerlip-width', 'min', 'max', 'frontView'),
+                    ('mouth-lowerlip-width', 'min', 'max', 'frontView'),            
+                    ('mouth-upperlip-height', 'min', 'max', 'frontView'),              
+                    ('mouth-upperlip-width', 'min', 'max', 'frontView'),
+                    ('mouth-width', 'min', 'max', 'frontView'),
+                ]]),
+            ('mouth features', [('data/targets/mouth/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/mouth/images/', i[3]) for i in
+                [
+                    ('mouth-lowerlip-ext', 'up', 'down', 'frontView'),
+                    ('mouth-angles', 'up', 'down', 'frontView'),                    
+                    ('mouth-lowerlip-middle', 'up', 'down', 'frontView'),                    
                     ('mouth-lowerlip', 'deflate', 'inflate', 'rightView'),
                     ('mouth-philtrum', 'up', 'down', 'frontView'),
                     ('mouth-philtrum', 'increase', 'decrease', 'rightView'),
                     ('mouth', 'up', 'down', 'frontView'),
                     ('mouth-upperlip', 'deflate', 'inflate', 'rightView'),
-                    ('mouth-upperlip-ext', 'up', 'down', 'frontView'),
-                    ('mouth-upperlip-height', 'min', 'max', 'frontView'),
-                    ('mouth-upperlip-middle', 'up', 'down', 'frontView'),
-                    ('mouth-upperlip-width', 'min', 'max', 'frontView'),
-                    ('mouth-width', 'min', 'max', 'frontView'),
+                    ('mouth-upperlip-ext', 'up', 'down', 'frontView'),                    
+                    ('mouth-upperlip-middle', 'up', 'down', 'frontView'),                    
                 ]]),
             ('right ear', [('data/targets/ears/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/ears/images/', i[3]) for i in
                 [                   
