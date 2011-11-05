@@ -327,45 +327,43 @@ int isMainWindowActive()
 
 void challengePythonUpdate()
 {
-    /* Perform a version check of the installed Python interpreter.
-     * If it is older than 3.x The User will be notified to update it.
-     */
-    const char* kPythonVersionNumber = Py_GetVersion();
-    int major, minor, sub;
-    const int rc(::sscanf(kPythonVersionNumber, "%d.%d.%d", &major, &minor, &sub));
-
-    if ((rc == 3) && !((major >= 3) && (minor >= 2)))
-    {
-        NSString *messageString = [NSString stringWithFormat:
-                                   @"Please update to Python 3.x as soon as possible!\n\n"
-                                   "Makehuman will use some extended Functionality of Python 3.x in the near future.\n\n"
-                                   "You are currently using Python V%d.%d.%d\n\n"
-                                   "So please update the Python on your machine as soon as possible!",major, minor, sub];
-
-        const NSInteger rc = NSRunInformationalAlertPanel(@"Alert Message",
-                                                          messageString,
-                                                          @"Start it anyway!",
-                                                          @"Visit the Python Website...",
-                                                          @"Download the Python installer...");
-        switch(rc)
-        {
-            case NSAlertDefaultReturn :
-                break;
-
-            case NSAlertAlternateReturn :
-                [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.python.org/download"]];
-                break;
-
-            case NSAlertOtherReturn :
-                [[NSWorkspace sharedWorkspace]
-                 openURL:[NSURL URLWithString:isRunningOnSnowLeopardAndAbove() ?
-                          @"http://www.python.org/ftp/python/3.2/python-3.2-macosx10.6.dmg" :
-                          @"http://www.python.org/ftp/python/3.2/python-3.2-macosx10.3.dmg"]];
-                break;
-        }
-        printf("rc is %d\n", rc);
-            //        printf("Please update to Python 3.x as soon as possible!\n");
-    }
+	/* Perform a version check of the installed Python interpreter.
+	 * If it is older than 2.7 The User will be notified to update it.
+	 */
+	const char* kPythonVersionNumber = Py_GetVersion();
+	int major, minor, sub;
+	const int rc(::sscanf(kPythonVersionNumber, "%d.%d.%d", &major, &minor, &sub));
+	
+	if ((rc == 3) && !((major >= 2) && (minor >= 7)))
+	{
+		NSString *messageString = [NSString stringWithFormat:
+								   @"Please update to Python 2.7 as soon as possible!\n\n"
+								   "Makehuman will use some extended Functionality of Python 2.7!\n\n"
+								   "You are currently using Python V%d.%d.%d\n\n"
+								   "So please update the Python on your machine first before you run MakeHuman!",major, minor, sub];
+		
+		const NSInteger rc = NSRunInformationalAlertPanel(@"Alert Message",
+														  messageString,
+														  @"Quit MakeHuman now!",
+														  @"Visit the Python Website...",
+														  @"Download the Python installer...");
+		switch(rc)
+		{
+			case NSAlertDefaultReturn :
+				break;
+				
+			case NSAlertAlternateReturn :
+				[[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"http://www.python.org/download"]];
+				break;
+				
+			case NSAlertOtherReturn :
+				[[NSWorkspace sharedWorkspace]
+				 openURL:[NSURL URLWithString:
+						  @"http://www.python.org/ftp/python/2.7.2/python-2.7.2-macosx10.3.dmg"]];
+				break;
+		}
+		exit(EXIT_FAILURE);
+	}
 }
 
 #pragma mark -
@@ -410,9 +408,9 @@ void challengePythonUpdate()
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:s]];
 }
 
--(IBAction)helpFileMHUsersGuide:(id)inSender        {[SDLMain openURL:@"FileMHUsersGuide"];}
+-(IBAction)helpFileMHUsersGuide:(id)inSender        {[SDLMain openURL:@"http://www.makehuman.org/download/MakeHuman.pdf"];}
 
--(IBAction)helpFileMHDevelMHProto:(id)inSender      {[SDLMain openFile:@"FileDevelMHProto"];}
+-(IBAction)helpFileMHDevelMHProto:(id)inSender      {[SDLMain openURL:@"http://www.makehuman.org/download/doc"];}
 
 -(IBAction)helpURLMHVisitHome:(id)inSender          {[SDLMain openURL:@"URLMHHome"];}
 -(IBAction)helpURLMHVisitForum:(id)inSender         {[SDLMain openURL:@"URLMHForum"];}

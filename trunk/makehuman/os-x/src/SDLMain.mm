@@ -304,7 +304,6 @@ static void CustomApplicationMain (int argc, char **argv)
     licenseWindowVisible = false; // The licensing panel should not be visible at launch time
 #endif
 
-//#define CHECK_PYTHON_VERSION
 #ifdef CHECK_PYTHON_VERSION
     challengePythonUpdate();
 #endif // #ifdef CHECK_PYTHON_VERSION
@@ -380,7 +379,7 @@ static void CustomApplicationMain (int argc, char **argv)
 /* Main entry point to executable - should *not* be SDL_main! */
 int main (int argc, char **argv)
 {
-    /* Copy the arguments into a global variable */
+    /* Copy the arguments		into a global variable */
     /* This is passed if we are launched by double-clicking */
     if ( argc >= 2 && strncmp (argv[1], "-psn", 4) == 0 ) {
         gArgv = (char **) SDL_malloc(sizeof (char *) * 2);

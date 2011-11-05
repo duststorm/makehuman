@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 45;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -21,7 +21,6 @@
 		685701B01001D79200F9C649 /* glmodule.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332B0E6193B000E37E9F /* glmodule.c */; };
 		685701B11001D79200F9C649 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332D0E6193B000E37E9F /* main.c */; };
 		685702011001D7EF00F9C649 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
-		685702021001D7EF00F9C649 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E50E61999C00E37E9F /* Python.framework */; };
 		685702031001D7EF00F9C649 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E70E6199B000E37E9F /* OpenGL.framework */; };
 		685702041001D7EF00F9C649 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E90E6199BD00E37E9F /* GLUT.framework */; };
 		685702051001D7EF00F9C649 /* SDL_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6894C4E10FA188D000A52097 /* SDL_image.framework */; };
@@ -33,7 +32,6 @@
 		6857023010031E0400F9C649 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		6857023110031E1C00F9C649 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E90E6199BD00E37E9F /* GLUT.framework */; };
 		6857023210031E1C00F9C649 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E70E6199B000E37E9F /* OpenGL.framework */; };
-		6857023310031E1C00F9C649 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E50E61999C00E37E9F /* Python.framework */; };
 		6857023410031E1C00F9C649 /* SDL_image.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 6894C4E10FA188D000A52097 /* SDL_image.framework */; };
 		68570267100320B500F9C649 /* SDL_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6894C4E10FA188D000A52097 /* SDL_image.framework */; };
 		68570292100322C400F9C649 /* glmodule.h in Headers */ = {isa = PBXBuildFile; fileRef = 685701301000EE8000F9C649 /* glmodule.h */; };
@@ -57,7 +55,6 @@
 		689F332E0E6193B000E37E9F /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332A0E6193B000E37E9F /* core.c */; };
 		689F332F0E6193B100E37E9F /* glmodule.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332B0E6193B000E37E9F /* glmodule.c */; };
 		689F33310E6193B100E37E9F /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 689F332D0E6193B000E37E9F /* main.c */; };
-		689F33E60E61999C00E37E9F /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E50E61999C00E37E9F /* Python.framework */; };
 		689F33E80E6199B000E37E9F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E70E6199B000E37E9F /* OpenGL.framework */; };
 		689F33EA0E6199BD00E37E9F /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 689F33E90E6199BD00E37E9F /* GLUT.framework */; };
 		68C96CE711933EA800CE9C5C /* splash_nb.png in Resources */ = {isa = PBXBuildFile; fileRef = 68C96CE611933EA800CE9C5C /* splash_nb.png */; };
@@ -85,6 +82,7 @@
 		68FAB546140C1FA400C1B9A1 /* ubuntu_0_trans.png in Resources */ = {isa = PBXBuildFile; fileRef = 68FAB543140C1FA400C1B9A1 /* ubuntu_0_trans.png */; };
 		68FAB547140C1FA400C1B9A1 /* courier_0_trans.png in Resources */ = {isa = PBXBuildFile; fileRef = 68FAB544140C1FA400C1B9A1 /* courier_0_trans.png */; };
 		68FAB548140C1FA400C1B9A1 /* verdana_0_trans.png in Resources */ = {isa = PBXBuildFile; fileRef = 68FAB545140C1FA400C1B9A1 /* verdana_0_trans.png */; };
+		68FC683D144FF62200CD1E65 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6850794B13AE1C2C004C0164 /* Python.framework */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
 
@@ -168,7 +166,6 @@
 		689F332A0E6193B000E37E9F /* core.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = core.c; path = ../src/core.c; sourceTree = "<group>"; };
 		689F332B0E6193B000E37E9F /* glmodule.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = glmodule.c; path = ../src/glmodule.c; sourceTree = "<group>"; };
 		689F332D0E6193B000E37E9F /* main.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = main.c; path = ../src/main.c; sourceTree = "<group>"; };
-		689F33E50E61999C00E37E9F /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = /System/Library/Frameworks/Python.framework; sourceTree = "<absolute>"; };
 		689F33E70E6199B000E37E9F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		689F33E90E6199BD00E37E9F /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
 		68C80AE10FE3E41D0090D1E5 /* utils */ = {isa = PBXFileReference; lastKnownFileType = folder; name = utils; path = ../utils; sourceTree = SOURCE_ROOT; };
@@ -224,7 +221,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				685702011001D7EF00F9C649 /* Cocoa.framework in Frameworks */,
-				685702021001D7EF00F9C649 /* Python.framework in Frameworks */,
 				685702031001D7EF00F9C649 /* OpenGL.framework in Frameworks */,
 				685702041001D7EF00F9C649 /* GLUT.framework in Frameworks */,
 				685702051001D7EF00F9C649 /* SDL_image.framework in Frameworks */,
@@ -239,7 +235,6 @@
 				6857023010031E0400F9C649 /* Cocoa.framework in Frameworks */,
 				6857023110031E1C00F9C649 /* GLUT.framework in Frameworks */,
 				6857023210031E1C00F9C649 /* OpenGL.framework in Frameworks */,
-				6857023310031E1C00F9C649 /* Python.framework in Frameworks */,
 				6869C0DF10322A0400DF62C3 /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -248,9 +243,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				68FC683D144FF62200CD1E65 /* Python.framework in Frameworks */,
 				680EAADA11A4394300DDEFEB /* glew.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
-				689F33E60E61999C00E37E9F /* Python.framework in Frameworks */,
 				689F33E80E6199B000E37E9F /* OpenGL.framework in Frameworks */,
 				689F33EA0E6199BD00E37E9F /* GLUT.framework in Frameworks */,
 				6894C4E20FA188D000A52097 /* SDL_image.framework in Frameworks */,
@@ -297,7 +292,6 @@
 				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
 				689F33E90E6199BD00E37E9F /* GLUT.framework */,
 				689F33E70E6199B000E37E9F /* OpenGL.framework */,
-				689F33E50E61999C00E37E9F /* Python.framework */,
 				13E42FB307B3F0F600E4EEF1 /* CoreData.framework */,
 				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
 			);
@@ -577,8 +571,7 @@
 				ORGANIZATIONNAME = MakeHuman;
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "MakeHuman" */;
-			compatibilityVersion = "Xcode 2.4";
-			developmentRegion = English;
+			compatibilityVersion = "Xcode 3.1";
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -671,7 +664,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# ------------------------------------------------------------------\n# The Basepath of Doxygen\n# ------------------------------------------------------------------\nDOXYGEN_BASE_DIR=\"/Applications/Doxygen.app/Contents/Resources/\"\n\n# Check if Doxygen is installed on this machine...\nif [ -e \"${DOXYGEN_BASE_DIR}/doxygen\" ]; then\n\texport PATH=\"${PATH}:${DOXYGEN_BASE_DIR}\"\n\n    cd \"${PROJECT_DIR}/../docs/\"\n    \"${DOXYGEN_BASE_DIR}/doxygen\" ./configs/doxygen_html_config_osx.txt\nfi\n";
+			shellScript = "exit; \n# ------------------------------------------------------------------\n# The Basepath of Doxygen\n# ------------------------------------------------------------------\nDOXYGEN_BASE_DIR=\"/Applications/Doxygen.app/Contents/Resources/\"\n\n# Check if Doxygen is installed on this machine...\nif [ -e \"${DOXYGEN_BASE_DIR}/doxygen\" ]; then\n\texport PATH=\"${PATH}:${DOXYGEN_BASE_DIR}\"\n\n    cd \"${PROJECT_DIR}/../docs/\"\n    \"${DOXYGEN_BASE_DIR}/doxygen\" ./configs/doxygen_html_config_osx.txt\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 		68F6D3510E63F23400D27961 /* Copy Resources Script */ = {
@@ -858,8 +851,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				EXECUTABLE_PREFIX = lib;
@@ -921,8 +913,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -960,7 +951,7 @@
 		686C9AE1116601BE0050C414 /* NightlyBuild */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ONLY_ACTIVE_ARCH_PRE_XCODE_3_1)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
 				EXTRA_FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/frameworks\"";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -969,7 +960,10 @@
 				);
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREFIX_HEADER = include/MakeHuman_Prefix.pch;
-				GCC_PREPROCESSOR_DEFINITIONS = NIGHT_BUILD;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					NIGHT_BUILD,
+					X_CHECK_PYTHON_VERSION,
+				);
 				GCC_VERSION = 4.2;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -979,10 +973,10 @@
 					./include/pythonwrapper/,
 					./include/sdlwrapper/,
 				);
-				ONLY_ACTIVE_ARCH_PRE_XCODE_3_1 = "$(NATIVE_ARCH)";
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-lz";
 				PREBINDING = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+				SDKROOT = macosx10.5;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
 				VALID_ARCHS = "i386 ppc ppc7400 ppc970";
 			};
@@ -1126,7 +1120,7 @@
 		C01FCF4F08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ONLY_ACTIVE_ARCH_PRE_XCODE_3_1)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
 				EXTRA_FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/frameworks\"";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1136,6 +1130,10 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREFIX_HEADER = include/MakeHuman_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					CHECK_PYTHON_VERSION,
+					DEBUG,
+				);
 				GCC_VERSION = 4.2;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -1145,10 +1143,10 @@
 					./include/pythonwrapper/,
 					./include/sdlwrapper/,
 				);
-				ONLY_ACTIVE_ARCH_PRE_XCODE_3_1 = "$(NATIVE_ARCH)";
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-lz";
 				PREBINDING = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+				SDKROOT = macosx10.5;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
 				VALID_ARCHS = "i386 ppc ppc7400 ppc970";
 			};
@@ -1157,14 +1155,16 @@
 		C01FCF5008A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				EXTRA_FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/frameworks\"";
 				FRAMEWORK_SEARCH_PATHS = "$(EXTRA_FRAMEWORK_SEARCH_PATHS)";
 				GCC_PREFIX_HEADER = include/MakeHuman_Prefix.pch;
-				GCC_PREPROCESSOR_DEFINITIONS = NDEBUG;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					CHECK_PYTHON_VERSION,
+					NDEBUG,
+				);
 				GCC_VERSION = 4.2;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -1177,7 +1177,7 @@
 				OTHER_LDFLAGS = "-lz";
 				PREBINDING = NO;
 				PRESERVE_DEAD_CODE_INITS_AND_TERMS = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+				SDKROOT = macosx10.5;
 				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
 				VALID_ARCHS = "i386 ppc ppc7400 ppc970";
 			};
