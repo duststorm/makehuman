@@ -6,6 +6,5 @@ The Aljabr Module
 ******************
  
 .. automodule:: aljabr
-   :members:
-   :private-members:
+   :members:  
 
