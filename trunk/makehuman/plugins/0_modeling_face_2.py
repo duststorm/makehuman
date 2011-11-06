@@ -235,16 +235,13 @@ class FaceTaskView(gui3d.TaskView):
 
         self.categoryBox.setPosition([event.width - 150, self.categoryBox.getPosition()[1], 9.0])
 
-    '''
     def onHumanChanged(self, event):
 
         human = event.human
 
         for slider in self.sliders:
-            value = slider.modifier.getValue(human)
-            if value:
-                slider.modifier.setValue(human, value)
-
+            slider.update()
+    '''
     def loadHandler(self, human, values):
 
         if values[0] == 'face':
