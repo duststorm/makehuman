@@ -23,7 +23,7 @@ For more info see: http://sites.google.com/site/makehumandocs/blender-export-and
 bl_addon_info = {
     "name": "Make clothes to MakeHuman",
     "author": "Thomas Larsson",
-    "version": 0.4,
+    "version": 0.5,
     "blender": (2, 5, 9),
     "api": 40000,
     "location": "View3D > Properties > Make MH clothes",
@@ -37,9 +37,16 @@ import os
 import mathutils
 import random
 
+#
+#   Global variables
+#
+
 theThreshold = -0.2
 theListLength = 3
 Epsilon = 1e-4
+# Number of verts which are body, not clothes
+NBodyVerts = 15340
+
 
 #
 #   isHuman(ob):
@@ -53,7 +60,7 @@ def isHuman(ob):
     try:
         return ob["MhxMesh"]
     except:
-        return False
+        return False                
         
 def isClothing(ob):
     return ((ob.type == 'MESH') and (not isHuman(ob)))
@@ -73,7 +80,8 @@ def getClothing(context):
 def getObjectPair(context):
     human = None
     clothing = None
-    for ob in context.scene.objects:
+    scn = context.scene
+    for ob in scn.objects:
         if ob.select:
             if isHuman(ob):
                 if human:
@@ -87,9 +95,37 @@ def getObjectPair(context):
                     clothing = ob
     if not human:
         raise NameError("No human selected")
-    if not clothing:
+    if scn["MakeClothesSelfClothed"]:
+        if clothing:
+            raise NameError("Clothing %s selected but human %s is self-clothed" % (clothing.name, human.name))
+        nverts = len(human.data.vertices)
+        clothing = copyObject(human, NBodyVerts, nverts, context, "Clothing")
+        base = copyObject(human, 0, NBodyVerts, context, "Base")
+        return (base, clothing)
+    elif not clothing:
         raise NameError("No clothing selected")
-    return (human, clothing)        
+    return (human, clothing)  
+    
+def copyObject(human, n0, n1, context, name):
+    scn = context.scene
+    for ob in scn.objects:
+        ob.select = False
+    human.select = True
+    scn.objects.active = human
+    bpy.ops.object.duplicate(linked=False)
+    ob = context.object
+    ob.name = name
+    ob.data.name = name
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.object.mode_set(mode='OBJECT')
+    print(context.object, context.object.data)
+    for n in range(n0,n1):
+        ob.data.vertices[n].select = False
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.delete(type='VERT')
+    bpy.ops.object.mode_set(mode='OBJECT')
+    return ob
 
 #
 #    printMverts(stuff, mverts):
@@ -461,6 +497,43 @@ def printClothes(context, path, file, bob, pob, data):
 
     fp.write("# name %s\n" % pob.name)
     fp.write("# obj_file %s.obj\n" % goodName(pob.name))
+    printScale(fp, bob, scn, 'x_scale', 0, 'MakeClothesX1', 'MakeClothesX2')
+    printScale(fp, bob, scn, 'z_scale', 1, 'MakeClothesY1', 'MakeClothesY2')
+    printScale(fp, bob, scn, 'y_scale', 2, 'MakeClothesZ1', 'MakeClothesZ2')
+
+    if scn["MakeClothesSelfClothed"]:
+        firstVert = NBodyVerts
+    else:
+        printStuff(fp, pob, scn)
+        firstVert = 0
+    useProjection = False
+    fp.write("# use_projection %d\n" % useProjection)
+    fp.write("# verts %d\n" % firstVert)
+    if useProjection:
+        for (pv, exact, verts, wts, proj) in data:
+            if exact:
+                (bv, dist) = verts[0]
+                fp.write("%5d\n" % bv.index)
+            else:
+                fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f\n" % (
+                    verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], proj))
+    else:                
+        for (pv, exact, verts, wts, diff) in data:
+            if exact:
+                (bv, dist) = verts[0]
+                fp.write("%5d\n" % bv.index)
+            else:
+                fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f %.5f %.5f\n" % (
+                    verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], diff[0], diff[2], -diff[1]))
+    fp.write('\n')
+    fp.close()
+    return
+      
+#
+#   printStuff(fp, pob, scn):    
+#
+
+def printStuff(fp, pob, scn):    
     fp.write("# z_depth %d\n" % scn["MakeClothesZDepth"])
     
     for mod in pob.modifiers:
@@ -496,10 +569,6 @@ def printClothes(context, path, file, bob, pob, data):
 "diffuse_color_factor 1.0\n" +
 "alpha_factor 1.0\n")
 
-    printScale(fp, bob, scn, 'x_scale', 0, 'MakeClothesX1', 'MakeClothesX2')
-    printScale(fp, bob, scn, 'z_scale', 1, 'MakeClothesY1', 'MakeClothesY2')
-    printScale(fp, bob, scn, 'y_scale', 2, 'MakeClothesZ1', 'MakeClothesZ2')
-
     me = pob.data
 
     useMats = scn['MakeClothesMaterials']
@@ -517,29 +586,7 @@ def printClothes(context, path, file, bob, pob, data):
         if useBlender:
             mhxfile = exportBlenderMaterial(me, path)
             fp.write("# material_file %s\n" % mhxfile)
-
-    useProjection = False
-    fp.write("# use_projection %d\n" % useProjection)
-    fp.write("# verts\n")
-    if useProjection:
-        for (pv, exact, verts, wts, proj) in data:
-            if exact:
-                (bv, dist) = verts[0]
-                fp.write("%5d\n" % bv.index)
-            else:
-                fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f\n" % (
-                    verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], proj))
-    else:                
-        for (pv, exact, verts, wts, diff) in data:
-            if exact:
-                (bv, dist) = verts[0]
-                fp.write("%5d\n" % bv.index)
-            else:
-                fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f %.5f %.5f\n" % (
-                    verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], diff[0], diff[2], -diff[1]))
-    fp.write('\n')
-    fp.close()
-    return
+    return            
 
 #
 #   exportObjFile(context):
@@ -1193,6 +1240,9 @@ def makeClothes(context):
     printClothes(context, outpath, outfile, bob, pob, data)
     if log:
         log.close()
+    if scn["MakeClothesSelfClothed"]:
+        scn.objects.unlink(bob)
+        scn.objects.unlink(pob)
     print("%s done" % outfile)
     return
     
@@ -1770,15 +1820,16 @@ def autoVertexGroups(context):
     left = ob.vertex_groups.new("Left")
     right = ob.vertex_groups.new("Right")
     for v in ob.data.vertices:
+        vn = v.index
         if v.co[0] > 0.01:
-            left.add([v.index], 1.0, 'REPLACE')
+            left.add([vn], 1.0, 'REPLACE')
         elif v.co[0] < -0.01:
-            right.add([v.index], 1.0, 'REPLACE')
+            right.add([vn], 1.0, 'REPLACE')
         else:
-            mid.add([v.index], 1.0, 'REPLACE')
-            if ishuman:
-                left.add([v.index], 1.0, 'REPLACE')
-                right.add([v.index], 1.0, 'REPLACE')
+            mid.add([vn], 1.0, 'REPLACE')
+            if ishuman and (vn < NBodyVerts):
+                left.add([vn], 1.0, 'REPLACE')
+                right.add([vn], 1.0, 'REPLACE')
     return
 
 class VIEW3D_OT_MhxAutoVertexGroupsButton(bpy.types.Operator):
@@ -1942,6 +1993,11 @@ def initInterface(scn):
         description="Write a log file for debugging")
     scn['MakeClothesLogging'] = False
 
+    bpy.types.Scene.MakeClothesSelfClothed = BoolProperty(
+        name="Self clothed", 
+        description="Clothes included in body mesh")
+    scn['MakeClothesSelfClothed'] = False
+
     bpy.types.Scene.MakeClothesX1 = IntProperty(
         name="X1", 
         description="First X vert for clothes rescaling")
@@ -2077,6 +2133,9 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.prop(scn, "MakeClothesHairMaterial")
         layout.prop(scn, "MakeClothesListLength")
         layout.prop(scn, "MakeClothesLogging")
+        layout.prop(scn, "MakeClothesSelfClothed")
+        layout.operator("mhclo.make_human", text="Make Human").isHuman = True
+        layout.operator("mhclo.make_human", text="Make Clothing").isHuman = False
         
         layout.separator()
         layout.operator("mhclo.make_clothes")
@@ -2217,6 +2276,21 @@ class OBJECT_OT_ExportBlenderMaterialButton(bpy.types.Operator):
         pob = getClothing(context)
         (outpath, outfile) = getFileName(pob, context, "mhx")
         exportBlenderMaterial(pob.data, outpath)
+        return{'FINISHED'}    
+
+#
+#    class OBJECT_OT_MakeHumanButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_MakeHumanButton(bpy.types.Operator):
+    bl_idname = "mhclo.make_human"
+    bl_label = "Make human"
+    isHuman = BoolProperty()
+
+    def execute(self, context):
+        ob = context.object
+        ob["MhxMesh"] = self.isHuman
+        print("Object %s: Human = %s" % (ob.name, ob["MhxMesh"]))
         return{'FINISHED'}    
 
 #
