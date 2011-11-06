@@ -35,6 +35,7 @@ extensions = ['sphinx.ext.todo', 'sphinx.ext.viewcode',
           'sphinx.ext.autodoc',
           'sphinx.ext.doctest',
           'inheritance_diagram',
+          'math_symbol_table',
           'numpydoc']
 
 # Add any paths that contain templates here, relative to this directory.
@@ -145,7 +146,7 @@ html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
-#html_last_updated_fmt = '%b %d, %Y'
+html_last_updated_fmt = '%b %d, %Y'
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
@@ -168,10 +169,10 @@ html_static_path = ['_static']
 #html_split_index = False
 
 # If true, links to the reST sources are added to the pages.
-#html_show_sourcelink = True
+html_show_sourcelink = False
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
-#html_show_sphinx = True
+html_show_sphinx = True
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
 #html_show_copyright = True
@@ -225,6 +226,9 @@ latex_logo = "_static/logo.png"
 
 # If false, no module index is generated.
 #latex_domain_indices = True
+
+#Additional package in the preamble
+latex_elements = {'preamble' : "\usepackage{latexsym}\n\usepackage{amssymb}\n\usepackage{txfonts}"}
 
 
 # -- Options for manual page output --------------------------------------------
