@@ -25,7 +25,6 @@ html,
   -moz-box-shadow:0px 0px 12px #666;
   -webkit-box-shadow:0px 0px 12px #666;
   box-shadow:0px 0px 12px #666;
-  margin:15px 25px 15px 0px;
   margin:0px 25px 0px 0px;
   border:9px solid white;
   -moz-border-radius:14px;
@@ -37,9 +36,20 @@ html,
 .sphinxsidebar a,
 .sphinxsidebar h3,
 .sphinxsidebar h4,
-.sphinxsidebar h5 { color:#555 !important }
- 
+.sphinxsidebar h5 { color:#555 !important } 
 .sphinxsidebar .searchtip { color:black; }
+.sphinxsidebar { 
+  -moz-box-shadow:0px 0px 12px #666;
+  -webkit-box-shadow:0px 0px 12px #666;  
+  -moz-border-radius:14px;
+  -webkit-border-radius:14px;
+  border-radius:8px;
+  box-shadow:0px 0px 12px #666;   
+  border:9px;
+  margin:10px 25px 0px 0px;  
+  background-color:white;
+  max-width:200px;
+}
  
 .body h1,
 .body h2,

@@ -17,29 +17,40 @@ html,
 }
  
 .related ul {
-  max-width:900px; margin-left:250px !important; font-size:smaller
+  max-width:900px; margin-left:250px !important; font-size:1em;
 }
 .related ul a {  background-color: transparent !important;}
  
 .body {
   -moz-box-shadow:0px 0px 12px #666;
   -webkit-box-shadow:0px 0px 12px #666;
-  box-shadow:0px 0px 12px #666;
-  margin:15px 25px 15px 0px;
+  box-shadow:0px 0px 10px #666;
   margin:0px 25px 0px 0px;
-  border:9px solid white;
-  -moz-border-radius:14px;
-  -webkit-border-radius:14px;
-  border-radius:14px;
+  border:1px solid black;
+  -moz-border-radius:10px;
+  -webkit-border-radius:10px;
+  border-radius:10px;
   max-width:900px;
 }
  
 .sphinxsidebar a,
 .sphinxsidebar h3,
 .sphinxsidebar h4,
-.sphinxsidebar h5 { color:#555 !important }
- 
+.sphinxsidebar h5 { color:#555 !important } 
 .sphinxsidebar .searchtip { color:black; }
+.sphinxsidebar { 
+  -moz-box-shadow:0px 0px 12px #666;
+  -webkit-box-shadow:0px 0px 12px #666;  
+  -moz-border-radius:10px;
+  -webkit-border-radius:10px;
+  border-radius:10px;
+  box-shadow:0px 0px 12px #666;   
+  border:1px solid black;
+  margin:0px 25px 0px 0px;  
+  background-color:white;
+  max-width:200px;
+  padding-top:17px !important;
+}
  
 .body h1,
 .body h2,
