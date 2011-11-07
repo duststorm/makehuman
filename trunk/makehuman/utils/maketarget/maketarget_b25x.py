@@ -244,9 +244,9 @@ def parseFace(words):
             pass
     return (face, texface)
 
-class VIEW3D_OT_ImportBaseButton(bpy.types.Operator):
-    bl_idname = "mh.import_base"
-    bl_label = "Import base"
+class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
+    bl_idname = "mh.import_base_mhclo"
+    bl_label = "Import base mhclo"
 
     filename_ext = ".mhclo"
     filter_glob = StringProperty(default="*.mhclo", options={'HIDDEN'})
@@ -265,6 +265,32 @@ class VIEW3D_OT_ImportBaseButton(bpy.types.Operator):
         setupVertexPairs(context)
         print("Base object imported")
         print(theProxy)
+        return{'FINISHED'}    
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+class VIEW3D_OT_ImportBaseObjButton(bpy.types.Operator):
+    bl_idname = "mh.import_base_obj"
+    bl_label = "Import base obj"
+
+    filename_ext = ".obj"
+    filter_glob = StringProperty(default="*.obj", options={'HIDDEN'})
+    filepath = bpy.props.StringProperty(
+        name="File Path", 
+        description="File path used for obj file", 
+        maxlen= 1024, default= "")
+
+    def execute(self, context):
+        global theProxy
+        theProxy = None
+        ob = import_obj(self.properties.filepath)
+        ob["MakeTarget"] = "Base"
+        ob["ProxyFile"] = 0
+        ob["ObjFile"] = self.properties.filepath
+        setupVertexPairs(context)
+        print("Base object imported")
         return{'FINISHED'}    
 
     def invoke(self, context, event):
@@ -431,8 +457,13 @@ def fitTarget(context):
     if not isTarget(ob):
         return
     if not theProxy:
-        print("Rereading %s" % ob["ProxyFile"])
-        theProxy = readProxyFile(ob["ProxyFile"])
+        path = ob["ProxyFile"]
+        if path:
+            print("Rereading %s" % path)
+            theProxy = readProxyFile(path)
+        else:
+            raise NameError("Object %s has no associated mhclo file. Cannot fit" % ob.name)
+            return
     print(theProxy)
     theProxy.update(ob.data)
     return
@@ -540,7 +571,8 @@ class MakeTargetPanel(bpy.types.Panel):
     
     def draw(self, context):
         layout = self.layout
-        layout.operator("mh.import_base")
+        layout.operator("mh.import_base_mhclo")
+        layout.operator("mh.import_base_obj")
         ob = context.object
         if isBase(ob):
             layout.operator("mh.load_target")
