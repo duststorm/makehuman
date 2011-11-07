@@ -963,6 +963,16 @@ class MHApplication(gui3d.Application):
                 [center[0], center[1] + distance, center[2],
                 center[0], center[1], center[2],
                 0, 0, -1]))
+        elif view == 'left':
+            tl.append(animation3d.CameraAction(self.modelCamera, None,
+                [center[0] - distance, center[1], center[2],
+                center[0], center[1], center[2],
+                0, 1, 0]))
+        elif view == 'right':
+            tl.append(animation3d.CameraAction(self.modelCamera, None,
+                [center[0] + distance, center[1], center[2],
+                center[0], center[1], center[2],
+                0, 1, 0]))
         tl.append(animation3d.PathAction(human, [human.getPosition(), [0.0, 0.0, 0.0]]))
         tl.append(animation3d.RotateAction(human, human.getRotation(), [0.0, 0.0, 0.0]))
         tl.append(animation3d.UpdateAction(self))
@@ -1018,17 +1028,29 @@ class MHApplication(gui3d.Application):
         rightHandNames = [group.name for group in human.meshData.faceGroups if ("r-hand" in group.name)]
         self.setCameraGroupsViewDistance(rightHandNames, 'top')
         
-    def setLeftFootCamera(self):
+    def setLeftFootFrontCamera(self):
         
         human = self.selectedHuman
         leftFootNames = [group.name for group in human.meshData.faceGroups if ("l-foot" in group.name)]
         self.setCameraGroupsViewDistance(leftFootNames)
         
-    def setRightFootCamera(self):
+    def setLeftFootLeftCamera(self):
+        
+        human = self.selectedHuman
+        leftFootNames = [group.name for group in human.meshData.faceGroups if ("l-foot" in group.name)]
+        self.setCameraGroupsViewDistance(leftFootNames, 'left')
+        
+    def setRightFootFrontCamera(self):
         
         human = self.selectedHuman
         rightFootNames = [group.name for group in human.meshData.faceGroups if ("r-foot" in group.name)]
         self.setCameraGroupsViewDistance(rightFootNames)
+        
+    def setRightFootRightCamera(self):
+        
+        human = self.selectedHuman
+        rightFootNames = [group.name for group in human.meshData.faceGroups if ("r-foot" in group.name)]
+        self.setCameraGroupsViewDistance(rightFootNames, 'right')
         
     def setLeftArmCamera(self):
         

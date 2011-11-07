@@ -63,22 +63,22 @@ class HeadTaskView(gui3d.TaskView):
                 ]]),
             ('right foot', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/head/images/', i[3]) for i in
                 [                     
-                    ('r-foot-scale-depth', 'decr', 'incr', 'setRightFootCamera'),
-                    ('r-foot-scale-horiz', 'decr', 'incr', 'setRightFootCamera'),
-                    ('r-foot-scale-vert', 'decr', 'incr', 'setRightFootCamera'),
-                    ('r-foot-trans', 'in', 'out', 'setRightFootCamera'),
-                    ('r-foot-trans', 'down', 'up', 'setRightFootCamera'),
-                    ('r-foot-trans', 'forward', 'backward', 'setRightFootCamera'),                          
+                    ('r-foot-scale-depth', 'decr', 'incr', 'setRightFootRightCamera'),
+                    ('r-foot-scale-horiz', 'decr', 'incr', 'setRightFootFrontCamera'),
+                    ('r-foot-scale-vert', 'decr', 'incr', 'setRightFootFrontCamera'),
+                    ('r-foot-trans', 'in', 'out', 'setRightFootFrontCamera'),
+                    ('r-foot-trans', 'down', 'up', 'setRightFootFrontCamera'),
+                    ('r-foot-trans', 'forward', 'backward', 'setRightFootRightCamera'),                          
                                                       
                 ]]),
             ('left foot', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/head/images/', i[3]) for i in
                 [                     
-                    ('l-foot-scale-depth', 'decr', 'incr', 'setLeftFootCamera'),
-                    ('l-foot-scale-horiz', 'decr', 'incr', 'setLeftFootCamera'),
-                    ('l-foot-scale-vert', 'decr', 'incr', 'setLeftFootCamera'),
-                    ('l-foot-trans', 'in', 'out', 'setLeftFootCamera'),
-                    ('l-foot-trans', 'down', 'up', 'setLeftFootCamera'),
-                    ('l-foot-trans', 'forward', 'backward', 'setLeftFootCamera'),                          
+                    ('l-foot-scale-depth', 'decr', 'incr', 'setLeftFootLeftCamera'),
+                    ('l-foot-scale-horiz', 'decr', 'incr', 'setLeftFootFrontCamera'),
+                    ('l-foot-scale-vert', 'decr', 'incr', 'setLeftFootFrontCamera'),
+                    ('l-foot-trans', 'in', 'out', 'setLeftFootFrontCamera'),
+                    ('l-foot-trans', 'down', 'up', 'setLeftFootFrontCamera'),
+                    ('l-foot-trans', 'forward', 'backward', 'setLeftFootLeftCamera'),                          
                                                       
                 ]]), 
             ('left arm', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/head/images/', i[3]) for i in
