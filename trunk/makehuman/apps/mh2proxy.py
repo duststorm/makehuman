@@ -107,7 +107,7 @@ class CMaterial:
 
 def getFileName(folder, file, suffix):
     folder = os.path.realpath(os.path.expanduser(folder))
-    folder = folder.lower()
+    #folder = folder.lower()
     (name, ext) = os.path.split(file)
     if ext:
         return (folder, file)
