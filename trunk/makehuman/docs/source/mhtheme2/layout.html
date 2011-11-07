@@ -1,0 +1,24 @@
+{#
+    mhtheme2/layout.html
+    ~~~~~~~~~~~~~~~~~~~~~
+
+    Based on Sphinxdoc
+    :license: BSD
+#}
+{% extends "basic/layout.html" %}
+
+{% block extrahead %}
+<link href="http://fonts.googleapis.com/css?family=Ubuntu:300,300italic,regular,italic,500,500italic,bold,bolditalic" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{# put the sidebar before the body #}
+{% block sidebar1 %}{{ sidebar() }}{% endblock %}
+{% block sidebar2 %}{% endblock %}
+
+{% block relbar1 %}
+<div style="background-color: #333333; text-align: left; padding: 10px 10px 15px 15px">
+<a href="{{ pathto('index') }}"><img src="{{
+pathto("_static/logohtml.png", 1) }}" border="0" alt="makehuman API"/></a>
+</div>
+{{ super() }}
+{% endblock %}
