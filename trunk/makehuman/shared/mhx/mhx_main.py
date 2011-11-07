@@ -711,12 +711,12 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
         fromDir = os.path.dirname(tex)
         texfile = getOutFileName(tex, fromDir, True)
         fp.write(
-"Image %s%s\n" % (theHuman,texname) +
+"Image %s\n" % texname +
 "  Filename %s ;\n" % texfile +
 "  use_premultiply True ;\n" +
 "end Image\n\n" +
-"Texture %s%s IMAGE\n" % (theHuman, texname) +
-"  Image %s%s ;\n" % (theHuman, texname))
+"Texture %s IMAGE\n" % texname +
+"  Image %s ;\n" % texname)
         writeProxyMaterialSettings(fp, mat.textureSettings)             
         fp.write("end Texture\n")
     
@@ -724,16 +724,12 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
     nMasks = countMasks(proxy, prxList)
     
     fp.write("Material %s%s \n" % (theHuman, mat.name))
-    if tex:
-        lastBlend = 'MULTIPLY'
-    else:
-        lastBlend = 'MIX'
-    addProxyMaskMTexs(fp, mat, proxy, prxList, lastBlend)
+    addProxyMaskMTexs(fp, mat, proxy, prxList, tex)
     writeProxyMaterialSettings(fp, mat.settings)   
     if tex:
         fp.write(
 "  MTex %d diffuse UV COLOR\n" % nMasks +
-"    texture Refer Texture %s%s ;\n" % (theHuman, texname))
+"    texture Refer Texture %s ;\n" % texname)
         writeProxyMaterialSettings(fp, mat.mtexSettings)             
         fp.write("  end MTex\n")
     if nMasks > 0:
@@ -759,7 +755,7 @@ def writeProxyMaterialSettings(fp, settings):
         else:
             fp.write("  %s '%s' ;\n" % (key, value))
 
-def addProxyMaskMTexs(fp, mat, proxy, prxList, lastBlend):
+def addProxyMaskMTexs(fp, mat, proxy, prxList, tex):
     n = 0  
     m = len(prxList)
     for (zdepth, prx) in prxList:
@@ -767,7 +763,8 @@ def addProxyMaskMTexs(fp, mat, proxy, prxList, lastBlend):
         if zdepth > proxy.z_depth:
             addMaskMTex(fp, prx.mask, 'MULTIPLY', n)
             n += 1
-    addMaskMTex(fp, (None,'solid'), 'MIX', n)
+    if not tex:            
+        addMaskMTex(fp, (None,'solid'), 'MIX', n)
     return   
     
 def sortedMasks(proxyData):
