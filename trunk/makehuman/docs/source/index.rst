@@ -11,11 +11,29 @@ It largely relates to the development of new features but also contains general 
 
 The MakeHuman project is an open source project developed, managed and maintained by voluntary efforts. It is hosted on http://code.google.com/p/makehuman/ where the current source code is available for download from the SVN repository. An earlier CVS repository has been retained for reference purposes, but is no longer maintained.
 
+Developers guide
+################
+
 .. toctree::
    :maxdepth: 2
    
+   coding_intro.rst
    writing_plugins.rst
+   
+Modules
+#######
+
+.. toctree::
+   :maxdepth: 2
+   
    module_aljabr.rst
+   
+Doc Writers Guide
+#################
+
+.. toctree::
+   :maxdepth: 2
+   
    appendix_1.rst
 
 Indices and tables
