@@ -19,7 +19,7 @@ import sys, os
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.append(os.path.abspath('sphinxext'))
 sys.path.append('../core')
-
+sys.path.append("C:\Python26\Lib\site-packages\matplotlib")
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -30,8 +30,7 @@ sys.path.append('../core')
 extensions = ['sphinx.ext.todo', 'sphinx.ext.viewcode',
           'matplotlib.sphinxext.mathmpl',
           'matplotlib.sphinxext.only_directives',
-          'matplotlib.sphinxext.plot_directive',
-          'matplotlib.sphinxext.ipython_directive',
+          'matplotlib.sphinxext.plot_directive',          
           'sphinx.ext.autodoc',
           'sphinx.ext.doctest',
           'inheritance_diagram',
