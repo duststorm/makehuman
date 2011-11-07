@@ -98,6 +98,7 @@ def getObjectPair(context):
     if scn["MakeClothesSelfClothed"]:
         if clothing:
             raise NameError("Clothing %s selected but human %s is self-clothed" % (clothing.name, human.name))
+        checkObjectOK(human, context)
         nverts = len(human.data.vertices)
         clothing = copyObject(human, NBodyVerts, nverts, context, "Clothing")
         base = copyObject(human, 0, NBodyVerts, context, "Base")
@@ -112,6 +113,10 @@ def copyObject(human, n0, n1, context, name):
         ob.select = False
     human.select = True
     scn.objects.active = human
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.reveal()
+    bpy.ops.mesh.select_all(action='DESELECT')
+    bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.duplicate(linked=False)
     ob = context.object
     ob.name = name
@@ -239,8 +244,10 @@ def findClothes(context, bob, pob, log):
                 log.write("%d %d %.5f %s %d %d\n" % (pv.index, mv.index, mindist, gname, pindex, bindex))
             #printMverts("  ", mverts)
         else:
+            print("*** %d (%.4f %.4f %.4f) %s" % (pv.index, pv.co[0], pv.co[1], pv.co[2], gname))
             raise NameError("Failed to find vert %d in group %s %d %d" % (pv.index, gname, pindex, bindex))
         if mindist > 5:
+            print("*** %d (%.4f %.4f %.4f) %s" % (pv.index, pv.co[0], pv.co[1], pv.co[2], gname))
             raise NameError("Minimal distance %f > 5.0. Check base and proxy scales." % mindist)
 
         if gname[0:3] != "Mid":

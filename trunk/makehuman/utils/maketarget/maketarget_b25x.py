@@ -47,11 +47,6 @@ import math
 from bpy.props import *
 from bpy_extras.io_utils import ExportHelper, ImportHelper
 
-MHDIR = "/home/svn/makehuman/"
-sys.path.append(MHDIR+"apps/")
-sys.path.append(MHDIR+"core/")
-import mh2proxy
-
 #----------------------------------------------------------
 #   Global variables
 #----------------------------------------------------------
@@ -79,14 +74,25 @@ class CProxy:
         self.obj_file = None
         self.refVerts = []
         self.firstVert = 0
+        self.xScale = None
+        self.yScale = None
+        self.zScale = None
         return
+        
+    def __repr__(self):
+        return ("<CProxy %s %d\n  %s\n  x %s\n  y %s\n  z %s>" % 
+            (self.name, self.firstVert, self.obj_file, self.xScale, self.yScale, self.zScale))
         
     def update(self, mesh):
         rlen = len(self.refVerts)
         mlen = len(mesh.vertices)
         first = self.firstVert
         if (first+rlen) != mlen:
-            raise NameError( "Bug: %d refVerts != %d meshVerts" % (rlen, mlen) )
+            raise NameError( "Bug: %d refVerts != %d meshVerts" % (first+rlen, mlen) )
+        s0 = getScale(self.xScale, mesh.vertices, 0)
+        s1 = getScale(self.yScale, mesh.vertices, 2)
+        s2 = getScale(self.zScale, mesh.vertices, 1)
+        print("Scales", s0, s1, s2)
         for n in range(rlen):
             vert = mesh.vertices[n+first]
             refVert = self.refVerts[n]
@@ -95,9 +101,9 @@ class CProxy:
                 v0 = mesh.vertices[rv0]
                 v1 = mesh.vertices[rv1]
                 v2 = mesh.vertices[rv2]
-                vert.co[0] = w0*v0.co[0] + w1*v1.co[0] + w2*v2.co[0] + d0
-                vert.co[1] = w0*v0.co[1] + w1*v1.co[1] + w2*v2.co[1] + d1
-                vert.co[2] = w0*v0.co[2] + w1*v1.co[2] + w2*v2.co[2] + d2
+                vert.co[0] = w0*v0.co[0] + w1*v1.co[0] + w2*v2.co[0] + d0*s0
+                vert.co[1] = w0*v0.co[1] + w1*v1.co[1] + w2*v2.co[1] - d2*s2
+                vert.co[2] = w0*v0.co[2] + w1*v1.co[2] + w2*v2.co[2] + d1*s1
             else:
                 vert.co = mesh.vertices[refVert].co
 #
@@ -116,15 +122,8 @@ def readProxyFile(filepath):
         return None
 
     proxy = CProxy()
-    useProjection = True
-    ignoreOffset = False
-    xScale = 1.0
-    yScale = 1.0
-    zScale = 1.0
-    
     status = 0
     doVerts = 1
-
     vn = 0
     for line in tmpl:
         words= line.split()
@@ -140,12 +139,12 @@ def readProxyFile(filepath):
                 status = doVerts
             elif words[1] == 'name':
                 proxy.name = words[2]
-            #elif words[1] == 'x_scale':
-            #    xScale = getScale(words, verts, 0)
-            #elif words[1] == 'y_scale':
-            #    yScale = getScale(words, verts, 1)
-            #elif words[1] == 'z_scale':
-            #    zScale = getScale(words, verts, 2)                
+            elif words[1] == 'x_scale':
+                proxy.xScale = scaleInfo(words)
+            elif words[1] == 'y_scale':
+                proxy.yScale = scaleInfo(words)
+            elif words[1] == 'z_scale':
+                proxy.zScale = scaleInfo(words)                
             elif words[1] == 'obj_file':
                 proxy.obj_file = os.path.join(folder, words[2])
             else:
@@ -161,20 +160,20 @@ def readProxyFile(filepath):
                 w0 = float(words[3])
                 w1 = float(words[4])
                 w2 = float(words[5])            
-                d0 = float(words[6]) * xScale
-                d1 = float(words[7]) * yScale
-                d2 = float(words[8]) * zScale
-                proxy.refVerts.append( (v0,v1,v2,w0,w1,w2,d0,-d2,d1) )
+                d0 = float(words[6])
+                d1 = float(words[7])
+                d2 = float(words[8])
+                proxy.refVerts.append( (v0,v1,v2,w0,w1,w2,d0,d1,d2) )
     return proxy
 
-#
-#   getScale(words, verts, index):                
-#
-
-def getScale(words, verts, index):                
+def scaleInfo(words):                
     v1 = int(words[2])
     v2 = int(words[3])
     den = float(words[4])
+    return (v1, v2, den)
+
+def getScale(info, verts, index):
+    (v1, v2, den) = info
     num = abs(verts[v1].co[index] - verts[v2].co[index])
     return num/den
     
@@ -265,6 +264,7 @@ class VIEW3D_OT_ImportBaseButton(bpy.types.Operator):
         ob["ObjFile"] = theProxy.obj_file
         setupVertexPairs(context)
         print("Base object imported")
+        print(theProxy)
         return{'FINISHED'}    
 
     def invoke(self, context, event):
@@ -303,15 +303,14 @@ def setupVertexPairs(context):
         if n1 < 0: n1 = 0
         if n2 >= nmax: n2 = nmax
         vmir = findVert(verts[n1:n2], vn, -x, y, z)
-        if x > Epsilon and vmir >= 0:
+        if vmir < 0:
+            Mid[vn] = vn
+        elif x > Epsilon:
             Left[vn] = vmir
-        elif x < Epsilon and vmir >= 0:
+        elif x < Epsilon:
             Right[vn] = vmir
         else:
-            Mid[vn] = vn
-        #for (lv,rv) in Left.items():
-        #    print("* ", lv, ob.data.vertices[lv].co)
-        #    print("  ", rv, ob.data.vertices[rv].co)
+            Mid[vn] = vmir
     print("end")        
     return
     
@@ -434,6 +433,7 @@ def fitTarget(context):
     if not theProxy:
         print("Rereading %s" % ob["ProxyFile"])
         theProxy = readProxyFile(ob["ProxyFile"])
+    print(theProxy)
     theProxy.update(ob.data)
     return
 
