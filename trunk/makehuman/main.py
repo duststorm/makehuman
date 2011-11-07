@@ -178,6 +178,39 @@ class Camera(events3d.EventHandler):
         
     focusZ = property(getFocusZ, setFocusZ)
     
+    def getUpX(self):
+    
+        return self.camera.upX
+
+    def setUpX(self, value):
+    
+        self.camera.upX = value
+        self.changed()
+        
+    upX = property(getUpX, setUpX)
+        
+    def getUpY(self):
+    
+        return self.camera.upY
+
+    def setUpY(self, value):
+    
+        self.camera.upY = value
+        self.changed()
+        
+    upY = property(getUpY, setUpY)
+    
+    def getUpZ(self):
+    
+        return self.camera.upZ
+
+    def setUpZ(self, value):
+    
+        self.camera.upZ = value
+        self.changed()
+        
+    upZ = property(getUpZ, setUpZ)
+    
     def getStereoMode(self):
     
         return self.camera.stereoMode
@@ -915,25 +948,33 @@ class MHApplication(gui3d.Application):
         self.redraw()
       
     # Camera's
-    def setCameraCenterDistance(self, center, distance=10):
+    def setCameraCenterViewDistance(self, center, view='front', distance=10):
     
         human = self.selectedHuman
         tl = animation3d.Timeline(0.20)
         cam = self.modelCamera
-        tl.append(animation3d.CameraAction(self.modelCamera, [cam.eyeX, cam.eyeY, cam.eyeZ, cam.focusX, cam.focusY, cam.focusZ],
-            [center[0],center[1],distance,center[0],center[1],0]))
+        if view == 'front':
+            tl.append(animation3d.CameraAction(self.modelCamera, None,
+                [center[0], center[1], distance,
+                center[0], center[1], 0,
+                0, 1, 0]))
+        elif view == 'top':
+            tl.append(animation3d.CameraAction(self.modelCamera, None,
+                [center[0], center[1] + distance, center[2],
+                center[0], center[1], center[2],
+                0, 0, -1]))
         tl.append(animation3d.PathAction(human, [human.getPosition(), [0.0, 0.0, 0.0]]))
         tl.append(animation3d.RotateAction(human, human.getRotation(), [0.0, 0.0, 0.0]))
         tl.append(animation3d.UpdateAction(self))
         tl.start()
         
-    def setCameraGroupsDistance(self, groupNames, distance=10):
+    def setCameraGroupsViewDistance(self, groupNames, view='front', distance=10):
     
         human = self.selectedHuman
         vertices, faces = human.meshData.getVerticesAndFacesForGroups(groupNames)
         center = centroid([v.co for v in vertices])
         
-        self.setCameraCenterDistance(center, distance)
+        self.setCameraCenterViewDistance(center, view, distance)
     
     def setGlobalCamera(self):
         
@@ -941,7 +982,7 @@ class MHApplication(gui3d.Application):
         
         tl = animation3d.Timeline(0.20)
         cam = self.modelCamera
-        tl.append(animation3d.CameraAction(self.modelCamera, [cam.eyeX, cam.eyeY, cam.eyeZ, cam.focusX, cam.focusY, cam.focusZ], [0,0,60,0,0,0]))
+        tl.append(animation3d.CameraAction(self.modelCamera, None, [0,0,60, 0,0,0, 0,1,0]))
         tl.append(animation3d.PathAction(human, [human.getPosition(), [0.0, 0.0, 0.0]]))
         tl.append(animation3d.RotateAction(human, human.getRotation(), [0.0, 0.0, 0.0]))
         tl.append(animation3d.UpdateAction(self))
@@ -951,55 +992,67 @@ class MHApplication(gui3d.Application):
         
         human = self.selectedHuman
         headNames = [group.name for group in human.meshData.faceGroups if ("head" in group.name or "jaw" in group.name)]
-        self.setCameraGroupsDistance(headNames)
+        self.setCameraGroupsViewDistance(headNames)
         
-    def setLeftHandCamera(self):
+    def setLeftHandFrontCamera(self):
         
         human = self.selectedHuman
         leftHandNames = [group.name for group in human.meshData.faceGroups if ("l-hand" in group.name)]
-        self.setCameraGroupsDistance(leftHandNames)
+        self.setCameraGroupsViewDistance(leftHandNames)
         
-    def setRightHandCamera(self):
+    def setLeftHandTopCamera(self):
+        
+        human = self.selectedHuman
+        leftHandNames = [group.name for group in human.meshData.faceGroups if ("l-hand" in group.name)]
+        self.setCameraGroupsViewDistance(leftHandNames, 'top')
+        
+    def setRightHandFrontCamera(self):
         
         human = self.selectedHuman
         rightHandNames = [group.name for group in human.meshData.faceGroups if ("r-hand" in group.name)]
-        self.setCameraGroupsDistance(rightHandNames)
+        self.setCameraGroupsViewDistance(rightHandNames)
+        
+    def setRightHandTopCamera(self):
+        
+        human = self.selectedHuman
+        rightHandNames = [group.name for group in human.meshData.faceGroups if ("r-hand" in group.name)]
+        self.setCameraGroupsViewDistance(rightHandNames, 'top')
         
     def setLeftFootCamera(self):
         
         human = self.selectedHuman
         leftFootNames = [group.name for group in human.meshData.faceGroups if ("l-foot" in group.name)]
-        self.setCameraGroupsDistance(leftFootNames)
+        self.setCameraGroupsViewDistance(leftFootNames)
         
     def setRightFootCamera(self):
         
         human = self.selectedHuman
         rightFootNames = [group.name for group in human.meshData.faceGroups if ("r-foot" in group.name)]
-        self.setCameraGroupsDistance(rightFootNames)
+        self.setCameraGroupsViewDistance(rightFootNames)
         
     def setLeftArmCamera(self):
         
         human = self.selectedHuman
         leftArmNames = [group.name for group in human.meshData.faceGroups if ("l-lowerarm" in group.name or "l-upperarm" in group.name)]
-        self.setCameraGroupsDistance(leftArmNames)
+        self.setCameraGroupsViewDistance(leftArmNames)
         
     def setRightArmCamera(self):
         
         human = self.selectedHuman
         rightArmNames = [group.name for group in human.meshData.faceGroups if ("r-lowerarm" in group.name or "r-upperarm" in group.name)]
-        self.setCameraGroupsDistance(rightArmNames)
+        self.setCameraGroupsViewDistance(rightArmNames)
         
     def setLeftLegCamera(self):
         
         human = self.selectedHuman
         leftLegNames = [group.name for group in human.meshData.faceGroups if ("l-lowerleg" in group.name or "l-upperleg" in group.name)]
-        self.setCameraGroupsDistance(leftLegNames)
+        self.setCameraGroupsViewDistance(leftLegNames)
         
     def setRightLegCamera(self):
         
         human = self.selectedHuman
         rightLegNames = [group.name for group in human.meshData.faceGroups if ("r-lowerleg" in group.name or "r-upperleg" in group.name)]
-        self.setCameraGroupsDistance(rightLegNames)
+        self.setCameraGroupsViewDistance(rightLegNames)
         
     # Shortcuts
     def setShortcut(self, modifier, key, method):
@@ -1228,8 +1281,8 @@ class MHApplication(gui3d.Application):
     def resetView(self):
         cam = self.modelCamera
         animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman, self.selectedHuman.getRotation(), [0.0, 0.0, 0.0]),
-            animation3d.CameraAction(cam, [cam.eyeX, cam.eyeY, cam.eyeZ, cam.focusX, cam.focusY, cam.focusZ],
-            [cam.eyeX, cam.eyeY, 60.0, cam.focusX, cam.focusY, cam.focusZ])])
+            animation3d.CameraAction(cam, None,
+            [cam.eyeX, cam.eyeY, 60.0, cam.focusX, cam.focusY, cam.focusZ, 0, 1, 0])])
         
     # Mouse actions    
     def mouseTranslate(self, event):

@@ -272,12 +272,12 @@ class CameraAction(Action):
     def __init__(self, cam, startParams, endParams):
         
         self.cam = cam
-        self.startParams = startParams
-        self.endParams = endParams
+        self.startParams = startParams or (self.cam.eyeX, self.cam.eyeY, self.cam.eyeZ, self.cam.focusX, self.cam.focusY, self.cam.focusZ, self.cam.upX, self.cam.upY, self.cam.upZ)
+        self.endParams = endParams or (self.cam.eyeX, self.cam.eyeY, self.cam.eyeZ, self.cam.focusX, self.cam.focusY, self.cam.focusZ, self.cam.upX, self.cam.upY, self.cam.upZ)
 
     def set(self, alpha):
         value = lerpVector(self.startParams, self.endParams, alpha)
-        self.cam.eyeX, self.cam.eyeY, self.cam.eyeZ, self.cam.focusX, self.cam.focusY, self.cam.focusZ = value
+        self.cam.eyeX, self.cam.eyeY, self.cam.eyeZ, self.cam.focusX, self.cam.focusY, self.cam.focusZ, self.cam.upX, self.cam.upY, self.cam.upZ = value
 
 class UpdateAction(Action):
 
