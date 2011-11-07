@@ -1052,29 +1052,53 @@ class MHApplication(gui3d.Application):
         rightFootNames = [group.name for group in human.meshData.faceGroups if ("r-foot" in group.name)]
         self.setCameraGroupsViewDistance(rightFootNames, 'right')
         
-    def setLeftArmCamera(self):
+    def setLeftArmFrontCamera(self):
         
         human = self.selectedHuman
         leftArmNames = [group.name for group in human.meshData.faceGroups if ("l-lowerarm" in group.name or "l-upperarm" in group.name)]
-        self.setCameraGroupsViewDistance(leftArmNames)
+        self.setCameraGroupsViewDistance(leftArmNames, distance=30)
         
-    def setRightArmCamera(self):
+    def setLeftArmTopCamera(self):
+        
+        human = self.selectedHuman
+        leftArmNames = [group.name for group in human.meshData.faceGroups if ("l-lowerarm" in group.name or "l-upperarm" in group.name)]
+        self.setCameraGroupsViewDistance(leftArmNames, 'top', distance=30)
+        
+    def setRightArmFrontCamera(self):
         
         human = self.selectedHuman
         rightArmNames = [group.name for group in human.meshData.faceGroups if ("r-lowerarm" in group.name or "r-upperarm" in group.name)]
-        self.setCameraGroupsViewDistance(rightArmNames)
+        self.setCameraGroupsViewDistance(rightArmNames, distance=30)
         
-    def setLeftLegCamera(self):
+    def setRightArmTopCamera(self):
+        
+        human = self.selectedHuman
+        rightArmNames = [group.name for group in human.meshData.faceGroups if ("r-lowerarm" in group.name or "r-upperarm" in group.name)]
+        self.setCameraGroupsViewDistance(rightArmNames, 'top', distance=30)
+        
+    def setLeftLegFrontCamera(self):
         
         human = self.selectedHuman
         leftLegNames = [group.name for group in human.meshData.faceGroups if ("l-lowerleg" in group.name or "l-upperleg" in group.name)]
-        self.setCameraGroupsViewDistance(leftLegNames)
+        self.setCameraGroupsViewDistance(leftLegNames, distance=30)
         
-    def setRightLegCamera(self):
+    def setLeftLegLeftCamera(self):
+        
+        human = self.selectedHuman
+        leftLegNames = [group.name for group in human.meshData.faceGroups if ("l-lowerleg" in group.name or "l-upperleg" in group.name)]
+        self.setCameraGroupsViewDistance(leftLegNames, 'left', distance=30)
+        
+    def setRightLegFrontCamera(self):
         
         human = self.selectedHuman
         rightLegNames = [group.name for group in human.meshData.faceGroups if ("r-lowerleg" in group.name or "r-upperleg" in group.name)]
-        self.setCameraGroupsViewDistance(rightLegNames)
+        self.setCameraGroupsViewDistance(rightLegNames, distance=30)
+        
+    def setRightLegRightCamera(self):
+        
+        human = self.selectedHuman
+        rightLegNames = [group.name for group in human.meshData.faceGroups if ("r-lowerleg" in group.name or "r-upperleg" in group.name)]
+        self.setCameraGroupsViewDistance(rightLegNames, 'right', distance=30)
         
     # Shortcuts
     def setShortcut(self, modifier, key, method):
