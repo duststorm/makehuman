@@ -99,7 +99,6 @@ Symbols
 
 fooo fooo fooo :math:'\alpha > \beta' fooo
 
-.. math_symbol_table::
 
 
 
