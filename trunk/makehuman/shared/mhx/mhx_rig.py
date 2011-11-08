@@ -1893,7 +1893,7 @@ def setupRig(obj):
     Armature += custArmature
     
     newSetupJoints(obj, Joints, True)
-    if mhx_main.theConfig.useRig == 'mhx':
+    if mhx_main.theConfig.useRig in ['mhx', 'game']:
         rig_body_25.BodyDynamicLocations()
     setupHeadsTails(HeadsTails)
     return
