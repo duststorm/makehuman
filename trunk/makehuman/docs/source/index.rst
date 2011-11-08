@@ -27,6 +27,7 @@ Modules
    :maxdepth: 2
    
    module_aljabr.rst
+   module_animation3d.rst
    module_font3d.rst
    module_gui3d.rst
    

@@ -2,61 +2,47 @@
 # -*- coding: utf-8 -*-
 
 """
-Classes for widgets (GUI utilities).
+:Authors:
+    Marc Flerackers
 
-**Project Name:**      MakeHuman
+:Version: 1.0
+:Copyright: MakeHuman Team 2001-2011
+:License: GPL3 
 
-**Product Home Page:** http://www.makehuman.org/
-
-**Code Home Page:**    http://code.google.com/p/makehuman/
-
-**Authors:**           Marc Flerackers
-
-**Copyright(c):**      MakeHuman Team 2001-2011
-
-**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
-
-**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
-
-Abstract
---------
-
-This module contains classes defined to implement widgets that provide utility functions
-to the graphical user interface.
+This module contains functions and classes to animate a wide range of objects and attributes.
 
 To know more about the interpolation methods used, see the following references:
-  http://local.wasp.uwa.edu.au/~pbourke/miscellaneous/interpolation/
-  http://en.wikipedia.org/wiki/Cubic_Hermite_spline
-  http://en.wikipedia.org/wiki/Kochanek-Bartels_spline
-  http://www.geometrictools.com/Documentation/KBSplines.pdf
-  http://www.tinaja.com/glib/cubemath.pdf
+
+* http://local.wasp.uwa.edu.au/~pbourke/miscellaneous/interpolation/
+* http://en.wikipedia.org/wiki/Cubic_Hermite_spline
+* http://en.wikipedia.org/wiki/Kochanek-Bartels_spline
+* http://www.geometrictools.com/Documentation/KBSplines.pdf
+* http://www.tinaja.com/glib/cubemath.pdf
 """
 
 import time
 import math
 
-# Good interpolator when you have two values to interpolate between, but doesn't give fluid animation
-# when more points are involved since it follows straight lines between the points.
-
-
 def linearInterpolate(v1, v2, alpha):
+    """
+    Good interpolator when you have two values to interpolate between, but doesn't give fluid animation
+    when more points are involved since it follows straight lines between the points.
+    """
     return v1 + alpha * (v2 - v1)
 
-
-# When you have more than 2 points two interpolate (for example following a path), this is a better
-# choice than a linear interpolator.
-
-
 def cosineInterpolate(v1, v2, alpha):
+    """
+    When you have more than 2 points two interpolate (for example following a path), this is a better
+    choice than a linear interpolator.
+    """
     alpha2 = (1 - math.cos(alpha * math.pi)) / 2
     return v1 + alpha2 * (v2 - v1)
 
-
-# Cubic interpolator. Gives better continuity along the spline than the cosine interpolator,
-# however needs 4 points to interpolate.
-
-
 def cubicInterpolate(v0, v1, v2, v3, alpha):
+    """
+    Cubic interpolator. Gives better continuity along the spline than the cosine interpolator,
+    however needs 4 points to interpolate.
+    """
     alpha2 = alpha * alpha
     a0 = (v3 - v2) - v0 + v1
     a1 = (v0 - v1) - a0
@@ -64,16 +50,17 @@ def cubicInterpolate(v0, v1, v2, v3, alpha):
     a3 = v1
 
     return (a0 * alpha) * alpha2 + a1 * alpha2 + a2 * alpha + a3
-
-
-# Hermite interpolator. Allows better control of the bends in the spline by providing two
-# parameters to adjust them:
-#   tension: 1 for high tension, 0 for normal tension and -1 for low tension.
-#   bias: 1 for bias towards the next segment, 0 for even bias, -1 for bias towards the previous segment.
-# Using 0 bias gives a cardinal spline with just tension, using both 0 tension and 0 bias gives a Catmul-Rom spline.
-
-
+    
 def hermiteInterpolate(v0, v1, v2, v3, alpha, tension, bias):
+    """
+    Hermite interpolator. Allows better control of the bends in the spline by providing two
+    parameters to adjust them:
+    
+    * tension: 1 for high tension, 0 for normal tension and -1 for low tension.
+    * bias: 1 for bias towards the next segment, 0 for even bias, -1 for bias towards the previous segment.
+    
+    Using 0 bias gives a cardinal spline with just tension, using both 0 tension and 0 bias gives a Catmul-Rom spline.
+    """
     alpha2 = alpha * alpha
     alpha3 = alpha2 * alpha
     m0 = (((v1 - v0) * (1 - tension)) * (1 + bias)) / 2.0
@@ -87,16 +74,17 @@ def hermiteInterpolate(v0, v1, v2, v3, alpha, tension, bias):
 
     return a0 * v1 + a1 * m0 + a2 * m1 + a3 * v2
 
-
-# Kochanek-Bartels interpolator. Allows even better control of the bends in the spline by providing three
-# parameters to adjust them:
-#   tension: 1 for high tension, 0 for normal tension and -1 for low tension.
-#   continuity: 1 for inverted corners, 0 for normal corners, -1 for box corners.
-#   bias: 1 for bias towards the next segment, 0 for even bias, -1 for bias towards the previous segment.
-# Using 0 continuity gives a hermite spline.
-
-
 def kochanekBartelsInterpolator(v0, v1, v2, v3, alpha, tension, continuity, bias):
+    """
+    Kochanek-Bartels interpolator. Allows even better control of the bends in the spline by providing three
+    parameters to adjust them:
+    
+    * tension: 1 for high tension, 0 for normal tension and -1 for low tension.
+    * continuity: 1 for inverted corners, 0 for normal corners, -1 for box corners.
+    * bias: 1 for bias towards the next segment, 0 for even bias, -1 for bias towards the previous segment.
+    
+    Using 0 continuity gives a hermite spline.
+    """
     alpha2 = alpha * alpha
     alpha3 = alpha2 * alpha
     m0 = ((((v1 - v0) * (1 - tension)) * (1 + continuity)) * (1 + bias)) / 2.0
@@ -110,40 +98,58 @@ def kochanekBartelsInterpolator(v0, v1, v2, v3, alpha, tension, continuity, bias
 
     return a0 * v1 + a1 * m0 + a2 * m1 + a3 * v2
 
-
-# Quadratic Bezier interpolator. v0 and v2 are begin and end point respectively, v1 is a control point.
-# | 1   -2    1|
-# |-2    2    0|
-# | 1    0    0|
-
-
 def quadraticBezierInterpolator(v0, v1, v2, alpha):
+    """
+    Quadratic Bezier interpolator. v0 and v2 are begin and end point respectively, v1 is a control point.
+    
+    +---+---+---+
+    | 1 |-2 | 1 |
+    +---+---+---+
+    |-2 | 2 | 0 |
+    +---+---+---+
+    | 1 | 0 | 0 |
+    +---+---+---+
+    """
     alpha2 = alpha * alpha
 
     return (v2 - 2 * v1 + v0) * alpha2 + ((v1 - v0) * 2) * alpha + v0
 
 
-# Cubic Bezier interpolator. v0 and v3 are begin and end point respectively, v1 and v2 are control points.
-# |-1    3   -3    1|
-# | 3   -6    3    0|
-# |-3    3    0    0|
-# | 1    0    0    0|
-
-
 def cubicBezierInterpolator(v0, v1, v2, v3, alpha):
+    """
+    Cubic Bezier interpolator. v0 and v3 are begin and end point respectively, v1 and v2 are control points.
+
+    +---+---+---+---+
+    |-1 | 3 |-3 | 1 |
+    +---+---+---+---+
+    | 3 |-6 | 3 | 0 |
+    +---+---+---+---+
+    |-3 | 3 | 0 | 0 |
+    +---+---+---+---+
+    | 1 | 0 | 0 | 0 |
+    +---+---+---+---+
+    """
+
     alpha2 = alpha * alpha
     alpha3 = alpha2 * alpha
 
     return ((v3 - 3 * v2 + 3 * v1) - v0) * alpha3 + (3 * v2 - 6 * v1 + 3 * v0) * alpha2 + (3 * v1 - 3 * v0) * alpha + v0
 
-
-# Quadratic b-spline interpolator. v0 and v2 are begin and end point respectively, v1 is a control point.
-# 1   | 1   -2    1|
-# - * |-2    2    0|
-# 2   | 1    1    0|
-
-
 def quadraticBSplineInterpolator(v0, v1, v2, alpha):
+    """
+    Quadratic b-spline interpolator. v0 and v2 are begin and end point respectively, v1 is a control point.
+
+    1/2*
+    
+    +---+---+---+
+    | 1 |-2 | 1 |
+    +---+---+---+
+    |-2 | 2 | 0 |
+    +---+---+---+
+    | 1 | 1 | 0 |
+    +---+---+---+
+    """
+
     alpha2 = alpha * alpha
 
     return ((v2 - 2 * v1 + v0) * alpha2 + ((v1 - v0) * 2) * alpha + v0 + v1) / 2.0
@@ -197,18 +203,20 @@ def ThreeDQBspline(v0, v1, v2, alpha):
 
     # return [v1[0] + alpha * (v2[0] - v1[0]), v1[1] + alpha * (v2[1] - v1[1]), v1[2] + alpha * (v2[2] - v1[2])]
 
-# Interpolates a whole vector at once.
-
-
 def lerpVector(v0, v1, alpha, interpolator=linearInterpolate):
+    """
+    Interpolates a whole vector at once.
+    """
     return [interpolator(v0[i], v1[i], alpha) for i in xrange(len(v1))]
 
 
     # return [v1[0] + alpha * (v2[0] - v1[0]), v1[1] + alpha * (v2[1] - v1[1]), v1[2] + alpha * (v2[2] - v1[2])]
 
-# Base action class, does nothing
-class Action:
 
+class Action:
+    """
+    Base action class, does nothing
+    """
     def __init__():
         pass
 
@@ -217,7 +225,9 @@ class Action:
 
 
 class PathAction(Action):
-
+    """
+    Path action class. Moves an object along a path
+    """
     def __init__(self, obj, positions):
         self.obj = obj
         self.positions = positions
@@ -244,7 +254,9 @@ class PathAction(Action):
 
 
 class RotateAction(Action):
-
+    """
+    Rotate action class. Rotates an object from a start orientation to an end orientation.
+    """
     def __init__(self, obj, startAngles, endAngles):
         self.obj = obj
         self.startAngle = startAngles
@@ -256,7 +268,9 @@ class RotateAction(Action):
 
 
 class ScaleAction(Action):
-
+    """
+    Scale action class. Scales an object from a start scale to an end scale.
+    """
     def __init__(self, obj, startScale, endScale):
         self.obj = obj
         self.startScale = startScale
@@ -268,7 +282,9 @@ class ScaleAction(Action):
         
 
 class CameraAction(Action):
-
+    """
+    CameraAction action class. Animates all camera attributes.
+    """
     def __init__(self, cam, startParams, endParams):
         
         self.cam = cam
@@ -280,7 +296,9 @@ class CameraAction(Action):
         self.cam.eyeX, self.cam.eyeY, self.cam.eyeZ, self.cam.focusX, self.cam.focusY, self.cam.focusZ, self.cam.upX, self.cam.upY, self.cam.upZ = value
 
 class UpdateAction(Action):
-
+    """
+    Updates the scene. Without this acton and animation is not visible.
+    """
     def __init__(self, app):
         self.app = app
 
@@ -289,7 +307,9 @@ class UpdateAction(Action):
 
 
 class Timeline:
-
+    """
+    A timeline combines several animation3d.Action objects to an animation.
+    """
     def __init__(self, seconds):
         self.length = float(seconds)
         self.actions = []
@@ -309,7 +329,9 @@ class Timeline:
             action.set(1.0)
 
 def animate(app, seconds, actions):
-    
+    """
+    Animates the given actions by creating a animation3d.Timeline, adding an animation3d.UpdateAction and calling start.
+    """
     tl = Timeline(seconds)
     for action in actions:
         tl.append(action)

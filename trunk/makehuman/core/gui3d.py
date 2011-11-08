@@ -10,7 +10,8 @@
 :Copyright: MakeHuman Team 2001-2011
 :License: GPL3 
 
-This module contains the GUI framework.
+This module contains classes defined to implement widgets that provide utility functions
+to the graphical user interface.
 """
 
 import events3d
