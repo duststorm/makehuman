@@ -246,7 +246,8 @@ def parseFace(words):
 
 class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
     bl_idname = "mh.import_base_mhclo"
-    bl_label = "Import base mhclo"
+    bl_label = "Mhclo"
+    delete = BoolProperty()
 
     filename_ext = ".mhclo"
     filter_glob = StringProperty(default="*.mhclo", options={'HIDDEN'})
@@ -257,6 +258,8 @@ class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
 
     def execute(self, context):
         global theProxy
+        if self.delete:
+            deleteAll(context)
         theProxy = readProxyFile(self.properties.filepath)
         ob = import_obj(theProxy.obj_file)
         ob["MakeTarget"] = "Base"
@@ -273,7 +276,8 @@ class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
 
 class VIEW3D_OT_ImportBaseObjButton(bpy.types.Operator):
     bl_idname = "mh.import_base_obj"
-    bl_label = "Import base obj"
+    bl_label = "Obj"
+    delete = BoolProperty()
 
     filename_ext = ".obj"
     filter_glob = StringProperty(default="*.obj", options={'HIDDEN'})
@@ -284,6 +288,8 @@ class VIEW3D_OT_ImportBaseObjButton(bpy.types.Operator):
 
     def execute(self, context):
         global theProxy
+        if self.delete:
+            deleteAll(context)
         theProxy = None
         ob = import_obj(self.properties.filepath)
         ob["MakeTarget"] = "Base"
@@ -389,6 +395,8 @@ def loadTarget(filepath, context):
             vec[2] += dy
     fp.close()     
     base.hide = True
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.object.mode_set(mode='OBJECT')
     print("Target loaded")
     return
 
@@ -421,6 +429,11 @@ def saveTarget(context):
     scn = context.scene
     if not isTarget(ob):
         raise NameError("%s is not a target")
+    if isSaving(ob):
+        ob["Saving"] = False
+    else:
+        ob["Saving"] = True
+        return    
     base = findBase(context)
     filepath = ob["FilePath"] 
     fp = open(filepath, "w")  
@@ -444,6 +457,16 @@ class VIEW3D_OT_SaveTargetButton(bpy.types.Operator):
 
     def execute(self, context):
         saveTarget(context)
+        return{'FINISHED'}            
+
+class VIEW3D_OT_SkipButton(bpy.types.Operator):
+    bl_idname = "mh.skip_save"
+    bl_label = "Skip"
+    message = StringProperty()
+
+    def execute(self, context):
+        context.object["Saving"] = False
+        print("Target not saved")
         return{'FINISHED'}            
 
 #----------------------------------------------------------
@@ -558,6 +581,26 @@ def isTarget(ob):
         return (ob["MakeTarget"] == "Target")
     except:
         return False
+        
+def isBaseOrTarget(ob):
+    try:
+        ob["MakeTarget"]
+        return True
+    except:
+        return False
+
+def isSaving(ob):
+    try:
+        return ob["Saving"]
+    except:
+        return False
+        
+def deleteAll(context):
+    scn = context.scene
+    for ob in scn.objects:
+        if isBaseOrTarget(ob):
+            scn.objects.unlink(ob)
+    return                    
 
 #----------------------------------------------------------
 #   class MakeTargetPanel(bpy.types.Panel):
@@ -571,12 +614,21 @@ class MakeTargetPanel(bpy.types.Panel):
     
     def draw(self, context):
         layout = self.layout
-        layout.operator("mh.import_base_mhclo")
-        layout.operator("mh.import_base_obj")
         ob = context.object
+        if isSaving(ob):
+            layout.label("Overwrite old target file?")
+            layout.operator("mh.save_target", text="yes") 
+            layout.operator("mh.skip_save", text="no")
+            return            
+        if isBaseOrTarget(ob):
+            layout.operator("mh.import_base_mhclo", text="Reimport base mhclo").delete = True
+            layout.operator("mh.import_base_obj", text="Reimport base obj").delete = True
+        else:
+            layout.operator("mh.import_base_mhclo", text="Import base mhclo").delete = False
+            layout.operator("mh.import_base_obj", text="Import base obj").delete = False
         if isBase(ob):
             layout.operator("mh.load_target")
-        if isTarget(ob):
+        elif isTarget(ob):
             layout.operator("mh.fit_target")
             layout.operator("mh.symmetrize_target", text="Symm Left->Right").left2right = True
             layout.operator("mh.symmetrize_target", text="Symm Right->Left").left2right = False
