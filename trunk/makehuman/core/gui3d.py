@@ -404,6 +404,10 @@ class TextObject(Object):
 # Base layout
 
 class Layout:
+
+    """
+    The base layout from which all layouts are derived.
+    """
     
     def __init__(self, view):
         
@@ -420,6 +424,12 @@ class Layout:
 # Horizontal or vertical box layout
         
 class BoxLayout(Layout):
+
+    """
+    The BoxLayout. A layout which works like a text layout.
+    It positions children in rows as long as they fit, when they don't a new row is created.
+    A row is as high as the highest child. The height is adjusted to fit all rows.
+    """
     
     def __init__(self, view):
         
@@ -517,11 +527,11 @@ class View(events3d.EventHandler):
         This is the constructor for the View class.
 
         :param parent: The parent view.
-        :type parent: View
+        :type parent: gui3d.View
         :param style: The style.
-        :type style: Style
+        :type style: gui3d.Style
         :param layout: The layout.
-        :type layout: Layout
+        :type layout: gui3d.Layout
         :param visible: The visibility state.
         :type visible: Boolean
         """
@@ -1098,11 +1108,11 @@ class TabView(View):
         This is the constructor for the TabView class.
 
         :param parent: The parent view.
-        :type parent: View
+        :type parent: gui3d.View
         :param style: The style.
-        :type style: Style
+        :type style: gui3d.Style
         :param tabStyle: The tab style.
-        :type tabStyle: Style
+        :type tabStyle: gui3d.Style
         """
         
         View.__init__(self, parent, style, BoxLayout(self))
@@ -1181,7 +1191,7 @@ class Slider(View):
         This is the constructor for the Slider class.
 
         :param parent: The parent view.
-        :type parent: View
+        :type parent: gui3d.View
         :param value: The original value.
         :type value: int or float
         :param min: The minimum value.
@@ -1191,9 +1201,9 @@ class Slider(View):
         :param label: The label.
         :type label: str
         :param style: The style.
-        :type style: Style
+        :type style: gui3d.Style
         :param thumbStyle: The thumb style.
-        :type thumbStyle: Style
+        :type thumbStyle: gui3d.Style
         """
         
         View.__init__(self, parent, style)
@@ -1433,13 +1443,13 @@ class Button(View):
         This is the constructor for the Button class.
 
         :param parent: The parent view.
-        :type parent: View
+        :type parent: gui3d.View
         :param label: The label.
         :type label: str
         :param selected: The selected state.
         :type selected: Boolean
         :param style: The style.
-        :type style: Style
+        :type style: gui3d.Style
         """
         
         font = parent.app.getFont(style.fontFamily)
@@ -1592,7 +1602,7 @@ class RadioButton(Button):
         This is the constructor for the RadioButton class.
 
         :param parent: The parent view.
-        :type parent: View
+        :type parent: gui3d.View
         :param group: The group.
         :type group: list
         :param label: The label.
@@ -1600,7 +1610,7 @@ class RadioButton(Button):
         :param selected: The selected state.
         :type selected: Boolean
         :param style: The style.
-        :type style: Style
+        :type style: gui3d.Style
         """
         
         Button.__init__(self, parent, label, selected, style)
@@ -1645,13 +1655,13 @@ class ToggleButton(Button):
         This is the constructor for the ToggleButton class.
 
         :param parent: The parent view.
-        :type parent: View
+        :type parent: gui3d.View
         :param label: The label.
         :type label: str
         :param selected: The selected state.
         :type selected: Boolean
         :param style: The style.
-        :type style: Style
+        :type style: gui3d.Style
         """
 
         Button.__init__(self, parent, label, selected, style)
@@ -1692,13 +1702,13 @@ class CheckBox(ToggleButton):
         This is the constructor for the CheckBox class.
 
         :param parent: The parent view.
-        :type parent: View
+        :type parent: gui3d.View
         :param label: The label.
         :type label: str
         :param selected: The selected state.
         :type selected: Boolean 
         :param style: The style.
-        :type style: Style
+        :type style: gui3d.Style
         """
         
         Button.__init__(self, parent, label, selected, style)
@@ -1730,13 +1740,13 @@ class ProgressBar(View):
         This is the constructor for the ProgressBar class. It takes the following parameters:
 
         :param parent: The parent view.
-        :type parent: View
+        :type parent: gui3d.View
         :param position: The position.
         :type position: list
         :param style: The style.
-        :type style: Style
+        :type style: gui3d.Style
         :param barStyle: The bar style.
-        :type barStyle: Style
+        :type barStyle: gui3d.Style
         """
 
         View.__init__(self, parent, style, None, visible)
@@ -2520,13 +2530,13 @@ class GroupBox(View):
         This is the constructor for the GroupBox class.
 
         :param parent: The parent view.
-        :type parent: View
+        :type parent: gui3d.View
         :param position: The position, a list of 3 int or float elements.
         :type position: list
         :param label: The label.
         :type label: str
         :param style: The style.
-        :type style: Style
+        :type style: gui3d.Style
         """
         
         font = parent.app.getFont(style.fontFamily)
@@ -2598,7 +2608,7 @@ class ShortcutEdit(View):
         This is the constructor for the ShortcutEdit class.
 
         :param parent: The parent view.
-        :type parent: View
+        :type parent: gui3d.View
         :param position: The position, a list of 4 int or float elements.
         :type position: list
         :param shortcut: The position, a tuple of modifiers and a key.
@@ -2732,7 +2742,7 @@ class MouseActionEdit(ShortcutEdit):
         This is the constructor for the MouseActionEdit class.
 
         :param parent: The parent view.
-        :type parent: View
+        :type parent: gui3d.View
         :param position: The position, a list of 3 int or float elements.
         :type position: list
         :param shortcut: The position, a tuple of modifiers and a key.
