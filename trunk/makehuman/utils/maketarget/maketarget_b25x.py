@@ -83,29 +83,29 @@ class CProxy:
         return ("<CProxy %s %d\n  %s\n  x %s\n  y %s\n  z %s>" % 
             (self.name, self.firstVert, self.obj_file, self.xScale, self.yScale, self.zScale))
         
-    def update(self, mesh):
+    def update(self, verts):
         rlen = len(self.refVerts)
-        mlen = len(mesh.vertices)
+        mlen = len(verts)
         first = self.firstVert
         if (first+rlen) != mlen:
             raise NameError( "Bug: %d refVerts != %d meshVerts" % (first+rlen, mlen) )
-        s0 = getScale(self.xScale, mesh.vertices, 0)
-        s1 = getScale(self.yScale, mesh.vertices, 2)
-        s2 = getScale(self.zScale, mesh.vertices, 1)
+        s0 = getScale(self.xScale, verts, 0)
+        s1 = getScale(self.yScale, verts, 2)
+        s2 = getScale(self.zScale, verts, 1)
         print("Scales", s0, s1, s2)
         for n in range(rlen):
-            vert = mesh.vertices[n+first]
+            vert = verts[n+first]
             refVert = self.refVerts[n]
             if type(refVert) == tuple:
                 (rv0, rv1, rv2, w0, w1, w2, d0, d1, d2) = refVert
-                v0 = mesh.vertices[rv0]
-                v1 = mesh.vertices[rv1]
-                v2 = mesh.vertices[rv2]
+                v0 = verts[rv0]
+                v1 = verts[rv1]
+                v2 = verts[rv2]
                 vert.co[0] = w0*v0.co[0] + w1*v1.co[0] + w2*v2.co[0] + d0*s0
                 vert.co[1] = w0*v0.co[1] + w1*v1.co[1] + w2*v2.co[1] - d2*s2
                 vert.co[2] = w0*v0.co[2] + w1*v1.co[2] + w2*v2.co[2] + d1*s1
             else:
-                vert.co = mesh.vertices[refVert].co
+                vert.co = verts[refVert].co
 #
 #    readProxyFile(filepath):
 #
