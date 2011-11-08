@@ -136,18 +136,21 @@ def cubicBezierInterpolator(v0, v1, v2, v3, alpha):
     return ((v3 - 3 * v2 + 3 * v1) - v0) * alpha3 + (3 * v2 - 6 * v1 + 3 * v0) * alpha2 + (3 * v1 - 3 * v0) * alpha + v0
 
 def quadraticBSplineInterpolator(v0, v1, v2, alpha):
-    """
+    r"""
     Quadratic b-spline interpolator. v0 and v2 are begin and end point respectively, v1 is a control point.
 
-    1/2*
     
-    +---+---+---+
-    | 1 |-2 | 1 |
-    +---+---+---+
-    |-2 | 2 | 0 |
-    +---+---+---+
-    | 1 | 1 | 0 |
-    +---+---+---+
+    
+    .. math::
+        \frac{1}{2} *
+        
+    .. math::
+        
+        \begin{array}
+        1 & -2 & 1 \\
+        -2 & 2 & 0 \\
+        1 & 1 & 0 \\
+        \end{array}
     """
 
     alpha2 = alpha * alpha
