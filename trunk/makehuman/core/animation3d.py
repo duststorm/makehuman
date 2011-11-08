@@ -148,29 +148,25 @@ def cubicBSplineInterpolator(v0, v1, v2, v3, alpha):
 
     return (((v3 - 3 * v2 + 3 * v1) - v0) * alpha3 + (3 * v2 - 6 * v1 + 3 * v0) * alpha2 + (3 * v2 - 3 * v0) * alpha + v0 + 4 * v1 + v2) / 6.0
 
-
-# Cubic Catmull Rom interpolator. v0 and v3 are begin and end point respectively, v1 and v2 are control points.
-#     |-1    3   -3    1|
-# 1   | 2   -5    4   -1|
-# - * |-1    0    1    0|
-# 2   | 1    2    0    0|
-
-
 def cubicCatmullRomInterpolator(v0, v1, v2, v3, alpha):
+    r"""
+    Cubic Catmull Rom interpolator. v0 and v3 are begin and end point respectively, v1 and v2 are control points.
+    
+    .. math::
+        \frac{1}{2} * \begin{bmatrix} -1 & 3 & -3 & 1 \\ 2 & -5 & 4 & -1 \\ -1 & 0 & 1 & 0 \\ 1 & 2 & 0 & 0 \end{bmatrix}
+    """
     alpha2 = alpha * alpha
     alpha3 = alpha2 * alpha
 
     return (((v3 - 3 * v2 + 3 * v1) - v0) * alpha3 + ((-v3 + 4 * v2) - 5 * v1 + 2 * v0) * alpha2 + (v2 - v0) * alpha + 2 * v1 + v0) / 2.0
 
-
-# Cubic hermite interpolator. v0 and v3 are begin and end point respectively, v1 and v2 are control points.
-#     | 2    1   -2    1|
-# 1   |-3   -2    3   -1|
-# - * | 0    1    0    0|
-# 6   | 1    0    0    0|
-
-
 def cubicHermiteInterpolator(v0, v1, v2, v3, alpha):
+    r"""
+    Cubic hermite interpolator. v0 and v3 are begin and end point respectively, v1 and v2 are control points.
+    
+    .. math::
+        \frac{1}{6} * \begin{bmatrix} 2 & 1 & -2 & 1 \\ -3 & -2 & 3 & -1 \\ 0 & 1 & 0 & 0 \\ 1 & 0 & 0 & 0 \end{bmatrix}
+    """
     alpha2 = alpha * alpha
     alpha3 = alpha2 * alpha
 
@@ -180,18 +176,11 @@ def cubicHermiteInterpolator(v0, v1, v2, v3, alpha):
 def ThreeDQBspline(v0, v1, v2, alpha):
     return [quadraticBSplineInterpolator(v0[i], v1[i], v2[i], alpha) for i in xrange(len(v1))]
 
-
-    # return [v1[0] + alpha * (v2[0] - v1[0]), v1[1] + alpha * (v2[1] - v1[1]), v1[2] + alpha * (v2[2] - v1[2])]
-
 def lerpVector(v0, v1, alpha, interpolator=linearInterpolate):
     """
     Interpolates a whole vector at once.
     """
     return [interpolator(v0[i], v1[i], alpha) for i in xrange(len(v1))]
-
-
-    # return [v1[0] + alpha * (v2[0] - v1[0]), v1[1] + alpha * (v2[1] - v1[1]), v1[2] + alpha * (v2[2] - v1[2])]
-
 
 class Action:
     """
