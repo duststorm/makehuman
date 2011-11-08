@@ -229,7 +229,10 @@ def import_obj(filepath):
     scn = bpy.context.scene
     ob = bpy.data.objects.new(name, me)
     scn.objects.link(ob)
+    ob.select = True
     scn.objects.active = ob
+    ob.shape_key_add(name="Basis")
+    bpy.ops.object.shade_smooth()
     return ob
     
 def parseFace(words):
@@ -315,7 +318,7 @@ def setupVertexPairs(context):
     global Left, Right, Mid
     if Left.keys():
         return
-    ob = findBase(context)
+    ob = context.object
     verts = []
     for v in ob.data.vertices:
         x = v.co[0]
@@ -367,19 +370,12 @@ def loadTarget(filepath, context):
     fp = open(realpath, "rU")  
     print("Loading target %s" % realpath)
 
-    base = findBase(context)
-    base.select = True
-    context.scene.objects.active = base
-    print("Old", context.object)
-    bpy.ops.object.duplicate(linked=False)
     ob = context.object
-    print("New", ob)
     name = os.path.basename(filepath)
-    ob.name = name
-    ob.data.name = name
-    ob["MakeTarget"] = "Target"
-    ob["FilePath"] = realpath
-    ob["ProxyFile"] = base["ProxyFile"]
+    #skey = ob.shape_key_add(name=name, from_mix=False)
+    bpy.ops.object.shape_key_add(from_mix=False)
+    skey = ob.active_shape_key
+    skey.name = name
     for line in fp:
         words = line.split()
         if len(words) == 0:
@@ -389,14 +385,16 @@ def loadTarget(filepath, context):
             dx = float(words[1])
             dy = float(words[2])
             dz = float(words[3])
-            vec = ob.data.vertices[index].co
+            #vec = ob.data.vertices[index].co
+            vec = skey.data[index].co
             vec[0] += dx
             vec[1] += -dz
             vec[2] += dy
     fp.close()     
-    base.hide = True
-    bpy.ops.object.mode_set(mode='EDIT')
-    bpy.ops.object.mode_set(mode='OBJECT')
+    ob.show_only_shape_key = True
+    ob.use_shape_key_edit_mode = False
+    ob["MakeTarget"] = "Target"
+    ob["FilePath"] = realpath
     print("Target loaded")
     return
 
@@ -434,21 +432,18 @@ def saveTarget(context):
     else:
         ob["Saving"] = True
         return    
-    base = findBase(context)
     filepath = ob["FilePath"] 
     fp = open(filepath, "w")  
     print("Saving target %s to %s" % (ob, filepath))
-    
-    for n,v in enumerate(ob.data.vertices):
-        bv = base.data.vertices[n]
+
+    skey = ob.active_shape_key    
+    for n,v in enumerate(skey.data):
+        bv = ob.data.vertices[n]
         vec = v.co - bv.co
         if vec.length > Epsilon:
             fp.write("%d %.6f %.6f %.6f\n" % (n, vec[0], vec[2], -vec[1]))
     fp.close()    
-    base.hide = False
-    scn.objects.active = base
-    scn.objects.unlink(ob)
-    print("Target saved and deleted")
+    print("Target saved")
     return
                             
 class VIEW3D_OT_SaveTargetButton(bpy.types.Operator):
@@ -459,10 +454,9 @@ class VIEW3D_OT_SaveTargetButton(bpy.types.Operator):
         saveTarget(context)
         return{'FINISHED'}            
 
-class VIEW3D_OT_SkipButton(bpy.types.Operator):
+class VIEW3D_OT_SkipSaveButton(bpy.types.Operator):
     bl_idname = "mh.skip_save"
-    bl_label = "Skip"
-    message = StringProperty()
+    bl_label = "No"
 
     def execute(self, context):
         context.object["Saving"] = False
@@ -488,7 +482,7 @@ def fitTarget(context):
             raise NameError("Object %s has no associated mhclo file. Cannot fit" % ob.name)
             return
     print(theProxy)
-    theProxy.update(ob.data)
+    theProxy.update(ob.active_shape_key.data)
     return
 
 class VIEW3D_OT_FitTargetButton(bpy.types.Operator):
@@ -505,13 +499,15 @@ class VIEW3D_OT_FitTargetButton(bpy.types.Operator):
 
 def discardTarget(context):
     ob = context.object
-    scn = context.scene
     if not isTarget(ob):
         return
-    base = findBase(context)
-    base.hide = False
-    scn.objects.active = base
-    scn.objects.unlink(ob)
+    if isDiscarding(ob):
+        ob["Discarding"] = False
+    else:
+        ob["Discarding"] = True
+        return    
+    bpy.ops.object.shape_key_remove()
+    ob["MakeTarget"] = "Base"
     return
 
 class VIEW3D_OT_DiscardTargetButton(bpy.types.Operator):
@@ -521,6 +517,15 @@ class VIEW3D_OT_DiscardTargetButton(bpy.types.Operator):
     def execute(self, context):
         discardTarget(context)
         return{'FINISHED'}                
+
+class VIEW3D_OT_SkipDiscardButton(bpy.types.Operator):
+    bl_idname = "mh.skip_discard"
+    bl_label = "No"
+
+    def execute(self, context):
+        context.object["Discarding"] = False
+        return{'FINISHED'}            
+
 
 #----------------------------------------------------------
 # symmetrizeTarget(context, left2right):
@@ -533,7 +538,7 @@ def symmetrizeTarget(context, left2right):
     scn = context.scene
     if not isTarget(ob):
         return
-    verts = ob.data.vertices
+    verts = ob.active_shape_key.data
     for vn in Mid.keys():
         v = verts[vn]
         v.co[0] = 0
@@ -595,6 +600,12 @@ def isSaving(ob):
     except:
         return False
         
+def isDiscarding(ob):
+    try:
+        return ob["Discarding"]
+    except:
+        return False
+        
 def deleteAll(context):
     scn = context.scene
     for ob in scn.objects:
@@ -616,9 +627,14 @@ class MakeTargetPanel(bpy.types.Panel):
         layout = self.layout
         ob = context.object
         if isSaving(ob):
-            layout.label("Overwrite old target file?")
-            layout.operator("mh.save_target", text="yes") 
-            layout.operator("mh.skip_save", text="no")
+            layout.label("Overwrite target file?")
+            layout.operator("mh.save_target", text="Yes") 
+            layout.operator("mh.skip_save")
+            return            
+        if isDiscarding(ob):
+            layout.label("Really discard target?")
+            layout.operator("mh.discard_target", text="Yes") 
+            layout.operator("mh.skip_discard")
             return            
         if isBaseOrTarget(ob):
             layout.operator("mh.import_base_mhclo", text="Reimport base mhclo").delete = True
@@ -629,6 +645,8 @@ class MakeTargetPanel(bpy.types.Panel):
         if isBase(ob):
             layout.operator("mh.load_target")
         elif isTarget(ob):
+            layout.prop(ob, "show_only_shape_key")
+            layout.prop(ob.active_shape_key, "value")
             layout.operator("mh.fit_target")
             layout.operator("mh.symmetrize_target", text="Symm Left->Right").left2right = True
             layout.operator("mh.symmetrize_target", text="Symm Right->Left").left2right = False
