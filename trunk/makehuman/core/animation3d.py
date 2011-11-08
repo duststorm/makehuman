@@ -99,16 +99,11 @@ def kochanekBartelsInterpolator(v0, v1, v2, v3, alpha, tension, continuity, bias
     return a0 * v1 + a1 * m0 + a2 * m1 + a3 * v2
 
 def quadraticBezierInterpolator(v0, v1, v2, alpha):
-    """
+    r"""
     Quadratic Bezier interpolator. v0 and v2 are begin and end point respectively, v1 is a control point.
     
-    +---+---+---+
-    | 1 |-2 | 1 |
-    +---+---+---+
-    |-2 | 2 | 0 |
-    +---+---+---+
-    | 1 | 0 | 0 |
-    +---+---+---+
+    .. math::
+        \begin{bmatrix} 1 & -2 & 1 \\ -2 & 2 & 0 \\ 1 & 1 & 0 \end{bmatrix}
     """
     alpha2 = alpha * alpha
 
@@ -116,18 +111,11 @@ def quadraticBezierInterpolator(v0, v1, v2, alpha):
 
 
 def cubicBezierInterpolator(v0, v1, v2, v3, alpha):
-    """
+    r"""
     Cubic Bezier interpolator. v0 and v3 are begin and end point respectively, v1 and v2 are control points.
 
-    +---+---+---+---+
-    |-1 | 3 |-3 | 1 |
-    +---+---+---+---+
-    | 3 |-6 | 3 | 0 |
-    +---+---+---+---+
-    |-3 | 3 | 0 | 0 |
-    +---+---+---+---+
-    | 1 | 0 | 0 | 0 |
-    +---+---+---+---+
+    .. math::
+        \begin{bmatrix} -1 & 3 & -3 & 1 \\ 3 & -6 & 3 & 0 \\ -3 & 3 & 0 & 0 \\ 1 & 0 & 0 & 0 \end{bmatrix}
     """
 
     alpha2 = alpha * alpha
@@ -139,33 +127,22 @@ def quadraticBSplineInterpolator(v0, v1, v2, alpha):
     r"""
     Quadratic b-spline interpolator. v0 and v2 are begin and end point respectively, v1 is a control point.
 
-    
-    
     .. math::
-        \frac{1}{2} *
-        
-    .. math::
-        
-        \begin{array}
-        1 & -2 & 1 \\
-        -2 & 2 & 0 \\
-        1 & 1 & 0 \\
-        \end{array}
+        \frac{1}{2} * \begin{bmatrix} 1 & -2 & 1 \\ -2 & 2 & 0 \\ 1 & 1 & 0 \end{bmatrix}
     """
 
     alpha2 = alpha * alpha
 
     return ((v2 - 2 * v1 + v0) * alpha2 + ((v1 - v0) * 2) * alpha + v0 + v1) / 2.0
 
-
-# Cubic b-spline interpolator. v0 and v3 are begin and end point respectively, v1 and v2 are control points.
-#     |-1    3   -3    1|
-# 1   | 3   -6    3    0|
-# - * |-3    0    3    0|
-# 6   | 1    4    1    0|
-
-
 def cubicBSplineInterpolator(v0, v1, v2, v3, alpha):
+    r'''
+    Cubic b-spline interpolator. v0 and v3 are begin and end point respectively, v1 and v2 are control points.
+
+    .. math::
+        \frac{1}{6} * \begin{bmatrix} -1 & 3 & -3 & 1 \\ 3 & -6 & 3 & 0 \\ -3 & 0 & 3 & 0 \\ 1 & 4 & 1 & 0 \end{bmatrix}
+    '''
+
     alpha2 = alpha * alpha
     alpha3 = alpha2 * alpha
 
