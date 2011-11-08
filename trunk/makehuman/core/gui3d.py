@@ -367,8 +367,31 @@ AlignCenter = 1
 AlignRight = 2
 
 class TextObject(Object):
+
+    """
+    A text object on the screen.
+    """
+    
     def __init__(self, view, position, text = '', wrapWidth=0, alignment=AlignLeft, fontFamily = defaultFontFamily, fontSize = defaultFontSize):
+        """
+        This is the constructor for the TextObject class.
         
+        :param view: The parent view.
+        :type view: gui3d.View
+        :param position: The position in 3d space.
+        :type position: list
+        :param text: The text.
+        :type text: str
+        :param wrapWidth: The width to wrap the text to, 0 means no wrap.
+        :type wrapWidth: int
+        :param alignment: Text alignment.
+        :type alignment: int
+        :param fontFamily: The font to use.
+        :type fontFamily: str
+        :param fontSize: The size of the font (unused).
+        :type fontSize: int
+        """
+    
         self.text = text
         self.wrapWidth = wrapWidth
         self.alignment = alignment
@@ -383,6 +406,13 @@ class TextObject(Object):
         
     def setText(self, text):
         
+        """
+        Sets the text to be displayed.
+        
+        :param text: The text.
+        :type text: str
+        """
+        
         if self.text == text:
             return
             
@@ -395,6 +425,13 @@ class TextObject(Object):
         self.app.scene3d.update()
         
     def getText(self):
+    
+        """
+        Gets the displayed text.
+        
+        :return: The displayed text.
+        :rtype: str
+        """
         
         return self.text
         

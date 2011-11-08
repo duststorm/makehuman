@@ -5,7 +5,9 @@ import module3d
 
 
 class Font:
-
+    """
+    A font object used to display text on the screen.
+    """
     def __init__(self, filename):
         f = open(filename, 'r')
 
@@ -115,6 +117,14 @@ class Font:
 
     # Returns the width of the string
     def stringWidth(self, text):
+        """
+        Measures the width of the text if displayed using this font.
+        
+        :param text: The text to measure.
+        :type text: str
+        :return: The width of the text if displayed using this font.
+        :rtype: int
+        """
         width = 0
         previous = -1
 
@@ -127,7 +137,18 @@ class Font:
         return width
         
 def wrapText(font, text, width):
+    """
+    Wraps text according to the given width by inserting extra enters. The wrapped text is returned.
     
+    :param font: The font which is going to be used to display the text.
+    :type font: font3d.Font
+    :param text: The text to wrap.
+    :type text: str
+    :param width: The width.
+    :type width: int or float
+    :return: The wrapped text.
+    :rtype: str
+    """
     wrappedText = ''
     line = ''
     space = 0
