@@ -2,25 +2,15 @@
 # -*- coding: utf-8 -*-
 
 """
-**Project Name:**	  MakeHuman
+:Authors:
+    Manuel Bastioni,
+    Marc Flerackers
 
-**Product Home Page:** http://www.makehuman.org/
+:Version: 1.0
+:Copyright: MakeHuman Team 2001-2011
+:License: GPL3 
 
-**Code Home Page:**	http://code.google.com/p/makehuman/
-
-**Authors:**		   Manuel Bastioni, Marc Flerackers
-
-**Copyright(c):**	  MakeHuman Team 2001-2011
-
-**Licensing:**		 GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
-
-**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
-
-Abstract
---------
-
-TODO
-
+This module contains the GUI framework.
 """
 
 import events3d
@@ -43,8 +33,11 @@ if os.path.isfile(os.path.join(mh.getPath(''), "settings.ini")):
     f.close()
 
 class Style(object):
+    """
+    Base style object from which all styles are dervived
+    """
     def __init__(self, **kwds):
-            
+        
         self.__parent = kwds.pop('parent', None)
         self.__params = dict(kwds)
         
@@ -78,6 +71,10 @@ class Style(object):
 
 # Wrapper around Object3D
 class Object(events3d.EventHandler):
+
+    """
+    An object on the screen.
+    """
 
     def __init__(self, view, position, mesh, visible=True):
         
@@ -510,19 +507,23 @@ ViewStyle = Style(**{
 
 class View(events3d.EventHandler):
 
+    """
+    The base view from which all widgets are derived.
+    """
+
     def __init__(self, parent=None, style=None, layout=None, visible=True):
         
         """
         This is the constructor for the View class.
 
-        @param parent: The parent view.
-        @type parent: L{View}
-        @param style: The style.
-        @type style: L{Style}
-        @param layout: The layout.
-        @type layout: L{Layout}
-        @param visible: The visibility state.
-        @type visible: C{Boolean} 
+        :param parent: The parent view.
+        :type parent: View
+        :param style: The style.
+        :type style: Style
+        :param layout: The layout.
+        :type layout: Layout
+        :param visible: The visibility state.
+        :type visible: Boolean
         """
         
         if not parent:
@@ -1096,12 +1097,12 @@ class TabView(View):
         """
         This is the constructor for the TabView class.
 
-        @param parent: The parent view.
-        @type parent: L{View}
-        @param style: The style.
-        @type style: L{Style}
-        @param tabStyle: The tab style.
-        @type tabStyle: L{Style}
+        :param parent: The parent view.
+        :type parent: View
+        :param style: The style.
+        :type style: Style
+        :param tabStyle: The tab style.
+        :type tabStyle: Style
         """
         
         View.__init__(self, parent, style, BoxLayout(self))
@@ -1179,20 +1180,20 @@ class Slider(View):
         """
         This is the constructor for the Slider class.
 
-        @param parent: The parent view.
-        @type parent: L{View}
-        @param value: The original value.
-        @type value: C{int} or C{float}
-        @param min: The minimum value.
-        @type min: C{int} or C{float}
-        @param max: The maximum value.
-        @type max: C{int} or C{float}
-        @param label: The label.
-        @type label: C{str}
-        @param style: The style.
-        @type style: L{Style}
-        @param thumbStyle: The thumb style.
-        @type thumbStyle: L{Style}
+        :param parent: The parent view.
+        :type parent: View
+        :param value: The original value.
+        :type value: int or float
+        :param min: The minimum value.
+        :type min: int or float
+        :param max: The maximum value.
+        :type max: int or float
+        :param label: The label.
+        :type label: str
+        :param style: The style.
+        :type style: Style
+        :param thumbStyle: The thumb style.
+        :type thumbStyle: Style
         """
         
         View.__init__(self, parent, style)
@@ -1431,14 +1432,14 @@ class Button(View):
         """
         This is the constructor for the Button class.
 
-        @param parent: The parent view.
-        @type parent: L{View}
-        @param label: The label.
-        @type label: C{str}
-        @param selected: The selected state.
-        @type selected: C{Boolean} 
-        @param style: The style.
-        @type style: L{Style}
+        :param parent: The parent view.
+        :type parent: View
+        :param label: The label.
+        :type label: str
+        :param selected: The selected state.
+        :type selected: Boolean
+        :param style: The style.
+        :type style: Style
         """
         
         font = parent.app.getFont(style.fontFamily)
@@ -1493,12 +1494,24 @@ class Button(View):
         self.button.setTexture(texture)
         
     def getLabel(self):
+        """
+        Gets the label for the button
+        
+        :return: The label for the button
+        :rtype: str
+        """
         if self.label:
             return self.label.getText()
         else:
             return ''
             
     def setLabel(self, label):
+        """
+        Sets the label for the button
+        
+        :param label: The label.
+        :type label: str
+        """
         if self.label:
             font = self.app.getFont(self.style.fontFamily)
             translatedLabel = self.app.getLanguageString(label) if label else ''
@@ -1578,16 +1591,16 @@ class RadioButton(Button):
         """
         This is the constructor for the RadioButton class.
 
-        @param parent: The parent view.
-        @type parent: L{View}
-        @param group: The group.
-        @type group: C{list}
-        @param label: The label.
-        @type label: C{str}
-        @param selected: The selected state.
-        @type selected: C{Boolean} 
-        @param style: The style.
-        @type style: L{Style}
+        :param parent: The parent view.
+        :type parent: View
+        :param group: The group.
+        :type group: list
+        :param label: The label.
+        :type label: str
+        :param selected: The selected state.
+        :type selected: Boolean
+        :param style: The style.
+        :type style: Style
         """
         
         Button.__init__(self, parent, label, selected, style)
@@ -1631,14 +1644,14 @@ class ToggleButton(Button):
         """
         This is the constructor for the ToggleButton class.
 
-        @param parent: The parent view.
-        @type parent: L{View}
-        @param label: The label.
-        @type label: C{str}
-        @param selected: The selected state.
-        @type selected: C{Boolean} 
-        @param style: The style.
-        @type style: L{Style}
+        :param parent: The parent view.
+        :type parent: View
+        :param label: The label.
+        :type label: str
+        :param selected: The selected state.
+        :type selected: Boolean
+        :param style: The style.
+        :type style: Style
         """
 
         Button.__init__(self, parent, label, selected, style)
@@ -1678,14 +1691,14 @@ class CheckBox(ToggleButton):
         """
         This is the constructor for the CheckBox class.
 
-        @param parent: The parent view.
-        @type parent: L{View}
-        @param label: The label.
-        @type label: C{str}
-        @param selected: The selected state.
-        @type selected: C{Boolean} 
-        @param style: The style.
-        @type style: L{Style}
+        :param parent: The parent view.
+        :type parent: View
+        :param label: The label.
+        :type label: str
+        :param selected: The selected state.
+        :type selected: Boolean 
+        :param style: The style.
+        :type style: Style
         """
         
         Button.__init__(self, parent, label, selected, style)
@@ -1716,14 +1729,14 @@ class ProgressBar(View):
         """
         This is the constructor for the ProgressBar class. It takes the following parameters:
 
-        @param parent: The parent view.
-        @type parent: L{View}
-        @param position: The position.
-        @type position: C{list}
-        @param style: The style.
-        @type style: L{Style}
-        @param barStyle: The bar style.
-        @type barStyle: L{Style}
+        :param parent: The parent view.
+        :type parent: View
+        :param position: The position.
+        :type position: list
+        :param style: The style.
+        :type style: Style
+        :param barStyle: The bar style.
+        :type barStyle: Style
         """
 
         View.__init__(self, parent, style, None, visible)
@@ -1745,13 +1758,10 @@ class ProgressBar(View):
         """
     This method updates the progress and optionally updates the screen
 
-    Parameters
-    ----------
-
-    progress:
-        *float* The progress from 0.0 to 1.0.
-    redraw:
-        *int* 1 if a redraw is needed, 0 otherwise.
+    :param progress: The progress from 0.0 to 1.0.
+    :type progress: float
+    :param redraw: True if a redraw is needed, False otherwise.
+    :type redraw: Boolean
     """
 
         self.bar.mesh.setScale(progress, 1.0, 1.0)
@@ -2105,6 +2115,10 @@ class FileSortRadioButton(RadioButton):
         parent.refresh()
 
 class FileChooser(View):
+
+    """
+    A FileChooser widget. This widget can be used to let the user choose an existing file.
+    """
     
     def __init__(self, parent, path, extension, previewExtension='bmp', notFoundImage=None, sort=FileSort(), style=FileChooserStyle):
         
@@ -2288,12 +2302,8 @@ class FileChooser(View):
         self.slider.setPosition([10, event.height-35, 9.1])
         font = self.app.getFont(TextViewStyle.fontFamily)
         self.location.setPosition([10 + 112 + 10, event.height-2-font.lineHeight, 9.1])
-               
+             
 class FileChooser2(View):
-    
-    """
-    A FileEntryView widget. This widget can be used to let the user choose an existing file.
-    """
 
     def __init__(self, parent, path, extension, previewExtension='bmp'):
         View.__init__(self, parent)
@@ -2509,14 +2519,14 @@ class GroupBox(View):
         """
         This is the constructor for the GroupBox class.
 
-        @param parent: The parent view.
-        @type parent: L{View}
-        @param position: The position, a list of 4 C{int} or C{float} elements.
-        @type position: C{list}
-        @param label: The label.
-        @type label: C{str}
-        @param style: The style.
-        @type style: L{Style}
+        :param parent: The parent view.
+        :type parent: View
+        :param position: The position, a list of 3 int or float elements.
+        :type position: list
+        :param label: The label.
+        :type label: str
+        :param style: The style.
+        :type style: Style
         """
         
         font = parent.app.getFont(style.fontFamily)
@@ -2587,12 +2597,12 @@ class ShortcutEdit(View):
         """
         This is the constructor for the ShortcutEdit class.
 
-        @param parent: The parent view.
-        @type parent: L{View}
-        @param position: The position, a list of 4 C{int} or C{float} elements.
-        @type position: C{list}
-        @param shortcut: The position, a C{tuple} of modifiers and a key.
-        @type shortcut: C{tuple}
+        :param parent: The parent view.
+        :type parent: View
+        :param position: The position, a list of 4 int or float elements.
+        :type position: list
+        :param shortcut: The position, a tuple of modifiers and a key.
+        :type shortcut: tuple
         """
         
         View.__init__(self, parent, style)
@@ -2721,12 +2731,12 @@ class MouseActionEdit(ShortcutEdit):
         """
         This is the constructor for the MouseActionEdit class.
 
-        @param parent: The parent view.
-        @type parent: L{View}
-        @param position: The position, a list of 4 C{int} or C{float} elements.
-        @type position: C{list}
-        @param shortcut: The position, a C{tuple} of modifiers and a key.
-        @type shortcut: C{tuple}
+        :param parent: The parent view.
+        :type parent: View
+        :param position: The position, a list of 3 int or float elements.
+        :type position: list
+        :param shortcut: The position, a tuple of modifiers and a key.
+        :type shortcut: tuple
         """
         
         ShortcutEdit.__init__(self, parent, shortcut)
@@ -2784,14 +2794,14 @@ class NineSliceMesh(module3d.Object3D):
         """
         This is the constructor for the NineSliceMesh class.
 
-        @param width: The width.
-        @type width: C{int} or C{float}
-        @param height: The height.
-        @type height: C{int} or C{float}
-        @param texture: The texture.
-        @type texture: C{str}
-        @param border: The border, a list of 4 C{int} or C{float} elements.
-        @type border: C{list}
+        :param width: The width.
+        :type width: int or float
+        :param height: The height.
+        :type height: int or float
+        :param texture: The texture.
+        :type texture: str
+        :param border: The border, a list of 4 int or float elements.
+        :type border: list
         """
         
         module3d.Object3D.__init__(self, '9slice_' + texture + '_' + str(border))
@@ -2869,12 +2879,12 @@ class RectangleMesh(module3d.Object3D):
         """
         This is the constructor for the RectangleMesh class.
 
-        @param width: The width.
-        @type width: C{int} or C{float}
-        @param height: The height.
-        @type height: C{int} or C{float}
-        @param texture: The texture.
-        @type texture: C{str}
+        :param width: The width.
+        :type width: int or float
+        :param height: The height.
+        :type height: int or float
+        :param texture: The texture.
+        :type texture: str
         """
         
         module3d.Object3D.__init__(self, 'rectangle_%s' % texture)
@@ -2919,10 +2929,10 @@ class FrameMesh(module3d.Object3D):
         """
         This is the constructor for the FrameMesh class.
 
-        @param width: The width.
-        @type width: C{int} or C{float}
-        @param height: The height.
-        @type height: C{int} or C{float}
+        :param width: The width.
+        :type width: int or float
+        :param height: The height.
+        :type height: int or float
         """
         
         module3d.Object3D.__init__(self, 'frame', 2)

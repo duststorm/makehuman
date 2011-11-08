@@ -19,6 +19,8 @@ import sys, os
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.append(os.path.abspath('sphinxext'))
 sys.path.append('../core')
+sys.path.append('../apps')
+sys.path.append('..')
 
 # -- General configuration -----------------------------------------------------
 
