@@ -247,30 +247,6 @@ class LoadTaskView(gui3d.TaskView):
         
         self.filechooser.onResized(event)
 
-class GuiProxy():
-
-    def __init__(self, options, y):
-    
-        proxies = []
-        self.noProxy = gui3d.RadioButton(options, proxies, "No proxy", True);y+=24
-        self.rorkimaru = gui3d.RadioButton(options, proxies, "Rorkimaru proxy");y+=24
-        self.ascottk = gui3d.RadioButton(options, proxies, "Ascottk proxy");y+=24
-        self.forsaken = gui3d.RadioButton(options, proxies, "Forsaken proxy");y+=24
-        self.new_male = gui3d.RadioButton(options, proxies, "New male mesh");y+=24
-        
-    def getName(self):
-    
-        if self.rorkimaru.selected:
-            return 'Rorkimaru'
-        elif self.ascottk.selected:
-            return'ascottk'
-        elif self.forsaken.selected:
-            return'forsaken'
-        elif self.new_male.selected:
-            return'new_male'
-        else:
-            return None
-
 class ExportTaskView(gui3d.TaskView):
     
     def __init__(self, category):
@@ -300,7 +276,6 @@ class ExportTaskView(gui3d.TaskView):
         self.exportGroups = gui3d.CheckBox(self.objOptions, "Groups", True);y+=24
         self.exportSmooth = gui3d.CheckBox(self.objOptions, "Subdivide", False);y+=24
         self.exportHair = gui3d.CheckBox(self.objOptions, "Hair as mesh", selected=True);y+=24
-        self.objProxy = GuiProxy(self.objOptions, y)
         
         # MHX options
         y = yy
@@ -323,7 +298,6 @@ class ExportTaskView(gui3d.TaskView):
         self.mhxRig = gui3d.RadioButton(self.mhxOptions, rigs, "Use mhx rig", True);y+=24
         self.rigifyRig = gui3d.RadioButton(self.mhxOptions, rigs, "Use rigify rig");y+=24
         self.gameRig = gui3d.RadioButton(self.mhxOptions, rigs, "Use game rig");y+=24
-        self.mhxProxy = GuiProxy(self.mhxOptions, y)
 
         self.mhxOptions.hide()
         
@@ -336,7 +310,6 @@ class ExportTaskView(gui3d.TaskView):
         self.gameDae = gui3d.RadioButton(self.colladaOptions, rigs, "Default rig", True);y+=24
         self.dazDae = gui3d.RadioButton(self.colladaOptions, rigs, "Poser/DAZ rig");y+=24
         #self.mbDae = gui3d.RadioButton(self.colladaOptions, rigs, "Motionbuilder rig");y+=24
-        self.colladaProxy = GuiProxy(self.colladaOptions, y)
         self.colladaOptions.hide()
 
         # STL options
@@ -432,8 +405,7 @@ class ExportTaskView(gui3d.TaskView):
                     os.path.join(exportPath, filename + ".obj"),
                     self.exportGroups.selected,
                     filter)
-                proxy = self.objProxy.getName()
-                mh2obj_proxy.exportProxyObj(human, os.path.join(exportPath, filename), proxy)
+                mh2obj_proxy.exportProxyObj(human, os.path.join(exportPath, filename))
                 
                 if self.exportSkeleton.selected:
                     mh2bvh.exportSkeleton(human.meshData, os.path.join(exportPath, filename + ".bvh"))
@@ -470,7 +442,6 @@ class ExportTaskView(gui3d.TaskView):
                         'clothes':self.exportClothes.selected,
                         'cage':self.exportCage.selected,
                         'useRig': rig,
-                        'useProxy': self.mhxProxy.getName()
                     }
                 # TL 2011.02.08: exportMhx uses the human instead of his meshData
                 mh2mhx.exportMhx(self.app.selectedHuman, os.path.join(exportPath, filename + ".mhx"), options)
@@ -485,7 +456,6 @@ class ExportTaskView(gui3d.TaskView):
                     "useRig": rig,
                     "rotate90" : self.colladaRot90.selected,
                     "copyImages" : self.colladaCopyImages.selected,
-                    "proxy" : self.colladaProxy.getName()
                 }
                 mh2collada.exportCollada(self.app.selectedHuman, os.path.join(exportPath, filename), options)
             elif self.md5.selected:

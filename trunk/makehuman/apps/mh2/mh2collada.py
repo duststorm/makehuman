@@ -51,17 +51,15 @@ Root = 'MasterFloor'
 #
 
 def exportCollada(human, name, options=None):
-    global useRotate90, useCopyImages, useProxy, useRig
+    global useRotate90, useCopyImages, useRig
     if options:
         useRig = options["useRig"]
         useRotate90 = options["rotate90"]
         useCopyImages = options["copyImages"]
-        useProxy = options["proxy"]
     else:
         useRig = "game"
         useRotate90 = False
         useCopyImages = False
-        useProxy = None
     filename = name+".dae"
     time1 = time.clock()
     try:
@@ -479,7 +477,7 @@ def filterMesh(mesh1):
 #
 
 def exportDae(human, fp):
-    global theStuff, Root, useRotate90, useProxy, useRig
+    global theStuff, Root, useRotate90, useRig
     cfg = export_config.exportConfig(human, True)
     obj = human.meshData
     if useRig == "game":
@@ -498,13 +496,8 @@ def exportDae(human, fp):
     stuff = CStuff('Human', None)
     stuff.setBones(amt)
     theStuff = stuff
-    if useProxy:
-        pfile = export_config.CProxyFile()
-        pfile.set('Proxy', 0, False, False, True)
-        pfile.file = "data/templates/%s.proxy" % useProxy.lower()
-        print("Using %s" % pfile.file)
-        setupProxies('Proxy', obj, stuffs, amt, rawTargets, [pfile])
-    else:
+    foundProxy = setupProxies('Proxy', obj, stuffs, amt, rawTargets, cfg.proxyList)
+    if not foundProxy:
         mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
         mesh2 = filterMesh(mesh1)
         stuff.setMesh(mesh2)
@@ -590,10 +583,12 @@ def exportDae(human, fp):
 
 def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
     global theStuff
+    foundProxy = False    
     for pfile in proxyList:
         if pfile.useDae and pfile.type == typename:
             proxy = mh2proxy.readProxyFile(obj, pfile, True)
             if proxy and proxy.name and proxy.texVerts:
+                foundProxy = True
                 stuff = CStuff(proxy.name, proxy)
                 print(proxy.name, proxy.rig, proxy.weightfile)
                 if proxy.rig:
@@ -627,7 +622,7 @@ def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
                     mesh = mh2proxy.getMeshInfo(obj, proxy, stuff.rawWeights, rawTargets, stuffname)
                     stuff.setMesh(mesh)
                     stuffs.append(stuff)
-    return
+    return foundProxy
 
 #
 #    writeImages(obj, fp, stuff):

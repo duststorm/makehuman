@@ -152,8 +152,6 @@ def exportConfig(human, useHair, options=None):
         cfg.bodyshapes = options['bodyshapes']
         cfg.cage = options['cage']
         cfg.useRig = options['useRig']
-        #useClothes = options['clothes']
-        #useProxy = options['useProxy']
         fp = 0
     else:    
         fp = proxyFilePtr('mh_export.config')

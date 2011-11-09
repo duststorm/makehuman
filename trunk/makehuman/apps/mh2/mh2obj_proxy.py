@@ -23,27 +23,18 @@ import export_config
 import mh2proxy
 
 #
-#    exportProxyObj(human, filename, proxyName):    
+#    exportProxyObj(human, filename):    
 #    exportProxyObj1(obj, filename, proxy):
 #
 
-def exportProxyObj(human, name, proxyName):
+def exportProxyObj(human, name):
     obj = human.meshData
-    if proxyName:
-        pfile = export_config.CProxyFile()
-        pfile.type = 'Proxy'
-        pfile.file = "./data/templates/%s.proxy" % proxyName.lower()
-        proxy = mh2proxy.readProxyFile(obj, pfile, True)
-        if proxy and proxy.name:
-            filename = "%s_%s.obj" % (name.lower(), proxy.name)
-            exportProxyObj1(obj, filename, proxy)
-    
     cfg = export_config.exportConfig(human, False)
     for pfile in cfg.proxyList:
-        if pfile.useObj and pfile.type != 'Proxy':
+        if pfile.useObj:
             proxy = mh2proxy.readProxyFile(obj, pfile, True)
             if proxy and proxy.name:
-                filename = "%s_%s.obj" % (name.lower(), proxy.name)
+                filename = "%s_%s.obj" % (name.lower(), proxy.name.lower())
                 exportProxyObj1(obj, filename, proxy)
     return
 
