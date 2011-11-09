@@ -330,26 +330,30 @@ def setupVertexPairs(context):
     Right = {}
     Mid = {}
     nmax = len(verts)
-    print("Did not find mirror image for vertices")
+    notfound = []
     for n,data in enumerate(verts):
         (z,y,x,vn) = data
         n1 = n - 20
         n2 = n + 20
         if n1 < 0: n1 = 0
         if n2 >= nmax: n2 = nmax
-        vmir = findVert(verts[n1:n2], vn, -x, y, z)
+        vmir = findVert(verts[n1:n2], vn, -x, y, z, notfound)
         if vmir < 0:
             Mid[vn] = vn
         elif x > Epsilon:
             Left[vn] = vmir
-        elif x < Epsilon:
+        elif x < -Epsilon:
             Right[vn] = vmir
         else:
             Mid[vn] = vmir
-    print("end")        
+    if notfound:            
+        print("Did not find mirror image for vertices:")
+        for msg in notfound:
+            print(msg)
+    print("Left-right-mid", len(Left.keys()), len(Right.keys()), len(Mid.keys()))
     return
     
-def findVert(verts, v, x, y, z):
+def findVert(verts, v, x, y, z, notfound):
     for (z1,y1,x1,v1) in verts:
         dx = x-x1
         dy = y-y1
@@ -358,7 +362,7 @@ def findVert(verts, v, x, y, z):
         if dist < Epsilon:
             return v1
     if abs(x) > Epsilon:            
-        print("  %d at (%.4f %.4f %.4f)" % (v, x, y, z))
+        notfound.append("  %d at (%.4f %.4f %.4f)" % (v, x, y, z))
     return -1            
 
 #----------------------------------------------------------
