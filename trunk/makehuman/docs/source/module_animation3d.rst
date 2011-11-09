@@ -1,4 +1,4 @@
-.. _getting_started:
+.. _moduleanimation3d:
 
 
 **********************

@@ -7,7 +7,7 @@
 Appendix 1 -RestructuredTex math-
 ##################################
 
-.. _plugins:
+.. _general sintax:
 
 General sintax
 ===============
