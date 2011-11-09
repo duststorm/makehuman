@@ -2,7 +2,7 @@
 
 
 *******************
-The Events3d Module
+The Events3D Module
 *******************
  
 .. automodule:: events3d

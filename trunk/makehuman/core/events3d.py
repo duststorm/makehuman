@@ -17,7 +17,7 @@ __docformat__ = 'restructuredtext'
 
 class Event:
     """
-    Base class for all events
+    Base class for all events, does not contain information.
     """
     def __init__(self):
         pass
@@ -29,6 +29,17 @@ class Event:
 class MouseEvent(Event):
     """
     Contains information about a mouse event.
+    
+    :param button: the button that is pressed in case of a mousedown or mouseup event, or button flags in case of a mousemove event.
+    :type button: int
+    :param x: the x position of the mouse in window coordinates.
+    :type x: int
+    :param y: the y position of the mouse in window coordinates.
+    :type y: int
+    :param dx: the difference in x position in case of a mousemove event.
+    :type dx: int
+    :param dy: the difference in y position in case of a mousemove event.
+    :type dy: int
     """
     def __init__(self, button, x, y, dx=0, dy=0):
         self.button = button
@@ -44,6 +55,9 @@ class MouseEvent(Event):
 class MouseWheelEvent(Event):
     """
     Contains information about a mouse wheel event.
+    
+    :param wheelDelta: the amount and direction that the wheel was scrolled.
+    :type wheelDelta: int
     """
     def __init__(self, wheelDelta):
         self.wheelDelta = wheelDelta
@@ -55,6 +69,13 @@ class MouseWheelEvent(Event):
 class KeyEvent(Event):
     """
     Contains information about a keyboard event.
+    
+    :param key: the key code of the key that was pressed or released.
+    :type key: int
+    :param character: the unicode character if the key represents a character.
+    :type character: unicode
+    :param modifiers: the modifier keys that were down at the time of pressing the key.
+    :type modifiers: int
     """
     def __init__(self, key, character, modifiers):
         self.key = key
@@ -68,18 +89,34 @@ class KeyEvent(Event):
 class FocusEvent(Event):
     """
     Contains information about a view focus/blur event
+    
+    :param blurred: the view that lost the focus.
+    :type blurred: guid3d.View
+    :param focused: the view that gained the focus.
+    :type focused: guid3d.View
     """
     def __init__(self, blurred, focused):
         self.blurred = blurred
         self.focused = focused
 
     def __repr__(self):
-        return 'FocusEvent(%s, %s)' % self.character
+        return 'FocusEvent(%s, %s)' % (self.blurred, self.focused)
 
 
 class ResizeEvent(Event):
     """
     Contains information about a resize event
+    
+    :param width: the new width of the window in pixels.
+    :type width: int
+    :param height: the new height of the window in pixels.
+    :type height: int
+    :param fullscreen: the new fullscreen state of the window.
+    :type fullscreen: Boolean
+    :param dx: the change in width of the window in pixels.
+    :type dx: int
+    :param dy: the change in height of the window in pixels.
+    :type dy: int
     """
     def __init__(self, width, height, fullscreen, dx, dy):
         self.width = width

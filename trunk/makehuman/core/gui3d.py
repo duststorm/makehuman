@@ -75,6 +75,14 @@ class Object(events3d.EventHandler):
 
     """
     An object on the screen.
+    
+    :param view: The parent view.
+    :type view: gui3d.View
+    :param position: The position in 3d space.
+    :type position: list or tuple
+    :param mesh: The mesh object.
+    :param visible: Wether the object should be initially visible.
+    :type visible: Boolean
     """
 
     def __init__(self, view, position, mesh, visible=True):
@@ -371,27 +379,24 @@ class TextObject(Object):
 
     """
     A text object on the screen.
+    
+    :param view: The parent view.
+    :type view: gui3d.View
+    :param position: The position in 3d space.
+    :type position: list or tuple
+    :param text: The text.
+    :type text: str
+    :param wrapWidth: The width to wrap the text to, 0 means no wrap.
+    :type wrapWidth: int
+    :param alignment: Text alignment.
+    :type alignment: int
+    :param fontFamily: The font to use.
+    :type fontFamily: str
+    :param fontSize: The size of the font (unused).
+    :type fontSize: int
     """
     
     def __init__(self, view, position, text = '', wrapWidth=0, alignment=AlignLeft, fontFamily = defaultFontFamily, fontSize = defaultFontSize):
-        """
-        This is the constructor for the TextObject class.
-        
-        :param view: The parent view.
-        :type view: gui3d.View
-        :param position: The position in 3d space.
-        :type position: list
-        :param text: The text.
-        :type text: str
-        :param wrapWidth: The width to wrap the text to, 0 means no wrap.
-        :type wrapWidth: int
-        :param alignment: Text alignment.
-        :type alignment: int
-        :param fontFamily: The font to use.
-        :type fontFamily: str
-        :param fontSize: The size of the font (unused).
-        :type fontSize: int
-        """
     
         self.text = text
         self.wrapWidth = wrapWidth
@@ -557,22 +562,18 @@ class View(events3d.EventHandler):
 
     """
     The base view from which all widgets are derived.
+    
+    :param parent: The parent view.
+    :type parent: gui3d.View
+    :param style: The style.
+    :type style: gui3d.Style
+    :param layout: The layout.
+    :type layout: gui3d.Layout
+    :param visible: The visibility state.
+    :type visible: Boolean
     """
 
     def __init__(self, parent=None, style=None, layout=None, visible=True):
-        
-        """
-        This is the constructor for the View class.
-
-        :param parent: The parent view.
-        :type parent: gui3d.View
-        :param style: The style.
-        :type style: gui3d.Style
-        :param layout: The layout.
-        :type layout: gui3d.Layout
-        :param visible: The visibility state.
-        :type visible: Boolean
-        """
         
         if not parent:
             raise RuntimeError('A view needs a parent')
@@ -1138,20 +1139,16 @@ class TabView(View):
     
     """
     A tab widget. This widget can be used to switch between widgets.
+
+    :param parent: The parent view.
+    :type parent: gui3d.View
+    :param style: The style.
+    :type style: gui3d.Style
+    :param tabStyle: The tab style.
+    :type tabStyle: gui3d.Style
     """
 
     def __init__(self, parent, style=TabViewStyle, tabStyle=TabViewTabStyle):
-        
-        """
-        This is the constructor for the TabView class.
-
-        :param parent: The parent view.
-        :type parent: gui3d.View
-        :param style: The style.
-        :type style: gui3d.Style
-        :param tabStyle: The tab style.
-        :type tabStyle: gui3d.Style
-        """
         
         View.__init__(self, parent, style, BoxLayout(self))
         
@@ -1220,29 +1217,25 @@ class Slider(View):
     The onChange event is triggered when the slider is released, with the new value as parameter.
     For real-time feedback the onChanging event is triggered when the slider is being moved, with the
     current value as parameter.
+    
+    :param parent: The parent view.
+    :type parent: gui3d.View
+    :param value: The original value.
+    :type value: int or float
+    :param min: The minimum value.
+    :type min: int or float
+    :param max: The maximum value.
+    :type max: int or float
+    :param label: The label.
+    :type label: str
+    :param style: The style.
+    :type style: gui3d.Style
+    :param thumbStyle: The thumb style.
+    :type thumbStyle: gui3d.Style
     """
 
     def __init__(self, parent, value=0.0, min=0.0, max=1.0, label=None,
         style=SliderStyle, thumbStyle=SliderThumbStyle):
-        
-        """
-        This is the constructor for the Slider class.
-
-        :param parent: The parent view.
-        :type parent: gui3d.View
-        :param value: The original value.
-        :type value: int or float
-        :param min: The minimum value.
-        :type min: int or float
-        :param max: The maximum value.
-        :type max: int or float
-        :param label: The label.
-        :type label: str
-        :param style: The style.
-        :type style: gui3d.Style
-        :param thumbStyle: The thumb style.
-        :type thumbStyle: gui3d.Style
-        """
         
         View.__init__(self, parent, style)
         
@@ -1473,23 +1466,19 @@ class Button(View):
     A push button widget. This widget can be used to trigger an action by catching the onClicked event.
     The onClicked event is triggered when the button is clicked and the mouse is released while being
     over the widget.
+    
+    :param parent: The parent view.
+    :type parent: gui3d.View
+    :param label: The label.
+    :type label: str
+    :param selected: The selected state.
+    :type selected: Boolean
+    :param style: The style.
+    :type style: gui3d.Style
     """
 
     def __init__(self, parent, label=None, selected=False, style=ButtonStyle):
-        
-        """
-        This is the constructor for the Button class.
 
-        :param parent: The parent view.
-        :type parent: gui3d.View
-        :param label: The label.
-        :type label: str
-        :param selected: The selected state.
-        :type selected: Boolean
-        :param style: The style.
-        :type style: gui3d.Style
-        """
-        
         font = parent.app.getFont(style.fontFamily)
         translatedLabel = parent.app.getLanguageString(label) if label else ''
         labelWidth = font.stringWidth(translatedLabel) if translatedLabel else 0
@@ -1632,25 +1621,21 @@ class RadioButton(Button):
     Several radio button widgets form a group when they are created with the same group list.
     The onClicked event can be used to know when the user changes his/her choice, though generally this choice
     is determined in an action by checking each radio button's selected property.
+    
+    :param parent: The parent view.
+    :type parent: gui3d.View
+    :param group: The group.
+    :type group: list
+    :param label: The label.
+    :type label: str
+    :param selected: The selected state.
+    :type selected: Boolean
+    :param style: The style.
+    :type style: gui3d.Style
     """
     
     def __init__(self, parent, group, label=None, selected=False, style=RadioButtonStyle):
-            
-        """
-        This is the constructor for the RadioButton class.
-
-        :param parent: The parent view.
-        :type parent: gui3d.View
-        :param group: The group.
-        :type group: list
-        :param label: The label.
-        :type label: str
-        :param selected: The selected state.
-        :type selected: Boolean
-        :param style: The style.
-        :type style: gui3d.Style
-        """
-        
+    
         Button.__init__(self, parent, label, selected, style)
         self.group = group
         self.group.append(self)
@@ -1682,26 +1667,22 @@ class RadioButton(Button):
 class ToggleButton(Button):
     
     """
-    A toggle button widget. This widget is used when there is a stat which can be turned on or off.
+    A toggle button widget. This widget is used when there is a status which can be turned on or off.
     The onClicked event can be used to know when the user changes his/her choice, though generally this choice
     is determined in an action by checking the toggle button's selected property.
+    
+    :param parent: The parent view.
+    :type parent: gui3d.View
+    :param label: The label.
+    :type label: str
+    :param selected: The selected state.
+    :type selected: Boolean
+    :param style: The style.
+    :type style: gui3d.Style
     """
 
     def __init__(self, parent, label=None, selected=False, style=ButtonStyle):
-            
-        """
-        This is the constructor for the ToggleButton class.
-
-        :param parent: The parent view.
-        :type parent: gui3d.View
-        :param label: The label.
-        :type label: str
-        :param selected: The selected state.
-        :type selected: Boolean
-        :param style: The style.
-        :type style: gui3d.Style
-        """
-
+    
         Button.__init__(self, parent, label, selected, style)
 
     def onClicked(self, event):
@@ -1733,22 +1714,22 @@ CheckBoxStyle = Style(**{
     })
             
 class CheckBox(ToggleButton):
+
+    """
+    A CheckBox is a ToggleButton with the look of a standard check box.
+
+    :param parent: The parent view.
+    :type parent: gui3d.View
+    :param label: The label.
+    :type label: str
+    :param selected: The selected state.
+    :type selected: Boolean 
+    :param style: The style.
+    :type style: gui3d.Style
+    """
     
     def __init__(self, parent, label=None, selected=False, style=CheckBoxStyle):
-        
-        """
-        This is the constructor for the CheckBox class.
-
-        :param parent: The parent view.
-        :type parent: gui3d.View
-        :param label: The label.
-        :type label: str
-        :param selected: The selected state.
-        :type selected: Boolean 
-        :param style: The style.
-        :type style: gui3d.Style
-        """
-        
+    
         Button.__init__(self, parent, label, selected, style)
 
 ProgressBarStyle = Style(**{
@@ -1770,22 +1751,18 @@ class ProgressBar(View):
     """
     A ProgressBar widget. This widget can be used to show the user the progress of a 
     lengthy operation.
+    
+    :param parent: The parent view.
+    :type parent: gui3d.View
+    :param position: The position.
+    :type position: list
+    :param style: The style.
+    :type style: gui3d.Style
+    :param barStyle: The bar style.
+    :type barStyle: gui3d.Style
     """
 
     def __init__(self, parent, style=ProgressBarStyle, barStyle=ProgressBarBarStyle, visible=True):
-    
-        """
-        This is the constructor for the ProgressBar class. It takes the following parameters:
-
-        :param parent: The parent view.
-        :type parent: gui3d.View
-        :param position: The position.
-        :type position: list
-        :param style: The style.
-        :type style: gui3d.Style
-        :param barStyle: The bar style.
-        :type barStyle: gui3d.Style
-        """
 
         View.__init__(self, parent, style, None, visible)
         
@@ -1804,13 +1781,13 @@ class ProgressBar(View):
 
     def setProgress(self, progress, redraw=True):
         """
-    This method updates the progress and optionally updates the screen
+        This method updates the progress and optionally updates the screen
 
-    :param progress: The progress from 0.0 to 1.0.
-    :type progress: float
-    :param redraw: True if a redraw is needed, False otherwise.
-    :type redraw: Boolean
-    """
+        :param progress: The progress from 0.0 to 1.0.
+        :type progress: float
+        :param redraw: True if a redraw is needed, False otherwise.
+        :type redraw: Boolean
+        """
 
         self.bar.mesh.setScale(progress, 1.0, 1.0)
         if redraw:
@@ -2560,22 +2537,18 @@ class GroupBox(View):
     
     """
     A group box widget. This widget can be used to show which widgets belong together.
+    
+    :param parent: The parent view.
+    :type parent: gui3d.View
+    :param position: The position, a list of 3 int or float elements.
+    :type position: list
+    :param label: The label.
+    :type label: str
+    :param style: The style.
+    :type style: gui3d.Style
     """
 
     def __init__(self, parent, position=[0, 0, 9], label=None, style=GroupBoxStyle):
-        
-        """
-        This is the constructor for the GroupBox class.
-
-        :param parent: The parent view.
-        :type parent: gui3d.View
-        :param position: The position, a list of 3 int or float elements.
-        :type position: list
-        :param label: The label.
-        :type label: str
-        :param style: The style.
-        :type style: gui3d.Style
-        """
         
         font = parent.app.getFont(style.fontFamily)
         translatedLabel = parent.app.getLanguageString(label) if label else ''
@@ -2638,21 +2611,17 @@ class ShortcutEdit(View):
     
     """
     An edit control for entering shortcuts.
+
+    :param parent: The parent view.
+    :type parent: gui3d.View
+    :param position: The position, a list of 4 int or float elements.
+    :type position: list
+    :param shortcut: The position, a tuple of modifiers and a key.
+    :type shortcut: tuple
     """
     
     def __init__(self, parent, shortcut, style=ShortcutEditStyle):
-        
-        """
-        This is the constructor for the ShortcutEdit class.
 
-        :param parent: The parent view.
-        :type parent: gui3d.View
-        :param position: The position, a list of 4 int or float elements.
-        :type position: list
-        :param shortcut: The position, a tuple of modifiers and a key.
-        :type shortcut: tuple
-        """
-        
         View.__init__(self, parent, style)
         
         self.texture = self.app.getThemeResource('images', self.style.normal)
@@ -2772,20 +2741,16 @@ class MouseActionEdit(ShortcutEdit):
     
     """
     An edit control for entering mouse actions.
+    
+    :param parent: The parent view.
+    :type parent: gui3d.View
+    :param position: The position, a list of 3 int or float elements.
+    :type position: list
+    :param shortcut: The position, a tuple of modifiers and a key.
+    :type shortcut: tuple
     """
     
     def __init__(self, parent, shortcut):
-        
-        """
-        This is the constructor for the MouseActionEdit class.
-
-        :param parent: The parent view.
-        :type parent: gui3d.View
-        :param position: The position, a list of 3 int or float elements.
-        :type position: list
-        :param shortcut: The position, a tuple of modifiers and a key.
-        :type shortcut: tuple
-        """
         
         ShortcutEdit.__init__(self, parent, shortcut)
         
@@ -2835,22 +2800,18 @@ class NineSliceMesh(module3d.Object3D):
     """
     A 9 slice mesh. It is a mesh with fixed size borders and a resizeable center.
     This makes sure the borders of a group box are not stretched.
+    
+    :param width: The width.
+    :type width: int or float
+    :param height: The height.
+    :type height: int or float
+    :param texture: The texture.
+    :type texture: str
+    :param border: The border, a list of 4 int or float elements.
+    :type border: list
     """
     
     def __init__(self, width, height, texture, border):
-    
-        """
-        This is the constructor for the NineSliceMesh class.
-
-        :param width: The width.
-        :type width: int or float
-        :param height: The height.
-        :type height: int or float
-        :param texture: The texture.
-        :type texture: str
-        :param border: The border, a list of 4 int or float elements.
-        :type border: list
-        """
         
         module3d.Object3D.__init__(self, '9slice_' + texture + '_' + str(border))
         
@@ -2920,21 +2881,20 @@ class NineSliceMesh(module3d.Object3D):
         self.update()
     
 class RectangleMesh(module3d.Object3D):
+
+    """
+    A filled rectangle.
+    
+    :param width: The width.
+    :type width: int or float
+    :param height: The height.
+    :type height: int or float
+    :param texture: The texture.
+    :type texture: str
+    """
             
     def __init__(self, width, height, texture=None):
-        
-        
-        """
-        This is the constructor for the RectangleMesh class.
 
-        :param width: The width.
-        :type width: int or float
-        :param height: The height.
-        :type height: int or float
-        :param texture: The texture.
-        :type texture: str
-        """
-        
         module3d.Object3D.__init__(self, 'rectangle_%s' % texture)
         
         self.uvValues = []
@@ -2970,19 +2930,18 @@ class RectangleMesh(module3d.Object3D):
         self.update()     
        
 class FrameMesh(module3d.Object3D):
+
+    """
+    A wire rectangle.
+
+    :param width: The width.
+    :type width: int or float
+    :param height: The height.
+    :type height: int or float
+    """
             
     def __init__(self, width, height):
-        
-        
-        """
-        This is the constructor for the FrameMesh class.
 
-        :param width: The width.
-        :type width: int or float
-        :param height: The height.
-        :type height: int or float
-        """
-        
         module3d.Object3D.__init__(self, 'frame', 2)
         
         self.uvValues = []
