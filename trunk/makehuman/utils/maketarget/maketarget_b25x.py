@@ -399,6 +399,7 @@ def loadTarget(filepath, context):
     ob.use_shape_key_edit_mode = False
     ob["MakeTarget"] = "Target"
     ob["FilePath"] = realpath
+    ob["SelectedOnly"] = False
     print("Target loaded")
     return
 
@@ -435,6 +436,7 @@ def newTarget(context):
     ob.use_shape_key_edit_mode = False
     ob["MakeTarget"] = "Target"
     ob["FilePath"] = 0
+    ob["SelectedOnly"] = False
     return
 
 class VIEW3D_OT_NewTargetButton(bpy.types.Operator):
@@ -467,10 +469,11 @@ def doSaveTarget(ob, filepath):
 
     skey = ob.active_shape_key    
     skey.name = os.path.basename(filepath)
+    saveAll = not ob["SelectedOnly"]
     for n,v in enumerate(skey.data):
         bv = ob.data.vertices[n]
         vec = v.co - bv.co
-        if vec.length > Epsilon:
+        if vec.length > Epsilon and (saveAll or bv.select):
             fp.write("%d %.6f %.6f %.6f\n" % (n, vec[0], vec[2], -vec[1]))
     fp.close()    
     ob["FilePath"] = filepath
@@ -702,6 +705,7 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.operator("mh.symmetrize_target", text="Symm Left->Right").left2right = True
             layout.operator("mh.symmetrize_target", text="Symm Right->Left").left2right = False
             layout.operator("mh.discard_target")
+            layout.prop(ob, '["SelectedOnly"]')
             if ob["FilePath"]:
             	layout.operator("mh.save_target")           
             layout.operator("mh.saveas_target")           
