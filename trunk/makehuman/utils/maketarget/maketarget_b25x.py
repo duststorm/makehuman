@@ -423,12 +423,34 @@ class VIEW3D_OT_LoadTargetButton(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
 #----------------------------------------------------------
+#   newTarget(context):
+#----------------------------------------------------------
+
+def newTarget(context):
+    ob = context.object
+    bpy.ops.object.shape_key_add(from_mix=False)
+    skey = ob.active_shape_key
+    skey.name = "Target"
+    ob.show_only_shape_key = True
+    ob.use_shape_key_edit_mode = False
+    ob["MakeTarget"] = "Target"
+    ob["FilePath"] = 0
+    return
+
+class VIEW3D_OT_NewTargetButton(bpy.types.Operator):
+    bl_idname = "mh.new_target"
+    bl_label = "New target"
+
+    def execute(self, context):
+        newTarget(context)
+        return {'FINISHED'}
+
+#----------------------------------------------------------
 #   saveTarget(context):
 #----------------------------------------------------------
 
 def saveTarget(context):
     ob = context.object
-    scn = context.scene
     if not isTarget(ob):
         raise NameError("%s is not a target")
     if isSaving(ob):
@@ -436,17 +458,22 @@ def saveTarget(context):
     else:
         ob["Saving"] = True
         return    
-    filepath = ob["FilePath"] 
+    doSaveTarget(ob, ob["FilePath"])
+    return
+    
+def doSaveTarget(ob, filepath):    
     fp = open(filepath, "w")  
     print("Saving target %s to %s" % (ob, filepath))
 
     skey = ob.active_shape_key    
+    skey.name = os.path.basename(filepath)
     for n,v in enumerate(skey.data):
         bv = ob.data.vertices[n]
         vec = v.co - bv.co
         if vec.length > Epsilon:
             fp.write("%d %.6f %.6f %.6f\n" % (n, vec[0], vec[2], -vec[1]))
     fp.close()    
+    ob["FilePath"] = filepath
     print("Target saved")
     return
                             
@@ -457,6 +484,25 @@ class VIEW3D_OT_SaveTargetButton(bpy.types.Operator):
     def execute(self, context):
         saveTarget(context)
         return{'FINISHED'}            
+
+class VIEW3D_OT_SaveasTargetButton(bpy.types.Operator):
+    bl_idname = "mh.saveas_target"
+    bl_label = "Save target as"
+
+    filename_ext = ".target"
+    filter_glob = StringProperty(default="*.target", options={'HIDDEN'})
+    filepath = bpy.props.StringProperty(
+        name="File Path", 
+        description="File path used for target file", 
+        maxlen= 1024, default= "")
+
+    def execute(self, context):
+        doSaveTarget(context.object, self.properties.filepath)
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
 
 class VIEW3D_OT_SkipSaveButton(bpy.types.Operator):
     bl_idname = "mh.skip_save"
@@ -647,6 +693,7 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.operator("mh.import_base_mhclo", text="Import base mhclo").delete = False
             layout.operator("mh.import_base_obj", text="Import base obj").delete = False
         if isBase(ob):
+            layout.operator("mh.new_target")
             layout.operator("mh.load_target")
         elif isTarget(ob):
             layout.prop(ob, "show_only_shape_key")
@@ -655,7 +702,9 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.operator("mh.symmetrize_target", text="Symm Left->Right").left2right = True
             layout.operator("mh.symmetrize_target", text="Symm Right->Left").left2right = False
             layout.operator("mh.discard_target")
-            layout.operator("mh.save_target")           
+            if ob["FilePath"]:
+            	layout.operator("mh.save_target")           
+            layout.operator("mh.saveas_target")           
 
 #
 #    Init and register
