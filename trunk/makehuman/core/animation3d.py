@@ -128,7 +128,7 @@ def quadraticBSplineInterpolator(v0, v1, v2, alpha):
     Quadratic b-spline interpolator. v0 and v2 are begin and end point respectively, v1 is a control point.
 
     .. math::
-        \frac{1}{2} * \begin{bmatrix} 1 & -2 & 1 \\ -2 & 2 & 0 \\ 1 & 1 & 0 \end{bmatrix}
+        \frac{1}{2} \begin{bmatrix} 1 & -2 & 1 \\ -2 & 2 & 0 \\ 1 & 1 & 0 \end{bmatrix}
     """
 
     alpha2 = alpha * alpha
@@ -140,7 +140,7 @@ def cubicBSplineInterpolator(v0, v1, v2, v3, alpha):
     Cubic b-spline interpolator. v0 and v3 are begin and end point respectively, v1 and v2 are control points.
 
     .. math::
-        \frac{1}{6} * \begin{bmatrix} -1 & 3 & -3 & 1 \\ 3 & -6 & 3 & 0 \\ -3 & 0 & 3 & 0 \\ 1 & 4 & 1 & 0 \end{bmatrix}
+        \frac{1}{6} \begin{bmatrix} -1 & 3 & -3 & 1 \\ 3 & -6 & 3 & 0 \\ -3 & 0 & 3 & 0 \\ 1 & 4 & 1 & 0 \end{bmatrix}
     '''
 
     alpha2 = alpha * alpha
@@ -153,7 +153,7 @@ def cubicCatmullRomInterpolator(v0, v1, v2, v3, alpha):
     Cubic Catmull Rom interpolator. v0 and v3 are begin and end point respectively, v1 and v2 are control points.
     
     .. math::
-        \frac{1}{2} * \begin{bmatrix} -1 & 3 & -3 & 1 \\ 2 & -5 & 4 & -1 \\ -1 & 0 & 1 & 0 \\ 1 & 2 & 0 & 0 \end{bmatrix}
+        \frac{1}{2} \begin{bmatrix} -1 & 3 & -3 & 1 \\ 2 & -5 & 4 & -1 \\ -1 & 0 & 1 & 0 \\ 1 & 2 & 0 & 0 \end{bmatrix}
     """
     alpha2 = alpha * alpha
     alpha3 = alpha2 * alpha
@@ -165,7 +165,7 @@ def cubicHermiteInterpolator(v0, v1, v2, v3, alpha):
     Cubic hermite interpolator. v0 and v3 are begin and end point respectively, v1 and v2 are control points.
     
     .. math::
-        \frac{1}{6} * \begin{bmatrix} 2 & 1 & -2 & 1 \\ -3 & -2 & 3 & -1 \\ 0 & 1 & 0 & 0 \\ 1 & 0 & 0 & 0 \end{bmatrix}
+        \frac{1}{6} \begin{bmatrix} 2 & 1 & -2 & 1 \\ -3 & -2 & 3 & -1 \\ 0 & 1 & 0 & 0 \\ 1 & 0 & 0 & 0 \end{bmatrix}
     """
     alpha2 = alpha * alpha
     alpha3 = alpha2 * alpha

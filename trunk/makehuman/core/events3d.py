@@ -1,35 +1,24 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-""" 
-Event definitions and handler.
+"""
+:Authors:
+    Marc Flerackers
 
-**Project Name:**      MakeHuman
+:Version: 1.0
+:Copyright: MakeHuman Team 2001-2011
+:License: GPL3 
 
-**Product Home Page:** http://www.makehuman.org/
-
-**Code Home Page:**    http://code.google.com/p/makehuman/
-
-**Authors:**           Marc Flerackers
-
-**Copyright(c):**      MakeHuman Team 2001-2011
-
-**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
-
-**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
-
-Abstract
---------
-
-This module contains interface to SDL events
-
+This module contains classes to allow an object to handle events.
 """
 
 __docformat__ = 'restructuredtext'
 
 
 class Event:
-
+    """
+    Base class for all events
+    """
     def __init__(self):
         pass
 
@@ -38,7 +27,9 @@ class Event:
 
 
 class MouseEvent(Event):
-
+    """
+    Contains information about a mouse event.
+    """
     def __init__(self, button, x, y, dx=0, dy=0):
         self.button = button
         self.x = x
@@ -51,7 +42,9 @@ class MouseEvent(Event):
 
 
 class MouseWheelEvent(Event):
-
+    """
+    Contains information about a mouse wheel event.
+    """
     def __init__(self, wheelDelta):
         self.wheelDelta = wheelDelta
 
@@ -60,7 +53,9 @@ class MouseWheelEvent(Event):
 
 
 class KeyEvent(Event):
-
+    """
+    Contains information about a keyboard event.
+    """
     def __init__(self, key, character, modifiers):
         self.key = key
         self.character = character
@@ -71,7 +66,9 @@ class KeyEvent(Event):
 
 
 class FocusEvent(Event):
-
+    """
+    Contains information about a view focus/blur event
+    """
     def __init__(self, blurred, focused):
         self.blurred = blurred
         self.focused = focused
@@ -81,7 +78,9 @@ class FocusEvent(Event):
 
 
 class ResizeEvent(Event):
-
+    """
+    Contains information about a resize event
+    """
     def __init__(self, width, height, fullscreen, dx, dy):
         self.width = width
         self.height = height
@@ -94,7 +93,35 @@ class ResizeEvent(Event):
         
 
 class EventHandler(object):
-
+    """
+    Base event handler class. Derive from this class if an object needs to be able to have events attached to it.
+    Currently only one event per event name can be attached. This is because we either allow a class method or
+    a custom method to be attached as event handling method. Since the custom method replaces the class method,
+    it is needed in some case to call the base class's method from the event handling method.
+    
+    There are 2 ways to attach handlers:
+    
+    1. Override the method. This is the most appropriate way when you want to add distinctive behaviour to many EventHandlers.
+    
+    .. code-block:: python
+        
+        class Widget(View):
+        
+            def onMouseDown(self, event):
+                #Handle event
+                
+    2. Use the event decorator. This is the most appropriate way when you want to attach distinctive behaviour to one EventHandler.
+    
+    .. code-block:: python
+    
+        widget = Widget()
+        
+        @widget.event:
+        def onMouseDown(event):
+            #Handle event
+            
+    Note that self is not passed to the handler in this case, which should not be a problem as you can just use the variable since you are creating a closure. 
+    """
     def __init__(self):
         pass
 
