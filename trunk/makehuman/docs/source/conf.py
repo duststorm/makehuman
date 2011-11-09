@@ -241,3 +241,8 @@ man_pages = [
     ('index', 'makehuman', u'MakeHuman Documentation',
      [u'MHteam'], 1)
 ]
+
+# -- Options for pngmath -------------------------------------------------------
+
+pngmath_dvipng_args = ['-gamma 1.5', '-D 110', '-bg', 'Transparent']
+pngmath_use_preview = True
