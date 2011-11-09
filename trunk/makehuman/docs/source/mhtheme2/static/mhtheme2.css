@@ -84,7 +84,10 @@ div.related ul li a:hover {
     color: black;
 }
 
+
 div.sphinxsidebarwrapper {
+    width: 200px;
+    position:fixed;top:150px;right:0;
     background-color: #eeeeec;
     border-radius:18px 18px  18px 18px;
     -moz-border-radius:18px;
@@ -93,10 +96,8 @@ div.sphinxsidebarwrapper {
     -moz-box-shadow:5px 5px 5px #666;
     -webkit-box-shadow:5px 5px 5px #666;
     box-shadow:5px 5px 5px #666;
-    margin-left:1%;
-    margin-right:1%;
+    margin-right:90px;
     padding-left:10px;
-    margin-top:5px;
 }
 
 div.sphinxsidebar {
