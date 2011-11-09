@@ -1,8 +1,18 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import module3d
+"""
+:Authors:
+    Marc Flerackers
 
+:Version: 1.0
+:Copyright: MakeHuman Team 2001-2011
+:License: GPL3 
+
+This module contains classes and methods to work with bitmap fonts and text.
+"""
+
+import module3d
 
 class Font:
     """

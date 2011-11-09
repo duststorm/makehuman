@@ -57,8 +57,8 @@ a new category. This is what we initially did for measurement for example
     def load(app):
         category = gui3d.Category(app, "Measurement")
 
-Next you probably want your own task to implement your feature. While it’s pos
-sible to attach functionality to an instance of gui3d.Task, it’s often easier to derive your
+Next you probably want your own task to implement your feature. While it’s possible
+to attach functionality to an instance of gui3d.Task, it’s often easier to derive your
 own class. When you create an instance of your class, you pass the parent of your task,
 which can either be an existing category
 
@@ -90,8 +90,8 @@ Morph targets
 ==============
 
 Whatever your plugin does, there’s a big chance that it will modify the model. As
-many of you probably know, MakeHuman doesn’t work mathematically or procedu
-ral, but artistically. This means that you don’t just drag vertices when moving a part
+many of you probably know, MakeHuman doesn’t work mathematically or procedural,
+but artistically. This means that you don’t just drag vertices when moving a part
 of the body, but you actually apply a morph made by an artist. There are different
 kind of morphs targets which are applied in different ways. Macro targets, which
 are the most complex internally, are ironically the easiest to use: human.setGender,
@@ -201,8 +201,8 @@ put all this together, we can write a simple Wavefront object exporter now
 
 
 
-As you can see, we take the uv values from obj.uvValues. The uv values are ref
-erenced in two places, obj.uvValues holds all the uv values of each vertex by index.
+As you can see, we take the uv values from obj.uvValues. The uv values are referenced
+in two places, obj.uvValues holds all the uv values of each vertex by index.
 Face.uv is a list with the uv values of each vertex of the face. The reason is that while
 normals are per vertex, uv values are per facevertex, because a vertex can have a different
 uv depending on which face is drawn.
@@ -276,8 +276,7 @@ simple as the ones above.
     human.setRotation([0.0, 0.0, 0.0])
 
 If we would allow the human to be translated and rotated, we would need to take
-this transformation into account, as above we calculated the center of the untrans
-formed mesh.
+this transformation into account, as above we calculated the center of the untransformed mesh.
 
 .. _gui_controls:
 
@@ -303,17 +302,20 @@ Layout guidelines
 =================
 
 To have a consistent look, it is important that all tasks use the same layout practices.
-GroupBoxes on the left side have x=10. The first GroupBox starts at y=80. Con
-trols start 25 pixels lower, and after the last control there are 6 extra pixels (besides the
+GroupBoxes on the left side have x=10. The first GroupBox starts at y=80. Controls start
+25 pixels lower, and after the last control there are 6 extra pixels (besides the
 4 pixels spacing from the last control). So the total height of a GroupBox is 25+con
 tent+6. Sliders start at x=10 and are 128 pixels wide, so there is no border left or right.
-Buttons start at x=18 and are 112 wide, so there are 8 pixels of border on each side. Be
-tween controls there are 4 pixels. Sliders are 32 pixels high and Buttons are 20 pixels
+Buttons start at x=18 and are 112 wide, so there are 8 pixels of border on each side. Between
+controls there are 4 pixels. Sliders are 32 pixels high and Buttons are 20 pixels
 high. This means that the space to the next control for a Slider is 36, and for a Button
 24. So the height of a GroupBox can be calculated as 25+36*sliders+24*buttons+6.
 Between GroupBoxes there are 10 pixels.
 
-
+When creating a GUI, many of these rules are followed automatically. Controls have default styles assigned
+which take care of the margin, padding and size of the control. When using GroupBoxes, a BoxLayout will
+automatically place the controls in rows or columns. Only on a higher level, namely placing the GroupBoxes
+themselves, some custom positioning has to be done, as well as when reacting to screen resizing.
 
 Labels only have the first letter capitalized, unless there is an acronym that needs
 to be in uppercase.
@@ -386,8 +388,10 @@ It returns a value to be used by removeTimer to stop the timer.
         ...
 
 If a lengthy operation includes blocking on sockets or pipes, it is advised to use a
-python thread. However this has been shown to be problematic on Linux. See the clock
-plugin example for example code on how to use threads.
+python thread. However this has been shown to be problematic on Linux. To get around the problems
+on linux you should not access any makehuman structures from within your thread,
+but use mh.callAsync to call the methods from the main thread. See the clock
+plugin example for example code on how to use threads correctly.
 
 
 

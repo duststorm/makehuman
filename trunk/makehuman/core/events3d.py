@@ -12,9 +12,6 @@
 This module contains classes to allow an object to handle events.
 """
 
-__docformat__ = 'restructuredtext'
-
-
 class Event:
     """
     Base class for all events, does not contain information.
@@ -140,7 +137,7 @@ class EventHandler(object):
     
     1. Override the method. This is the most appropriate way when you want to add distinctive behaviour to many EventHandlers.
     
-    .. code-block:: python
+    ::
         
         class Widget(View):
         
@@ -149,8 +146,8 @@ class EventHandler(object):
                 
     2. Use the event decorator. This is the most appropriate way when you want to attach distinctive behaviour to one EventHandler.
     
-    .. code-block:: python
-    
+    ::
+        
         widget = Widget()
         
         @widget.event:

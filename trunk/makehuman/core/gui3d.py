@@ -457,11 +457,18 @@ class Layout:
         self.view = view
         
     def onChildAdded(self, child):
+        """
+        Called when a new child is added to the parent view. This method can reposition the child according to the layout method used, as well as adjust the size of the parent view.
         
+        :param child: The new child which is added to the view.
+        :type child: gui3d.View
+        """
         pass
         
     def rebuild(self):
-        
+        """
+        Called to rebuild the layout when the parent is being resized or the layout is changed.
+        """
         pass
 
 # Horizontal or vertical box layout
@@ -829,6 +836,9 @@ class Category(View):
 
 
 class Application(events3d.EventHandler):
+    """
+   The Application.
+    """
 
     def __init__(self):
         self.scene3d = module3d.Scene3D()
@@ -863,6 +873,9 @@ class Application(events3d.EventHandler):
         self.callEvent('onStart', None)
 
     def run(self):
+        """
+        Starts the event loop
+        """
         mh.callAsync(self.started)
         mh.startEventLoop()
 
@@ -871,12 +884,24 @@ class Application(events3d.EventHandler):
         mh.shutDown()
         
     def redraw(self):
+        """
+        Redraws the screen once control is returned to the event handler.
+        """
         mh.redraw(1)
         
     def redrawNow(self):
+        """
+        Redraws immediately.
+        """
         mh.redraw(0)
         
     def getWindowSize(self):
+        """
+        Returns the current window size.
+        
+        :returns: The current window size.
+        :rtype: (int, int)
+        """
         return mh.getWindowSize()
 
     def isVisible(self):
@@ -1184,7 +1209,16 @@ class TabView(View):
         pass
         
     def addTab(self, label='', style=None):
+        """
+        Adds a tab to the gui3d.TabView.
         
+        :param label: The label text for the new tab.
+        :type label: str
+        :param style: The style for the new tab or None for the default tabStyle.
+        :type style: gui3d.Style
+        :return: The new tab, which is a ToggleButton.
+        :rtype: gui3d.ToggleButton
+        """
         tab = ToggleButton(self, label, style=style or self.tabStyle)
 
         @tab.event
@@ -1350,18 +1384,41 @@ class Slider(View):
             self.edit.setPosition([position[0], position[1], position[2]+0.3])
 
     def setValue(self, value):
+        """
+        Sets the value, clipped to the min and max of the slider, and moves the slider thumb.
         
+        :param value: The new value.
+        :type value: int or float
+        """
         self.__setValue(value)
         self.__updateThumb()
 
     def getValue(self):
+        """
+        Gets the value.
+        
+        :return: The current value.
+        :rtype: int or float
+        """
         return self.__value
         
     def setMin(self, value):
+        """
+        Sets the minimum value, makes sure the current value lies within the new bounderies.
+        
+        :param value: The new minimum.
+        :type value: int or float
+        """
         self.min = value
         self.setValue(self.__value)
         
     def setMax(self, value):
+        """
+        Sets the maximum value, makes sure the current value lies within the new bounderies.
+        
+        :param value: The new maximum.
+        :type value: int or float
+        """
         self.max = value
         self.setValue(self.__value)
         
@@ -1754,12 +1811,12 @@ class ProgressBar(View):
     
     :param parent: The parent view.
     :type parent: gui3d.View
-    :param position: The position.
-    :type position: list
     :param style: The style.
     :type style: gui3d.Style
     :param barStyle: The bar style.
     :type barStyle: gui3d.Style
+    :param visible: The visibility state.
+    :type visible: Boolean
     """
 
     def __init__(self, parent, style=ProgressBarStyle, barStyle=ProgressBarBarStyle, visible=True):
@@ -1806,6 +1863,13 @@ class TextView(View):
     
     """
     A TextView widget. This widget can be used as a label. The text is not editable by the user.
+    
+    :param parent: The parent view.
+    :type parent: gui3d.View
+    :param label: The initial text.
+    :type label: str
+    :param style: The style.
+    :type style: gui3d.Style
     """
 
     def __init__(self, parent, label = '', style=TextViewStyle):
@@ -1844,6 +1908,15 @@ class TextEdit(View):
     
     """
     A TextEdit widget. This widget can be used to let the user enter some text.
+    
+    :param parent: The parent view.
+    :type parent: gui3d.View
+    :param label: The initial text.
+    :type label: str
+    :param style: The style.
+    :type style: gui3d.Style
+    :param validator: A method taking a unicode object rturning True if the text validates, False otherwise.
+    :type validator: method
     """
 
     def __init__(self, parent, text='', style=TextEditStyle, validator = None):
@@ -2000,15 +2073,21 @@ class TextEdit(View):
         self.__validator = validator
 
 def intValidator(text):
-    
+    """
+    TextEdit validator for integers.
+    """
     return not text or text.isdigit() or (text[0] == '-' and (len(text) == 1 or text[1:].isdigit()))
     
 def floatValidator(text):
-    
+    """
+    TextEdit validator for floats.
+    """
     return not text or (text.replace('.', '').isdigit() and text.count('.') <= 1) or (text[0] == '-' and (len(text) == 1 or text[1:].replace('.', '').isdigit()) and text.count('.') <= 1) # Negative sign and optionally digits with optionally 1 decimal point
 
 def filenameValidator(text):
-
+    """
+    TextEdit validator for filenames.
+    """
     return not text or len(set(text) & set('\\/:*?"<>|')) == 0
 
 # FileEntryView widget
@@ -2018,6 +2097,11 @@ class FileEntryView(View):
     
     """
     A FileEntryView widget. This widget can be used to let the user enter a filename.
+    
+    :param parent: The parent view.
+    :type parent: gui3d.View
+    :param buttonLabel: The label for the confirm button.
+    :type buttonLabel: str
     """
 
     def __init__(self, parent, buttonLabel):
@@ -2089,17 +2173,23 @@ FileChooserStyle = Style(**{
     })
     
 class FileSort():
-    
+    """
+    The default file sorting class. Can sort files on name, creation and modification date and size.
+    """
     def __init__(self):
         
         pass
         
     def fields(self):
+        """
+        Returns the names of the fields on which this FileSort can sort. For each field it is assumed that the method called sortField exists.
         
+        :return: The names of the fields on which this FileSort can sort.
+        :rtype: list or tuple
+        """
         return ("name", "created", "modified", "size")
         
     def sort(self, by, filenames):
-    
         method = getattr(self, "sort%s" % by.capitalize())
         return method(filenames)
         
@@ -2143,6 +2233,21 @@ class FileChooser(View):
 
     """
     A FileChooser widget. This widget can be used to let the user choose an existing file.
+    
+    :param parent: The parent view.
+    :type parent: gui3d.View
+    :param path: The path from which the recursive search is started.
+    :type path: str
+    :param extension: The extension(s) of the files to display.
+    :type extension: str or list
+    :param previewExtension: The extension of the preview for the files. None if the file itself is to be used.
+    :type previewExtension: str or None
+    :param notFoundImage: The filename of the image to be used in case the preview is not found.
+    :type notFoundImage: str or None
+    :param sort: A file sorting instance which will be used to provide sorting of the found files.
+    :type sort: gui3d.FileSort
+    :param style: The style.
+    :type style: gui3d.Style
     """
     
     def __init__(self, parent, path, extension, previewExtension='bmp', notFoundImage=None, sort=FileSort(), style=FileChooserStyle):
@@ -2616,7 +2721,7 @@ class ShortcutEdit(View):
     :type parent: gui3d.View
     :param position: The position, a list of 4 int or float elements.
     :type position: list
-    :param shortcut: The position, a tuple of modifiers and a key.
+    :param shortcut: The shortcut, a tuple of modifiers and a key.
     :type shortcut: tuple
     """
     
@@ -2746,7 +2851,7 @@ class MouseActionEdit(ShortcutEdit):
     :type parent: gui3d.View
     :param position: The position, a list of 3 int or float elements.
     :type position: list
-    :param shortcut: The position, a tuple of modifiers and a key.
+    :param shortcut: The shortcut, a tuple of modifiers and a key.
     :type shortcut: tuple
     """
     
