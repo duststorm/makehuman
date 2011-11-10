@@ -40,6 +40,19 @@ hand-crafted models.
 
 """
 
+bl_info = {
+    "name": "Make target",
+    "author": "Manuel Bastioni, Thomas Larsson",
+    "version": "0.1",
+    "blender": (2, 6, 0),
+    "api": 40000,
+    "location": "View3D > Properties > Make target",
+    "description": "Make MakeHuman target",
+    "warning": "",
+    'wiki_url': '',
+    "category": "3D View"}
+
+
 import bpy
 import os
 import sys
@@ -83,7 +96,7 @@ class CProxy:
         return ("<CProxy %s %d\n  %s\n  x %s\n  y %s\n  z %s>" % 
             (self.name, self.firstVert, self.obj_file, self.xScale, self.yScale, self.zScale))
         
-    def update(self, verts):
+    def update(self, verts, bverts):
         rlen = len(self.refVerts)
         mlen = len(verts)
         first = self.firstVert
@@ -104,8 +117,11 @@ class CProxy:
                 vert.co[0] = w0*v0.co[0] + w1*v1.co[0] + w2*v2.co[0] + d0*s0
                 vert.co[1] = w0*v0.co[1] + w1*v1.co[1] + w2*v2.co[1] - d2*s2
                 vert.co[2] = w0*v0.co[2] + w1*v1.co[2] + w2*v2.co[2] + d1*s1
+                bverts[n+first].select = (bverts[rv0].select or bverts[rv1].select or bverts[rv2].select)
             else:
-                vert.co = verts[refVert].co
+                v0 = verts[refVert]
+                vert.co = v0.co
+                bvert[n+first].select = bverts[rv0].select
 #
 #    readProxyFile(filepath):
 #
@@ -375,6 +391,9 @@ def loadTarget(filepath, context):
     print("Loading target %s" % realpath)
 
     ob = context.object
+    bpy.ops.object.mode_set(mode='OBJECT')
+    for v in ob.data.vertices:
+        v.select = False
     name = os.path.basename(filepath)
     #skey = ob.shape_key_add(name=name, from_mix=False)
     bpy.ops.object.shape_key_add(from_mix=False)
@@ -394,6 +413,7 @@ def loadTarget(filepath, context):
             vec[0] += dx
             vec[1] += -dz
             vec[2] += dy
+            ob.data.vertices[index].select = True
     fp.close()     
     ob.show_only_shape_key = True
     ob.use_shape_key_edit_mode = False
@@ -429,6 +449,7 @@ class VIEW3D_OT_LoadTargetButton(bpy.types.Operator):
 
 def newTarget(context):
     ob = context.object
+    bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.shape_key_add(from_mix=False)
     skey = ob.active_shape_key
     skey.name = "Target"
@@ -467,6 +488,7 @@ def doSaveTarget(ob, filepath):
     fp = open(filepath, "w")  
     print("Saving target %s to %s" % (ob, filepath))
 
+    bpy.ops.object.mode_set(mode='OBJECT')
     skey = ob.active_shape_key    
     skey.name = os.path.basename(filepath)
     saveAll = not ob["SelectedOnly"]
@@ -523,6 +545,7 @@ class VIEW3D_OT_SkipSaveButton(bpy.types.Operator):
 def fitTarget(context):
     global theProxy
     ob = context.object
+    bpy.ops.object.mode_set(mode='OBJECT')
     scn = context.scene
     if not isTarget(ob):
         return
@@ -535,7 +558,7 @@ def fitTarget(context):
             raise NameError("Object %s has no associated mhclo file. Cannot fit" % ob.name)
             return
     print(theProxy)
-    theProxy.update(ob.active_shape_key.data)
+    theProxy.update(ob.active_shape_key.data, ob.data.vertices)
     return
 
 class VIEW3D_OT_FitTargetButton(bpy.types.Operator):
@@ -559,6 +582,7 @@ def discardTarget(context):
     else:
         ob["Discarding"] = True
         return    
+    bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.shape_key_remove()
     ob["MakeTarget"] = "Base"
     return
@@ -591,7 +615,9 @@ def symmetrizeTarget(context, left2right):
     scn = context.scene
     if not isTarget(ob):
         return
+    bpy.ops.object.mode_set(mode='OBJECT')
     verts = ob.active_shape_key.data
+    bverts = ob.data.vertices
     for vn in Mid.keys():
         v = verts[vn]
         v.co[0] = 0
@@ -602,10 +628,12 @@ def symmetrizeTarget(context, left2right):
             rv[0] = -lv[0]
             rv[1] = lv[1]
             rv[2] = lv[2]
+            bverts[rvn].select = bverts[lvn].select
         else:
             lv[0] = -rv[0]
             lv[1] = rv[1]
             lv[2] = rv[2]
+            bverts[lvn].select = bverts[rvn].select
     print("Target symmetrized")
     return
 
@@ -707,7 +735,7 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.operator("mh.discard_target")
             layout.prop(ob, '["SelectedOnly"]')
             if ob["FilePath"]:
-            	layout.operator("mh.save_target")           
+                layout.operator("mh.save_target")           
             layout.operator("mh.saveas_target")           
 
 #
@@ -715,7 +743,9 @@ class MakeTargetPanel(bpy.types.Panel):
 #
 def register():
     bpy.utils.register_module(__name__)
-    pass
+
+def unregister():
+    bpy.utils.unregister_module(__name__)
 
 if __name__ == "__main__":
     register()
