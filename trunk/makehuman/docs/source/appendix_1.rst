@@ -7,13 +7,13 @@
 Appendix 1 -RestructuredTex math-
 ##################################
 
-.. _general sintax:
+.. _general syntax:
 
-General sintax
+General syntax
 ===============
 
 
-The general sintax for a math block is:
+The general syntax for a math block is:
 
     ``.. math::``
     
