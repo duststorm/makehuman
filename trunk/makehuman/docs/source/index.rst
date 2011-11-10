@@ -30,6 +30,7 @@ Modules
    module_animation3d.rst
    module_events3d.rst
    module_font3d.rst
+   module_geometry3d.rst
    module_gui3d.rst
    
 Doc Writers Guide
