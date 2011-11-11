@@ -52,7 +52,7 @@ class SaveTaskView(gui3d.TaskView):
         self.fileentry = gui3d.FileEntryView(self, 'Save')
         
         mesh = gui3d.FrameMesh(100, 100)
-        self.selection = gui3d.Object(self.app, [0, 0, 9], mesh)
+        self.selection = self.app.addObject(gui3d.Object([0, 0, 9], mesh))
         mesh.setColor([0, 0, 0, 255])
         mesh.setPickable(0)
         self.selection.hide()

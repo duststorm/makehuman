@@ -65,7 +65,7 @@ class SkeletonView(gui3d.TaskView):
         if not self.__skeletonObject:
             
             self.__buildSkeletonMesh(human)
-            self.__skeletonObject = gui3d.Object(self, human.getPosition(), self.__skeletonMesh)
+            self.__skeletonObject = self.addObject(gui3d.Object(human.getPosition(), self.__skeletonMesh))
             self.app.scene3d.update()
             
         else:

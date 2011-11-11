@@ -25,7 +25,6 @@ TO DO
 
 import algos3d
 import gui3d
-import files3d
 import os
 import humanmodifier
 import hair
@@ -42,10 +41,9 @@ class HumanEvent(events3d.Event):
 
 class Human(gui3d.Object):
 
-    def __init__(self, view, mesh, hairObj=None):
+    def __init__(self, mesh, hairObj=None):
 
-        mesh = files3d.loadMesh(view.app.scene3d, mesh)
-        gui3d.Object.__init__(self, view, [0, 0, 0], mesh, True)
+        gui3d.Object.__init__(self, [0, 0, 0], mesh, True)
         self.mesh.setCameraProjection(0)
         self.mesh.setShadeless(0)
         self.meshData = self.mesh

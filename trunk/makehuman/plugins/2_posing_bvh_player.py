@@ -207,7 +207,7 @@ class BvhView(gui3d.TaskView):
         if not self.__skeletonObject:
             
             self.__buildSkeletonMesh()
-            self.__skeletonObject = gui3d.Object(self, aljabr.vadd(human.getPosition(), [0.0, -20.0, 0.0]), self.__skeletonMesh)
+            self.__skeletonObject = self.addObject(gui3d.Object(aljabr.vadd(human.getPosition(), [0.0, -20.0, 0.0]), self.__skeletonMesh))
             self.app.scene3d.update()
             
         else:

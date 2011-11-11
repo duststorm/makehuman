@@ -45,7 +45,7 @@ class BackgroundTaskView(gui3d.TaskView):
         self.filenames = {}
 
         mesh = gui3d.RectangleMesh(420, 420)
-        self.backgroundImage = gui3d.Object(self.app.categories['Modelling'], [190, 90, 1], mesh, visible=False)
+        self.backgroundImage = self.app.categories['Modelling'].addObject(gui3d.Object([190, 90, 1], mesh, visible=False))
         self.opacity = 100
         mesh.setColor([255, 255, 255, self.opacity])
         mesh.setPickable(0)

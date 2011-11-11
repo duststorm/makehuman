@@ -75,6 +75,7 @@ import glob, imp
 from os.path import join, basename, splitext
 
 import mh
+import files3d
 import gui3d, events3d, font3d, animation3d
 import mh2obj, mh2bvh, mh2mhx
 import human
@@ -363,7 +364,7 @@ class MHApplication(gui3d.Application):
         
         # Display the initial splash screen and the progress bar during startup
         mesh = gui3d.RectangleMesh(800, 600, self.app.getThemeResource('images', 'splash.png'))
-        self.splash = gui3d.Object(self, [0, 0, 9.8], mesh)
+        self.splash = self.addObject(gui3d.Object([0, 0, 9.8], mesh))
         self.progressBar = gui3d.ProgressBar(self, style=gui3d.ProgressBarStyle._replace(left=800-150, top=600-15, zIndex=9.85))
         self.progressBar.text = gui3d.TextView(self.progressBar, style=gui3d.TextViewStyle._replace(left=10, top=600-20, zIndex=9.85, width=800-150-20, textAlign=gui3d.AlignRight))
         self.scene3d.update()
@@ -379,7 +380,7 @@ class MHApplication(gui3d.Application):
 
         self.progressBar.setProgress(0.1)
 
-        self.statusbar = gui3d.Object(self, [0, 580, 9], gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "lowerbar.png")))
+        self.statusbar = self.addObject(gui3d.Object([0, 580, 9], gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "lowerbar.png"))))
         mh.setClearColor(0.5, 0.5, 0.5, 1.0)
         
         mh.callAsync(self.loadHuman)
@@ -389,7 +390,7 @@ class MHApplication(gui3d.Application):
         self.progressBar.setProgress(0.2)
         #hairObj = hair.loadHairsFile(self.scene3d, path="./data/hairs/default", update = False)
         #self.scene3d.clear(hairObj) 
-        self.selectedHuman = human.Human(self, "data/3dobjs/base.obj")
+        self.selectedHuman = self.addObject(human.Human(files3d.loadMesh(self.scene3d, "data/3dobjs/base.obj")))
         
         mh.callAsync(self.loadMainGui)
         
@@ -622,7 +623,7 @@ class MHApplication(gui3d.Application):
         self.selectedHuman.applyAllTargets(self.app.progress)
         self.selectedHuman.callEvent('onChanged', human.HumanEvent(self.selectedHuman, 'reset'))
         self.dialog = gui3d.View(self)
-        self.dialog.blocker = gui3d.Object(self.dialog, [0, 0, 9.7], gui3d.RectangleMesh(800, 600))
+        self.dialog.blocker = self.dialog.addObject(gui3d.Object([0, 0, 9.7], gui3d.RectangleMesh(800, 600)))
         self.dialog.box = gui3d.GroupBox(self.dialog, [800 / 2 - 100, 600 / 2 - 75, 9.8], '', gui3d.GroupBoxStyle._replace(width=200, height=150))
         self.dialog.text = gui3d.TextView(self.dialog.box, '', style=gui3d.TextViewStyle._replace(width=180))
         self.dialog.check = gui3d.CheckBox(self.dialog.box, "Don't show this again", style=gui3d.CheckBoxStyle._replace(width=180, margin=[2, 4, 2, 2]))
@@ -634,7 +635,7 @@ class MHApplication(gui3d.Application):
         self.dialog.hide()
         self.prompt('Warning', 'This is an alpha release, which means that there are still bugs present and features missing. Use at your own risk.',
             'OK', helpId='alphaWarning')
-        self.progressBar.blocker = gui3d.Object(self.progressBar, [0, 0, 9.7], gui3d.RectangleMesh(800, 600), visible=False)
+        self.progressBar.blocker = self.progressBar.addObject(gui3d.Object( [0, 0, 9.7], gui3d.RectangleMesh(800, 600), visible=False))
         self.scene3d.update()
         self.dialog.blocker.mesh.setColor([0, 0, 0, 128])
         self.progressBar.blocker.mesh.setColor([0, 0, 0, 128])

@@ -25,7 +25,6 @@ import weakref
 from catmull_clark_subdivision import createSubdivisionObject, updateSubdivisionObject
 from geometry3d import NineSliceMesh, RectangleMesh, FrameMesh
 
-defaultFontSize = 12
 defaultFontFamily = 'arial'
 
 if os.path.isfile(os.path.join(mh.getPath(''), "settings.ini")):
@@ -86,28 +85,19 @@ class Object(events3d.EventHandler):
     :type visible: Boolean
     """
 
-    def __init__(self, view, position, mesh, visible=True):
+    def __init__(self, position, mesh, visible=True):
         
         if mesh.object:
             raise RuntimeException('This mesh is already attached to an object')
                 
-        self.app = view.app
-        self.view = view
-        self.mesh=mesh
-        if mesh not in self.app.scene3d.objects:
-            self.app.scene3d.objects.append(mesh)
-        self.meshName = mesh.name
+        self.mesh = mesh
         self.mesh.setLoc(*position)
-            
-        view.objects.append(self)
-        
-        if view.isVisible() and visible:
-            self.mesh.setVisibility(1)
-        else:
-            self.mesh.setVisibility(0)
-   
-        self.visible = visible
         self.mesh.object = self
+        self.mesh.setVisibility(visible)
+        
+        self.view = None
+        
+        self.visible = visible
         
         self.proxy = None
         
@@ -118,12 +108,26 @@ class Object(events3d.EventHandler):
         
     def __del__(self):
     
-        self.proxy
+        self.proxy = None
         
         self.__seedMesh = None
         self.__proxyMesh = None
         self.__subdivisionMesh = None
         self.__proxySubdivisionMesh = None
+        
+    def attach(self):
+    
+        self.app = self.view.app
+        if self.view.isVisible() and self.visible:
+            self.mesh.setVisibility(1)
+        else:
+            self.mesh.setVisibility(0)
+            
+        if self.mesh not in self.app.scene3d.objects:
+            self.app.scene3d.objects.append(self.mesh)
+            
+    def detach(self):
+        pass
 
     def show(self):
         
@@ -391,25 +395,22 @@ class TextObject(Object):
     :type wrapWidth: int
     :param alignment: Text alignment.
     :type alignment: int
-    :param fontFamily: The font to use.
-    :type fontFamily: str
-    :param fontSize: The size of the font (unused).
-    :type fontSize: int
+    :param font: The font to use.
+    :type font: gui3d.Font
     """
     
-    def __init__(self, view, position, text = '', wrapWidth=0, alignment=AlignLeft, fontFamily = defaultFontFamily, fontSize = defaultFontSize):
+    def __init__(self, position, text = '', wrapWidth=0, alignment=AlignLeft, font=None):
     
         self.text = text
         self.wrapWidth = wrapWidth
         self.alignment = alignment
-        self.font = view.app.getFont(fontFamily)
-        self.fontSize = fontSize
+        self.font = font
         
         self.mesh = font3d.createMesh(self.font, text, wrapWidth = wrapWidth, alignment = alignment);
         self.mesh.setCameraProjection(1)
         self.mesh.setShadeless(1)
         
-        Object.__init__(self, view, [int(position[0]), int(position[1]), position[2]], self.mesh)
+        Object.__init__(self, [int(position[0]), int(position[1]), position[2]], self.mesh)
         
     def setText(self, text):
         
@@ -559,7 +560,6 @@ ViewStyle = Style(**{
     'selected':None,
     'focused':None,
     'fontFamily':defaultFontFamily,
-    'fontSize':defaultFontSize,
     'textAlign':AlignLeft,
     'border':None,
     'margin':[0,0,0,0],
@@ -613,6 +613,53 @@ class View(events3d.EventHandler):
         self.parent.children.remove(self)
         if self.parent.layout:
             self.parent.layout.rebuild()
+            
+    def addView(self, view):
+    
+        if view.parent:
+            raise RuntimeException('The view is already attached to a view')
+            
+        view.parent = self
+        self.children.append(view)
+        
+        for object in self.objects:
+            object.attach()
+            
+        return view
+    
+    def removeView(self, view):
+    
+        if view not in self.children:
+            raise RuntimeException('The view is not a child of this view')
+            
+        view.parent = None
+        self.children.remove(view)
+        
+        for object in self.objects:
+            object.detach()
+            
+    def addObject(self, object):
+    
+        if object.view:
+            raise RuntimeException('The object is already attached to a view')
+            
+        object.view = self
+        self.objects.append(object)
+            
+        if self.parent:
+            object.attach()
+            
+        return object
+            
+    def removeObject(self, object):
+    
+        if object not in self.objects:
+            raise RuntimeException('The object is not a child of this view')
+            
+        object.view = None
+        self.objects.remove(object)
+        
+        object.detach()
         
     def show(self):
         self.__visible = True
@@ -724,7 +771,6 @@ TaskTabStyle = Style(**{
     'selected':'button_tab2_on.png',
     'focused':'button_tab2_focused.png',
     'fontFamily':defaultFontFamily,
-    'fontSize':defaultFontSize,
     'textAlign':AlignCenter,
     'border':[7,7,7,7],
     'padding':[4,0,4,0],
@@ -772,7 +818,6 @@ CategoryTabStyle = Style(**{
     'selected':'button_tab_on.png',
     'focused':'button_tab_focused.png',
     'fontFamily':defaultFontFamily,
-    'fontSize':defaultFontSize,
     'textAlign':AlignCenter, 
     'border':[7,7,7,7],
     'margin':[0,0,2,0],
@@ -789,7 +834,6 @@ CategoryButtonStyle = Style(**{
     'selected':'button_tab3_on.png',
     'focused':'button_tab3_focused.png',
     'fontFamily':defaultFontFamily,
-    'fontSize':defaultFontSize,
     'textAlign':AlignCenter, 
     'border':[7,7,7,7],
     'margin':[0,0,0,0],
@@ -845,6 +889,7 @@ class Application(events3d.EventHandler):
         self.scene3d = module3d.Scene3D()
         self.scene3d.application = self
         self.app = self
+        self.parent = self
         self.children = []
         self.objects = []
         self.layout = None
@@ -904,6 +949,29 @@ class Application(events3d.EventHandler):
         :rtype: (int, int)
         """
         return mh.getWindowSize()
+        
+    def addObject(self, object):
+    
+        if object.view:
+            raise RuntimeException('The object is already attached to a view')
+            
+        object.view = self
+        self.objects.append(object)
+            
+        if self.parent:
+            object.attach()
+            
+        return object
+            
+    def removeObject(self, object):
+    
+        if object not in self.objects:
+            raise RuntimeException('The object is not a child of this view')
+            
+        object.view = None
+        self.objects.remove(object)
+        
+        object.detach()
 
     def isVisible(self):
         return True
@@ -1178,9 +1246,9 @@ class TabView(View):
         
         View.__init__(self, parent, style, BoxLayout(self))
         
-        self.box = Object(self, [self.style.left, self.style.top, self.style.zIndex],
+        self.box = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex],
             RectangleMesh(self.style.width, self.style.height,
-            self.app.getThemeResource("images", self.style.normal)))
+            self.app.getThemeResource("images", self.style.normal))))
             
         self.tabStyle = tabStyle
     
@@ -1280,14 +1348,14 @@ class Slider(View):
         self.focusedThumbTexture = self.app.getThemeResource('images', thumbStyle.focused)
         
         mesh = RectangleMesh(style.width, style.height, self.app.getThemeResource('images', style.normal))
-        self.background = Object(self, [style.left, style.top, style.zIndex], mesh)
+        self.background = self.addObject(Object([style.left, style.top, style.zIndex], mesh))
         
         mesh = RectangleMesh(thumbStyle.width, thumbStyle.height, self.thumbTexture)
-        self.thumb = Object(self, [style.left, style.top + style.height / 2, style.zIndex + 0.01], mesh)
+        self.thumb = self.addObject(Object([style.left, style.top + style.height / 2, style.zIndex + 0.01], mesh))
             
         if isinstance(label, str) or isinstance(label, unicode):
             font = self.app.getFont(style.fontFamily)
-            self.label = TextObject(self, [style.left, style.top + style.height / 4 - font.lineHeight / 2, style.zIndex + 0.2], self.app.getLanguageString(label), fontSize = style.fontSize)
+            self.label = self.addObject(TextObject([style.left, style.top + style.height / 4 - font.lineHeight / 2, style.zIndex + 0.2], self.app.getLanguageString(label), font = self.app.getFont(style.fontFamily)))
             if '%' in label:
                 self.labelFormat = self.app.getLanguageString(label)
                 self.edit = TextEdit(self, '',
@@ -1564,13 +1632,13 @@ class Button(View):
             mesh = NineSliceMesh(width, height, t, self.style.border)
         else:
             mesh = RectangleMesh(width, height, t)
-        self.button = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
+        self.button = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex], mesh))
         if isinstance(label, str):
             textAlign = self.style.textAlign
             wrapWidth = width - self.style.padding[0] - self.style.padding[2] if textAlign else 0
-            self.label = TextObject(self, [self.style.left + self.style.padding[0], 
+            self.label = self.addObject(TextObject([self.style.left + self.style.padding[0], 
                 self.style.top + height/2.0-font.lineHeight/2.0, self.style.zIndex + 0.001],
-                translatedLabel, wrapWidth, textAlign, fontSize = self.style.fontSize, fontFamily = self.style.fontFamily)
+                translatedLabel, wrapWidth, textAlign, font))
             
         self.selected = selected
         
@@ -1825,9 +1893,9 @@ class ProgressBar(View):
         View.__init__(self, parent, style, None, visible)
         
         mesh = RectangleMesh(style.width, style.height, self.app.getThemeResource('images', style.normal))
-        self.background = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
+        self.background = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex], mesh))
         mesh = RectangleMesh(barStyle.width, barStyle.height, self.app.getThemeResource('images', barStyle.normal))
-        self.bar = Object(self, [self.style.left, self.style.top, self.style.zIndex+0.05], mesh)
+        self.bar = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex+0.05], mesh))
         self.bar.mesh.setScale(0.0, 1.0, 1.0)
         
     def canFocus(self):
@@ -1877,8 +1945,8 @@ class TextView(View):
         
         View.__init__(self, parent, style)
         
-        self.textObject = TextObject(self, [self.style.left, self.style.top, self.style.zIndex], label,
-            style.width, style.textAlign, style.fontFamily, style.fontSize)
+        self.textObject = self.addObject(TextObject([self.style.left, self.style.top, self.style.zIndex], label,
+            style.width, style.textAlign, self.app.getFont(style.fontFamily)))
         self.style.height = self.textObject.getHeight()
             
     def canFocus(self):
@@ -1928,10 +1996,10 @@ class TextEdit(View):
         self.focusedTexture = self.app.getThemeResource('images', 'texedit_on.png')
 
         mesh = NineSliceMesh(self.style.width, self.style.height, self.texture, self.style.border)
-        self.background = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
+        self.background = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex], mesh))
             
         font = self.app.getFont(self.style.fontFamily)
-        self.textObject = TextObject(self, [self.style.left + 10.0, self.style.top + self.style.height / 2 - font.lineHeight / 2 - 1, self.style.zIndex + 0.1], fontSize = self.style.fontSize)
+        self.textObject = self.addObject(TextObject([self.style.left + 10.0, self.style.top + self.style.height / 2 - font.lineHeight / 2 - 1, self.style.zIndex + 0.1], font=self.app.getFont(self.style.fontFamily)))
 
         self.text = text
         self.__position = len(self.text)
@@ -2145,10 +2213,10 @@ class FileChooserRectangle(View):
         
         # Preview
         mesh = RectangleMesh(self.style.width, self.style.height, self.style.normal)
-        self.preview = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
+        self.preview = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex], mesh))
         
         # Label
-        self.label = TextObject(self, [self.style.left, self.style.top + self.style.height, self.style.zIndex], label)
+        self.label = self.addObject(TextObject([self.style.left, self.style.top + self.style.height, self.style.zIndex], label, font=self.app.getFont(self.style.fontFamily)))
         
         self.file = file
         
@@ -2664,12 +2732,11 @@ class GroupBox(View):
         
         texture = self.app.getThemeResource('images', style.normal)
         mesh = NineSliceMesh(self.style.width, self.style.height, texture, self.style.border)
-        self.box = Object(self, position, mesh)
+        self.box = self.addObject(Object(position, mesh))
         
         if isinstance(label, str):
-            self.label = TextObject(self,
-                [position[0]+self.style.padding[0],position[1]+self.style.padding[1]/2-font.lineHeight/2-2,position[2]+0.001],
-                translatedLabel, alignment = self.style.textAlign, fontSize = self.style.fontSize, fontFamily = self.style.fontFamily)
+            self.label = self.addObject(TextObject([position[0]+self.style.padding[0],position[1]+self.style.padding[1]/2-font.lineHeight/2-2,position[2]+0.001],
+                translatedLabel, alignment=self.style.textAlign, font=self.app.getFont(self.style.fontFamily)))
     
     def getPosition(self):
         return self.box.getPosition()
@@ -2734,11 +2801,10 @@ class ShortcutEdit(View):
         self.focusedTexture = self.app.getThemeResource('images', self.style.focused)
         
         mesh = NineSliceMesh(self.style.width, self.style.height, self.texture, self.style.border)
-        self.background = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
+        self.background = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex], mesh))
         font = self.app.getFont(self.style.fontFamily)
-        self.label = TextObject(self,
-            [self.style.left + 7 + 3, self.style.top+self.style.height/2.0-font.lineHeight/2.0, self.style.zIndex+0.001],
-            self.shortcutToLabel(shortcut[0], shortcut[1]))
+        self.label = self.addObject(TextObject([self.style.left + 7 + 3, self.style.top+self.style.height/2.0-font.lineHeight/2.0, self.style.zIndex+0.001],
+            self.shortcutToLabel(shortcut[0], shortcut[1]), font=self.app.getFont(self.style.fontFamily)))
             
     def getPosition(self):
         return self.background.getPosition()
@@ -2950,7 +3016,7 @@ class Radial(View):
         else:
             mesh = RectangleMesh(width, height, t)
             
-        self.radial = Object(self, [self.style.left, self.style.top, self.style.zIndex], mesh)
+        self.radial = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex], mesh))
         
     def getPosition(self):
         return self.radial.getPosition()

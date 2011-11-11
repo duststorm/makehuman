@@ -78,7 +78,7 @@ class MeasureTaskView(gui3d.TaskView):
         self.measureMesh.setPickable(0)
         self.measureMesh.updateIndexBuffer()
         
-        self.measureObject = gui3d.Object(self, [0, 0, 9], self.measureMesh)
+        self.measureObject = self.addObject(gui3d.Object([0, 0, 9], self.measureMesh))
 
         measurements = [
             ('neck', ['neckcirc', 'neckheight']),

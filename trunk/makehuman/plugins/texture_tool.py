@@ -97,7 +97,7 @@ class TextureToolTaskView(gui3d.TaskView):
             self.mesh.setShadeless(1)
             self.mesh.updateIndexBuffer()
             
-            self.object = gui3d.Object(self, [0, 0, 0], self.mesh, True)
+            self.object = self.addObject(gui3d.Object([0, 0, 0], self.mesh, True))
         
             self.app.scene3d.update()
             
