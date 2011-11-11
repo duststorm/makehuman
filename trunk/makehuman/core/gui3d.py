@@ -95,7 +95,7 @@ class Object(events3d.EventHandler):
         self.mesh.object = self
         self.mesh.setVisibility(visible)
         
-        self.view = None
+        self.__view = None
         
         self.visible = visible
         
@@ -115,10 +115,10 @@ class Object(events3d.EventHandler):
         self.__subdivisionMesh = None
         self.__proxySubdivisionMesh = None
         
-    def attach(self):
+    def __attach(self):
     
-        self.app = self.view.app
-        if self.view.isVisible() and self.visible:
+        self.app = self.__view().app
+        if self.__view().isVisible() and self.visible:
             self.mesh.setVisibility(1)
         else:
             self.mesh.setVisibility(0)
@@ -126,8 +126,20 @@ class Object(events3d.EventHandler):
         if self.mesh not in self.app.scene3d.objects:
             self.app.scene3d.objects.append(self.mesh)
             
-    def detach(self):
-        pass
+    def __detach(self):
+        
+        self.app = None
+        module3d.detach(self.__seedMesh)
+        if self.__proxyMesh:
+            module3d.detach(self.__proxyMesh)
+        if self.__subdivisionMesh:
+            module3d.detach(self.__subdivisionMesh)
+        if self.__proxySubdivisionMesh:
+            module3d.detach(self.__proxySubdivisionMesh)
+            
+    @property
+    def view(self):
+        return self.__view()
 
     def show(self):
         
@@ -144,7 +156,7 @@ class Object(events3d.EventHandler):
         
     def setVisibility(self, visibility):
 
-        if self.view.isVisible() and self.visible and visibility:
+        if self.__view().isVisible() and self.visible and visibility:
             self.mesh.setVisibility(1)
         else:
             self.mesh.setVisibility(0)
@@ -347,34 +359,34 @@ class Object(events3d.EventHandler):
         return bbox[1][2] - bbox[0][2]
 
     def onMouseDown(self, event):
-        self.view.callEvent('onMouseDown', event)
+        self.__view().callEvent('onMouseDown', event)
 
     def onMouseMoved(self, event):
-        self.view.callEvent('onMouseMoved', event)
+        self.__view().callEvent('onMouseMoved', event)
 
     def onMouseDragged(self, event):
-        self.view.callEvent('onMouseDragged', event)
+        self.__view().callEvent('onMouseDragged', event)
 
     def onMouseUp(self, event):
-        self.view.callEvent('onMouseUp', event)
+        self.__view().callEvent('onMouseUp', event)
 
     def onMouseEntered(self, event):
-        self.view.callEvent('onMouseEntered', event)
+        self.__view().callEvent('onMouseEntered', event)
 
     def onMouseExited(self, event):
-        self.view.callEvent('onMouseExited', event)
+        self.__view().callEvent('onMouseExited', event)
 
     def onClicked(self, event):
-        self.view.callEvent('onClicked', event)
+        self.__view().callEvent('onClicked', event)
 
     def onMouseWheel(self, event):
-        self.view.callEvent('onMouseWheel', event)
+        self.__view().callEvent('onMouseWheel', event)
 
     def onKeyDown(self, event):
-        self.view.callEvent('onKeyDown', event)
+        self.__view().callEvent('onKeyDown', event)
 
     def onKeyUp(self, event):
-        self.view.callEvent('onKeyDown', event)
+        self.__view().callEvent('onKeyDown', event)
 
 AlignLeft = 0
 AlignCenter = 1
@@ -639,27 +651,39 @@ class View(events3d.EventHandler):
             object.detach()
             
     def addObject(self, object):
-    
-        if object.view:
+        """
+        Adds the object to the view. If the view is attached to the app, the object will also be attached and will get an OpenGL counterpart.
+        
+        :param object: The object to be added.
+        :type object: gui3d.Object
+        :return: The object, for convenience.
+        :rvalue: gui3d.Object
+        """
+        if object._Object__view:
             raise RuntimeException('The object is already attached to a view')
             
-        object.view = self
+        object._Object__view = weakref.ref(self)
         self.objects.append(object)
             
         if self.parent:
-            object.attach()
+            object._Object__attach()
             
         return object
             
     def removeObject(self, object):
-    
+        """
+        Removes the object from the view. If the object was attached to the app, its OpenGL counterpart will be removed as well.
+        
+        :param object: The object to be added.
+        :type object: gui3d.Object
+        """
         if object not in self.objects:
             raise RuntimeException('The object is not a child of this view')
             
-        object.view = None
+        object._Object__view = None
         self.objects.remove(object)
         
-        object.detach()
+        object._Object__detach()
         
     def show(self):
         self.__visible = True
@@ -952,14 +976,14 @@ class Application(events3d.EventHandler):
         
     def addObject(self, object):
     
-        if object.view:
+        if object._Object__view:
             raise RuntimeException('The object is already attached to a view')
             
-        object.view = self
+        object._Object__view = weakref.ref(self)
         self.objects.append(object)
             
         if self.parent:
-            object.attach()
+            object._Object__attach()
             
         return object
             
@@ -968,10 +992,10 @@ class Application(events3d.EventHandler):
         if object not in self.objects:
             raise RuntimeException('The object is not a child of this view')
             
-        object.view = None
+        object._Object__view = None
         self.objects.remove(object)
         
-        object.detach()
+        object._Object__detach()
 
     def isVisible(self):
         return True
