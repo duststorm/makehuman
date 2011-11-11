@@ -26,7 +26,7 @@ TO DO
 __docformat__ = 'restructuredtext'
 
 import algos3d
-from gui3d import Slider, SliderStyle, SliderThumbStyle
+import gui3d
 from string import Template
 from operator import mul
 import math
@@ -45,7 +45,7 @@ class DetailAction:
     def do(self):
         for (target, value) in self.after.iteritems():
             self.human.setDetail(target, value)
-        self.human.applyAllTargets(self.human.app.progress, update=self.update)
+        self.human.applyAllTargets(gui3d.app.progress, update=self.update)
         if self.postAction:
             self.postAction()
         return True
@@ -70,29 +70,29 @@ class ModifierAction:
 
     def do(self):
         self.modifier.setValue(self.human, self.after)
-        self.human.applyAllTargets(self.human.app.progress)
+        self.human.applyAllTargets(gui3d.app.progress)
         self.postAction()
         return True
 
     def undo(self):
         self.modifier.setValue(self.human, self.before)
-        self.human.applyAllTargets(self.human.app.progress)
+        self.human.applyAllTargets(gui3d.app.progress)
         self.postAction()
         return True
         
-class ModifierSlider(Slider):
+class ModifierSlider(gui3d.Slider):
     
     def __init__(self, parent, value=0.0, min=0.0, max=1.0, label=None,
-        style=SliderStyle, thumbStyle=SliderThumbStyle, modifier=None):
+        style=gui3d.SliderStyle, thumbStyle=gui3d.SliderThumbStyle, modifier=None):
         
-        Slider.__init__(self, parent, value, min, max, label, style, thumbStyle)
+        gui3d.Slider.__init__(self, parent, value, min, max, label, style, thumbStyle)
         self.modifier = modifier
         self.value = None
         
     def onChanging(self, value):
         
-        if self.app.settings.get('realtimeUpdates', True):
-            human = self.app.selectedHuman
+        if gui3d.app.settings.get('realtimeUpdates', True):
+            human = gui3d.app.selectedHuman
             if self.value is None:
                 self.value = self.modifier.getValue(human)
                 if human.isSubdivided():
@@ -101,14 +101,14 @@ class ModifierSlider(Slider):
                     else:
                         human.getSeedMesh().setVisibility(1)
                     human.getSubdivisionMesh(False).setVisibility(0)
-            self.modifier.updateValue(human, value, self.app.settings.get('realtimeNormalUpdates', True))
+            self.modifier.updateValue(human, value, gui3d.app.settings.get('realtimeNormalUpdates', True))
             human.updateProxyMesh()
             
     def onChange(self, value):
         
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
         if self.value != value:
-            self.app.do(ModifierAction(human, self.modifier, self.value, value, self.update))
+            gui3d.app.do(ModifierAction(human, self.modifier, self.value, value, self.update))
         if human.isSubdivided():
             if human.isProxied():
                 human.getProxyMesh().setVisibility(0)
@@ -119,7 +119,7 @@ class ModifierSlider(Slider):
         
     def update(self):
         
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
         self.setValue(self.modifier.getValue(human))
 
 class Modifier:

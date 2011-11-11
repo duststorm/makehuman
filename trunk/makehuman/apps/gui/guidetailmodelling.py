@@ -207,7 +207,7 @@ class BreastFirmnessModifier(BreastsModifier):
 class DetailTool(events3d.EventHandler):
 
     def __init__(self, app, micro, left, right):
-        self.app = app
+        gui3d.app = app
         self.micro = micro
         self.left = left
         self.before = None
@@ -217,16 +217,16 @@ class DetailTool(events3d.EventHandler):
         self.selectedGroups = []
 
     def onMouseDown(self, event):
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
 
     # Find the target name
 
         if self.micro:
             folder = 'data/targets/microdetails/'
-            part = self.app.selectedGroup.name
+            part = gui3d.app.selectedGroup.name
         else:
             folder = 'data/targets/details/'
-            part = human.getPartNameForGroupName(self.app.selectedGroup.name)
+            part = human.getPartNameForGroupName(gui3d.app.selectedGroup.name)
 
     # Find the targets
 
@@ -273,7 +273,7 @@ class DetailTool(events3d.EventHandler):
         if not self.modifier:
             print 'No modifier available'
             
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
 
         # check which vector we need to check
 
@@ -292,11 +292,11 @@ class DetailTool(events3d.EventHandler):
             self.symmetryModifier.updateValue(human, self.modifier.getValue(human))
 
     def onMouseUp(self, event):
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
 
         # Recalculate
 
-        human.applyAllTargets(self.app.progress)
+        human.applyAllTargets(gui3d.app.progress)
         
         if human.isSubdivided():
             human.meshData.setVisibility(0)
@@ -309,10 +309,10 @@ class DetailTool(events3d.EventHandler):
         for target in self.before.iterkeys():
             after[target] = human.getDetail(target)
 
-        self.app.did(humanmodifier.DetailAction(human, self.before, after))
+        gui3d.app.did(humanmodifier.DetailAction(human, self.before, after))
 
     def onMouseMoved(self, event):
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
 
         groups = []
 
@@ -337,20 +337,20 @@ class DetailTool(events3d.EventHandler):
                 g.setColor([0, 255, 0, 255])
 
         self.selectedGroups = groups
-        self.app.redraw()
+        gui3d.app.redraw()
 
     def onMouseExited(self, event):
         for g in self.selectedGroups:
             g.setColor([255, 255, 255, 255])
 
         self.selectedGroups = []
-        self.app.redraw()
+        gui3d.app.redraw()
 
 
 class Detail3dTool(events3d.EventHandler):
 
     def __init__(self, app, micro, type):
-        self.app = app
+        gui3d.app = app
         self.micro = micro
         self.type = type
         if type == 'scale':
@@ -379,7 +379,7 @@ class Detail3dTool(events3d.EventHandler):
 
     # TODO: top and botton view
 
-        rot = self.app.selectedHuman.getRotation()
+        rot = gui3d.app.selectedHuman.getRotation()
 
         xRot = rot[0] % 360
         yRot = rot[1] % 360
@@ -436,11 +436,11 @@ class Detail3dTool(events3d.EventHandler):
             event.dx = d
 
     def onMouseUp(self, event):
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
 
     # Recalculate
 
-        human.applyAllTargets(self.app.progress)
+        human.applyAllTargets(gui3d.app.progress)
         
         if human.isSubdivided():
             human.meshData.setVisibility(0)
@@ -462,10 +462,10 @@ class Detail3dTool(events3d.EventHandler):
         for target in before.iterkeys():
             after[target] = human.getDetail(target)
 
-        self.app.did(humanmodifier.DetailAction(human, before, after))
+        gui3d.app.did(humanmodifier.DetailAction(human, before, after))
 
     def onMouseMoved(self, event):
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
 
         groups = []
 
@@ -495,14 +495,14 @@ class Detail3dTool(events3d.EventHandler):
                 g.setColor([0, 255, 0, 255])
 
         self.selectedGroups = groups
-        self.app.redraw()
+        gui3d.app.redraw()
 
     def onMouseExited(self, event):
         for g in self.selectedGroups:
             g.setColor([255, 255, 255, 255])
 
         self.selectedGroups = []
-        self.app.redraw()
+        gui3d.app.redraw()
 
 class DetailSlider(humanmodifier.ModifierSlider):
     
@@ -542,13 +542,13 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.modifiers['buttocks'] = AsymmetricDetailModifier('data/targets/details/${gender}-${age}-nates${buttocks}.target', 'buttocks', '1', '2', False)
         self.modifiers['stomach'] = StomachModifier()
         
-        self.app.addLoadHandler('detail', self.loadHandler)
-        self.app.addLoadHandler('microdetail', self.loadHandler)
+        gui3d.app.addLoadHandler('detail', self.loadHandler)
+        gui3d.app.addLoadHandler('microdetail', self.loadHandler)
         for modifier in self.modifiers:
-            self.app.addLoadHandler(modifier, self.loadHandler)
+            gui3d.app.addLoadHandler(modifier, self.loadHandler)
         for modifier in self.oldModifiers:
-            self.app.addLoadHandler(modifier, self.loadHandler)
-        self.app.addSaveHandler(self.saveHandler)
+            gui3d.app.addLoadHandler(modifier, self.loadHandler)
+        gui3d.app.addSaveHandler(self.saveHandler)
         
         self.sliders = []
         
@@ -577,21 +577,21 @@ class DetailModelingTaskView(gui3d.TaskView):
 
         self.detailButtonGroup = []
 
-        self.tool = Detail3dTool(self.app, False, 'translation')
+        self.tool = Detail3dTool(gui3d.app, False, 'translation')
 
         self.translationButton = gui3d.RadioButton(self.modifiersBox, self.detailButtonGroup, 'Move', True, modifierStyle)
         self.scaleButton = gui3d.RadioButton(self.modifiersBox, self.detailButtonGroup, label='Scale', style=modifierStyle);y+=24
 
         @self.translationButton.event
         def onClicked(event):
-            self.tool = Detail3dTool(self.app, self.microButton.selected, 'translation')
-            self.app.tool = self.tool
+            self.tool = Detail3dTool(gui3d.app, self.microButton.selected, 'translation')
+            gui3d.app.tool = self.tool
             gui3d.RadioButton.onClicked(self.translationButton, event)
 
         @self.scaleButton.event
         def onClicked(event):
-            self.tool = Detail3dTool(self.app, self.microButton.selected, 'scale')
-            self.app.tool = self.tool
+            self.tool = Detail3dTool(gui3d.app, self.microButton.selected, 'scale')
+            gui3d.app.tool = self.tool
             gui3d.RadioButton.onClicked(self.scaleButton, event)
 
         self.rightSymmetryButton = gui3d.Button(self.modifiersBox, 'Sym<', style=modifierStyle)
@@ -601,35 +601,35 @@ class DetailModelingTaskView(gui3d.TaskView):
 
         @self.rightSymmetryButton.event
         def onClicked(event):
-            human = self.app.selectedHuman
+            human = gui3d.app.selectedHuman
             human.applySymmetryRight()
 
         @self.leftSymmetryButton.event
         def onClicked(event):
-            human = self.app.selectedHuman
+            human = gui3d.app.selectedHuman
             human.applySymmetryLeft()
 
         @self.symmetryButton.event
         def onClicked(event):
             gui3d.ToggleButton.onClicked(self.symmetryButton, event)
-            human = self.app.selectedHuman
+            human = gui3d.app.selectedHuman
             human.symmetryModeEnabled = self.symmetryButton.selected
             self.parent.tasksByName['Micro modelling'].symmetryButton.setSelected(self.symmetryButton.selected)
             
         @self.microButton.event
         def onClicked(event):
             gui3d.ToggleButton.onClicked(self.microButton, event)
-            self.tool = Detail3dTool(self.app, self.microButton.selected, self.tool.type)
-            self.app.tool = self.tool
+            self.tool = Detail3dTool(gui3d.app, self.microButton.selected, self.tool.type)
+            gui3d.app.tool = self.tool
 
     def onShow(self, event):
-        self.app.tool = self.tool
+        gui3d.app.tool = self.tool
         self.sliders[0].setFocus()
         self.syncSliders()
         gui3d.TaskView.onShow(self, event)
 
     def onHide(self, event):
-        self.app.tool = None
+        gui3d.app.tool = None
         gui3d.TaskView.onHide(self, event)
         
     def onResized(self, event):

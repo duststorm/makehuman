@@ -53,18 +53,18 @@ class ModellingCategory(gui3d.Category):
 
         @self.anaglyphsButton.event
         def onClicked(event):
-            self.app.toggleStereo()
+            gui3d.app.toggleStereo()
             self.anaglyphsButton.setSelected(mh.cameras[0].stereoMode != 0)
             
         @self.wireButton.event
         def onClicked(event):
-            self.app.toggleSolid()
-            self.wireButton.setSelected(self.app.selectedHuman.mesh.solid == 0)
+            gui3d.app.toggleSolid()
+            self.wireButton.setSelected(gui3d.app.selectedHuman.mesh.solid == 0)
             
         @self.subdivisionButton.event
         def onClicked(event):
-            self.app.toggleSubdivision()
-            self.subdivisionButton.setSelected(self.app.selectedHuman.isSubdivided())
+            gui3d.app.toggleSubdivision()
+            self.subdivisionButton.setSelected(gui3d.app.selectedHuman.isSubdivided())
         
         guimacromodelling.MacroModelingTaskView(self)
         guidetailmodelling.DetailModelingTaskView(self)

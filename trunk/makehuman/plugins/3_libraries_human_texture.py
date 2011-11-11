@@ -66,47 +66,47 @@ class HumanTextureTaskView(gui3d.TaskView):
         self.filechooser = gui3d.FileChooser(self, os.path.join(mh.getPath(''), 'data', 'skins'), 'tif', 'png')
         self.update = gui3d.Button(self.filechooser.sortBox, 'Check for updates')
         self.mediaSync = None
-        self.currentTexture = gui3d.Button(self.app.categories['Modelling'],
-            style=HumanTextureButtonStyle._replace(left=800-252, top=600-36, zIndex=9.2, normal=self.app.selectedHuman.getTexture()))
+        self.currentTexture = gui3d.Button(gui3d.app.categories['Modelling'],
+            style=HumanTextureButtonStyle._replace(left=800-252, top=600-36, zIndex=9.2, normal=gui3d.app.selectedHuman.getTexture()))
 
         @self.filechooser.event
         def onFileSelected(filename):
             print 'Loading %s' % filename
             
-            self.app.do(Action(self.app.selectedHuman,
-                self.app.selectedHuman.getTexture(),
+            gui3d.app.do(Action(gui3d.app.selectedHuman,
+                gui3d.app.selectedHuman.getTexture(),
                 os.path.join(mh.getPath(''), 'data', 'skins', filename), self.syncTexture))
             
-            self.app.switchCategory('Modelling')
+            gui3d.app.switchCategory('Modelling')
             
         @self.currentTexture.event
         def onClicked(event):
-            self.app.switchCategory('Library')
-            self.app.switchTask("Human texture")
+            gui3d.app.switchCategory('Library')
+            gui3d.app.switchTask("Human texture")
             
         @self.update.event
         def onClicked(event):
             self.syncMedia()
             
-        self.app.addLoadHandler('skinTexture', self.loadHandler)
-        self.app.addSaveHandler(self.saveHandler)
+        gui3d.app.addLoadHandler('skinTexture', self.loadHandler)
+        gui3d.app.addSaveHandler(self.saveHandler)
             
     def syncTexture(self):
         
-        self.currentTexture.setTexture(self.app.selectedHuman.getTexture().replace('tif', 'png'))
+        self.currentTexture.setTexture(gui3d.app.selectedHuman.getTexture().replace('tif', 'png'))
 
     def onShow(self, event):
 
         # When the task gets shown, set the focus to the file chooser
         gui3d.TaskView.onShow(self, event)
-        self.app.selectedHuman.hide()
+        gui3d.app.selectedHuman.hide()
         self.filechooser.setFocus()
         
         if not len([filename for filename in os.listdir(os.path.join(mh.getPath(''), 'data', 'skins')) if filename.lower().endswith('tif')]):    
-            self.app.prompt('No skins found', 'You don\'t seem to have any skins, download them from the makehuman media repository?\nNote: this can take some time depending on your connection speed.', 'Yes', 'No', self.syncMedia)
+            gui3d.app.prompt('No skins found', 'You don\'t seem to have any skins, download them from the makehuman media repository?\nNote: this can take some time depending on your connection speed.', 'Yes', 'No', self.syncMedia)
 
     def onHide(self, event):
-        self.app.selectedHuman.show()
+        gui3d.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
         
     def onResized(self, event):
@@ -132,7 +132,7 @@ class HumanTextureTaskView(gui3d.TaskView):
         
         if self.mediaSync:
             return
-        self.mediaSync = download.MediaSync(self.app, os.path.join(mh.getPath(''), 'data', 'skins'), 'http://www.makehuman.org/download/skins/', self.syncMediaFinished)
+        self.mediaSync = download.MediaSync(gui3d.app, os.path.join(mh.getPath(''), 'data', 'skins'), 'http://www.makehuman.org/download/skins/', self.syncMediaFinished)
         self.mediaSync.start()
         
     def syncMediaFinished(self):

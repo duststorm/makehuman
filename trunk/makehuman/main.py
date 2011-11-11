@@ -248,17 +248,17 @@ class PluginCheckBox(gui3d.CheckBox):
 
     def __init__(self, parent, module):
     
-        gui3d.CheckBox.__init__(self, parent, module, False if module in parent.app.settings['excludePlugins'] else True)
+        gui3d.CheckBox.__init__(self, parent, module, False if module in gui3d.app.settings['excludePlugins'] else True)
         self.module = module
         
     def onClicked(self, event):
         gui3d.CheckBox.onClicked(self, event)
         if self.selected:
-            self.app.settings['excludePlugins'].remove(self.module)
+            gui3d.app.settings['excludePlugins'].remove(self.module)
         else:
-            self.app.settings['excludePlugins'].append(self.module)
+            gui3d.app.settings['excludePlugins'].append(self.module)
             
-        self.app.saveSettings()
+        gui3d.app.saveSettings()
 
 class PluginsTaskView(gui3d.TaskView):
 
@@ -267,7 +267,7 @@ class PluginsTaskView(gui3d.TaskView):
 
         pluginsBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Plugins')
         
-        for module in self.app.modules:
+        for module in gui3d.app.modules:
             check = PluginCheckBox(pluginsBox, module)
         
 class MHApplication(gui3d.Application):
@@ -363,7 +363,7 @@ class MHApplication(gui3d.Application):
         self.saveHandlers = []
         
         # Display the initial splash screen and the progress bar during startup
-        mesh = gui3d.RectangleMesh(800, 600, self.app.getThemeResource('images', 'splash.png'))
+        mesh = gui3d.RectangleMesh(800, 600, gui3d.app.getThemeResource('images', 'splash.png'))
         self.splash = self.addObject(gui3d.Object([0, 0, 9.8], mesh))
         self.progressBar = gui3d.ProgressBar(self, style=gui3d.ProgressBarStyle._replace(left=800-150, top=600-15, zIndex=9.85))
         self.progressBar.text = gui3d.TextView(self.progressBar, style=gui3d.TextViewStyle._replace(left=10, top=600-20, zIndex=9.85, width=800-150-20, textAlign=gui3d.AlignRight))
@@ -407,7 +407,7 @@ class MHApplication(gui3d.Application):
         @self.selectedHuman.event
         def onMouseDown(event):
           if self.tool:
-            self.selectedGroup = self.app.scene3d.getSelectedFacesGroup()
+            self.selectedGroup = gui3d.app.scene3d.getSelectedFacesGroup()
             self.tool.callEvent("onMouseDown", event)
           else:
             self.currentTask.callEvent("onMouseDown", event)
@@ -532,7 +532,7 @@ class MHApplication(gui3d.Application):
             path = self.pluginsToLoad.pop()
             try:
                 name, ext = splitext(basename(path))
-                if name not in self.app.settings['excludePlugins']:
+                if name not in self.settings['excludePlugins']:
                     module = imp.load_source(name, path)
                     self.modules[name] = module
                     module.load(self)
@@ -567,7 +567,7 @@ class MHApplication(gui3d.Application):
         
         self.progressBar.setProgress(0.9)
                     
-        PluginsTaskView(self.app.getCategory('Settings'))
+        PluginsTaskView(self.getCategory('Settings'))
           
         # Exit button
         category = gui3d.Category(self, "Exit", tabStyle=gui3d.CategoryButtonStyle)
@@ -584,11 +584,11 @@ class MHApplication(gui3d.Application):
                                         
         @self.undoButton.event
         def onClicked(event):
-            self.app.undo()
+            gui3d.app.undo()
 
         @self.redoButton.event
         def onClicked(event):
-            self.app.redo()
+            gui3d.app.redo()
 
         @self.resetButton.event
         def onClicked(event):
@@ -605,11 +605,11 @@ class MHApplication(gui3d.Application):
         
         @self.globalButton.event
         def onClicked(event):
-          self.app.setGlobalCamera()
+          gui3d.app.setGlobalCamera()
           
         @self.faceButton.event
         def onClicked(event):
-          self.app.setFaceCamera()
+          gui3d.app.setFaceCamera()
 
         self.switchCategory("Modelling")
 
@@ -620,7 +620,7 @@ class MHApplication(gui3d.Application):
                 
     def loadFinish(self):
         
-        self.selectedHuman.applyAllTargets(self.app.progress)
+        self.selectedHuman.applyAllTargets(gui3d.app.progress)
         self.selectedHuman.callEvent('onChanged', human.HumanEvent(self.selectedHuman, 'reset'))
         self.dialog = gui3d.View(self)
         self.dialog.blocker = self.dialog.addObject(gui3d.Object([0, 0, 9.7], gui3d.RectangleMesh(800, 600)))
@@ -690,7 +690,7 @@ class MHApplication(gui3d.Application):
         if self.selectedHuman.isVisible():
             
             zoomOut = event.wheelDelta > 0
-            if self.app.settings.get('invertMouseWheel', False):
+            if gui3d.app.settings.get('invertMouseWheel', False):
                 zoomOut = not zoomOut
             
             if zoomOut:
@@ -782,8 +782,8 @@ class MHApplication(gui3d.Application):
             self.settings.update(settings)
             f.close()
             
-        if 'language' in self.app.settings:
-            self.setLanguage(self.app.settings['language'])
+        if 'language' in gui3d.app.settings:
+            self.setLanguage(gui3d.app.settings['language'])
         
         if os.path.isfile(os.path.join(mh.getPath(''), "shortcuts.ini")):
             self.shortcuts = {}
@@ -1217,7 +1217,7 @@ class MHApplication(gui3d.Application):
         self.redraw()
         
     def toggleSubdivision(self):
-        self.selectedHuman.setSubdivided(not self.selectedHuman.isSubdivided(), True, self.app.progress)
+        self.selectedHuman.setSubdivided(not self.selectedHuman.isSubdivided(), True, gui3d.app.progress)
         self.redraw()
         
     def saveTarget(self):
@@ -1298,12 +1298,12 @@ class MHApplication(gui3d.Application):
         self.redraw()
         
     def zoomOut(self):
-        speed = self.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.KMOD_SHIFT else self.app.settings.get('lowspeed', 1)
+        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.KMOD_SHIFT else gui3d.app.settings.get('lowspeed', 1)
         self.modelCamera.eyeZ += 0.65 * speed
         self.redraw()
         
     def zoomIn(self):
-        speed = self.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.KMOD_SHIFT else self.app.settings.get('lowspeed', 1)
+        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.KMOD_SHIFT else gui3d.app.settings.get('lowspeed', 1)
         self.modelCamera.eyeZ -= 0.65 * speed
         self.redraw()
         
@@ -1334,7 +1334,7 @@ class MHApplication(gui3d.Application):
     # Mouse actions    
     def mouseTranslate(self, event):
             
-        speed = self.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.KMOD_SHIFT else self.app.settings.get('lowspeed', 1)
+        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.KMOD_SHIFT else gui3d.app.settings.get('lowspeed', 1)
         
         human = self.selectedHuman
         trans = human.getPosition()
@@ -1346,7 +1346,7 @@ class MHApplication(gui3d.Application):
 
     def mouseRotate(self, event):
         
-        speed = self.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.KMOD_SHIFT else self.app.settings.get('lowspeed', 1)
+        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.KMOD_SHIFT else gui3d.app.settings.get('lowspeed', 1)
         
         human = self.selectedHuman
         rot = human.getRotation()
@@ -1356,9 +1356,9 @@ class MHApplication(gui3d.Application):
         
     def mouseZoom(self, event):
     
-        speed = self.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.KMOD_SHIFT else self.app.settings.get('lowspeed', 1)
+        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.KMOD_SHIFT else gui3d.app.settings.get('lowspeed', 1)
         
-        if self.app.settings.get('invertMouseWheel', False):
+        if gui3d.app.settings.get('invertMouseWheel', False):
             speed *= -1
         
         self.modelCamera.eyeZ -= 0.05 * event.dy * speed

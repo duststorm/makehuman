@@ -34,9 +34,9 @@ class ProxyTaskView(gui3d.TaskView):
         @self.filechooser.event
         def onFileSelected(filename):
             
-            self.setProxy(self.app.selectedHuman, filename)
+            self.setProxy(gui3d.app.selectedHuman, filename)
 
-            self.app.switchCategory('Modelling')
+            gui3d.app.switchCategory('Modelling')
         
     def setProxy(self, human, proxy):
 
@@ -44,12 +44,12 @@ class ProxyTaskView(gui3d.TaskView):
 
     def onShow(self, event):
         # When the task gets shown, set the focus to the file chooser
-        self.app.selectedHuman.hide()
+        gui3d.app.selectedHuman.hide()
         gui3d.TaskView.onShow(self, event)
         self.filechooser.setFocus()
 
     def onHide(self, event):
-        self.app.selectedHuman.show()
+        gui3d.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
         
     def onResized(self, event):

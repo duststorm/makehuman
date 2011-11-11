@@ -45,12 +45,12 @@ class BackgroundTaskView(gui3d.TaskView):
         self.filenames = {}
 
         mesh = gui3d.RectangleMesh(420, 420)
-        self.backgroundImage = self.app.categories['Modelling'].addObject(gui3d.Object([190, 90, 1], mesh, visible=False))
+        self.backgroundImage = gui3d.app.categories['Modelling'].addObject(gui3d.Object([190, 90, 1], mesh, visible=False))
         self.opacity = 100
         mesh.setColor([255, 255, 255, self.opacity])
         mesh.setPickable(0)
         
-        self.backgroundImageToggle = gui3d.ToggleButton(self.app.categories['Modelling'].viewBox, 'Background');
+        self.backgroundImageToggle = gui3d.ToggleButton(gui3d.app.categories['Modelling'].viewBox, 'Background');
         y = 280
         self.backgroundBox = gui3d.GroupBox(self, [10, y, 9], 'Background 2 settings', gui3d.GroupBoxStyle._replace(height=25+36*3+24*1+6));y+=25
 
@@ -71,15 +71,15 @@ class BackgroundTaskView(gui3d.TaskView):
                 self.backgroundImage.show()
                 self.backgroundImageToggle.setSelected(True)
             else:
-                self.app.switchCategory('Library')
-                self.app.switchTask('Background')
+                gui3d.app.switchCategory('Library')
+                gui3d.app.switchTask('Background')
                 
         self.filechooser = gui3d.FileChooser(self, self.backgroundsFolder, ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None)
 
         @self.filechooser.event
         def onFileSelected(filename):
         
-            self.reference = self.app.selectedHuman.getPosition()
+            self.reference = gui3d.app.selectedHuman.getPosition()
 
             if self.bgImageFrontRadioButton.selected:
                 self.filenames['front'] = filename
@@ -108,29 +108,29 @@ class BackgroundTaskView(gui3d.TaskView):
 
             bg.show()
             self.backgroundImageToggle.setSelected(True)
-            self.app.switchCategory('Modelling')
-            self.app.switchTask('Background')
-            self.app.redraw()
+            gui3d.app.switchCategory('Modelling')
+            gui3d.app.switchTask('Background')
+            gui3d.app.redraw()
             
     def fixateBackground(self):
     
-        self.reference = self.app.selectedHuman.getPosition()
-        _, _, z = self.app.modelCamera.convertToScreen(*self.reference)
+        self.reference = gui3d.app.selectedHuman.getPosition()
+        _, _, z = gui3d.app.modelCamera.convertToScreen(*self.reference)
         x, y, _ = self.backgroundImage.getPosition()
-        self.leftTop = self.app.modelCamera.convertToWorld3D(x, y, z)
-        self.rightBottom = self.app.modelCamera.convertToWorld3D(x + self.backgroundWidth, y + self.backgroundHeight, z)
+        self.leftTop = gui3d.app.modelCamera.convertToWorld3D(x, y, z)
+        self.rightBottom = gui3d.app.modelCamera.convertToWorld3D(x + self.backgroundWidth, y + self.backgroundHeight, z)
             
     def updateBackground(self):
     
         if self.backgroundImage.hasTexture():
         
-            reference = self.app.selectedHuman.getPosition()
+            reference = gui3d.app.selectedHuman.getPosition()
             diff = aljabr.vsub(reference, self.reference)
             self.leftTop = aljabr.vadd(self.leftTop, diff)
             self.rightBottom = aljabr.vadd(self.rightBottom, diff)
             
-            leftTop = self.app.modelCamera.convertToScreen(*self.leftTop)
-            rightBottom = self.app.modelCamera.convertToScreen(*self.rightBottom)
+            leftTop = gui3d.app.modelCamera.convertToScreen(*self.leftTop)
+            rightBottom = gui3d.app.modelCamera.convertToScreen(*self.rightBottom)
             
             self.backgroundImage.setPosition([leftTop[0], leftTop[1], 8])
             self.backgroundWidth = rightBottom[0]-leftTop[0]
@@ -142,14 +142,14 @@ class BackgroundTaskView(gui3d.TaskView):
     def onShow(self, event):
         
         gui3d.TaskView.onShow(self, event)
-        self.app.selectedHuman.hide()
-        self.app.prompt('Info', u'Images which are placed in %s will show up here.' % self.backgroundsFolder, 'OK', helpId='backgroundHelp')
+        gui3d.app.selectedHuman.hide()
+        gui3d.app.prompt('Info', u'Images which are placed in %s will show up here.' % self.backgroundsFolder, 'OK', helpId='backgroundHelp')
         self.filechooser.setFocus()
 
     def onHide(self, event):
         
         gui3d.TaskView.onHide(self, event)
-        self.app.selectedHuman.show()
+        gui3d.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
         
     def onHumanTranslated(self, event):
@@ -162,7 +162,7 @@ class BackgroundTaskView(gui3d.TaskView):
             self.backgroundImage.mesh.setTexture(os.path.join(self.backgroundsFolder, filename))
 	 
     def onHumanRotated(self, event):
-        rot = self.app.selectedHuman.getRotation()
+        rot = gui3d.app.selectedHuman.getRotation()
         if rot==[0,0,0]:
             self.setBackgroundImage('front')
         elif rot==[0,180,0]:

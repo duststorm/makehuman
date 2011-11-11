@@ -22,7 +22,7 @@ class FaceSlider(humanmodifier.ModifierSlider):
 
         humanmodifier.ModifierSlider.__init__(self, parent, min=-1.0, max=1.0, modifier=modifier, style=gui3d.SliderStyle._replace(height=56, normal=image), thumbStyle=gui3d.SliderThumbStyle._replace(width = 32, height = 32, normal="slider2.png", focused="slider2_focused.png"))
 
-        self.view = getattr(self.app, view)
+        self.view = getattr(gui3d.app, view)
 
     def onFocus(self, event):
 
@@ -226,7 +226,7 @@ class FaceTaskView(gui3d.TaskView):
 
         gui3d.TaskView.onShow(self, event)
 
-        self.app.setFaceCamera()
+        gui3d.app.setFaceCamera()
 
         for slider in self.sliders:
             slider.update()

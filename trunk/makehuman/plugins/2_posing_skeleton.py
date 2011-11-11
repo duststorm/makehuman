@@ -45,7 +45,7 @@ class SkeletonView(gui3d.TaskView):
 
         gui3d.TaskView.onShow(self, event)
         
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
         
         human.hide()
         self.getSkeleton().show()
@@ -55,18 +55,18 @@ class SkeletonView(gui3d.TaskView):
 
         gui3d.TaskView.onHide(self, event)
         
-        self.app.selectedHuman.show()
+        gui3d.app.selectedHuman.show()
         self.getSkeleton().hide()
         
     def getSkeleton(self):
         
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
         
         if not self.__skeletonObject:
             
             self.__buildSkeletonMesh(human)
             self.__skeletonObject = self.addObject(gui3d.Object(human.getPosition(), self.__skeletonMesh))
-            self.app.scene3d.update()
+            gui3d.app.scene3d.update()
             
         else:
             
@@ -220,22 +220,22 @@ class SkeletonView(gui3d.TaskView):
         
     def onMouseDragged(self, event):
         
-        self.app.selectedHuman.show()
+        gui3d.app.selectedHuman.show()
         self.getSkeleton().hide()
         
         gui3d.TaskView.onMouseDragged(self, event)
             
-        self.app.selectedHuman.hide()
+        gui3d.app.selectedHuman.hide()
         self.getSkeleton().show()
         
     def onMouseWheel(self, event):
         
-        self.app.selectedHuman.show()
+        gui3d.app.selectedHuman.show()
         self.getSkeleton().hide()
         
         gui3d.TaskView.onMouseWheel(self, event)
             
-        self.app.selectedHuman.hide()
+        gui3d.app.selectedHuman.hide()
         self.getSkeleton().show()
         
     def onMouseEntered(self, event):
@@ -245,7 +245,7 @@ class SkeletonView(gui3d.TaskView):
         self.bone = event.group
         self.bone.setColor([0, 255, 0, 255])
         self.status.setText(event.group.name)
-        self.app.redraw()
+        gui3d.app.redraw()
 
     def onMouseExited(self, event):
         
@@ -253,7 +253,7 @@ class SkeletonView(gui3d.TaskView):
         
         self.bone.setColor([255, 255, 255, 255])
         self.status.setText('')
-        self.app.redraw()
+        gui3d.app.redraw()
         
     def onMouseMoved(self, event):
         
@@ -264,7 +264,7 @@ class SkeletonView(gui3d.TaskView):
             self.bone = event.group
             self.bone.setColor([0, 255, 0, 255])
             self.status.setText(event.group.name)
-        self.app.redraw()
+        gui3d.app.redraw()
         
     def onResized(self, event):
         

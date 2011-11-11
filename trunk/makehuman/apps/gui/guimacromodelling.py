@@ -15,13 +15,13 @@ class MacroAction:
 
     def do(self):
         getattr(self.human, 'set' + self.method)(self.after)
-        self.human.applyAllTargets(self.human.app.progress, update=self.update)
+        self.human.applyAllTargets(gui3d.app.progress, update=self.update)
         self.postAction()
         return True
 
     def undo(self):
         getattr(self.human, 'set' + self.method)(self.before)
-        self.human.applyAllTargets(self.human.app.progress)
+        self.human.applyAllTargets(gui3d.app.progress)
         self.postAction()
         return True
 
@@ -30,7 +30,7 @@ class MacroModelingTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Macro modelling', label='Macro')
 
-        font = self.app.getFont(gui3d.TextViewStyle.fontFamily)
+        font = gui3d.app.getFont(gui3d.TextViewStyle.fontFamily)
         self.status = gui3d.TextView(self, style=gui3d.TextViewStyle._replace(width=800-20, left=10, top=600-2-font.lineHeight, zIndex=9.1))
 
         self.macroBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Main', style=gui3d.GroupBoxStyle._replace(height=25+36*5+6))\
@@ -52,49 +52,49 @@ class MacroModelingTaskView(gui3d.TaskView):
         
         @self.genderSlider.event
         def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(MacroAction(human, 'Gender', value, self.syncSliders,False))
+            human = gui3d.app.selectedHuman
+            gui3d.app.do(MacroAction(human, 'Gender', value, self.syncSliders,False))
             self.syncStatus()
             human.meshData.update()
 
 
         @self.ageSlider.event
         def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(MacroAction(human, 'Age', value, self.syncSliders,False))
+            human = gui3d.app.selectedHuman
+            gui3d.app.do(MacroAction(human, 'Age', value, self.syncSliders,False))
             self.syncStatus()
             human.meshData.update()
 
         @self.muscleSlider.event
         def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(MacroAction(human, 'Muscle', value, self.syncSliders))
+            human = gui3d.app.selectedHuman
+            gui3d.app.do(MacroAction(human, 'Muscle', value, self.syncSliders))
             self.syncStatus()
 
         @self.weightSlider.event
         def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(MacroAction(human, 'Weight', value, self.syncSliders))
+            human = gui3d.app.selectedHuman
+            gui3d.app.do(MacroAction(human, 'Weight', value, self.syncSliders))
             self.syncStatus()
 
         @self.heightSlider.event
         def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(MacroAction(human, 'Height', value, self.syncSliders, False))
+            human = gui3d.app.selectedHuman
+            gui3d.app.do(MacroAction(human, 'Height', value, self.syncSliders, False))
             self.syncStatus()
             human.meshData.update()
             
         @self.africanSlider.event
         def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(MacroAction(human, 'African', value, self.syncSliders, False))
+            human = gui3d.app.selectedHuman
+            gui3d.app.do(MacroAction(human, 'African', value, self.syncSliders, False))
             self.syncStatus()
             human.meshData.update()
             
         @self.asianSlider.event
         def onChange(value):
-            human = self.app.selectedHuman
-            self.app.do(MacroAction(human, 'Asian', value, self.syncSliders, False))
+            human = gui3d.app.selectedHuman
+            gui3d.app.do(MacroAction(human, 'Asian', value, self.syncSliders, False))
             self.syncStatus()
             human.meshData.update()
             
@@ -102,7 +102,7 @@ class MacroModelingTaskView(gui3d.TaskView):
         self.syncStatus()
 
     def syncSliders(self):
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
         self.genderSlider.setValue(human.getGender())
         self.ageSlider.setValue(human.getAge())
         self.muscleSlider.setValue(human.getMuscle())
@@ -112,7 +112,7 @@ class MacroModelingTaskView(gui3d.TaskView):
         self.asianSlider.setValue(human.getAsian())
 
     def syncStatus(self):
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
         status = ''
         if human.getGender() == 0.0:
             gender = 'Gender: female, '
@@ -131,7 +131,7 @@ class MacroModelingTaskView(gui3d.TaskView):
         status += 'Muscle: %.2f%%, ' % (human.getMuscle() * 100.0)
         status += 'Weight: %.2f%%, ' % (50 + (150 - 50) * human.getWeight())
         height = 10 * max(human.meshData.verts[8223].co[1] - human.meshData.verts[12361].co[1], human.meshData.verts[8223].co[1] - human.meshData.verts[13155].co[1])
-        if self.app.settings['units'] == 'metric':
+        if gui3d.app.settings['units'] == 'metric':
             status += 'Height: %.2f cm' % height
         else:
             status += 'Height: %.2f in' % (height * 0.393700787)
@@ -150,6 +150,6 @@ class MacroModelingTaskView(gui3d.TaskView):
             self.syncStatus()
 
     def onResized(self, event):
-        font = self.app.getFont(gui3d.TextViewStyle.fontFamily)
+        font = gui3d.app.getFont(gui3d.TextViewStyle.fontFamily)
         self.status.setPosition([10, event.height-2-font.lineHeight, 9.1])
         self.radialBox.setPosition([event.width - 210, self.radialBox.getPosition()[1], 9.0])

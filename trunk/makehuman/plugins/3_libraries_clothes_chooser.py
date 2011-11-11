@@ -34,9 +34,9 @@ class ClothesTaskView(gui3d.TaskView):
         @self.filechooser.event
         def onFileSelected(filename):
             
-            self.setClothes(self.app.selectedHuman, filename)
+            self.setClothes(gui3d.app.selectedHuman, filename)
 
-            self.app.switchCategory('Modelling')
+            gui3d.app.switchCategory('Modelling')
         
     def setClothes(self, human, mhclo):
 
@@ -51,11 +51,11 @@ class ClothesTaskView(gui3d.TaskView):
         except:
             clo = None
         if clo:
-            self.app.scene3d.delete(clo.mesh)
+            gui3d.app.scene3d.delete(clo.mesh)
             del human.clothesObjs[proxy.name]
             return
 
-        mesh = files3d.loadMesh(self.app.scene3d, obj)
+        mesh = files3d.loadMesh(gui3d.app.scene3d, obj)
         if proxy.texture:
             (dir, name) = proxy.texture
             tif = os.path.join(folder, name)
@@ -63,7 +63,7 @@ class ClothesTaskView(gui3d.TaskView):
         else:
             pass
         
-        clo = gui3d.Object(self.app, human.getPosition(), mesh)
+        clo = gui3d.app.addObject(gui3d.Object(human.getPosition(), mesh))
         clo.setRotation(human.getRotation())
         clo.mesh.setCameraProjection(0)
         clo.mesh.setSolid(human.mesh.solid)
@@ -73,7 +73,7 @@ class ClothesTaskView(gui3d.TaskView):
         
         human.clothesProxies[proxy.name] = proxy
 
-        self.app.scene3d.update()
+        gui3d.app.scene3d.update()
         self.adaptClothesToHuman(human)
         clo.setSubdivided(human.isSubdivided())
         
@@ -91,12 +91,12 @@ class ClothesTaskView(gui3d.TaskView):
 
     def onShow(self, event):
         # When the task gets shown, set the focus to the file chooser
-        self.app.selectedHuman.hide()
+        gui3d.app.selectedHuman.hide()
         gui3d.TaskView.onShow(self, event)
         self.filechooser.setFocus()
 
     def onHide(self, event):
-        self.app.selectedHuman.show()
+        gui3d.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
         
     def onResized(self, event):
@@ -109,7 +109,7 @@ class ClothesTaskView(gui3d.TaskView):
             print 'deleting clothes'
             for (name,clo) in human.clothesObjs.items():
                 if clo:
-                    self.app.scene3d.delete(clo.mesh)
+                    gui3d.app.scene3d.delete(clo.mesh)
                 del human.clothesObjs[name]
                 del human.clothesProxies[name]
             # self.clothesButton.setTexture('data/clothes/clear.png')

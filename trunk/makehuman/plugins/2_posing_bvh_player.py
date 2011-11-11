@@ -130,13 +130,13 @@ class BvhView(gui3d.TaskView):
         def onChanging(value):
             self.__updateSkeletonMesh(value-1)
             self.__updateHumanMesh(self.__humanSkeleton.root)
-            self.app.selectedHuman.meshData.update()
+            gui3d.app.selectedHuman.meshData.update()
             
         @self.frameSlider.event
         def onChange(value):
             self.__updateSkeletonMesh(value-1)
             self.__updateHumanMesh(self.__humanSkeleton.root)
-            self.app.selectedHuman.meshData.update()
+            gui3d.app.selectedHuman.meshData.update()
                 
         @self.playPause.event
         def onClicked(value):
@@ -151,10 +151,10 @@ class BvhView(gui3d.TaskView):
         def onClicked(event):
             self.showHuman.setSelected(not self.showHuman.selected)
             if self.showHuman.selected:
-                self.app.selectedHuman.show()
+                gui3d.app.selectedHuman.show()
                 self.getSkeleton().hide()
             else:
-                self.app.selectedHuman.hide()
+                gui3d.app.selectedHuman.hide()
                 self.getSkeleton().show()
                 
         @self.exportFrame.event
@@ -170,7 +170,7 @@ class BvhView(gui3d.TaskView):
             
         self.frameSlider.setValue(frame)
         self.__updateSkeletonMesh(frame-1)
-        self.app.redraw()
+        gui3d.app.redraw()
         
     def exportCurrentFrame(self):
         
@@ -178,37 +178,37 @@ class BvhView(gui3d.TaskView):
         if not os.path.exists(exportPath):
             os.makedirs(exportPath)
              
-        mh2obj.exportObj(self.app.selectedHuman.meshData, os.path.join(exportPath, 'bvh_frame_%d.obj' % self.frameSlider.getValue()))
+        mh2obj.exportObj(gui3d.app.selectedHuman.meshData, os.path.join(exportPath, 'bvh_frame_%d.obj' % self.frameSlider.getValue()))
             
     def onShow(self, event):
 
         gui3d.TaskView.onShow(self, event)
         
-        self.app.selectedHuman.hide()
+        gui3d.app.selectedHuman.hide()
         self.getSkeleton().show()
         
-        self.app.selectedHuman.storeMesh()
-        self.__humanSkeleton.update(self.app.selectedHuman.meshData)
+        gui3d.app.selectedHuman.storeMesh()
+        self.__humanSkeleton.update(gui3d.app.selectedHuman.meshData)
         
     def onHide(self, event):
 
         gui3d.TaskView.onHide(self, event)
-        self.app.selectedHuman.show()
+        gui3d.app.selectedHuman.show()
         self.getSkeleton().hide()
         
-        self.app.selectedHuman.restoreMesh()
-        self.app.selectedHuman.meshData.calcNormals()
-        self.app.selectedHuman.meshData.update()
+        gui3d.app.selectedHuman.restoreMesh()
+        gui3d.app.selectedHuman.meshData.calcNormals()
+        gui3d.app.selectedHuman.meshData.update()
         
     def getSkeleton(self):
         
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
         
         if not self.__skeletonObject:
             
             self.__buildSkeletonMesh()
             self.__skeletonObject = self.addObject(gui3d.Object(aljabr.vadd(human.getPosition(), [0.0, -20.0, 0.0]), self.__skeletonMesh))
-            self.app.scene3d.update()
+            gui3d.app.scene3d.update()
             
         else:
             
@@ -269,12 +269,12 @@ class BvhView(gui3d.TaskView):
         joint.calcTransform(False)
         
         if not src:
-            src = self.app.selectedHuman.meshStored
+            src = gui3d.app.selectedHuman.meshStored
             
         if not dst:
-            dst = self.app.selectedHuman.meshData.verts
+            dst = gui3d.app.selectedHuman.meshData.verts
             
-        nsrc = self.app.selectedHuman.meshStoredNormals
+        nsrc = gui3d.app.selectedHuman.meshStoredNormals
             
         for i in joint.bindedVects:
             #dst[i].co = aljabr.mtransform(joint.transform, aljabr.mtransform(joint.inverseTransform, src[i]))
@@ -397,14 +397,14 @@ class BvhView(gui3d.TaskView):
         
     def onMouseDragged(self, event):
       
-      self.app.selectedHuman.show()
+      gui3d.app.selectedHuman.show()
       self.getSkeleton().hide()
       
       gui3d.TaskView.onMouseDragged(self, event)
       if self.showHuman.selected:
         pass
       else:
-        self.app.selectedHuman.hide()
+        gui3d.app.selectedHuman.hide()
         self.getSkeleton().show()
         
     def onMouseWheel(self, event):
@@ -412,7 +412,7 @@ class BvhView(gui3d.TaskView):
       if self.showHuman.selected:
         pass
       else:
-        self.app.selectedHuman.show()
+        gui3d.app.selectedHuman.show()
         self.getSkeleton().hide()
       
       gui3d.TaskView.onMouseWheel(self, event)
@@ -420,7 +420,7 @@ class BvhView(gui3d.TaskView):
       if self.showHuman.selected:
         pass
       else:
-        self.app.selectedHuman.hide()
+        gui3d.app.selectedHuman.hide()
         self.getSkeleton().show()
         
     def onMouseEntered(self, event):
@@ -431,7 +431,7 @@ class BvhView(gui3d.TaskView):
             self.bone = event.group
             self.bone.setColor([0, 255, 0, 255])
             self.status.setText(event.group.name)
-        self.app.redraw()
+        gui3d.app.redraw()
 
     def onMouseExited(self, event):
         
@@ -440,7 +440,7 @@ class BvhView(gui3d.TaskView):
         if self.bone:
             self.bone.setColor([255, 255, 255, 255])
             self.status.setText('')
-        self.app.redraw()
+        gui3d.app.redraw()
         
     def onMouseMoved(self, event):
         
@@ -451,7 +451,7 @@ class BvhView(gui3d.TaskView):
             self.bone = event.group
             self.bone.setColor([0, 255, 0, 255])
             self.status.setText(event.group.name)
-        self.app.redraw()
+        gui3d.app.redraw()
         
     def onResized(self, event):
         

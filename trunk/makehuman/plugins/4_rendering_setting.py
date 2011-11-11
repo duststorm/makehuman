@@ -10,25 +10,25 @@ class RenderingSettingTaskView(gui3d.TaskView):
 
         #Rendering resolution
         resBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Resolution', gui3d.GroupBoxStyle._replace(height=25+24*2+6))
-        rendering_width = self.app.settings.get('rendering_width', 800)
+        rendering_width = gui3d.app.settings.get('rendering_width', 800)
         self.width= gui3d.TextEdit(resBox, str(rendering_width), gui3d.TextEditStyle._replace(width=112),
             gui3d.intValidator)
-        rendering_height = self.app.settings.get('rendering_height', 600)
+        rendering_height = gui3d.app.settings.get('rendering_height', 600)
         self.height= gui3d.TextEdit(resBox, str(rendering_height), gui3d.TextEditStyle._replace(width=112),
             gui3d.intValidator)
 
         @self.width.event
         def onChange(value):
-            self.app.settings['rendering_width'] = 0 if not value else int(value)
+            gui3d.app.settings['rendering_width'] = 0 if not value else int(value)
 
         @self.height.event
         def onChange(value):
-            self.app.settings['rendering_height'] = 0 if not value else int(value)
+            gui3d.app.settings['rendering_height'] = 0 if not value else int(value)
 
     def onHide(self, event):
 
         gui3d.TaskView.onHide(self, event)
-        self.app.saveSettings()
+        gui3d.app.saveSettings()
 
 def load(app):
     category = app.getCategory('Rendering')

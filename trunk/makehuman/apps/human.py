@@ -483,7 +483,7 @@ class Human(gui3d.Object):
         if self.isSubdivided():
             self.getSubdivisionMesh()
 
-        self.app.redraw()
+        gui3d.app.redraw()
 
     def rotateLimb(self, targetPath, morphFactor):
         targetPath1 = targetPath+".target"
@@ -575,8 +575,8 @@ class Human(gui3d.Object):
                     modifier.setValue(self, float(lineData[1]), 0)
                 elif lineData[0] == 'asymmetry':
                     self.targetsDetailStack['data/targets/asym/' + lineData[1] + '.target'] = float(lineData[2])
-                elif lineData[0] in self.app.loadHandlers:
-                    self.app.loadHandlers[lineData[0]](self, lineData)
+                elif lineData[0] in gui3d.app.loadHandlers:
+                    gui3d.app.loadHandlers[lineData[0]](self, lineData)
                 else:
                     print('Could not load %s' % lineData)
 
@@ -605,7 +605,7 @@ class Human(gui3d.Object):
             if '/asym' in t:
                f.write('asymmetry %s %f\n' % (os.path.basename(t).replace('.target', ''), self.targetsDetailStack[t]))
                
-        for handler in self.app.saveHandlers:
+        for handler in gui3d.app.saveHandlers:
             handler(self, f)
                
         f.close()

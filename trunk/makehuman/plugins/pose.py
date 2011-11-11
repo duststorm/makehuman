@@ -14,7 +14,7 @@ class PoseTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Posing')      
 
-        self.engine = poseengine.Poseengine(self.app.selectedHuman)        
+        self.engine = poseengine.Poseengine(gui3d.app.selectedHuman)        
         self.shoulder = self.engine.getLimb("joint-r-shoulder")
         self.shoulder.oBoundingBox = [[0.0, 8.1955895],[3.674790375, 6.1586085],[-1.120018, 1.192948875]]
         #self.shoulder.oBoundingBox = [[0.592449, 2.9099749999999998],\
@@ -84,13 +84,13 @@ class PoseTaskView(gui3d.TaskView):
             pass
             
     def onShow(self, event):
-        self.app.selectedHuman.storeMesh()
-        #self.applyPose()
+        gui3d.app.selectedHuman.storeMesh()
+        #gui3d.applyPose()
         gui3d.TaskView.onShow(self, event)
 
     def onHide(self, event):
-        self.app.selectedHuman.restoreMesh()
-        self.app.selectedHuman.meshData.update()
+        gui3d.app.selectedHuman.restoreMesh()
+        gui3d.app.selectedHuman.meshData.update()
         gui3d.TaskView.onHide(self, event)
 
     def test(self, limbToSave, sliderX,sliderY,sliderZ,savePose = None):
@@ -113,7 +113,7 @@ class PoseTaskView(gui3d.TaskView):
             self.shoulderYslider.setValue(angle[2])
             limbToSave.angle = angle
             limbToSave.applyPose(savePath)
-            self.app.redraw()
+            gui3d.app.redraw()
 
 
     def reset(self, limbToTest):
@@ -122,7 +122,7 @@ class PoseTaskView(gui3d.TaskView):
         self.shoulderYslider.setValue(0.0)
         self.shoulderZslider.setValue(0.0)
         limbToTest.applyPose()
-        self.app.redraw()
+        gui3d.app.redraw()
         
 
 category = None

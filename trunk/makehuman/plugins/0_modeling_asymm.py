@@ -49,7 +49,7 @@ class AsymmTaskView(gui3d.TaskView):
                 self.asymmTargets.append(os.path.join(self.asymmDataPath, f))
 
         #The human mesh
-        self.human = self.app.selectedHuman
+        self.human = gui3d.app.selectedHuman
 
         #Random factor from Slider
         self.randomVal = 0.5
@@ -83,7 +83,7 @@ class AsymmTaskView(gui3d.TaskView):
             
             after = self.getTargetsAndValues(bodyPartName)
             
-            self.app.did(humanmodifier.DetailAction(self.human, self.before, after, self.syncSliders))
+            gui3d.app.did(humanmodifier.DetailAction(self.human, self.before, after, self.syncSliders))
             
             self.before = None
 
@@ -138,7 +138,7 @@ class AsymmTaskView(gui3d.TaskView):
             @param bodypart: The name of part to asymmetrize.
             """
             modifiers = self.getModifiers(bodypart)
-            human = self.app.selectedHuman
+            human = gui3d.app.selectedHuman
            
             for modifier in modifiers:
                 if realtime:
@@ -160,7 +160,7 @@ class AsymmTaskView(gui3d.TaskView):
     def getSliderValue(self, bodypart):
         modifiers = self.modifiers[bodypart]
         if modifiers:
-            human = self.app.selectedHuman
+            human = gui3d.app.selectedHuman
             return modifiers[0].getValue(human)
         else:
             return 0.0
@@ -192,9 +192,9 @@ class AsymmTaskView(gui3d.TaskView):
 
         # Undo redo
         if event.key == events3d.SDLK_y:
-            self.app.redo()
+            gui3d.app.redo()
         elif event.key == events3d.SDLK_z:
-            self.app.undo()
+            gui3d.app.undo()
             
         gui3d.TaskView.onKeyDown(self, event)
 

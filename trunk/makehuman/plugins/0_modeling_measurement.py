@@ -157,9 +157,9 @@ class MeasureTaskView(gui3d.TaskView):
             
     def getMeasure(self, measure):
         
-        human = self.app.selectedHuman
-        measure = self.ruler.getMeasure(human, measure, self.app.settings['units'])
-        if self.app.settings['units'] == 'metric':
+        human = gui3d.app.selectedHuman
+        measure = self.ruler.getMeasure(human, measure, gui3d.app.settings['units'])
+        if gui3d.app.settings['units'] == 'metric':
             return '%.1f cm' % measure
         else:
             return '%.1f in' % measure
@@ -192,8 +192,8 @@ class MeasureTaskView(gui3d.TaskView):
         
     def updateMeshes(self):
     
-        human = self.app.selectedHuman
-        slider = self.app.focusView
+        human = gui3d.app.selectedHuman
+        slider = gui3d.app.focusView
  
         if (isinstance(slider, MeasureSlider)):
         
@@ -217,7 +217,7 @@ class MeasureTaskView(gui3d.TaskView):
             ]
             
             for i, v in enumerate(box):
-                box[i] = self.app.modelCamera.convertToScreen(v[0], v[1], v[2], human.mesh.object3d)
+                box[i] = gui3d.app.modelCamera.convertToScreen(v[0], v[1], v[2], human.mesh.object3d)
                 
             x1, y1, x2, y2 = min([v[0] for v in box]), min([v[1] for v in box]), max([v[0] for v in box]), max([v[1] for v in box])
             
@@ -228,7 +228,7 @@ class MeasureTaskView(gui3d.TaskView):
             # MeasureMesh
             vertidx = self.ruler.Measures[slider.measure]
             for i, j in enumerate(vertidx):
-                self.measureMesh.verts[i].co = self.app.modelCamera.convertToScreen(*human.mesh.verts[j].co, obj=human.mesh.object3d)
+                self.measureMesh.verts[i].co = gui3d.app.modelCamera.convertToScreen(*human.mesh.verts[j].co, obj=human.mesh.object3d)
                 self.measureMesh.verts[i].co[2] = 0.0
             for i in xrange(len(vertidx), len(self.measureMesh.verts)):
                 self.measureMesh.verts[i].co = self.measureMesh.verts[len(vertidx)-1].co[:]
@@ -269,10 +269,10 @@ class MeasureTaskView(gui3d.TaskView):
     
     def syncStatistics(self):
         
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
         
         height = 10 * max(human.meshData.verts[8223].co[1] - human.meshData.verts[12361].co[1], human.meshData.verts[8223].co[1] - human.meshData.verts[13155].co[1])
-        if self.app.settings['units'] == 'metric':
+        if gui3d.app.settings['units'] == 'metric':
             height = '%.2f cm' % height
         else:
             height = '%.2f in' % (height * 0.393700787)
@@ -284,7 +284,7 @@ class MeasureTaskView(gui3d.TaskView):
         
     def syncBraSizes(self):
         
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
         
         bust = self.ruler.getMeasure(human, 'bust', 'metric')
         underbust = self.ruler.getMeasure(human, 'underbust', 'metric')

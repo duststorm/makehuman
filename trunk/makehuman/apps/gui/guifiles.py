@@ -52,7 +52,7 @@ class SaveTaskView(gui3d.TaskView):
         self.fileentry = gui3d.FileEntryView(self, 'Save')
         
         mesh = gui3d.FrameMesh(100, 100)
-        self.selection = self.app.addObject(gui3d.Object([0, 0, 9], mesh))
+        self.selection = gui3d.app.addObject(gui3d.Object([0, 0, 9], mesh))
         mesh.setColor([0, 0, 0, 255])
         mesh.setPickable(0)
         self.selection.hide()
@@ -69,16 +69,16 @@ class SaveTaskView(gui3d.TaskView):
             # Save the thumbnail
 
             leftTop = self.selection.getPosition()
-            self.app.scene3d.grabScreen(int(leftTop[0]+1), int(leftTop[1]+1), int(self.selection.width-1), int(self.selection.height-1), os.path.join(modelPath, filename + '.bmp'))
+            gui3d.app.scene3d.grabScreen(int(leftTop[0]+1), int(leftTop[1]+1), int(self.selection.width-1), int(self.selection.height-1), os.path.join(modelPath, filename + '.bmp'))
 
             # Save the model
 
-            human = self.app.selectedHuman
+            human = gui3d.app.selectedHuman
             human.save(os.path.join(modelPath, filename + '.mhm'), tags)
             
-            self.app.setCaption("MakeHuman - [%s]" % filename)
+            gui3d.app.setCaption("MakeHuman - [%s]" % filename)
 
-            self.app.switchCategory('Modelling')
+            gui3d.app.switchCategory('Modelling')
 
     def onShow(self, event):
 
@@ -86,21 +86,21 @@ class SaveTaskView(gui3d.TaskView):
 
         gui3d.TaskView.onShow(self, event)
         self.fileentry.setFocus()
-        self.pan = self.app.selectedHuman.getPosition()
-        self.eyeX = self.app.modelCamera.eyeX
-        self.eyeY = self.app.modelCamera.eyeY
-        self.eyeZ = self.app.modelCamera.eyeZ
-        self.focusX = self.app.modelCamera.focusX
-        self.focusY = self.app.modelCamera.focusY
-        self.focusZ = self.app.modelCamera.focusZ
-        self.rotation = self.app.selectedHuman.getRotation()
-        self.app.selectedHuman.setPosition([0, -1, 0])
-        self.app.setGlobalCamera();
-        self.app.modelCamera.eyeZ = 70
-        self.app.selectedHuman.setRotation([0.0, 0.0, 0.0])
+        self.pan = gui3d.app.selectedHuman.getPosition()
+        self.eyeX = gui3d.app.modelCamera.eyeX
+        self.eyeY = gui3d.app.modelCamera.eyeY
+        self.eyeZ = gui3d.app.modelCamera.eyeZ
+        self.focusX = gui3d.app.modelCamera.focusX
+        self.focusY = gui3d.app.modelCamera.focusY
+        self.focusZ = gui3d.app.modelCamera.focusZ
+        self.rotation = gui3d.app.selectedHuman.getRotation()
+        gui3d.app.selectedHuman.setPosition([0, -1, 0])
+        gui3d.app.setGlobalCamera();
+        gui3d.app.modelCamera.eyeZ = 70
+        gui3d.app.selectedHuman.setRotation([0.0, 0.0, 0.0])
         
-        leftTop = self.app.modelCamera.convertToScreen(-10, 9, 0)
-        rightBottom = self.app.modelCamera.convertToScreen(10, -10, 0)
+        leftTop = gui3d.app.modelCamera.convertToScreen(-10, 9, 0)
+        rightBottom = gui3d.app.modelCamera.convertToScreen(10, -10, 0)
         
         self.selection.setPosition([int(leftTop[0]) + 0.5, int(leftTop[1]) + 0.5, 9])
         self.selection.width = int(rightBottom[0] - leftTop[0])
@@ -111,20 +111,20 @@ class SaveTaskView(gui3d.TaskView):
     def onHide(self, event):
         
         gui3d.TaskView.onHide(self, event)
-        self.app.selectedHuman.setPosition(self.pan)
-        self.app.modelCamera.eyeX = self.eyeX
-        self.app.modelCamera.eyeY = self.eyeY
-        self.app.modelCamera.eyeZ = self.eyeZ
-        self.app.modelCamera.focusX = self.focusX
-        self.app.modelCamera.focusY = self.focusY
-        self.app.modelCamera.focusZ = self.focusZ
-        self.app.selectedHuman.setRotation(self.rotation)
+        gui3d.app.selectedHuman.setPosition(self.pan)
+        gui3d.app.modelCamera.eyeX = self.eyeX
+        gui3d.app.modelCamera.eyeY = self.eyeY
+        gui3d.app.modelCamera.eyeZ = self.eyeZ
+        gui3d.app.modelCamera.focusX = self.focusX
+        gui3d.app.modelCamera.focusY = self.focusY
+        gui3d.app.modelCamera.focusZ = self.focusZ
+        gui3d.app.selectedHuman.setRotation(self.rotation)
         self.selection.hide()
         
     def onResized(self, event):
     
-        leftTop = self.app.modelCamera.convertToScreen(-10, 9, 0)
-        rightBottom = self.app.modelCamera.convertToScreen(10, -10, 0)
+        leftTop = gui3d.app.modelCamera.convertToScreen(-10, 9, 0)
+        rightBottom = gui3d.app.modelCamera.convertToScreen(10, -10, 0)
         
         self.selection.setPosition([int(leftTop[0]) + 0.5, int(leftTop[1]) + 0.5, 9])
         self.selection.width = int(rightBottom[0] - leftTop[0])
@@ -210,37 +210,37 @@ class LoadTaskView(gui3d.TaskView):
         @self.filechooser.event
         def onFileSelected(filename):
 
-            human = self.app.selectedHuman
+            human = gui3d.app.selectedHuman
 
-            human.load(filename, True, self.app.progress)
+            human.load(filename, True, gui3d.app.progress)
 
-            del self.app.undoStack[:]
-            del self.app.redoStack[:]
+            del gui3d.app.undoStack[:]
+            del gui3d.app.redoStack[:]
             
             name = os.path.basename(filename).replace('.mhm', '')
 
             self.parent.tasksByName['Save'].fileentry.text = name
             self.parent.tasksByName['Save'].fileentry.edit.setText(name)
             
-            self.app.setCaption(("MakeHuman - [%s]" % name).encode("utf8"))
+            gui3d.app.setCaption(("MakeHuman - [%s]" % name).encode("utf8"))
 
-            self.app.switchCategory('Modelling')
+            gui3d.app.switchCategory('Modelling')
 
     def onShow(self, event):
 
         # When the task gets shown, set the focus to the file chooser
 
-        self.app.selectedHuman.hide()
+        gui3d.app.selectedHuman.hide()
         gui3d.TaskView.onShow(self, event)
         self.filechooser.setFocus()
 
         # HACK: otherwise the toolbar background disappears for some weird reason
 
-        self.app.redraw()
+        gui3d.app.redraw()
 
     def onHide(self, event):
         
-        self.app.selectedHuman.show()
+        gui3d.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
 
     def onResized(self, event):
@@ -397,7 +397,7 @@ class ExportTaskView(gui3d.TaskView):
                 else:
                     filter = lambda fg: not ('joint' in fg.name or 'eyebrown' in fg.name)
                     
-                human = self.app.selectedHuman
+                human = gui3d.app.selectedHuman
                     
                 mesh = human.getSubdivisionMesh() if self.exportSmooth.selected else human.getSeedMesh()
                 
@@ -444,7 +444,7 @@ class ExportTaskView(gui3d.TaskView):
                         'useRig': rig,
                     }
                 # TL 2011.02.08: exportMhx uses the human instead of his meshData
-                mh2mhx.exportMhx(self.app.selectedHuman, os.path.join(exportPath, filename + ".mhx"), options)
+                mh2mhx.exportMhx(gui3d.app.selectedHuman, os.path.join(exportPath, filename + ".mhx"), options)
             elif self.collada.selected:
                 if self.gameDae.selected:
                     rig = 'game'
@@ -457,19 +457,19 @@ class ExportTaskView(gui3d.TaskView):
                     "rotate90" : self.colladaRot90.selected,
                     "copyImages" : self.colladaCopyImages.selected,
                 }
-                mh2collada.exportCollada(self.app.selectedHuman, os.path.join(exportPath, filename), options)
+                mh2collada.exportCollada(gui3d.app.selectedHuman, os.path.join(exportPath, filename), options)
             elif self.md5.selected:
-                mh2md5.exportMd5(self.app.selectedHuman.meshData, os.path.join(exportPath, filename + ".md5mesh"))
+                mh2md5.exportMd5(gui3d.app.selectedHuman.meshData, os.path.join(exportPath, filename + ".md5mesh"))
             elif self.stl.selected:
-                mesh = self.app.selectedHuman.getSubdivisionMesh() if self.exportSmooth.selected else self.app.selectedHuman.meshData
+                mesh = gui3d.app.selectedHuman.getSubdivisionMesh() if self.exportSmooth.selected else gui3d.app.selectedHuman.meshData
                 if self.stlAscii.selected:
                     mh2stl.exportStlAscii(mesh, os.path.join(exportPath, filename + ".stl"))
                 else:
                     mh2stl.exportStlBinary(mesh, os.path.join(exportPath, filename + ".stl"))
                     
-            self.app.prompt('Info', u'The mesh has been exported to %s.' % os.path.join(mh.getPath(''), u'exports'), 'OK', helpId='exportHelp')
+            gui3d.app.prompt('Info', u'The mesh has been exported to %s.' % os.path.join(mh.getPath(''), u'exports'), 'OK', helpId='exportHelp')
 
-            self.app.switchCategory('Modelling')
+            gui3d.app.switchCategory('Modelling')
             
     def updateGui(self):
         
@@ -502,7 +502,7 @@ class ExportTaskView(gui3d.TaskView):
         
         self.fileentry.setFocus()
 
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
         camera = mh.cameras[0]
         
         self.pan = human.getPosition()
@@ -514,7 +514,7 @@ class ExportTaskView(gui3d.TaskView):
         self.focusZ = camera.focusZ
         self.rotation = human.getRotation()
         human.setPosition([0, -1, 0])
-        self.app.setGlobalCamera();
+        gui3d.app.setGlobalCamera();
         camera.eyeZ = 70
         human.setRotation([0.0, 0.0, 0.0])
         self.exportSmooth.setSelected(human.isSubdivided())
@@ -524,7 +524,7 @@ class ExportTaskView(gui3d.TaskView):
         
         gui3d.TaskView.onHide(self, event)
         
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
         camera = mh.cameras[0]
         
         human.setPosition(self.pan)

@@ -38,13 +38,13 @@ class TextureToolTaskView(gui3d.TaskView):
         def onClicked(event):
             gui3d.CheckBox.onClicked(self.textured, event)
             if self.textured.selected:
-                self.object.setTexture(self.app.selectedHuman.mesh.texture)
+                self.object.setTexture(gui3d.app.selectedHuman.mesh.texture)
             else:
                 self.object.clearTexture()
             
     def switchToModel(self):
     
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
         for f in self.mesh.faces:
             for i, v in enumerate(f.verts):
                 v.co = human.mesh.faces[f.idx].verts[i].co[:]
@@ -62,7 +62,7 @@ class TextureToolTaskView(gui3d.TaskView):
     
         gui3d.TaskView.onShow(self, event)
         
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
         human.hide()
         
         if not self.mesh:
@@ -99,7 +99,7 @@ class TextureToolTaskView(gui3d.TaskView):
             
             self.object = self.addObject(gui3d.Object([0, 0, 0], self.mesh, True))
         
-            self.app.scene3d.update()
+            gui3d.app.scene3d.update()
             
         else:
         
@@ -126,11 +126,11 @@ class TextureToolTaskView(gui3d.TaskView):
     
         gui3d.TaskView.onHide(self, event)
 
-        self.app.selectedHuman.show()
+        gui3d.app.selectedHuman.show()
         
     def onMouseDragged(self, event):
         
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
         
         human.show()
         self.object.hide()
@@ -145,12 +145,12 @@ class TextureToolTaskView(gui3d.TaskView):
         
     def onMouseWheel(self, event):
         
-        self.app.selectedHuman.show()
+        gui3d.app.selectedHuman.show()
         self.object.hide()
         
         gui3d.TaskView.onMouseWheel(self, event)
             
-        self.app.selectedHuman.hide()
+        gui3d.app.selectedHuman.hide()
         self.object.show()
 
 category = None

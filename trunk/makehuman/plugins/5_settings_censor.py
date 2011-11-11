@@ -10,26 +10,26 @@ class CensorTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Censor')
         
         self.mouseBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Censor', gui3d.GroupBoxStyle._replace(height=25+25*3+24+6))
-        self.enableCensor = gui3d.CheckBox(self.mouseBox, "Enable", self.app.settings.get('censor', False))
+        self.enableCensor = gui3d.CheckBox(self.mouseBox, "Enable", gui3d.app.settings.get('censor', False))
         type = []
-        self.blackSquare = gui3d.RadioButton(self.mouseBox, type, "Black", self.app.settings.get('censorType', 'black') == 'black');
-        self.mosaic = gui3d.RadioButton(self.mouseBox, type, "Mosaic", self.app.settings.get('censorType', 'black square') == 'mosaic');
+        self.blackSquare = gui3d.RadioButton(self.mouseBox, type, "Black", gui3d.app.settings.get('censorType', 'black') == 'black');
+        self.mosaic = gui3d.RadioButton(self.mouseBox, type, "Mosaic", gui3d.app.settings.get('censorType', 'black square') == 'mosaic');
         
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
 
         self.breastVertices, _ = human.mesh.getVerticesAndFacesForGroups(['l-torso-nipple', 'r-torso-nipple'])
         mesh = gui3d.RectangleMesh(100, 100)
-        self.breastCensorship = self.app.addObject(gui3d.Object([0, 0, 9], mesh))
+        self.breastCensorship = gui3d.app.addObject(gui3d.Object([0, 0, 9], mesh))
         mesh.setColor([0, 0, 0, 255])
         mesh.setPickable(0)
         
         self.genitalbreastVertices, _ = human.mesh.getVerticesAndFacesForGroups(['pelvis-genital-area'])
         mesh = gui3d.RectangleMesh(100, 100)
-        self.genitalCensorship = self.app.addObject(gui3d.Object([0, 0, 9], mesh))
+        self.genitalCensorship = gui3d.app.addObject(gui3d.Object([0, 0, 9], mesh))
         mesh.setColor([0, 0, 0, 255])
         mesh.setPickable(0)
         
-        if self.app.settings.get('censor', False):
+        if gui3d.app.settings.get('censor', False):
             self.updateCensor()
         else:
             self.breastCensorship.hide()
@@ -38,7 +38,7 @@ class CensorTaskView(gui3d.TaskView):
         @self.enableCensor.event
         def onClicked(event):
             gui3d.ToggleButton.onClicked(self.enableCensor, event)
-            self.app.settings['censor'] = self.enableCensor.selected
+            gui3d.app.settings['censor'] = self.enableCensor.selected
             if self.enableCensor.selected:
                 self.updateCensor()
                 self.breastCensorship.show()
@@ -49,7 +49,7 @@ class CensorTaskView(gui3d.TaskView):
         
     def calcProjectedBBox(self, vertices):
     
-        human = self.app.selectedHuman
+        human = gui3d.app.selectedHuman
         
         vmin, vmax = aljabr.calcBBox(vertices)
         
@@ -65,7 +65,7 @@ class CensorTaskView(gui3d.TaskView):
         ]
         
         for i, v in enumerate(box):
-            box[i] = self.app.modelCamera.convertToScreen(v[0], v[1], v[2], human.mesh.object3d)
+            box[i] = gui3d.app.modelCamera.convertToScreen(v[0], v[1], v[2], human.mesh.object3d)
             
         return min([v[0] for v in box]), min([v[1] for v in box]), max([v[0] for v in box]), max([v[1] for v in box])
         
@@ -87,7 +87,7 @@ class CensorTaskView(gui3d.TaskView):
     def onHide(self, event):
 
         gui3d.TaskView.onHide(self, event)
-        self.app.saveSettings()
+        gui3d.app.saveSettings()
         
     def onResized(self, event):
         
@@ -99,29 +99,29 @@ class CensorTaskView(gui3d.TaskView):
             
     def onHumanTranslated(self, event):
     
-        if self.app.settings.get('censor', False):
+        if gui3d.app.settings.get('censor', False):
             mh.callAsync(lambda:self.updateCensor())
             
     def onHumanRotated(self, event):
     
-        if self.app.settings.get('censor', False):
+        if gui3d.app.settings.get('censor', False):
             mh.callAsync(lambda:self.updateCensor())
             
     def onHumanShown(self, event):
     
-        if self.app.settings.get('censor', False):
+        if gui3d.app.settings.get('censor', False):
             self.breastCensorship.show();
             self.genitalCensorship.show();
             
     def onHumanHidden(self, event):
     
-        if self.app.settings.get('censor', False):
+        if gui3d.app.settings.get('censor', False):
             self.breastCensorship.hide();
             self.genitalCensorship.hide();
 
     def onCameraChanged(self, event):
     
-        if self.app.settings.get('censor', False):
+        if gui3d.app.settings.get('censor', False):
             mh.callAsync(lambda:self.updateCensor())
 
 def load(app):

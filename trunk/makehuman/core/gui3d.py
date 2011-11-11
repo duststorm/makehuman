@@ -117,18 +117,16 @@ class Object(events3d.EventHandler):
         
     def __attach(self):
     
-        self.app = self.__view().app
         if self.__view().isVisible() and self.visible:
             self.mesh.setVisibility(1)
         else:
             self.mesh.setVisibility(0)
             
-        if self.mesh not in self.app.scene3d.objects:
-            self.app.scene3d.objects.append(self.mesh)
+        if self.mesh not in app.scene3d.objects:
+           app.scene3d.objects.append(self.mesh)
             
     def __detach(self):
         
-        self.app = None
         module3d.detach(self.__seedMesh)
         if self.__proxyMesh:
             module3d.detach(self.__proxyMesh)
@@ -271,10 +269,10 @@ class Object(events3d.EventHandler):
         if self.proxy:
         
             self.proxy = None
-            self.app.scene3d.delete(self.__proxyMesh)
+            app.scene3d.delete(self.__proxyMesh)
             self.__proxyMesh = None
             if self.__proxySubdivisionMesh:
-                self.app.scene3d.delete(self.__proxySubdivisionMesh)
+                app.scene3d.delete(self.__proxySubdivisionMesh)
                 self.__proxySubdivisionMesh = None
             self.mesh = self.__seedMesh
             self.mesh.setVisibility(1)
@@ -285,7 +283,7 @@ class Object(events3d.EventHandler):
             
             (folder, name) = proxy.obj_file
             
-            self.__proxyMesh = files3d.loadMesh(self.app.scene3d, os.path.join(folder, name))
+            self.__proxyMesh = files3d.loadMesh(app.scene3d, os.path.join(folder, name))
             self.__proxyMesh.x, self.__proxyMesh.y, self.__proxyMesh.z = self.mesh.x, self.mesh.y, self.mesh.z
             self.__proxyMesh.rx, self.__proxyMesh.ry, self.__proxyMesh.rz = self.mesh.rx, self.mesh.ry, self.mesh.rz
             self.__proxyMesh.sx, self.__proxyMesh.sy, self.__proxyMesh.sz = self.mesh.sx, self.mesh.sy, self.mesh.sz
@@ -299,7 +297,7 @@ class Object(events3d.EventHandler):
             
             self.proxy.update(self.__proxyMesh, self.__seedMesh)
             
-            self.app.scene3d.update()
+            app.scene3d.update()
             
             self.mesh.setVisibility(0)
             self.mesh = self.__proxyMesh
@@ -309,14 +307,14 @@ class Object(events3d.EventHandler):
         
         if self.isProxied():
             if not self.__proxySubdivisionMesh:
-                self.__proxySubdivisionMesh = createSubdivisionObject(self.app.scene3d, self.__proxyMesh, progressCallback)
+                self.__proxySubdivisionMesh = createSubdivisionObject(app.scene3d, self.__proxyMesh, progressCallback)
             elif update:
                 updateSubdivisionObject(self.__proxySubdivisionMesh, progressCallback)
                 
             return self.__proxySubdivisionMesh
         else:
             if not self.__subdivisionMesh:
-                self.__subdivisionMesh = createSubdivisionObject(self.app.scene3d, self.__seedMesh, progressCallback)
+                self.__subdivisionMesh = createSubdivisionObject(app.scene3d, self.__seedMesh, progressCallback)
             elif update:
                 updateSubdivisionObject(self.__subdivisionMesh, progressCallback)
                 
@@ -438,11 +436,11 @@ class TextObject(Object):
             
         self.text = text
         
-        self.app.scene3d.clear(self.mesh)
+        app.scene3d.clear(self.mesh)
         self.mesh = font3d.createMesh(self.font, text, self.mesh, self.wrapWidth, self.alignment)
         self.mesh.setCameraProjection(1)
         self.mesh.setShadeless(1)
-        self.app.scene3d.update()
+        app.scene3d.update()
         
     def getText(self):
     
@@ -598,7 +596,6 @@ class View(events3d.EventHandler):
         if not parent:
             raise RuntimeError('A view needs a parent')
                 
-        self.app = parent.app
         self.__parent = weakref.ref(parent)
         self.children = []
         self.objects = []
@@ -700,10 +697,10 @@ class View(events3d.EventHandler):
         return self.__totalVisibility
 
     def setFocus(self):
-        self.app.setFocus(self)
+        app.setFocus(self)
 
     def hasFocus(self):
-        return self.app.focusView is self
+        return app.focusView is self
         
     def canFocus(self):
         return True
@@ -885,7 +882,7 @@ class Category(View):
         
         @self.tabs.event
         def onTabSelected(tab):
-            self.app.switchTask(tab.name)
+            app.switchTask(tab.name)
             
     def canFocus(self):
         return False
@@ -902,17 +899,20 @@ class Category(View):
         self.tabs.box.mesh.resize(event.width, 32)
 
 # The application, a wrapper around Scene3D
-
+app = None
 
 class Application(events3d.EventHandler):
     """
    The Application.
     """
+    
+    singleton = None
 
     def __init__(self):
+        global app
+        app = self
         self.scene3d = module3d.Scene3D()
         self.scene3d.application = self
-        self.app = self
         self.parent = self
         self.children = []
         self.objects = []
@@ -1272,7 +1272,7 @@ class TabView(View):
         
         self.box = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex],
             RectangleMesh(self.style.width, self.style.height,
-            self.app.getThemeResource("images", self.style.normal))))
+            app.getThemeResource("images", self.style.normal))))
             
         self.tabStyle = tabStyle
     
@@ -1368,20 +1368,20 @@ class Slider(View):
         
         self.thumbStyle = thumbStyle
         
-        self.thumbTexture = self.app.getThemeResource('images', thumbStyle.normal)
-        self.focusedThumbTexture = self.app.getThemeResource('images', thumbStyle.focused)
+        self.thumbTexture = app.getThemeResource('images', thumbStyle.normal)
+        self.focusedThumbTexture = app.getThemeResource('images', thumbStyle.focused)
         
-        mesh = RectangleMesh(style.width, style.height, self.app.getThemeResource('images', style.normal))
+        mesh = RectangleMesh(style.width, style.height, app.getThemeResource('images', style.normal))
         self.background = self.addObject(Object([style.left, style.top, style.zIndex], mesh))
         
         mesh = RectangleMesh(thumbStyle.width, thumbStyle.height, self.thumbTexture)
         self.thumb = self.addObject(Object([style.left, style.top + style.height / 2, style.zIndex + 0.01], mesh))
             
         if isinstance(label, str) or isinstance(label, unicode):
-            font = self.app.getFont(style.fontFamily)
-            self.label = self.addObject(TextObject([style.left, style.top + style.height / 4 - font.lineHeight / 2, style.zIndex + 0.2], self.app.getLanguageString(label), font = self.app.getFont(style.fontFamily)))
+            font = app.getFont(style.fontFamily)
+            self.label = self.addObject(TextObject([style.left, style.top + style.height / 4 - font.lineHeight / 2, style.zIndex + 0.2], app.getLanguageString(label), font = app.getFont(style.fontFamily)))
             if '%' in label:
-                self.labelFormat = self.app.getLanguageString(label)
+                self.labelFormat = app.getLanguageString(label)
                 self.edit = TextEdit(self, '',
                     TextEditStyle._replace(width=self.style.width, height=16,
                     left=style.left, top=style.top, zIndex=style.zIndex + 0.3),
@@ -1409,7 +1409,7 @@ class Slider(View):
 
                     if event.key == events3d.SDLK_RETURN:
                         self.setFocus()
-                        self.app.redraw()
+                        app.redraw()
                     else:
                         TextEdit.onKeyDown(self.edit, event)
             else:
@@ -1629,8 +1629,8 @@ class Button(View):
 
     def __init__(self, parent, label=None, selected=False, style=ButtonStyle):
 
-        font = parent.app.getFont(style.fontFamily)
-        translatedLabel = parent.app.getLanguageString(label) if label else ''
+        font = app.getFont(style.fontFamily)
+        translatedLabel = app.getLanguageString(label) if label else ''
         labelWidth = font.stringWidth(translatedLabel) if translatedLabel else 0
         
         if labelWidth > style.width - style.padding[0] - style.padding[2]:
@@ -1640,9 +1640,9 @@ class Button(View):
         
         self.label = None
         
-        self.texture = self.app.getThemeResource('images', self.style.normal)
-        self.selectedTexture = self.app.getThemeResource('images', style.selected) if self.style.selected else None
-        self.focusedTexture = self.app.getThemeResource('images', style.focused) if self.style.focused else None
+        self.texture = app.getThemeResource('images', self.style.normal)
+        self.selectedTexture = app.getThemeResource('images', style.selected) if self.style.selected else None
+        self.focusedTexture = app.getThemeResource('images', style.focused) if self.style.focused else None
         
         if selected and self.selectedTexture:
             t = self.selectedTexture
@@ -1672,7 +1672,7 @@ class Button(View):
     def setPosition(self, position):
         self.button.setPosition(position)
         if getattr(self, 'label'):
-            font = self.app.getFont(self.style.fontFamily)
+            font = app.getFont(self.style.fontFamily)
             self.label.setPosition([position[0] + self.style.padding[0], 
                 position[1] + self.style.height/2.0-font.lineHeight/2.0, position[2] + 0.001])
 
@@ -1700,8 +1700,8 @@ class Button(View):
         :type label: str
         """
         if self.label:
-            font = self.app.getFont(self.style.fontFamily)
-            translatedLabel = self.app.getLanguageString(label) if label else ''
+            font = app.getFont(self.style.fontFamily)
+            translatedLabel = app.getLanguageString(label) if label else ''
             labelWidth = font.stringWidth(translatedLabel) if translatedLabel else 0
             if labelWidth > self.style.width:
                 self.style.width = labelWidth + self.style.padding[0] + self.style.padding[2]
@@ -1719,7 +1719,7 @@ class Button(View):
     def onKeyDown(self, event):
         if event.key == events3d.SDLK_RETURN or event.key == events3d.SDLK_KP_ENTER:
             self.setSelected(True)
-            self.app.redraw()
+            app.redraw()
         else:
             View.onKeyDown(self, event)
 
@@ -1727,7 +1727,7 @@ class Button(View):
         if event.key == events3d.SDLK_RETURN or event.key == events3d.SDLK_KP_ENTER:
             self.setSelected(False)
             self.callEvent('onClicked', event)
-            self.app.redraw()
+            app.redraw()
 
     def setSelected(self, selected):
         if self.selected != selected:
@@ -1916,9 +1916,9 @@ class ProgressBar(View):
 
         View.__init__(self, parent, style, None, visible)
         
-        mesh = RectangleMesh(style.width, style.height, self.app.getThemeResource('images', style.normal))
+        mesh = RectangleMesh(style.width, style.height, app.getThemeResource('images', style.normal))
         self.background = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex], mesh))
-        mesh = RectangleMesh(barStyle.width, barStyle.height, self.app.getThemeResource('images', barStyle.normal))
+        mesh = RectangleMesh(barStyle.width, barStyle.height, app.getThemeResource('images', barStyle.normal))
         self.bar = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex+0.05], mesh))
         self.bar.mesh.setScale(0.0, 1.0, 1.0)
         
@@ -1941,7 +1941,7 @@ class ProgressBar(View):
 
         self.bar.mesh.setScale(progress, 1.0, 1.0)
         if redraw:
-            self.app.redrawNow()
+            app.redrawNow()
 
 
 # TextView widget
@@ -1970,7 +1970,7 @@ class TextView(View):
         View.__init__(self, parent, style)
         
         self.textObject = self.addObject(TextObject([self.style.left, self.style.top, self.style.zIndex], label,
-            style.width, style.textAlign, self.app.getFont(style.fontFamily)))
+            style.width, style.textAlign, app.getFont(style.fontFamily)))
         self.style.height = self.textObject.getHeight()
             
     def canFocus(self):
@@ -2016,14 +2016,14 @@ class TextEdit(View):
         
         View.__init__(self, parent, style)
         
-        self.texture = self.app.getThemeResource('images', 'texedit_off.png')
-        self.focusedTexture = self.app.getThemeResource('images', 'texedit_on.png')
+        self.texture = app.getThemeResource('images', 'texedit_off.png')
+        self.focusedTexture = app.getThemeResource('images', 'texedit_on.png')
 
         mesh = NineSliceMesh(self.style.width, self.style.height, self.texture, self.style.border)
         self.background = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex], mesh))
             
-        font = self.app.getFont(self.style.fontFamily)
-        self.textObject = self.addObject(TextObject([self.style.left + 10.0, self.style.top + self.style.height / 2 - font.lineHeight / 2 - 1, self.style.zIndex + 0.1], font=self.app.getFont(self.style.fontFamily)))
+        font = app.getFont(self.style.fontFamily)
+        self.textObject = self.addObject(TextObject([self.style.left + 10.0, self.style.top + self.style.height / 2 - font.lineHeight / 2 - 1, self.style.zIndex + 0.1], font=app.getFont(self.style.fontFamily)))
 
         self.text = text
         self.__position = len(self.text)
@@ -2140,7 +2140,7 @@ class TextEdit(View):
 
         self.__updateTextObject()
         self.callEvent('onChange', self.getText())
-        self.app.redraw()
+        app.redraw()
 
     def onFocus(self, event):
         if self.focusedTexture:
@@ -2215,7 +2215,7 @@ class FileEntryView(View):
 
         if event.key == events3d.SDLK_RETURN:
             self.onFileSelected(self.edit.getText())
-            self.app.redraw()
+            app.redraw()
                 
     def onFocus(self, event):
         self.edit.setFocus()
@@ -2240,7 +2240,7 @@ class FileChooserRectangle(View):
         self.preview = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex], mesh))
         
         # Label
-        self.label = self.addObject(TextObject([self.style.left, self.style.top + self.style.height, self.style.zIndex], label, font=self.app.getFont(self.style.fontFamily)))
+        self.label = self.addObject(TextObject([self.style.left, self.style.top + self.style.height, self.style.zIndex], label, font=app.getFont(self.style.fontFamily)))
         
         self.file = file
         
@@ -2351,7 +2351,7 @@ class FileChooser(View):
         self.extension = extension
         self.previewExtension = previewExtension
         self.slider = Slider(self, 0, 0, 0, style=SliderStyle._replace(left=10, top=600-35, zIndex=9.1))
-        font = self.app.getFont(TextViewStyle.fontFamily)
+        font = app.getFont(TextViewStyle.fontFamily)
         self.location = TextView(self.slider, os.path.abspath(path), style=TextViewStyle._replace(left=10 + 112 + 10, top=600-2-font.lineHeight, zIndex=9.1))
         self.sortBox = GroupBox(self.slider, [10, 80, 9.0], 'Sort')
         sortgroup = []
@@ -2400,8 +2400,8 @@ class FileChooser(View):
             for child in self.children:
                 if isinstance(child, Slider) or isinstance(child, GroupBox) or isinstance(child, TextView):
                     continue
-                self.app.scene3d.delete(child.preview.mesh)
-                self.app.scene3d.delete(child.label.mesh)
+                app.scene3d.delete(child.preview.mesh)
+                app.scene3d.delete(child.label.mesh)
             self.children = self.children[:1]
             sliderIsShown = self.slider.isShown()
             if sliderIsShown:
@@ -2437,8 +2437,8 @@ class FileChooser(View):
                 
         self.__updateScrollBar()
             
-        self.app.scene3d.update()
-        self.app.redraw()
+        app.scene3d.update()
+        app.redraw()
         
     def scrollTo(self, value):
         
@@ -2497,11 +2497,11 @@ class FileChooser(View):
         elif event.key == events3d.SDLK_UP:
             self.slider.setValue(self.slider.getValue()-1)
             self.scrollTo(self.slider.getValue())
-            self.app.redraw()
+            app.redraw()
         elif event.key == events3d.SDLK_DOWN:
             self.slider.setValue(self.slider.getValue()+1)
             self.scrollTo(self.slider.getValue())
-            self.app.redraw()
+            app.redraw()
         else:
             View.onKeyDown(self, event)
             
@@ -2523,7 +2523,7 @@ class FileChooser(View):
         self.style.width, self.style.height = event.width, event.height
         self.__updateScrollBar()
         self.slider.setPosition([10, event.height-35, 9.1])
-        font = self.app.getFont(TextViewStyle.fontFamily)
+        font = app.getFont(TextViewStyle.fontFamily)
         self.location.setPosition([10 + 112 + 10, event.height-2-font.lineHeight, 9.1])
              
 class FileChooser2(View):
@@ -2636,7 +2636,7 @@ class FileChooser2(View):
               self.nextFile.clearTexture()
               self.nextFile.hide()
 
-        self.app.redraw()
+        app.redraw()
 
     def onKeyDown(self, event):
         if event.modifiers & events3d.KMOD_CTRL:
@@ -2683,7 +2683,7 @@ class FileChooser2(View):
         self.nextFile.setTexture(self.path + '/' + self.getPreview(self.files[self.selectedFile + 1]))
         self.nextFile.show()
 
-        self.app.redraw()
+        app.redraw()
 
     def goNext(self):
         if self.selectedFile + 1 == len(self.files):
@@ -2719,7 +2719,7 @@ class FileChooser2(View):
             self.nextFile.clearTexture()
             self.nextFile.hide()
 
-        self.app.redraw()
+        app.redraw()
         
 GroupBoxStyle = Style(**{
     'parent':ViewStyle,
@@ -2748,19 +2748,19 @@ class GroupBox(View):
 
     def __init__(self, parent, position=[0, 0, 9], label=None, style=GroupBoxStyle):
         
-        font = parent.app.getFont(style.fontFamily)
-        translatedLabel = parent.app.getLanguageString(label) if label else ''
+        font = app.getFont(style.fontFamily)
+        translatedLabel = app.getLanguageString(label) if label else ''
         labelWidth = font.stringWidth(translatedLabel) if translatedLabel else 0
         
         View.__init__(self, parent, style, BoxLayout(self))
         
-        texture = self.app.getThemeResource('images', style.normal)
+        texture = app.getThemeResource('images', style.normal)
         mesh = NineSliceMesh(self.style.width, self.style.height, texture, self.style.border)
         self.box = self.addObject(Object(position, mesh))
         
         if isinstance(label, str):
             self.label = self.addObject(TextObject([position[0]+self.style.padding[0],position[1]+self.style.padding[1]/2-font.lineHeight/2-2,position[2]+0.001],
-                translatedLabel, alignment=self.style.textAlign, font=self.app.getFont(self.style.fontFamily)))
+                translatedLabel, alignment=self.style.textAlign, font=app.getFont(self.style.fontFamily)))
     
     def getPosition(self):
         return self.box.getPosition()
@@ -2774,7 +2774,7 @@ class GroupBox(View):
         
         self.box.setPosition(position)
         
-        font = self.app.getFont(self.style.fontFamily)
+        font = app.getFont(self.style.fontFamily)
         
         self.label.setPosition([position[0]+self.style.padding[0],position[1]+self.style.padding[1]/2-font.lineHeight/2-2,position[2]+0.001])
         
@@ -2821,26 +2821,26 @@ class ShortcutEdit(View):
 
         View.__init__(self, parent, style)
         
-        self.texture = self.app.getThemeResource('images', self.style.normal)
-        self.focusedTexture = self.app.getThemeResource('images', self.style.focused)
+        self.texture = app.getThemeResource('images', self.style.normal)
+        self.focusedTexture = app.getThemeResource('images', self.style.focused)
         
         mesh = NineSliceMesh(self.style.width, self.style.height, self.texture, self.style.border)
         self.background = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex], mesh))
-        font = self.app.getFont(self.style.fontFamily)
+        font = app.getFont(self.style.fontFamily)
         self.label = self.addObject(TextObject([self.style.left + 7 + 3, self.style.top+self.style.height/2.0-font.lineHeight/2.0, self.style.zIndex+0.001],
-            self.shortcutToLabel(shortcut[0], shortcut[1]), font=self.app.getFont(self.style.fontFamily)))
+            self.shortcutToLabel(shortcut[0], shortcut[1]), font=app.getFont(self.style.fontFamily)))
             
     def getPosition(self):
         return self.background.getPosition()
     
     def setPosition(self, position):
         self.background.setPosition(position)
-        font = self.app.getFont(self.style.fontFamily)
+        font = app.getFont(self.style.fontFamily)
         self.label.setPosition([position[0] + 7 + 3, position[1]+self.style.height/2.0-font.lineHeight/2.0, position[2]+0.001])
             
     def setShortcut(self, shortcut):
         self.label.setText(self.shortcutToLabel(shortcut[0], shortcut[1]))
-        self.app.redraw()
+        app.redraw()
         
     def canFocus(self):
         return True
@@ -2859,7 +2859,7 @@ class ShortcutEdit(View):
         #print event.key, event.character, event.modifiers
             
         self.label.setText(self.shortcutToLabel(event.modifiers, event.key))
-        self.app.redraw()
+        app.redraw()
         
         if event.key not in [events3d.SDLK_RCTRL, events3d.SDLK_LCTRL, events3d.SDLK_RALT, events3d.SDLK_LALT]:
             m = 0
@@ -2955,7 +2955,7 @@ class MouseActionEdit(ShortcutEdit):
         modifiers = mh.getKeyModifiers() & (events3d.KMOD_CTRL | events3d.KMOD_ALT | events3d.KMOD_SHIFT)
             
         self.label.setText(self.shortcutToLabel(modifiers, event.button))
-        self.app.redraw()
+        app.redraw()
             
         self.callEvent('onChanged', (modifiers, event.button))
             
@@ -3022,7 +3022,7 @@ class Radial(View):
         
         View.__init__(self, parent, style)
         
-        self.texture = self.app.getThemeResource('images', self.style.normal)
+        self.texture = app.getThemeResource('images', self.style.normal)
         
         '''if selected and self.selectedTexture:
             t = self.selectedTexture

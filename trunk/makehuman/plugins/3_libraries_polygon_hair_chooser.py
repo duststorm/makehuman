@@ -39,7 +39,7 @@ class HairTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Hair')
         self.filechooser = gui3d.FileChooser(self, 'data/hairstyles', 'obj', 'png', 'notfound.png')
         
-        self.hairButton = gui3d.Button(self.app.categories['Modelling'],
+        self.hairButton = gui3d.Button(gui3d.app.categories['Modelling'],
             style=HairButtonStyle._replace(left=800-216, top=600-36, zIndex=9.2, normal='data/hairstyles/clear.png'))
         
         self.oHeadCentroid = [0.0, 7.436, 0.03 + 0.577]
@@ -48,14 +48,14 @@ class HairTaskView(gui3d.TaskView):
         @self.filechooser.event
         def onFileSelected(filename):
             
-            self.setHair(self.app.selectedHuman, filename)
+            self.setHair(gui3d.app.selectedHuman, filename)
             
-            self.app.switchCategory('Modelling')
+            gui3d.app.switchCategory('Modelling')
             
         @self.hairButton.event
         def onClicked(event):
-            self.app.switchCategory('Library')
-            self.app.switchTask("Hair")
+            gui3d.app.switchCategory('Library')
+            gui3d.app.switchTask("Hair")
 
     def setHair(self, human, filename):
 
@@ -65,26 +65,26 @@ class HairTaskView(gui3d.TaskView):
         tif = obj.replace('.obj', '_texture.tif')
         
         if human.hairObj:
-            self.app.scene3d.delete(human.hairObj.mesh)
+            gui3d.app.scene3d.delete(human.hairObj.mesh)
             human.hairObj = None
             human.hairProxy = None
 
-        mesh = files3d.loadMesh(self.app.scene3d, obj)
+        mesh = files3d.loadMesh(gui3d.app.scene3d, obj)
         if mesh:
             mesh.setTexture(tif)        
-            human.hairObj = gui3d.Object(self.app, human.getPosition(), mesh)
+            human.hairObj = gui3d.app.addObject(gui3d.Object(human.getPosition(), mesh))
             human.hairObj.setRotation(human.getRotation())
             human.hairObj.mesh.setCameraProjection(0)
             human.hairObj.mesh.setSolid(human.mesh.solid)
             human.hairObj.mesh.setTransparentPrimitives(len(human.hairObj.mesh.faces))
             human.hairObj.mesh.originalHairVerts = [v.co[:] for v in human.hairObj.mesh.verts]
                 
-            hairName = human.hairObj.meshName.split('.')[0]
+            hairName = human.hairObj.mesh.name.split('.')[0]
             file = "data/hairstyles/%s.mhclo" % hairName
             print("Loading clothes hair %s" % file)
             human.hairProxy = mh2proxy.readProxyFile(human.meshData, file, False)
 
-            self.app.scene3d.update()
+            gui3d.app.scene3d.update()
             self.adaptHairToHuman(human)
             human.hairObj.setSubdivided(human.isSubdivided())
             
@@ -124,12 +124,12 @@ class HairTaskView(gui3d.TaskView):
         
     def onShow(self, event):
         # When the task gets shown, set the focus to the file chooser
-        self.app.selectedHuman.hide()
+        gui3d.app.selectedHuman.hide()
         gui3d.TaskView.onShow(self, event)
         self.filechooser.setFocus()
 
     def onHide(self, event):
-        self.app.selectedHuman.show()
+        gui3d.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
         
     def onResized(self, event):
@@ -141,7 +141,7 @@ class HairTaskView(gui3d.TaskView):
         human = event.human
         if event.change == 'reset':
             if human.hairObj:
-                self.app.scene3d.delete(human.hairObj.mesh)
+                gui3d.app.scene3d.delete(human.hairObj.mesh)
                 human.hairObj = None
                 human.hairProxy = None
             self.hairButton.setTexture('data/hairstyles/clear.png')

@@ -109,7 +109,7 @@ class PoseTaskView(gui3d.TaskView):
     
     @self.savePoseButton.event
     def onClicked(event):
-        exportObj(self.app.selectedHuman.meshData, os.path.join(mh.getPath('exports'), "posed.obj"))
+        exportObj(gui3d.app.selectedHuman.meshData, os.path.join(mh.getPath('exports'), "posed.obj"))
 
     @self.resetPoseButton.event
     def onClicked(event):
@@ -121,8 +121,8 @@ class PoseTaskView(gui3d.TaskView):
             rotation = [value - self.joint.rotation[0], 0.0, 0.0]
             self.joint.rotation[0] = value
             self.rotateJoint(self.joint, self.joint.position, rotation)
-            self.app.selectedHuman.meshData.calcNormals()
-            self.app.selectedHuman.meshData.update()
+            gui3d.app.selectedHuman.meshData.calcNormals()
+            gui3d.app.selectedHuman.meshData.update()
                 
     @self.Yslider.event
     def onChange(value):
@@ -130,8 +130,8 @@ class PoseTaskView(gui3d.TaskView):
             rotation = [0.0, value - self.joint.rotation[1], 0.0]
             self.joint.rotation[1] = value
             self.rotateJoint(self.joint, self.joint.position, rotation)
-            self.app.selectedHuman.meshData.calcNormals()
-            self.app.selectedHuman.meshData.update()
+            gui3d.app.selectedHuman.meshData.calcNormals()
+            gui3d.app.selectedHuman.meshData.update()
         
     @self.Zslider.event
     def onChange(value):
@@ -139,12 +139,12 @@ class PoseTaskView(gui3d.TaskView):
             rotation = [0.0, 0.0, value - self.joint.rotation[2]]
             self.joint.rotation[2] = value
             self.rotateJoint(self.joint, self.joint.position,rotation)
-            self.app.selectedHuman.meshData.calcNormals()
-            self.app.selectedHuman.meshData.update()
+            gui3d.app.selectedHuman.meshData.calcNormals()
+            gui3d.app.selectedHuman.meshData.update()
                   
   def onMouseMoved(self, event):
     if not self.joint:
-      human = self.app.selectedHuman
+      human = gui3d.app.selectedHuman
       groups = []
       self.zone = self.getJointZones(event.group.name)
 
@@ -165,7 +165,7 @@ class PoseTaskView(gui3d.TaskView):
             g.setColor([0, 169, 184, 255])
             
         self.selectedGroups = groups
-        self.app.redraw()
+        gui3d.app.redraw()
   
   def onMouseUp(self, event):
       if self.joint: 
@@ -179,12 +179,12 @@ class PoseTaskView(gui3d.TaskView):
   
   #todo: use a reference on human so we know if we need to compute this on every onShow
   def onShow(self, event):
-      self.app.selectedHuman.storeMesh()
-      self.skeleton.update(self.app.selectedHuman.meshData)         
+      gui3d.app.selectedHuman.storeMesh()
+      self.skeleton.update(gui3d.app.selectedHuman.meshData)         
       
       #compute bounding box
       #must do this! because mh human changes after the init -_-
-      bboxj = calcBBox(self.app.selectedHuman.meshData.verts, self.jointVerts)
+      bboxj = calcBBox(gui3d.app.selectedHuman.meshData.verts, self.jointVerts)
       
       #compute right shoulder joint position because we cannot rely on the diamond
       pos = vmul(vadd(bboxj[0],bboxj[1]),0.5)
@@ -201,9 +201,9 @@ class PoseTaskView(gui3d.TaskView):
         self.jointVerts.append(int(line));
       f.close()
       
-      self.bindedFaces = module3d.getFacesFromVerts(self.jointVerts,self.app.selectedHuman.meshData.verts)
+      self.bindedFaces = module3d.getFacesFromVerts(self.jointVerts,gui3d.app.selectedHuman.meshData.verts)
 
-      bboxj = calcBBox(self.app.selectedHuman.meshData.verts, self.jointVerts)
+      bboxj = calcBBox(gui3d.app.selectedHuman.meshData.verts, self.jointVerts)
       """
       #for the new test we dont add any offset yet
       #adding offset
@@ -227,7 +227,7 @@ class PoseTaskView(gui3d.TaskView):
       
       
       #computing prejoint bounding box
-      #bboxpre = calcBBox(self.app.selectedHuman.meshData.verts, self.preJointVerts)
+      #bboxpre = calcBBox(gui3d.app.selectedHuman.meshData.verts, self.preJointVerts)
       #bboxpre[1][0] = min(bboxpre[1][0], bboxj[0][0])
       #print "bboxpre: ", bboxpre
       #self.preTets =  box2Tetrahedrons(bboxpre)
@@ -235,8 +235,8 @@ class PoseTaskView(gui3d.TaskView):
       gui3d.TaskView.onShow(self, event)
 
   def onHide(self, event):
-      self.app.selectedHuman.restoreMesh()
-      self.app.selectedHuman.meshData.update()
+      gui3d.app.selectedHuman.restoreMesh()
+      gui3d.app.selectedHuman.meshData.update()
       gui3d.TaskView.onHide(self, event)
       
   def getJointZones(self, groupName):
@@ -246,8 +246,8 @@ class PoseTaskView(gui3d.TaskView):
       return None
    
   def rotateJoint(self, joint, center, rotation, transform=None):                
-    src = self.app.selectedHuman.meshStored
-    dst = self.app.selectedHuman.meshData.verts
+    src = gui3d.app.selectedHuman.meshStored
+    dst = gui3d.app.selectedHuman.meshData.verts
     cage = None
     if not transform:
       transform = euler2matrix(vmul(rotation,degree2rad), "sxyz")
@@ -327,10 +327,10 @@ class PoseTaskView(gui3d.TaskView):
       transform = euler2matrix(vmul(rotation,degree2rad), "szyx")
       #self.joint.rotation = [0.0,0.0,0.0]
       self.rotateJoint(self.joint, self.joint.position,None, transform)
-      self.app.selectedHuman.meshData.calcNormals()
-      self.app.selectedHuman.meshData.update()
+      gui3d.app.selectedHuman.meshData.calcNormals()
+      gui3d.app.selectedHuman.meshData.update()
       
-    self.app.redraw()
+    gui3d.app.redraw()
       
   def test(self):
     pass

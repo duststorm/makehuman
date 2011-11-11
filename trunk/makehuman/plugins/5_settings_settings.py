@@ -8,28 +8,28 @@ class FontRadioButton(gui3d.RadioButton):
 
     def __init__(self, parent, group, font):
     
-        gui3d.RadioButton.__init__(self, parent, group, font.capitalize(), parent.app.settings.get('font', 'arial') == font, style=gui3d.RadioButtonStyle._replace(fontFamily=font))
+        gui3d.RadioButton.__init__(self, parent, group, font.capitalize(), gui3d.app.settings.get('font', 'arial') == font, style=gui3d.RadioButtonStyle._replace(fontFamily=font))
         self.font = font
         
     def onClicked(self, event):
     
         gui3d.RadioButton.onClicked(self, event)
-        self.app.settings['font'] = self.font
-        self.app.prompt('Info', 'You need to restart for your font changes to be applied.', 'OK', helpId='fontHelp')
+        gui3d.app.settings['font'] = self.font
+        gui3d.app.prompt('Info', 'You need to restart for your font changes to be applied.', 'OK', helpId='fontHelp')
         
 class LanguageRadioButton(gui3d.RadioButton):
 
     def __init__(self, parent, group, language):
     
-        gui3d.RadioButton.__init__(self, parent, group, language.capitalize(), parent.app.settings.get('language', 'english') == language)
+        gui3d.RadioButton.__init__(self, parent, group, language.capitalize(), gui3d.app.settings.get('language', 'english') == language)
         self.language = language
         
     def onClicked(self, event):
     
         gui3d.RadioButton.onClicked(self, event)
-        self.app.settings['language'] = self.language
-        self.app.setLanguage(self.language)
-        self.app.prompt('Info', 'You need to restart for your language changes to be applied.', 'OK', helpId='languageHelp')  
+        gui3d.app.settings['language'] = self.language
+        gui3d.app.setLanguage(self.language)
+        gui3d.app.prompt('Info', 'You need to restart for your language changes to be applied.', 'OK', helpId='languageHelp')  
 
 class SettingsTaskView(gui3d.TaskView):
 
@@ -47,25 +47,25 @@ class SettingsTaskView(gui3d.TaskView):
         
         sliderBox = gui3d.GroupBox(self, [10, y, 9.0], 'Slider behavior');y+=25
         self.realtimeUpdates = gui3d.CheckBox(sliderBox, "Update real-time",
-            self.app.settings.get('realtimeUpdates', True));y+=24
+            gui3d.app.settings.get('realtimeUpdates', True));y+=24
         self.realtimeNormalUpdates = gui3d.CheckBox(sliderBox, "Update normals",
-            self.app.settings.get('realtimeNormalUpdates', True));y+=24
+            gui3d.app.settings.get('realtimeNormalUpdates', True));y+=24
         y+=16
             
         mouseBox = gui3d.GroupBox(self, [10, y, 9.0], 'Mouse behavior');y+=25
         self.normal = gui3d.Slider(mouseBox,
-            self.app.settings.get('lowspeed', 1), 1, 10,
+            gui3d.app.settings.get('lowspeed', 1), 1, 10,
             "Normal: %d");y+=36
         self.shift = gui3d.Slider(mouseBox,
-            self.app.settings.get('highspeed', 5), 1, 10,
+            gui3d.app.settings.get('highspeed', 5), 1, 10,
             "Shift: %d");y+=36
         y+=16
             
         modes = [] 
                
         unitBox = self.unitsBox = gui3d.GroupBox(self, [10, y, 9.0], 'Units');y += 25
-        metric = gui3d.RadioButton(unitBox, modes, 'Metric', self.app.settings.get('units', 'metric') == 'metric');y += 24
-        imperial = gui3d.RadioButton(unitBox, modes, 'Imperial', self.app.settings.get('units', 'metric') == 'imperial');y += 24
+        metric = gui3d.RadioButton(unitBox, modes, 'Metric', gui3d.app.settings.get('units', 'metric') == 'metric');y += 24
+        imperial = gui3d.RadioButton(unitBox, modes, 'Imperial', gui3d.app.settings.get('units', 'metric') == 'imperial');y += 24
         y+=16
         
         fonts = []
@@ -90,7 +90,7 @@ class SettingsTaskView(gui3d.TaskView):
         @self.shaderNo.event
         def onClicked(event):
             gui3d.RadioButton.onClicked(self.shaderNo, event)
-            human = self.app.selectedHuman
+            human = gui3d.app.selectedHuman
             human.mesh.setShader(0)
             
         @self.shaderPhong.event
@@ -107,39 +107,39 @@ class SettingsTaskView(gui3d.TaskView):
         def onClicked(event):
             gui3d.RadioButton.onClicked(self.shaderSkin, event)
             self.setShader("data/shaders/glsl/skin_vertex_shader.txt", "data/shaders/glsl/skin_fragment_shader.txt")
-            self.app.selectedHuman.mesh.setShaderParameter("gradientMap", mh.loadTexture("data/textures/color_temperature.png", 0))
-            self.app.selectedHuman.mesh.setShaderParameter("ambientOcclusionMap", mh.loadTexture("data/textures/female_young.tif", 0))
+            gui3d.app.selectedHuman.mesh.setShaderParameter("gradientMap", mh.loadTexture("data/textures/color_temperature.png", 0))
+            gui3d.app.selectedHuman.mesh.setShaderParameter("ambientOcclusionMap", mh.loadTexture("data/textures/female_young.tif", 0))
                 
         @self.realtimeUpdates.event
         def onClicked(event):
             gui3d.ToggleButton.onClicked(self.realtimeUpdates, event)
-            self.app.settings['realtimeUpdates'] = self.realtimeUpdates.selected
+            gui3d.app.settings['realtimeUpdates'] = self.realtimeUpdates.selected
             
         @self.realtimeNormalUpdates.event
         def onClicked(event):
             gui3d.ToggleButton.onClicked(self.realtimeNormalUpdates, event)
-            self.app.settings['realtimeNormalUpdates'] = self.realtimeNormalUpdates.selected
+            gui3d.app.settings['realtimeNormalUpdates'] = self.realtimeNormalUpdates.selected
             
         @self.normal.event
         def onChange(value):
-            self.app.settings['lowspeed'] = value
+            gui3d.app.settings['lowspeed'] = value
             
         @self.shift.event
         def onChange(value):
-            self.app.settings['highspeed'] = value
+            gui3d.app.settings['highspeed'] = value
             
         @metric.event
         def onClicked(event):
             gui3d.RadioButton.onClicked(metric, event)
-            self.app.settings['units'] = 'metric'
+            gui3d.app.settings['units'] = 'metric'
             
         @imperial.event
         def onClicked(event):
             gui3d.RadioButton.onClicked(imperial, event)
-            self.app.settings['units'] = 'imperial'
+            gui3d.app.settings['units'] = 'imperial'
                 
     def setShader(self, vertex, fragment):
-            human = self.app.selectedHuman
+            human = gui3d.app.selectedHuman
             try:
                 human.vertex_shader = mh.createVertexShader(open(vertex).read())
                 human.fragment_shader = mh.createFragmentShader(open(fragment).read())
@@ -156,7 +156,7 @@ class SettingsTaskView(gui3d.TaskView):
     def onHide(self, event):
 
         gui3d.TaskView.onHide(self, event)
-        self.app.saveSettings()
+        gui3d.app.saveSettings()
         
     def onResized(self, event):
         
