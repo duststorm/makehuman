@@ -16,9 +16,16 @@
 {% block sidebar2 %}{% endblock %}
 
 {% block relbar1 %}
-<div style="background-color: #333333; text-align: left; padding: 10px 10px 15px 15px">
-<a href="{{ pathto('index') }}"><img src="{{
-pathto("_static/logohtml.png", 1) }}" border="0" alt="makehuman API"/></a>
+<div style="background-color: black; background-image:url('{{pathto("_static/bg-not-front.gif", 1) }}'); text-align: left; padding: 0px 0px 0px 0px">
+<a href="{{ pathto('index') }}"><img src="{{pathto("_static/logohtml.png", 1) }}" border="0" alt="makehuman API"/></a>
 </div>
-{{ super() }}
+{% endblock %}
+{% block relbar2 %}{% endblock %}
+
+{% block footer %}
+<div style="background-color: black;">
+    &copy; Copyright 2011, MHteam.
+      Last updated on Nov 11, 2011.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.
+    </div>
 {% endblock %}
