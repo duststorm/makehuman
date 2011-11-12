@@ -11,21 +11,15 @@
 <link href="http://fonts.googleapis.com/css?family=Ubuntu:300,300italic,regular,italic,500,500italic,bold,bolditalic" rel="stylesheet" type="text/css">
 {% endblock %}
 
-{# put the sidebar before the body #}
-{% block sidebar1 %}{{ sidebar() }}{% endblock %}
-{% block sidebar2 %}{% endblock %}
+
+
 
 {% block relbar1 %}
-<div style="background-color: black; background-image:url('{{pathto("_static/bg-not-front.gif", 1) }}'); text-align: left; padding: 0px 0px 0px 0px">
-<a href="{{ pathto('index') }}"><img src="{{pathto("_static/logohtml.png", 1) }}" border="0" alt="makehuman API"/></a>
+<div class="siteheader">
+<a href="http://mhnew.jwp.se"><img src="{{pathto("_static/logohtml.png", 1) }}" border="0" alt="makehuman API"/></a>
 </div>
+
 {% endblock %}
 {% block relbar2 %}{% endblock %}
 
-{% block footer %}
-<div style="background-color: black;">
-    &copy; Copyright 2011, MHteam.
-      Last updated on Nov 11, 2011.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.
-    </div>
-{% endblock %}
+
