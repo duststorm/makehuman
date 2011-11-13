@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to MakeHuman python API documentation
+Welcome to MakeHuman documentation
 =============================================
 
 This document is the 'Developers Guide' for the MakeHuman application and covers key aspects of the development environment configuration and setup on the various supported platforms (Windows, Mac OS X and GNU/Linux). It also contains the coding standards required to develop consistently high-quality code for the MakeHuman project and details key features of the Application Programming Interface that MakeHuman developers and Plugin developers can use to maintain and extend the product.
