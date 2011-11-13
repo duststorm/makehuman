@@ -37,10 +37,9 @@ class HairTaskView(gui3d.TaskView):
     def __init__(self, category):
         
         gui3d.TaskView.__init__(self, category, 'Hair')
-        self.filechooser = gui3d.FileChooser(self, 'data/hairstyles', 'obj', 'png', 'notfound.png')
+        self.filechooser = self.addView(gui3d.FileChooser('data/hairstyles', 'obj', 'png', 'notfound.png'))
         
-        self.hairButton = gui3d.Button(gui3d.app.categories['Modelling'],
-            style=HairButtonStyle._replace(left=800-216, top=600-36, zIndex=9.2, normal='data/hairstyles/clear.png'))
+        self.hairButton = gui3d.app.categories['Modelling'].addView(gui3d.Button(style=HairButtonStyle._replace(left=800-216, top=600-36, zIndex=9.2, normal='data/hairstyles/clear.png')))
         
         self.oHeadCentroid = [0.0, 7.436, 0.03 + 0.577]
         self.oHeadBBox = [[-0.84,6.409,-0.9862],[0.84,8.463,1.046]]
@@ -166,7 +165,7 @@ class HairTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Library')
-    taskview = HairTaskView(category)
+    taskview = category.addView(HairTaskView(category))
 
     app.addLoadHandler('hair', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)

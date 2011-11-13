@@ -31,22 +31,22 @@ class MacroModelingTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Macro modelling', label='Macro')
 
         font = gui3d.app.getFont(gui3d.TextViewStyle.fontFamily)
-        self.status = gui3d.TextView(self, style=gui3d.TextViewStyle._replace(width=800-20, left=10, top=600-2-font.lineHeight, zIndex=9.1))
+        self.status = self.addView(gui3d.TextView(style=gui3d.TextViewStyle._replace(width=800-20, left=10, top=600-2-font.lineHeight, zIndex=9.1)))
 
-        self.macroBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Main', style=gui3d.GroupBoxStyle._replace(height=25+36*5+6))\
+        self.macroBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Main', style=gui3d.GroupBoxStyle._replace(height=25+36*5+6)))
        
         # Macro sliders
 
-        self.genderSlider = gui3d.Slider(self.macroBox, value=0.5, label = "Gender")
-        self.ageSlider = gui3d.Slider(self.macroBox, value=0.5, label = "Age")
-        self.muscleSlider = gui3d.Slider(self.macroBox, value=0.5, label = "Tone")
-        self.weightSlider = gui3d.Slider(self.macroBox, value=0.5, label = "Weight")
-        self.heightSlider = gui3d.Slider(self.macroBox, value=0.0, min=-1.0, max=1.0, label = "Height")
-        self.africanSlider = gui3d.Slider(self.macroBox, value=0.0, min=0.0, max=1.0, label = "Afro")
-        self.asianSlider = gui3d.Slider(self.macroBox, value=0.0, min=0.0, max=1.0, label = "Asian")
+        self.genderSlider = self.macroBox.addView(gui3d.Slider(value=0.5, label = "Gender"))
+        self.ageSlider = self.macroBox.addView(gui3d.Slider(value=0.5, label = "Age"))
+        self.muscleSlider = self.macroBox.addView(gui3d.Slider(value=0.5, label = "Tone"))
+        self.weightSlider = self.macroBox.addView(gui3d.Slider(value=0.5, label = "Weight"))
+        self.heightSlider = self.macroBox.addView(gui3d.Slider(value=0.0, min=-1.0, max=1.0, label = "Height"))
+        self.africanSlider = self.macroBox.addView(gui3d.Slider(value=0.0, min=0.0, max=1.0, label = "Afro"))
+        self.asianSlider = self.macroBox.addView(gui3d.Slider(value=0.0, min=0.0, max=1.0, label = "Asian"))
         
-        self.radialBox = gui3d.GroupBox(self, [590, 80, 9.0], 'Radial', gui3d.GroupBoxStyle._replace(width=185+15))
-        self.radialWidget = gui3d.Radial(self.radialBox)
+        #self.radialBox = gui3d.GroupBox(self, [590, 80, 9.0], 'Radial', gui3d.GroupBoxStyle._replace(width=185+15))
+        #self.radialWidget = gui3d.Radial(self.radialBox)
 
         #hair update only necessary for : gender, age , height
         
@@ -152,4 +152,4 @@ class MacroModelingTaskView(gui3d.TaskView):
     def onResized(self, event):
         font = gui3d.app.getFont(gui3d.TextViewStyle.fontFamily)
         self.status.setPosition([10, event.height-2-font.lineHeight, 9.1])
-        self.radialBox.setPosition([event.width - 210, self.radialBox.getPosition()[1], 9.0])
+        #self.radialBox.setPosition([event.width - 210, self.radialBox.getPosition()[1], 9.0])

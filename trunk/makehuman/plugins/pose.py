@@ -27,18 +27,18 @@ class PoseTaskView(gui3d.TaskView):
         self.shoulder.keyRot1 = [-135,-67,0,45]
         self.shoulder.keyRot2 = [-115,-90,-67,-45,-22,0,22,45,67,90]
 
-        box = gui3d.GroupBox(self, [10, 80, 9.0], 'Shoulder', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6))
+        box = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Shoulder', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6)))
 
-        self.shoulderXslider = gui3d.Slider(box, value = 0.0, min = -85, max = 80, label = "RotX: %d")
-        self.shoulderYslider = gui3d.Slider(box, value = 0.0, min = -140, max = 50, label = "RotY: %d")
-        self.shoulderZslider = gui3d.Slider(box, value = 0.0, min = -120, max = 90, label = "RotZ: %d")
+        self.shoulderXslider = box.addView(gui3d.Slider(value = 0.0, min = -85, max = 80, label = "RotX: %d"))
+        self.shoulderYslider = box.addView(gui3d.Slider(value = 0.0, min = -140, max = 50, label = "RotY: %d"))
+        self.shoulderZslider = box.addView(gui3d.Slider(value = 0.0, min = -120, max = 90, label = "RotZ: %d"))
 
         self.savePoseFiles = 0
 
-        self.resetPoseButton = gui3d.Button(box, "Reset")
-        self.testPoseButton = gui3d.Button(box, "Test")
+        self.resetPoseButton = box.addView(gui3d.Button("Reset"))
+        self.testPoseButton = box.addView(gui3d.Button("Test"))
         
-        self.savePoseToggle = gui3d.CheckBox(box, "SavePose")
+        self.savePoseToggle = box.addView(gui3d.CheckBox("SavePose"))
 
         @self.savePoseToggle.event
         def onClicked(event):
@@ -134,7 +134,7 @@ taskview = None
 
 def load(app):
     category = app.getCategory('Experiments')
-    taskview = PoseTaskView(category)
+    taskview = category.addView(PoseTaskView(category))
     print 'pose loaded'
             
     @taskview.event

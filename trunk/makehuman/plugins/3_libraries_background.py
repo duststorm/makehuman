@@ -50,17 +50,17 @@ class BackgroundTaskView(gui3d.TaskView):
         mesh.setColor([255, 255, 255, self.opacity])
         mesh.setPickable(0)
         
-        self.backgroundImageToggle = gui3d.ToggleButton(gui3d.app.categories['Modelling'].viewBox, 'Background');
+        self.backgroundImageToggle = gui3d.app.categories['Modelling'].viewBox.addView(gui3d.ToggleButton('Background'));
         y = 280
-        self.backgroundBox = gui3d.GroupBox(self, [10, y, 9], 'Background 2 settings', gui3d.GroupBoxStyle._replace(height=25+36*3+24*1+6));y+=25
+        self.backgroundBox = self.addView(gui3d.GroupBox([10, y, 9], 'Background 2 settings', gui3d.GroupBoxStyle._replace(height=25+36*3+24*1+6)));y+=25
 
         self.radioButtonGroup = []
-        self.bgImageFrontRadioButton = gui3d.RadioButton(self.backgroundBox, self.radioButtonGroup, selected=True, label='Front')
-        self.bgImageBackRadioButton = gui3d.RadioButton(self.backgroundBox, self.radioButtonGroup, selected=False, label='Back')
-        self.bgImageLeftRadioButton = gui3d.RadioButton(self.backgroundBox, self.radioButtonGroup, selected=False, label='Left')
-        self.bgImageRightRadioButton = gui3d.RadioButton(self.backgroundBox, self.radioButtonGroup, selected=False, label='Right')
-        self.bgImageTopRadioButton = gui3d.RadioButton(self.backgroundBox, self.radioButtonGroup, selected=False, label='Top')
-        self.bgImageBottomRadioButton = gui3d.RadioButton(self.backgroundBox, self.radioButtonGroup, selected=False, label='Bottom')
+        self.bgImageFrontRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=True, label='Front'))
+        self.bgImageBackRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Back'))
+        self.bgImageLeftRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Left'))
+        self.bgImageRightRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Right'))
+        self.bgImageTopRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Top'))
+        self.bgImageBottomRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Bottom'))
             
         @self.backgroundImageToggle.event
         def onClicked(event):
@@ -74,7 +74,7 @@ class BackgroundTaskView(gui3d.TaskView):
                 gui3d.app.switchCategory('Library')
                 gui3d.app.switchTask('Background')
                 
-        self.filechooser = gui3d.FileChooser(self, self.backgroundsFolder, ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None)
+        self.filechooser = self.addView(gui3d.FileChooser(self.backgroundsFolder, ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None))
 
         @self.filechooser.event
         def onFileSelected(filename):
@@ -160,7 +160,7 @@ class BackgroundTaskView(gui3d.TaskView):
         filename = self.filenames.get(side)
         if filename:
             self.backgroundImage.mesh.setTexture(os.path.join(self.backgroundsFolder, filename))
-	 
+
     def onHumanRotated(self, event):
         rot = gui3d.app.selectedHuman.getRotation()
         if rot==[0,0,0]:
@@ -193,9 +193,9 @@ class BackgroundTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Library')
-    taskview = BackgroundTaskView(category)
+    taskview = category.addView(BackgroundTaskView(category))
     category = app.getCategory('Modelling')
-    taskview = settingsTaskView(category, taskview)
+    taskview = category.addView(settingsTaskView(category, taskview))
 
     print 'Background chooser loaded'
 
@@ -220,13 +220,13 @@ class settingsTaskView(gui3d.TaskView) :
         
         self.lastPos = [0, 0]
         
-        self.backgroundBox = gui3d.GroupBox(self, [10, y, 9], 'Background settings', gui3d.GroupBoxStyle._replace(height=25+36*3+24*1+6));y+=25
+        self.backgroundBox = self.addView(gui3d.GroupBox([10, y, 9], 'Background settings', gui3d.GroupBoxStyle._replace(height=25+36*3+24*1+6)));y+=25
         
         # sliders
-        self.opacitySlider = gui3d.Slider(self.backgroundBox, value=taskview.opacity, min=0,max=255, label = "Opacity")
+        self.opacitySlider = self.backgroundBox.addView(gui3d.Slider(value=taskview.opacity, min=0,max=255, label = "Opacity"))
         
         # toggle button
-        self.dragButton = gui3d.ToggleButton(self.backgroundBox, 'Move & Resize')
+        self.dragButton = self.backgroundBox.addView(gui3d.ToggleButton('Move & Resize'))
             
         @self.opacitySlider.event
         def onChanging(value):

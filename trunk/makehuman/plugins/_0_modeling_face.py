@@ -157,7 +157,7 @@ class FaceTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Modelling')
-    taskview = FaceTaskView(category)
+    taskview = category.addView(FaceTaskView(category))
     
     app.addLoadHandler('face', taskview.loadHandler)
     app.addLoadHandler('headAge', taskview.loadHandler)

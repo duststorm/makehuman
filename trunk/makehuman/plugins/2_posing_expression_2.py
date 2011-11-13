@@ -8,8 +8,8 @@ import humanmodifier
 print 'Expression 2 imported'
 
 class GroupBoxRadioButton(gui3d.RadioButton):
-    def __init__(self, parent, group, label, groupBox, selected=False):
-        gui3d.RadioButton.__init__(self, parent, group, label, selected, style=gui3d.ButtonStyle)
+    def __init__(self, group, label, groupBox, selected=False):
+        gui3d.RadioButton.__init__(self, group, label, selected, style=gui3d.ButtonStyle)
         self.groupBox = groupBox
         
     def onClicked(self, event):
@@ -18,9 +18,9 @@ class GroupBoxRadioButton(gui3d.RadioButton):
         self.groupBox.show()
         
 class ExpressionSlider(humanmodifier.ModifierSlider):
-    def __init__(self, parent, label, modifier):
+    def __init__(self, label, modifier):
         
-        humanmodifier.ModifierSlider.__init__(self, parent, label=label, modifier=modifier)
+        humanmodifier.ModifierSlider.__init__(self, label=label, modifier=modifier)
 
 class ExpressionTaskView(gui3d.TaskView):
 
@@ -43,11 +43,11 @@ class ExpressionTaskView(gui3d.TaskView):
         
         self.modifiers = {}
         
-        self.categoryBox = gui3d.GroupBox(self, [650, 80, 9.0], 'Category')
+        self.categoryBox = self.addView(gui3d.GroupBox([650, 80, 9.0], 'Category'))
         
         for name, subnames in expressions:
             # Create box
-            box = gui3d.GroupBox(self, [10, 80, 9.0], name.capitalize())
+            box = self.addView(gui3d.GroupBox([10, 80, 9.0], name.capitalize()))
             self.groupBoxes.append(box)
             
             # Create sliders
@@ -56,11 +56,11 @@ class ExpressionTaskView(gui3d.TaskView):
                 #modifier = humanmodifier.GenderAgeModifier('data/targets/expression/units/${gender}_${age}/%s-%s.target' % (name, subname))
                 modifier = humanmodifier.GenderAgeEthnicModifier2('data/targets/expression/units/${ethnic}/${gender}_${age}/%s-%s.target' % (name, subname))
                 self.modifiers[subname] = modifier
-                slider = ExpressionSlider(box, subname.capitalize(), modifier)
+                slider = box.addView(ExpressionSlider(subname.capitalize(), modifier))
                 self.sliders.append(slider)
             
             # Create radiobutton
-            radio = GroupBoxRadioButton(self.categoryBox, self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0)
+            radio = self.categoryBox.addView(GroupBoxRadioButton(self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0))
 
         self.hideAllBoxes()
         self.groupBoxes[0].show()
@@ -109,7 +109,7 @@ class ExpressionTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Posing')
-    taskview = ExpressionTaskView(category)
+    taskview = category.addView(ExpressionTaskView(category))
     
     #app.addLoadHandler('expression', taskview.loadHandler)
     #app.addSaveHandler(taskview.saveHandler)

@@ -9,13 +9,13 @@ class RenderingSettingTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Rendering Setting', label='Settings')
 
         #Rendering resolution
-        resBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Resolution', gui3d.GroupBoxStyle._replace(height=25+24*2+6))
+        resBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Resolution', gui3d.GroupBoxStyle._replace(height=25+24*2+6)))
         rendering_width = gui3d.app.settings.get('rendering_width', 800)
-        self.width= gui3d.TextEdit(resBox, str(rendering_width), gui3d.TextEditStyle._replace(width=112),
-            gui3d.intValidator)
+        self.width= resBox.addView(gui3d.TextEdit(str(rendering_width), gui3d.TextEditStyle._replace(width=112),
+            gui3d.intValidator))
         rendering_height = gui3d.app.settings.get('rendering_height', 600)
-        self.height= gui3d.TextEdit(resBox, str(rendering_height), gui3d.TextEditStyle._replace(width=112),
-            gui3d.intValidator)
+        self.height= resBox.addView(gui3d.TextEdit(str(rendering_height), gui3d.TextEditStyle._replace(width=112),
+            gui3d.intValidator))
 
         @self.width.event
         def onChange(value):
@@ -32,7 +32,7 @@ class RenderingSettingTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Rendering')
-    taskview = RenderingSettingTaskView(category)
+    taskview = category.addView(RenderingSettingTaskView(category))
     print 'Rendering setting imported'
 
 def unload(app):

@@ -18,11 +18,11 @@ class TextureToolTaskView(gui3d.TaskView):
         self.mesh = None
         self.object = None
         
-        self.box = gui3d.GroupBox(self, [10, 80, 9.0], 'Inspect')
+        self.box = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Inspect'))
         group = []
-        self.model = gui3d.RadioButton(self.box, group, "Model", True)
-        self.texture = gui3d.RadioButton(self.box, group, "Texture")
-        self.textured = gui3d.CheckBox(self.box, "Textured", True)
+        self.model = self.box.addView(gui3d.RadioButton(group, "Model", True))
+        self.texture = self.box.addView(gui3d.RadioButton(group, "Texture"))
+        self.textured = self.box.addView(gui3d.CheckBox("Textured", True))
         
         @self.model.event
         def onClicked(event):
@@ -162,7 +162,7 @@ taskview = None
 
 def load(app):
     category = app.getCategory('Experiments')
-    taskview = TextureToolTaskView(category)
+    taskview = category.addView(TextureToolTaskView(category))
     print 'Texture tool loaded'
 
 # This method is called when the plugin is unloaded from makehuman

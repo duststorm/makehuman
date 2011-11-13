@@ -11,8 +11,8 @@ import aljabr
 import mh
 
 class GroupBoxRadioButton(gui3d.RadioButton):
-    def __init__(self, parent, group, label, groupBox, selected=False):
-        gui3d.RadioButton.__init__(self, parent, group, label, selected, style=gui3d.ButtonStyle)
+    def __init__(self, group, label, groupBox, selected=False):
+        gui3d.RadioButton.__init__(self, group, label, selected, style=gui3d.ButtonStyle)
         self.groupBox = groupBox
         
     def onClicked(self, event):
@@ -22,10 +22,10 @@ class GroupBoxRadioButton(gui3d.RadioButton):
         self.groupBox.children[0].setFocus()
 
 class MeasureSlider(humanmodifier.ModifierSlider):
-    def __init__(self, parent, template, measure, modifier):
+    def __init__(self, template, task, measure, modifier):
         
-        humanmodifier.ModifierSlider.__init__(self, parent, value=0.0, min=-1.0, max=1.0,
-            label=template + parent.parent.getMeasure(measure), modifier=modifier)
+        humanmodifier.ModifierSlider.__init__(self, value=0.0, min=-1.0, max=1.0,
+            label=template + task.getMeasure(measure), modifier=modifier)
         self.template = template
         self.measure = measure
         
@@ -122,15 +122,15 @@ class MeasureTaskView(gui3d.TaskView):
         measureDataPath = "data/targets/measure/"
         
         y = 80
-        self.categoryBox = gui3d.GroupBox(self, [650, y, 9.0], 'Category');y += 25
+        self.categoryBox = self.addView(gui3d.GroupBox([650, y, 9.0], 'Category'));y += 25
 
         for name, subnames in measurements:
             # Create box
-            box = gui3d.GroupBox(self, [10, 80, 9.0], name.capitalize(), gui3d.GroupBoxStyle._replace(height=25+36*len(subnames)+6))
+            box = self.addView(gui3d.GroupBox([10, 80, 9.0], name.capitalize(), gui3d.GroupBoxStyle._replace(height=25+36*len(subnames)+6)))
             self.groupBoxes[name] = box
             
             # Create radiobutton
-            radio = GroupBoxRadioButton(self.categoryBox, self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0);y += 24
+            radio = self.categoryBox.addView(GroupBoxRadioButton(self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0));y += 24
             
             # Create sliders
             for subname in subnames:
@@ -138,21 +138,21 @@ class MeasureTaskView(gui3d.TaskView):
                     os.path.join(measureDataPath, "measure-%s-decrease.target" % subname),
                     os.path.join(measureDataPath, "measure-%s-increase.target" % subname))
                 self.modifiers[subname] = modifier
-                slider = MeasureSlider(box, sliderLabel[subname], subname, modifier)
+                slider = box.addView(MeasureSlider(sliderLabel[subname], self, subname, modifier))
                 self.sliders.append(slider)
                
         y+=16
-        self.statsBox = gui3d.GroupBox(self, [650, y, 9.0], 'Statistics');y += 25
-        self.height = gui3d.TextView(self.statsBox, 'Height: ');y += 20
-        self.chest = gui3d.TextView(self.statsBox, 'Chest: ');y += 20
-        self.waist = gui3d.TextView(self.statsBox, 'Waist: ');y += 20
-        self.hips = gui3d.TextView(self.statsBox, 'Hips: ');y += 20
+        self.statsBox = self.addView(gui3d.GroupBox([650, y, 9.0], 'Statistics'));y += 25
+        self.height = self.statsBox.addView(gui3d.TextView('Height: '));y += 20
+        self.chest = self.statsBox.addView(gui3d.TextView('Chest: '));y += 20
+        self.waist = self.statsBox.addView(gui3d.TextView('Waist: '));y += 20
+        self.hips = self.statsBox.addView(gui3d.TextView('Hips: '));y += 20
         y+=16
-        self.braBox = gui3d.GroupBox(self, [650, y, 9.0], 'Brassiere size');y += 25
-        self.eu = gui3d.TextView(self.braBox, 'EU: ');y += 20
-        self.jp = gui3d.TextView(self.braBox, 'JP: ');y += 20
-        self.us = gui3d.TextView(self.braBox, 'US: ');y += 20
-        self.uk = gui3d.TextView(self.braBox, 'UK: ');y += 20
+        self.braBox = self.addView(gui3d.GroupBox([650, y, 9.0], 'Brassiere size'));y += 25
+        self.eu = self.braBox.addView(gui3d.TextView('EU: '));y += 20
+        self.jp = self.braBox.addView(gui3d.TextView('JP: '));y += 20
+        self.us = self.braBox.addView(gui3d.TextView('US: '));y += 20
+        self.uk = self.braBox.addView(gui3d.TextView('UK: '));y += 20
         y+=16
             
     def getMeasure(self, measure):
@@ -332,7 +332,7 @@ def load(app):
     Plugin load function, needed by design.
     """
     category = app.getCategory('Modelling')
-    taskview = MeasureTaskView(category)
+    taskview = category.addView(MeasureTaskView(category))
     
     app.addLoadHandler('measure', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)

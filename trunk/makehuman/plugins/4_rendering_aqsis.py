@@ -46,15 +46,15 @@ class AqsisTaskView(gui3d.TaskView):
 
         self.sceneToRender = None
 
-        optionsBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*1+6))
+        optionsBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*1+6)))
                                               
         #Sliders                            
-        self.shadingRateSlider= gui3d.Slider(optionsBox, value=2, min=0.1, max=10, label = "ShadingRate: %.2f")
-        self.samplesSlider= gui3d.Slider(optionsBox, value=2, min=1.0, max=10, label = "Samples: %.2f")
-        self.skinOilSlider= gui3d.Slider(optionsBox, value=0.3, min=0.0, max=10, label = "Skin Oil: %.2f")
+        self.shadingRateSlider= optionsBox.addView(gui3d.Slider(value=2, min=0.1, max=10, label = "ShadingRate: %.2f"))
+        self.samplesSlider= optionsBox.addView(gui3d.Slider(value=2, min=1.0, max=10, label = "Samples: %.2f"))
+        self.skinOilSlider= optionsBox.addView(gui3d.Slider(value=0.3, min=0.0, max=10, label = "Skin Oil: %.2f"))
         
         #Buttons
-        self.renderButton = gui3d.Button(optionsBox, 'Render')
+        self.renderButton = optionsBox.addView(gui3d.Button('Render'))
             
         @self.shadingRateSlider.event
         def onChanging(value):
@@ -107,7 +107,7 @@ class AqsisTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Rendering')
-    taskview = AqsisTaskView(category)
+    taskview = category.addView(AqsisTaskView(category))
 
 def unload(app):
     pass

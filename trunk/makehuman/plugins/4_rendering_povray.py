@@ -19,19 +19,19 @@ class PovrayTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Povray')
 
-        optionsBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*7+6))
+        optionsBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*7+6)))
         
         #Buttons
         source=[]
-        self.iniButton = gui3d.RadioButton(optionsBox, source, 'Use ini settings')
-        self.guiButton = gui3d.RadioButton(optionsBox, source, 'Use gui settings', selected = True)
+        self.iniButton = optionsBox.addView(gui3d.RadioButton(source, 'Use ini settings'))
+        self.guiButton = optionsBox.addView(gui3d.RadioButton(source, 'Use gui settings', selected = True))
         format=[]
-        self.arrayButton = gui3d.RadioButton(optionsBox, format, 'Array format')
-        self.mesh2Button = gui3d.RadioButton(optionsBox, format, 'Mesh2 format', selected = True)
+        self.arrayButton = optionsBox.addView(gui3d.RadioButton(format, 'Array format'))
+        self.mesh2Button = optionsBox.addView(gui3d.RadioButton(format, 'Mesh2 format', selected = True))
         action=[]
-        self.exportButton = gui3d.RadioButton(optionsBox, action , 'Export only', selected = True)
-        self.exportandrenderButton = gui3d.RadioButton(optionsBox, action , 'Export and render')
-        self.renderButton = gui3d.Button(optionsBox, 'Render')
+        self.exportButton = optionsBox.addView(gui3d.RadioButton(action , 'Export only', selected = True))
+        self.exportandrenderButton = optionsBox.addView(gui3d.RadioButton(action , 'Export and render'))
+        self.renderButton = optionsBox.addView(gui3d.Button('Render'))
 
         @self.renderButton.event
         def onClicked(event):            
@@ -52,7 +52,7 @@ class PovrayTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Rendering')
-    taskview = PovrayTaskView(category)
+    taskview = category.addView(PovrayTaskView(category))
 
     print 'Povray loaded'
 

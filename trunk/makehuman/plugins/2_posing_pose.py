@@ -55,17 +55,17 @@ class PoseTaskView(gui3d.TaskView):
     self.selectedGroups = []
     self.joint = None
             
-    self.box = gui3d.GroupBox(self, [10, 80, 9.0], 'Rotation', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6))
+    self.box = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Rotation', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6)))
 
-    self.Xslider = gui3d.Slider(self.box, value = 0.0, min = -180.0, max = 180.0, label = "RotX: %d")
-    self.Yslider = gui3d.Slider(self.box, value = 0.0, min = -180.0, max = 180.0, label = "RotY: %d")
-    self.Zslider = gui3d.Slider(self.box, value = 0.0, min = -180.0, max = 180.0, label = "RotZ: %d")
+    self.Xslider = self.box.addView(gui3d.Slider(value = 0.0, min = -180.0, max = 180.0, label = "RotX: %d"))
+    self.Yslider = self.box.addView(gui3d.Slider(value = 0.0, min = -180.0, max = 180.0, label = "RotY: %d"))
+    self.Zslider = self.box.addView(gui3d.Slider(value = 0.0, min = -180.0, max = 180.0, label = "RotZ: %d"))
     
-    self.skin = gui3d.CheckBox(self.box, "Skin", False)
+    self.skin = self.box.addView(gui3d.CheckBox("Skin", False))
     
-    self.resetPoseButton = gui3d.Button(self.box, "Reset")
-    self.savePoseButton = gui3d.Button(self.box, "Save")
-    self.testButton = gui3d.Button(self.box, "Test")
+    self.resetPoseButton = self.box.addView(gui3d.Button("Reset"))
+    self.savePoseButton = self.box.addView(gui3d.Button("Save"))
+    self.testButton = self.box.addView(gui3d.Button("Test"))
     
     #get bindings for r-shoulder-joint
     f = open("utils/makepose/r-shoulder-joint.txt")
@@ -344,7 +344,7 @@ taskview = None
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
 def load(app):
     category = app.getCategory('Posing')
-    taskview = PoseTaskView(category)
+    taskview = category.addView(PoseTaskView(category))
     print 'pose loaded'
             
     @taskview.event

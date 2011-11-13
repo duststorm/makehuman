@@ -29,7 +29,7 @@ class ClothesTaskView(gui3d.TaskView):
     def __init__(self, category):
         
         gui3d.TaskView.__init__(self, category, 'Clothes')
-        self.filechooser = gui3d.FileChooser(self, 'data/clothes', 'mhclo', 'png', 'notfound.png')
+        self.filechooser = self.addView(gui3d.FileChooser('data/clothes', 'mhclo', 'png', 'notfound.png'))
 
         @self.filechooser.event
         def onFileSelected(filename):
@@ -135,7 +135,7 @@ class ClothesTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Library')
-    taskview = ClothesTaskView(category)
+    taskview = category.addView(ClothesTaskView(category))
 
     app.addLoadHandler('clothes', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)

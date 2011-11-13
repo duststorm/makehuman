@@ -10,8 +10,8 @@ import events3d
 
 class AssymSlider(gui3d.Slider):
     
-    def __init__(self, parent, bodypart, label):
-        gui3d.Slider.__init__(self, parent, value=0.0, min=-1.0, max=1.0, label=label)
+    def __init__(self, bodypart, label):
+        gui3d.Slider.__init__(self, value=0.0, min=-1.0, max=1.0, label=label)
         self.bodypart = bodypart
         
     def onChange(self, value):
@@ -26,20 +26,20 @@ class AsymmTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Asymmetry')
 
         #Sliders
-        self.leftBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Face', gui3d.GroupBoxStyle._replace(height=25+36*9+6))
-        self.asymmBrowSlider = AssymSlider(self.leftBox, "brown", "Brow asymmetry")
-        self.asymmCheekSlider = AssymSlider(self.leftBox, "cheek", "Cheek asymmetry")
-        self.asymmEarsSlider = AssymSlider(self.leftBox, "ear", "Ears asymmetry")
-        self.asymmEyeSlider = AssymSlider(self.leftBox, "eye", "Eye asymmetry")
-        self.asymmJawSlider = AssymSlider(self.leftBox, "jaw", "Jaw asymmetry")
-        self.asymmMouthSlider = AssymSlider(self.leftBox, "mouth", "Mouth asymmetry")
-        self.asymmNoseSlider = AssymSlider(self.leftBox, "nose", "Nose asymmetry")
-        self.asymmTempleSlider = AssymSlider(self.leftBox, "temple", "Temple asymmetry")
-        self.asymmTopSlider = AssymSlider(self.leftBox, "top", "Top asymmetry")
+        self.leftBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Face', gui3d.GroupBoxStyle._replace(height=25+36*9+6)))
+        self.asymmBrowSlider = self.leftBox.addView(AssymSlider("brown", "Brow asymmetry"))
+        self.asymmCheekSlider = self.leftBox.addView(AssymSlider("cheek", "Cheek asymmetry"))
+        self.asymmEarsSlider = self.leftBox.addView(AssymSlider("ear", "Ears asymmetry"))
+        self.asymmEyeSlider = self.leftBox.addView(AssymSlider("eye", "Eye asymmetry"))
+        self.asymmJawSlider = self.leftBox.addView(AssymSlider("jaw", "Jaw asymmetry"))
+        self.asymmMouthSlider = self.leftBox.addView(AssymSlider("mouth", "Mouth asymmetry"))
+        self.asymmNoseSlider = self.leftBox.addView(AssymSlider("nose", "Nose asymmetry"))
+        self.asymmTempleSlider = self.leftBox.addView(AssymSlider("temple", "Temple asymmetry"))
+        self.asymmTopSlider = self.leftBox.addView(AssymSlider("top", "Top asymmetry"))
 
-        self.rightBox = gui3d.GroupBox(self, [650, 80, 9.0], 'Body', gui3d.GroupBoxStyle._replace(height=25+36*2+6))
-        self.asymmTrunkSlider = AssymSlider(self.rightBox, "trunk", "Trunk asymmetry")
-        self.asymmBreastSlider = AssymSlider(self.rightBox, "breast", "Breast asymmetry")
+        self.rightBox = self.addView(gui3d.GroupBox([650, 80, 9.0], 'Body', gui3d.GroupBoxStyle._replace(height=25+36*2+6)))
+        self.asymmTrunkSlider = self.rightBox.addView(AssymSlider("trunk", "Trunk asymmetry"))
+        self.asymmBreastSlider = self.rightBox.addView(AssymSlider("breast", "Breast asymmetry"))
 
         #Get a list with all targes (complete with path) used in asymm library
         self.asymmDataPath = "data/targets/asym/"
@@ -203,7 +203,7 @@ def load(app):
     Plugin load function, needed by design.
     """
     category = app.getCategory('Modelling')
-    taskview = AsymmTaskView(category)
+    taskview = category.addView(AsymmTaskView(category))
     
     print 'Asymmetry loaded'
 

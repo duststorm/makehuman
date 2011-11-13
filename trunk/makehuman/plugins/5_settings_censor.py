@@ -9,11 +9,11 @@ class CensorTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Censor')
         
-        self.mouseBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Censor', gui3d.GroupBoxStyle._replace(height=25+25*3+24+6))
-        self.enableCensor = gui3d.CheckBox(self.mouseBox, "Enable", gui3d.app.settings.get('censor', False))
+        self.mouseBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Censor', gui3d.GroupBoxStyle._replace(height=25+25*3+24+6)))
+        self.enableCensor = self.mouseBox.addView(gui3d.CheckBox("Enable", gui3d.app.settings.get('censor', False)))
         type = []
-        self.blackSquare = gui3d.RadioButton(self.mouseBox, type, "Black", gui3d.app.settings.get('censorType', 'black') == 'black');
-        self.mosaic = gui3d.RadioButton(self.mouseBox, type, "Mosaic", gui3d.app.settings.get('censorType', 'black square') == 'mosaic');
+        self.blackSquare = self.mouseBox.addView(gui3d.RadioButton(type, "Black", gui3d.app.settings.get('censorType', 'black') == 'black'));
+        self.mosaic = self.mouseBox.addView(gui3d.RadioButton(type, "Mosaic", gui3d.app.settings.get('censorType', 'black square') == 'mosaic'));
         
         human = gui3d.app.selectedHuman
 
@@ -126,7 +126,7 @@ class CensorTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Settings')
-    taskview = CensorTaskView(category)
+    taskview = category.addView(CensorTaskView(category))
 
 def unload(app):
     pass

@@ -33,7 +33,7 @@ class SkeletonView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Skeleton')
         
-        self.status = gui3d.TextView(self, style=gui3d.TextViewStyle._replace(left=10, top=585, zIndex=9.1))
+        self.status = self.addView(gui3d.TextView(style=gui3d.TextViewStyle._replace(left=10, top=585, zIndex=9.1)))
         
         self.__skeleton = Skeleton()
         self.__skeletonMesh = None
@@ -273,7 +273,7 @@ class SkeletonView(gui3d.TaskView):
 def load(app):
     
     category = app.getCategory('Posing')
-    taskview = SkeletonView(category)
+    taskview = category.addView(SkeletonView(category))
     
     print 'Skeleton loaded'
 

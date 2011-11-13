@@ -49,7 +49,7 @@ class SaveTaskView(gui3d.TaskView):
     def __init__(self, category):
         
         gui3d.TaskView.__init__(self, category, 'Save')
-        self.fileentry = gui3d.FileEntryView(self, 'Save')
+        self.fileentry = self.addView(gui3d.FileEntryView('Save'))
         
         mesh = gui3d.FrameMesh(100, 100)
         self.selection = gui3d.app.addObject(gui3d.Object([0, 0, 9], mesh))
@@ -205,7 +205,7 @@ class LoadTaskView(gui3d.TaskView):
         
         modelPath = mh.getPath('models')
         gui3d.TaskView.__init__(self, category, 'Load', )
-        self.filechooser = gui3d.FileChooser(self, modelPath, 'mhm', sort=HumanFileSort())
+        self.filechooser = self.addView(gui3d.FileChooser(modelPath, 'mhm', sort=HumanFileSort()))
 
         @self.filechooser.event
         def onFileSelected(filename):
@@ -252,73 +252,73 @@ class ExportTaskView(gui3d.TaskView):
     def __init__(self, category):
         
         gui3d.TaskView.__init__(self, category, 'Export')
-        self.fileentry = gui3d.FileEntryView(self, 'Export')
+        self.fileentry = self.addView(gui3d.FileEntryView('Export'))
 
         self.exportBodyGroup = []
         self.exportHairGroup = []
         
         # Formats
         y = 80
-        self.formatBox = gui3d.GroupBox(self, [10, y, 9.0], 'Format', gui3d.GroupBoxStyle._replace(height=25+24*5+6));y+=25
-        self.wavefrontObj = gui3d.RadioButton(self.formatBox, self.exportBodyGroup, "Wavefront obj", True, gui3d.ButtonStyle);y+=24
-        self.mhx = gui3d.RadioButton(self.formatBox, self.exportBodyGroup, label="Blender exchange (mhx)", style=gui3d.ButtonStyle);y+=24
-        self.collada = gui3d.RadioButton(self.formatBox, self.exportBodyGroup, label="Collada (dae)", style=gui3d.ButtonStyle);y+=24
-        self.md5 = gui3d.RadioButton(self.formatBox, self.exportBodyGroup, label="MD5", style=gui3d.ButtonStyle);y+=24
-        self.stl = gui3d.RadioButton(self.formatBox, self.exportBodyGroup, label="Stereolithography (stl)", style=gui3d.ButtonStyle);y+=24
+        self.formatBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Format', gui3d.GroupBoxStyle._replace(height=25+24*5+6)));y+=25
+        self.wavefrontObj = self.formatBox.addView(gui3d.RadioButton(self.exportBodyGroup, "Wavefront obj", True, gui3d.ButtonStyle));y+=24
+        self.mhx = self.formatBox.addView(gui3d.RadioButton(self.exportBodyGroup, label="Blender exchange (mhx)", style=gui3d.ButtonStyle));y+=24
+        self.collada = self.formatBox.addView(gui3d.RadioButton(self.exportBodyGroup, label="Collada (dae)", style=gui3d.ButtonStyle));y+=24
+        self.md5 = self.formatBox.addView(gui3d.RadioButton(self.exportBodyGroup, label="MD5", style=gui3d.ButtonStyle));y+=24
+        self.stl = self.formatBox.addView(gui3d.RadioButton(self.exportBodyGroup, label="Stereolithography (stl)", style=gui3d.ButtonStyle));y+=24
         y+=16
             
         # OBJ options
         yy = y
-        self.objOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*10+6));y+=25
-        self.exportEyebrows = gui3d.CheckBox(self.objOptions, "Eyebrows", True);y+=24
-        self.exportDiamonds = gui3d.CheckBox(self.objOptions, "Diamonds", False);y+=24
-        self.exportSkeleton = gui3d.CheckBox(self.objOptions, "Skeleton", True);y+=24
-        self.exportGroups = gui3d.CheckBox(self.objOptions, "Groups", True);y+=24
-        self.exportSmooth = gui3d.CheckBox(self.objOptions, "Subdivide", False);y+=24
-        self.exportHair = gui3d.CheckBox(self.objOptions, "Hair as mesh", selected=True);y+=24
+        self.objOptions = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*10+6)));y+=25
+        self.exportEyebrows = self.objOptions.addView(gui3d.CheckBox("Eyebrows", True));y+=24
+        self.exportDiamonds = self.objOptions.addView(gui3d.CheckBox("Diamonds", False));y+=24
+        self.exportSkeleton = self.objOptions.addView(gui3d.CheckBox("Skeleton", True));y+=24
+        self.exportGroups = self.objOptions.addView(gui3d.CheckBox("Groups", True));y+=24
+        self.exportSmooth = self.objOptions.addView(gui3d.CheckBox( "Subdivide", False));y+=24
+        self.exportHair = self.objOptions.addView(gui3d.CheckBox("Hair as mesh", selected=True));y+=24
         
         # MHX options
         y = yy
-        self.mhxOptionsSource = gui3d.GroupBox(self, [10, y, 9.0], 'Options source', gui3d.GroupBoxStyle._replace(height=25+24*2+6));y+=25
+        self.mhxOptionsSource = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options source', gui3d.GroupBoxStyle._replace(height=25+24*2+6)));y+=25
         source = []
-        self.mhxConfig = gui3d.RadioButton(self.mhxOptionsSource, source, "Use config options", True);y+=24
-        self.mhxGui = gui3d.RadioButton(self.mhxOptionsSource, source, "Use gui options");y+=24
+        self.mhxConfig = self.mhxOptionsSource.addView(gui3d.RadioButton(source, "Use config options", True));y+=24
+        self.mhxGui = self.mhxOptionsSource.addView(gui3d.RadioButton(source, "Use gui options"));y+=24
         self.mhxOptionsSource.hide()
         y+=16
         
-        self.mhxOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*14+6));y+=25
-        self.version24 = gui3d.CheckBox(self.mhxOptions, "Version 2.4", True);y+=24
-        self.version25 = gui3d.CheckBox(self.mhxOptions, "Version 2.5", True);y+=24
-        self.exportExpressions = gui3d.CheckBox(self.mhxOptions, "Expressions", True);y+=24
-        self.exportFaceShapes = gui3d.CheckBox(self.mhxOptions, "Face shapes", True);y+=24
-        self.exportBodyShapes = gui3d.CheckBox(self.mhxOptions, "Body shapes", False);y+=24
-        self.exportClothes = gui3d.CheckBox(self.mhxOptions, "Clothes", True);y+=24
-        self.exportCage = gui3d.CheckBox(self.mhxOptions, "Cage", False);y+=24
+        self.mhxOptions = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*14+6)));y+=25
+        self.version24 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.4", True));y+=24
+        self.version25 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.5", True));y+=24
+        self.exportExpressions = self.mhxOptions.addView(gui3d.CheckBox("Expressions", True));y+=24
+        self.exportFaceShapes = self.mhxOptions.addView(gui3d.CheckBox("Face shapes", True));y+=24
+        self.exportBodyShapes = self.mhxOptions.addView(gui3d.CheckBox("Body shapes", False));y+=24
+        self.exportClothes = self.mhxOptions.addView(gui3d.CheckBox("Clothes", True));y+=24
+        self.exportCage = self.mhxOptions.addView(gui3d.CheckBox("Cage", False));y+=24
         rigs = []
-        self.mhxRig = gui3d.RadioButton(self.mhxOptions, rigs, "Use mhx rig", True);y+=24
-        self.rigifyRig = gui3d.RadioButton(self.mhxOptions, rigs, "Use rigify rig");y+=24
-        self.gameRig = gui3d.RadioButton(self.mhxOptions, rigs, "Use game rig");y+=24
+        self.mhxRig = self.mhxOptions.addView(gui3d.RadioButton(rigs, "Use mhx rig", True));y+=24
+        self.rigifyRig = self.mhxOptions.addView(gui3d.RadioButton(rigs, "Use rigify rig"));y+=24
+        self.gameRig = self.mhxOptions.addView(gui3d.RadioButton(rigs, "Use game rig"));y+=24
 
         self.mhxOptions.hide()
         
         # Collada options
         y = yy
-        self.colladaOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*8+6));y+=25
-        self.colladaRot90 = gui3d.CheckBox(self.colladaOptions, "Rotate 90", False);y+=24
-        self.colladaCopyImages = gui3d.CheckBox(self.colladaOptions, "Copy images", False);y+=24
+        self.colladaOptions = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*8+6)));y+=25
+        self.colladaRot90 = self.colladaOptions.addView(gui3d.CheckBox("Rotate 90", False));y+=24
+        self.colladaCopyImages = self.colladaOptions.addView(gui3d.CheckBox("Copy images", False));y+=24
         rigs = []
-        self.gameDae = gui3d.RadioButton(self.colladaOptions, rigs, "Default rig", True);y+=24
-        self.dazDae = gui3d.RadioButton(self.colladaOptions, rigs, "Poser/DAZ rig");y+=24
-        #self.mbDae = gui3d.RadioButton(self.colladaOptions, rigs, "Motionbuilder rig");y+=24
+        self.gameDae = self.colladaOptions.addView(gui3d.RadioButton(rigs, "Default rig", True));y+=24
+        self.dazDae = self.colladaOptions.addView(gui3d.RadioButton(rigs, "Poser/DAZ rig"));y+=24
+        #self.mbDae = self.colladaOptions.addView(gui3d.RadioButton(rigs, "Motionbuilder rig"));y+=24
         self.colladaOptions.hide()
 
         # STL options
         y = yy
-        self.stlOptions = gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*3+6));y+=25
+        self.stlOptions = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*3+6)));y+=25
         stlOptions = []
-        self.stlAscii = gui3d.RadioButton(self.stlOptions, stlOptions,  "Ascii", selected=True);y+=24
-        self.stlBinary = gui3d.RadioButton(self.stlOptions, stlOptions, "Binary");y+=24
-        self.stlSmooth = gui3d.CheckBox(self.stlOptions, "Subdivide", False);y+=24
+        self.stlAscii = self.stlOptions.addView(gui3d.RadioButton(stlOptions,  "Ascii", selected=True));y+=24
+        self.stlBinary = self.stlOptions.addView(gui3d.RadioButton(stlOptions, "Binary"));y+=24
+        self.stlSmooth = self.stlOptions.addView(gui3d.CheckBox("Subdivide", False));y+=24
         self.stlOptions.hide()
         
         @self.mhxConfig.event
@@ -542,8 +542,8 @@ class FilesCategory(gui3d.Category):
         
         gui3d.Category.__init__(self, parent, 'Files')
 
-        SaveTaskView(self)
-        LoadTaskView(self)
-        ExportTaskView(self)
+        self.addView(SaveTaskView(self))
+        self.addView(LoadTaskView(self))
+        self.addView(ExportTaskView(self))
 
 

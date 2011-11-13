@@ -11,11 +11,11 @@ class HelpTaskView(gui3d.TaskView):
         
         gui3d.TaskView.__init__(self, category, 'Help')
 
-        optionsBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Support options', gui3d.GroupBoxStyle._replace(height=25+24*4+6))
-        self.manualButton = gui3d.Button(optionsBox, "Manual")
-        self.reportBugButton = gui3d.Button(optionsBox, "Report bug")
-        self.requestFeatureButton = gui3d.Button(optionsBox, "Request feature")
-        self.donateButton = gui3d.Button(optionsBox, "Donate")
+        optionsBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Support options', gui3d.GroupBoxStyle._replace(height=25+24*4+6)))
+        self.manualButton = optionsBox.addView(gui3d.Button("Manual"))
+        self.reportBugButton = optionsBox.addView(gui3d.Button("Report bug"))
+        self.requestFeatureButton = optionsBox.addView(gui3d.Button("Request feature"))
+        self.donateButton = optionsBox.addView(gui3d.Button("Donate"))
         
         @self.manualButton.event
         def onClicked(event):
@@ -40,7 +40,7 @@ class HelpTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Help')
-    taskview = HelpTaskView(category)
+    taskview = category.addView(HelpTaskView(category))
     print 'Help imported'
 
 def unload(app):

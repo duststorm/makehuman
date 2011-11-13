@@ -76,8 +76,6 @@ class Object(events3d.EventHandler):
     """
     An object on the screen.
     
-    :param view: The parent view.
-    :type view: gui3d.View
     :param position: The position in 3d space.
     :type position: list or tuple
     :param mesh: The mesh object.
@@ -395,8 +393,6 @@ class TextObject(Object):
     """
     A text object on the screen.
     
-    :param view: The parent view.
-    :type view: gui3d.View
     :param position: The position in 3d space.
     :type position: list or tuple
     :param text: The text.
@@ -500,7 +496,7 @@ class BoxLayout(Layout):
         self.spaceAvailable = None
         self.rowHeight = 0
 
-    def onChildAdded(self, child, init=True):
+    def onChildAdded(self, child):
 
         childWidth = child.style.width + child.style.margin[0] + child.style.margin[2]
         childHeight = child.style.height + child.style.margin[1] + child.style.margin[3]
@@ -532,10 +528,10 @@ class BoxLayout(Layout):
         position[1] += child.style.margin[1]
         
         # Add child
-        if init:
-            child.style.left, child.style.top, child.style.zIndex = position
-        else:
-            child.setPosition(position)
+        #if init:
+        #    child.style.left, child.style.top, child.style.zIndex = position
+        #else:
+        child.setPosition(position)
             
         # In case not all children have the same height
         self.rowHeight = max(self.rowHeight, childHeight)
@@ -549,7 +545,7 @@ class BoxLayout(Layout):
         
         for child in self.view.children:
             if child.isShown():
-                self.onChildAdded(child, False)
+                self.onChildAdded(child)
                 
     @property
     def height(self):
@@ -581,8 +577,6 @@ class View(events3d.EventHandler):
     """
     The base view from which all widgets are derived.
     
-    :param parent: The parent view.
-    :type parent: gui3d.View
     :param style: The style.
     :type style: gui3d.Style
     :param layout: The layout.
@@ -591,22 +585,15 @@ class View(events3d.EventHandler):
     :type visible: Boolean
     """
 
-    def __init__(self, parent=None, style=None, layout=None, visible=True):
-        
-        if not parent:
-            raise RuntimeError('A view needs a parent')
-                
-        self.__parent = weakref.ref(parent)
+    def __init__(self, style=None, layout=None, visible=True):
+
         self.children = []
         self.objects = []
         self.style = Style(parent=(style if style else ViewStyle))
         self.layout = layout
         self.__visible = visible
-        self.__totalVisibility = parent.isVisible() and visible
-
-        self.parent.children.append(self)
-        if self.parent.layout:
-            self.parent.layout.onChildAdded(self)
+        self.__totalVisibility = False
+        self.__parent = None
 
     def __del__(self):
     
@@ -615,24 +602,25 @@ class View(events3d.EventHandler):
         
     @property
     def parent(self):
-        return self.__parent();
+        if self.__parent:
+            return self.__parent();
+        else:
+            return None
         
-    def remove(self):
-    
-        self.parent.children.remove(self)
-        if self.parent.layout:
-            self.parent.layout.rebuild()
-            
     def addView(self, view):
     
         if view.parent:
             raise RuntimeException('The view is already attached to a view')
             
-        view.parent = self
+        view.__parent = weakref.ref(self)
+        view.__updateVisibility()
         self.children.append(view)
+
+        if self.layout:
+            self.layout.onChildAdded(view)
         
-        for object in self.objects:
-            object.attach()
+        for object in view.objects:
+            object._Object__attach()
             
         return view
     
@@ -641,11 +629,14 @@ class View(events3d.EventHandler):
         if view not in self.children:
             raise RuntimeException('The view is not a child of this view')
             
-        view.parent = None
+        view.__parent = None
         self.children.remove(view)
         
-        for object in self.objects:
-            object.detach()
+        if self.layout:
+            self.layout.rebuild(view)
+        
+        for object in view.objects:
+            object._Object__detach()
             
     def addObject(self, object):
         """
@@ -801,7 +792,7 @@ TaskTabStyle = Style(**{
 class TaskView(View):
 
     def __init__(self, category, name, label=None, style=TaskTabStyle):
-        View.__init__(self, category, None, None, False)
+        View.__init__(self, None, None, False)
         self.name = name
         self.focusWidget = None
 
@@ -863,22 +854,22 @@ CategoryButtonStyle = Style(**{
 
 class Category(View):
 
-    def __init__(self, parent, name, label = None, tabStyle=CategoryTabStyle):
+    def __init__(self, app, name, label = None, tabStyle=CategoryTabStyle):
         
-        View.__init__(self, parent, None, None, False)
+        View.__init__(self, None, None, False)
         
         self.name = name
         self.tasks = []
         self.tasksByName = {}
 
-        if name in parent.categories:
+        if name in app.categories:
             raise KeyError('A category with this name already exists', name)
 
-        parent.categories[name] = self
-        self.tab = parent.tabs.addTab(label or name, style=tabStyle)
+        app.categories[name] = self
+        self.tab = app.tabs.addTab(label or name, style=tabStyle)
         self.tab.name = self.name
         
-        self.tabs = TabView(self, style=TabViewStyle._replace(top=32, normal="lowerbar.png"), tabStyle=TaskTabStyle)
+        self.tabs = self.addView(TabView(style=TabViewStyle._replace(top=32, normal="lowerbar.png"), tabStyle=TaskTabStyle))
         
         @self.tabs.event
         def onTabSelected(tab):
@@ -996,6 +987,34 @@ class Application(events3d.EventHandler):
         self.objects.remove(object)
         
         object._Object__detach()
+        
+    def addView(self, view):
+    
+        if view.parent:
+            raise RuntimeException('The view is already attached to a view')
+            
+        view._View__parent = weakref.ref(self)
+        view._View__updateVisibility()
+        self.children.append(view)
+
+        if self.layout:
+            self.layout.onChildAdded(view)
+        
+        for object in view.objects:
+            object._Object__attach()
+            
+        return view
+    
+    def removeView(self, view):
+    
+        if view not in self.children:
+            raise RuntimeException('The view is not a child of this view')
+            
+        view._View__parent = None
+        self.children.remove(view)
+        
+        for object in view.objects:
+            object._Object__detach()
 
     def isVisible(self):
         return True
@@ -1227,7 +1246,7 @@ class Application(events3d.EventHandler):
         try:
             return self.categories[name]
         except:
-            return Category(self, name, None, style)
+            return self.addView(Category(self, name, None, style))
 
 # Widgets
 
@@ -1258,17 +1277,15 @@ class TabView(View):
     """
     A tab widget. This widget can be used to switch between widgets.
 
-    :param parent: The parent view.
-    :type parent: gui3d.View
     :param style: The style.
     :type style: gui3d.Style
     :param tabStyle: The tab style.
     :type tabStyle: gui3d.Style
     """
 
-    def __init__(self, parent, style=TabViewStyle, tabStyle=TabViewTabStyle):
+    def __init__(self, style=TabViewStyle, tabStyle=TabViewTabStyle):
         
-        View.__init__(self, parent, style, BoxLayout(self))
+        View.__init__(self, style, BoxLayout(self))
         
         self.box = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex],
             RectangleMesh(self.style.width, self.style.height,
@@ -1312,7 +1329,7 @@ class TabView(View):
         :return: The new tab, which is a ToggleButton.
         :rtype: gui3d.ToggleButton
         """
-        tab = ToggleButton(self, label, style=style or self.tabStyle)
+        tab = self.addView(ToggleButton(label, style=style or self.tabStyle))
 
         @tab.event
         def onClicked(event):
@@ -1345,8 +1362,6 @@ class Slider(View):
     For real-time feedback the onChanging event is triggered when the slider is being moved, with the
     current value as parameter.
     
-    :param parent: The parent view.
-    :type parent: gui3d.View
     :param value: The original value.
     :type value: int or float
     :param min: The minimum value.
@@ -1361,10 +1376,10 @@ class Slider(View):
     :type thumbStyle: gui3d.Style
     """
 
-    def __init__(self, parent, value=0.0, min=0.0, max=1.0, label=None,
+    def __init__(self, value=0.0, min=0.0, max=1.0, label=None,
         style=SliderStyle, thumbStyle=SliderThumbStyle):
         
-        View.__init__(self, parent, style)
+        View.__init__(self, style)
         
         self.thumbStyle = thumbStyle
         
@@ -1382,10 +1397,10 @@ class Slider(View):
             self.label = self.addObject(TextObject([style.left, style.top + style.height / 4 - font.lineHeight / 2, style.zIndex + 0.2], app.getLanguageString(label), font = app.getFont(style.fontFamily)))
             if '%' in label:
                 self.labelFormat = app.getLanguageString(label)
-                self.edit = TextEdit(self, '',
+                self.edit = self.addView(TextEdit('',
                     TextEditStyle._replace(width=self.style.width, height=16,
                     left=style.left, top=style.top, zIndex=style.zIndex + 0.3),
-                    intValidator if isinstance(min, int) else floatValidator)
+                    intValidator if isinstance(min, int) else floatValidator))
                 self.edit.hide()
                 
                 @self.edit.event
@@ -1617,8 +1632,6 @@ class Button(View):
     The onClicked event is triggered when the button is clicked and the mouse is released while being
     over the widget.
     
-    :param parent: The parent view.
-    :type parent: gui3d.View
     :param label: The label.
     :type label: str
     :param selected: The selected state.
@@ -1627,7 +1640,7 @@ class Button(View):
     :type style: gui3d.Style
     """
 
-    def __init__(self, parent, label=None, selected=False, style=ButtonStyle):
+    def __init__(self, label=None, selected=False, style=ButtonStyle):
 
         font = app.getFont(style.fontFamily)
         translatedLabel = app.getLanguageString(label) if label else ''
@@ -1636,7 +1649,7 @@ class Button(View):
         if labelWidth > style.width - style.padding[0] - style.padding[2]:
             style = Style(parent=style, width=labelWidth + style.padding[0] + style.padding[2])
         
-        View.__init__(self, parent, style)
+        View.__init__(self, style)
         
         self.label = None
         
@@ -1772,8 +1785,6 @@ class RadioButton(Button):
     The onClicked event can be used to know when the user changes his/her choice, though generally this choice
     is determined in an action by checking each radio button's selected property.
     
-    :param parent: The parent view.
-    :type parent: gui3d.View
     :param group: The group.
     :type group: list
     :param label: The label.
@@ -1784,9 +1795,9 @@ class RadioButton(Button):
     :type style: gui3d.Style
     """
     
-    def __init__(self, parent, group, label=None, selected=False, style=RadioButtonStyle):
+    def __init__(self, group, label=None, selected=False, style=RadioButtonStyle):
     
-        Button.__init__(self, parent, label, selected, style)
+        Button.__init__(self, label, selected, style)
         self.group = group
         self.group.append(self)
 
@@ -1821,8 +1832,6 @@ class ToggleButton(Button):
     The onClicked event can be used to know when the user changes his/her choice, though generally this choice
     is determined in an action by checking the toggle button's selected property.
     
-    :param parent: The parent view.
-    :type parent: gui3d.View
     :param label: The label.
     :type label: str
     :param selected: The selected state.
@@ -1831,9 +1840,9 @@ class ToggleButton(Button):
     :type style: gui3d.Style
     """
 
-    def __init__(self, parent, label=None, selected=False, style=ButtonStyle):
+    def __init__(self, label=None, selected=False, style=ButtonStyle):
     
-        Button.__init__(self, parent, label, selected, style)
+        Button.__init__(self, label, selected, style)
 
     def onClicked(self, event):
         if self.selected:
@@ -1868,8 +1877,6 @@ class CheckBox(ToggleButton):
     """
     A CheckBox is a ToggleButton with the look of a standard check box.
 
-    :param parent: The parent view.
-    :type parent: gui3d.View
     :param label: The label.
     :type label: str
     :param selected: The selected state.
@@ -1878,9 +1885,9 @@ class CheckBox(ToggleButton):
     :type style: gui3d.Style
     """
     
-    def __init__(self, parent, label=None, selected=False, style=CheckBoxStyle):
+    def __init__(self, label=None, selected=False, style=CheckBoxStyle):
     
-        Button.__init__(self, parent, label, selected, style)
+        Button.__init__(self, label, selected, style)
 
 ProgressBarStyle = Style(**{
     'parent':ViewStyle,
@@ -1902,8 +1909,6 @@ class ProgressBar(View):
     A ProgressBar widget. This widget can be used to show the user the progress of a 
     lengthy operation.
     
-    :param parent: The parent view.
-    :type parent: gui3d.View
     :param style: The style.
     :type style: gui3d.Style
     :param barStyle: The bar style.
@@ -1912,9 +1917,9 @@ class ProgressBar(View):
     :type visible: Boolean
     """
 
-    def __init__(self, parent, style=ProgressBarStyle, barStyle=ProgressBarBarStyle, visible=True):
+    def __init__(self, style=ProgressBarStyle, barStyle=ProgressBarBarStyle, visible=True):
 
-        View.__init__(self, parent, style, None, visible)
+        View.__init__(self, style, None, visible)
         
         mesh = RectangleMesh(style.width, style.height, app.getThemeResource('images', style.normal))
         self.background = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex], mesh))
@@ -1957,17 +1962,15 @@ class TextView(View):
     """
     A TextView widget. This widget can be used as a label. The text is not editable by the user.
     
-    :param parent: The parent view.
-    :type parent: gui3d.View
     :param label: The initial text.
     :type label: str
     :param style: The style.
     :type style: gui3d.Style
     """
 
-    def __init__(self, parent, label = '', style=TextViewStyle):
+    def __init__(self, label = '', style=TextViewStyle):
         
-        View.__init__(self, parent, style)
+        View.__init__(self, style)
         
         self.textObject = self.addObject(TextObject([self.style.left, self.style.top, self.style.zIndex], label,
             style.width, style.textAlign, app.getFont(style.fontFamily)))
@@ -2002,8 +2005,6 @@ class TextEdit(View):
     """
     A TextEdit widget. This widget can be used to let the user enter some text.
     
-    :param parent: The parent view.
-    :type parent: gui3d.View
     :param label: The initial text.
     :type label: str
     :param style: The style.
@@ -2012,9 +2013,9 @@ class TextEdit(View):
     :type validator: method
     """
 
-    def __init__(self, parent, text='', style=TextEditStyle, validator = None):
+    def __init__(self, text='', style=TextEditStyle, validator = None):
         
-        View.__init__(self, parent, style)
+        View.__init__(self, style)
         
         self.texture = app.getThemeResource('images', 'texedit_off.png')
         self.focusedTexture = app.getThemeResource('images', 'texedit_on.png')
@@ -2191,17 +2192,15 @@ class FileEntryView(View):
     """
     A FileEntryView widget. This widget can be used to let the user enter a filename.
     
-    :param parent: The parent view.
-    :type parent: gui3d.View
     :param buttonLabel: The label for the confirm button.
     :type buttonLabel: str
     """
 
-    def __init__(self, parent, buttonLabel):
-        View.__init__(self, parent)
+    def __init__(self, buttonLabel):
+        View.__init__(self)
 
-        self.edit = TextEdit(self, style=TextEditStyle._replace(left=200, top=90, zIndex=9.5), validator=filenameValidator)
-        self.bConfirm = Button(self, buttonLabel, style=ButtonStyle._replace(width=40, height=20, left=610, top=90, zIndex=9.1))
+        self.edit = self.addView(TextEdit(style=TextEditStyle._replace(left=200, top=90, zIndex=9.5), validator=filenameValidator))
+        self.bConfirm = self.addView(Button(buttonLabel, style=ButtonStyle._replace(width=40, height=20, left=610, top=90, zIndex=9.1)))
 
         @self.bConfirm.event
         def onClicked(event):
@@ -2231,9 +2230,9 @@ FileChooserRectangleStyle = Style(**{
 
 class FileChooserRectangle(View):
     
-    def __init__(self, parent, file, label, style=FileChooserRectangleStyle):
+    def __init__(self, file, label, style=FileChooserRectangleStyle):
         
-        View.__init__(self, parent, style)
+        View.__init__(self, style)
         
         # Preview
         mesh = RectangleMesh(self.style.width, self.style.height, self.style.normal)
@@ -2310,9 +2309,9 @@ class FileSort():
 
 class FileSortRadioButton(RadioButton):
     
-    def __init__(self, parent, group, selected, field):
+    def __init__(self, group, selected, field):
         
-        RadioButton.__init__(self, parent, group, "By %s" % field, selected=selected)
+        RadioButton.__init__(self, group, "By %s" % field, selected=selected)
         self.field = field
         
     def onClicked(self, event):
@@ -2327,8 +2326,6 @@ class FileChooser(View):
     """
     A FileChooser widget. This widget can be used to let the user choose an existing file.
     
-    :param parent: The parent view.
-    :type parent: gui3d.View
     :param path: The path from which the recursive search is started.
     :type path: str
     :param extension: The extension(s) of the files to display.
@@ -2343,22 +2340,22 @@ class FileChooser(View):
     :type style: gui3d.Style
     """
     
-    def __init__(self, parent, path, extension, previewExtension='bmp', notFoundImage=None, sort=FileSort(), style=FileChooserStyle):
+    def __init__(self, path, extension, previewExtension='bmp', notFoundImage=None, sort=FileSort(), style=FileChooserStyle):
         
-        View.__init__(self, parent, style, None)
+        View.__init__(self, style, None)
         
         self.path = path
         self.extension = extension
         self.previewExtension = previewExtension
-        self.slider = Slider(self, 0, 0, 0, style=SliderStyle._replace(left=10, top=600-35, zIndex=9.1))
+        self.slider = self.addView(Slider(0, 0, 0, style=SliderStyle._replace(left=10, top=600-35, zIndex=9.1)))
         font = app.getFont(TextViewStyle.fontFamily)
-        self.location = TextView(self.slider, os.path.abspath(path), style=TextViewStyle._replace(left=10 + 112 + 10, top=600-2-font.lineHeight, zIndex=9.1))
-        self.sortBox = GroupBox(self.slider, [10, 80, 9.0], 'Sort')
+        self.location = self.slider.addView(TextView(os.path.abspath(path), style=TextViewStyle._replace(left=10 + 112 + 10, top=600-2-font.lineHeight, zIndex=9.1)))
+        self.sortBox = self.slider.addView(GroupBox([10, 80, 9.0], 'Sort'))
         sortgroup = []
         self.sort = sort
-        self.refreshButton = Button(self.sortBox, 'Refresh')
+        self.refreshButton = self.sortBox.addView(Button('Refresh'))
         for i, field in enumerate(self.sort.fields()):
-            FileSortRadioButton(self.sortBox, sortgroup, (i==0), field)
+            self.sortBox.addView(FileSortRadioButton(sortgroup, (i==0), field))
         self.layout = BoxLayout(self) # We set the layout here so that it doesn't influence the placement of the slider
         self.files = []
         self.selection = ''
@@ -2433,7 +2430,7 @@ class FileChooser(View):
             if isinstance(self.extension, str):
                 label = os.path.basename(file.replace(os.path.splitext(file)[-1], ''))
             
-            FileChooserRectangle(self, file, label or os.path.basename(file), FileChooserRectangleStyle._replace(normal=self.getPreview(file)))
+            self.addView(FileChooserRectangle(file, label or os.path.basename(file), FileChooserRectangleStyle._replace(normal=self.getPreview(file))))
                 
         self.__updateScrollBar()
             
@@ -2736,8 +2733,6 @@ class GroupBox(View):
     """
     A group box widget. This widget can be used to show which widgets belong together.
     
-    :param parent: The parent view.
-    :type parent: gui3d.View
     :param position: The position, a list of 3 int or float elements.
     :type position: list
     :param label: The label.
@@ -2746,13 +2741,13 @@ class GroupBox(View):
     :type style: gui3d.Style
     """
 
-    def __init__(self, parent, position=[0, 0, 9], label=None, style=GroupBoxStyle):
+    def __init__(self, position=[0, 0, 9], label=None, style=GroupBoxStyle):
         
         font = app.getFont(style.fontFamily)
         translatedLabel = app.getLanguageString(label) if label else ''
         labelWidth = font.stringWidth(translatedLabel) if translatedLabel else 0
         
-        View.__init__(self, parent, style, BoxLayout(self))
+        View.__init__(self, style, BoxLayout(self))
         
         texture = app.getThemeResource('images', style.normal)
         mesh = NineSliceMesh(self.style.width, self.style.height, texture, self.style.border)
@@ -2809,17 +2804,15 @@ class ShortcutEdit(View):
     """
     An edit control for entering shortcuts.
 
-    :param parent: The parent view.
-    :type parent: gui3d.View
     :param position: The position, a list of 4 int or float elements.
     :type position: list
     :param shortcut: The shortcut, a tuple of modifiers and a key.
     :type shortcut: tuple
     """
     
-    def __init__(self, parent, shortcut, style=ShortcutEditStyle):
+    def __init__(self, shortcut, style=ShortcutEditStyle):
 
-        View.__init__(self, parent, style)
+        View.__init__(self, style)
         
         self.texture = app.getThemeResource('images', self.style.normal)
         self.focusedTexture = app.getThemeResource('images', self.style.focused)
@@ -2938,17 +2931,15 @@ class MouseActionEdit(ShortcutEdit):
     """
     An edit control for entering mouse actions.
     
-    :param parent: The parent view.
-    :type parent: gui3d.View
     :param position: The position, a list of 3 int or float elements.
     :type position: list
     :param shortcut: The shortcut, a tuple of modifiers and a key.
     :type shortcut: tuple
     """
     
-    def __init__(self, parent, shortcut):
+    def __init__(self, shortcut):
         
-        ShortcutEdit.__init__(self, parent, shortcut)
+        ShortcutEdit.__init__(self, shortcut)
         
     def onMouseDragged(self, event):
         

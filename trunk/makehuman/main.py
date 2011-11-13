@@ -52,6 +52,18 @@ import sys
 sys.path.append("./pythonmodules")
 import os
 
+def printleaf(object, indent=0):
+
+    print "%s%s %s" % (' ' * indent, object, object._Object__view)
+
+def printtree(view, indent=0):
+
+    print "%s%s %s" % (' ' * indent, type(view), type(view.parent))
+    for child in view.children:
+        printtree(child, indent+2)
+    for object in view.objects:
+        printleaf(object, indent+2)
+
 def recursiveDirNames(root):
   pathlist=[]
   #root=os.path.dirname(root)
@@ -246,9 +258,9 @@ class Camera(events3d.EventHandler):
 
 class PluginCheckBox(gui3d.CheckBox):
 
-    def __init__(self, parent, module):
+    def __init__(self, module):
     
-        gui3d.CheckBox.__init__(self, parent, module, False if module in gui3d.app.settings['excludePlugins'] else True)
+        gui3d.CheckBox.__init__(self, module, False if module in gui3d.app.settings['excludePlugins'] else True)
         self.module = module
         
     def onClicked(self, event):
@@ -265,10 +277,10 @@ class PluginsTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Plugins')
 
-        pluginsBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Plugins')
+        self.pluginsBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Plugins'))
         
         for module in gui3d.app.modules:
-            check = PluginCheckBox(pluginsBox, module)
+            check = self.pluginsBox.addView(PluginCheckBox(module))
         
 class MHApplication(gui3d.Application):
   
@@ -365,12 +377,12 @@ class MHApplication(gui3d.Application):
         # Display the initial splash screen and the progress bar during startup
         mesh = gui3d.RectangleMesh(800, 600, gui3d.app.getThemeResource('images', 'splash.png'))
         self.splash = self.addObject(gui3d.Object([0, 0, 9.8], mesh))
-        self.progressBar = gui3d.ProgressBar(self, style=gui3d.ProgressBarStyle._replace(left=800-150, top=600-15, zIndex=9.85))
-        self.progressBar.text = gui3d.TextView(self.progressBar, style=gui3d.TextViewStyle._replace(left=10, top=600-20, zIndex=9.85, width=800-150-20, textAlign=gui3d.AlignRight))
+        self.progressBar = self.addView(gui3d.ProgressBar(gui3d.ProgressBarStyle._replace(left=800-150, top=600-15, zIndex=9.85)))
+        self.progressBar.text = self.progressBar.addView(gui3d.TextView(style=gui3d.TextViewStyle._replace(left=10, top=600-20, zIndex=9.85, width=800-150-20, textAlign=gui3d.AlignRight)))
         self.scene3d.update()
         self.redrawNow()
         
-        self.tabs = gui3d.TabView(self)
+        self.tabs = self.addView(gui3d.TabView())
         
         @self.tabs.event
         def onTabSelected(tab):
@@ -503,8 +515,8 @@ class MHApplication(gui3d.Application):
 
         # Set up categories and tasks
         
-        guimodelling.ModellingCategory(self)
-        guifiles.FilesCategory(self)
+        self.addView(guimodelling.ModellingCategory(self))
+        self.addView(guifiles.FilesCategory(self))
         
         mh.callAsync(self.loadPlugins)
         
@@ -519,7 +531,10 @@ class MHApplication(gui3d.Application):
         self.pluginsToLoad.sort()
         self.pluginsToLoad.reverse()
         
-        mh.callAsync(self.loadNextPlugin)
+        if self.pluginsToLoad:
+            mh.callAsync(self.loadNextPlugin)
+        else:
+            mh.callAsync(self.loadGui)
     
     def loadNextPlugin(self):
         
@@ -566,21 +581,22 @@ class MHApplication(gui3d.Application):
     def loadGui(self):
         
         self.progressBar.setProgress(0.9)
-                    
-        PluginsTaskView(self.getCategory('Settings'))
+              
+        category = self.getCategory('Settings')
+        category.addView(PluginsTaskView(category))
           
         # Exit button
-        category = gui3d.Category(self, "Exit", tabStyle=gui3d.CategoryButtonStyle)
+        category = self.addView(gui3d.Category(self, "Exit", tabStyle=gui3d.CategoryButtonStyle))
         @category.tab.event
         def onClicked(event):
             self.promptAndExit()
           
-        self.undoButton = gui3d.Button(self, "Undo",
-            style=gui3d.ButtonStyle._replace(width=40, left=650, top=505, zIndex=9.1))
-        self.redoButton = gui3d.Button(self, "Redo",
-            style=gui3d.ButtonStyle._replace(width=40, left=694, top=505, zIndex=9.1))
-        self.resetButton = gui3d.Button(self, "Reset",
-            style=gui3d.ButtonStyle._replace(width=40, left=738, top=505, zIndex=9.1))
+        self.undoButton = self.addView(gui3d.Button("Undo",
+            style=gui3d.ButtonStyle._replace(width=40, left=650, top=505, zIndex=9.1)))
+        self.redoButton = self.addView(gui3d.Button("Redo",
+            style=gui3d.ButtonStyle._replace(width=40, left=694, top=505, zIndex=9.1)))
+        self.resetButton = self.addView(gui3d.Button("Reset",
+            style=gui3d.ButtonStyle._replace(width=40, left=738, top=505, zIndex=9.1)))
                                         
         @self.undoButton.event
         def onClicked(event):
@@ -598,10 +614,10 @@ class MHApplication(gui3d.Application):
             
             mh.setCaption("MakeHuman - [Untitled]")
           
-        self.globalButton = gui3d.Button(self, "Global cam",
-            style=gui3d.ButtonStyle._replace(width=128, height=20, left=650, top=530, zIndex=9.1))
-        self.faceButton = gui3d.Button(self, "Face cam",
-            style=gui3d.ButtonStyle._replace(width=128, height=20, left=650, top=555, zIndex=9.1))
+        self.globalButton = self.addView(gui3d.Button("Global cam",
+            style=gui3d.ButtonStyle._replace(width=128, height=20, left=650, top=530, zIndex=9.1)))
+        self.faceButton = self.addView(gui3d.Button("Face cam",
+            style=gui3d.ButtonStyle._replace(width=128, height=20, left=650, top=555, zIndex=9.1)))
         
         @self.globalButton.event
         def onClicked(event):
@@ -622,13 +638,13 @@ class MHApplication(gui3d.Application):
         
         self.selectedHuman.applyAllTargets(gui3d.app.progress)
         self.selectedHuman.callEvent('onChanged', human.HumanEvent(self.selectedHuman, 'reset'))
-        self.dialog = gui3d.View(self)
+        self.dialog = self.addView(gui3d.View())
         self.dialog.blocker = self.dialog.addObject(gui3d.Object([0, 0, 9.7], gui3d.RectangleMesh(800, 600)))
-        self.dialog.box = gui3d.GroupBox(self.dialog, [800 / 2 - 100, 600 / 2 - 75, 9.8], '', gui3d.GroupBoxStyle._replace(width=200, height=150))
-        self.dialog.text = gui3d.TextView(self.dialog.box, '', style=gui3d.TextViewStyle._replace(width=180))
-        self.dialog.check = gui3d.CheckBox(self.dialog.box, "Don't show this again", style=gui3d.CheckBoxStyle._replace(width=180, margin=[2, 4, 2, 2]))
-        self.dialog.button1 = gui3d.Button(self.dialog.box, '', style=gui3d.ButtonStyle._replace(width=60, margin=[2, 4, 2, 2]))
-        self.dialog.button2 = gui3d.Button(self.dialog.box, '', style=gui3d.ButtonStyle._replace(width=60, margin=[2, 4, 2, 2]))
+        self.dialog.box = self.dialog.addView(gui3d.GroupBox([800 / 2 - 100, 600 / 2 - 75, 9.8], '', gui3d.GroupBoxStyle._replace(width=200, height=150)))
+        self.dialog.text = self.dialog.box.addView(gui3d.TextView('', style=gui3d.TextViewStyle._replace(width=180)))
+        self.dialog.check = self.dialog.box.addView(gui3d.CheckBox("Don't show this again", style=gui3d.CheckBoxStyle._replace(width=180, margin=[2, 4, 2, 2])))
+        self.dialog.button1 = self.dialog.box.addView(gui3d.Button('', style=gui3d.ButtonStyle._replace(width=60, margin=[2, 4, 2, 2])))
+        self.dialog.button2 = self.dialog.box.addView(gui3d.Button('', style=gui3d.ButtonStyle._replace(width=60, margin=[2, 4, 2, 2])))
         self.dialog.button1Action = None
         self.dialog.button2Action = None
         self.dialog.helpId = None
@@ -642,6 +658,8 @@ class MHApplication(gui3d.Application):
         self.splash.hide()
         self.progressBar.blocker.show()
         mh.setCaption("MakeHuman - [Untitled]")
+        
+        printtree(self)
         
         @self.dialog.button1.event
         def onClicked(event):

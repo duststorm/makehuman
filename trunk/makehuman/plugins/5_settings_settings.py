@@ -6,9 +6,9 @@ import gui3d, mh, os
 
 class FontRadioButton(gui3d.RadioButton):
 
-    def __init__(self, parent, group, font):
+    def __init__(self, group, font):
     
-        gui3d.RadioButton.__init__(self, parent, group, font.capitalize(), gui3d.app.settings.get('font', 'arial') == font, style=gui3d.RadioButtonStyle._replace(fontFamily=font))
+        gui3d.RadioButton.__init__(self, group, font.capitalize(), gui3d.app.settings.get('font', 'arial') == font, style=gui3d.RadioButtonStyle._replace(fontFamily=font))
         self.font = font
         
     def onClicked(self, event):
@@ -19,9 +19,9 @@ class FontRadioButton(gui3d.RadioButton):
         
 class LanguageRadioButton(gui3d.RadioButton):
 
-    def __init__(self, parent, group, language):
+    def __init__(self, group, language):
     
-        gui3d.RadioButton.__init__(self, parent, group, language.capitalize(), gui3d.app.settings.get('language', 'english') == language)
+        gui3d.RadioButton.__init__(self, group, language.capitalize(), gui3d.app.settings.get('language', 'english') == language)
         self.language = language
         
     def onClicked(self, event):
@@ -38,54 +38,52 @@ class SettingsTaskView(gui3d.TaskView):
 
         self.shaderGroup = []
         y = 80
-        shaderBox = gui3d.GroupBox(self, [10, y, 9.0], 'Shader');y+=25
-        self.shaderNo = gui3d.RadioButton(shaderBox, self.shaderGroup, "No shader", True);y+=24
-        self.shaderPhong = gui3d.RadioButton(shaderBox, self.shaderGroup, "Phong shader");y+=24
-        self.shaderToon = gui3d.RadioButton(shaderBox, self.shaderGroup, "Toon shader");y+=24
-        self.shaderSkin = gui3d.RadioButton(shaderBox, self.shaderGroup, "Skin shader");y+=24
+        shaderBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Shader'));y+=25
+        self.shaderNo = shaderBox.addView(gui3d.RadioButton(self.shaderGroup, "No shader", True));y+=24
+        self.shaderPhong = shaderBox.addView(gui3d.RadioButton(self.shaderGroup, "Phong shader"));y+=24
+        self.shaderToon = shaderBox.addView(gui3d.RadioButton(self.shaderGroup, "Toon shader"));y+=24
+        self.shaderSkin = shaderBox.addView(gui3d.RadioButton(self.shaderGroup, "Skin shader"));y+=24
         y+=16
         
-        sliderBox = gui3d.GroupBox(self, [10, y, 9.0], 'Slider behavior');y+=25
-        self.realtimeUpdates = gui3d.CheckBox(sliderBox, "Update real-time",
-            gui3d.app.settings.get('realtimeUpdates', True));y+=24
-        self.realtimeNormalUpdates = gui3d.CheckBox(sliderBox, "Update normals",
-            gui3d.app.settings.get('realtimeNormalUpdates', True));y+=24
+        sliderBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Slider behavior'));y+=25
+        self.realtimeUpdates = sliderBox.addView(gui3d.CheckBox("Update real-time",
+            gui3d.app.settings.get('realtimeUpdates', True)));y+=24
+        self.realtimeNormalUpdates = sliderBox.addView(gui3d.CheckBox("Update normals",
+            gui3d.app.settings.get('realtimeNormalUpdates', True)));y+=24
         y+=16
             
-        mouseBox = gui3d.GroupBox(self, [10, y, 9.0], 'Mouse behavior');y+=25
-        self.normal = gui3d.Slider(mouseBox,
-            gui3d.app.settings.get('lowspeed', 1), 1, 10,
-            "Normal: %d");y+=36
-        self.shift = gui3d.Slider(mouseBox,
-            gui3d.app.settings.get('highspeed', 5), 1, 10,
-            "Shift: %d");y+=36
+        mouseBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Mouse behavior'));y+=25
+        self.normal = mouseBox.addView(gui3d.Slider(gui3d.app.settings.get('lowspeed', 1), 1, 10,
+            "Normal: %d"));y+=36
+        self.shift = mouseBox.addView(gui3d.Slider(gui3d.app.settings.get('highspeed', 5), 1, 10,
+            "Shift: %d"));y+=36
         y+=16
             
         modes = [] 
                
-        unitBox = self.unitsBox = gui3d.GroupBox(self, [10, y, 9.0], 'Units');y += 25
-        metric = gui3d.RadioButton(unitBox, modes, 'Metric', gui3d.app.settings.get('units', 'metric') == 'metric');y += 24
-        imperial = gui3d.RadioButton(unitBox, modes, 'Imperial', gui3d.app.settings.get('units', 'metric') == 'imperial');y += 24
+        unitBox = self.unitsBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Units'));y += 25
+        metric = unitBox.addView(gui3d.RadioButton(modes, 'Metric', gui3d.app.settings.get('units', 'metric') == 'metric'));y += 24
+        imperial = unitBox.addView(gui3d.RadioButton(modes, 'Imperial', gui3d.app.settings.get('units', 'metric') == 'imperial'));y += 24
         y+=16
         
         fonts = []
         
         y = 80
-        fontsBox = self.fontsBox = gui3d.GroupBox(self, [650, y, 9.0], 'Font');y += 25
+        fontsBox = self.fontsBox = self.addView(gui3d.GroupBox([650, y, 9.0], 'Font'));y += 25
         
         fontFiles = [os.path.basename(filename).replace('.fnt', '') for filename in os.listdir('data/fonts') if filename.split(os.extsep)[-1] == "fnt"]
         for font in fontFiles:
-            FontRadioButton(fontsBox, fonts, font);y += 24
+            fontsBox.addView(FontRadioButton(fonts, font));y += 24
         y+=16
         
         languages = []
         
-        languageBox = self.languageBox = gui3d.GroupBox(self, [650, y, 9.0], 'Language');y += 25
-        LanguageRadioButton(languageBox, languages, 'english');y += 24
+        languageBox = self.languageBox = self.addView(gui3d.GroupBox([650, y, 9.0], 'Language'));y += 25
+        languageBox.addView(LanguageRadioButton(languages, 'english'));y += 24
         
         languageFiles = [os.path.basename(filename).replace('.ini', '') for filename in os.listdir('data/languages') if filename.split(os.extsep)[-1] == "ini"]
         for language in languageFiles:
-            LanguageRadioButton(languageBox, languages, language);y += 24
+            languageBox.addView(LanguageRadioButton(languages, language));y += 24
         
         @self.shaderNo.event
         def onClicked(event):
@@ -165,7 +163,7 @@ class SettingsTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Settings')
-    taskview = SettingsTaskView(category)
+    taskview = category.addView(SettingsTaskView(category))
     print 'Settings imported'
 
 def unload(app):

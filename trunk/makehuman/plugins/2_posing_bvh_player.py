@@ -109,7 +109,7 @@ class BvhView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'BVH Player')
         
-        self.status = gui3d.TextView(self, style=gui3d.TextViewStyle._replace(left=10, top=585, zIndex=9.1))
+        self.status = self.addView(gui3d.TextView(style=gui3d.TextViewStyle._replace(left=10, top=585, zIndex=9.1)))
         
         self.__skeleton = bvhSkeleton('data/bvhs/03_03.bvh')
         self.__skeleton.updateFrame(-1)
@@ -119,12 +119,12 @@ class BvhView(gui3d.TaskView):
         
         self.__humanSkeleton = Skeleton()
         
-        self.optionsBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=24+25+36*1+24*2+6))
+        self.optionsBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=24+25+36*1+24*2+6)))
 
-        self.frameSlider = gui3d.Slider(self.optionsBox, value = 0, min = 0, max = self.__skeleton.frames, label = 'Frame: %d')
-        self.playPause = gui3d.Button(self.optionsBox, "Play")
-        self.showHuman = gui3d.ToggleButton(self.optionsBox, "Show human")
-        self.exportFrame = gui3d.Button(self.optionsBox, "Export frame")
+        self.frameSlider = self.optionsBox.addView(gui3d.Slider(value = 0, min = 0, max = self.__skeleton.frames, label = 'Frame: %d'))
+        self.playPause = self.optionsBox.addView(gui3d.Button("Play"))
+        self.showHuman = self.optionsBox.addView(gui3d.ToggleButton("Show human"))
+        self.exportFrame = self.optionsBox.addView(gui3d.Button("Export frame"))
         
         @self.frameSlider.event
         def onChanging(value):
@@ -460,7 +460,7 @@ class BvhView(gui3d.TaskView):
 def load(app):
     
     category = app.getCategory('Posing')
-    taskview = BvhView(category)
+    taskview = category.addView(BvhView(category))
     
     print 'BVH Player loaded'
 

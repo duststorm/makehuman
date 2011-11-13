@@ -42,12 +42,12 @@ class CustomTargetsTaskView(gui3d.TaskView):
         if not os.path.exists(self.targetsPath):
             os.makedirs(self.targetsPath)
         
-        self.msg = gui3d.TextView(self, label='No custom targets found.\nTo add a custom target, place the file in ' + self.targetsPath, \
-                                            style=gui3d.TextViewStyle._replace(left=10, top=80, width=320))
-        self.targetsBox = gui3d.GroupBox(self, label = 'Targets',position = [10, 80, 9.0])
+        self.msg = self.addView(gui3d.TextView(label='No custom targets found.\nTo add a custom target, place the file in ' + self.targetsPath, \
+                                            style=gui3d.TextViewStyle._replace(left=10, top=80, width=320)))
+        self.targetsBox = self.addView(gui3d.GroupBox(label = 'Targets',position = [10, 80, 9.0]))
         
-        self.optionsBox = gui3d.GroupBox(self, label = 'Options', position=[650, 80, 9.0], style=gui3d.GroupBoxStyle._replace(margin=[10,0,0,10]))
-        rescanButton = gui3d.Button(self.optionsBox, label="Rescan targets' folder")
+        self.optionsBox = self.addView(gui3d.GroupBox(label = 'Options', position=[650, 80, 9.0], style=gui3d.GroupBoxStyle._replace(margin=[10,0,0,10])))
+        rescanButton = self.optionsBox.addView(gui3d.Button(label="Rescan targets' folder"))
         @rescanButton.event
         def onClicked(event):
             #TODO: undo any applied change here
@@ -90,7 +90,7 @@ class CustomTargetsTaskView(gui3d.TaskView):
         
         modifier = humanmodifier.SimpleModifier(os.path.join(targetPath, targetFile))
         self.modifiers[targetName] = modifier
-        self.sliders.append(humanmodifier.ModifierSlider(box, value=0, label=targetName, modifier=modifier))
+        self.sliders.append(box.addView(humanmodifier.ModifierSlider(value=0, label=targetName, modifier=modifier)))
         
     def syncSliders(self):
         
@@ -130,7 +130,7 @@ taskview = None
 
 def load(app):
     category = app.getCategory('Modelling')
-    taskview = CustomTargetsTaskView(category, app)
+    taskview = category.addView(CustomTargetsTaskView(category, app))
     
     app.addLoadHandler('custom', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)

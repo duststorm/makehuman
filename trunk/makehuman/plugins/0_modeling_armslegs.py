@@ -8,8 +8,8 @@ import humanmodifier
 print 'Arms and leg imported'
 
 class GroupBoxRadioButton(gui3d.RadioButton):
-    def __init__(self, parent, group, label, groupBox, selected=False):
-        gui3d.RadioButton.__init__(self, parent, group, label, selected, style=gui3d.ButtonStyle)
+    def __init__(self, group, label, groupBox, selected=False):
+        gui3d.RadioButton.__init__(self, group, label, selected, style=gui3d.ButtonStyle)
         self.groupBox = groupBox
         
     def onClicked(self, event):
@@ -18,9 +18,9 @@ class GroupBoxRadioButton(gui3d.RadioButton):
         self.groupBox.show()
         
 class HeadSlider(humanmodifier.ModifierSlider):
-    def __init__(self, parent, modifier, image, view):
+    def __init__(self,modifier, image, view):
         
-        humanmodifier.ModifierSlider.__init__(self, parent, min=-1.0, max=1.0, modifier=modifier, style=gui3d.SliderStyle._replace(height=56, normal=image), thumbStyle=gui3d.SliderThumbStyle._replace(height = 32, width = 32, normal="slider2.png", focused="slider2_focused.png"))
+        humanmodifier.ModifierSlider.__init__(self, min=-1.0, max=1.0, modifier=modifier, style=gui3d.SliderStyle._replace(height=56, normal=image), thumbStyle=gui3d.SliderThumbStyle._replace(height = 32, width = 32, normal="slider2.png", focused="slider2_focused.png"))
         
         self.view = getattr(gui3d.app, view)
         
@@ -155,7 +155,7 @@ class HeadTaskView(gui3d.TaskView):
         
         self.modifiers = {}
         
-        self.categoryBox = gui3d.GroupBox(self, [650, y, 9.0], 'Category')
+        self.categoryBox = self.addView(gui3d.GroupBox([650, y, 9.0], 'Category'))
         y += 25
         
         for name, templates in features:
@@ -170,18 +170,18 @@ class HeadTaskView(gui3d.TaskView):
                         title = '%s %d' % (name.capitalize(), index / 12 + 1)
                         
                     # Create box
-                    box = gui3d.GroupBox(self, [10, 80, 9.0], title, gui3d.GroupBoxStyle._replace(width=128+112+4))
+                    box = self.addView(gui3d.GroupBox([10, 80, 9.0], title, gui3d.GroupBoxStyle._replace(width=128+112+4)))
                     self.groupBoxes.append(box)
                     
                     # Create radiobutton
-                    radio = GroupBoxRadioButton(self.categoryBox, self.radioButtons, title, box, selected=len(self.radioButtons) == 0)
+                    radio = self.categoryBox.addView(GroupBoxRadioButton(self.radioButtons, title, box, selected=len(self.radioButtons) == 0))
                     y += 24
             
                 # Create sliders
                 modifier = humanmodifier.GenderAgeEthnicAsymmetricModifier(template[0], 'value', template[2], template[3], False)
                 self.modifiers['%s%d' % (name, index + 1)] = modifier
 
-                slider = HeadSlider(box, modifier, '%s%s-%s-%s.png' % (template[4], template[1], template[2], template[3]), template[5])
+                slider = box.addView(HeadSlider(modifier, '%s%s-%s-%s.png' % (template[4], template[1], template[2], template[3]), template[5]))
                 self.sliders.append(slider)
                 
         y += 16
@@ -239,7 +239,7 @@ class HeadTaskView(gui3d.TaskView):
     
 def load(app):
     category = app.getCategory('Modelling')
-    taskview = HeadTaskView(category)
+    taskview = category.addView(HeadTaskView(category))
     
     '''
     app.addLoadHandler('face', taskview.loadHandler)

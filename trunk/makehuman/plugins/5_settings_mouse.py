@@ -5,8 +5,8 @@
 import gui3d
     
 class AppMouseActionEdit(gui3d.MouseActionEdit):
-    def __init__(self, parent, method):
-        gui3d.MouseActionEdit.__init__(self, parent, gui3d.app.getMouseAction(method))
+    def __init__(self, method):
+        gui3d.MouseActionEdit.__init__(self, gui3d.app.getMouseAction(method))
         self.method = method
 
     def onChanged(self, shortcut):
@@ -20,11 +20,11 @@ class MouseActionsTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Mouse')
         
-        self.mouseBox = gui3d.GroupBox(self, [10, 80, 9.0], 'Camera', gui3d.GroupBoxStyle._replace(height=25+25*3+24+6))
-        gui3d.TextView(self.mouseBox, "Move", style=MouseActionLabelStyle);AppMouseActionEdit(self.mouseBox, gui3d.app.mouseTranslate)
-        gui3d.TextView(self.mouseBox, "Rotate", style=MouseActionLabelStyle);AppMouseActionEdit(self.mouseBox, gui3d.app.mouseRotate)
-        gui3d.TextView(self.mouseBox, "Zoom", style=MouseActionLabelStyle);AppMouseActionEdit(self.mouseBox, gui3d.app.mouseZoom)
-        self.invertMouseWheel = gui3d.CheckBox(self.mouseBox, "Invert wheel", gui3d.app.settings.get('invertMouseWheel', False))
+        self.mouseBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Camera', gui3d.GroupBoxStyle._replace(height=25+25*3+24+6)))
+        self.mouseBox.addView(gui3d.TextView("Move", style=MouseActionLabelStyle));self.mouseBox.addView(AppMouseActionEdit(gui3d.app.mouseTranslate))
+        self.mouseBox.addView(gui3d.TextView("Rotate", style=MouseActionLabelStyle));self.mouseBox.addView(AppMouseActionEdit(gui3d.app.mouseRotate))
+        self.mouseBox.addView(gui3d.TextView("Zoom", style=MouseActionLabelStyle));self.mouseBox.addView(AppMouseActionEdit(gui3d.app.mouseZoom))
+        self.invertMouseWheel = self.mouseBox.addView(gui3d.CheckBox("Invert wheel", gui3d.app.settings.get('invertMouseWheel', False)))
         
         @self.invertMouseWheel.event
         def onClicked(event):
@@ -49,7 +49,7 @@ class MouseActionsTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Settings')
-    taskview = MouseActionsTaskView(category)
+    taskview = category.addView(MouseActionsTaskView(category))
 
 def unload(app):
     pass

@@ -45,11 +45,11 @@ class ModellingCategory(gui3d.Category):
         gui3d.Category.__init__(self, parent, 'Modelling')
               
         y = 600-155
-        self.viewBox = gui3d.GroupBox(self, [10, y, 9.0], 'View settings')
+        self.viewBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'View settings'))
         
-        self.anaglyphsButton = gui3d.ToggleButton(self.viewBox, 'Anaglyphs')
-        self.wireButton = gui3d.ToggleButton(self.viewBox, 'Wireframe')
-        self.subdivisionButton = gui3d.ToggleButton(self.viewBox, 'Smooth')
+        self.anaglyphsButton = self.viewBox.addView(gui3d.ToggleButton('Anaglyphs'))
+        self.wireButton = self.viewBox.addView(gui3d.ToggleButton('Wireframe'))
+        self.subdivisionButton = self.viewBox.addView(gui3d.ToggleButton('Smooth'))
 
         @self.anaglyphsButton.event
         def onClicked(event):
@@ -66,8 +66,8 @@ class ModellingCategory(gui3d.Category):
             gui3d.app.toggleSubdivision()
             self.subdivisionButton.setSelected(gui3d.app.selectedHuman.isSubdivided())
         
-        guimacromodelling.MacroModelingTaskView(self)
-        guidetailmodelling.DetailModelingTaskView(self)
+        self.addView(guimacromodelling.MacroModelingTaskView(self))
+        self.addView(guidetailmodelling.DetailModelingTaskView(self))
 
     def onResized(self, event):
         gui3d.Category.onResized(self, event)
