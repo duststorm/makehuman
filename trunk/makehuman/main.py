@@ -659,7 +659,7 @@ class MHApplication(gui3d.Application):
         self.progressBar.blocker.show()
         mh.setCaption("MakeHuman - [Untitled]")
         
-        printtree(self)
+        #printtree(self)
         
         @self.dialog.button1.event
         def onClicked(event):
