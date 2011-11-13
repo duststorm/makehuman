@@ -177,7 +177,8 @@ class InheritanceGraph(object):
     # These are the default options for graphviz
     default_graph_options = {
         "rankdir": "LR",
-        "size": '"8.0, 12.0"'
+        "size": '"8.0, 12.0"',
+        "bgcolor":"transparent"
         }
     default_node_options = {
         "shape": "box",
