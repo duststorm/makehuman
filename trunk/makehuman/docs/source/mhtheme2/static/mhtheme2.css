@@ -74,7 +74,7 @@ body {
 
 div.siteheader {
 background-color: black; 
-background-image:url('bg-not-front.png'); 
+background-image:url('images/bg-not-front.png'); 
 padding: 0px;
 margin: 0px;
 height: 120px;
@@ -228,7 +228,7 @@ div.sphinxsidebar input[type="submit"] {
 
 div.footer {
     background-color: black;
-    background-image:url('bg-pattern.png'); 
+    background-image:url('images/bg-pattern.png'); 
     color: #86989B;
     padding: 3px 8px 3px 0;
     clear: both;
@@ -444,9 +444,13 @@ div.admonition, div.warning {
     font-size: 0.9em;
     margin: 1em 0 1em 0;
     border: 1px solid #86989B;
-    background-color: #f7f7f7;
+    
+    background:url(images/alert_info_32.png) no-repeat;
+    background-color: #f1945c;    
+    background-position:right bottom;
     padding: 0;
 }
+
 
 div.admonition p, div.warning p {
     margin: 0.5em 1em 0.5em 1em;
@@ -464,7 +468,7 @@ div.warning p.admonition-title {
     color: white;
     border-bottom: 1px solid #86989B;
     font-weight: bold;
-    background-color: #AFC1C4;
+    background-color: #d66019;
 }
 
 div.warning {

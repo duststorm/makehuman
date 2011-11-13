@@ -246,3 +246,8 @@ man_pages = [
 
 pngmath_dvipng_args = ['-gamma 1.5', '-D 110', '-bg', 'Transparent']
 pngmath_use_preview = True
+
+
+
+
+
