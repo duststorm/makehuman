@@ -69,13 +69,15 @@ class CustomTargetsTaskView(gui3d.TaskView):
         else:
             self.msg.hide()
             
-            for i in self.targetsBox.children:
-                #This is a hack to ensure a deleted object doesn't show up even if there still is a reference somewhere
-                i.hide()
-                del i
+            children = self.targetsBox.children
+            for child in children:
+                self.targetsBox.removeView(child)
                 
-            for i in targets:
-                self.createTargetControls(self.targetsBox, self.targetsPath, i)
+            for target in targets:
+                self.createTargetControls(self.targetsBox, self.targetsPath, target)
+                
+            for child in self.targetsBox.children:
+                child.update()
             
             self.targetsBox.show()
             self.targetsBox.layout.rebuild()

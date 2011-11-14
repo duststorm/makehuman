@@ -122,16 +122,17 @@ class Object(events3d.EventHandler):
             
         if self.mesh not in app.scene3d.objects:
            app.scene3d.objects.append(self.mesh)
+           app.scene3d.attach(self.mesh)
             
     def __detach(self):
         
-        module3d.detach(self.__seedMesh)
+        app.scene3d.delete(self.__seedMesh)
         if self.__proxyMesh:
-            module3d.detach(self.__proxyMesh)
+            app.scene3d.delete(self.__proxyMesh)
         if self.__subdivisionMesh:
-            module3d.detach(self.__subdivisionMesh)
+            app.scene3d.delete(self.__subdivisionMesh)
         if self.__proxySubdivisionMesh:
-            module3d.detach(self.__proxySubdivisionMesh)
+            app.scene3d.delete(self.__proxySubdivisionMesh)
             
     @property
     def view(self):
@@ -594,6 +595,7 @@ class View(events3d.EventHandler):
         self.__visible = visible
         self.__totalVisibility = False
         self.__parent = None
+        self.__attached = False
 
     def __del__(self):
     
@@ -606,37 +608,71 @@ class View(events3d.EventHandler):
             return self.__parent();
         else:
             return None
+            
+    def __attach(self):
+        
+        self.__attached = True
+        
+        print "attach %s %s" % (self.parent, self)
+        
+        for object in self.objects:
+            object._Object__attach()
+            
+        for child in self.children:
+            child.__attach()
+        
+    def __detach(self):
+    
+        self.__attached = False
+        
+        print "detach %s %s" % (self.parent, self)
+        
+        for object in self.objects:
+            object._Object__detach()
+            
+        for child in self.children:
+            child.__detach()
         
     def addView(self, view):
-    
+        """
+        Adds the view to this view. If this view is attached to the app, the view will also be attached.
+        
+        :param view: The view to be added.
+        :type view: gui3d.View
+        :return: The view, for convenience.
+        :rvalue: gui3d.View
+        """
         if view.parent:
-            raise RuntimeException('The view is already attached to a view')
+            raise RuntimeException('The view is already added to a view')
             
         view.__parent = weakref.ref(self)
         view.__updateVisibility()
-        self.children.append(view)
+        if self.__attached:
+            view.__attach()
 
+        self.children.append(view)
         if self.layout:
             self.layout.onChildAdded(view)
-        
-        for object in view.objects:
-            object._Object__attach()
             
         return view
     
     def removeView(self, view):
-    
+        """
+        Removes the view from this view. If this view is attached to the app, the view will be detached.
+        
+        :param view: The view to be removed.
+        :type view: gui3d.View
+        """
         if view not in self.children:
             raise RuntimeException('The view is not a child of this view')
             
         view.__parent = None
+        if self.__attached:
+            view.__detach()
+            
         self.children.remove(view)
-        
         if self.layout:
-            self.layout.rebuild(view)
-        
-        for object in view.objects:
-            object._Object__detach()
+            self.layout.rebuild()
             
     def addObject(self, object):
         """
@@ -648,13 +684,13 @@ class View(events3d.EventHandler):
         :rvalue: gui3d.Object
         """
         if object._Object__view:
-            raise RuntimeException('The object is already attached to a view')
+            raise RuntimeException('The object is already added to a view')
             
         object._Object__view = weakref.ref(self)
-        self.objects.append(object)
-            
-        if self.parent:
+        if self.__attached:
             object._Object__attach()
+            
+        self.objects.append(object)
             
         return object
             
@@ -662,16 +698,17 @@ class View(events3d.EventHandler):
         """
         Removes the object from the view. If the object was attached to the app, its OpenGL counterpart will be removed as well.
         
-        :param object: The object to be added.
+        :param object: The object to be removed.
         :type object: gui3d.Object
         """
         if object not in self.objects:
             raise RuntimeException('The object is not a child of this view')
             
         object._Object__view = None
+        if self.__attached:
+            object._Object__detach()
+            
         self.objects.remove(object)
-        
-        object._Object__detach()
         
     def show(self):
         self.__visible = True
@@ -966,55 +1003,77 @@ class Application(events3d.EventHandler):
         return mh.getWindowSize()
         
     def addObject(self, object):
-    
+        """
+        Adds the object to the application. The object will also be attached and will get an OpenGL counterpart.
+        
+        :param object: The object to be added.
+        :type object: gui3d.Object
+        :return: The object, for convenience.
+        :rvalue: gui3d.Object
+        """
         if object._Object__view:
             raise RuntimeException('The object is already attached to a view')
             
         object._Object__view = weakref.ref(self)
+        object._Object__attach()
+        
         self.objects.append(object)
-            
-        if self.parent:
-            object._Object__attach()
             
         return object
             
     def removeObject(self, object):
-    
+        """
+        Removes the object from the application. Its OpenGL counterpart will be removed as well.
+        
+        :param object: The object to be removed.
+        :type object: gui3d.Object
+        """
         if object not in self.objects:
             raise RuntimeException('The object is not a child of this view')
             
         object._Object__view = None
-        self.objects.remove(object)
-        
         object._Object__detach()
         
+        self.objects.remove(object)
+        
     def addView(self, view):
-    
+        """
+        Adds the view to the application.The view will also be attached.
+        
+        :param view: The view to be added.
+        :type view: gui3d.View
+        :return: The view, for convenience.
+        :rvalue: gui3d.View
+        """
         if view.parent:
-            raise RuntimeException('The view is already attached to a view')
+            raise RuntimeException('The view is already attached')
             
         view._View__parent = weakref.ref(self)
         view._View__updateVisibility()
+        view._View__attach()
+        
         self.children.append(view)
-
         if self.layout:
             self.layout.onChildAdded(view)
-        
-        for object in view.objects:
-            object._Object__attach()
             
         return view
     
     def removeView(self, view):
-    
+        """
+        Removes the view from the application. The view will be detached.
+        
+        :param view: The view to be removed.
+        :type view: gui3d.View
+        """
         if view not in self.children:
             raise RuntimeException('The view is not a child of this view')
             
         view._View__parent = None
-        self.children.remove(view)
+        view._View__detach()
         
-        for object in view.objects:
-            object._Object__detach()
+        self.children.remove(view)
+        if self.layout:
+            self.layout.rebuild()
 
     def isVisible(self):
         return True
@@ -1441,6 +1500,9 @@ class Slider(View):
         
         self.sliding = False
         
+    def __str__(self):
+        return "%s - %s" % (type(self), self.label.getText() if self.label else "")
+        
     def __setValue(self, value):
         
         # Convert if needed
@@ -1678,6 +1740,9 @@ class Button(View):
                 translatedLabel, wrapWidth, textAlign, font))
             
         self.selected = selected
+        
+    def __str__(self):
+        return "%s - %s" % (type(self), self.getLabel())
         
     def getPosition(self):
         return self.button.getPosition()
@@ -2394,16 +2459,15 @@ class FileChooser(View):
             self.files = []
         if len(self.children) > 1:
             self.slider.setValue(0)
-            for child in self.children:
-                if isinstance(child, Slider) or isinstance(child, GroupBox) or isinstance(child, TextView):
-                    continue
-                app.scene3d.delete(child.preview.mesh)
-                app.scene3d.delete(child.label.mesh)
-            self.children = self.children[:1]
             sliderIsShown = self.slider.isShown()
             if sliderIsShown:
                 self.slider.hide()
-            self.layout.rebuild()
+            children = self.children[:]
+            for child in children:
+                if isinstance(child, Slider) or isinstance(child, GroupBox) or isinstance(child, TextView):
+                    continue
+                print "removing %s" % child
+                self.removeView(child)
             if sliderIsShown:
                 self.slider.show()
         
@@ -2756,6 +2820,9 @@ class GroupBox(View):
         if isinstance(label, str):
             self.label = self.addObject(TextObject([position[0]+self.style.padding[0],position[1]+self.style.padding[1]/2-font.lineHeight/2-2,position[2]+0.001],
                 translatedLabel, alignment=self.style.textAlign, font=app.getFont(self.style.fontFamily)))
+                
+    def __str__(self):
+        return "%s - %s" % (type(self), self.label.getText() if self.label else "")
     
     def getPosition(self):
         return self.box.getPosition()
