@@ -17,7 +17,6 @@ import sys, os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('.'))
-sys.path.append(os.path.abspath('sphinxext'))
 sys.path.append('../core')
 sys.path.append('../apps')
 sys.path.append('..')
@@ -36,9 +35,8 @@ extensions = ['sphinx.ext.todo', 'sphinx.ext.viewcode',
           'sphinx.ext.autodoc',
           'sphinx.ext.doctest',
           'sphinx.ext.pngmath',
-          'inheritance_diagram',
-          'math_symbol_table',
-          'numpydoc']
+          'sphinx.ext.inheritance_diagram',
+          ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['mhtheme/templates']
@@ -248,6 +246,6 @@ pngmath_dvipng_args = ['-gamma 1.5', '-D 110', '-bg', 'Transparent']
 pngmath_use_preview = True
 
 
-
+inheritance_graph_attrs = dict(bgcolor="transparent")
 
 
