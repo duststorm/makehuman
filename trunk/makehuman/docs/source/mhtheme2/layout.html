@@ -7,31 +7,52 @@
 #}
 {% extends "basic/layout.html" %}
 
+{% block sidebar1 %}{% endblock %}
+{% block sidebar2 %}{% endblock %}
 
-
-
-
-
-
-
-
+{% macro nav() %}
+        <div>          
+        {%- if prev %}        
+        &#160;&#160;<a href="{{ prev.link|e }}">{{ prev.title }}
+        &#160;&#160;<img src="{{pathto("_static/images/previous.png", 1) }}" border="0" alt="previous"/>&#160;&#160;
+        </a>        
+        {%- endif %}
+        <a class="uplink" href="{{ pathto(master_doc) }}">{{ _('Main') }}</a>
+        {%- if next %}
+        
+        <a href="{{ next.link|e }}">
+        &#160;&#160;<img src="{{pathto("_static/images/next.png", 1) }}" border="0" alt="next"/>&#160;&#160;    
+        {{ next.title }}        
+        </a>&#160;&#160;        
+        {%- endif %}       
+        </div>
+{% endmacro %}
 
 
 {% block relbar1 %}
 <div class="siteheader">
-<div class="subsiteheader">    
+<div class="subsiteheader">
 <a href="http://mhnew.jwp.se"><img src="{{pathto("_static/images/logohtml.png", 1) }}" border="0" alt="makehuman API"/></a>
 <br /><br />
 <a href="http://mhnew.jwp.se"><h4>Home</h4></a>
-
-{%- block rootrellink %}
-<a href="{{ pathto(master_doc) }}">{{ shorttitle|e }}</a>{{ reldelim1 }}
-{%- endblock %}
-     
 </div>
 </div>
-
+{{ nav() }}
 {% endblock %}
-{% block relbar2 %}{% endblock %}
+
+
+{% block relbar2 %}
+{{ nav() }}
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
 
 

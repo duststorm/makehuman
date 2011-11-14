@@ -106,14 +106,11 @@ pygments_style = 'sphinx'
 
 # -- Themes -----------------------------------------
 
-# Cloud theme
-#import cloud_sptheme as csp
-#html_theme_path = [csp.get_theme_dir()]
-#html_theme = "cloud"
-
 # mhtheme theme
 html_theme_path = ['.']
 html_theme = 'mhtheme2'
+
+#html_theme = 'haiku'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

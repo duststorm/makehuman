@@ -76,7 +76,8 @@ div.siteheader {
 background-color: black; 
 background-image:url('images/bg-not-front.png'); 
 padding: 0px;
-margin: 0px;
+margin-left:auto;
+margin-right:auto;
 height: 120px;
 color: white;
 max-width: 1500px;
