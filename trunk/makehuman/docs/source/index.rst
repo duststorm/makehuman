@@ -15,16 +15,23 @@ Developers guide
 ################
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    
    coding_intro.rst
-   writing_plugins.rst
+   dev_manual_gui.rst
+   dev_manual_morph_target.rst
+   dev_manual_undo-redo.rst
+   dev_manual_meshes.rst
+   dev_manual_camera.rst
+   dev_manual_gui_controls.rst
+   dev_manual_layout_guidelines.rst
+   dev_manual_asynchronous.rst
    
 Modules
 #######
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    
    module_aljabr.rst
    module_animation3d.rst
@@ -37,7 +44,7 @@ Doc Writers Guide
 #################
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    
    appendix_1.rst
 
