@@ -613,8 +613,6 @@ class View(events3d.EventHandler):
         
         self.__attached = True
         
-        print "attach %s %s" % (self.parent, self)
-        
         for object in self.objects:
             object._Object__attach()
             
@@ -624,8 +622,6 @@ class View(events3d.EventHandler):
     def __detach(self):
     
         self.__attached = False
-        
-        print "detach %s %s" % (self.parent, self)
         
         for object in self.objects:
             object._Object__detach()
@@ -2466,7 +2462,6 @@ class FileChooser(View):
             for child in children:
                 if isinstance(child, Slider) or isinstance(child, GroupBox) or isinstance(child, TextView):
                     continue
-                print "removing %s" % child
                 self.removeView(child)
             if sliderIsShown:
                 self.slider.show()
