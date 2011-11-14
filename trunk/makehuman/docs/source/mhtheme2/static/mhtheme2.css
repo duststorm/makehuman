@@ -65,9 +65,9 @@ body {
     margin-top: 0;
     margin-left: auto;
     margin-right: auto;
-    width: 1500px;
+    width: 100%;
     padding:0;
-    min-width: 1500px;
+    
 }
 
 /* Header */
@@ -79,6 +79,7 @@ padding: 0px;
 margin: 0px;
 height: 120px;
 color: white;
+max-width: 1500px;
 }
 
 div.subsiteheader {
@@ -161,7 +162,7 @@ div.related ul li a:hover {
 /* Sidebar */
 
 div.sphinxsidebarwrapper {
-    width: 200px;
+    width: 5%px;
     position:fixed;top:180px;left:50px
     background-color: #eeeeec;
     border-radius:18px 18px  18px 18px;
