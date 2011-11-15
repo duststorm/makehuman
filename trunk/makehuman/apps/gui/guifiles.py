@@ -69,7 +69,7 @@ class SaveTaskView(gui3d.TaskView):
             # Save the thumbnail
 
             leftTop = self.selection.getPosition()
-            gui3d.app.scene3d.grabScreen(int(leftTop[0]+1), int(leftTop[1]+1), int(self.selection.width-1), int(self.selection.height-1), os.path.join(modelPath, filename + '.bmp'))
+            mh.grabScreen(int(leftTop[0]+1), int(leftTop[1]+1), int(self.selection.width-1), int(self.selection.height-1), os.path.join(modelPath, filename + '.bmp'))
 
             # Save the model
 

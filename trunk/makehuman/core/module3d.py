@@ -1231,33 +1231,13 @@ class Scene3D:
 
         """
 
-        self.objects = []
         self.faceGroupColorID = {}
         self.colorID = 0
 
-    def __str__(self):
-        """
-        This method is the Print method for a Scene3D object, which returns a string containing the words
-        \"scene_type\".
-
-        **Parameters:** This method has no parameters.
-
-        """
-
-        return 'scene_type'
-
     def clear(self, obj):
         
-        if obj.object3d:
-            mh.world.remove(obj.object3d)
-            del obj.object3d
-            obj.object3d = None
+        self.detach(obj)
         obj.clear()
-        
-    def delete(self, obj):
-        
-        self.clear(obj)
-        self.objects.remove(obj)
 
     def attach(self, obj):
         if obj.object3d:
@@ -1334,25 +1314,10 @@ class Scene3D:
         # TODO add all obj attributes
 
     def detach(self, obj):
-        mh.world.remove(obj.object3d)
-        del obj.object3d
-        obj.object3d = None
-
-    def update(self):
-        """
-        This method sends scene data to the OpenGL engine to regenerate the OpenGL scene based on the objects
-        currently contained in this Scene3D object.
-        This is a very important function, but it is expensive in terms of processing time, so it must be called
-        only when absolutely necessary; in particular, when one or more new objects are added to the scene.
-
-        If you only need to *redraw* the scene, use the scene.redraw() method instead.
-
-        **Parameters:** This method has no parameters.
-
-        """
-
-        for obj in self.objects:
-            self.attach(obj)
+        if obj.object3d:
+            mh.world.remove(obj.object3d)
+            del obj.object3d
+            obj.object3d = None
 
     def reloadTextures(self):
         print 'Reloading textures'
@@ -1361,86 +1326,6 @@ class Scene3D:
                 textureCache[path].loadImage(path)
             except RuntimeError, text:
                 print text
-
-    def getWindowSize(self):
-        """
-        This method returns the width and height of the drawable area within 
-        the MakeHuman window in pixels (the viewport size).
-        It calls the getWindowSize function on the 'mh' module 
-        (a module created dynamically at run time by main.c) to retrieve the 
-        width and height of the window (the OpenGL viewport) from global 
-        variables updated before an event was passed up to the Python code. 
-
-        **Parameters:** This method has no parameters.
-        """
-
-        return mh.getWindowSize()
-
-    def getObject(self, name):
-        """
-        This method searches the list of 3D objects contained within the scene and returns the object with
-        the specified name, or None if no object with that name could be found.
-
-        Parameters
-        ----------
-
-        name:
-            *string*. The name of the object to retrieve.
-        """
-
-        for obj in self.objects:
-            if obj.name == name:
-                return obj
-        return None
-
-        # print "Obj %s not found"%(name)
-
-    def grabScreen(self, x, y, width, height, filename):
-        """
-        This method calls the grabScreen method on the 'mh' class which invokes the 
-        corresponding C function (mhGrabScreen) to take a rectangular section from 
-        the screen and write an image to a bitmap image file on disk containing the 
-        pixels currently displayed in that section of screen.
-
-        Parameters
-        ----------
-
-        x:
-            *int* an int containing the x coordinate of the corner of the area (in pixels).
-        y:
-            *int* an int containing the y coordinate of the corner of the area (in pixels).
-        width:
-            *int* an int containing the width of the area in pixels. 
-        length:
-            *int* an int containing the height of the area in pixels. 
-        filename:
-            *string* a string containing the full path of the file on disk.
-
-        """
-
-        # cursor = self.getObject("cursor.obj")
-        # cursor.setVisibility(0)
-
-        mh.grabScreen(x, y, width, height, filename)
-
-        # cursor.setVisibility(1)
-
-    def newObj(self, name):
-        """
-        This method creates a newly initialized Object3D instance within this Scene3D object
-        and returns it to the calling code ready to be populated.
-
-        Parameters
-        ----------
-
-        name:
-            *string*. The name for the new Object3D object.
-
-        """
-
-        newObj = Object3D(name)
-        self.objects.append(newObj)
-        return newObj
 
     def instanceObj(self, obj, name):
         """
@@ -1487,29 +1372,7 @@ class Scene3D:
         newObj.shader = obj.shader
         newObj.colors = obj.colors
         newObj.cameraMode = obj.cameraMode
-        self.objects.append(newObj)
         return newObj
-
-    def deleteObj(self, name):
-        """
-        This method searches the list of Object3D objects contained within this Scene3D object by name and,
-        if found, it deletes that object.
-        First, the instance of the object is deleted. Then the index of objects,
-        used to identify the object in the OpenGL engine array, is updated and
-        renumbered to close the gap.
-
-        Parameters
-        ----------
-
-        name:
-            *string*. The name of object to delete.
-        """
-
-        for obj in self.objects:
-            if obj.name == name:
-                self.objects.remove(obj)
-                mh.world.remove(obj)
-                break
 
     def assignSelectionID(self, obj):
         """
@@ -1604,7 +1467,5 @@ class Scene3D:
             return None
             
 def getFacesFromVerts(vertIndices, verts):
-  #F = set();
-  #for index in vertIndices:
-  #  F = F.union(verts[index].sharedFaces)
-  return set([f for i in vertIndices for f in verts[i].sharedFaces ])
+
+    return set([f for i in vertIndices for f in verts[i].sharedFaces])

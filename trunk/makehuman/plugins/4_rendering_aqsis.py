@@ -76,7 +76,7 @@ class AqsisTaskView(gui3d.TaskView):
                 return
             
             if not self.sceneToRender:
-                self.sceneToRender = mh2renderman.RMRScene(self.app)
+                self.sceneToRender = mh2renderman.RMRScene(gui3d.app)
             self.buildShaders()
             self.sceneToRender.render()
             

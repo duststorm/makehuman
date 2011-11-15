@@ -81,7 +81,6 @@ class CustomTargetsTaskView(gui3d.TaskView):
             
             self.targetsBox.show()
             self.targetsBox.layout.rebuild()
-            self.app.scene3d.update()
         
     def createTargetControls(self, box, targetPath, targetFile):
         # When the slider is dragged and released, an onChange event is fired

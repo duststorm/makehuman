@@ -52,6 +52,7 @@ is visible to the user through the GUI.
 
 import os
 import algos3d
+import module3d
     
 def loadMesh(scene, path, locX=0, locY=0, locZ=0, loadColors=1):
     """
@@ -75,7 +76,7 @@ def loadMesh(scene, path, locX=0, locY=0, locZ=0, loadColors=1):
     """
     
     name = os.path.basename(path)
-    obj = scene.newObj(name)
+    obj = module3d.Object3D(name)
 
     obj.path = path
     obj.x = locX

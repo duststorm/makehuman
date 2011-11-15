@@ -234,7 +234,11 @@ class MeasureTaskView(gui3d.TaskView):
                 self.measureMesh.verts[i].co = self.measureMesh.verts[len(vertidx)-1].co[:]
              
             self.measureMesh.update()
-            
+    
+    def onHumanChanged(self, event):
+    
+        self.updateMeshes()
+       
     def onHumanTranslated(self, event):
     
         self.updateMeshes()

@@ -98,8 +98,6 @@ class TextureToolTaskView(gui3d.TaskView):
             self.mesh.updateIndexBuffer()
             
             self.object = self.addObject(gui3d.Object([0, 0, 0], self.mesh, True))
-        
-            gui3d.app.scene3d.update()
             
         else:
         

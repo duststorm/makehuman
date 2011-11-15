@@ -379,7 +379,6 @@ class MHApplication(gui3d.Application):
         self.splash = self.addObject(gui3d.Object([0, 0, 9.8], mesh))
         self.progressBar = self.addView(gui3d.ProgressBar(gui3d.ProgressBarStyle._replace(left=800-150, top=600-15, zIndex=9.85)))
         self.progressBar.text = self.progressBar.addView(gui3d.TextView(style=gui3d.TextViewStyle._replace(left=10, top=600-20, zIndex=9.85, width=800-150-20, textAlign=gui3d.AlignRight)))
-        self.scene3d.update()
         self.redrawNow()
         
         self.tabs = self.addView(gui3d.TabView())
@@ -652,7 +651,6 @@ class MHApplication(gui3d.Application):
         self.prompt('Warning', 'This is an alpha release, which means that there are still bugs present and features missing. Use at your own risk.',
             'OK', helpId='alphaWarning')
         self.progressBar.blocker = self.progressBar.addObject(gui3d.Object( [0, 0, 9.7], gui3d.RectangleMesh(800, 600), visible=False))
-        self.scene3d.update()
         self.dialog.blocker.mesh.setColor([0, 0, 0, 128])
         self.progressBar.blocker.mesh.setColor([0, 0, 0, 128])
         self.splash.hide()
@@ -1256,7 +1254,7 @@ class MHApplication(gui3d.Application):
         if not os.path.exists(grabPath):
             os.makedirs(grabPath)
         # TODO: use bbox to choose grab region
-        self.scene3d.grabScreen(180, 80, 440, 440, os.path.join(grabPath, 'grab.bmp'))
+        mh.grabScreen(180, 80, 440, 440, os.path.join(grabPath, 'grab.bmp'))
         
     # Camera navigation
     def rotateDown(self):

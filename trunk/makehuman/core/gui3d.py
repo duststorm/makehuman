@@ -120,19 +120,24 @@ class Object(events3d.EventHandler):
         else:
             self.mesh.setVisibility(0)
             
-        if self.mesh not in app.scene3d.objects:
-           app.scene3d.objects.append(self.mesh)
-           app.scene3d.attach(self.mesh)
+        if self.__seedMesh:
+           app.scene3d.attach(self.__seedMesh)
+        if self.__proxyMesh:
+           app.scene3d.attach(self.__proxyMesh)
+        if self.__subdivisionMesh:
+           app.scene3d.attach(self.__subdivisionMesh)
+        if self.__proxySubdivisionMesh:
+           app.scene3d.attach(self.__proxySubdivisionMesh)
             
     def __detach(self):
         
-        app.scene3d.delete(self.__seedMesh)
+        app.scene3d.detach(self.__seedMesh)
         if self.__proxyMesh:
-            app.scene3d.delete(self.__proxyMesh)
+            app.scene3d.detach(self.__proxyMesh)
         if self.__subdivisionMesh:
-            app.scene3d.delete(self.__subdivisionMesh)
+            app.scene3d.detach(self.__subdivisionMesh)
         if self.__proxySubdivisionMesh:
-            app.scene3d.delete(self.__proxySubdivisionMesh)
+            app.scene3d.detach(self.__proxySubdivisionMesh)
             
     @property
     def view(self):
@@ -268,10 +273,10 @@ class Object(events3d.EventHandler):
         if self.proxy:
         
             self.proxy = None
-            app.scene3d.delete(self.__proxyMesh)
+            app.scene3d.clear(self.__proxyMesh)
             self.__proxyMesh = None
             if self.__proxySubdivisionMesh:
-                app.scene3d.delete(self.__proxySubdivisionMesh)
+                app.scene3d.clear(self.__proxySubdivisionMesh)
                 self.__proxySubdivisionMesh = None
             self.mesh = self.__seedMesh
             self.mesh.setVisibility(1)
@@ -296,7 +301,8 @@ class Object(events3d.EventHandler):
             
             self.proxy.update(self.__proxyMesh, self.__seedMesh)
             
-            app.scene3d.update()
+            if self.__seedMesh.object3d:
+                app.scene3d.attach(self.__proxyMesh)
             
             self.mesh.setVisibility(0)
             self.mesh = self.__proxyMesh
@@ -307,6 +313,8 @@ class Object(events3d.EventHandler):
         if self.isProxied():
             if not self.__proxySubdivisionMesh:
                 self.__proxySubdivisionMesh = createSubdivisionObject(app.scene3d, self.__proxyMesh, progressCallback)
+                if self.__seedMesh.object3d:
+                    app.scene3d.attach(self.__proxySubdivisionMesh)
             elif update:
                 updateSubdivisionObject(self.__proxySubdivisionMesh, progressCallback)
                 
@@ -314,6 +322,8 @@ class Object(events3d.EventHandler):
         else:
             if not self.__subdivisionMesh:
                 self.__subdivisionMesh = createSubdivisionObject(app.scene3d, self.__seedMesh, progressCallback)
+                if self.__seedMesh.object3d:
+                    app.scene3d.attach(self.__subdivisionMesh)
             elif update:
                 updateSubdivisionObject(self.__subdivisionMesh, progressCallback)
                 
@@ -437,7 +447,7 @@ class TextObject(Object):
         self.mesh = font3d.createMesh(self.font, text, self.mesh, self.wrapWidth, self.alignment)
         self.mesh.setCameraProjection(1)
         self.mesh.setShadeless(1)
-        app.scene3d.update()
+        self._Object__attach()
         
     def getText(self):
     
@@ -2493,7 +2503,6 @@ class FileChooser(View):
                 
         self.__updateScrollBar()
             
-        app.scene3d.update()
         app.redraw()
         
     def scrollTo(self, value):

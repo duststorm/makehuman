@@ -37,7 +37,7 @@ class PovrayTaskView(gui3d.TaskView):
         def onClicked(event):            
             
             reload(mh2povray)  # Avoid having to close and reopen MH for every coding change (can be removed once testing is complete)
-            mh2povray.povrayExport(self.app.scene3d.getObject('base.obj'), self.app,
+            mh2povray.povrayExport(gui3d.app.selectedHuman.mesh, gui3d.app,
                 {'source':'ini' if self.iniButton.selected else 'gui',
                  'format':'array' if self.arrayButton.selected else 'mesh2',
                  'action':'export' if self.exportButton.selected else 'render'})

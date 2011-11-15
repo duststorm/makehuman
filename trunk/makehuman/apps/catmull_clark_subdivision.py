@@ -25,6 +25,7 @@ __docformat__ = 'restructuredtext'
 
 from aljabr import centroid
 from fastmath import vmul3d, vadd3d, vavg2d, vavg2d4, vavg3d, vavg3d4
+from module3d import Object3D
 
 def createOriginalVert(object, v):
     
@@ -88,7 +89,7 @@ def createSubdivisionObject(scene, object, progressCallback=None):
     
     name = object.name + '.sub'
     
-    subdivisionObject = scene.newObj(name)
+    subdivisionObject = Object3D(name)
     subdivisionObject.x = object.x
     subdivisionObject.y = object.y
     subdivisionObject.z = object.z
@@ -205,9 +206,7 @@ def createSubdivisionObject(scene, object, progressCallback=None):
     subdivisionObject.texture = object.texture
     
     if progressCallback:progressCallback(0.8)  
-    subdivisionObject.calcNormals() 
-    if progressCallback:progressCallback(0.9)
-    scene.update() 
+    subdivisionObject.calcNormals()
     if progressCallback:progressCallback(1.0)
 
     return subdivisionObject

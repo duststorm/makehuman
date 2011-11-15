@@ -51,7 +51,7 @@ class ClothesTaskView(gui3d.TaskView):
         except:
             clo = None
         if clo:
-            gui3d.app.scene3d.delete(clo.mesh)
+            gui3d.app.removeObject(clo)
             del human.clothesObjs[proxy.name]
             return
 
@@ -73,7 +73,6 @@ class ClothesTaskView(gui3d.TaskView):
         
         human.clothesProxies[proxy.name] = proxy
 
-        gui3d.app.scene3d.update()
         self.adaptClothesToHuman(human)
         clo.setSubdivided(human.isSubdivided())
         
@@ -109,7 +108,7 @@ class ClothesTaskView(gui3d.TaskView):
             print 'deleting clothes'
             for (name,clo) in human.clothesObjs.items():
                 if clo:
-                    gui3d.app.scene3d.delete(clo.mesh)
+                    gui3d.app.removeObject(clo)
                 del human.clothesObjs[name]
                 del human.clothesProxies[name]
             # self.clothesButton.setTexture('data/clothes/clear.png')

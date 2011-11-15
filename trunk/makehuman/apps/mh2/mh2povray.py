@@ -280,10 +280,10 @@ def povrayExportArray(obj, camera, resolution, path):
   # FaceGroups - Write a POV-Ray array to the output stream and build a list of indices
   # that can be used to cross-reference faces to the Face Groups that they're part of.
 
-    outputFileDescriptor.write('#declare MakeHuman_FaceGroupArray = array[%s] {\n  ' % len(obj.facesGroups))
+    outputFileDescriptor.write('#declare MakeHuman_FaceGroupArray = array[%s] {\n  ' % obj.faceGroupCount)
     fgIndex = 0
     faceGroupIndex = {}
-    for fg in obj.facesGroups:
+    for fg in obj.faceGroups:
         faceGroupIndex[fg.name] = fgIndex
         outputFileDescriptor.write('  "%s",\n' % fg.name)
         fgIndex += 1
@@ -338,7 +338,7 @@ def povrayExportArray(obj, camera, resolution, path):
 
   # Write out the centre position of each joint
 
-    for fg in obj.facesGroups:
+    for fg in obj.faceGroups:
         if 'joint-' in fg.name:
             jointVarName = string.replace(fg.name, '-', '_')
             jointCentreX = (faceGroupExtents[fg.name][0] + faceGroupExtents[fg.name][3]) / 2

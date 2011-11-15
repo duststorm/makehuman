@@ -64,7 +64,7 @@ class HairTaskView(gui3d.TaskView):
         tif = obj.replace('.obj', '_texture.tif')
         
         if human.hairObj:
-            gui3d.app.scene3d.delete(human.hairObj.mesh)
+            gui3d.app.removeObject(human.hairObj)
             human.hairObj = None
             human.hairProxy = None
 
@@ -83,7 +83,6 @@ class HairTaskView(gui3d.TaskView):
             print("Loading clothes hair %s" % file)
             human.hairProxy = mh2proxy.readProxyFile(human.meshData, file, False)
 
-            gui3d.app.scene3d.update()
             self.adaptHairToHuman(human)
             human.hairObj.setSubdivided(human.isSubdivided())
             

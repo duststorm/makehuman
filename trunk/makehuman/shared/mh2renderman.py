@@ -467,7 +467,7 @@ class RMRScene:
         self.sceneFileName = os.path.join(self.ribsPath, "scene.rib")
 
         #Human in the scene
-        self.humanCharacter = RMRHuman(app.selectedHuman, "base.obj", MHscene.getObject("base.obj"), self.ribsPath)
+        self.humanCharacter = RMRHuman(app.selectedHuman, "base.obj", app.selectedHuman.mesh, self.ribsPath)
         self.humanCharacter.materialInit()
         self.humanCharacter.subObjectsInit()
         
