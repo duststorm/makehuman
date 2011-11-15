@@ -443,11 +443,14 @@ class TextObject(Object):
             
         self.text = text
         
+        attached = self.view and self.view._View__attached
+        
         app.scene3d.clear(self.mesh)
         self.mesh = font3d.createMesh(self.font, text, self.mesh, self.wrapWidth, self.alignment)
         self.mesh.setCameraProjection(1)
         self.mesh.setShadeless(1)
-        self._Object__attach()
+        if attached:
+            self._Object__attach()
         
     def getText(self):
     

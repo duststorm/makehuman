@@ -1054,34 +1054,6 @@ class Object3D(object):
             
         #print "updated %d vertices" % len(verticesToUpdate)
 
-    def applySelectionColor(self):
-        """
-        This method applies the 'selection' color to all of the vertices within this object.
-
-        Selection of a vertex is indicated on the screen by increasing
-        the Red color component and decreasing the Green and Blue color
-        components by a fixed amount (50) and then capping the value so
-        that it remains within the bounds of 0-255.
-
-        **Parameters:** This method has no parameters.
-
-        """
-
-        for v in self.verts:
-            v.update(0, 0, 1)
-
-    def applyDefaultColor(self):
-        """
-        This method applies the color white to all of the vertices within this object.
-
-        **Parameters:** This method has no parameters.
-
-        """
-
-        for v in self.verts:
-            v.color = [255, 255, 255, 255]
-            v.update(0, 0, 1)
-
     def calcNormals(self, recalcVertexNormals=1, recalcFaceNormals=1, verticesToUpdate=None, facesToUpdate=None):
         """
         This method calls the calcNormal method for a subset of the faces
@@ -1326,53 +1298,6 @@ class Scene3D:
                 textureCache[path].loadImage(path)
             except RuntimeError, text:
                 print text
-
-    def instanceObj(self, obj, name):
-        """
-        This macro creates a reference copy of the Object3D object that is passed in as a parameter.
-        It instantiates new FaceGroups which contain the same faces as the original.
-
-        This new object shares the same vertices and faces as the original. Only
-        index references are copied, and no new vertices or faces are created.
-
-        The new object is added into the Scene3D object and is returned to the calling code.
-
-        Parameters
-        ----------
-
-        obj:
-            *object 3D*. The object3D object to be copied.
-
-        name:
-            *string*. The name of the new instance.
-
-        """
-
-        newObj = Object3D(name)
-        newObj.x = obj.x
-        newObj.y = obj.y
-        newObj.z = obj.z
-        newObj.rx = obj.rx
-        newObj.ry = obj.ry
-        newObj.rz = obj.rz
-        newObj.r = obj.r
-        newObj.g = obj.g
-        newObj.b = obj.b
-        newObj.verts = obj.verts
-        newObj.faces = obj.faces
-
-        for fg in obj.__faceGroups:
-            newFg = FaceGroup(name + fg.name)
-            newFg.faces = fg.faces
-            newObj.addFaceGroup(newFg)
-
-        newObj.cameraMode = obj.cameraMode
-        newObj.visibility = obj.visibility
-        newObj.texture = obj.texture
-        newObj.shader = obj.shader
-        newObj.colors = obj.colors
-        newObj.cameraMode = obj.cameraMode
-        return newObj
 
     def assignSelectionID(self, obj):
         """
