@@ -45,7 +45,7 @@ textureCache = {}
 class Texture(mh.Texture):
 
     """
-    A subclass of the base texture class extended to hold a modifiaction date.
+    A subclass of the base texture class extended to hold a modification date.
     """
 
     def __init__(self):
@@ -86,7 +86,7 @@ def getTexture(path, cache=None):
             
     return texture
     
-def reloadTextures(self):
+def reloadTextures():
         print 'Reloading textures'
         for path in textureCache:
             try:
