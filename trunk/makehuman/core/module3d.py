@@ -269,7 +269,7 @@ class Vert:
         This method calculates the vertex surface normal based upon a mathematical average
         of the physical normals of all faces sharing this vertex. This results in a smooth surface.
 
-        .. image:: ../images/vert_norm.png
+        .. image:: _static/vert_norm.png
 
         The physical normal of a surface is a direction vector at right angles
         to that surface. Although the triangular mesh consists of a series of flat
@@ -298,7 +298,7 @@ class Vert:
         """
         This method returns a list of the vertices of all faces that share this vertex.
 
-        .. image:: ../images/vert_shared.png
+        .. image:: _static/vert_shared.png
 
         If processing the vector V in the image above this function would return [v1,v2,v3,v4,v5,v6,v7]
 
