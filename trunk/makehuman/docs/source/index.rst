@@ -54,6 +54,7 @@ Modules
    module_font3d.rst
    module_geometry3d.rst
    module_gui3d.rst
+   module_module3d.rst
    
 Doc Writers Guide
 #################

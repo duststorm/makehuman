@@ -1,25 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# You may use, modify and redistribute this module under the terms of the GNU GPL.
-# .. include:: docs/includes/example1.txt
-
 """
-Base 3D MakeHuman classes.
+:Authors:
+    Manuel Bastioni,
+    Marc Flerackers
 
-**Project Name:**      MakeHuman
-
-**Product Home Page:** http://www.makehuman.org/
-
-**Code Home Page:**    http://code.google.com/p/makehuman/
-
-**Authors:**           Manuel Bastioni, Marc Flerackers
-
-**Copyright(c):**      MakeHuman Team 2001-2011
-
-**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
-
-**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+:Version: 1.0
+:Copyright: MakeHuman Team 2001-2011
+:License: GPL3 
 
 Abstract
 --------
@@ -27,17 +16,16 @@ Abstract
 This module contains all of the base classes needed to manage the 3D MakeHuman
 data structures at runtime. This includes the data structures themselves as well
 as methods to handle their manipulation in memory. For example, the Vert class
-defines the data structures to hold information about mesh vertices objects,
+defines the data structures to hold information about mesh vertex objects,
 while the Face class defines data structures to hold information about mesh face
 objects.
 
 These base classes implement a nested hierarchical structure for the objects
 that make up the scene that is shown to the user. For example, a FaceGroup
-object contains groups of mesh face objects as defined by the Face class. An
+object contains a group of mesh face objects as defined by the Face class. An
 Object3D object contains all of the FaceGroup objects that go to make up a
 particular discrete object, such as the humanoid body or one of the GUI
-controls. The Scene3D object contains all of the Object3D objects that go
-to make up the entire scene.
+controls.
 
 """
 
@@ -57,13 +45,7 @@ textureCache = {}
 class Texture(mh.Texture):
 
     """
-    A simple handler for textures loaded in the scene.
-    
-    Attributes
-    ----------
-    
-    - **self.id** : *int* The texture identifier.
-    - **self.modified**: *int* A flag to indicate if a texture is modified, used to reload the texture if needed.
+    A subclass of the base texture class extended to hold a modifiaction date.
     """
 
     def __init__(self):
@@ -167,20 +149,6 @@ class Vert:
     C-based OpenGL world. See the description of the *update* method, below,
     for more detail about how the information in the Python-based Vert class is
     translated to the lists used by OpenGL.
-
-    Basic usage:
-    ------------
-
-    ::
-
-        import module3d
-
-        x,y,z = 1,1,1
-        v = module3d.Vert([x,y,z])
-        v.update()
-        
-    Attributes
-    ----------
     
     - **self.co**: *float list*. The coordinates of the vertex.
       Default: [coX, coY, coZ]).
@@ -192,34 +160,16 @@ class Vert:
     - **self.indicesInFullVertArray**: *Int list*. The list of corresponding vertices in the C OpenGL list.
     - **self.idx**: *Int* The index of this vertex in the vertices list.
     - **self.color**: *float list*. A list of 4 floats [r,g,b,a] used as the vertex color (including an alpha channel).
+    
+    :param co: The coordinates for this face.
+    :type co: [float, float, float]
+    :param idx: The index in the mesh for this face.
+    :type idx: int
+    :param object: The object which will own this face.
+    :type object: Object3d
     """
 
     def __init__(self, co=[0, 0, 0], idx=0, object=None):
-        """
-        This is the constructor method for the Vert class. It initializes the
-        vert attributes.
-
-
-
-        Parameters
-        ----------
-
-        coX:
-            *float*. The x coordinate of the vertex. Default is 0.
-
-        coY:
-            *float*. The y coordinate of the vertex. Default is 0.
-
-        coZ:
-            *float*. The z coordinate of the vertex. Default is 0.
-
-        idx:
-            *int*. The index of this vertex in the vertices list. Default is 0.
-
-        object:
-            *Object3d*. The Object3D object that uses this vertex. Default is None.
-
-        """
 
         self.co = co
         self.no = [0, 0, 0]
@@ -231,14 +181,32 @@ class Vert:
         self.weights = None
     
     def setCoordinates(self, co):
+        """
+        Replaces the coordinates.
+        
+        :param co: The coordinates for this face.
+        :type co: [float, float, float]
+        """
         self.co = co
         self.update(False, True, False)
         
     def setNormal(self, no):
+        """
+        Replaces the normal.
+        
+        :param no: The normal for this face.
+        :type no: [float, float, float]
+        """
         self.no = no
         self.update(True, False, False)
     
     def setColor(self, color):
+        """
+        Replaces the color.
+        
+        :param no: The color for this face.
+        :type no: [byte, byte, byte, byte]
+        """
         self.color = color
         self.update(False, False, True)
 
@@ -253,10 +221,6 @@ class Vert:
 
           - In Python, a single vertex can be shared by multiple faces. In OpenGL, there
             are always multiple copies of any such vertex.
-          - Vertex information is expanded, so the x, y and z coordinates
-            that are stored for a vertex in the Vert class take up 3 times as many
-            positions in the OpenGL coordinate list (and rgba color values
-            take 4 times as many index positions).
 
         Because one Python Vert object can appear multiple times in the C vertex list,
         each Python Vert object has an attribute, *indicesInFullVertArray*, which lists
@@ -286,29 +250,14 @@ class Vert:
         locations on the model or control or to show base colors.
         
         When updating the color information, this method usually sets all vertex colors in the C array
-        that were derived from a single Python Vert object to be the same color. 
-        **Editorial Note. The colorIndexToUpdate Parameter seems to allow for only a single C vertex
-        to be updated, but there don't seem to be any method calls that use this parameter.**
+        that were derived from a single Python Vert object to be the same color.
 
-        Parameters
-        ----------
-
-        updateNor:
-            *int*. If anything other than None, the normal will be updated.
-
-        updateCoo:
-            *int*. If anything other than None, the coords will be updated.
-
-        updateCol:
-            *int*. If anything other than None, the color will be updated.
-
-        colorIndexToUpdate:
-            *int*. If specified, this parameter is used as the index of a color
-            in the C array of colors. A vertex can be shared by various faces
-            and it's possible to assign it different colors on different faces.
-            If this parameter is left to default to 'None' the default color
-            index will be calculated based on the index of the vertex.
-
+        :param updateNor: Whether the normal needs to be updated.
+        :type updateNor: Boolean
+        :param updateCoo: Whether the coordinates needs to be updated.
+        :type updateCoo: Boolean
+        :param updateCol: Whether the color needs to be updated.
+        :type updateCol: Boolean
         """
         
         if not self.object.object3d:
@@ -338,17 +287,12 @@ class Vert:
         rendering engine (OpenGL) to shade the object so that the surface looks
         like a single, smooth shape.
 
-        Note for API developers
-        -----------------------
-
         Because the actual 3D engine uses optimized glDrawElements,
         where each vertex can have only one normal, it is impossible
         in MakeHuman to draw the geometry in a \"flat\" mode.
 
         MakeHuman is organically oriented, so the benefits of using this optimized technique
         outweigh potential performance costs.
-
-        **Parameters:** This method has no parameters.
 
         """
 
@@ -367,8 +311,6 @@ class Vert:
 
         If processing the vector V in the image above this function would return [v1,v2,v3,v4,v5,v6,v7]
 
-        **Parameters:** This method has no parameters.
-
         """
 
         sharedVertices = set()
@@ -383,8 +325,6 @@ class Vert:
         x, y, and z coordinates of this vertex. This method is called when 
         the vertex object is passed to the 'print' function.
 
-        **Parameters:** This method has no parameters.
-
         """
 
         return 'vert num %s, coord(%s,%s,%s)' % (self.idx, self.co[0], self.co[1], self.co[2])
@@ -393,24 +333,7 @@ class Vert:
 class Face:
 
     """
-    A face object.
-
-    Basic usage
-    ------------
-
-    ::
-
-        import module3d
-
-        v1 = module3d.Vert([0,0,0])
-        v2 = module3d.Vert([0,1,0])
-        v3 = module3d.Vert([1,1,0])
-        v3 = module3d.Vert([1,0,0])
-
-        f = module3d.Face(v1,v2,v3,v4)
-        
-    Attributes
-    ----------
+    An object representing a point, line, triangle or quad.
     
     - **self.no**: *float list* The physical surface normal of the face (x,y,z). Default: [0, 0, 0].
     - **self.verts**: *verts list* A list of 4 vertices that represent the corners of this face.
@@ -422,29 +345,12 @@ class Face:
       used as a 'selection' color.
     - **self.uv**: *list of ints*. A list of 4 ints [i,i,i,i]
       holding the index to the UV coordinates in the objects' uvValues list for the uv-mapping of textures to this face.
+      
+    :param verts: The vertices for this face.
+    :type: module3d.Vert, ..
     """
 
     def __init__(self, *verts):
-        """
-        This is the constructor method for the Face class.
-        It initializes all face attributes.
-
-        Parameters
-        ----------
-
-        v0:
-            *vert*. First vertex of face
-
-        v1:
-            *vert*. Second vertex of face
-
-        v2:
-            *vert*. Third vertex of face
-            
-        v3:
-            *vert*. Fourth vertex of face
-
-        """
 
         self.no = [0.0, 0.0, 0.0]
         self.verts = verts[:]
@@ -455,6 +361,12 @@ class Face:
         self.group = None
 
     def setColor(self, color):
+        """
+        Sets the color for this face.
+        
+        :param color: The color in rgba.
+        :type: [byte, byte, byte, byte]
+        """
         self.color = [color for v in self.verts]
         self.updateColors()
 
@@ -463,9 +375,6 @@ class Face:
         This method calculates the physical surface normal of the face using the planeNorm function from
         the aljabr.py module. This results in a direction vector at right angles to the
         two edges vt2_vt1 and vt2_vt3.
-
-        **Parameters:** This method has no parameters.
-
         """
 
         if len(self.verts) > 2:
@@ -481,23 +390,14 @@ class Face:
         This method updates the color attributes for each vertex on this face.
         """
 
-        # The position of color index to update in C color array
-        # is given by the index of face * 3 * 4
-        # because for each face we have 3 verts, and for each vert we have
-        # 4 floats R,G,B,A.
-
         for (i, v) in enumerate(self.verts):
-            v.color = self.color[i]
-            v.update(0, 0, 1)
+            v.setColor(self.color[i])
 
     def __str__(self):
         """
         This method returns a string listing the index of the face and the
         indices of the three vertices. This method is called when the face
         object is passed to the 'print' function.
-
-        **Parameters:** This method has no parameters.
-
         """
 
         return 'face %i: verts: %s' % (self.idx, [v.idx for v in self.verts])
@@ -514,26 +414,15 @@ class FaceGroup:
     The FaceGroup object contains a list of the faces in the group and must be
     kept in sync with the FaceGroup references stored by the individual faces.
     
-    Attributes
-    ----------
-    
     - **self.name**: *string*. The name of this FaceGroup.
     - **self.faces**: *faces list*. A list of faces. Default: empty.
     - **self.parent**: *Object3d*. The object3D object that contains this FaceGroup. Default: None.
 
+    :param name: The name of the group.
+    :type name: str
     """
 
     def __init__(self, name):
-        """
-        This is the constructor method for the FaceGroup class.
-        It initializes all facegroups attributes.
-
-        Parameters
-        ----------
-
-        name:
-            *string* The name of this FaceGroup.
-        """
 
         self.name = name
         self.__faces = []
@@ -553,7 +442,9 @@ class FaceGroup:
         return 'facegroup %s' % self.name
         
     def clear(self):
-        
+        """
+        Removes all faces from the group.
+        """
         del self.__faces[:]
         
     @property
@@ -561,7 +452,14 @@ class FaceGroup:
         return iter(self.__faces)
 
     def createFace(self, verts, uvs=None):
+        """
+        Creates a new module3d.Face based on the given vertices and optionally uv coordinates.
         
+        :param verts: The vertices.
+        :type verts: [module3d.Vert, ..]
+        :param uvs: The uv coordinates.
+        :type uvs: [(u,v), ..]
+        """
         if len(verts) != self.parent.vertsPerPrimitive:
             raise RuntimeError('The amount of vertices does not match the amount of vertices per primitive of the object')
         
@@ -582,6 +480,12 @@ class FaceGroup:
         return f
 
     def setColor(self, color):
+        """
+        Sets the color for all the faces in this group.
+        
+        :param color: The color in rgba.
+        :type color: [byte, byte, byte, byte]
+        """
         for f in self.__faces:
             f.setColor(color)
 
@@ -595,9 +499,6 @@ class Object3D(object):
     This object has a position and orientation of its own, and the positions and
     orientations of faces and vertices that make up this object are defined relative to
     it. 
-    
-    Attributes:
-    -----------
     
     - **self.name**: *string* The name of this Object3D object.
     - **self.object3d**: *mh.Object3d* The object in the OpenGL engine array.
@@ -627,17 +528,6 @@ class Object3D(object):
     """
 
     def __init__(self, objName, vertsPerPrimitive=4):
-        """
-        This is the constructor method for the Object3D class.
-        It initializes all object attributes.
-
-        Parameters
-        ----------
-
-        objName:
-            *string* The name of the object. This name is used to reference this object in the scene3D dictionary.
-
-        """
 
         self.name = objName
         self.object3d = None
@@ -869,9 +759,6 @@ class Object3D(object):
         """
         This method is used to set the location of the object in the 3D coordinate space of the scene.
 
-        Parameters
-        ----------
-
         locx:
             *float*. The x coordinate of the object.
         locy:
@@ -891,9 +778,6 @@ class Object3D(object):
     def setRot(self, rx, ry, rz):
         """
         This method sets the orientation of the object in the 3D coordinate space of the scene.
-
-        Parameters
-        ----------
 
         rx:
             *float*. Rotation around the x-axis.
@@ -916,9 +800,6 @@ class Object3D(object):
         This method sets the scale of the object in the 3D coordinate space of
         the scene, relative to the initially defined size of the object.
 
-        Parameters
-        ----------
-
         sx:
             *float*. Scale along the x-axis.
         sy:
@@ -939,9 +820,6 @@ class Object3D(object):
         """
         This method sets the visibility of the object.
 
-        Parameters
-        ----------
-
         visib:
             *int flag*. Whether or not the object is visible. 1=Visible, 0=Invisible.
         """
@@ -956,9 +834,6 @@ class Object3D(object):
         """
         This method sets the pickable flag of the object.
 
-        Parameters
-        ----------
-
         visib:
             *int flag*. Whether or not the object is pickable. 0=not pickable, 1=pickable.
         """
@@ -972,9 +847,6 @@ class Object3D(object):
     def setTexture(self, path, cache=None):
         """
         This method is used to specify the path of a TGA file on disk containing the object texture.
-
-        Parameters
-        ----------
 
         path:
             *string* The path of a texture TGA file.
@@ -996,9 +868,6 @@ class Object3D(object):
     def clearTexture(self):
         """
         This method is used to clear an object's texture.
-
-        **Parameters:** This method has no parameters.
-        
         """
 
         self.texture = None
@@ -1013,9 +882,6 @@ class Object3D(object):
     def setShader(self, shader):
         """
         This method is used to specify the shader.
-
-        Parameters
-        ----------
         
         path:
             *int* The shader.
@@ -1040,10 +906,7 @@ class Object3D(object):
         This is used for certain GUI controls to give them a more 2D type
         appearance (predominantly the top bar of GUI controls).
 
-        Parameters
-        ----------
-
-        shadeVal:
+        shadeless:
             *int* Whether or not the object is unaffected by lights. If 0, it is affected by lights; if 0, it is not.
 
         """
@@ -1080,9 +943,6 @@ class Object3D(object):
         This method searches the list of FaceGroups held for this object, and
         returns the FaceGroup with the specified name. If no FaceGroup is found
         for that name, this method returns None.
-
-        Parameters
-        ----------
 
         name:
             *string*  The name of the FaceGroup to retrieve.
@@ -1121,9 +981,6 @@ class Object3D(object):
         The first is generally used to model 3D objects (a human, clothes,
         etc.), while the second is used for 3D GUI controls.
 
-        Parameters
-        ----------
-
         mode:
             *int*  The camera mode to be used for this object. 0 = fixed camera; 1 = movable camera
         """
@@ -1137,9 +994,6 @@ class Object3D(object):
     def update(self, verticesToUpdate=None, updateN=True):
         """
         This method is used to call the update methods on each of a list of vertices that form part of this object.
-
-        Parameters
-        ----------
 
         indexToUpdate:
             *int list*  The list of vertex indices to update
@@ -1170,9 +1024,6 @@ class Object3D(object):
         The calcNorm method of a vertex calculates the vertex's surface normal
         as an average of the  physical surface normals of the faces that share
         that vertex.
-
-        Parameters
-        ----------
 
         indexToUpdate:
             *int list*  The list of indices pointing to the vertices that need to be updated.
@@ -1225,9 +1076,6 @@ class Object3D(object):
         This method returns a string containing the object name, the number of
         vertices, the number of faces, and the location of the object. It is
         called when the object is passed to the 'print' function.
-
-        **Parameters:** This method has no parameters.
-
         """
 
         return 'object3D named: %s, nverts: %s, nfaces: %s, at |%s,%s,%s|' % (self.name, len(self.verts), len(self.faces), self.x, self.y, self.z)
@@ -1262,9 +1110,6 @@ class SelectionColorMap:
     problem with selecting individual faces with very small FaceGroups using
     this technique. However, this is not a major problem for MakeHuman, which
     doesn't use such low polygon groupings.
-
-    Attributes
-    ----------
     
     - **self.colorIDToFaceGroup**: *Dictionary of colors IDs* A dictionary of the color IDs used for
       selection (see MakeHuman Selectors, above).
