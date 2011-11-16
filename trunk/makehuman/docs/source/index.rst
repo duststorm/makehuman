@@ -14,13 +14,28 @@ The MakeHuman project is an open source project developed, managed and maintaine
 Developers guide
 ################
 
+Application overview
+---------------------
+
+.. toctree::
+   :maxdepth: 1   
+
+   dev_manual_overview.rst
+   dev_manual_integration_layer.rst
+   dev_manual_scene_data.rst
+   dev_manual_gui_system.rst
+  
+   
+Writing plugins
+----------------
+
 .. toctree::
    :maxdepth: 1
    
-   coding_intro.rst
+   dev_manual_plugins.rst
    dev_manual_gui.rst
    dev_manual_morph_target.rst
-   dev_manual_undo-redo.rst
+   dev_manual_undo_redo.rst
    dev_manual_meshes.rst
    dev_manual_camera.rst
    dev_manual_gui_controls.rst
