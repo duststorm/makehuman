@@ -133,15 +133,6 @@ class Vert:
       
       [v1,v2,v3,v3,v2,v4]
 
-    In addition, the C vertex list is actually an expanded coordinate list,
-    containing each coordinate of each vertex (x, y, and z) in one long list
-    (stored as a one dimensional array):
-
-      [v1x,v1y,v1z,v2x,v2y,v2z,v3x,v3y,v3z,v3x,v3y,v3z,v2x,v2y,v2z,v4x,v4y,v4z]
-
-    Similarly, the four color components (r, g, b, and a) of each vertex are
-    stored in the C vertex color list.
-
     Each Python Vert object contains a list attribute, *indicesInFullVertArray*,
     listing the various locations where the vertex appears in the C vertex list.
     This allows information held against a single Vert object in Python to be
@@ -320,12 +311,6 @@ class Vert:
         return list(sharedVertices)
 
     def __str__(self):
-        """
-        This method returns a string listing the index of the vertex and the
-        x, y, and z coordinates of this vertex. This method is called when 
-        the vertex object is passed to the 'print' function.
-
-        """
 
         return 'vert num %s, coord(%s,%s,%s)' % (self.idx, self.co[0], self.co[1], self.co[2])
 
@@ -394,11 +379,6 @@ class Face:
             v.setColor(self.color[i])
 
     def __str__(self):
-        """
-        This method returns a string listing the index of the face and the
-        indices of the three vertices. This method is called when the face
-        object is passed to the 'print' function.
-        """
 
         return 'face %i: verts: %s' % (self.idx, [v.idx for v in self.verts])
 
@@ -614,7 +594,9 @@ class Object3D(object):
         del self.__faceGroups[:]
         
     def attach(self):
-    
+        """
+        Attachess the object by creating the remote data.
+        """
         if self.object3d:
             return
         if not self.vertexBufferSize:
@@ -699,13 +681,15 @@ class Object3D(object):
             self.object3d = None
 
     def updateIndexBuffer(self):
-        # Build the lists of vertex indices and UV-indices for this face group.
-        # In the Python data structures a single vertex can be shared between
-        # multiple faces in the same face group. However, if a single vertex
-        # has multiple UV-settings, then we generate additional vertices so
-        # that we have a place to record the separate UV-indices.
-        # Where the UV-map needs a sharp transition (e.g. where the eyelids
-        # meet the eyeball) we therefore create duplicate vertices.
+        """
+        Build the lists of vertex indices and UV-indices for this face group.
+        In the Python data structures a single vertex can be shared between
+        multiple faces in the same face group. However, if a single vertex
+        has multiple UV-settings, then we generate additional vertices so
+        that we have a place to record the separate UV-indices.
+        Where the UV-map needs a sharp transition (e.g. where the eyelids
+        meet the eyeball) we therefore create duplicate vertices.
+        """
         del self.indexBuffer[:]
         fullArrayIndex = 0
         for g in self.__faceGroups:
@@ -731,17 +715,39 @@ class Object3D(object):
         self.vertexBufferSize = fullArrayIndex
 
     def createFaceGroup(self, name):
+        """
+        Creates a new module3d.FaceGroup with the given name.
+
+        :param name: The name for the face group.
+        :type name: [float, float, float]
+        :return: The new face group.
+        :rtype: module3d.FaceGroup
+        """
         fg = FaceGroup(name)
         fg.parent = self
         self.__faceGroups.append(fg)
         return fg
 
     def createVertex(self, co):
+        """
+        Creates a new module3d.Vert with the given coordinates.
+
+        :param co: The coordinates for the vertex.
+        :type co: [float, float, float]
+        :return: The new vertex.
+        :rtype: module3d.Vert
+        """
         v = Vert(co, len(self.verts), self)
         self.verts.append(v)
         return v
         
     def addUv(self, uv):
+        """
+        Adds the uv coordinate to the uv map.
+
+        :param uv: The uv coordinates to add.
+        :type uv: (float, float)
+        """
         key = tuple(uv)
         try:
             return self.uvMap[key]
@@ -752,6 +758,12 @@ class Object3D(object):
             return index
             
     def setColor(self, color):
+        """
+        Sets the color for the entire object.
+
+        :param color: The color in rgba.
+        :type color: [byte, byte, byte, byte]
+        """
         for g in self.__faceGroups:
             g.setColor(color)
 
@@ -759,12 +771,12 @@ class Object3D(object):
         """
         This method is used to set the location of the object in the 3D coordinate space of the scene.
 
-        locx:
-            *float*. The x coordinate of the object.
-        locy:
-            *float*. The y coordinate of the object.
-        locz:
-            *float*. The z coordinate of the object.
+        :param locx: The x coordinate of the object.
+        :type locx: float
+        :param locy: The y coordinate of the object.
+        :type locy: float
+        :param locz: The z coordinate of the object.
+        :type locz: float
         """
 
         self.x = locx
@@ -779,12 +791,12 @@ class Object3D(object):
         """
         This method sets the orientation of the object in the 3D coordinate space of the scene.
 
-        rx:
-            *float*. Rotation around the x-axis.
-        ry:
-            *float*. Rotation around the y-axis.
-        rz:
-            *float*. Rotation around the z-axis.
+        :param rx: Rotation around the x-axis.
+        :type rx: float
+        :param ry: Rotation around the y-axis.
+        :type ry: float
+        :param rz: Rotation around the z-axis.
+        :type rz: float
         """
 
         self.rx = rx
@@ -800,12 +812,12 @@ class Object3D(object):
         This method sets the scale of the object in the 3D coordinate space of
         the scene, relative to the initially defined size of the object.
 
-        sx:
-            *float*. Scale along the x-axis.
-        sy:
-            *float*. Scale along the y-axis.
-        sz:
-            *float*. Scale along the z-axis.
+        :param sx: Scale along the x-axis.
+        :type sx: float
+        :param sy: Scale along the x-axis.
+        :type sy: float
+        :param sz: Scale along the x-axis.
+        :type sz: float
         """
 
         self.sx = sx
@@ -820,8 +832,8 @@ class Object3D(object):
         """
         This method sets the visibility of the object.
 
-        visib:
-            *int flag*. Whether or not the object is visible. 1=Visible, 0=Invisible.
+        :param visible: Whether or not the object is visible.
+        :type visible: Boolean
         """
 
         self.visibility = visible
@@ -834,8 +846,8 @@ class Object3D(object):
         """
         This method sets the pickable flag of the object.
 
-        visib:
-            *int flag*. Whether or not the object is pickable. 0=not pickable, 1=pickable.
+        :param pickable: Whether or not the object is pickable.
+        :type pickable: Boolean
         """
 
         self.pickable = pickable
@@ -846,10 +858,12 @@ class Object3D(object):
 
     def setTexture(self, path, cache=None):
         """
-        This method is used to specify the path of a TGA file on disk containing the object texture.
+        This method is used to specify the path of a file on disk containing the object texture.
 
-        path:
-            *string* The path of a texture TGA file.
+        :param path: The path of a texture file.
+        :type path: str
+        :param cache: The texture cache to use.
+        :type cache: dict
         """
         
         self.texture = path
@@ -883,8 +897,8 @@ class Object3D(object):
         """
         This method is used to specify the shader.
         
-        path:
-            *int* The shader.
+        :param shadeless: The shader.
+        :type shadeless: int
         """
 
         self.shader = shader
@@ -906,9 +920,8 @@ class Object3D(object):
         This is used for certain GUI controls to give them a more 2D type
         appearance (predominantly the top bar of GUI controls).
 
-        shadeless:
-            *int* Whether or not the object is unaffected by lights. If 0, it is affected by lights; if 0, it is not.
-
+        :param shadeless: Whether or not the object is unaffected by lights.
+        :type shadeless: Boolean
         """
 
         self.shadeless = shadeless
@@ -918,6 +931,13 @@ class Object3D(object):
             pass
             
     def setSolid(self, solid):
+        """
+        This method is used to specify whether or not the object is drawn solid or wireframe.
+
+        :param solid: Whether or not the object is drawn solid or wireframe.
+        :type solid: Boolean
+        """
+        
         self.solid = solid
         try:
             self.object3d.solid = self.solid
@@ -925,6 +945,13 @@ class Object3D(object):
             pass
             
     def setTransparentPrimitives(self, transparentPrimitives):
+        """
+        This method is used to specify the amount of transparent faces.
+
+        :param transparentPrimitives: The amount of transparent faces.
+        :type transparentPrimitives: int
+        """
+        
         self.transparentPrimitives = transparentPrimitives
         try:
             self.object3d.transparentPrimitives = self.transparentPrimitives
@@ -932,6 +959,12 @@ class Object3D(object):
             pass
             
     def setVertsPerPrimitive(self, vertsPerPrimitive):
+        """
+        This method is used to specify the amount of vertices per primitive. Points, lines, triangles or quads.
+
+        :param vertsPerPrimitive: The amount of vertices per primitive.
+        :type vertsPerPrimitive: int
+        """
         self.vertsPerPrimitive = vertsPerPrimitive
         try:
             self.object3d.vertsPerPrimitive = self.vertsPerPrimitive
@@ -944,8 +977,8 @@ class Object3D(object):
         returns the FaceGroup with the specified name. If no FaceGroup is found
         for that name, this method returns None.
 
-        name:
-            *string*  The name of the FaceGroup to retrieve.
+        :param name: The name of the FaceGroup to retrieve.
+        :type name: str
         """
 
         for fg in self.__faceGroups:
@@ -971,7 +1004,7 @@ class Object3D(object):
             if recalcNormals:
                 self.calcNormals(1, 1, vertices, faces)
             if update:
-                self.update(vertices)
+                self.update(vertices, False)
 
     def setCameraProjection(self, cameraMode):
         """
@@ -981,8 +1014,8 @@ class Object3D(object):
         The first is generally used to model 3D objects (a human, clothes,
         etc.), while the second is used for 3D GUI controls.
 
-        mode:
-            *int*  The camera mode to be used for this object. 0 = fixed camera; 1 = movable camera
+        :param cameraMode: The camera mode. 0 = fixed camera; 1 = movable camera.
+        :type cameraMode: int
         """
 
         self.cameraMode = cameraMode
@@ -991,51 +1024,34 @@ class Object3D(object):
         except AttributeError, text:
             pass
 
-    def update(self, verticesToUpdate=None, updateN=True):
+    def update(self, verticesToUpdate=None, updateNormals=True):
         """
-        This method is used to call the update methods on each of a list of vertices that form part of this object.
+        This method is used to call the update methods on each of a list of vertices or all vertices that form part of this object.
 
-        indexToUpdate:
-            *int list*  The list of vertex indices to update
-
+        :param verticesToUpdate: The list of vertices to update.
+        :type verticesToUpdate: [module3d.Vert, ..]
+        :param updateNormals: Whether to update the normals as well.
+        :type updateNormals: [module3d.Vert, ..]
         """
 
         if verticesToUpdate == None:
             verticesToUpdate = self.verts
         
         for v in verticesToUpdate:
-            v.update(updateNor=updateN)
-            
-        #print "updated %d vertices" % len(verticesToUpdate)
+            v.update(updateNor=updateNormals)
 
     def calcNormals(self, recalcVertexNormals=1, recalcFaceNormals=1, verticesToUpdate=None, facesToUpdate=None):
         """
-        This method calls the calcNormal method for a subset of the faces
-        in this Object3D object and the calcNorm method on a subset of the
-        vertices in this Object3D object.
-
-        If no faces are specified the face normals are not recalculated. If the
-        recalcNorms flag is set to None the vertex normals are not recalculated.
-        If 'None' is specified for the vertex indices then all vertex indices
-        are recalculated (so long as recalcNorms is not set to None).
-
-        The calcNormal method of a face will recalculate the actual physical
-        surface normal.
-        The calcNorm method of a vertex calculates the vertex's surface normal
-        as an average of the  physical surface normals of the faces that share
-        that vertex.
-
-        indexToUpdate:
-            *int list*  The list of indices pointing to the vertices that need to be updated.
-
-        facesToRecalcNorm:
-            *int list*  The list of indices pointing to the faces to be updated.
-
-        recalcNorms:
-            *flag*  A flag to indicate whether or not the vertex normals should be recalculated.
-            If set to anything other than None, the vertex normals are recalculated.
-            Otherwise only need the face normals are recalculated.
-
+        Updates the given vertex and/or face normals.
+        
+        :param recalcVertexNormals: A flag to indicate whether or not the vertex normals should be recalculated.
+        :type recalcVertexNormals: Boolean
+        :param recalcFaceNormals: A flag to indicate whether or not the face normals should be recalculated.
+        :type recalcFaceNormals: Boolean
+        :param verticesToUpdate: The list of vertices to be updated, if None all vertices are updated.
+        :type verticesToUpdate: list of module3d.Vert
+        :param facesToUpdate: The list of faces to be updated, if None all faces are updated.
+        :type facesToUpdate: list of module3d.Face
         """
 
         if recalcFaceNormals:
@@ -1051,7 +1067,9 @@ class Object3D(object):
                 v.calcNorm()
                 
     def calcBBox(self):
-        
+        """
+        Calculates the axis aligned bounding box of this object in the object's coordinate system. 
+        """
         if self.verts:
             bbox =  [self.verts[0].co[:],self.verts[0].co[:]]
             for v in self.verts:
@@ -1072,11 +1090,6 @@ class Object3D(object):
         return bbox
 
     def __str__(self):
-        """
-        This method returns a string containing the object name, the number of
-        vertices, the number of faces, and the location of the object. It is
-        called when the object is passed to the 'print' function.
-        """
 
         return 'object3D named: %s, nverts: %s, nfaces: %s, at |%s,%s,%s|' % (self.name, len(self.verts), len(self.faces), self.x, self.y, self.z)
 
