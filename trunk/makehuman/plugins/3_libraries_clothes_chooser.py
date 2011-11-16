@@ -55,7 +55,7 @@ class ClothesTaskView(gui3d.TaskView):
             del human.clothesObjs[proxy.name]
             return
 
-        mesh = files3d.loadMesh(gui3d.app.scene3d, obj)
+        mesh = files3d.loadMesh(obj)
         if proxy.texture:
             (dir, name) = proxy.texture
             tif = os.path.join(folder, name)

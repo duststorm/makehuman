@@ -222,7 +222,7 @@ class LoadTaskView(gui3d.TaskView):
             self.parent.tasksByName['Save'].fileentry.text = name
             self.parent.tasksByName['Save'].fileentry.edit.setText(name)
             
-            gui3d.app.setCaption(("MakeHuman - [%s]" % name).encode("utf8"))
+            gui3d.app.setCaption("MakeHuman - [%s]" % name)
 
             gui3d.app.switchCategory('Modelling')
 

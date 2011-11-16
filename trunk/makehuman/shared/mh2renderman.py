@@ -435,9 +435,7 @@ class RMRHeader:
 
 class RMRScene:
 
-    #def __init__(self, MHscene, camera):
     def __init__(self, app):
-        MHscene = app.scene3d
         camera = app.modelCamera
 
         #rendering properties

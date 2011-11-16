@@ -139,7 +139,7 @@ def load(app):
             
     @taskview.event
     def onMouseDown(event):
-        part = app.scene3d.getSelectedFacesGroup()
+        part = app.getSelectedFaceGroup()
         print part.name
 
 # This method is called when the plugin is unloaded from makehuman

@@ -103,6 +103,14 @@ def getTexture(path, cache=None):
             cache[path] = texture
             
     return texture
+    
+def reloadTextures(self):
+        print 'Reloading textures'
+        for path in textureCache:
+            try:
+                textureCache[path].loadImage(path)
+            except RuntimeError, text:
+                print text
 
 class Vert:
 
@@ -686,7 +694,14 @@ class Object3D(object):
         return len(self.__faceGroups)
         
     def clear(self):
+        """
+        Clears both local and remote data to repurpose this object
+        """
+    
+        # Clear remote data
+        self.detach()
 
+        # Clear local data data
         if self.indexBuffer:
             del self.indexBuffer[:]
         if self.uvValues:
@@ -707,6 +722,91 @@ class Object3D(object):
             del fg.parent
             fg.clear()
         del self.__faceGroups[:]
+        
+    def attach(self):
+    
+        if self.object3d:
+            return
+        if not self.vertexBufferSize:
+            return
+
+        selectionColorMap.assignSelectionID(self)
+
+        #print "sending: ", self.name, len(self.verts)
+
+        coIdx = 0
+        fidx = 0
+        uvIdx = 0
+        colIdx = 0
+
+        # create an object with vertexBufferSize vertices and len(indexBuffer) / 3 triangles
+
+        self.object3d = mh.Object3D(self.vertexBufferSize, self.indexBuffer)
+        mh.world.append(self.object3d)
+
+        for g in self.faceGroups:
+            if 'joint' in g.name:
+                continue
+            groupVerts = set()
+            for f in g.faces:
+                faceColor = f.color
+                if faceColor == None:
+                    faceColor = [[255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255]]
+                fUV = f.uv
+                if fUV == None:
+                    fUV = [-1, -1, -1, -1]
+
+                i = 0
+                for v in f.verts:
+                    if (v.idx, fUV[i]) not in groupVerts:
+
+                        # self.object3d.setAllCoord(coIdx, colIdx, v.co, v.no, f.colorID, faceColor[i])
+
+                        self.object3d.setVertCoord(coIdx, v.co)
+                        self.object3d.setNormCoord(coIdx, v.no)
+                        self.object3d.setColorIDComponent(coIdx, f.colorID)
+                        self.object3d.setColorComponent(colIdx, faceColor[i])
+                        groupVerts.add((v.idx, fUV[i]))
+
+                        coIdx += 1
+                        colIdx += 1
+
+                        if self.uvValues:
+                            self.object3d.setUVCoord(uvIdx, self.uvValues[fUV[i]])
+                            uvIdx += 1
+
+                    i += 1
+
+        if self.texture:
+            self.setTexture(self.texture)
+
+        self.object3d.shader = self.shader
+
+        for (name, value) in self.shaderParameters.iteritems():
+            self.object3d.shaderParameters[name] = value
+
+        self.object3d.translation = (self.x, self.y, self.z)
+        self.object3d.rotation = (self.rx, self.ry, self.rz)
+        self.object3d.scale = (self.sx, self.sy, self.sz)
+        self.object3d.visibility = self.visibility
+        self.object3d.shadeless = self.shadeless
+        self.object3d.pickable = self.pickable
+        self.object3d.solid = self.solid
+        self.object3d.transparentPrimitives = self.transparentPrimitives
+        self.object3d.vertsPerPrimitive = self.vertsPerPrimitive
+        self.object3d.cameraMode = self.cameraMode
+
+        # TODO add all obj attributes
+        
+    def detach(self):
+        """
+        Detaches the object, clearing all remote data
+        """
+        
+        if self.object3d:
+            mh.world.remove(self.object3d)
+            del self.object3d
+            self.object3d = None
 
     def updateIndexBuffer(self):
         # Build the lists of vertex indices and UV-indices for this face group.
@@ -1133,23 +1233,10 @@ class Object3D(object):
         return 'object3D named: %s, nverts: %s, nfaces: %s, at |%s,%s,%s|' % (self.name, len(self.verts), len(self.faces), self.x, self.y, self.z)
 
 
-class Scene3D:
+class SelectionColorMap:
 
     """
-    A 3D object that stores the contents of a scene (made up primarily of
-    one or more Object3D objects).
-    As a minimum the MakeHuman scene usually consists of a humanoid object
-    that can be manipulated by the MakeHuman application, plus a set of 3D GUI
-    controls.
-
-    Multiple 3D model objects can theoretically be added to the 3D scene.
-    Future versions of MakeHuman are likely to support multiple humanoid
-    objects, and potentially separate objects such as clothing and props.
-
-    MakeHuman Selectors
-    -------------------
-
-    This object supports the use of a technique called *Selection Using Unique
+    The objects support the use of a technique called *Selection Using Unique
     Color IDs*, that internally uses color-coding of components within the
     scene to support the selection of objects by the user using the mouse.
 
@@ -1179,125 +1266,24 @@ class Scene3D:
     Attributes
     ----------
     
-    - **self.objects**: *3Dobject list* A list of the 3D objects in the scene.
-    - **self.faceGroupColorID**: *Dictionary of colors IDs* A dictionary of the color IDs used for
+    - **self.colorIDToFaceGroup**: *Dictionary of colors IDs* A dictionary of the color IDs used for
       selection (see MakeHuman Selectors, above).
     - **self.colorID**: *float list* A progressive color ID.
     
-    The attributes *self.colorID* and *self.faceGroupColorID*
+    The attributes *self.colorID* and *self.colorIDToFaceGroup*
     support a technique called *Selection Using Unique Color IDs* to make each
     FaceGroup independently clickable.
 
     The attribute *self.colorID* stores a progressive color that is incremented for each successive
     FaceGroup added to the scene.
-    The *self.faceGroupColorID* attribute contains a list that serves as a directory to map
+    The *self.colorIDToFaceGroup* attribute contains a list that serves as a directory to map
     each color back to the corresponding FaceGroup by using its color ID.
     """
 
     def __init__(self):
-        """
-        This is the constructor method for the Scene3D class.
-        It initializes the following attributes:        
-
-        **Parameters:** This method has no parameters.
-
-        """
-
-        self.faceGroupColorID = {}
+    
+        self.colorIDToFaceGroup = {}
         self.colorID = 0
-
-    def clear(self, obj):
-        
-        self.detach(obj)
-        obj.clear()
-
-    def attach(self, obj):
-        if obj.object3d:
-            return
-        if not obj.vertexBufferSize:
-            return
-
-        self.assignSelectionID(obj)
-
-        #print "sending: ", obj.name, len(obj.verts)
-
-        coIdx = 0
-        fidx = 0
-        uvIdx = 0
-        colIdx = 0
-
-        # create an object with vertexBufferSize vertices and len(indexBuffer) / 3 triangles
-
-        obj.object3d = mh.Object3D(obj.vertexBufferSize, obj.indexBuffer)
-        mh.world.append(obj.object3d)
-
-        for g in obj.faceGroups:
-            if 'joint' in g.name:
-                continue
-            groupVerts = set()
-            for f in g.faces:
-                faceColor = f.color
-                if faceColor == None:
-                    faceColor = [[255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255], [255, 255, 255, 255]]
-                fUV = f.uv
-                if fUV == None:
-                    fUV = [-1, -1, -1, -1]
-
-                i = 0
-                for v in f.verts:
-                    if (v.idx, fUV[i]) not in groupVerts:
-
-                        # obj.object3d.setAllCoord(coIdx, colIdx, v.co, v.no, f.colorID, faceColor[i])
-
-                        obj.object3d.setVertCoord(coIdx, v.co)
-                        obj.object3d.setNormCoord(coIdx, v.no)
-                        obj.object3d.setColorIDComponent(coIdx, f.colorID)
-                        obj.object3d.setColorComponent(colIdx, faceColor[i])
-                        groupVerts.add((v.idx, fUV[i]))
-
-                        coIdx += 1
-                        colIdx += 1
-
-                        if obj.uvValues:
-                            obj.object3d.setUVCoord(uvIdx, obj.uvValues[fUV[i]])
-                            uvIdx += 1
-
-                    i += 1
-
-        if obj.texture:
-            obj.setTexture(obj.texture)
-
-        obj.object3d.shader = obj.shader
-
-        for (name, value) in obj.shaderParameters.iteritems():
-            obj.object3d.shaderParameters[name] = value
-
-        obj.object3d.translation = (obj.x, obj.y, obj.z)
-        obj.object3d.rotation = (obj.rx, obj.ry, obj.rz)
-        obj.object3d.scale = (obj.sx, obj.sy, obj.sz)
-        obj.object3d.visibility = obj.visibility
-        obj.object3d.shadeless = obj.shadeless
-        obj.object3d.pickable = obj.pickable
-        obj.object3d.solid = obj.solid
-        obj.object3d.transparentPrimitives = obj.transparentPrimitives
-        obj.object3d.vertsPerPrimitive = obj.vertsPerPrimitive
-        obj.object3d.cameraMode = obj.cameraMode
-
-        # TODO add all obj attributes
-
-    def detach(self, obj):
-        if obj.object3d:
-            mh.world.remove(obj.object3d)
-            del obj.object3d
-            obj.object3d = None
-
-    def reloadTextures(self):
-        print 'Reloading textures'
-        for path in textureCache:
-            try:
-                textureCache[path].loadImage(path)
-            except RuntimeError, text:
-                print text
 
     def assignSelectionID(self, obj):
         """
@@ -1314,14 +1300,8 @@ class Scene3D:
         This is part of a technique called *Selection Using Unique Color IDs*
         to make each FaceGroup independently clickable.
 
-        (See 'MakeHuman Selectors' above.)
-
-        Parameters
-        ----------
-
-        obj:
-            *object 3D*. The object3D object for which a color dictionary is to be generated.
-
+        :param obj: The object3D object for which color dictionary entries need to be generated.
+        :type obj: module3d.Object 3D
         """
 
         # print "DEBUG COLOR AND GROUPS, obj", obj.name
@@ -1339,20 +1319,19 @@ class Scene3D:
             for f in g.faces:
                 f.colorID = (idR, idG, idB)
             
-            self.faceGroupColorID[self.colorID] = g
+            self.colorIDToFaceGroup[self.colorID] = g
 
             # print "SELECTION DEBUG INFO: facegroup %s of obj %s has the colorID = %s,%s,%s or %s"%(g.name,obj.name,idR,idG,idB, self.colorID)
 
-    def getSelectedFacesGroup(self):
+    def getSelectedFaceGroup(self):
         """
         This method uses a non-displayed image containing color-coded faces
         to return the index of the FaceGroup selected by the user with the mouse.
         This is part of a technique called *Selection Using Unique Color IDs* to make each
         FaceGroup independently clickable.
-        (see 'MakeHuman Selectors' above.)
 
-        **Parameters:** This method has no parameters.
-
+        :return: The selected face group.
+        :rtype: module3d.FaceGroup
         """
 
         picked = mh.getColorPicked()
@@ -1362,7 +1341,7 @@ class Scene3D:
         # print "DEBUG COLOR PICKED: %s,%s,%s %s"%(picked[0], picked[1], picked[2], IDkey)
 
         try:
-            groupSelected = self.faceGroupColorID[IDkey]
+            groupSelected = self.colorIDToFaceGroup[IDkey]
         except:
 
             # print groupSelected.name
@@ -1371,18 +1350,18 @@ class Scene3D:
             groupSelected = None
         return groupSelected
 
-    def getPickedObject(self):
+    def getSelectedFaceGroupAndObject(self):
         """
         This method determines whether a FaceGroup or a non-selectable zone has been
         clicked with the mouse. It returns a tuple, showing the FaceGroup and the parent
         Object3D object, or None.
         If no object is picked, this method will simply print \"no clickable zone.\"
 
-        **Parameters:** This method has no parameters.
-
+        :return: The selected face group and object.
+        :rtype: (module3d.FaceGroup, module3d.Object3d)
         """
 
-        facegroupPicked = self.getSelectedFacesGroup()
+        facegroupPicked = self.getSelectedFaceGroup()
         if facegroupPicked:
             objPicked = facegroupPicked.parent
             return (facegroupPicked, objPicked)
@@ -1394,3 +1373,5 @@ class Scene3D:
 def getFacesFromVerts(vertIndices, verts):
 
     return set([f for i in vertIndices for f in verts[i].sharedFaces])
+    
+selectionColorMap = SelectionColorMap()

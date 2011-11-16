@@ -68,7 +68,7 @@ class HairTaskView(gui3d.TaskView):
             human.hairObj = None
             human.hairProxy = None
 
-        mesh = files3d.loadMesh(gui3d.app.scene3d, obj)
+        mesh = files3d.loadMesh(obj)
         if mesh:
             mesh.setTexture(tif)        
             human.hairObj = gui3d.app.addObject(gui3d.Object(human.getPosition(), mesh))
@@ -139,7 +139,7 @@ class HairTaskView(gui3d.TaskView):
         human = event.human
         if event.change == 'reset':
             if human.hairObj:
-                gui3d.app.scene3d.delete(human.hairObj.mesh)
+                human.hairObj.mesh.clear()
                 human.hairObj = None
                 human.hairProxy = None
             self.hairButton.setTexture('data/hairstyles/clear.png')

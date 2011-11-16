@@ -121,23 +121,23 @@ class Object(events3d.EventHandler):
             self.mesh.setVisibility(0)
             
         if self.__seedMesh:
-           app.scene3d.attach(self.__seedMesh)
+           self.__seedMesh.attach()
         if self.__proxyMesh:
-           app.scene3d.attach(self.__proxyMesh)
+           self.__proxyMesh.attach()
         if self.__subdivisionMesh:
-           app.scene3d.attach(self.__subdivisionMesh)
+           self.__subdivisionMesh.attach()
         if self.__proxySubdivisionMesh:
-           app.scene3d.attach(self.__proxySubdivisionMesh)
+           self.__proxySubdivisionMesh.attach()
             
     def __detach(self):
         
-        app.scene3d.detach(self.__seedMesh)
+        self.__seedMesh.detach()
         if self.__proxyMesh:
-            app.scene3d.detach(self.__proxyMesh)
+            self.__proxyMesh.detach()
         if self.__subdivisionMesh:
-            app.scene3d.detach(self.__subdivisionMesh)
+            self.__subdivisionMesh.detach()
         if self.__proxySubdivisionMesh:
-            app.scene3d.detach(self.__proxySubdivisionMesh)
+            self.__proxySubdivisionMesh.detach()
             
     @property
     def view(self):
@@ -273,10 +273,10 @@ class Object(events3d.EventHandler):
         if self.proxy:
         
             self.proxy = None
-            app.scene3d.clear(self.__proxyMesh)
+            self.__proxyMesh.clear()
             self.__proxyMesh = None
             if self.__proxySubdivisionMesh:
-                app.scene3d.clear(self.__proxySubdivisionMesh)
+                self.__proxySubdivisionMesh.clear()
                 self.__proxySubdivisionMesh = None
             self.mesh = self.__seedMesh
             self.mesh.setVisibility(1)
@@ -287,7 +287,7 @@ class Object(events3d.EventHandler):
             
             (folder, name) = proxy.obj_file
             
-            self.__proxyMesh = files3d.loadMesh(app.scene3d, os.path.join(folder, name))
+            self.__proxyMesh = files3d.loadMesh(os.path.join(folder, name))
             self.__proxyMesh.x, self.__proxyMesh.y, self.__proxyMesh.z = self.mesh.x, self.mesh.y, self.mesh.z
             self.__proxyMesh.rx, self.__proxyMesh.ry, self.__proxyMesh.rz = self.mesh.rx, self.mesh.ry, self.mesh.rz
             self.__proxyMesh.sx, self.__proxyMesh.sy, self.__proxyMesh.sz = self.mesh.sx, self.mesh.sy, self.mesh.sz
@@ -302,7 +302,7 @@ class Object(events3d.EventHandler):
             self.proxy.update(self.__proxyMesh, self.__seedMesh)
             
             if self.__seedMesh.object3d:
-                app.scene3d.attach(self.__proxyMesh)
+                self.__proxyMesh.attach()
             
             self.mesh.setVisibility(0)
             self.mesh = self.__proxyMesh
@@ -312,18 +312,18 @@ class Object(events3d.EventHandler):
         
         if self.isProxied():
             if not self.__proxySubdivisionMesh:
-                self.__proxySubdivisionMesh = createSubdivisionObject(app.scene3d, self.__proxyMesh, progressCallback)
+                self.__proxySubdivisionMesh = createSubdivisionObject(self.__proxyMesh, progressCallback)
                 if self.__seedMesh.object3d:
-                    app.scene3d.attach(self.__proxySubdivisionMesh)
+                    self.__proxySubdivisionMesh.attach()
             elif update:
                 updateSubdivisionObject(self.__proxySubdivisionMesh, progressCallback)
                 
             return self.__proxySubdivisionMesh
         else:
             if not self.__subdivisionMesh:
-                self.__subdivisionMesh = createSubdivisionObject(app.scene3d, self.__seedMesh, progressCallback)
+                self.__subdivisionMesh = createSubdivisionObject(self.__seedMesh, progressCallback)
                 if self.__seedMesh.object3d:
-                    app.scene3d.attach(self.__subdivisionMesh)
+                    self.__subdivisionMesh.attach()
             elif update:
                 updateSubdivisionObject(self.__subdivisionMesh, progressCallback)
                 
@@ -445,7 +445,7 @@ class TextObject(Object):
         
         attached = self.view and self.view._View__attached
         
-        app.scene3d.clear(self.mesh)
+        self.mesh.clear()
         self.mesh = font3d.createMesh(self.font, text, self.mesh, self.wrapWidth, self.alignment)
         self.mesh.setCameraProjection(1)
         self.mesh.setShadeless(1)
@@ -935,7 +935,7 @@ class Category(View):
     def onResized(self, event):
         self.tabs.box.mesh.resize(event.width, 32)
 
-# The application, a wrapper around Scene3D
+# The application
 app = None
 
 class Application(events3d.EventHandler):
@@ -948,8 +948,6 @@ class Application(events3d.EventHandler):
     def __init__(self):
         global app
         app = self
-        self.scene3d = module3d.Scene3D()
-        self.scene3d.application = self
         self.parent = self
         self.children = []
         self.objects = []
@@ -1117,6 +1115,14 @@ class Application(events3d.EventHandler):
 
             self.focusView = None
             self.focusObject = None
+            
+    def getSelectedFaceGroupAndObject(self):
+    
+        return module3d.selectionColorMap.getSelectedFaceGroupAndObject()
+        
+    def getSelectedFaceGroup(self):
+    
+        return module3d.selectionColorMap.getSelectedFaceGroup()
 
     def switchTask(self, name):
         if self.currentTask:
@@ -1168,7 +1174,7 @@ class Application(events3d.EventHandler):
             event = events3d.MouseEvent(button, x, y)
 
             # Get picked object
-            pickedObject = self.scene3d.getPickedObject()
+            pickedObject = self.getSelectedFaceGroupAndObject()
             if pickedObject:
                 object = pickedObject[1].object
             else:
@@ -1196,7 +1202,7 @@ class Application(events3d.EventHandler):
         event = events3d.MouseEvent(button, x, y)
 
         # Get picked object
-        pickedObject = self.scene3d.getPickedObject()
+        pickedObject = self.getSelectedFaceGroupAndObject()
         if pickedObject:
             object = pickedObject[1].object
         else:
@@ -1214,7 +1220,7 @@ class Application(events3d.EventHandler):
 
         # Get picked object
 
-        picked = self.scene3d.getPickedObject()
+        picked = self.getSelectedFaceGroupAndObject()
         
         if picked:
             group = picked[0]
@@ -1289,7 +1295,7 @@ class Application(events3d.EventHandler):
             
     def onResizedCallback(self, width, height, fullscreen):
         if self.fullscreen != fullscreen:
-            self.scene3d.reloadTextures()
+            module3d.reloadTextures()
         self.fullscreen = fullscreen
         
         event = events3d.ResizeEvent(width, height, fullscreen, width - self.width, height - self.height)

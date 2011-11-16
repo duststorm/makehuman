@@ -54,7 +54,7 @@ import os
 import algos3d
 import module3d
     
-def loadMesh(scene, path, locX=0, locY=0, locZ=0, loadColors=1):
+def loadMesh(path, locX=0, locY=0, locZ=0, loadColors=1):
     """
     This function loads the specified mesh objects into internal MakeHuman data structures,
     and return it.

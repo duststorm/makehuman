@@ -85,7 +85,7 @@ def updateEdgeVert(ev):
     else: # Outer edge
         ev.co = vavg3d(ev.data[0].co, ev.data[1].co)
 
-def createSubdivisionObject(scene, object, progressCallback=None):
+def createSubdivisionObject(object, progressCallback=None):
     
     name = object.name + '.sub'
     

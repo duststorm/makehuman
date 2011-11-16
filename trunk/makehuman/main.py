@@ -94,7 +94,7 @@ import human
 import guimodelling, guifiles#, guirender
 from aljabr import centroid
 import algos3d
-#import font3d
+import module3d
 
 class Camera(events3d.EventHandler):
 
@@ -401,7 +401,7 @@ class MHApplication(gui3d.Application):
         self.progressBar.setProgress(0.2)
         #hairObj = hair.loadHairsFile(self.scene3d, path="./data/hairs/default", update = False)
         #self.scene3d.clear(hairObj) 
-        self.selectedHuman = self.addObject(human.Human(files3d.loadMesh(self.scene3d, "data/3dobjs/base.obj")))
+        self.selectedHuman = self.addObject(human.Human(files3d.loadMesh("data/3dobjs/base.obj")))
         
         mh.callAsync(self.loadMainGui)
         
@@ -418,7 +418,7 @@ class MHApplication(gui3d.Application):
         @self.selectedHuman.event
         def onMouseDown(event):
           if self.tool:
-            self.selectedGroup = gui3d.app.scene3d.getSelectedFacesGroup()
+            self.selectedGroup = self.getSelectedFaceGroup()
             self.tool.callEvent("onMouseDown", event)
           else:
             self.currentTask.callEvent("onMouseDown", event)
