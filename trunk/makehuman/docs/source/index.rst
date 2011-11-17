@@ -11,6 +11,7 @@ It largely relates to the development of new features but also contains general 
 
 The MakeHuman project is an open source project developed, managed and maintained by voluntary efforts. It is hosted on http://code.google.com/p/makehuman/ where the current source code is available for download from the SVN repository. An earlier CVS repository has been retained for reference purposes, but is no longer maintained.
 
+
 Developers guide
 ################
 
@@ -25,8 +26,16 @@ Application overview
    dev_manual_scene_data
    dev_manual_gui_system
    dev_manual_gui_system
-   dev_manual_opengl_notes
+   dev_manual_opengl_notes   
+   
+Coding style, rules and environment
+------------------------------------
+
+.. toctree::
+   :maxdepth: 1    
+   
    dev_manual_environment
+   dev_manual_obtain_source
    
 Writing plugins
 ----------------

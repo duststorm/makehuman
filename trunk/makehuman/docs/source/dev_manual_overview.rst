@@ -3,8 +3,8 @@
 .. highlight:: python
    :linenothreshold: 5
 
-Application overview
-=====================
+Application structure
+======================
 
 
 MakeHuman is constructed using two main application components:
