@@ -146,11 +146,11 @@ class Vert:
         
     .. py:attribute:: object
     
-        The object of which this vertex is a part. module3d.Object3D
+        The object of which this vertex is a part. :py:class:`module3d.Object3D`
         
     .. py:attribute:: sharedFaces
     
-        The list of faces that share this vertex. [module3d.Face, ..]
+        The list of faces that share this vertex. [:py:class:`module3d.Face`, ..]
         
     .. py:attribute:: idx
     
@@ -165,7 +165,7 @@ class Vert:
     :param idx: The index in the mesh for this face.
     :type idx: int
     :param object: The object which will own this face.
-    :type object: Object3d
+    :type object: :py:class:`module3d.Object3d`
     """
 
     def __init__(self, co=[0, 0, 0], idx=0, object=None):
@@ -335,7 +335,7 @@ class Face:
         
     .. py:attribute:: verts
     
-        A list of vertices that represent the corners of this face. [module3d.Vert, ..]
+        A list of vertices that represent the corners of this face. [:py:class:`module3d.Vert`, ..]
         
     .. py:attribute:: idx
     
@@ -343,7 +343,7 @@ class Face:
         
     .. py:attribute:: group
     
-        The face group that is the parent of this face. module3d.FaceGroup
+        The face group that is the parent of this face. :py:class:`module3d.FaceGroup`
         
     .. py:attribute:: color
     
@@ -354,7 +354,7 @@ class Face:
         A list of indices to uv coordinates, one for each vertex. [int, ..]
       
     :param verts: The vertices for this face.
-    :type: module3d.Vert, ..
+    :type: :py:class:`module3d.Vert`, ..
     """
 
     def __init__(self, *verts):
@@ -378,8 +378,8 @@ class Face:
 
     def calcNormal(self):
         """
-        This method calculates the physical surface normal of the face using the planeNorm function from
-        the aljabr.py module. This results in a direction vector at right angles to the
+        This method calculates the physical surface normal of the face using the :py:func:`aljabr.planeNorm` function from
+        the aljabr module. This results in a direction vector at right angles to the
         two edges vt2_vt1 and vt2_vt3.
         """
 
@@ -421,11 +421,11 @@ class FaceGroup:
         
     .. py:attribute:: parent
     
-        The parent. module.Object3D
+        The parent. :py:class:`module3d.Object3D`
         
     .. py:attribute:: faces
     
-        A read-only iterator of the faces. [module3d.Face, ..]
+        A read-only iterator of the faces. [:py:class:`module3d.Face`, ..]
 
     :param name: The name of the group.
     :type name: str
@@ -466,7 +466,7 @@ class FaceGroup:
         Creates a new module3d.Face based on the given vertices and optionally uv coordinates.
         
         :param verts: The vertices.
-        :type verts: [module3d.Vert, ..]
+        :type verts: [:py:class:`module3d.Vert`, ..]
         :param uvs: The uv coordinates.
         :type uvs: [(u,v), ..]
         """
@@ -557,15 +557,15 @@ class Object3D(object):
         
     .. py:attribute:: verts
     
-        The list of vertices that go to make up this object. [module3d.Vert, ..]
+        The list of vertices that go to make up this object. [:py:class:`module3d.Vert`, ..]
         
     .. py:attribute:: faces
     
-        The list of faces that go to make up this object. [module3d.Face, ..]
+        The list of faces that go to make up this object. [:py:class:`module3d.Face`, ..]
         
     .. py:attribute:: faceGroups
     
-        A read-only iterator to the FaceGroups that go to make up this object. [module3d.FaceGroup, ..]
+        A read-only iterator to the FaceGroups that go to make up this object. [:py:class:`module3d.FaceGroup`, ..]
         
     .. py:attribute:: faceGroupCount
     
@@ -831,7 +831,7 @@ class Object3D(object):
         :param name: The name for the face group.
         :type name: [float, float, float]
         :return: The new face group.
-        :rtype: module3d.FaceGroup
+        :rtype: :py:class:`module3d.FaceGroup`
         """
         fg = FaceGroup(name)
         fg.parent = self
@@ -845,7 +845,7 @@ class Object3D(object):
         :param co: The coordinates for the vertex.
         :type co: [float, float, float]
         :return: The new vertex.
-        :rtype: module3d.Vert
+        :rtype: :py:class:`module3d.Vert`
         """
         v = Vert(co, len(self.verts), self)
         self.verts.append(v)
@@ -1089,6 +1089,8 @@ class Object3D(object):
 
         :param name: The name of the FaceGroup to retrieve.
         :type name: str
+        :return: The FaceGroup if found, None otherwise.
+        :rtype: :py:class:`module3d.FaceGroup`
         """
 
         for fg in self.__faceGroups:
@@ -1139,9 +1141,9 @@ class Object3D(object):
         This method is used to call the update methods on each of a list of vertices or all vertices that form part of this object.
 
         :param verticesToUpdate: The list of vertices to update.
-        :type verticesToUpdate: [module3d.Vert, ..]
+        :type verticesToUpdate: [:py:class:`module3d.Vert`, ..]
         :param updateNormals: Whether to update the normals as well.
-        :type updateNormals: [module3d.Vert, ..]
+        :type updateNormals: [:py:class:`module3d.Vert`, ..]
         """
 
         if verticesToUpdate == None:
@@ -1159,9 +1161,9 @@ class Object3D(object):
         :param recalcFaceNormals: A flag to indicate whether or not the face normals should be recalculated.
         :type recalcFaceNormals: Boolean
         :param verticesToUpdate: The list of vertices to be updated, if None all vertices are updated.
-        :type verticesToUpdate: list of module3d.Vert
+        :type verticesToUpdate: list of :py:class:`module3d.Vert`
         :param facesToUpdate: The list of faces to be updated, if None all faces are updated.
-        :type facesToUpdate: list of module3d.Face
+        :type facesToUpdate: list of :py:class:`module3d.Face`
         """
 
         if recalcFaceNormals:
@@ -1298,7 +1300,7 @@ class SelectionColorMap:
         FaceGroup independently clickable.
 
         :return: The selected face group.
-        :rtype: module3d.FaceGroup
+        :rtype: :py:class:`module3d.FaceGroup`
         """
 
         picked = mh.getColorPicked()
@@ -1325,7 +1327,7 @@ class SelectionColorMap:
         If no object is picked, this method will simply print \"no clickable zone.\"
 
         :return: The selected face group and object.
-        :rtype: (module3d.FaceGroup, module3d.Object3d)
+        :rtype: (:py:class:`module3d.FaceGroup`, :py:class:`module3d.Object3d`)
         """
 
         facegroupPicked = self.getSelectedFaceGroup()
