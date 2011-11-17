@@ -20,27 +20,29 @@ Application overview
 .. toctree::
    :maxdepth: 1   
 
-   dev_manual_overview.rst
-   dev_manual_integration_layer.rst
-   dev_manual_scene_data.rst
-   dev_manual_gui_system.rst
-  
+   dev_manual_overview
+   dev_manual_integration_layer
+   dev_manual_scene_data
+   dev_manual_gui_system
+   dev_manual_gui_system
+   dev_manual_opengl_notes
+   dev_manual_environment
    
 Writing plugins
 ----------------
 
 .. toctree::
    :maxdepth: 1
-   
-   dev_manual_plugins.rst
-   dev_manual_gui.rst
-   dev_manual_morph_target.rst
-   dev_manual_undo_redo.rst
-   dev_manual_meshes.rst
-   dev_manual_camera.rst
-   dev_manual_gui_controls.rst
-   dev_manual_layout_guidelines.rst
-   dev_manual_asynchronous.rst
+
+   dev_manual_plugins
+   dev_manual_gui
+   dev_manual_morph_target
+   dev_manual_undo_redo
+   dev_manual_meshes
+   dev_manual_camera
+   dev_manual_gui_controls
+   dev_manual_layout_guidelines
+   dev_manual_asynchronous
    
 Modules
 #######
@@ -48,13 +50,13 @@ Modules
 .. toctree::
    :maxdepth: 1
    
-   module_aljabr.rst
-   module_animation3d.rst
-   module_events3d.rst
-   module_font3d.rst
-   module_geometry3d.rst
-   module_gui3d.rst
-   module_module3d.rst
+   module_aljabr
+   module_animation3d
+   module_events3d
+   module_font3d
+   module_geometry3d
+   module_gui3d
+   module_module3d
    
 Doc Writers Guide
 #################
