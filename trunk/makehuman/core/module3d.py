@@ -21,11 +21,10 @@ while the Face class defines data structures to hold information about mesh face
 objects.
 
 These base classes implement a nested hierarchical structure for the objects
-that make up the scene that is shown to the user. For example, a FaceGroup
-object contains a group of mesh face objects as defined by the Face class. An
-Object3D object contains all of the FaceGroup objects that go to make up a
-particular discrete object, such as the humanoid body or one of the GUI
-controls.
+that make up the scene that is shown to the user. An Object3D contains one or more
+FaceGroup objects. A FaceGroup contains one or more Face objects, which themselves
+refer to one or more Vert objects (depending on the kind of primitives that are used).
+The Vert objects themselves are actually owned by the Object3D.
 
 """
 
@@ -97,24 +96,22 @@ def reloadTextures():
 class Vert:
 
     """
-    A 3D vertex object. This object records the 3D location and surface normal
-    of the vertex and an RGBA color value. It also records references to
-    other related data objects.
+    A vertex object. This object holds the 3D location and surface normal
+    of the vertex and an RGBA color value. It also has references to
+    other related data structures.
 
     Vertex information from this object is passed into the OpenGL 3D
     engine via the C code in *glmodule.c*, which uses the glDrawArray
     OpenGL function to draw objects.
 
-    A single Python Vert object is usually used for all of the faces within a 
-    given face group that share that same vertex. The exception to this is 
-    where the UV-data used to define the object (as read in from an obj file) 
-    used more than one UV-index for the same vertex index, in which case a 
-    copy of the vertex exists for each unique UV-index. You can therefore get
-    multiple (not usually more than 2) Python Vert objects sharing the same 
-    coordinates, but different UV-mapping data, color etc.
+    A single Python Vert object is used for all of the faces within a 
+    given face group that share that same vertex. This is why the uv coordinates
+    are stored in the Face object instead. This way one vertex might have more
+    than one uv coordinate pair depending on the face. It is similar to using an
+    uv layer.
     
-    However, the OpenGL code considers a vertex shared by multiple faces to
-    be multiple vertices. So, a Vert object that appears once on the Python
+    However, the OpenGL code considers a vertex shared by multiple faces with different
+    uv to be different vertices. So, a Vert object that appears once on the Python
     vertex list may appear multiple times on the C vertex list.
 
     For example: Two faces share the edge 'v2-v3'. One face is defined by
@@ -133,24 +130,35 @@ class Vert:
       
       [v1,v2,v3,v3,v2,v4]
 
-    Each Python Vert object contains a list attribute, *indicesInFullVertArray*,
+    Each Python Vert object contains a list attribute, *__indicesInFullVertArray*,
     listing the various locations where the vertex appears in the C vertex list.
     This allows information held against a single Vert object in Python to be
     copied to multiple locations in the coordinate and color lists in the
-    C-based OpenGL world. See the description of the *update* method, below,
-    for more detail about how the information in the Python-based Vert class is
-    translated to the lists used by OpenGL.
+    C-based OpenGL world.
     
-    - **self.co**: *float list*. The coordinates of the vertex.
-      Default: [coX, coY, coZ]).
-    - **self.no**: *float list*. The normal of this vertex (or 0).
-      Default: [0, 0, 0].
-    - **self.object**: *Object3d*. The object of which this vertex is a part.
-      Default: None
-    - **self.sharedFaces**: *faces list*. The list of faces that share this vertex.
-    - **self.indicesInFullVertArray**: *Int list*. The list of corresponding vertices in the C OpenGL list.
-    - **self.idx**: *Int* The index of this vertex in the vertices list.
-    - **self.color**: *float list*. A list of 4 floats [r,g,b,a] used as the vertex color (including an alpha channel).
+    .. py:attribute:: co
+    
+        The coordinates of the vertex. [float, float, float]
+        
+    .. py:attribute:: no
+    
+        The normal of this vertex. [float, float, float]
+        
+    .. py:attribute:: object
+    
+        The object of which this vertex is a part. module3d.Object3D
+        
+    .. py:attribute:: sharedFaces
+    
+        The list of faces that share this vertex. [module3d.Face, ..]
+        
+    .. py:attribute:: idx
+    
+        The index of this vertex in the vertices list. int
+        
+    .. py:attribute:: color
+    
+        The color of the vertex in rgba. [byte, byte, byte, byte]
     
     :param co: The coordinates for this face.
     :type co: [float, float, float]
@@ -166,10 +174,11 @@ class Vert:
         self.no = [0, 0, 0]
         self.object = object
         self.sharedFaces = []
-        self.indicesInFullVertArray = []
         self.idx = idx
         self.color = [255, 255, 255, 255]
         self.weights = None
+        
+        self.__indicesInFullVertArray = []
     
     def setCoordinates(self, co):
         """
@@ -214,13 +223,13 @@ class Vert:
             are always multiple copies of any such vertex.
 
         Because one Python Vert object can appear multiple times in the C vertex list,
-        each Python Vert object has an attribute, *indicesInFullVertArray*, which lists
+        each Python Vert object has an attribute, *__indicesInFullVertArray*, which lists
         the conceptual 'index' in the C lists of coordinates and colors.
 
         From this 'conceptual' index, we can find where the vertex's coordinates lie in the full C
         coordinate list. Because each vertex has three coordinates (x, y, and z), the
         coordinate list will be three times as long as this 'conceptual' index. So, a vertex
-        listed in the *indicesInFullVertArray* at positions 1 and 4 (the second and fifth
+        listed in the *__indicesInFullVertArray* at positions 1 and 4 (the second and fifth
         positions) will have its coordinates listed on the C coordinates list at
         positions 3, 4, and 5, and again at positions 12, 13, and 14. Or:
 
@@ -229,7 +238,7 @@ class Vert:
         The C color list is similar to the coordinate list. As each color is defined by
         four components 'red, green, blue, and alpha (transparency)' the C color list is
         four times as long as this 'conceptual' index. So, a vertex listed in the
-        *indicesInFullVertArray* at positions 1 and 4 will have its color component values listed in the C
+        *__indicesInFullVertArray* at positions 1 and 4 will have its color component values listed in the C
         color list at positions 4, 5, 6, and 7, and again at positions 16, 17, 18, and
         19. Or:
 
@@ -255,13 +264,13 @@ class Vert:
             return
 
         if updateCoo:
-            for i in self.indicesInFullVertArray:
+            for i in self.__indicesInFullVertArray:
                 self.object.object3d.setVertCoord(i, self.co)
         if updateNor:
-            for i in self.indicesInFullVertArray:
+            for i in self.__indicesInFullVertArray:
                 self.object.object3d.setNormCoord(i, self.no)
         if updateCol:
-            for i in self.indicesInFullVertArray:
+            for i in self.__indicesInFullVertArray:
                 self.object.object3d.setColorComponent(i, self.color)
 
     def calcNorm(self):
@@ -320,16 +329,29 @@ class Face:
     """
     An object representing a point, line, triangle or quad.
     
-    - **self.no**: *float list* The physical surface normal of the face (x,y,z). Default: [0, 0, 0].
-    - **self.verts**: *verts list* A list of 4 vertices that represent the corners of this face.
-    - **self.idx**: *int* The index of this face in the list of faces.
-    - **self.group**: *FaceGroup* The face group that is the parent of this face.
-    - **self.color**: *list of list of ints*. A list of 3 lists of 4 integers (0-255)
-      [[r,g,b,a],[r,g,b,a],[r,g,b,a]] used as the 3 vertex colors (including an alpha channel).
-    - **self.colorID**: *list of list of ints*. A list of 3 integers (0-255) [index1,index2,index3]
-      used as a 'selection' color.
-    - **self.uv**: *list of ints*. A list of 4 ints [i,i,i,i]
-      holding the index to the UV coordinates in the objects' uvValues list for the uv-mapping of textures to this face.
+    .. py:attribute:: no
+        
+        The normal of the face. [float, float, float]
+        
+    .. py:attribute:: verts
+    
+        A list of vertices that represent the corners of this face. [module3d.Vert, ..]
+        
+    .. py:attribute:: idx
+    
+        The index of this face in the list of faces. int
+        
+    .. py:attribute:: group
+    
+        The face group that is the parent of this face. module3d.FaceGroup
+        
+    .. py:attribute:: color
+    
+        A list of rgba colors, one for each vertex. [[byte, byte, byte, byte], ..]
+        
+    .. py:attribute:: uv
+    
+        A list of indices to uv coordinates, one for each vertex. [int, ..]
       
     :param verts: The vertices for this face.
     :type: module3d.Vert, ..
@@ -341,7 +363,6 @@ class Face:
         self.verts = verts[:]
         self.uv = None
         self.color = None
-        self.colorID = [0, 0, 0]
         self.idx = None
         self.group = None
 
@@ -394,9 +415,17 @@ class FaceGroup:
     The FaceGroup object contains a list of the faces in the group and must be
     kept in sync with the FaceGroup references stored by the individual faces.
     
-    - **self.name**: *string*. The name of this FaceGroup.
-    - **self.faces**: *faces list*. A list of faces. Default: empty.
-    - **self.parent**: *Object3d*. The object3D object that contains this FaceGroup. Default: None.
+    .. py:attribute:: name
+    
+        The name. str
+        
+    .. py:attribute:: parent
+    
+        The parent. module.Object3D
+        
+    .. py:attribute:: faces
+    
+        A read-only iterator of the faces. [module3d.Face, ..]
 
     :param name: The name of the group.
     :type name: str
@@ -407,8 +436,9 @@ class FaceGroup:
         self.name = name
         self.__faces = []
         self.parent = None
-        self.elementIndex = 0
-        self.elementCount = 0
+        self.__elementIndex = 0
+        self.__elementCount = 0
+        self.__colorID = [0, 0, 0]
 
     def __str__(self):
         """
@@ -478,32 +508,116 @@ class Object3D(object):
 
     This object has a position and orientation of its own, and the positions and
     orientations of faces and vertices that make up this object are defined relative to
-    it. 
+    it.
     
-    - **self.name**: *string* The name of this Object3D object.
-    - **self.object3d**: *mh.Object3d* The object in the OpenGL engine array.
-    - **self.x**: *float* The x coordinate of the position of this object in the coordinate space of the scene.
-    - **self.y**: *float* The y coordinate of the position of this object in the coordinate space of the scene.
-    - **self.z**: *float* The z coordinate of the position of this object in the coordinate space of the scene.
-    - **self.rx**: *float* The x rotation component of the orientation of this object within the coordinate space of the scene.
-    - **self.ry**: *float* The y rotation component of the orientation of this object within the coordinate space of the scene.
-    - **self.rz**: *float* The z rotation component of the orientation of this object within the coordinate space of the scene.
-    - **self.sx**: *float* The x scale component of the size of this object within the coordinate space of the scene.
-    - **self.sy**: *float* The y scale component of the size of this object within the coordinate space of the scene.
-    - **self.sz**: *float* The z scale component of the size of this object within the coordinate space of the scene.
-    - **self.verts**: *verts list* The list of vertices that go to make up this object.
-    - **self.faces**: *faces list* The list of faces that go to make up this object.
-    - **self.faceGroups**: *faceGroups list* The list of FaceGroups that go to make up this object.
-    - **self.cameraMode**: *int flag* A flag to indicate which of the two available perspective camera projections, fixed or movable, is to be used to draw this object.
-    - **self.visibility**: *int flag* A flag to indicate whether or not this object is visible.
-    - **self.texture**: *string* The path of a TGA file on disk containing the object texture.
-    - **self.shader**: *int* The shader.
-    - **self.shaderParameters**: *dictionary* The shader parameters.
-    - **self.shadeless**: *int flag* A flag to indicate whether this object is unaffected by variations in lighting (certain GUI elements aren't).
-    - **self.indexBuffer**: *faces list* The list of faces as indices to the vertexbuffer.
-    - **self.vertexBufferSize**: *int* size in vertices of the vertexbuffer.
-    - **self.uvValues**: *uv list* The list of uv values referenced to by the faces.
-    - **self.pickable**: *int flag* A flag to indicate whether this object is pickable by mouse or not.
+    .. py:attribute:: name
+    
+        The name. str
+        
+    .. py:attribute:: object3d
+    
+        The object in the OpenGL engine. mh.Object3D
+    
+    .. py:attribute:: x
+    
+        The x coordinate of the position of this object in the coordinate space of the scene. float
+        
+    .. py:attribute:: y
+    
+        The x coordinate of the position of this object in the coordinate space of the scene. float
+        
+    .. py:attribute:: z
+    
+        The x coordinate of the position of this object in the coordinate space of the scene. float
+
+    .. py:attribute:: rx
+    
+        The x rotation component of the orientation of this object within the coordinate space of the scene. float
+        
+    .. py:attribute:: ry
+    
+        The y rotation component of the orientation of this object within the coordinate space of the scene. float
+        
+    .. py:attribute:: rz
+    
+        The z rotation component of the orientation of this object within the coordinate space of the scene. float
+        
+
+    .. py:attribute:: sx
+    
+        The x scale component of the size of this object within the coordinate space of the scene. float
+        
+    .. py:attribute:: sy
+    
+        The y scale component of the size of this object within the coordinate space of the scene. float
+        
+    .. py:attribute:: sz
+    
+        The z scale component of the size of this object within the coordinate space of the scene. float
+        
+    .. py:attribute:: verts
+    
+        The list of vertices that go to make up this object. [module3d.Vert, ..]
+        
+    .. py:attribute:: faces
+    
+        The list of faces that go to make up this object. [module3d.Face, ..]
+        
+    .. py:attribute:: faceGroups
+    
+        A read-only iterator to the FaceGroups that go to make up this object. [module3d.FaceGroup, ..]
+        
+    .. py:attribute:: faceGroupCount
+    
+        A read-only property indicating the amount of FaceGroups since len does not work on an iterator. int
+        
+    .. py:attribute:: cameraMode
+        
+        A flag to indicate which of the two available perspective camera projections, fixed or movable, is to be used to draw this object. int
+        
+    .. py:attribute:: visibility
+    
+        A flag to indicate whether or not this object is visible. Boolean
+        
+    .. py:attribute:: pickable
+    
+        A flag to indicate whether this object is pickable by mouse or not. Boolean
+        
+    .. py:attribute:: texture
+    
+        The path of a file on disk containing the object texture. str
+        
+    .. py:attribute:: shader
+    
+        The shader. int
+        
+    .. py:attribute:: shaderParameters.
+    
+        The shader parameters. dict
+        
+    .. py:attribute:: shadeless
+    
+        A flag to indicate whether this object is unaffected by variations in lighting (certain GUI elements aren't). Boolean
+        
+    .. py:attribute:: solid
+    
+        A flag to indicate whether this object is solid or wireframe. Boolean
+        
+    .. py:attribute:: transparentPrimitives
+    
+        The amount of transparent primitives in this object. int
+        
+    .. py:attribute:: vertsPerPrimitive
+    
+        The amount of vertices per primitive. int
+        
+    .. py:attribute:: uvValues
+    
+        A list of uv values referenced to by the faces. [(float, float), ]
+        
+    .. py:attribute:: uvMap
+    
+        A map of uv values to speed up searching. dict
 
     """
 
@@ -529,16 +643,12 @@ class Object3D(object):
         self.texture = None
         self.shader = 0
         self.shaderParameters = {}
-
-        # self.colors = []
-
         self.shadeless = 0
         self.solid = 1
         self.transparentPrimitives = 0
         self.vertsPerPrimitive = vertsPerPrimitive
-        self.indexBuffer = []
-        self.vertexBufferSize = None
-        
+        self.__indexBuffer = []
+        self.__vertexBufferSize = None
         self.uvValues = None
         self.uvMap = {}
         
@@ -572,8 +682,8 @@ class Object3D(object):
         self.detach()
 
         # Clear local data data
-        if self.indexBuffer:
-            del self.indexBuffer[:]
+        if self.__indexBuffer:
+            del self.__indexBuffer[:]
         if self.uvValues:
             del self.uvValues[:]
         self.uvMap.clear()
@@ -599,7 +709,7 @@ class Object3D(object):
         """
         if self.object3d:
             return
-        if not self.vertexBufferSize:
+        if not self.__vertexBufferSize:
             return
 
         selectionColorMap.assignSelectionID(self)
@@ -611,9 +721,9 @@ class Object3D(object):
         uvIdx = 0
         colIdx = 0
 
-        # create an object with vertexBufferSize vertices and len(indexBuffer) / 3 triangles
+        # create an object with __vertexBufferSize vertices and len(__indexBuffer) / 3 triangles
 
-        self.object3d = mh.Object3D(self.vertexBufferSize, self.indexBuffer)
+        self.object3d = mh.Object3D(self.__vertexBufferSize, self.__indexBuffer)
         mh.world.append(self.object3d)
 
         for g in self.faceGroups:
@@ -632,11 +742,11 @@ class Object3D(object):
                 for v in f.verts:
                     if (v.idx, fUV[i]) not in groupVerts:
 
-                        # self.object3d.setAllCoord(coIdx, colIdx, v.co, v.no, f.colorID, faceColor[i])
+                        # self.object3d.setAllCoord(coIdx, colIdx, v.co, v.no, g._FaceGroup__colorID, faceColor[i])
 
                         self.object3d.setVertCoord(coIdx, v.co)
                         self.object3d.setNormCoord(coIdx, v.no)
-                        self.object3d.setColorIDComponent(coIdx, f.colorID)
+                        self.object3d.setColorIDComponent(coIdx, g._FaceGroup__colorID)
                         self.object3d.setColorComponent(colIdx, faceColor[i])
                         groupVerts.add((v.idx, fUV[i]))
 
@@ -690,12 +800,12 @@ class Object3D(object):
         Where the UV-map needs a sharp transition (e.g. where the eyelids
         meet the eyeball) we therefore create duplicate vertices.
         """
-        del self.indexBuffer[:]
+        del self.__indexBuffer[:]
         fullArrayIndex = 0
         for g in self.__faceGroups:
           if 'joint' in g.name:
             continue
-          g.elementIndex = fullArrayIndex  # first index in opengl array
+          g._FaceGroup__elementIndex = fullArrayIndex  # first index in opengl array
           groupVerts = {}
           for f in g.faces:
               for (i, v) in enumerate(f.verts):
@@ -704,15 +814,15 @@ class Object3D(object):
                   else:
                       t = -1
                   if (v.idx, t) not in groupVerts:
-                      v.indicesInFullVertArray.append(fullArrayIndex)
+                      v._Vert__indicesInFullVertArray.append(fullArrayIndex)
                       groupVerts[(v.idx, t)] = fullArrayIndex
-                      self.indexBuffer.append(fullArrayIndex)
+                      self.__indexBuffer.append(fullArrayIndex)
                       fullArrayIndex += 1
                   else:
-                      self.indexBuffer.append(groupVerts[(v.idx, t)])
-          g.elementCount = g.elementIndex - fullArrayIndex
+                      self.__indexBuffer.append(groupVerts[(v.idx, t)])
+          g._FaceGroup__elementCount = g._FaceGroup__elementIndex - fullArrayIndex
 
-        self.vertexBufferSize = fullArrayIndex
+        self.__vertexBufferSize = fullArrayIndex
 
     def createFaceGroup(self, name):
         """
@@ -1174,8 +1284,7 @@ class SelectionColorMap:
             idG = ((self.colorID >> 5) % 32) * 8
             idB = ((self.colorID >> 10) % 32) * 8
 
-            for f in g.faces:
-                f.colorID = (idR, idG, idB)
+            g._FaceGroup__colorID = (idR, idG, idB)
             
             self.colorIDToFaceGroup[self.colorID] = g
 

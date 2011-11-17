@@ -197,7 +197,6 @@ def createMesh(font, text, object = None, wrapWidth=0, alignment=AlignLeft):
         
     object = object or module3d.Object3D(text)
     object.uvValues = object.uvValues or []
-    object.indexBuffer = object.indexBuffer or []
     
     # create group
     fg = object.createFaceGroup('text')
