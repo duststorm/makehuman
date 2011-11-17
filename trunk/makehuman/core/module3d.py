@@ -1116,7 +1116,7 @@ class Object3D(object):
             if recalcNormals:
                 self.calcNormals(1, 1, vertices, faces)
             if update:
-                self.update(vertices, False)
+                self.update(vertices, recalcNormals)
 
     def setCameraProjection(self, cameraMode):
         """

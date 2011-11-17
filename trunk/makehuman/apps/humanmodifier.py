@@ -185,7 +185,7 @@ class Modifier:
         vertices = [human.meshData.verts[i] for i in self.verts]
         if updateNormals:
             human.meshData.calcNormals(1, 1, vertices, faces)
-        human.meshData.update(vertices)
+        human.meshData.update(vertices, updateNormals)
 
 class GenericModifier:
 
@@ -241,7 +241,7 @@ class GenericModifier:
         vertices = [human.meshData.verts[i] for i in self.verts]
         if updateNormals:
             human.meshData.calcNormals(1, 1, vertices, faces)
-        human.meshData.update(vertices)
+        human.meshData.update(vertices, updateNormals)
 
 class SimpleModifier(GenericModifier):
 
