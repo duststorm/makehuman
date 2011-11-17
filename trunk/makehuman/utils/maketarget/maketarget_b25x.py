@@ -415,6 +415,8 @@ def loadTarget(filepath, context):
             vec[2] += dy
             ob.data.vertices[index].select = True
     fp.close()     
+    skey.slider_min = -1.0
+    skey.slider_max = 1.0
     ob.show_only_shape_key = True
     ob.use_shape_key_edit_mode = False
     ob["MakeTarget"] = "Target"
