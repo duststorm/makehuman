@@ -753,6 +753,7 @@ PyMODINIT_FUNC initmh()
 
     RegisterObject3D(module);
     RegisterCamera(module);
+	RegisterImage(module);
     RegisterTexture(module);
     RegisterArrayBuffer(module);
     RegisterTypedArrayViews(module);
@@ -793,6 +794,7 @@ int main(int argc, char *argv[])
     module = Py_InitModule("mh", EmbMethods);
     RegisterObject3D(module);
     RegisterCamera(module);
+	RegisterImage(module);
     RegisterTexture(module);
     RegisterArrayBuffer(module);
     RegisterTypedArrayViews(module);

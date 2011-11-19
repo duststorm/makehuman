@@ -31,6 +31,185 @@ import mh
 import os
 import aljabr
 
+def pointInRect(point, rect):
+
+    if point[0] < rect[0] or point[0] > rect[2] or point[1] < rect[1] or point[1] > rect[3]:
+        return False
+    else:
+        return True
+        
+class Warp(object):
+    
+    def __init__(self, src, dst):
+    
+        m1 = self.quadToSquare(src[0][0], src[0][1], src[1][0], src[1][1], src[2][0], src[2][1], src[3][0], src[3][1])
+        m2 = self.squareToQuad(dst[0][0], dst[0][1], dst[1][0], dst[1][1], dst[2][0], dst[2][1], dst[3][0], dst[3][1])
+        self.m = self.mult(m1, m2)
+        
+    def squareToQuad(self, x0, y0, x1, y1, x2, y2, x3, y3):
+
+        m = [0] * 9
+        
+        ax  = x0 - x1 + x2 - x3
+        ay  = y0 - y1 + y2 - y3
+
+        if ax == 0 or ay == 0:
+        
+            m[0] = x1 - x0; m[1] = y1 - y0; m[2] = 0.0
+            m[3] = x2 - x1; m[4] = y2 - y1; m[5] = 0.0
+            m[6] = x0;      m[7] = y0;      m[8] = 1.0
+        
+        else:
+        
+            ax1 = x1 - x2
+            ax2 = x3 - x2
+            ay1 = y1 - y2
+            ay2 = y3 - y2
+
+            gtop    = ax  * ay2 - ax2 * ay
+            htop    = ax1 * ay  - ax  * ay1
+            bottom  = ax1 * ay2 - ax2 * ay1
+
+            g = gtop/bottom
+            h = htop/bottom
+
+            a = x1 - x0 + g * x1
+            b = x3 - x0 + h * x3
+            c = x0
+            d = y1 - y0 + g * y1
+            e = y3 - y0 + h * y3
+            f = y0
+
+            m[0] = a; m[1] = d; m[2] = g
+            m[3] = b; m[4] = e; m[5] = h
+            m[6] = c; m[7] = f; m[8] = 1.0
+        
+        return m
+        
+    def quadToSquare(self, x0, y0, x1, y1, x2, y2, x3, y3):
+    
+        m = self.squareToQuad(x0, y0, x1, y1, x2, y2, x3, y3)
+
+        return self.inverted(m)
+        
+    def inverted(self, m):
+    
+        det = self.determinant(m)
+        a = self.adjoint(m)
+        
+        return [i/det for i in a]
+        
+    def determinant(self, m):
+    
+        return m[0] * (m[8] * m[4] - m[7] * m[5]) -\
+               m[3] * (m[8] * m[1] - m[7] * m[2]) +\
+               m[6] * (m[5] * m[1] - m[4] * m[2])
+               
+    def adjoint(self, m):
+        
+        a = [0] * 9
+        
+        a[0] = m[4]*m[8] - m[5]*m[7]
+        a[3] = m[5]*m[6] - m[3]*m[8]
+        a[6] = m[3]*m[7] - m[4]*m[6]
+        a[1] = m[2]*m[7] - m[1]*m[8]
+        a[4] = m[0]*m[8] - m[2]*m[6]
+        a[7] = m[1]*m[6] - m[0]*m[7]
+        a[2] = m[1]*m[5] - m[2]*m[4]
+        a[5] = m[2]*m[3] - m[0]*m[5]
+        a[8] = m[0]*m[4] - m[1]*m[3]
+    
+        return a
+        
+    def mult(self, m1, m2):
+        
+        m = [0] * 9
+        
+        m[0] = m1[0]*m2[0] + m1[1]*m2[3] + m1[2]*m2[6]
+        m[1] = m1[0]*m2[1] + m1[1]*m2[4] + m1[2]*m2[7]
+        m[2] = m1[0]*m2[2] + m1[1]*m2[5] + m1[2]*m2[8]
+
+        m[3] = m1[3]*m2[0] + m1[4]*m2[3] + m1[5]*m2[6]
+        m[4] = m1[3]*m2[1] + m1[4]*m2[4] + m1[5]*m2[7]
+        m[5] = m1[3]*m2[2] + m1[4]*m2[5] + m1[5]*m2[8]
+
+        m[6] = m1[6]*m2[0] + m1[7]*m2[3] + m1[8]*m2[6]
+        m[7] = m1[6]*m2[1] + m1[7]*m2[4] + m1[8]*m2[7]
+        m[8] = m1[6]*m2[2] + m1[7]*m2[5] + m1[8]*m2[8]
+                             
+        return m
+                             
+    def warp(self, x, y):
+    
+        wx = self.m[0] * x + self.m[3] * y + self.m[6]
+        wy = self.m[1] * x + self.m[4] * y + self.m[7]
+        w  = self.m[2] * x + self.m[5] * y + self.m[8]
+        
+        return (wx/w,wy/w)
+     
+# Not really fast since it checks every pixel in the bounding rectangle
+# http://www.devmaster.net/codespotlight/show.php?id=17
+def RasterizeTriangle(warp, src, dst, p0, p1, p2):
+    
+    y1 = p0[1]
+    y2 = p1[1]
+    y3 = p2[1]
+
+    x1 = p0[0]
+    x2 = p1[0]
+    x3 = p2[0]
+
+    dx12 = x1 - x2
+    dx23 = x2 - x3
+    dx31 = x3 - x1
+
+    dy12 = y1 - y2
+    dy23 = y2 - y3
+    dy31 = y3 - y1
+    
+    minx = min([x1, x2, x3])
+    maxx = max([x1, x2, x3])
+    miny = min([y1, y2, y3])
+    maxy = max([y1, y2, y3])
+    
+    c1 = dy12 * x1 - dx12 * y1
+    c2 = dy23 * x2 - dx23 * y2
+    c3 = dy31 * x3 - dx31 * y3
+
+    cy1 = c1 + dx12 * miny - dy12 * minx
+    cy2 = c2 + dx23 * miny - dy23 * minx
+    cy3 = c3 + dx31 * miny - dy31 * minx
+    
+    y = miny
+    while y < maxy:
+    
+        cx1 = cy1
+        cx2 = cy2
+        cx3 = cy3
+        
+        x = minx
+        while x < maxx:
+
+            if cx1 > 0 and cx2 > 0 and cx3 > 0:
+
+                dx, dy = warp.warp(x, y)
+                try:
+                    dst[int(x), int(y)] = src[int(dx), int(dy)]
+                except:
+                    pass #dst[int(x), int(y)] = (255, 0, 0)
+
+            cx1 -= dy12
+            cx2 -= dy23
+            cx3 -= dy31
+            
+            x += 1
+
+        cy1 += dx12
+        cy2 += dx23
+        cy3 += dx31
+        
+        y += 1
+
 class BackgroundTaskView(gui3d.TaskView):
 
     def __init__(self, category):
@@ -51,17 +230,7 @@ class BackgroundTaskView(gui3d.TaskView):
         mesh.setPickable(0)
         
         self.backgroundImageToggle = gui3d.app.categories['Modelling'].viewBox.addView(gui3d.ToggleButton('Background'));
-        y = 280
-        self.backgroundBox = self.addView(gui3d.GroupBox([10, y, 9], 'Background 2 settings', gui3d.GroupBoxStyle._replace(height=25+36*3+24*1+6)));y+=25
-
-        self.radioButtonGroup = []
-        self.bgImageFrontRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=True, label='Front'))
-        self.bgImageBackRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Back'))
-        self.bgImageLeftRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Left'))
-        self.bgImageRightRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Right'))
-        self.bgImageTopRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Top'))
-        self.bgImageBottomRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Bottom'))
-            
+        
         @self.backgroundImageToggle.event
         def onClicked(event):
             if self.backgroundImage.isVisible():
@@ -73,7 +242,18 @@ class BackgroundTaskView(gui3d.TaskView):
             else:
                 gui3d.app.switchCategory('Library')
                 gui3d.app.switchTask('Background')
-                
+        
+        y = 280
+        self.backgroundBox = self.addView(gui3d.GroupBox([10, y, 9], 'Background 2 settings', gui3d.GroupBoxStyle._replace(height=25+36*3+24*1+6)));y+=25
+
+        self.radioButtonGroup = []
+        self.bgImageFrontRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=True, label='Front'))
+        self.bgImageBackRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Back'))
+        self.bgImageLeftRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Left'))
+        self.bgImageRightRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Right'))
+        self.bgImageTopRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Top'))
+        self.bgImageBottomRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Bottom'))
+                        
         self.filechooser = self.addView(gui3d.FileChooser(self.backgroundsFolder, ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None))
 
         @self.filechooser.event
@@ -138,6 +318,43 @@ class BackgroundTaskView(gui3d.TaskView):
             self.backgroundImage.mesh.resize(self.backgroundWidth, self.backgroundHeight)
             
             self.reference = reference
+            
+    def projectBackground(self):
+    
+        mesh = gui3d.app.selectedHuman.getSeedMesh()
+        
+        # for all quads, project vertex to screen
+        # if one vertex falls in bg rect, project screen quad into uv quad
+        # warp image region into texture
+        leftTop = gui3d.app.modelCamera.convertToScreen(*self.leftTop)
+        rightBottom = gui3d.app.modelCamera.convertToScreen(*self.rightBottom)
+        
+        r = [leftTop[0], leftTop[1], rightBottom[0], rightBottom[1]]
+        
+        srcImg = mh.Image(self.backgroundImage.getTexture())    
+        dstImg = mh.Image(gui3d.app.selectedHuman.getTexture())
+        
+        for f in mesh.faces:
+        
+            if f.group.name.startswith("joint"):
+                continue
+            
+            src = [gui3d.app.modelCamera.convertToScreen(*v.co) for v in f.verts]
+            
+            if any([pointInRect(p, r) for p in src]):
+                #f.setColor([0, 255, 0, 255])
+                xscale = srcImg.width / (rightBottom[0] - leftTop[0])
+                yscale = srcImg.height / (rightBottom[1] - leftTop[1])
+                src = [((v[0]-leftTop[0])*xscale, (v[1]-leftTop[1])*yscale) for v in src]
+                dst = [(mesh.uvValues[i][0]*dstImg.width, dstImg.height-(mesh.uvValues[i][1]*dstImg.height)) for i in f.uv]
+                w = Warp(dst, src)
+                RasterizeTriangle(w, srcImg, dstImg, *dst[:3])
+                RasterizeTriangle(w, srcImg, dstImg, dst[2], dst[3], dst[0])
+            #else:
+            #    f.setColor([255, 255, 255, 255])
+                    
+        dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'projection.tga'))
+        gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'projection.tga'))
 
     def onShow(self, event):
         
@@ -224,9 +441,6 @@ class settingsTaskView(gui3d.TaskView) :
         
         # sliders
         self.opacitySlider = self.backgroundBox.addView(gui3d.Slider(value=taskview.opacity, min=0,max=255, label = "Opacity"))
-        
-        # toggle button
-        self.dragButton = self.backgroundBox.addView(gui3d.ToggleButton('Move & Resize'))
             
         @self.opacitySlider.event
         def onChanging(value):
@@ -252,11 +466,19 @@ class settingsTaskView(gui3d.TaskView) :
                     taskview.backgroundHeight += event.dy
                 self.backgroundImage.mesh.resize(taskview.backgroundWidth, taskview.backgroundHeight)
                 taskview.fixateBackground()
+                
+        self.dragButton = self.backgroundBox.addView(gui3d.ToggleButton('Move & Resize'))
         
         @self.dragButton.event
         def onClicked(event):
             gui3d.ToggleButton.onClicked(self.dragButton, event)
             self.backgroundImage.mesh.setPickable(self.dragButton.selected)
+            
+        self.projectBackgroundButton = self.backgroundBox.addView(gui3d.Button('Project background'))
+                
+        @self.projectBackgroundButton.event
+        def onClicked(event):
+            taskview.projectBackground()
 
     def onShow(self, event):
         

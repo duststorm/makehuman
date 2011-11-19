@@ -43,6 +43,7 @@ extern "C"
     void RegisterObject3D(PyObject *module);
     void RegisterCamera(PyObject *module);
     void RegisterTexture(PyObject *module);
+	void RegisterImage(PyObject *module);
 
     extern PyTypeObject Object3DType;
 

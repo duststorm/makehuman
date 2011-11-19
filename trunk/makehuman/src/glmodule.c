@@ -211,12 +211,6 @@ static PyObject *Camera_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     return (PyObject*)self;
 }
 
-/** \brief The constructor of the Texture object.
- *  \param self The Texture object which is being constructed.
- *  \param args The arguments.
- *
- *  The constructor of the Texture object.
- */
 static int Camera_init(Camera *self, PyObject *args, PyObject *kwds)
 {
     char *path = NULL;
@@ -226,6 +220,504 @@ static int Camera_init(Camera *self, PyObject *args, PyObject *kwds)
 
     return 0;
 }
+
+static SDL_Surface *mhLoadImage(const char *fname)
+{
+    SDL_Surface *surface;
+
+#ifndef __APPLE__ // OS X utilizes the SDL_image framework for image loading!
+    if (!g_sdlImageHandle)
+    {
+#ifdef __WIN32__
+        g_sdlImageHandle = SDL_LoadObject("SDL_image");
+#else
+        g_sdlImageHandle = SDL_LoadObject("libSDL_image-1.2.so.0");
+#endif
+
+        if (!g_sdlImageHandle)
+        {
+            PyErr_Format(PyExc_RuntimeError, "Could not load %s, SDL_image not found", fname);
+            return 0;
+        }
+
+        IMG_Load = (PFN_IMG_LOAD)SDL_LoadFunction(g_sdlImageHandle, "IMG_Load");
+    }
+
+    if (!IMG_Load)
+    {
+        PyErr_Format(PyExc_RuntimeError, "Could not load %s, IMG_Load not found", fname);
+        return 0;
+    }
+#endif // ifndef __APPLE__
+    surface = (SDL_Surface*)IMG_Load(fname);
+
+    if (!surface)
+    {
+        PyErr_Format(PyExc_RuntimeError, "Could not load %s, %s", fname, SDL_GetError());
+        return 0;
+    }
+
+    return surface;
+}
+
+/** \brief The constructor of the Image object.
+ *  \param self The Image object which is being constructed.
+ *  \param args The arguments.
+ *
+ *  The constructor of the Image object.
+ */
+
+typedef struct
+{
+    PyObject_HEAD
+    SDL_Surface *surface;
+} Image;
+
+static PyObject *Image_getItem(Image *self, PyObject *xy);
+static int Image_setItem(Image *self, PyObject *xy, PyObject *color);
+
+// Image mapping
+static PyMappingMethods Image_as_mapping[] = {
+    (lenfunc)NULL,
+    (binaryfunc)Image_getItem,
+    (objobjargproc)Image_setItem,
+};
+
+static PyObject *Image_load(Image *image, PyObject *path);
+static PyObject *Image_save(Image *image, PyObject *path);
+
+// Image Methods
+static PyMethodDef Image_methods[] =
+{
+    {
+        "load", (PyCFunction)Image_load, METH_O,
+        "Loads the specified image from file"
+    },
+	{
+        "save", (PyCFunction)Image_save, METH_O,
+        "Saves the specified image to file"
+    },
+    {NULL}  /* Sentinel */
+};
+
+static PyObject *Image_getWidth(Image *self, void *closure);
+static PyObject *Image_getHeight(Image *self, void *closure);
+
+// Image attributes indirectly accessed by Python
+static PyGetSetDef Image_getset[] =
+{
+    {"width", (getter)Image_getWidth, (setter)NULL, "The width of the image.", NULL},
+    {"height", (getter)Image_getHeight, (setter)NULL, "The heigh of the image.", NULL},
+    {NULL}
+};
+
+static void Image_dealloc(Image *self);
+static PyObject *Image_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
+static int Image_init(Image *self, PyObject *args, PyObject *kwds);
+
+// Image type definition
+PyTypeObject ImageType =
+{
+    PyObject_HEAD_INIT(NULL)
+    0,                                        // ob_size
+    "mh.Image",                               // tp_name
+    sizeof(Image),                            // tp_basicsize
+    0,                                        // tp_itemsize
+    (destructor)Image_dealloc,                // tp_dealloc
+    0,                                        // tp_print
+    0,                                        // tp_getattr
+    0,                                        // tp_setattr
+    0,                                        // tp_compare
+    0,                                        // tp_repr
+    0,                                        // tp_as_number
+    0,                                        // tp_as_sequence
+    Image_as_mapping,                         // tp_as_mapping
+    0,                                        // tp_hash
+    0,                                        // tp_call
+    0,                                        // tp_str
+    0,                                        // tp_getattro
+    0,                                        // tp_setattro
+    0,                                        // tp_as_buffer
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, // tp_flags
+    "Image object",                           // tp_doc
+    0,                                        // tp_traverse
+    0,                                        // tp_clear
+    0,                                        // tp_richcompare
+    0,                                        // tp_weaklistoffset
+    0,                                        // tp_iter
+    0,                                        // tp_iternext
+    Image_methods,                            // tp_methods
+    0,                                        // tp_members
+    Image_getset,                             // tp_getset
+    0,                                        // tp_base
+    0,                                        // tp_dict
+    0,                                        // tp_descr_get
+    0,                                        // tp_descr_set
+    0,                                        // tp_dictoffset
+    (initproc)Image_init,                     // tp_init
+    0,                                        // tp_alloc
+    Image_new,                                // tp_new
+};
+
+/** \brief Registers the Image object in the Python environment.
+ *  \param module The module to register the Image object in.
+ *
+ *  This function registers the Image object in the Python environment.
+ */
+void RegisterImage(PyObject *module)
+{
+    if (PyType_Ready(&ImageType) < 0)
+        return;
+
+    Py_INCREF(&ImageType);
+    PyModule_AddObject(module, "Image", (PyObject*)&ImageType);
+}
+
+/** \brief Takes care of the deallocation of the SDL surface.
+ *  \param self The Image object which is being deallocated.
+ *
+ *  This function takes care of the deallocation of the SDL surface.
+ */
+static void Image_dealloc(Image *self)
+{
+    // Free our data
+    SDL_FreeSurface(self->surface);
+
+    // Free Python data
+    self->ob_type->tp_free((PyObject*)self);
+}
+
+/** \brief Takes care of the initialization of the Image object members.
+ *  \param self The Image object which is being initialized.
+ *
+ *  This function takes care of the initialization of the Image object members.
+ */
+static PyObject *Image_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    // Alloc Python data
+    Image *self = (Image*)type->tp_alloc(type, 0);
+
+    // Init our data
+    if (self)
+    {
+		self->surface = NULL;
+    }
+
+    return (PyObject*)self;
+}
+
+/** \brief The constructor of the Image object.
+ *  \param self The Image object which is being constructed.
+ *  \param args The arguments.
+ *
+ *  The constructor of the Image object.
+ */
+static int Image_init(Image *self, PyObject *args, PyObject *kwds)
+{
+    char *path = NULL;
+
+    if (!PyArg_ParseTuple(args, "|s", &path))
+        return -1;
+
+    if (path && !(self->surface = mhLoadImage(path)))
+        return -1;
+
+    return 0;
+}
+
+static PyObject *Image_getItem(Image *self, PyObject *xy)
+{
+	PyObject *ox, *oy;
+	int x, y;
+	unsigned char *pixels, r, g, b, a;
+
+	if (!self->surface)
+	{
+		PyErr_SetString(PyExc_RuntimeError, "image not initialized");
+		return NULL;
+	}
+
+	if (!PyTuple_Check(xy) || PyTuple_GET_SIZE(xy) != 2)
+	{
+		PyErr_SetString(PyExc_TypeError, "tuple of length 2 expected");
+		return NULL;
+	}
+
+	ox = PyTuple_GET_ITEM(xy, 0);
+	oy = PyTuple_GET_ITEM(xy, 1);
+
+	if (!PyInt_Check(ox) || !PyInt_Check(oy))
+	{
+		PyErr_SetString(PyExc_TypeError, "tuple of 2 ints expected");
+		return NULL;
+	}
+
+	x = PyInt_AS_LONG(ox);
+	y = PyInt_AS_LONG(oy);
+
+	if (x < 0 || x > self->surface->w || y < 0 || y > self->surface->h)
+	{
+		PyErr_SetString(PyExc_IndexError, "element index out of range");
+		return NULL;
+	}
+
+	pixels = (unsigned char*)self->surface->pixels + y * self->surface->pitch + x * self->surface->format->BytesPerPixel;
+
+	if (self->surface->format->BytesPerPixel == 4)
+	{
+		SDL_GetRGBA(*(unsigned int*)pixels, self->surface->format, &r, &g, &b, &a);
+		return Py_BuildValue("iiii", r, g, b, a);
+	}
+	else if (self->surface->format->BytesPerPixel == 3)
+	{
+		SDL_GetRGB(*(unsigned int*)pixels, self->surface->format, &r, &g, &b);
+		return Py_BuildValue("iii", r, g, b);
+	}
+
+	PyErr_SetString(PyExc_RuntimeError, "unknown image type");
+	return NULL;
+}
+
+static int Image_setItem(Image *self, PyObject *xy, PyObject *color)
+{
+	PyObject *ox, *oy;
+	int x, y;
+	unsigned char *pixels;
+	unsigned int pixel;
+
+	if (!self->surface)
+	{
+		PyErr_SetString(PyExc_RuntimeError, "image not initialized");
+		return -1;
+	}
+
+	if (!PyTuple_Check(xy) || PyTuple_GET_SIZE(xy) != 2)
+	{
+		PyErr_SetString(PyExc_TypeError, "tuple of length 2 expected");
+		return -1;
+	}
+
+	ox = PyTuple_GET_ITEM(xy, 0);
+	oy = PyTuple_GET_ITEM(xy, 1);
+
+	if (!PyInt_Check(ox) || !PyInt_Check(oy))
+	{
+		PyErr_SetString(PyExc_TypeError, "tuple of 2 ints expected");
+		return -1;
+	}
+
+	x = PyInt_AS_LONG(ox);
+	y = PyInt_AS_LONG(oy);
+
+	if (x < 0 || x > self->surface->w || y < 0 || y > self->surface->h)
+	{
+		PyErr_SetString(PyExc_IndexError, "element index out of range");
+		return -1;
+	}
+
+	if (!PyTuple_Check(color))
+	{
+		PyErr_Format(PyExc_TypeError, "tuple expected");
+		return -1;
+	}
+	
+	//SDL_LockSurface(self->surface);
+
+	pixels = (unsigned char*)self->surface->pixels + y * self->surface->pitch + x * self->surface->format->BytesPerPixel;
+	if (PyTuple_GET_SIZE(color) == 4)
+		pixel = SDL_MapRGBA(self->surface->format,
+			(unsigned char)PyInt_AS_LONG(PyTuple_GET_ITEM(color, 0)),
+			(unsigned char)PyInt_AS_LONG(PyTuple_GET_ITEM(color, 1)),
+			(unsigned char)PyInt_AS_LONG(PyTuple_GET_ITEM(color, 2)),
+			(unsigned char)PyInt_AS_LONG(PyTuple_GET_ITEM(color, 3)));
+	else
+		pixel = SDL_MapRGB(self->surface->format,
+			(unsigned char)PyInt_AS_LONG(PyTuple_GET_ITEM(color, 0)),
+			(unsigned char)PyInt_AS_LONG(PyTuple_GET_ITEM(color, 1)),
+			(unsigned char)PyInt_AS_LONG(PyTuple_GET_ITEM(color, 2)));
+
+	memcpy(pixels, &pixel, self->surface->format->BytesPerPixel);
+
+	//SDL_UnlockSurface(self->surface);
+
+	return 0;
+}
+
+static PyObject *Image_load(Image *self, PyObject *path)
+{
+	if (self->surface)
+	{
+		SDL_FreeSurface(self->surface);
+		self->surface = NULL;
+	}
+
+    if (PyString_Check(path))
+    {
+        if (!(self->surface = mhLoadImage(PyString_AsString(path))))
+            return NULL;
+    }
+    else if (PyUnicode_Check(path))
+    {
+        path = PyUnicode_AsUTF8String(path);
+        if (!(self->surface = mhLoadImage(PyString_AsString(path))))
+        {
+            Py_DECREF(path);
+            return NULL;
+        }
+        Py_DECREF(path);
+    }
+    else
+    {
+        PyErr_SetString(PyExc_TypeError, "String or Unicode object expected");
+        return NULL;
+    }
+
+    return Py_BuildValue("");
+}
+
+static PyObject *Image_save(Image *self, PyObject *path)
+{
+	SDL_RWops *file;
+	int y;
+	unsigned short w;
+	unsigned short h;
+	unsigned char header[18];
+	SDL_Surface *surface = self->surface;
+
+	if (!self->surface)
+	{
+		PyErr_SetString(PyExc_RuntimeError, "image not initialized");
+		return NULL;
+	}
+
+    if (PyString_Check(path))
+    {
+        if (!(file = SDL_RWFromFile(PyString_AsString(path), "wb+")))
+		{
+			PyErr_SetString(PyExc_RuntimeError, SDL_GetError());
+            return NULL;
+		}
+    }
+    else if (PyUnicode_Check(path))
+    {
+        path = PyUnicode_AsUTF8String(path);
+		if (!(file = SDL_RWFromFile(PyString_AsString(path), "wb+")))
+        {
+            Py_DECREF(path);
+			PyErr_SetString(PyExc_RuntimeError, SDL_GetError());
+            return NULL;
+        }
+        Py_DECREF(path);
+    }
+    else
+    {
+        PyErr_SetString(PyExc_TypeError, "String or Unicode object expected");
+        return NULL;
+    }
+
+	w = SDL_SwapLE16(self->surface->w);
+	h = SDL_SwapLE16(self->surface->h);
+
+	header[0] = 0; // Id length
+	header[1] = 0; // Color map type
+	header[2] = 2; // Data type code
+	header[3] = 0; header[4] = 0; // Color map origin
+	header[5] = 0; header[6] = 0; // Color map length
+	header[7] = 0; // Color map depth
+	header[8] = 0; header[9] = 0; // X origin
+	header[10] = 0; header[11] = 0; // Y origin
+	header[12] = w & 0x00FF; header[13] = (w & 0xFF00) >> 8; // Width
+	header[14] = h & 0x00FF; header[15] = (h & 0xFF00) >> 8; // Height
+	header[16] = self->surface->format->BitsPerPixel; // Bits per pixel
+	header[17] = 0; // Image descriptor
+
+	SDL_RWwrite(file, &header, 1, 18);
+
+	if (self->surface->format->Rmask != 0x00FF0000 ||
+		self->surface->format->Gmask != 0x0000FF00 ||
+		self->surface->format->Bmask != 0x000000FF)
+	{
+		if (self->surface->format->BitsPerPixel == 32)
+		{
+			SDL_PixelFormat format;
+            format.palette = NULL;
+            format.BitsPerPixel = 32;
+            format.BytesPerPixel = 4;
+            format.Rloss = format.Gloss = format.Bloss = format.Aloss = 0;
+            format.Rmask = 0x00FF0000;
+            format.Gmask = 0x0000FF00;
+            format.Bmask = 0x000000FF;
+            format.Amask = 0xFF000000;
+            format.colorkey = 0x00000000;
+            format.alpha = 0xFF;
+            format.Rshift = 16;
+            format.Gshift = 8;
+            format.Bshift = 0;
+            format.Ashift = 24;
+
+			surface = SDL_ConvertSurface(self->surface, &format, SDL_SWSURFACE);
+		}
+		else if (self->surface->format->BitsPerPixel == 24)
+		{
+			SDL_PixelFormat format;
+            format.palette = NULL;
+            format.BitsPerPixel = 24;
+            format.BytesPerPixel = 3;
+            format.Rloss = format.Gloss = format.Bloss = format.Aloss = 0;
+            format.Rmask = 0x00FF0000;
+            format.Gmask = 0x0000FF00;
+            format.Bmask = 0x000000FF;
+            format.Amask = 0x00000000;
+            format.colorkey = 0x00000000;
+            format.alpha = 0xFF;
+            format.Rshift = 16;
+            format.Gshift = 8;
+            format.Bshift = 0;
+            format.Ashift = 24;
+
+			surface = SDL_ConvertSurface(self->surface, &format, SDL_SWSURFACE);
+		}
+	}
+
+	for (y = surface->h - 1; y >= 0; y--)
+	{
+		SDL_RWwrite(file, (unsigned char*)surface->pixels + surface->pitch * y, 1, surface->w * surface->format->BytesPerPixel);
+	}
+
+	if (surface != self->surface)
+		SDL_FreeSurface(surface);
+
+	if (SDL_RWclose(file) != 0)
+	{
+		PyErr_SetString(PyExc_RuntimeError, SDL_GetError());
+		return NULL;
+	}
+
+    return Py_BuildValue("");
+}
+
+static PyObject *Image_getWidth(Image *self, void *closure)
+{
+	if (!self->surface)
+		return Py_BuildValue("i", 0);
+
+	return Py_BuildValue("i", self->surface->w);
+}
+
+static PyObject *Image_getHeight(Image *self, void *closure)
+{
+	if (!self->surface)
+		return Py_BuildValue("i", 0);
+
+	return Py_BuildValue("i", self->surface->h);
+}
+
+/** \brief The constructor of the Texture object.
+ *  \param self The Texture object which is being constructed.
+ *  \param args The arguments.
+ *
+ *  The constructor of the Texture object.
+ */
 
 typedef struct
 {
@@ -517,45 +1009,6 @@ static void mhFlipSurface(SDL_Surface *surface)
         if (SDL_MUSTLOCK(surface)) SDL_UnlockSurface(surface);
         free(line);
     }
-}
-
-static SDL_Surface *mhLoadImage(const char *fname)
-{
-    SDL_Surface *surface;
-
-#ifndef __APPLE__ // OS X utilizes the SDL_image framework for image loading!
-    if (!g_sdlImageHandle)
-    {
-#ifdef __WIN32__
-        g_sdlImageHandle = SDL_LoadObject("SDL_image");
-#else
-        g_sdlImageHandle = SDL_LoadObject("libSDL_image-1.2.so.0");
-#endif
-
-        if (!g_sdlImageHandle)
-        {
-            PyErr_Format(PyExc_RuntimeError, "Could not load %s, SDL_image not found", fname);
-            return 0;
-        }
-
-        IMG_Load = (PFN_IMG_LOAD)SDL_LoadFunction(g_sdlImageHandle, "IMG_Load");
-    }
-
-    if (!IMG_Load)
-    {
-        PyErr_Format(PyExc_RuntimeError, "Could not load %s, IMG_Load not found", fname);
-        return 0;
-    }
-#endif // ifndef __APPLE__
-    surface = (SDL_Surface*)IMG_Load(fname);
-
-    if (!surface)
-    {
-        PyErr_Format(PyExc_RuntimeError, "Could not load %s, %s", fname, SDL_GetError());
-        return 0;
-    }
-
-    return surface;
 }
 
 /** \brief Load a texture from a file and bind it into the textures array.
