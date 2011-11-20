@@ -30,6 +30,7 @@ import events3d
 import mh
 import os
 import aljabr
+from math import floor, ceil
 
 def pointInRect(point, rect):
 
@@ -149,15 +150,16 @@ class Warp(object):
      
 # Not really fast since it checks every pixel in the bounding rectangle
 # http://www.devmaster.net/codespotlight/show.php?id=17
+
 def RasterizeTriangle(warp, src, dst, p0, p1, p2):
     
-    y1 = p0[1]
-    y2 = p1[1]
-    y3 = p2[1]
+    y1 = round(p0[1])
+    y2 = round(p1[1])
+    y3 = round(p2[1])
 
-    x1 = p0[0]
-    x2 = p1[0]
-    x3 = p2[0]
+    x1 = round(p0[0])
+    x2 = round(p1[0])
+    x3 = round(p2[0])
 
     dx12 = x1 - x2
     dx23 = x2 - x3
@@ -175,40 +177,38 @@ def RasterizeTriangle(warp, src, dst, p0, p1, p2):
     c1 = dy12 * x1 - dx12 * y1
     c2 = dy23 * x2 - dx23 * y2
     c3 = dy31 * x3 - dx31 * y3
+    
+    if (dy12 < 0 or (dy12 == 0 and dx12 > 0)): c1+=1
+    if (dy23 < 0 or (dy23 == 0 and dx23 > 0)): c2+=1
+    if (dy31 < 0 or (dy31 == 0 and dx31 > 0)): c3+=1
 
     cy1 = c1 + dx12 * miny - dy12 * minx
     cy2 = c2 + dx23 * miny - dy23 * minx
     cy3 = c3 + dx31 * miny - dy31 * minx
     
-    y = miny
-    while y < maxy:
+    for y in xrange(int(miny), int(maxy)):
     
         cx1 = cy1
         cx2 = cy2
         cx3 = cy3
         
-        x = minx
-        while x < maxx:
+        for x in xrange(int(minx), int(maxx)):
 
             if cx1 > 0 and cx2 > 0 and cx3 > 0:
 
                 dx, dy = warp.warp(x, y)
                 try:
-                    dst[int(x), int(y)] = src[int(dx), int(dy)]
+                    dst[x, y] = src[int(dx), int(dy)]
                 except:
                     pass #dst[int(x), int(y)] = (255, 0, 0)
 
             cx1 -= dy12
             cx2 -= dy23
             cx3 -= dy31
-            
-            x += 1
 
         cy1 += dx12
         cy2 += dx23
         cy3 += dx31
-        
-        y += 1
 
 class BackgroundTaskView(gui3d.TaskView):
 
