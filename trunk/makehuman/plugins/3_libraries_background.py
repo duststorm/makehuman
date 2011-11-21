@@ -209,6 +209,71 @@ def RasterizeTriangle(warp, src, dst, p0, p1, p2):
         cy1 += dx12
         cy2 += dx23
         cy3 += dx31
+        
+def RasterizeColorTriangle(dst, p0, p1, p2, col0, col1, col2):
+    
+    y1 = round(p0[1])
+    y2 = round(p1[1])
+    y3 = round(p2[1])
+
+    x1 = round(p0[0])
+    x2 = round(p1[0])
+    x3 = round(p2[0])
+
+    dx12 = x1 - x2
+    dx23 = x2 - x3
+    dx31 = x3 - x1
+
+    dy12 = y1 - y2
+    dy23 = y2 - y3
+    dy31 = y3 - y1
+    
+    minx = min([x1, x2, x3])
+    maxx = max([x1, x2, x3])
+    miny = min([y1, y2, y3])
+    maxy = max([y1, y2, y3])
+    
+    c1 = dy12 * x1 - dx12 * y1
+    c2 = dy23 * x2 - dx23 * y2
+    c3 = dy31 * x3 - dx31 * y3
+    
+    if (dy12 < 0 or (dy12 == 0 and dx12 > 0)): c1+=1
+    if (dy23 < 0 or (dy23 == 0 and dx23 > 0)): c2+=1
+    if (dy31 < 0 or (dy31 == 0 and dx31 > 0)): c3+=1
+
+    cy1 = c1 + dx12 * miny - dy12 * minx
+    cy2 = c2 + dx23 * miny - dy23 * minx
+    cy3 = c3 + dx31 * miny - dy31 * minx
+    
+    for y in xrange(int(miny), int(maxy)):
+    
+        cx1 = cy1
+        cx2 = cy2
+        cx3 = cy3
+        
+        for x in xrange(int(minx), int(maxx)):
+
+            if cx1 > 0 and cx2 > 0 and cx3 > 0:
+
+                d = - dy23 * dx31 + dx23 * dy31
+                a = (dy23 * (x - x3) - dx23 * (y - y3)) / d
+                b = (dy31 * (x - x3) - dx31 * (y - y3)) / d
+                c = 1.0 - a - b
+                col = [col0[i] * a + col1[i] * b + col2[i] * c for i in xrange(3)]
+                col = map(lambda l: min(255, int(l)), col)
+                dst[x, y] = tuple(col)
+
+            cx1 -= dy12
+            cx2 -= dy23
+            cx3 -= dy31
+
+        cy1 += dx12
+        cy2 += dx23
+        cy3 += dx31
+        
+def GaussianBlur(img):
+
+    pass
 
 class BackgroundTaskView(gui3d.TaskView):
 
@@ -334,27 +399,58 @@ class BackgroundTaskView(gui3d.TaskView):
         srcImg = mh.Image(self.backgroundImage.getTexture())    
         dstImg = mh.Image(gui3d.app.selectedHuman.getTexture())
         
-        for f in mesh.faces:
+        for g in mesh.faceGroups:
         
-            if f.group.name.startswith("joint"):
+            if g.name.startswith("joint"):
                 continue
-            
-            src = [gui3d.app.modelCamera.convertToScreen(*v.co) for v in f.verts]
-            
-            if any([pointInRect(p, r) for p in src]):
-                #f.setColor([0, 255, 0, 255])
-                xscale = srcImg.width / (rightBottom[0] - leftTop[0])
-                yscale = srcImg.height / (rightBottom[1] - leftTop[1])
-                src = [((v[0]-leftTop[0])*xscale, (v[1]-leftTop[1])*yscale) for v in src]
-                dst = [(mesh.uvValues[i][0]*dstImg.width, dstImg.height-(mesh.uvValues[i][1]*dstImg.height)) for i in f.uv]
-                w = Warp(dst, src)
-                RasterizeTriangle(w, srcImg, dstImg, *dst[:3])
-                RasterizeTriangle(w, srcImg, dstImg, dst[2], dst[3], dst[0])
-            #else:
-            #    f.setColor([255, 255, 255, 255])
+                
+            for f in g.faces:
+                
+                src = [gui3d.app.modelCamera.convertToScreen(*v.co, obj=mesh.object3d) for v in f.verts]
+                
+                if any([pointInRect(p, r) for p in src]):
+                
+                    xscale = srcImg.width / (rightBottom[0] - leftTop[0])
+                    yscale = srcImg.height / (rightBottom[1] - leftTop[1])
+                    src = [((v[0]-leftTop[0])*xscale, (v[1]-leftTop[1])*yscale) for v in src]
+                    dst = [(mesh.uvValues[i][0]*dstImg.width, dstImg.height-(mesh.uvValues[i][1]*dstImg.height)) for i in f.uv]
+                    w = Warp(dst, src)
+                    RasterizeTriangle(w, srcImg, dstImg, *dst[:3])
+                    RasterizeTriangle(w, srcImg, dstImg, dst[2], dst[3], dst[0])
                     
         dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'projection.tga'))
         gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'projection.tga'))
+        
+    def projectLighting(self):
+    
+        mesh = gui3d.app.selectedHuman.mesh
+        mesh.setShadeless(1)
+        
+        dstImg = mh.Image(gui3d.app.selectedHuman.getTexture())
+        
+        for v in mesh.verts:
+        
+            ld = aljabr.vnorm(aljabr.vsub((-10.99, 20.0, 20.0,), v.co))
+            s = aljabr.vdot(v.no, ld)
+            s = max(0, min(255, int(s*255)))
+            v.setColor([s, s, s, 255])
+            
+        for g in mesh.faceGroups:
+        
+            if g.name.startswith("joint"):
+                continue
+                
+            for f in g.faces:
+
+                co = [(mesh.uvValues[i][0]*dstImg.width, dstImg.height-(mesh.uvValues[i][1]*dstImg.height)) for i in f.uv]
+                c = [v.color for v in f.verts]
+                RasterizeColorTriangle(dstImg, co[0], co[1], co[2], c[0], c[1], c[2])
+                RasterizeColorTriangle(dstImg, co[2], co[3], co[0], c[2], c[3], c[0])
+            
+        dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.tga'))
+        gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.tga'))
+        
+        mesh.setColor([255, 255, 255, 255])
 
     def onShow(self, event):
         
@@ -479,6 +575,12 @@ class settingsTaskView(gui3d.TaskView) :
         @self.projectBackgroundButton.event
         def onClicked(event):
             taskview.projectBackground()
+            
+        self.projectLightingButton = self.backgroundBox.addView(gui3d.Button('Project lighting'))
+                
+        @self.projectLightingButton.event
+        def onClicked(event):
+            taskview.projectLighting()
 
     def onShow(self, event):
         
