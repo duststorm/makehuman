@@ -381,7 +381,11 @@ void RegisterImage(PyObject *module)
 static void Image_dealloc(Image *self)
 {
     // Free our data
-    SDL_FreeSurface(self->surface);
+	if (self->surface)
+	{
+		SDL_FreeSurface(self->surface);
+		self->surface = NULL;
+	}
 
     // Free Python data
     self->ob_type->tp_free((PyObject*)self);
@@ -455,7 +459,7 @@ static PyObject *Image_getItem(Image *self, PyObject *xy)
 	x = PyInt_AS_LONG(ox);
 	y = PyInt_AS_LONG(oy);
 
-	if (x < 0 || x > self->surface->w || y < 0 || y > self->surface->h)
+	if (x < 0 || x >= self->surface->w || y < 0 || y >= self->surface->h)
 	{
 		PyErr_SetString(PyExc_IndexError, "element index out of range");
 		return NULL;
@@ -509,7 +513,7 @@ static int Image_setItem(Image *self, PyObject *xy, PyObject *color)
 	x = PyInt_AS_LONG(ox);
 	y = PyInt_AS_LONG(oy);
 
-	if (x < 0 || x > self->surface->w || y < 0 || y > self->surface->h)
+	if (x < 0 || x >= self->surface->w || y < 0 || y >= self->surface->h)
 	{
 		PyErr_SetString(PyExc_IndexError, "element index out of range");
 		return -1;
