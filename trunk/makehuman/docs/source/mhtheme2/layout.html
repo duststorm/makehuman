@@ -5,7 +5,7 @@
     Based on Sphinxdoc
     :license: BSD
 #}
-{% extends "basic/layout.html" %}
+{% extends "layout_basic.html" %}
 
 {# do not display sidebars #}
 {% block sidebar1 %}{% endblock %}
@@ -13,6 +13,14 @@
 
 
 {% block extrahead %}
+<script src="_static/Hyphenator.js" type="text/javascript"></script>
+<script type="text/javascript">
+	Hyphenator.config({
+		displaytogglebox : true,
+		minwordlength : 4
+	});
+	Hyphenator.run();
+</script>
 {% endblock %}
 
 
@@ -59,8 +67,10 @@
   {%- block document %}         
         <div class="bodywrapper">           
           <div class="body">
+			  <div class="hyphenate">
               Lorem ipsum dolor sit amet, consectetuer adipiscing elit accumsan
             {% block body %} {% endblock %}
+              </div>
           </div>
           {{sitecolumn()}}      
         </div>     
