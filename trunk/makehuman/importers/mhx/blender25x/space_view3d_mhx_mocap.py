@@ -1866,6 +1866,8 @@ def simplifyFCurves(context, rig, useVisible, useMarkers):
     scn = context.scene
     if not scn.MhxDoSimplify:
         return
+    print("WARNING: F-curve simplification turned off")
+    return
     try:
         act = rig.animation_data.action
     except:
@@ -1891,8 +1893,15 @@ def simplifyFCurves(context, rig, useVisible, useMarkers):
     else:
         (minTime, maxTime) = ('All', 0)
 
+    curveInfo = []
     for fcu in fcurves:
-        simplifyFCurve(fcu, act, scn.MhxErrorLoc, scn.MhxErrorRot, minTime, maxTime)
+        info = simplifyFCurve(fcu, act, scn.MhxErrorLoc, scn.MhxErrorRot, minTime, maxTime)
+        curveInfo.append(info)
+    for fcu in fcurves:
+        act.fcurves.remove(fcu)
+    for info in curveInfo:
+        createNewFCurve(act, info)            
+        
     setInterpolation(rig)
     print("Curves simplified")
     return
@@ -1902,8 +1911,6 @@ def simplifyFCurves(context, rig, useVisible, useMarkers):
 #
 
 def simplifyFCurve(fcu, act, maxErrLoc, maxErrRot, minTime, maxTime):
-    #print("WARNING: F-curve simplification turned off")
-    #return
     words = fcu.data_path.split('.')
     if words[-1] == 'location':
         maxErr = maxErrLoc
@@ -1944,12 +1951,13 @@ def simplifyFCurve(fcu, act, maxErrLoc, maxErrRot, minTime, maxTime):
     for n in keeps:
         newVerts.append(points[n].co)
     newVerts += after
+    return((fcu.data_path, fcu.array_index, fcu.group.name, newVerts))
     
-    path = fcu.data_path
-    index = fcu.array_index
-    grp = fcu.group.name
-    act.fcurves.remove(fcu)
+def createNewFCurve(act, info):
+    (path, index, grp, newVerts) = info
+    print(path, index)
     nfcu = act.fcurves.new(path, index, grp)
+    print(nfcu, nfcu.keyframe_points)
     for co in newVerts:
         t = co[0]
         try:
@@ -1960,8 +1968,8 @@ def simplifyFCurve(fcu, act, maxErrLoc, maxErrRot, minTime, maxTime):
             pass
             # print(path, co, dt)
         else:
+            print("  ", co)
             nfcu.keyframe_points.insert(frame=co[0], value=co[1])
-
     return
 
 #
