@@ -285,6 +285,8 @@ static PyMappingMethods Image_as_mapping[] = {
 
 static PyObject *Image_load(Image *image, PyObject *path);
 static PyObject *Image_save(Image *image, PyObject *path);
+static PyObject *Image_resize(Image *image, PyObject *path);
+static PyObject *Image_resized(Image *image, PyObject *path);
 
 // Image Methods
 static PyMethodDef Image_methods[] =
@@ -297,17 +299,27 @@ static PyMethodDef Image_methods[] =
         "save", (PyCFunction)Image_save, METH_O,
         "Saves the specified image to file"
     },
+	{
+        "resize", (PyCFunction)Image_resize, METH_VARARGS,
+        "resizes the specified image to width x height pixels"
+    },
+	{
+        "resized", (PyCFunction)Image_resized, METH_VARARGS,
+        "returns a resized copy of the specified image"
+    },
     {NULL}  /* Sentinel */
 };
 
 static PyObject *Image_getWidth(Image *self, void *closure);
 static PyObject *Image_getHeight(Image *self, void *closure);
+static PyObject *Image_getBitsPerPixel(Image *self, void *closure);
 
 // Image attributes indirectly accessed by Python
 static PyGetSetDef Image_getset[] =
 {
     {"width", (getter)Image_getWidth, (setter)NULL, "The width of the image.", NULL},
     {"height", (getter)Image_getHeight, (setter)NULL, "The heigh of the image.", NULL},
+	{"bitsPerPixel", (getter)Image_getBitsPerPixel, (setter)NULL, "The bits per pixel of the image.", NULL},
     {NULL}
 };
 
@@ -418,13 +430,23 @@ static PyObject *Image_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
  */
 static int Image_init(Image *self, PyObject *args, PyObject *kwds)
 {
-    char *path = NULL;
+    PyObject *path = NULL;
+	int width = 0, height = 0, bitsPerPixel = 32;
+	char *format = "rgba";
+	static char *kwlist[] = {"path", "width", "height", "bitsPerPixel", NULL};
 
-    if (!PyArg_ParseTuple(args, "|s", &path))
-        return -1;
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|Oiii", kwlist, &path, &width, &height, &bitsPerPixel))
+		return -1;
 
-    if (path && !(self->surface = mhLoadImage(path)))
+    if (path && !Image_load(self, path))
         return -1;
+	else if (width && height && bitsPerPixel)
+	{
+		if (bitsPerPixel == 32)
+			self->surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 32,  0X000000FF, 0X0000FF00, 0X00FF0000, 0XFF000000);
+		else if (bitsPerPixel == 24)
+			self->surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 24,  0X000000FF, 0X0000FF00, 0X00FF0000, 0X00000000);
+	}
 
     return 0;
 }
@@ -700,6 +722,70 @@ static PyObject *Image_save(Image *self, PyObject *path)
     return Py_BuildValue("");
 }
 
+static PyObject *Image_resize(Image *self, PyObject *args)
+{
+	int width, height;
+	SDL_Surface *surface = NULL;
+
+	if (!self->surface)
+	{
+		PyErr_SetString(PyExc_RuntimeError, "image not initialized");
+		return NULL;
+	}
+
+	if (self->surface->format->BitsPerPixel != 32 && self->surface->format->BitsPerPixel != 24)
+	{
+		PyErr_Format(PyExc_RuntimeError, "unknown image type %d bits per pixel", self->surface->format);
+		return NULL;
+	}
+
+	if (!PyArg_ParseTuple(args, "ii", &width, &height))
+		return NULL;
+
+	surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, self->surface->format->BitsPerPixel,  self->surface->format->Rmask, self->surface->format->Gmask, self->surface->format->Bmask, self->surface->format->Amask);
+
+	if (self->surface->format->BitsPerPixel == 32)
+		gluScaleImage(GL_RGBA, self->surface->w, self->surface->h, GL_UNSIGNED_BYTE, self->surface->pixels, width, height, GL_UNSIGNED_BYTE, surface->pixels);
+	else if (self->surface->format->BitsPerPixel == 24)
+		gluScaleImage(GL_RGB, self->surface->w, self->surface->h, GL_UNSIGNED_BYTE, self->surface->pixels, width, height, GL_UNSIGNED_BYTE, surface->pixels);
+
+	SDL_FreeSurface(self->surface);
+	self->surface = surface;
+
+	return Py_BuildValue("");
+}
+
+static PyObject *Image_resized(Image *self, PyObject *args)
+{
+	int width, height;
+	Image *img = NULL;
+
+	if (!self->surface)
+	{
+		PyErr_SetString(PyExc_RuntimeError, "image not initialized");
+		return NULL;
+	}
+
+	if (self->surface->format->BitsPerPixel != 32 && self->surface->format->BitsPerPixel != 24)
+	{
+		PyErr_Format(PyExc_RuntimeError, "unknown image type %d bits per pixel", self->surface->format);
+		return NULL;
+	}
+
+	if (!PyArg_ParseTuple(args, "ii", &width, &height))
+		return NULL;
+
+	img = (Image*)PyObject_New(Image, (PyTypeObject*)&ImageType);
+	img->surface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, self->surface->format->BitsPerPixel,  self->surface->format->Rmask, self->surface->format->Gmask, self->surface->format->Bmask, self->surface->format->Amask);
+
+	if (self->surface->format->BitsPerPixel == 32)
+		gluScaleImage(GL_RGBA, self->surface->w, self->surface->h, GL_UNSIGNED_BYTE, self->surface->pixels, width, height, GL_UNSIGNED_BYTE, img->surface->pixels);
+	else if (self->surface->format->BitsPerPixel == 24)
+		gluScaleImage(GL_RGB, self->surface->w, self->surface->h, GL_UNSIGNED_BYTE, self->surface->pixels, width, height, GL_UNSIGNED_BYTE, img->surface->pixels);
+
+	return (PyObject*)img;
+}
+
 static PyObject *Image_getWidth(Image *self, void *closure)
 {
 	if (!self->surface)
@@ -714,6 +800,14 @@ static PyObject *Image_getHeight(Image *self, void *closure)
 		return Py_BuildValue("i", 0);
 
 	return Py_BuildValue("i", self->surface->h);
+}
+
+static PyObject *Image_getBitsPerPixel(Image *self, void *closure)
+{
+	if (!self->surface)
+		return Py_BuildValue("i", 0);
+
+	return Py_BuildValue("i", self->surface->format->BitsPerPixel);
 }
 
 /** \brief The constructor of the Texture object.

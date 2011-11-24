@@ -29,8 +29,8 @@ import gui3d
 import events3d
 import mh
 import os
-import aljabr
-from math import floor, ceil
+from aljabr import vnorm, vsub, vadd, vdot
+from math import floor, ceil, pi, sqrt, exp
 
 def pointInRect(point, rect):
 
@@ -260,7 +260,7 @@ def RasterizeColorTriangle(dst, p0, p1, p2, col0, col1, col2):
                 b = (dy31 * (x - x3) - dx31 * (y - y3)) / d
                 c = 1.0 - a - b
                 col = [col0[i] * a + col1[i] * b + col2[i] * c for i in xrange(3)]
-                col = map(lambda l: min(255, int(l)), col)
+                col = map(int, col)
                 dst[x, y] = tuple(col)
 
             cx1 -= dy12
@@ -270,10 +270,122 @@ def RasterizeColorTriangle(dst, p0, p1, p2, col0, col1, col2):
         cy1 += dx12
         cy2 += dx23
         cy3 += dx31
-        
-def GaussianBlur(img):
+       
+"""
+def convolveAndTranspose(kernel, src, dst):
 
-    pass
+        cols = len(kernel);
+        cols2 = cols/2;
+        
+        dstW = dst.width
+        dstH = dst.height
+
+        for y in xrange(dstH):
+
+            for x in xrange(dstW):
+
+                pixel = [0] * 4
+                
+                for index, col in enumerate(xrange(x-cols2, x+cols2+1)):
+                
+                    f = kernel[index];
+
+                    if (f != 0):
+                        
+                        if col < 0:
+                            col = 0
+                        elif col >= dstW:
+                            col = dstW-1
+
+                        color = src[col, y];
+                        
+                        pixel = map(lambda p, c: p + f * c, pixel, color)
+
+                pixel = map(lambda c: max(0, min(255, int(c))), pixel)
+                dst[y, x] = tuple(pixel)
+ 
+def gaussianBlur(img, radius):
+
+    tmp = mh.Image(width=img.width, height=img.height)
+    
+    radius = float(radius)
+
+    r = int(ceil(radius))
+    rows = r * 2 + 1;
+    kernel = [0.0] * rows
+    sigma = radius / 3
+    sigma22 = 2 * sigma * sigma
+    sigmaPi2 = 2 * pi * sigma
+    sqrtSigmaPi2 = sqrt(sigmaPi2)
+    radius2 = radius * radius
+    total = 0.0;
+    for index, row in  enumerate(xrange(-r, r+1)):
+        distance = row * row;
+        if distance > radius2:
+            kernel[index] = 0
+        else:
+            kernel[index] = exp(-(distance) / sigma22) / sqrtSigmaPi2
+        total += kernel[index]
+
+    map(lambda x: x / total, kernel)
+
+    print kernel
+    convolveAndTranspose(kernel, img, tmp)
+    convolveAndTranspose(kernel, tmp, img)
+
+def verticalSample(img, x, y, radius):
+       
+    sum = [0, 0, 0, 0]
+    count = 0
+    height = img.height
+
+    for yy in xrange(y-radius, y+radius+1):
+       
+        if yy > 0 and yy < height:
+            color = img[x, yy]
+            sum[0] += color[0]
+            sum[1] += color[1]
+            sum[2] += color[2]
+            sum[3] += color[3]
+            count = count+1
+
+    return (sum[0]/count, sum[1]/count, sum[2]/count, sum[3]/count)
+    
+def horizontalSample(img, x, y, radius):
+   
+    sum = [0, 0, 0, 0]
+    count = 0
+    width = img.width
+
+    for xx in xrange(x-radius, x+radius+1):
+       
+        if xx > 0 and xx < width:
+            color = img[xx, y]
+            sum[0] += color[0]
+            sum[1] += color[1]
+            sum[2] += color[2]
+            sum[3] += color[3]
+            count = count+1
+
+    return (sum[0]/count, sum[1]/count, sum[2]/count, sum[3]/count)
+        
+def blur(img, radius):
+
+    tmp = mh.Image(width=img.width, height=img.height)
+    width = img.width
+    height = img.height
+    
+    # Vertical blur
+    for y in xrange(height):
+        for x in xrange(width):
+        
+           tmp[x, y] = verticalSample(img, x, y, radius)
+           
+    for y in xrange(height):
+        for x in xrange(width):
+        
+           img[x, y] = horizontalSample(tmp, x, y, radius)
+"""
 
 class BackgroundTaskView(gui3d.TaskView):
 
@@ -370,9 +482,9 @@ class BackgroundTaskView(gui3d.TaskView):
         if self.backgroundImage.hasTexture():
         
             reference = gui3d.app.selectedHuman.getPosition()
-            diff = aljabr.vsub(reference, self.reference)
-            self.leftTop = aljabr.vadd(self.leftTop, diff)
-            self.rightBottom = aljabr.vadd(self.rightBottom, diff)
+            diff = vsub(reference, self.reference)
+            self.leftTop = vadd(self.leftTop, diff)
+            self.rightBottom = vadd(self.rightBottom, diff)
             
             leftTop = gui3d.app.modelCamera.convertToScreen(*self.leftTop)
             rightBottom = gui3d.app.modelCamera.convertToScreen(*self.rightBottom)
@@ -399,6 +511,11 @@ class BackgroundTaskView(gui3d.TaskView):
         srcImg = mh.Image(self.backgroundImage.getTexture())    
         dstImg = mh.Image(gui3d.app.selectedHuman.getTexture())
         
+        srcW = srcImg.width
+        srcH = srcImg.height
+        dstW = dstImg.width
+        dstH = dstImg.height
+        
         for g in mesh.faceGroups:
         
             if g.name.startswith("joint"):
@@ -410,10 +527,10 @@ class BackgroundTaskView(gui3d.TaskView):
                 
                 if any([pointInRect(p, r) for p in src]):
                 
-                    xscale = srcImg.width / (rightBottom[0] - leftTop[0])
-                    yscale = srcImg.height / (rightBottom[1] - leftTop[1])
+                    xscale = srcW / (rightBottom[0] - leftTop[0])
+                    yscale = srcH / (rightBottom[1] - leftTop[1])
                     src = [((v[0]-leftTop[0])*xscale, (v[1]-leftTop[1])*yscale) for v in src]
-                    dst = [(mesh.uvValues[i][0]*dstImg.width, dstImg.height-(mesh.uvValues[i][1]*dstImg.height)) for i in f.uv]
+                    dst = [(mesh.uvValues[i][0]*dstW, dstH-(mesh.uvValues[i][1]*dstH)) for i in f.uv]
                     w = Warp(dst, src)
                     RasterizeTriangle(w, srcImg, dstImg, *dst[:3])
                     RasterizeTriangle(w, srcImg, dstImg, dst[2], dst[3], dst[0])
@@ -426,12 +543,15 @@ class BackgroundTaskView(gui3d.TaskView):
         mesh = gui3d.app.selectedHuman.mesh
         mesh.setShadeless(1)
         
-        dstImg = mh.Image(gui3d.app.selectedHuman.getTexture())
+        dstImg = mh.Image(width=1024, height=1024, bitsPerPixel=24)
+        
+        dstW = dstImg.width
+        dstH = dstImg.height
         
         for v in mesh.verts:
         
-            ld = aljabr.vnorm(aljabr.vsub((-10.99, 20.0, 20.0,), v.co))
-            s = aljabr.vdot(v.no, ld)
+            ld = vnorm(vsub((-10.99, 20.0, 20.0,), v.co))
+            s = vdot(v.no, ld)
             s = max(0, min(255, int(s*255)))
             v.setColor([s, s, s, 255])
             
@@ -442,11 +562,13 @@ class BackgroundTaskView(gui3d.TaskView):
                 
             for f in g.faces:
 
-                co = [(mesh.uvValues[i][0]*dstImg.width, dstImg.height-(mesh.uvValues[i][1]*dstImg.height)) for i in f.uv]
+                co = [(mesh.uvValues[i][0]*dstW, dstH-(mesh.uvValues[i][1]*dstH)) for i in f.uv]
                 c = [v.color for v in f.verts]
                 RasterizeColorTriangle(dstImg, co[0], co[1], co[2], c[0], c[1], c[2])
                 RasterizeColorTriangle(dstImg, co[2], co[3], co[0], c[2], c[3], c[0])
-            
+        
+        dstImg.resize(128, 128);
+        
         dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.tga'))
         gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.tga'))
         
