@@ -12,7 +12,6 @@
 
 @import url("basic.css");
 
-
 html {
     font-family: Cambria, Georgia, "Times New Roman", Times, serif;    
     font-size: 1em;
@@ -254,6 +253,14 @@ pre a {
 
 /*--- VARIOUS ---*/
 
+div.body p.caption {
+    font-family: sans-serif;
+    color: black;     
+    font-size: .7em;
+    text-align: left;
+    line-height: 1.2em;
+}
+
 dl {
     padding:1em;
     margin-bottom: 1.5em;    
@@ -370,7 +377,7 @@ div.admonition, div.warning {
     margin: 1em 0 1em 0;
     border: 1px solid #86989B;    
     background:url(images/alert_info_32.png) no-repeat;
-    background-color: #f1945c;    
+    background-color: #ffe9e9;    
     background-position:right bottom;
     padding: 0;
 }
@@ -386,12 +393,8 @@ div.admonition pre, div.warning pre {
 }
 
 div.admonition p.admonition-title,
-div.warning p.admonition-title {
-    margin: 0;
-    padding: 0.1em 0 0.1em 0.5em;
-    color: white;
-    border-bottom: 1px solid #86989B;
-    font-weight: bold;
+div.warning p.admonition-title {    
+    border-bottom: 1px solid #86989B;    
     background-color: #d66019;
 }
 
@@ -400,8 +403,12 @@ div.warning {
 }
 
 div.warning p.admonition-title {
-    background-color: #CF0000;
-    border-bottom-color: #940000;
+    margin: 0.5em 1em 0.5em 1em;
+    padding: 0;
+    color: black;
+    background-color: #ffe9e9;
+    border-bottom-color: red;
+    font-weight: bold;
 }
 
 

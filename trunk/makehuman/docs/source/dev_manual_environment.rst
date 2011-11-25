@@ -17,9 +17,9 @@ A development environment enables you to compile and build a new copy of MakeHum
 
 You do need a development environment to:
 
-    * Participate in the development of the MakeHuman
-    * Build a copy of the application currently under development
-    * Build a copy of the application to run on a platform that is not officially supported.
+* Participate in the development of the MakeHuman
+* Build a copy of the application currently under development
+* Build a copy of the application to run on a platform that is not officially supported.
 
 To participate in the development of the MakeHuman code as a MakeHuman Team member you will also need to familiarise yourself with the Coding standard and Build Processes contained within this document.  The 'C' compiler is platform dependent. The following are recommended for MakeHuman development:
 
@@ -32,8 +32,8 @@ Windows 'C' Development Environment
     
 The supported environments for MakeHuman 'C' code development are MinGW and Microsoft Visual C++
 
-    * To roughly build MakeHuman, you can simply run the compile_src.bat file (maybe you need to adjust it, in order to match your local paths).
-    * A better result is obtained using Visual C++ (see section Mingw vs. Visual C. below). Actually there is not a VC project file in svn, but it will be added before the release 1.0 final.
+* To roughly build MakeHuman, you can simply run the compile_src.bat file (maybe you need to adjust it, in order to match your local paths).
+* A better result is obtained using Visual C++ (see section Mingw vs. Visual C. below). Actually there is not a VC project file in svn, but it will be added before the release 1.0 final.
 
 Windows Visual C++ 
 +++++++++++++++++++
@@ -50,9 +50,9 @@ Windows Visual C++
 Windows gcc
 ++++++++++++
 
-    * Python 2.6 (headers + libpython26.a + python26.dll)
-    * SDL 1.2.13 (headers + libSDLmain.a + libSDL.dll.a + SDL.dll)
-    * SDL_Image 1.2.7 (headers + SDL_Image.dll + optionally jpeg.dll, libpng12-0.dll, libtiff-3.dll, zlib1.dll) 
+* Python 2.6 (headers + libpython26.a + python26.dll)
+* SDL 1.2.13 (headers + libSDLmain.a + libSDL.dll.a + SDL.dll)
+* SDL_Image 1.2.7 (headers + SDL_Image.dll + optionally jpeg.dll, libpng12-0.dll, libtiff-3.dll, zlib1.dll) 
 
 The MakeHuman application uses functions from the SDL_image libraries which needs to be linked into the program during the build. You will need to place the set of associated DLL's in a directory accessible during the build.
 The DLL files are available for different platforms from http://www.libsdl.org/projects/SDL_image/release/. For example, a zip archive is available for Windows called : http://www.libsdl.org/projects/SDL_image/release/SDL_image-1.2.7-win32.zip. Just copy all of the DLL's from the archive into a directory in your build path before you build the MakeHuman application.
@@ -92,22 +92,24 @@ Linux gcc
     
 You need followin packages:
 
-    * Python 2.5 (headers + libpython2.5.a)
-    * SDL 1.2.13 (headers + libSDLmain.a + libSDL.a + libSDL.so)
-    * SDL_Image 1.2.7 (headers + libSDL_image-1.2.so.0)
+* Python 2.5 (headers + libpython2.5.a)
+* SDL 1.2.13 (headers + libSDLmain.a + libSDL.a + libSDL.so)
+* SDL_Image 1.2.7 (headers + libSDL_image-1.2.so.0)
 
 Using Ubuntu or Debian, this mean you need to install, by synaptics, the following packages:
 
-    * build-essential
-    * python2.5-dev
-    * libsdl1.2-dev
-    * libsdl-image1.2
-    * scons
+* build-essential
+* python2.5-dev
+* libsdl1.2-dev
+* libsdl-image1.2
+* scons
 
 The compiler (of course, GCC) is included in build-essential package.
 Compile under Linux is very simple. If you have all packages listed above correctly installed, you must just open the console, go in MH folder and type "scons".
 
-SCons is a Python-based cross-platform build environment that can be used to simplify the build processes for cross-platform applications. Knowledge required to successfully build the application can be built into SCon scripts, which can validate the environment and provide user-friendly information to the person performing the build in the event that the environment is incomplete. A draft SConstruct build script is provided in the current MakeHuman SVN build directory, although at the time of writing it is likely still to need adapting for your particular platform. is an useful utility (http://www.scons.org/ ) and in future we will use it for Windows too.
+SCons is a Python-based cross-platform build environment that can be used to simplify the build processes for cross-platform applications. Knowledge required to successfully build the application can be built into SCon scripts, which can validate the environment and provide user-friendly information to the person performing the build in the event that the environment is incomplete. 
+
+A draft SConstruct build script is provided in the current MakeHuman SVN build directory, although at the time of writing it is likely still to need adapting for your particular platform. is an useful utility (http://www.scons.org/ ) and in future we will use it for Windows too.
 
 
 Mac OS-X 'C' Development Environment
@@ -119,11 +121,13 @@ In addition the SVN contains a makefile (Makefile.osx) which is supposed to buil
 
 Whether using an Xcode project or the 'make' shell command to build MakeHuman you will need to install the Xcode Tools which include the GCC C Compiler. Xcode is not installed by default, but is part of the "OS-X Developer Tools" package which is available on your OS-X installation DVD. If you don't have the DVD you may download an image of this DVD free of charge from the Apple developer site at http://developer.apple.com.
 
-Currently the build process uses a 'make' shell command which is unusual for OS-X. OS-X build processes usually use the 'Xcode' development system which provides a fully Integrated Development Environment (IDE) that incorporates editors, a build system, dependency generation, debugging support etc. An Xcode project file for the current source deck is under development. For further information about the Xcode Tools please refer to http://developer.apple.com/tools/xcode/ . The standard OS-X build process uses an Xcode project to build the source downloaded from SVN. You have two choices to compile the source deck that you download from SVN:
+Currently the build process uses a 'make' shell command which is unusual for OS-X. OS-X build processes usually use the 'Xcode' development system which provides a fully Integrated Development Environment (IDE) that incorporates editors, a build system, dependency generation, debugging support etc. An Xcode project file for the current source deck is under development. 
 
-    * Either you may use a makefile to perform the build. You can use the file ' compile_src_osx.sh' which is used to launch a 'make' command specifying the 'Makefile_osx' file as the parameter file. ie 'make -f Makefile_osx'. This command compiles and builds the C core.
+For further information about the Xcode Tools please refer to http://developer.apple.com/tools/xcode/ . The standard OS-X build process uses an Xcode project to build the source downloaded from SVN. You have two choices to compile the source deck that you download from SVN:
 
-    * You may load the Xcode project file named MakeHuman.xcodeproj into the Xcode Development IDE and perform the build within the Development system.
+* Either you may use a makefile to perform the build. You can use the file ' compile_src_osx.sh' which is used to launch a 'make' command specifying the 'Makefile_osx' file as the parameter file. ie 'make -f Makefile_osx'. This command compiles and builds the C core.
+
+* You may load the Xcode project file named MakeHuman.xcodeproj into the Xcode Development IDE and perform the build within the Development system.
 
 Both ways assumes that you have already installed the free Xcode package which incorporates a C/C++, and Objective-C++ compiler.
 

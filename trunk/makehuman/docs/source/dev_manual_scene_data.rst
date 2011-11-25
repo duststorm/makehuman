@@ -6,7 +6,9 @@
 Scene data
 ===========
 
- A scene is stored as a flat object list, there is no hierarchy and thus no transformations or properties are inherited. This means that if a model wears clothes, the clothes need to undergo the same transform as the model, it is not automatic. Besides the object list, the scene also contains a dictionary of 'false' colors for each object, this enables the system to work out which object the user has clicked on by comparing it with an image generated from the current camera position using these false colors.
+A scene is stored as a flat object list, there is no hierarchy and thus no transformations or properties are inherited. This means that if a model wears clothes, the clothes need to undergo the same transform as the model, it is not automatic. 
+
+Besides the object list, the scene also contains a dictionary of 'false' colors for each object, this enables the system to work out which object the user has clicked on by comparing it with an image generated from the current camera position using these false colors.
  
 Object
 ---------
@@ -14,7 +16,9 @@ Object
 .. warning::
     Editorial Note: to update
 
-An object is used to represent an object that can appear on the screen. This can be the humanoid object or one of the GUI objects. An object has a name to identify it in the scene. It also holds an index to the corresponding object in the array of C objects. For transformation it holds translation, rotation and scale settings and for the purposes of selection it holds a selection color. The object includes lists of vertices, faces and facegroups to enable it to be rendered. Other object properties which affect the rendering are cameraMode, visibility, texture, hasTexture and shadeless.
+An object is used to represent an object that can appear on the screen. This can be the humanoid object or one of the GUI objects. An object has a name to identify it in the scene. It also holds an index to the corresponding object in the array of C objects. 
+
+For transformation it holds translation, rotation and scale settings and for the purposes of selection it holds a selection color. The object includes lists of vertices, faces and facegroups to enable it to be rendered. Other object properties which affect the rendering are cameraMode, visibility, texture, hasTexture and shadeless.
 
 Facegroup
 ----------
