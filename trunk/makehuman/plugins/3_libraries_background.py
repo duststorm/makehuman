@@ -498,6 +498,10 @@ class BackgroundTaskView(gui3d.TaskView):
             
     def projectBackground(self):
     
+        if not hasattr(self, "leftTop"):
+            gui3d.app.prompt("Warning", "You need to load a background before you can project it.", "OK")
+            return
+    
         mesh = gui3d.app.selectedHuman.getSeedMesh()
         
         # for all quads, project vertex to screen
