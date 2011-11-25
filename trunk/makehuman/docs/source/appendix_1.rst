@@ -1,7 +1,5 @@
 .. _appendix_1:
 
-.. highlight:: python
-   :linenothreshold: 5
 
 ##################################
 Appendix 1 -RestructuredTex math-

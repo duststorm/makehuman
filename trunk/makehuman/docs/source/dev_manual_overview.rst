@@ -24,7 +24,7 @@ The application is written in a layered fashion as detailed below.
 
    This figure illustrates the two main components of the MakeHuman Application along with the integration layer that connects them. The Python code delivers MakeHuman Specific functionality. The C application provides a Python interpreter and exposes a set of generic MakeHuman functions through the integration layer. 
    
-   The integration layer consists of a set of C functions enabling events to be passed up to Python code and a dynamically generated Python module enabling C functions to be called from the Python code.
+The integration layer consists of a set of C functions enabling events to be passed up to Python code and a dynamically generated Python module enabling C functions to be called from the Python code.
 
 
 C data structure
