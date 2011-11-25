@@ -65,14 +65,14 @@ A view is a container holding other views and objects. When it is shown or hidde
 
 Additional properties are:
 
-    * parent: optional, defaults to None.
-    * visible: optional, defaults to True.
+* parent: optional, defaults to None.
+* visible: optional, defaults to True.
 
 
 Additional events are:
 
-    * onShow/onHide: fired when the view's visibility changes.
-    * onFocus/onBlur: fired when the view's focus status changes.
+* onShow/onHide: fired when the view's visibility changes.
+* onFocus/onBlur: fired when the view's focus status changes.
 
 Widgets
 ========
@@ -84,8 +84,8 @@ A button is a standard push button. It has a selected state, which is only true 
 
 Additional properties are:
 
-    * selected: boolean indicating whether a button is showing itself as selected.
-    * selectedTexture: a string indicating the optional texture to use when the button is selected.
+* selected: boolean indicating whether a button is showing itself as selected.
+* selectedTexture: a string indicating the optional texture to use when the button is selected.
 
 
 Additional events are:
@@ -115,15 +115,15 @@ A Slider is a widget allowing the user to select a value in a certain range.
 
 Additional properties are:
 
-    * backgroundTexture: a string indicating the texture to use as the background of the slider.
-    * sliderTexture: a string indicating the texture to use as the slider of the slider.
-    * value: optional current value, if not given defaults to 0.0.
-    * min: optional minimum value, if not given defaults to 0.0.
-    * max: optional maximum value, if not given defaults to 1.0.
+* backgroundTexture: a string indicating the texture to use as the background of the slider.
+* sliderTexture: a string indicating the texture to use as the slider of the slider.
+* value: optional current value, if not given defaults to 0.0.
+* min: optional minimum value, if not given defaults to 0.0.
+* max: optional maximum value, if not given defaults to 1.0.
 
 Additional events are:
 
-    * onChange: fired when the slider's value changes.
+* onChange: fired when the slider's value changes.
 
 ProgressBar
 ------------
@@ -132,12 +132,12 @@ A ProgressBar shows the progress of a lengthy operation.
 
 Additional properties are:
 
-    * backgroundMesh: a string indicating the mesh to use as the background of the progressbar.
-    * backgroundTexture: a string indicating the texture to use as the background of the progressbar.
-    * backgroundPosition: position of the background
-    * barMes : a string indicating the mesh to use as the bar of the progressbar.
-    * barTexture: a string indicating the texture to use as the bar of the progressbar.
-    * barPosition: position of the bar
+* backgroundMesh: a string indicating the mesh to use as the background of the progressbar.
+* backgroundTexture: a string indicating the texture to use as the background of the progressbar.
+* backgroundPosition: position of the background
+* barMes : a string indicating the mesh to use as the bar of the progressbar.
+* barTexture: a string indicating the texture to use as the bar of the progressbar.
+* barPosition: position of the bar
 
 Event flow
 ===========

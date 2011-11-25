@@ -31,10 +31,10 @@ This can be imagined as being comparable to specifying the characteristics of a 
 
 MakeHuman sets a perspective projection using the function gluPerspective(fovAngle,aspectRatio,near,far) where:
 
-    * fovAngle: is the vertical field of view angle (45 degrees)
-    * aspectRatio: is the viewport width divided by the viewport height which, by default, is 800/600 (4/3)
-    * near: is the distance to the centre of the viewing plane (0.1)
-    * far: is the distance to the centre of the rear clippling plane (100)
+* fovAngle: is the vertical field of view angle (45 degrees)
+* aspectRatio: is the viewport width divided by the viewport height which, by default, is 800/600 (4/3)
+* near: is the distance to the centre of the viewing plane (0.1)
+* far: is the distance to the centre of the rear clippling plane (100)
 
 
 Modelview Transformation 
@@ -44,8 +44,8 @@ For OpenGL to know what to display in the viewport it also needs to know where t
 
 Both the projection transformation and the modelview transformation are stored internally in 4x4 transformation matrices. You can modify these matrices by calling functions that apply direct transformations (translations and rotations) or by calling functions that calculate transformations (e.g. the gluPerspective function outlined above). To apply transformations you need to first make one of these matrices the current matrix. Subsequent transformations are applied cumulatively to the current matrix. The glMatrixMode function is used to set the current matrix mode:
 
-    * glMatrixMode(GL_PROJECTION) makes the projection transformation the current matrix so that projection settings can be applied, such as the Field of View angle and Aspect Ratio.
-    * glMatrixMode(GL_MODELVIEW) makes the modelview transformation matrix the current matrix so that subsequent translations and rotations move the current location through the 3D world.
+* glMatrixMode(GL_PROJECTION) makes the projection transformation the current matrix so that projection settings can be applied, such as the Field of View angle and Aspect Ratio.
+* glMatrixMode(GL_MODELVIEW) makes the modelview transformation matrix the current matrix so that subsequent translations and rotations move the current location through the 3D world.
 
 Resetting a transformation matrix
 ------------------------------------

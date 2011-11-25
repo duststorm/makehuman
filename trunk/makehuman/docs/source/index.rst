@@ -19,20 +19,19 @@ Application overview
 ---------------------
 
 .. toctree::
-   :maxdepth: 1   
+   :titlesonly:
 
    dev_manual_overview
    dev_manual_integration_layer
    dev_manual_scene_data
-   dev_manual_gui_system
-   dev_manual_gui_system
+   dev_manual_gui_system   
    dev_manual_opengl_notes   
    
 Coding style, rules and environment
 ------------------------------------
 
 .. toctree::
-   :maxdepth: 1    
+   :titlesonly:
    
    dev_manual_environment
    dev_manual_obtain_source
@@ -41,7 +40,7 @@ Writing plugins
 ----------------
 
 .. toctree::
-   :maxdepth: 1
+   :titlesonly:
 
    dev_manual_plugins
    dev_manual_gui
@@ -57,7 +56,7 @@ Modules
 #######
 
 .. toctree::
-   :maxdepth: 1
+   :titlesonly:
    
    module_aljabr
    module_animation3d
@@ -71,7 +70,7 @@ Doc Writers Guide
 #################
 
 .. toctree::
-   :maxdepth: 1
+   :titlesonly:
    
    appendix_1.rst
 

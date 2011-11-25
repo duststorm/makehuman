@@ -22,6 +22,7 @@ html {
     margin: 0 auto;
     background-color: #f5f5f5;
     line-height: 1.5em;
+
     
 }
 
@@ -57,6 +58,13 @@ margin-left:auto;
 margin-right:auto;
 }
 
+div.subsiteheader img
+{
+border: 0;
+float: left; 
+}
+
+
 /*--- TABLE OF INDEX ---*/
 
 div.tableofindex {
@@ -66,18 +74,19 @@ div.tableofindex {
     margin-right:auto;
 }
 
+div.tableofindex a{
+	text-decoration:none;
+	font-family: sans-serif;
+	color: black;
+}
+
 div.tableofindexint {
     float:left; 
-    width: 300px; 
+    width: 33%; 
     font-size: .75em; 
     text-align: center;
 }
 
-div.subsiteheader img
-{
-border: 0;
-float: left; 
-}
 
 
 /*--- DOCUMENT ---*/
@@ -92,25 +101,30 @@ div.bodywrapper {
     width: 940px;
     margin-left:auto;
     margin-right:auto;
-    border-style:solid; 
-    border-width:1px;
-
 }
 
 div.sitecolumn {
     float:right; 
-    width:12em; 
-    padding: 3em 0px 0px 0px;
-    border-style:solid; 
-    border-width:0px;
+    width:22em; 
+    padding-left: 1em;
+    padding-top: 5em;    
+    font-family: sans-serif;
+    font-size: .75em;
+    color: #333;
+    text-align: left;
 }
 
 div.body {
     margin: 0;
-    padding: 3em 0px 0px 0px;
+    padding: 3em 2em 0em 0em;
     float:left;
     width:31em;
 
+    border-width:1px;
+    border-top-style:none;
+    border-right-style:dashed;
+    border-bottom-style:none;
+    border-left-style:none;
 }
 
 div.body img{
@@ -145,8 +159,9 @@ div.footer a {
 /*--- HEADINGS ---*/
 
 h1, h2, h3, h4, h5, h6 {
-  margin-bottom: 24px;
+  margin-bottom: 1.5em;
   font-weight: bold;
+  font-family: sans-serif;
 }
 
 h1 {
@@ -196,14 +211,13 @@ ul {
 
 ul ul,
 ol ol {
-  margin: 0 0 0 4em;
+  margin: 0 0 0 0em;
 }
 
 /*--- QUOTES ---*/
 
 blockquote {
   margin: 0 60px 0 45px;
-  border-left: 0.3em solid #ccc;
   padding-left: 10px;
   text-indent: -0.4em;
 }
@@ -213,14 +227,44 @@ blockquote b {
   text-indent: 0;
 }
 
+
+/*--- LINKS ---*/
+
+a:link {
+	color:black;
+	text-decoration:none;
+}      
+a:visited {
+	color:black;
+	text-decoration:none;
+}  
+a:hover {
+	color:#555;
+	text-decoration:none;
+}  
+a:active {
+	color:#0000FF;
+	text-decoration:none;
+}  
+
+pre a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+/*--- VARIOUS ---*/
+
 dl {
     padding:1em;
-    margin-bottom: 15px;
-    border-radius:18px 18px  18px 18px;
-    -moz-border-radius:18px;
-    -webkit-border-radius:18px;
-    border: 2px solid #dddddd;
-    background-color: #f8f8f8;
+    margin-bottom: 1.5em;    
+    border: 1px;
+    background-color: #f5f5f5;
+    overflow:visible;
+    border-width:1px;
+    border-top-style:dashed;
+    border-right-style:none;
+    border-bottom-style:none;
+    border-left-style:none;
 }
 
 cite, code, tt {
@@ -228,6 +272,7 @@ cite, code, tt {
                  'Bitstream Vera Sans Mono', monospace;
     font-size: 0.95em;
     letter-spacing: 0.01em;
+overflow:visible;
 }
 
 tt {
@@ -247,28 +292,15 @@ hr {
     margin: 2em;
 }
 
-a tt {
-    border: 0;
-    color: #CA7900;
-}
-
-a tt:hover {
-    color: #2491CF;
-}
-
+/*--- CODE ---*/
 pre {
     font-family: 'Consolas', 'Deja Vu Sans Mono',
                  'Bitstream Vera Sans Mono', monospace;
-    font-size: 0.95em;
+    font-size: 0.65em;
     letter-spacing: 0.015em;
     line-height: 120%;
     padding: 0.5em;
-
-}
-
-pre a {
-    color: inherit;
-    text-decoration: underline;
+    overflow:hidden;
 }
 
 td.linenos pre {
@@ -296,41 +328,47 @@ table td, table th {
     padding: 0.2em 0.5em 0.2em 0.5em;
 }
 
-div.highlight {
-  padding: 6px;
+div.highlight {  
   background-color: #eeeeec;
   line-height:1em;
-  width:90%;
+  width:100%;
   margin-left:0%;
+overflow:visible;
 }
 
 div.highlight-python{
   background-color: #eeeeec;
-  border-radius:18px 18px  18px 18px;
-  -moz-border-radius:18px;
-  -webkit-border-radius:18px;
-  border: 2px solid #dddddd;
-  margin-left:5%;
-  margin-right:5%;
+  border-radius:5px 5px  5px 5px;
+  -moz-border-radius:5px;
+  -webkit-border-radius:5px;
+  border: 1px solid #dddddd;  
   padding-left:10px;
   margin-top:5px;
   line-height:1em;
+  width:31em;
+  overflow:auto;
 }
 
-table.highlighttable {
-table-layout:auto;
-width:90%;
-}
 
 table.highlighttable td {
     padding: 0px;
+overflow:visible;
+}
+
+table.highlighttable tr {
+    padding: 0px;
+    overflow:visible;
+}
+
+.highlighttable {
+    padding: 0px;
+    overflow:visible;
 }
 
 div.admonition, div.warning {
     font-size: 0.9em;
     margin: 1em 0 1em 0;
-    border: 1px solid #86989B;
-    
+    border: 1px solid #86989B;    
     background:url(images/alert_info_32.png) no-repeat;
     background-color: #f1945c;    
     background-position:right bottom;
@@ -366,11 +404,6 @@ div.warning p.admonition-title {
     border-bottom-color: #940000;
 }
 
-div.admonition ul, div.admonition ol,
-div.warning ul, div.warning ol {
-    margin: 0.1em 0.5em 0.5em 3em;
-    padding: 0;
-}
 
 div.versioninfo {
     margin: 1em 0 0 0;

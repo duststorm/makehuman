@@ -46,63 +46,22 @@
 </div> 
 {% endmacro %}
 
-
-
 {% macro sitecolumn() %}
-<div class="sitecolumn">foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo foooo fooo </div>      
+<div class="sitecolumn">
+{%- include "sitecolumn.html" %}
+</div>      
 {% endmacro %}
-
-
-
-
-
-
-
-
-
-
-
-
         
   {%- block document %}         
         <div class="bodywrapper">           
           <div class="body">
-			  <div class="hyphenate">
-              Lorem ipsum dolor sit amet, consectetuer adipiscing elit accumsan
+			  <div class="hyphenate">              
             {% block body %} {% endblock %}
               </div>
           </div>
           {{sitecolumn()}}      
         </div>     
   {%- endblock %}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 {% block relbar1 %}
 <div class="siteheader">
