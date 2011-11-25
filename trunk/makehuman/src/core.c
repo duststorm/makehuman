@@ -104,6 +104,7 @@ static PyGetSetDef Object3D_getset[] =
     {"scale", (getter)Object3D_getScale, (setter)Object3D_setScale, "The scale of the object as a 3 component vector.", NULL},
     {"transparentPrimitives", (getter)Object3D_getTransparentPrimitives, (setter)Object3D_setTransparentPrimitives, "How many of the primitives are transparent, transparent primitives are always at the end.", NULL},
     {"vertsPerPrimitive", (getter)Object3D_getVertsPerPrimitive, (setter)Object3D_setVertsPerPrimitive, "How many vertices each primitive has.", NULL},
+	{"transform", (getter)Object3D_getTransform, (setter)NULL, "The transform of the object.", NULL},
     {NULL}
 };
 

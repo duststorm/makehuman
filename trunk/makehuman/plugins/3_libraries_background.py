@@ -29,7 +29,7 @@ import gui3d
 import events3d
 import mh
 import os
-from aljabr import vnorm, vsub, vadd, vdot
+from aljabr import vnorm, vsub, vadd, vdot, mtransform
 from math import floor, ceil, pi, sqrt, exp
 
 def pointInRect(point, rect):
@@ -516,6 +516,13 @@ class BackgroundTaskView(gui3d.TaskView):
         dstW = dstImg.width
         dstH = dstImg.height
         
+        eye = gui3d.app.modelCamera.eye
+        focus = gui3d.app.modelCamera.focus
+        transform = mesh.object3d.transform
+        eye = mtransform(transform, eye)
+        focus = mtransform(transform, focus)
+        camera = vnorm(vsub(eye, focus))
+        
         for g in mesh.faceGroups:
         
             if g.name.startswith("joint"):
@@ -527,13 +534,15 @@ class BackgroundTaskView(gui3d.TaskView):
                 
                 if any([pointInRect(p, r) for p in src]):
                 
-                    xscale = srcW / (rightBottom[0] - leftTop[0])
-                    yscale = srcH / (rightBottom[1] - leftTop[1])
-                    src = [((v[0]-leftTop[0])*xscale, (v[1]-leftTop[1])*yscale) for v in src]
-                    dst = [(mesh.uvValues[i][0]*dstW, dstH-(mesh.uvValues[i][1]*dstH)) for i in f.uv]
-                    w = Warp(dst, src)
-                    RasterizeTriangle(w, srcImg, dstImg, *dst[:3])
-                    RasterizeTriangle(w, srcImg, dstImg, dst[2], dst[3], dst[0])
+                    if vdot(f.no, camera) >= 0:
+                
+                        xscale = srcW / (rightBottom[0] - leftTop[0])
+                        yscale = srcH / (rightBottom[1] - leftTop[1])
+                        src = [((v[0]-leftTop[0])*xscale, (v[1]-leftTop[1])*yscale) for v in src]
+                        dst = [(mesh.uvValues[i][0]*dstW, dstH-(mesh.uvValues[i][1]*dstH)) for i in f.uv]
+                        w = Warp(dst, src)
+                        RasterizeTriangle(w, srcImg, dstImg, *dst[:3])
+                        RasterizeTriangle(w, srcImg, dstImg, dst[2], dst[3], dst[0])
                     
         dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'projection.tga'))
         gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'projection.tga'))

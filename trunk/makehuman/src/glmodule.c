@@ -69,6 +69,29 @@ static void *g_sdlImageHandle = NULL;
 static PFN_IMG_LOAD IMG_Load = NULL;
 #endif
 
+PyObject *Object3D_getTransform(Object3D *self, void *closure)
+{
+	GLdouble matrix[16];
+	PyObject *transform;
+	int i;
+
+	glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+	glTranslatef(self->x, self->y, self->z);
+	glRotatef(self->rx, 1, 0, 0);
+	glRotatef(self->ry, 0, 1, 0);
+	glRotatef(self->rz, 0, 0, 1);
+	glScalef(self->sx, self->sy, self->sz);
+	glGetDoublev(GL_MODELVIEW_MATRIX, matrix);
+
+	transform = PyTuple_New(16);
+
+	for (i = 0; i < 16; i++)
+		PyTuple_SET_ITEM(transform, i, PyFloat_FromDouble(matrix[i]));
+
+	return transform;
+}
+
 void mhCameraPosition(Camera *camera, int eye);
 
 // Camera attributes directly accessed by Python
@@ -114,6 +137,15 @@ static PyMethodDef Camera_methods[] =
     {NULL}  /* Sentinel */
 };
 
+static PyObject *Camera_getTransform(Camera *self, void *closure);
+
+// Image attributes indirectly accessed by Python
+static PyGetSetDef Camera_getset[] =
+{
+    {"transform", (getter)Camera_getTransform, (setter)NULL, "The transform of the camera.", NULL},
+    {NULL}
+};
+
 static PyObject *Camera_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 static int Camera_init(Camera *self, PyObject *args, PyObject *kwds);
 
@@ -150,7 +182,7 @@ PyTypeObject CameraType =
     0,                                        // tp_iternext
     Camera_methods,                           // tp_methods
     Camera_members,                           // tp_members
-    0,                                        // tp_getset
+    Camera_getset,                            // tp_getset
     0,                                        // tp_base
     0,                                        // tp_dict
     0,                                        // tp_descr_get
@@ -219,6 +251,23 @@ static int Camera_init(Camera *self, PyObject *args, PyObject *kwds)
         return -1;
 
     return 0;
+}
+
+static PyObject *Camera_getTransform(Camera *self, void *closure)
+{
+	GLdouble matrix[16];
+	PyObject *transform;
+	int i;
+
+	mhCameraPosition(self, 0);
+	glGetDoublev(GL_MODELVIEW_MATRIX, matrix);
+
+	transform = PyTuple_New(16);
+
+	for (i = 0; i < 16; i++)
+		PyTuple_SET_ITEM(transform, i, PyFloat_FromDouble(matrix[i]));
+
+	return transform;
 }
 
 static SDL_Surface *mhLoadImage(const char *fname)

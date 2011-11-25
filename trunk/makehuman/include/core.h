@@ -133,6 +133,7 @@ extern "C"
     int Object3D_setTransparentPrimitives(Object3D *self, PyObject *value);
     PyObject * Object3D_getVertsPerPrimitive( Object3D *self, void *closure);
     int Object3D_setVertsPerPrimitive( Object3D *self, PyObject *value);
+	PyObject *Object3D_getTransform(Object3D *self, void *closure);
 
 // Object3D attributes indirectly accessed by Python
     PyObject *Object3D_getShaderParameters(Object3D *self, void *closure);

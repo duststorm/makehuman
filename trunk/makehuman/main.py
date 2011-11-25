@@ -157,6 +157,10 @@ class Camera(events3d.EventHandler):
         self.changed()
         
     eyeZ = property(getEyeZ, setEyeZ)
+    
+    @property
+    def eye(self):
+        return (self.camera.eyeX, self.camera.eyeY, self.camera.eyeZ)
         
     def getFocusX(self):
     
@@ -191,6 +195,10 @@ class Camera(events3d.EventHandler):
         
     focusZ = property(getFocusZ, setFocusZ)
     
+    @property
+    def focus(self):
+        return (self.camera.focusX, self.camera.focusY, self.camera.focusZ)
+    
     def getUpX(self):
     
         return self.camera.upX
@@ -223,6 +231,10 @@ class Camera(events3d.EventHandler):
         self.changed()
         
     upZ = property(getUpZ, setUpZ)
+    
+    @property
+    def focus(self):
+        return (self.camera.upX, self.camera.upY, self.camera.upZ)
     
     def getStereoMode(self):
     
