@@ -32,7 +32,7 @@ C data structure
 
 The principal data structures used by the C code are contained within the 'G.' global structure. This global data structure is defined in the file 'core.h' in the 'include' directory within SVN. Certain state information is held directly in 'G.', such as camera settings, viewport dimensions etc. 
 
-Information required to define the 3D objects, such as the humanoid figure and the GUI controls is nested within the 'G.world.' data structure, which is a pointer to an array of object3D data structures. Each object3D data structure contains the information needed to define a single object to OpenGL (verts, norms, UV, colors etc.). 
+Information required to define the 3D objects, such as the humanoid figure and the GUI controls is nested within the 'G.world.' data structure, which is a python list of object3D data structures. Each object3D data structure contains the information needed to define a single object to OpenGL (vertices, normals, UV coordinates, colors etc.). 
 
 
 Python Data Structures
@@ -40,10 +40,8 @@ Python Data Structures
 
 The data used to populate the C data structures is maintained through Python code and a copy of that data is held in Python data structures. Python application components load the 3D object data required to populate the corresponding C data structures from object files. 
 
-That data is loaded into instances of Python classes, that are defined in the file 'module3d.py' (in the 'mh_core' directory in SVN) before being transposed and copied down into the C data structures. 
+That data is loaded into instances of Python classes, that are defined in the file 'module3d.py' (in the 'core' directory in SVN) before being transposed and copied down into the C data structures. 
 
-These classes can be seen as being organised in a sort of hierarchical structure; A single Scene3D object holds references to the set of Object3D objects used to describe the humanoid model and the various GUI controls. 
-
-Each Object3D object contains lists of references to the FaceGroup, Face and Vert objects that are used to construct a single 3D object. 
+These classes can be seen as being organised in a sort of hierarchical structure. Each Object3D object contains lists of references to the FaceGroup, Face and Vert objects that are used to construct a single 3D object. 
 
 
