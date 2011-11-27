@@ -29,9 +29,15 @@ Part I: General usage
 
 .. toctree::
    :titlesonly:
-
+   
+   user_manual_intro.rst 
+   user_manual_installation.rst 
    user_manual_view.rst  
    user_manual_files.rst
+   user_manual_posing.rst
+   user_manual_advanced_modelling.rst
+   user_manual_rendering.rst  
+   user_manual_setting.rst
 
 
 Part II: Writing plugins
