@@ -26,6 +26,19 @@ In Python documentation, there is the following convetional hierarchy:
     * -, for subsections
     * ^, for subsubsections
     * ", for paragraphs
+    
+    
+Links
+======
+
+A special case of an image that work as clickable link:
+
+::
+
+    I recommend you try |Python|_.
+
+    .. |Python| image:: /images/logo.png
+    .. _Python: http://www.python.org/ 
 
 
 

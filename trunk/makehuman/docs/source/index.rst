@@ -78,8 +78,11 @@ Part IV: The Base mesh
    dev_manual_basemesh
   
 
+Part V: MakeHuman and Blender
+=============================
+
    
-Part V: Doc Writers Guide
+Part VI: Doc Writers Guide
 =============================
 
 .. toctree::
@@ -89,7 +92,7 @@ Part V: Doc Writers Guide
    appendix_2.rst
    
    
-Part VI: Modules
+Part VII: Modules
 ==================
 
 .. toctree::
@@ -102,7 +105,17 @@ Part VI: Modules
    module_geometry3d
    module_gui3d
    module_module3d
-      
+   
+Part VIII: Licensing
+======================
+  
+.. toctree::
+   :titlesonly:
+
+   dev_manual_licensing1
+   dev_manual_licensing2
+   
+Part IX: FAQ
 
 Indices and tables
 ==================
