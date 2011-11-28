@@ -19,9 +19,9 @@ This manual is provided under an Attribution-NonCommercial-NoDerivs 3.0 Unported
 
 To extend the software with new features and write a plugins, *it'is comfortable the knowledge of python and the reading of chapter "Start from here: writing plugins"*. 
 
-The second chapter, "Application details", contains specific information about the Python engine written in C, and it's intended for developers that want to touch the core of MH only. 
+The part III, "Application details", contains specific information about the Python engine written in C, and it's intended for developers that want to touch the core of MH only. 
 
-Third chapter is a practical one, about coding style and key aspects of the development environment configuration and setup on the various supported platforms (Windows, Mac OS X and GNU/Linux). 
+The part III, also, contain coding style and key aspects of the development environment configuration and setup on the various supported platforms (Windows, Mac OS X and GNU/Linux). 
 
 
 Part I: General usage
@@ -33,9 +33,10 @@ Part I: General usage
    user_manual_intro.rst 
    user_manual_installation.rst 
    user_manual_view.rst  
+   user_manual_modelling.rst 
    user_manual_files.rst
    user_manual_posing.rst
-   user_manual_advanced_modelling.rst
+   user_manual_library.rst
    user_manual_rendering.rst  
    user_manual_setting.rst
 
@@ -66,10 +67,19 @@ Part III: Application details
    dev_manual_gui_system   
    dev_manual_opengl_notes    
    dev_manual_environment
-   dev_manual_obtain_source   
+   dev_manual_obtain_source 
+   
+Part IV: The Base mesh
+=========================
+
+.. toctree::
+   :titlesonly:
+
+   dev_manual_basemesh
+  
 
    
-Part IV: Doc Writers Guide
+Part V: Doc Writers Guide
 =============================
 
 .. toctree::
@@ -79,7 +89,7 @@ Part IV: Doc Writers Guide
    appendix_2.rst
    
    
-Part V: Modules
+Part VI: Modules
 ==================
 
 .. toctree::

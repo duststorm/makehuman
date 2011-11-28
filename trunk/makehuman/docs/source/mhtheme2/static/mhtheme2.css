@@ -396,7 +396,7 @@ div.admonition pre, div.warning pre {
 div.admonition p.admonition-title,
 div.warning p.admonition-title {    
     border-bottom: 1px solid #86989B;    
-    background-color: #d66019;
+    background-color: #ffe9e9;
 }
 
 div.warning {

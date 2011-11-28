@@ -1,9 +1,9 @@
 .. _appendix_2:
 
 
-##################################
-Appendix 1 -RestructuredTex Sintax-
-##################################
+####################################
+Appendix 2 -RestructuredTex Sintax-
+####################################
 
 
 Sections
