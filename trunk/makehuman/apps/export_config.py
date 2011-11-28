@@ -157,7 +157,7 @@ def exportConfig(human, useHair, options=None):
         fp = proxyFilePtr('mh_export.config')
 
     if useHair and human.hairObj:
-        words = human.hairObj.meshName.split('.')
+        words = human.hairObj.mesh.name.split('.')
         pfile = CProxyFile()
         pfile.set('Clothes', 2, useMhx, useObj, useDae)
         pfile.file = os.path.expanduser("./data/hairstyles/%s.mhclo" % words[0].lower())
