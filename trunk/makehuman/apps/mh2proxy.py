@@ -258,9 +258,12 @@ def readProxyFile(obj, file, evalOnLoad):
                 w0 = float(words[3])
                 w1 = float(words[4])
                 w2 = float(words[5])            
-                d0 = float(words[6]) * xScale
-                d1 = float(words[7]) * yScale
-                d2 = float(words[8]) * zScale
+                if len(words) > 6:
+                    d0 = float(words[6]) * xScale
+                    d1 = float(words[7]) * yScale
+                    d2 = float(words[8]) * zScale
+                else:
+                    (d0,d1,d2) = (0,0,0)
                 proxy.refVerts.append( (v0,v1,v2,w0,w1,w2,d0,d1,d2) )
         elif status == doVerts:
             if len(words) == 1:
