@@ -112,6 +112,10 @@ static PyMemberDef Camera_members[] =
     {"upX", T_FLOAT, offsetof(Camera, upX), 0, "The x of the up vector."},
     {"upY", T_FLOAT, offsetof(Camera, upY), 0, "The y of the up vector."},
     {"upZ", T_FLOAT, offsetof(Camera, upZ), 0, "The z of the up vector."},
+	{"left", T_FLOAT, offsetof(Camera, left), 0, "The left clipping plane."},
+	{"right", T_FLOAT, offsetof(Camera, right), 0, "The right clipping plane. If 0 defaults to window width."},
+	{"bottom", T_FLOAT, offsetof(Camera, bottom), 0, "The bottom clipping plane. If 0 defaults to window height."},
+	{"top", T_FLOAT, offsetof(Camera, top), 0, "The top clipping plane."},
     {NULL}  /* Sentinel */
 };
 
@@ -238,6 +242,10 @@ static PyObject *Camera_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
         self->upX = 0.0f;
         self->upY = 1.0f;
         self->upZ = 0.0f;
+		self->left = 0.0f;
+        self->right = 0.0f;
+        self->bottom = 0.0f;
+		self->top = 0.0f;
     }
 
     return (PyObject*)self;
@@ -546,7 +554,7 @@ static PyObject *Image_getItem(Image *self, PyObject *xy)
 	else if (self->surface->format->BytesPerPixel == 3)
 	{
 		SDL_GetRGB(*(unsigned int*)pixels, self->surface->format, &r, &g, &b);
-		return Py_BuildValue("iii", r, g, b);
+		return Py_BuildValue("iiii", r, g, b, 255);
 	}
 
 	PyErr_SetString(PyExc_RuntimeError, "unknown image type");
@@ -2120,8 +2128,10 @@ void mhCameraPosition(Camera *camera, int eye)
 
         if (camera->projection)
             gluPerspective(camera->fovAngle, (float)G.windowWidth/G.windowHeight, camera->nearPlane, camera->farPlane);
-        else
+        else if (camera->left == camera->right && camera->top == camera->bottom)
             glOrtho(0.0, G.windowWidth, G.windowHeight, 0.0, camera->nearPlane, camera->farPlane);
+		else
+			glOrtho(camera->left, camera->right, camera->bottom, camera->top, camera->nearPlane, camera->farPlane);
 
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();

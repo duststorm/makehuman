@@ -92,9 +92,10 @@ import gui3d, events3d, font3d, animation3d
 import mh2obj, mh2bvh, mh2mhx
 import human
 import guimodelling, guifiles#, guirender
-from aljabr import centroid
+from aljabr import centroid, vdist
 import algos3d
 import module3d
+from math import tan, pi
 
 class Camera(events3d.EventHandler):
 
@@ -125,6 +126,28 @@ class Camera(events3d.EventHandler):
         
     fovAngle = property(getFovAngle, setFovAngle)
     
+    def getNearPlane(self):
+    
+        return self.camera.nearPlane
+
+    def setNearPlane(self, value):
+    
+        self.camera.nearPlane = value
+        self.changed()
+        
+    nearPlane = property(getNearPlane, setNearPlane)
+    
+    def getFarPlane(self):
+    
+        return self.camera.farPlane
+
+    def setFarPlane(self, value):
+    
+        self.camera.farPlane = value
+        self.changed()
+        
+    farPlane = property(getFarPlane, setFarPlane)
+    
     def getEyeX(self):
     
         return self.camera.eyeX
@@ -154,6 +177,8 @@ class Camera(events3d.EventHandler):
     def setEyeZ(self, value):
     
         self.camera.eyeZ = value
+        if self.camera.projection == 0:
+            self.switchToOrtho();
         self.changed()
         
     eyeZ = property(getEyeZ, setEyeZ)
@@ -191,6 +216,8 @@ class Camera(events3d.EventHandler):
     def setFocusZ(self, value):
     
         self.camera.focusZ = value
+        if self.camera.projection == 0:
+            self.switchToOrtho();
         self.changed()
         
     focusZ = property(getFocusZ, setFocusZ)
@@ -235,6 +262,50 @@ class Camera(events3d.EventHandler):
     @property
     def focus(self):
         return (self.camera.upX, self.camera.upY, self.camera.upZ)
+        
+    def getLeft(self):
+    
+        return self.camera.left
+
+    def setLeft(self, value):
+    
+        self.camera.left = value
+        self.changed()
+        
+    left = property(getLeft, setLeft)
+    
+    def getRight(self):
+    
+        return self.camera.right
+
+    def setRight(self, value):
+    
+        self.camera.right = value
+        self.changed()
+        
+    right = property(getRight, setRight)
+    
+    def getBottom(self):
+    
+        return self.camera.bottom
+
+    def setBottom(self, value):
+    
+        self.camera.bottom = value
+        self.changed()
+        
+    bottom = property(getBottom, setBottom)
+    
+    def getTop(self):
+    
+        return self.camera.top
+
+    def setTop(self, value):
+    
+        self.camera.top = value
+        self.changed()
+        
+    top = property(getTop, setTop)
     
     def getStereoMode(self):
     
@@ -267,6 +338,25 @@ class Camera(events3d.EventHandler):
     
         self.callEvent('onChanged', self)
         self.changedPending = False
+        
+    def switchToOrtho(self):
+    
+        self.camera.projection = 0
+            
+        width, height = gui3d.app.getWindowSize()
+        aspect = float(width) / float(height)
+        fov = tan(self.camera.fovAngle * 0.5 * pi / 180.0)
+        y = vdist(self.eye, self.focus) * fov
+        x = y * aspect
+        
+        self.camera.left = -x
+        self.camera.right = x
+        self.camera.bottom = -y
+        self.camera.top = y
+        
+    def switchToPerspective(self):
+    
+        self.camera.projection = 0
 
 class PluginCheckBox(gui3d.CheckBox):
 

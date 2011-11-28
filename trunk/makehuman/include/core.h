@@ -165,6 +165,11 @@ extern "C"
         float upX;
         float upY;
         float upZ;
+	    float left;
+        float right;
+        float bottom;
+		float top;
+
     } Camera;
 
     typedef struct

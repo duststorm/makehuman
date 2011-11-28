@@ -39,179 +39,68 @@ def pointInRect(point, rect):
     else:
         return True
         
-class Warp(object):
+class Shader(object):
+
+    def __init__(self):
     
-    def __init__(self, src, dst):
+        pass
+        
+    def shade(self, x, y, u, v, w):
     
-        m1 = self.quadToSquare(src[0][0], src[0][1], src[1][0], src[1][1], src[2][0], src[2][1], src[3][0], src[3][1])
-        m2 = self.squareToQuad(dst[0][0], dst[0][1], dst[1][0], dst[1][1], dst[2][0], dst[2][1], dst[3][0], dst[3][1])
-        self.m = self.mult(m1, m2)
+        return (255, 255, 255, 0)
         
-    def squareToQuad(self, x0, y0, x1, y1, x2, y2, x3, y3):
+class ColorShader(Shader):
 
-        m = [0] * 9
-        
-        ax  = x0 - x1 + x2 - x3
-        ay  = y0 - y1 + y2 - y3
-
-        if ax == 0 or ay == 0:
-        
-            m[0] = x1 - x0; m[1] = y1 - y0; m[2] = 0.0
-            m[3] = x2 - x1; m[4] = y2 - y1; m[5] = 0.0
-            m[6] = x0;      m[7] = y0;      m[8] = 1.0
-        
-        else:
-        
-            ax1 = x1 - x2
-            ax2 = x3 - x2
-            ay1 = y1 - y2
-            ay2 = y3 - y2
-
-            gtop    = ax  * ay2 - ax2 * ay
-            htop    = ax1 * ay  - ax  * ay1
-            bottom  = ax1 * ay2 - ax2 * ay1
-
-            g = gtop/bottom
-            h = htop/bottom
-
-            a = x1 - x0 + g * x1
-            b = x3 - x0 + h * x3
-            c = x0
-            d = y1 - y0 + g * y1
-            e = y3 - y0 + h * y3
-            f = y0
-
-            m[0] = a; m[1] = d; m[2] = g
-            m[3] = b; m[4] = e; m[5] = h
-            m[6] = c; m[7] = f; m[8] = 1.0
-        
-        return m
-        
-    def quadToSquare(self, x0, y0, x1, y1, x2, y2, x3, y3):
+    def __init__(self, colors):
     
-        m = self.squareToQuad(x0, y0, x1, y1, x2, y2, x3, y3)
+        self.colors = colors
+        
+    def shade(self, x, y, u, v, w):
+    
+        col = [self.colors[0][i] * u + self.colors[1][i] * v + self.colors[2][i] * w for i in xrange(3)]
+        return tuple(map(int, col))
+            
+class UvShader(Shader):
 
-        return self.inverted(m)
-        
-    def inverted(self, m):
+    def __init__(self, texture, uv):
     
-        det = self.determinant(m)
-        a = self.adjoint(m)
+        self.texture = texture
+        self.width = texture.width
+        self.height = texture.height
+        self.uv = uv
         
-        return [i/det for i in a]
+    def shade(self, x, y, u, v, w):
         
-    def determinant(self, m):
-    
-        return m[0] * (m[8] * m[4] - m[7] * m[5]) -\
-               m[3] * (m[8] * m[1] - m[7] * m[2]) +\
-               m[6] * (m[5] * m[1] - m[4] * m[2])
-               
-    def adjoint(self, m):
-        
-        a = [0] * 9
-        
-        a[0] = m[4]*m[8] - m[5]*m[7]
-        a[3] = m[5]*m[6] - m[3]*m[8]
-        a[6] = m[3]*m[7] - m[4]*m[6]
-        a[1] = m[2]*m[7] - m[1]*m[8]
-        a[4] = m[0]*m[8] - m[2]*m[6]
-        a[7] = m[1]*m[6] - m[0]*m[7]
-        a[2] = m[1]*m[5] - m[2]*m[4]
-        a[5] = m[2]*m[3] - m[0]*m[5]
-        a[8] = m[0]*m[4] - m[1]*m[3]
-    
-        return a
-        
-    def mult(self, m1, m2):
-        
-        m = [0] * 9
-        
-        m[0] = m1[0]*m2[0] + m1[1]*m2[3] + m1[2]*m2[6]
-        m[1] = m1[0]*m2[1] + m1[1]*m2[4] + m1[2]*m2[7]
-        m[2] = m1[0]*m2[2] + m1[1]*m2[5] + m1[2]*m2[8]
+        x, y = [self.uv[0][i] * u + self.uv[1][i] * v + self.uv[2][i] * w for i in xrange(2)]
+        try:
+            return self.texture[int(x*self.width), int(y*self.height)]
+        except:
+            return (255, 255, 255, 255)
+            
+class UvAlphaShader(Shader):
 
-        m[3] = m1[3]*m2[0] + m1[4]*m2[3] + m1[5]*m2[6]
-        m[4] = m1[3]*m2[1] + m1[4]*m2[4] + m1[5]*m2[7]
-        m[5] = m1[3]*m2[2] + m1[4]*m2[5] + m1[5]*m2[8]
-
-        m[6] = m1[6]*m2[0] + m1[7]*m2[3] + m1[8]*m2[6]
-        m[7] = m1[6]*m2[1] + m1[7]*m2[4] + m1[8]*m2[7]
-        m[8] = m1[6]*m2[2] + m1[7]*m2[5] + m1[8]*m2[8]
-                             
-        return m
-                             
-    def warp(self, x, y):
+    def __init__(self, dst, texture, uva):
     
-        wx = self.m[0] * x + self.m[3] * y + self.m[6]
-        wy = self.m[1] * x + self.m[4] * y + self.m[7]
-        w  = self.m[2] * x + self.m[5] * y + self.m[8]
+        self.dst = dst
+        self.texture = texture
+        self.width = texture.width
+        self.height = texture.height
+        self.uva = uva
         
-        return (wx/w,wy/w)
-     
+    def shade(self, x, y, u, v, w):
+        
+        dst = self.dst[x, y]
+        x, y, a = [self.uva[0][i] * u + self.uva[1][i] * v + self.uva[2][i] * w for i in xrange(3)]
+        try:
+            src = self.texture[int(x*self.width), int(y*self.height)]
+            return tuple([int(a * (src[i] - dst[i]) + dst[i]) for i in xrange(4)])
+        except:
+            return dst
+
 # Not really fast since it checks every pixel in the bounding rectangle
 # http://www.devmaster.net/codespotlight/show.php?id=17
+def RasterizeTriangle(dst, p0, p1, p2, shader):
 
-def RasterizeTriangle(warp, src, dst, p0, p1, p2):
-    
-    y1 = round(p0[1])
-    y2 = round(p1[1])
-    y3 = round(p2[1])
-
-    x1 = round(p0[0])
-    x2 = round(p1[0])
-    x3 = round(p2[0])
-
-    dx12 = x1 - x2
-    dx23 = x2 - x3
-    dx31 = x3 - x1
-
-    dy12 = y1 - y2
-    dy23 = y2 - y3
-    dy31 = y3 - y1
-    
-    minx = min([x1, x2, x3])
-    maxx = max([x1, x2, x3])
-    miny = min([y1, y2, y3])
-    maxy = max([y1, y2, y3])
-    
-    c1 = dy12 * x1 - dx12 * y1
-    c2 = dy23 * x2 - dx23 * y2
-    c3 = dy31 * x3 - dx31 * y3
-    
-    if (dy12 < 0 or (dy12 == 0 and dx12 > 0)): c1+=1
-    if (dy23 < 0 or (dy23 == 0 and dx23 > 0)): c2+=1
-    if (dy31 < 0 or (dy31 == 0 and dx31 > 0)): c3+=1
-
-    cy1 = c1 + dx12 * miny - dy12 * minx
-    cy2 = c2 + dx23 * miny - dy23 * minx
-    cy3 = c3 + dx31 * miny - dy31 * minx
-    
-    for y in xrange(int(miny), int(maxy)):
-    
-        cx1 = cy1
-        cx2 = cy2
-        cx3 = cy3
-        
-        for x in xrange(int(minx), int(maxx)):
-
-            if cx1 > 0 and cx2 > 0 and cx3 > 0:
-
-                dx, dy = warp.warp(x, y)
-                try:
-                    dst[x, y] = src[int(dx), int(dy)]
-                except:
-                    pass #dst[int(x), int(y)] = (255, 0, 0)
-
-            cx1 -= dy12
-            cx2 -= dy23
-            cx3 -= dy31
-
-        cy1 += dx12
-        cy2 += dx23
-        cy3 += dx31
-        
-def RasterizeColorTriangle(dst, p0, p1, p2, col0, col1, col2):
-    
     y1 = round(p0[1])
     y2 = round(p1[1])
     y3 = round(p2[1])
@@ -256,12 +145,10 @@ def RasterizeColorTriangle(dst, p0, p1, p2, col0, col1, col2):
             if cx1 > 0 and cx2 > 0 and cx3 > 0:
 
                 d = - dy23 * dx31 + dx23 * dy31
-                a = (dy23 * (x - x3) - dx23 * (y - y3)) / d
-                b = (dy31 * (x - x3) - dx31 * (y - y3)) / d
-                c = 1.0 - a - b
-                col = [col0[i] * a + col1[i] * b + col2[i] * c for i in xrange(3)]
-                col = map(int, col)
-                dst[x, y] = tuple(col)
+                u = (dy23 * (x - x3) - dx23 * (y - y3)) / d
+                v = (dy31 * (x - x3) - dx31 * (y - y3)) / d
+                w = 1.0 - u - v
+                dst[x, y] = shader.shade(x, y, u, v, w)
 
             cx1 -= dy12
             cx2 -= dy23
@@ -270,122 +157,6 @@ def RasterizeColorTriangle(dst, p0, p1, p2, col0, col1, col2):
         cy1 += dx12
         cy2 += dx23
         cy3 += dx31
-       
-"""
-def convolveAndTranspose(kernel, src, dst):
-
-        cols = len(kernel);
-        cols2 = cols/2;
-        
-        dstW = dst.width
-        dstH = dst.height
-
-        for y in xrange(dstH):
-
-            for x in xrange(dstW):
-
-                pixel = [0] * 4
-                
-                for index, col in enumerate(xrange(x-cols2, x+cols2+1)):
-                
-                    f = kernel[index];
-
-                    if (f != 0):
-                        
-                        if col < 0:
-                            col = 0
-                        elif col >= dstW:
-                            col = dstW-1
-
-                        color = src[col, y];
-                        
-                        pixel = map(lambda p, c: p + f * c, pixel, color)
-
-                pixel = map(lambda c: max(0, min(255, int(c))), pixel)
-                dst[y, x] = tuple(pixel)
- 
-def gaussianBlur(img, radius):
-
-    tmp = mh.Image(width=img.width, height=img.height)
-    
-    radius = float(radius)
-
-    r = int(ceil(radius))
-    rows = r * 2 + 1;
-    kernel = [0.0] * rows
-    sigma = radius / 3
-    sigma22 = 2 * sigma * sigma
-    sigmaPi2 = 2 * pi * sigma
-    sqrtSigmaPi2 = sqrt(sigmaPi2)
-    radius2 = radius * radius
-    total = 0.0;
-    for index, row in  enumerate(xrange(-r, r+1)):
-        distance = row * row;
-        if distance > radius2:
-            kernel[index] = 0
-        else:
-            kernel[index] = exp(-(distance) / sigma22) / sqrtSigmaPi2
-        total += kernel[index]
-
-    map(lambda x: x / total, kernel)
-
-    print kernel
-    convolveAndTranspose(kernel, img, tmp)
-    convolveAndTranspose(kernel, tmp, img)
-
-def verticalSample(img, x, y, radius):
-       
-    sum = [0, 0, 0, 0]
-    count = 0
-    height = img.height
-
-    for yy in xrange(y-radius, y+radius+1):
-       
-        if yy > 0 and yy < height:
-            color = img[x, yy]
-            sum[0] += color[0]
-            sum[1] += color[1]
-            sum[2] += color[2]
-            sum[3] += color[3]
-            count = count+1
-
-    return (sum[0]/count, sum[1]/count, sum[2]/count, sum[3]/count)
-    
-def horizontalSample(img, x, y, radius):
-   
-    sum = [0, 0, 0, 0]
-    count = 0
-    width = img.width
-
-    for xx in xrange(x-radius, x+radius+1):
-       
-        if xx > 0 and xx < width:
-            color = img[xx, y]
-            sum[0] += color[0]
-            sum[1] += color[1]
-            sum[2] += color[2]
-            sum[3] += color[3]
-            count = count+1
-
-    return (sum[0]/count, sum[1]/count, sum[2]/count, sum[3]/count)
-        
-def blur(img, radius):
-
-    tmp = mh.Image(width=img.width, height=img.height)
-    width = img.width
-    height = img.height
-    
-    # Vertical blur
-    for y in xrange(height):
-        for x in xrange(width):
-        
-           tmp[x, y] = verticalSample(img, x, y, radius)
-           
-    for y in xrange(height):
-        for x in xrange(width):
-        
-           img[x, y] = horizontalSample(tmp, x, y, radius)
-"""
 
 class BackgroundTaskView(gui3d.TaskView):
 
@@ -465,6 +236,10 @@ class BackgroundTaskView(gui3d.TaskView):
 
             bg.show()
             self.backgroundImageToggle.setSelected(True)
+            
+            # Switch to orthogonal view
+            gui3d.app.modelCamera.switchToOrtho()
+            
             gui3d.app.switchCategory('Modelling')
             gui3d.app.switchTask('Background')
             gui3d.app.redraw()
@@ -539,14 +314,17 @@ class BackgroundTaskView(gui3d.TaskView):
                 if any([pointInRect(p, r) for p in src]):
                 
                     if vdot(f.no, camera) >= 0:
+                    
+                        for i, v in enumerate(f.verts):
+                            src[i][2] = max(0.0, vdot(v.no, camera))
                 
-                        xscale = srcW / (rightBottom[0] - leftTop[0])
-                        yscale = srcH / (rightBottom[1] - leftTop[1])
-                        src = [((v[0]-leftTop[0])*xscale, (v[1]-leftTop[1])*yscale) for v in src]
-                        dst = [(mesh.uvValues[i][0]*dstW, dstH-(mesh.uvValues[i][1]*dstH)) for i in f.uv]
-                        w = Warp(dst, src)
-                        RasterizeTriangle(w, srcImg, dstImg, *dst[:3])
-                        RasterizeTriangle(w, srcImg, dstImg, dst[2], dst[3], dst[0])
+                        co = [(mesh.uvValues[i][0]*dstW, dstH-(mesh.uvValues[i][1]*dstH)) for i in f.uv]
+                        uva = [((v[0]-leftTop[0])/(rightBottom[0] - leftTop[0]), (v[1]-leftTop[1])/(rightBottom[1] - leftTop[1]), v[2]) for v in src]
+                        #c = [[v[2]*255]*3 + [255] for v in src]
+                        #RasterizeTriangle(dstImg, co[0], co[1], co[2], ColorShader(c[:3]))
+                        #RasterizeTriangle(dstImg, co[2], co[3], co[0], ColorShader((c[2], c[3], c[0])))
+                        RasterizeTriangle(dstImg, co[0], co[1], co[2], UvAlphaShader(dstImg, srcImg, (uva[:3])))
+                        RasterizeTriangle(dstImg, co[2], co[3], co[0], UvAlphaShader(dstImg, srcImg, ((uva[2], uva[3], uva[0]))))
                     
         dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'projection.tga'))
         gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'projection.tga'))
@@ -577,10 +355,10 @@ class BackgroundTaskView(gui3d.TaskView):
 
                 co = [(mesh.uvValues[i][0]*dstW, dstH-(mesh.uvValues[i][1]*dstH)) for i in f.uv]
                 c = [v.color for v in f.verts]
-                RasterizeColorTriangle(dstImg, co[0], co[1], co[2], c[0], c[1], c[2])
-                RasterizeColorTriangle(dstImg, co[2], co[3], co[0], c[2], c[3], c[0])
+                RasterizeTriangle(dstImg, co[0], co[1], co[2], ColorShader(c[:3]))
+                RasterizeTriangle(dstImg, co[2], co[3], co[0], ColorShader((c[2], c[3], c[0])))
         
-        dstImg.resize(128, 128);
+        #dstImg.resize(128, 128);
         
         dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.tga'))
         gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.tga'))
