@@ -5,8 +5,9 @@
 
 .. _developers_environment:
 
+##############################
 The C Development Environment
-==============================
+##############################
 
 .. warning::
 
@@ -23,8 +24,9 @@ You do need a development environment to:
 
 To participate in the development of the MakeHuman code as a MakeHuman Team member you will also need to familiarise yourself with the Coding standard and Build Processes contained within this document.  The 'C' compiler is platform dependent. The following are recommended for MakeHuman development:
 
+************************************
 Windows 'C' Development Environment
-------------------------------------
+************************************
 
 .. note::
 
@@ -36,7 +38,7 @@ The supported environments for MakeHuman 'C' code development are MinGW and Micr
 * A better result is obtained using Visual C++ (see section Mingw vs. Visual C. below). Actually there is not a VC project file in svn, but it will be added before the release 1.0 final.
 
 Windows Visual C++ 
-+++++++++++++++++++
+====================
 
     Get the following files:
         Python 2.6 (headers + python26.lib + python26.dll)
@@ -48,7 +50,7 @@ Windows Visual C++
     Build
 
 Windows gcc
-++++++++++++
+=============
 
 * Python 2.6 (headers + libpython26.a + python26.dll)
 * SDL 1.2.13 (headers + libSDLmain.a + libSDL.dll.a + SDL.dll)
@@ -58,7 +60,7 @@ The MakeHuman application uses functions from the SDL_image libraries which need
 The DLL files are available for different platforms from http://www.libsdl.org/projects/SDL_image/release/. For example, a zip archive is available for Windows called : http://www.libsdl.org/projects/SDL_image/release/SDL_image-1.2.7-win32.zip. Just copy all of the DLL's from the archive into a directory in your build path before you build the MakeHuman application.
 
 MinGW vs Windows Visual C++ 
------------------------------
+============================
 
 An SDL program needs to be linked to a static library called SDLmain, which provides the main/WinMain entry of your program. The original main entry is renamed using a #define when including SDL. The visual C++ version of this SDLMain called SDLmain.lib is compiled using --disable-stdio-redirect while the MinGW version called libSDLmain.a seems to be compiled without this flag. This makes the MinGW version redirect all output to two files, stdout.txt and stderr.txt. Python doesn't like this, and output from python will fail in this case. A workaround is to redirect Python's output itself to file before it does any output:
 
@@ -85,10 +87,10 @@ The real cause why Python fails is still to be examined.
 Another workaround is rebuilding SDL for MinGW using the --disable-stdio-redirect flag.
 
 Linux 'C' Development Environment
-----------------------------------
+==================================
 
 Linux gcc
-++++++++++    
+-------------  
     
 You need followin packages:
 
@@ -113,7 +115,7 @@ A draft SConstruct build script is provided in the current MakeHuman SVN build d
 
 
 Mac OS-X 'C' Development Environment
--------------------------------------
+=====================================
 
 The Project source files stored under SVN contains a project file for Apples (free) Developing environment named Xcode.
 
@@ -136,8 +138,9 @@ NOTE: Since the latest version of MakeHuman uses Python 2.5 or above, MakeHuman 
 If you are using a different Interactive Development Environment (IDE) then you will need to use a text editor to adjust the makefile parameter file before launching the shell script.
 In Addition the build system will use some custom Open Source Frameworks which are not maintained by the MakeHuman team. However the SVN contains these Frameworks so you don't have to bother to explicit download them.
 
+************************************
 The Python Development Environment
-====================================
+************************************
 
 The vast majority of the functionality delivered by MakeHuman is written in Python which has been used to develop GUI components, service functions and even certain processor intensive functions, such as subdivision. The rationale for developing in Python is that it results in highly human readable code, it is largely free of 'silent crashes', it is easier to find coders to contribute to the development and is far easier to debug than 'C'. The price we have to pay is with the performance of some processor intensive algorithms.
 

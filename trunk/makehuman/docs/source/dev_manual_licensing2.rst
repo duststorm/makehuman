@@ -4,8 +4,9 @@
 Mesh Model, Documentation Licensing
 ####################################
 
+*******************
 The MakeHuman Mesh
-===================
+*******************
 
 The MakeHuman application uses a 3D mesh to represent human figures. This mesh was developed in a number of successive iterations (see The Humanoid Mesh) over a number of years to support a diverse range of physiological variants and pose-based deformations. The application uses a mesh with a standard topology (how the vertices, edges and faces relate to one another), which is manipulated by applying standard morph targets (mesh deformations).
 
@@ -19,8 +20,9 @@ You own any 2D images that you create using exported MakeHuman mesh data and any
 
 THE MESH IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE MESH OR THE USE OR OTHER DEALINGS IN THE MESH.
 
+******************
 Documentation
-================
+******************
 
 In general the documentation (including the text on this Wiki) produced by the MakeHuman Team is Copyright© 2001-2009 by the MakeHuman Team (makehuman.org) who grant you permission to use and redistribute under the This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License. 
 
@@ -30,8 +32,9 @@ In general the documentation (including the text on this Wiki) produced by the M
     
     The Documentation Archive on this Wiki may also contain documents or links to documents that were or were not produced by the MakeHuman Team and/or may contain their own separate Copyright© notices, which may differ from this generic documentation licensing statement. Any licensing statements within individual documents take precedence over this licensing statement. 
 
+***************************************************************
 The essentials of the MakeHuman license for content creators
-===============================================================
+***************************************************************
 
 The text below describes a way to setup a commercial usage scenario for Artwork created with MakeHuman or based on MakeHuman assets.
 

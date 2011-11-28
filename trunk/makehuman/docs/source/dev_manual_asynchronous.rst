@@ -5,8 +5,9 @@
 
 .. _Asynchronous:
 
+##################################
 Asynchronous calls and animation
-================================
+##################################
 
 When doing lengthy operations it is important not to block the GUI from redrawing.
 Since everything runs in one thread, it is easy to block the event loop in your plugin.

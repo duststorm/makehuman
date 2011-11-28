@@ -81,6 +81,10 @@ Part IV: The Base mesh
 Part V: MakeHuman and Blender
 =============================
 
+.. toctree::
+   :titlesonly:
+   
+   user_manual_export_mhx.rst
    
 Part VI: Doc Writers Guide
 =============================

@@ -4,8 +4,9 @@
 
 .. _the_camera:
 
+#############
 The camera
-===========
+#############
 
 When your plugin allows editing a certain part of the model, it’s often good to focus the camera on that region. There are two camera’s used in MakeHuman, accessible from the application class as modelCamera and guiCamera. 
 

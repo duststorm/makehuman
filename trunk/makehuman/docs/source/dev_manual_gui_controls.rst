@@ -4,8 +4,9 @@
    
 .. _gui_controls:
 
+###############
 GUI controls
-============
+###############
 
 Whether you are writing an exporter, modeling feature or mesh algorithm, sooner or later you will need to add some controls in order to interact with the user. MakeHuman has a lot of the usual controls which you find in in other GUI toolkits:
 
@@ -17,9 +18,10 @@ Whether you are writing an exporter, modeling feature or mesh algorithm, sooner 
 * TextEdit: A one line text field.
 * TextView: A label.
 * GroupBox: Used to group a few controls together under a title.
-    
+  
+********************    
 Layout guidelines
-=================
+********************
 
 To have a consistent look, it is important that all tasks use the same layout practices. GroupBoxes on the left side have x=10. The first GroupBox starts at y=80. Controls start
 25 pixels lower, and after the last control there are 6 extra pixels (besides the 4 pixels spacing from the last control). So the total height of a GroupBox is 25+content+6. Sliders start at x=10 and are 128 pixels wide, so there is no border left or right.

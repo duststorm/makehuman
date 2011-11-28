@@ -3,8 +3,9 @@
 .. highlight:: python
    :linenothreshold: 5
 
+########################
 Application structure
-======================
+########################
 
 
 MakeHuman is constructed using two main application components:
@@ -26,17 +27,17 @@ The application is written in a layered fashion as detailed below.
    
 The integration layer consists of a set of C functions enabling events to be passed up to Python code and a dynamically generated Python module enabling C functions to be called from the Python code.
 
-
+********************
 C data structure
------------------
+********************
 
 The principal data structures used by the C code are contained within the 'G.' global structure. This global data structure is defined in the file 'core.h' in the 'include' directory within SVN. Certain state information is held directly in 'G.', such as camera settings, viewport dimensions etc. 
 
 Information required to define the 3D objects, such as the humanoid figure and the GUI controls is nested within the 'G.world.' data structure, which is a python list of object3D data structures. Each object3D data structure contains the information needed to define a single object to OpenGL (vertices, normals, UV coordinates, colors etc.). 
 
-
+*************************
 Python Data Structures
------------------------
+*************************
 
 The data used to populate the C data structures is maintained through Python code and a copy of that data is held in Python data structures. Python application components load the 3D object data required to populate the corresponding C data structures from object files. 
 

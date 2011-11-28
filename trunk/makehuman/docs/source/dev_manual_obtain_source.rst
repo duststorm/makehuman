@@ -5,13 +5,15 @@
 
 .. _obtain_source:
 
+#########################
 Obtain MakeHuman Source
-=========================
+#########################
 
 Anyone can get a copy of the MakeHuman source deck by pointing an SVN client application at the repository.
 
+*************************
 SubVersion (SVN) Client
-------------------------
+*************************
 
 To be able to participate fully as a MakeHuman developer you will need an SVN client application. This will enable you to take a local copy of the MakeHuman files, regularly update your local copy from the SVN repository and (if you are member of MHteam) commit changes that you have made (and properly tested) back to the SVN repository. SVN update permissions are controlled by the MakeHuman development team, so you'll need an administrator to authorise you with write access.
 
@@ -22,11 +24,13 @@ Other SVN clients provide a comparable mechanism for checking out a copy of the 
 
 http://makehuman.googlecode.com/svn/trunk/
 
+*************
 Coding Style
-=============
+*************
+
 
 Python
--------
+========
 
 Python code must be written following the rules of PEP 8 and PEP 12.
 
@@ -40,12 +44,13 @@ Getters and setters waste CPU time, but more important, they waste programmer ti
 About the naming style: we use the "mixedCase", as describes in pep 008. So we write "makeHuman" instead, for example, "make_human". Of course, class names must be always capitalised.
 
 C
---
+===
 
 C code must be formatted using Astyle software, from http://astyle.sourceforge.net/ (ANSI style).
 
+***************
 Coding Rules
-=============
+***************
 
 * Indenting (astyle options for C).
 * Follow the established MakeHuman naming conventions.
@@ -60,17 +65,18 @@ The openGL core is entirely contained within the file glmodule.c and ad heres to
 * complex patterns are avoided
 * the C coding is kept stylistically as simple and readable as possible
 
+***********
 SVN usage
-===========
+***********
 
 * Test all changes before submitting to the repository. As an absolute minimum make sure your changes won't break the build for other developers.
 * Commit changes as soon as possible so that other developers aren't developing against out of date code.
 * Ask for permission before writing into another persons repository. SVN write permission doesn't give you the right to write without bounds!
 * Only insert files in SVN that aren't available through another place. 
 
-
+************
 Bugreports
-===========
+************
 
 Where to report bugs?:
 Check existing bug reports before submitting your own to avoid duplication. If you have additional information add a comment. Issues and bugs have to be submitted at http://code.google.com/p/makehuman/issues/list.

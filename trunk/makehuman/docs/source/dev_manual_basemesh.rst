@@ -3,9 +3,9 @@
 .. highlight:: python
    :linenothreshold: 5
 
-
+##############################################################
 Evolution Towards a Universal Model topology: the HoMunculus
-=============================================================
+##############################################################
 
 The principal aim of the MakeHuman project is to develop an Open Source application capable of realistically modelling a very wide variety of human anatomical forms in the full range of natural human poses from a single, universal mesh.
 

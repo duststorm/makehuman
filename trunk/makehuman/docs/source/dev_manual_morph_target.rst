@@ -4,8 +4,9 @@
 
 .. _morph_targets:
 
+##############
 Morph targets
-==============
+##############
 
 Whatever your plugin does, there’s a big chance that it will modify the model. As many of you probably know, MakeHuman doesn’t work mathematically or procedural, but artistically. This means that you don’t just drag vertices when moving a part of the body, but you actually apply a morph made by an artist. 
 

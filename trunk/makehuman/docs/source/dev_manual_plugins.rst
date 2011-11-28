@@ -3,14 +3,15 @@
 .. highlight:: python
    :linenothreshold: 5
 
-************************
+#########################
 Makehuman plugin system
-************************
+#########################
 
 .. _plugins:
 
+**********
 Plugins
-=========
+**********
 
 
 Makehuman has a simple plugin framework which makes it easy to add and remove features. At startup, MakeHuman now looks for .py files in the plugins folder which are not starting with an underscore (which makes it easier to disable unwanted plugins).
@@ -24,8 +25,9 @@ The rules for plugins are very simple:
 
 The reason a plugin cannot import other plugins is that it would make it difficult to know which files belong to which plugin. We still need to define a convention for shared files beyond the core MakeHuman files. To get started look at example.py or any of the other plugins to see how you can create your own feature in MakeHuman.
 
+****
 GUI
-====
+****
 
 The GUI in MakeHuman is still far from finished. Since the first alpha there have been many changes already and many other will come. This is because when features are added or modified, we can run out of space, or start to see things differently. 
 

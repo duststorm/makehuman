@@ -4,8 +4,9 @@
 
 .. _undoredo:
 
+##########
 Undo-redo
-=========
+##########
 
 
 One of the first features written was undoredo. Having this from the start saves us a lot of time later as we add this functionality to each kind of model modification immediately. It is important that every modification is undoable, since just one undo able modification would leave the user without the possibility to undo anything. So it’s crucial that if you write a plugin which modifies the model, you also make undo work. 
@@ -38,8 +39,9 @@ If you want to make your own undoredo buttons, you can use app.undo and app.redo
 
 The postAction is a handy way to specify a method to keep your GUI in sync with the changes. In this case we update the color control to show the correct color when the user chooses to undo or redo the hair color change.
 
+********
 Meshes
-======
+********
 
 
 When writing exporters, subdivision or polygon reducing algorithms it can be useful to know how the mesh is stored in Python (the C side has a different compact but less convenient representation). 
