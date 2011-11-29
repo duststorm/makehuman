@@ -240,6 +240,7 @@ class BackgroundTaskView(gui3d.TaskView):
             # Switch to orthogonal view
             gui3d.app.modelCamera.switchToOrtho()
             
+            
             gui3d.app.switchCategory('Modelling')
             gui3d.app.switchTask('Background')
             gui3d.app.redraw()
@@ -313,7 +314,10 @@ class BackgroundTaskView(gui3d.TaskView):
                 
                 if any([pointInRect(p, r) for p in src]):
                 
-                    if vdot(f.no, camera) >= 0:
+                    for i, v in enumerate(f.verts):
+                        src[i][2] = max(0.0, vdot(v.no, camera))
+                
+                    if any([v[2] >= 0.0 for v in src]):
                     
                         for i, v in enumerate(f.verts):
                             src[i][2] = max(0.0, vdot(v.no, camera))
