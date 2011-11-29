@@ -86,6 +86,8 @@ Part V: MakeHuman and Blender
    
    user_manual_export_mhx.rst
    user_manual_import_mhx_249.rst
+   user_manual_import_mhx_250.rst
+   user_manual_cage_and_mesh-deform.rst
    
 Part VI: Doc Writers Guide
 =============================
