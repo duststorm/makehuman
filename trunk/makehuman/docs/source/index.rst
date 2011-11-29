@@ -85,6 +85,7 @@ Part V: MakeHuman and Blender
    :titlesonly:
    
    user_manual_export_mhx.rst
+   user_manual_import_mhx_249.rst
    
 Part VI: Doc Writers Guide
 =============================
