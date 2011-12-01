@@ -39,6 +39,7 @@ Part I: General usage
    user_manual_library.rst
    user_manual_rendering.rst  
    user_manual_setting.rst
+   user_manual_faq.rst
 
 
 Part II: Writing plugins
