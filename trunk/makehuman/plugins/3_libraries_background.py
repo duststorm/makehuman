@@ -231,6 +231,8 @@ class BackgroundTaskView(gui3d.TaskView):
             bg.mesh.resize(self.texture.width, self.texture.height)
             self.backgroundWidth = self.texture.width
             self.backgroundHeight = self.texture.height
+            self.originalWidth = self.texture.width
+            self.originalHeight = self.texture.height
 
             self.fixateBackground()
 
@@ -324,9 +326,6 @@ class BackgroundTaskView(gui3d.TaskView):
                 
                         co = [(mesh.uvValues[i][0]*dstW, dstH-(mesh.uvValues[i][1]*dstH)) for i in f.uv]
                         uva = [((v[0]-leftTop[0])/(rightBottom[0] - leftTop[0]), (v[1]-leftTop[1])/(rightBottom[1] - leftTop[1]), v[2]) for v in src]
-                        #c = [[v[2]*255]*3 + [255] for v in src]
-                        #RasterizeTriangle(dstImg, co[0], co[1], co[2], ColorShader(c[:3]))
-                        #RasterizeTriangle(dstImg, co[2], co[3], co[0], ColorShader((c[2], c[3], c[0])))
                         RasterizeTriangle(dstImg, co[0], co[1], co[2], UvAlphaShader(dstImg, srcImg, (uva[:3])))
                         RasterizeTriangle(dstImg, co[2], co[3], co[0], UvAlphaShader(dstImg, srcImg, ((uva[2], uva[3], uva[0]))))
                     
@@ -472,11 +471,11 @@ class settingsTaskView(gui3d.TaskView) :
                 taskview.fixateBackground()
             elif event.button == events3d.SDL_BUTTON_RIGHT_MASK:
                 if abs(event.dx) > abs(event.dy):
-                    taskview.backgroundHeight = taskview.backgroundHeight * (taskview.backgroundWidth + event.dx) / taskview.backgroundWidth
                     taskview.backgroundWidth += event.dx
+                    taskview.backgroundHeight = taskview.originalHeight * taskview.backgroundWidth / taskview.originalWidth
                 else:
-                    taskview.backgroundWidth = taskview.backgroundWidth * (taskview.backgroundHeight + event.dy) / taskview.backgroundHeight
                     taskview.backgroundHeight += event.dy
+                    taskview.backgroundWidth = taskview.originalWidth * taskview.backgroundHeight / taskview.originalHeight
                 self.backgroundImage.mesh.resize(taskview.backgroundWidth, taskview.backgroundHeight)
                 taskview.fixateBackground()
                 
