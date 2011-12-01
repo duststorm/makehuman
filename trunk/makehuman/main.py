@@ -342,6 +342,8 @@ class Camera(events3d.EventHandler):
     def switchToOrtho(self):
     
         self.camera.projection = 0
+        
+        self.camera.nearPlane = 0.001
             
         width, height = gui3d.app.getWindowSize()
         aspect = float(width) / float(height)
@@ -353,6 +355,8 @@ class Camera(events3d.EventHandler):
         self.camera.right = x
         self.camera.bottom = -y
         self.camera.top = y
+        
+        self.camera.nearPlane = -100.0
         
     def switchToPerspective(self):
     
