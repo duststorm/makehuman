@@ -105,7 +105,7 @@ class CProxy:
         s0 = getScale(self.xScale, verts, 0)
         s1 = getScale(self.yScale, verts, 2)
         s2 = getScale(self.zScale, verts, 1)
-        print("Scales", s0, s1, s2)
+        #print("Scales", s0, s1, s2)
         for n in range(rlen):
             vert = verts[n+first]
             refVert = self.refVerts[n]
@@ -122,6 +122,7 @@ class CProxy:
                 v0 = verts[refVert]
                 vert.co = v0.co
                 bvert[n+first].select = bverts[rv0].select
+        return
 #
 #    readProxyFile(filepath):
 #
@@ -422,7 +423,6 @@ def loadTarget(filepath, context):
     ob["MakeTarget"] = "Target"
     ob["FilePath"] = realpath
     ob["SelectedOnly"] = False
-    print("Target loaded")
     return
 
 
@@ -439,6 +439,7 @@ class VIEW3D_OT_LoadTargetButton(bpy.types.Operator):
 
     def execute(self, context):
         loadTarget(self.properties.filepath, context)
+        print("Target loaded")
         return {'FINISHED'}
 
     def invoke(self, context, event):
@@ -501,7 +502,6 @@ def doSaveTarget(ob, filepath):
             fp.write("%d %.6f %.6f %.6f\n" % (n, vec[0], vec[2], -vec[1]))
     fp.close()    
     ob["FilePath"] = filepath
-    print("Target saved")
     return
                             
 class VIEW3D_OT_SaveTargetButton(bpy.types.Operator):
@@ -510,6 +510,7 @@ class VIEW3D_OT_SaveTargetButton(bpy.types.Operator):
 
     def execute(self, context):
         saveTarget(context)
+        print("Target saved")
         return{'FINISHED'}            
 
 class VIEW3D_OT_SaveasTargetButton(bpy.types.Operator):
@@ -525,6 +526,7 @@ class VIEW3D_OT_SaveasTargetButton(bpy.types.Operator):
 
     def execute(self, context):
         doSaveTarget(context.object, self.properties.filepath)
+        print("Target saved")
         return {'FINISHED'}
 
     def invoke(self, context, event):
@@ -540,6 +542,50 @@ class VIEW3D_OT_SkipSaveButton(bpy.types.Operator):
         print("Target not saved")
         return{'FINISHED'}            
 
+#----------------------------------------------------------
+#   batch
+#----------------------------------------------------------
+
+def batchFixTargets(context, folder):
+    scn = context.scene
+    if isSaving(scn):
+        scn["Saving"] = False
+    else:
+        scn["Saving"] = True
+        return    
+    for fname in os.listdir(folder):
+        (root, ext) = os.path.splitext(fname)
+        file = os.path.join(folder, fname)        
+        if os.path.isfile(file) and ext == ".target":
+            print(file)            
+            loadTarget(file, context)        
+            fitTarget(context)
+            doSaveTarget(context.object, file)
+            bpy.ops.object.mode_set(mode='OBJECT')
+            bpy.ops.object.shape_key_remove()            
+        elif os.path.isdir(file):
+            batchFixTargets(context, file)
+    return            
+            
+class VIEW3D_OT_BatchFixButton(bpy.types.Operator):
+    bl_idname = "mh.batch_fix"
+    bl_label = "Batch fix targets"
+
+    def execute(self, context):
+        folder = os.path.expanduser("/home/svn/makehuman/data")
+        batchFixTargets(context, folder)
+        print("All targets fixed")
+        return{'FINISHED'}            
+
+class VIEW3D_OT_SkipBatchButton(bpy.types.Operator):
+    bl_idname = "mh.skip_batch"
+    bl_label = "No"
+
+    def execute(self, context):
+        context.scene["Saving"] = False
+        print("Batch fitting discarded")
+        return{'FINISHED'}            
+        
 #----------------------------------------------------------
 #   fitTarget(context):
 #----------------------------------------------------------
@@ -559,7 +605,7 @@ def fitTarget(context):
         else:
             raise NameError("Object %s has no associated mhclo file. Cannot fit" % ob.name)
             return
-    print(theProxy)
+    #print(theProxy)
     theProxy.update(ob.active_shape_key.data, ob.data.vertices)
     return
 
@@ -709,6 +755,7 @@ class MakeTargetPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         ob = context.object
+        scn = context.scene
         if isSaving(ob):
             layout.label("Overwrite target file?")
             layout.operator("mh.save_target", text="Yes") 
@@ -719,6 +766,11 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.operator("mh.discard_target", text="Yes") 
             layout.operator("mh.skip_discard")
             return            
+        if isSaving(scn):
+            layout.label("Really batch fix targets?")
+            layout.operator("mh.batch_fix", text="Yes")
+            layout.operator("mh.skip_batch")
+            return
         if isBaseOrTarget(ob):
             layout.operator("mh.import_base_mhclo", text="Reimport base mhclo").delete = True
             layout.operator("mh.import_base_obj", text="Reimport base obj").delete = True
@@ -727,7 +779,8 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.operator("mh.import_base_obj", text="Import base obj").delete = False
         if isBase(ob):
             layout.operator("mh.new_target")
-            layout.operator("mh.load_target")
+            layout.operator("mh.load_target")            
+            layout.operator("mh.batch_fix")
         elif isTarget(ob):
             layout.prop(ob, "show_only_shape_key")
             layout.prop(ob.active_shape_key, "value")

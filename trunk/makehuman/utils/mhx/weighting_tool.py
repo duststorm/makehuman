@@ -778,6 +778,127 @@ class VIEW3D_OT_ListVertPairsButton(bpy.types.Operator):
         return{'FINISHED'}    
                    
 #
+#
+#
+
+
+def joinMeshes(context):
+    scn = context.scene
+    base = context.object
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+    clothes = []
+    for ob in context.selected_objects:
+        if ob != base and ob.type == 'MESH':
+            clothes.append(ob)
+            scn.objects.active = ob            
+            bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+    print("Joining %s to %s" % (clothes, base))            
+
+    verts = []
+    faces = []    
+    texfaces = []
+    v0 = appendStuff(base, 0, verts, faces, texfaces)
+    for clo in clothes:
+        v0 = appendStuff(clo, v0, verts, faces, texfaces)
+    me = bpy.data.meshes.new("NewBase")
+    me.from_pydata(verts, [], faces)
+
+    uvtex = me.uv_textures.new(name = "UVTex")
+    for n,tf in enumerate(texfaces):
+        print(n, tf)
+        uvtex.data[n].uv = tf        
+    ob = bpy.data.objects.new("NewBase", me)
+    scn.objects.link(ob)
+    scn.objects.active = ob
+    print("Meshes joined")
+    
+    
+    return
+             
+def appendStuff(ob, v0, verts, faces, texfaces):                
+    for v in ob.data.vertices:
+        verts.append(v.co)
+    for f in ob.data.faces:
+        face = []
+        for vn in f.vertices:
+            face.append(vn + v0)
+        faces.append(face)
+    v0 += len(ob.data.vertices)    
+    
+    if ob.data.uv_textures:
+        uvtex = ob.data.uv_textures[0]
+        for f in ob.data.faces:
+            tf = uvtex.data[f.index].uv
+            texfaces.append(tf)
+    else:
+        x0 = 0.99
+        y0 = 0.99
+        x1 = 1.0
+        y1 = 1.0
+        for f in ob.data.faces:
+            tf = ((x0,y0),(x0,y1),(x1,y0),(x1,y1))
+            texfaces.append(tf)                
+    print("Done %s %d verts" % (ob.name, v0))
+    return v0
+
+class VIEW3D_OT_JoinMeshesButton(bpy.types.Operator):
+    bl_idname = "mhw.join_meshes"
+    bl_label = "Join meshes"
+
+    def execute(self, context):
+        joinMeshes(context)
+        return{'FINISHED'}    
+                 
+#                 
+#   fixBaseFile():
+#
+
+def fixBaseFile():
+    folder = "C:/home/svn/makehuman/data/3dobjs"
+    
+    fp = open(os.path.join(folder, "base0.obj"), "rU")
+    grp = None
+    grps = {}
+    fn = 0
+    for line in fp:
+        words = line.split()
+        if words[0] == "f":
+            grps[fn] = grp
+            fn += 1
+        elif words[0] == "g":
+            grp = words[1]
+    fp.close()
+    
+    infp = open(os.path.join(folder, "base1.obj"), "rU")
+    outfp = open(os.path.join(folder, "base2.obj"), "w")
+    fn = 0
+    grp = None
+    for line in infp:
+        words = line.split()
+        if words[0] == "f":
+            try:
+                fgrp = grps[fn]
+            except:
+                fgrp = None
+            if fgrp != grp:
+                grp = fgrp
+                outfp.write("g %s\n" % grp)
+            fn += 1
+        outfp.write(line)
+    infp.close()
+    outfp.close()
+    print("Base file fixed")
+    return
+
+class VIEW3D_OT_FixBaseFileButton(bpy.types.Operator):
+    bl_idname = "mhw.fix_base_file"
+    bl_label = "Fix base file"
+
+    def execute(self, context):
+        fixBaseFile()
+        return{'FINISHED'}    
+                 
+#
 #    initInterface(context):
 #    class VIEW3D_OT_InitInterfaceButton(bpy.types.Operator):
 #
@@ -885,6 +1006,10 @@ class MhxWeightToolsPanel(bpy.types.Panel):
         layout.prop(context.scene, 'MhxBone1')
         layout.prop(context.scene, 'MhxBone2')
         layout.operator("mhw.pair_weight")
+        
+        layout.label("Join meshes")
+        layout.operator("mhw.join_meshes")
+        layout.operator("mhw.fix_base_file")
 
 #
 #    Init and register
