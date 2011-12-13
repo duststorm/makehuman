@@ -32,8 +32,8 @@
     ftn 176 4 1 ;
     ftn 161 5 1 ;
     ftn 176 4 1 ;
-    ftn 134 5 1 ;
-    ftn 27 5 1 ;
+    ftn 161 5 1 ;
+    ftn 3104 1 1 ;
 
   end Faces
   

@@ -2053,19 +2053,20 @@ def postProcess(args):
 #
 #    deleteDiamonds(ob)
 #    Delete joint diamonds in main mesh
+#    Invisio = material # 1
 #
 
 def deleteDiamonds(ob):
     bpy.context.scene.objects.active = ob
     if not bpy.context.object:
         return
-    print("Delete diamonds in %s" % bpy.context.object)
+    print("Delete helper geometry in %s" % bpy.context.object)
     bpy.ops.object.mode_set(mode='EDIT')
     bpy.ops.mesh.select_all(action='DESELECT')
     bpy.ops.object.mode_set(mode='OBJECT')
     me = ob.data
-    for f in me.faces:        
-        if len(f.vertices) < 4:
+    for f in me.faces:    
+        if f.material_index == 1:
             for vn in f.vertices:
                 me.vertices[vn].select = True
     bpy.ops.object.mode_set(mode='EDIT')
@@ -2852,7 +2853,7 @@ MhxBoolProps = [
     ("face", "Face shapes", "Include facial shapekeys", T_Face),
     ("shape", "Body shapes", "Include body shapekeys", T_Shape),
     ("symm", "Symmetric shapes", "Keep shapekeys symmetric", T_Symm),
-    ("diamond", "Diamonds", "Keep joint diamonds", T_Diamond),
+    ("diamond", "Helper geometry", "Keep helper geometry", T_Diamond),
     ("rigify", "Rigify", "Create rigify control rig", T_Rigify),
 ]
 
@@ -2868,7 +2869,7 @@ class ImportMhx(bpy.types.Operator, ImportHelper):
     scale = FloatProperty(name="Scale", description="Default meter, decimeter = 1.0", default = theScale)
     filename_ext = ".mhx"
     filter_glob = StringProperty(default="*.mhx", options={'HIDDEN'})
-    filepath = StringProperty(name="File Path", description="File path used for importing the MHX file", maxlen= 1024, default= "")
+    filepath = StringProperty(subtype='FILE_PATH')
 
     for (prop, name, desc, flag) in MhxBoolProps:
         expr = '%s = BoolProperty(name="%s", description="%s", default=toggle&%s)' % (prop, name, desc, flag)
@@ -3262,7 +3263,7 @@ def readMagpie(context, filepath, offs):
 class VIEW3D_OT_MhxLoadMohoButton(bpy.types.Operator):
     bl_idname = "mhx.pose_load_moho"
     bl_label = "Moho (.dat)"
-    filepath = StringProperty(name="File Path", description="File path used for importing the file", maxlen= 1024, default= "")
+    filepath = StringProperty(subtype='FILE_PATH')
     startFrame = IntProperty(name="Start frame", description="First frame to import", default=1)
 
     def execute(self, context):
@@ -3281,7 +3282,7 @@ class VIEW3D_OT_MhxLoadMohoButton(bpy.types.Operator):
 class VIEW3D_OT_MhxLoadMagpieButton(bpy.types.Operator):
     bl_idname = "mhx.pose_load_magpie"
     bl_label = "Magpie (.mag)"
-    filepath = StringProperty(name="File Path", description="File path used for importing the file", maxlen= 1024, default= "")
+    filepath = StringProperty(subtype='FILE_PATH')
     startFrame = IntProperty(name="Start frame", description="First frame to import", default=1)
 
     def execute(self, context):
