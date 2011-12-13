@@ -853,10 +853,10 @@ class VIEW3D_OT_JoinMeshesButton(bpy.types.Operator):
 #   fixBaseFile():
 #
 
+the3dobjFolder = "C:/home/svn/makehuman/data/3dobjs"
+
 def fixBaseFile():
-    folder = "C:/home/svn/makehuman/data/3dobjs"
-    
-    fp = open(os.path.join(folder, "base0.obj"), "rU")
+    fp = open(os.path.join(the3dobjFolder, "base0.obj"), "rU")
     grp = None
     grps = {}
     fn = 0
@@ -869,8 +869,8 @@ def fixBaseFile():
             grp = words[1]
     fp.close()
     
-    infp = open(os.path.join(folder, "base1.obj"), "rU")
-    outfp = open(os.path.join(folder, "base2.obj"), "w")
+    infp = open(os.path.join(the3dobjFolder, "base1.obj"), "rU")
+    outfp = open(os.path.join(the3dobjFolder, "base2.obj"), "w")
     fn = 0
     grp = None
     for line in infp:
@@ -897,6 +897,104 @@ class VIEW3D_OT_FixBaseFileButton(bpy.types.Operator):
     def execute(self, context):
         fixBaseFile()
         return{'FINISHED'}    
+        
+        
+#
+#    class CProxy
+#
+
+class CProxy:
+    def __init__(self):
+        self.refVerts = []
+        self.firstVert = 0
+        return
+        
+    def setWeights(self, verts, grp):
+        rlen = len(self.refVerts)
+        mlen = len(verts)
+        first = self.firstVert
+        if (first+rlen) != mlen:
+            raise NameError( "Bug: %d refVerts != %d meshVerts" % (first+rlen, mlen) )
+        gn = grp.index
+        for n in range(rlen):
+            vert = verts[n+first]
+            refVert = self.refVerts[n]
+            if type(refVert) == tuple:
+                (rv0, rv1, rv2, w0, w1, w2, d0, d1, d2) = refVert
+                vw0 = CProxy.getWeight(verts[rv0], gn)
+                vw1 = CProxy.getWeight(verts[rv1], gn)
+                vw2 = CProxy.getWeight(verts[rv2], gn)
+                vw = w0*vw0 + w1*vw1 + w2*vw2
+            else:
+                vw = getWeight(verts[rv0], gn)
+            grp.add([vert.index], vw, 'REPLACE')
+        return
+        
+    def getWeight(vert, gn):
+        for grp in vert.groups:
+            if grp.group == gn:
+                return grp.weight
+        return 0                
+
+    def read(self, filepath):
+        realpath = os.path.realpath(os.path.expanduser(filepath))
+        folder = os.path.dirname(realpath)
+        try:
+            tmpl = open(filepath, "rU")
+        except:
+            tmpl = None
+        if tmpl == None:
+            print("*** Cannot open %s" % realpath)
+            return None
+
+        status = 0
+        doVerts = 1
+        vn = 0
+        for line in tmpl:
+            words= line.split()
+            if len(words) == 0:
+                pass
+            elif words[0] == '#':
+                status = 0
+                if len(words) == 1:
+                    pass
+                elif words[1] == 'verts':
+                    if len(words) > 2:
+                        self.firstVert = int(words[2])                    
+                    status = doVerts
+                else:
+                    pass
+            elif status == doVerts:
+                if len(words) == 1:
+                    v = int(words[0])
+                    self.refVerts.append(v)
+                else:                
+                    v0 = int(words[0])
+                    v1 = int(words[1])
+                    v2 = int(words[2])
+                    w0 = float(words[3])
+                    w1 = float(words[4])
+                    w2 = float(words[5])            
+                    d0 = float(words[6])
+                    d1 = float(words[7])
+                    d2 = float(words[8])
+                    self.refVerts.append( (v0,v1,v2,w0,w1,w2,d0,d1,d2) )
+        return
+        
+class VIEW3D_OT_ProjectWeightsButton(bpy.types.Operator):
+    bl_idname = "mhw.project_weights"
+    bl_label = "Project weights from proxy"
+
+    def execute(self, context):
+        ob = context.object
+        proxy = CProxy()
+        proxy.read(os.path.join(the3dobjFolder, "base.mhclo"))
+        for grp in ob.vertex_groups:
+            print(grp.name)
+            proxy.setWeights(ob.data.vertices, grp)
+        print("Weights projected from proxy")
+        return{'FINISHED'}    
+
                  
 #
 #    initInterface(context):
@@ -1007,9 +1105,10 @@ class MhxWeightToolsPanel(bpy.types.Panel):
         layout.prop(context.scene, 'MhxBone2')
         layout.operator("mhw.pair_weight")
         
-        layout.label("Join meshes")
+        layout.label("Helper construction")
         layout.operator("mhw.join_meshes")
         layout.operator("mhw.fix_base_file")
+        layout.operator("mhw.project_weights")
 
 #
 #    Init and register

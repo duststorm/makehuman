@@ -123,65 +123,61 @@ class CProxy:
                 vert.co = v0.co
                 bvert[n+first].select = bverts[rv0].select
         return
-#
-#    readProxyFile(filepath):
-#
 
-def readProxyFile(filepath):
-    realpath = os.path.realpath(os.path.expanduser(filepath))
-    folder = os.path.dirname(realpath)
-    try:
-        tmpl = open(filepath, "rU")
-    except:
-        tmpl = None
-    if tmpl == None:
-        print("*** Cannot open %s" % realpath)
-        return None
+    def read(self, filepath):
+        realpath = os.path.realpath(os.path.expanduser(filepath))
+        folder = os.path.dirname(realpath)
+        try:
+            tmpl = open(filepath, "rU")
+        except:
+            tmpl = None
+        if tmpl == None:
+            print("*** Cannot open %s" % realpath)
+            return None
 
-    proxy = CProxy()
-    status = 0
-    doVerts = 1
-    vn = 0
-    for line in tmpl:
-        words= line.split()
-        if len(words) == 0:
-            pass
-        elif words[0] == '#':
-            status = 0
-            if len(words) == 1:
+        status = 0
+        doVerts = 1
+        vn = 0
+        for line in tmpl:
+            words= line.split()
+            if len(words) == 0:
                 pass
-            elif words[1] == 'verts':
-                if len(words) > 2:
-                    proxy.firstVert = int(words[2])                    
-                status = doVerts
-            elif words[1] == 'name':
-                proxy.name = words[2]
-            elif words[1] == 'x_scale':
-                proxy.xScale = scaleInfo(words)
-            elif words[1] == 'y_scale':
-                proxy.yScale = scaleInfo(words)
-            elif words[1] == 'z_scale':
-                proxy.zScale = scaleInfo(words)                
-            elif words[1] == 'obj_file':
-                proxy.obj_file = os.path.join(folder, words[2])
-            else:
-                pass
-        elif status == doVerts:
-            if len(words) == 1:
-                v = int(words[0])
-                proxy.refVerts.append(v)
-            else:                
-                v0 = int(words[0])
-                v1 = int(words[1])
-                v2 = int(words[2])
-                w0 = float(words[3])
-                w1 = float(words[4])
-                w2 = float(words[5])            
-                d0 = float(words[6])
-                d1 = float(words[7])
-                d2 = float(words[8])
-                proxy.refVerts.append( (v0,v1,v2,w0,w1,w2,d0,d1,d2) )
-    return proxy
+            elif words[0] == '#':
+                status = 0
+                if len(words) == 1:
+                    pass
+                elif words[1] == 'verts':
+                    if len(words) > 2:
+                        self.firstVert = int(words[2])                    
+                    status = doVerts
+                elif words[1] == 'name':
+                    self.name = words[2]
+                elif words[1] == 'x_scale':
+                    self.xScale = scaleInfo(words)
+                elif words[1] == 'y_scale':
+                    self.yScale = scaleInfo(words)
+                elif words[1] == 'z_scale':
+                    self.zScale = scaleInfo(words)                
+                elif words[1] == 'obj_file':
+                    self.obj_file = os.path.join(folder, words[2])
+                else:
+                    pass
+            elif status == doVerts:
+                if len(words) == 1:
+                    v = int(words[0])
+                    self.refVerts.append(v)
+                else:                
+                    v0 = int(words[0])
+                    v1 = int(words[1])
+                    v2 = int(words[2])
+                    w0 = float(words[3])
+                    w1 = float(words[4])
+                    w2 = float(words[5])            
+                    d0 = float(words[6])
+                    d1 = float(words[7])
+                    d2 = float(words[8])
+                    self.refVerts.append( (v0,v1,v2,w0,w1,w2,d0,d1,d2) )
+        return
 
 def scaleInfo(words):                
     v1 = int(words[2])
@@ -280,7 +276,8 @@ class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
         global theProxy
         if self.delete:
             deleteAll(context)
-        theProxy = readProxyFile(self.properties.filepath)
+        theProxy = CProxy()
+        theProxy.read(self.properties.filepath)
         ob = import_obj(theProxy.obj_file)
         ob["MakeTarget"] = "Base"
         ob["ProxyFile"] = self.properties.filepath
@@ -547,12 +544,7 @@ class VIEW3D_OT_SkipSaveButton(bpy.types.Operator):
 #----------------------------------------------------------
 
 def batchFixTargets(context, folder):
-    scn = context.scene
-    if isSaving(scn):
-        scn["Saving"] = False
-    else:
-        scn["Saving"] = True
-        return    
+    print("Batch", folder)
     for fname in os.listdir(folder):
         (root, ext) = os.path.splitext(fname)
         file = os.path.join(folder, fname)        
@@ -572,10 +564,19 @@ class VIEW3D_OT_BatchFixButton(bpy.types.Operator):
     bl_label = "Batch fix targets"
 
     def execute(self, context):
-        folder = os.path.expanduser("/home/svn/makehuman/data")
-        batchFixTargets(context, folder)
+        global TargetSubPaths
+        scn = context.scene
+        if isSaving(scn):
+            scn["Saving"] = False
+        else:
+            scn["Saving"] = True
+            return {'FINISHED'}  
+        folder = os.path.expanduser(scn["TargetPath"])
+        for subfolder in TargetSubPaths:
+            if scn["Mh%s" % subfolder]:
+                batchFixTargets(context, os.path.join(folder, subfolder))
         print("All targets fixed")
-        return{'FINISHED'}            
+        return {'FINISHED'}            
 
 class VIEW3D_OT_SkipBatchButton(bpy.types.Operator):
     bl_idname = "mh.skip_batch"
@@ -601,7 +602,8 @@ def fitTarget(context):
         path = ob["ProxyFile"]
         if path:
             print("Rereading %s" % path)
-            theProxy = readProxyFile(path)
+            theProxy = CProxy()
+            theProxy.read(path)
         else:
             raise NameError("Object %s has no associated mhclo file. Cannot fit" % ob.name)
             return
@@ -756,6 +758,9 @@ class MakeTargetPanel(bpy.types.Panel):
         layout = self.layout
         ob = context.object
         scn = context.scene
+        if not isInited(scn):
+            layout.operator("mh.init")
+            return
         if isSaving(ob):
             layout.label("Overwrite target file?")
             layout.operator("mh.save_target", text="Yes") 
@@ -780,6 +785,9 @@ class MakeTargetPanel(bpy.types.Panel):
         if isBase(ob):
             layout.operator("mh.new_target")
             layout.operator("mh.load_target")            
+            layout.label("Batch fix targets")
+            for fname in TargetSubPaths:
+                layout.prop(scn, "Mh%s" % fname)
             layout.operator("mh.batch_fix")
         elif isTarget(ob):
             layout.prop(ob, "show_only_shape_key")
@@ -793,10 +801,50 @@ class MakeTargetPanel(bpy.types.Panel):
                 layout.operator("mh.save_target")           
             layout.operator("mh.saveas_target")           
 
-#
-#    Init and register
-#
+#----------------------------------------------------------
+#   Init
+#----------------------------------------------------------
+
+
+def initScene(scn):
+    global TargetSubPaths
+    scn["TargetPath"] = "/home/svn/makehuman/data/targets"            
+    TargetSubPaths = []
+    folder = os.path.realpath(os.path.expanduser(scn["TargetPath"]))
+    for fname in os.listdir(folder):
+        file = os.path.join(folder, fname)        
+        if os.path.isdir(file) and fname[0] != ".":
+            TargetSubPaths.append(fname)
+            expr = 'bpy.types.Scene.Mh%s = BoolProperty(name="%s")' % (fname,fname)
+            exec(expr)
+            scn["Mh%s" % fname] = False
+    return  
+    
+def isInited(scn):
+    try:
+        TargetSubPaths
+        scn["TargetPath"]
+        return True
+    except:
+        return False    
+
+class VIEW3D_OT_InitButton(bpy.types.Operator):
+    bl_idname = "mh.init"
+    bl_label = "Initialize"
+
+    def execute(self, context):
+        initScene(context.scene)
+        return{'FINISHED'}                
+
+#----------------------------------------------------------
+#   Register
+#----------------------------------------------------------
+
 def register():
+    try:
+        initScene(bpy.context.scene)
+    except:
+        pass
     bpy.utils.register_module(__name__)
 
 def unregister():
