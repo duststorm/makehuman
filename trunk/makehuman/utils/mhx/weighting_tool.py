@@ -152,6 +152,40 @@ class VIEW3D_OT_RemoveVertexGroupsButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
+#
+#
+
+def copyVertexGroups(scn, src, trg):
+    print("Copy vertex groups %s => %s" % (src.name, trg.name))
+    scn.objects.active = trg
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.vertex_group_remove(all=True)
+    groups = {}
+    for sgrp in src.vertex_groups:
+        tgrp = trg.vertex_groups.new(name=sgrp.name)
+        groups[sgrp.index] = tgrp
+    for vs in src.data.vertices:
+        for g in vs.groups:            
+            tgrp = groups[g.group]
+            tgrp.add([vs.index], g.weight, 'REPLACE')
+    return
+
+class VIEW3D_OT_CopyVertexGroupsButton(bpy.types.Operator):
+    bl_idname = "mhw.copy_vertex_groups"
+    bl_label = "Copy vgroups active => selected"
+
+    def execute(self, context):
+        src = context.object
+        scn = context.scene
+        for ob in scn.objects:
+            if ob.type == 'MESH' and ob != src:
+                trg = ob
+                break
+        copyVertexGroups(scn, src, trg)
+        print("Vertex groups copied")
+        return{'FINISHED'}    
+
+#
 #    unVertexDiamonds(context):
 #    class VIEW3D_OT_UnvertexDiamondsButton(bpy.types.Operator):
 #
@@ -177,9 +211,19 @@ class VIEW3D_OT_UnvertexDiamondsButton(bpy.types.Operator):
     bl_label = "Unvertex diamonds"
 
     def execute(self, context):
-        import bpy
         unVertexDiamonds(context)
         print("Diamonds unvertexed")
+        return{'FINISHED'}    
+
+class VIEW3D_OT_UnvertexSelectedButton(bpy.types.Operator):
+    bl_idname = "mhw.unvertex_selected"
+    bl_label = "Unvertex selected"
+
+    def execute(self, context):
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.object.vertex_group_remove_from(all=True)
+        bpy.ops.object.mode_set(mode='OBJECT')
+        print("Selected unvertexed")
         return{'FINISHED'}    
 
 #
@@ -1070,7 +1114,9 @@ class MhxWeightToolsPanel(bpy.types.Panel):
         layout.operator("mhw.print_enums")
         layout.operator("mhw.print_fnums")
         layout.operator("mhw.select_quads")
+        layout.operator("mhw.copy_vertex_groups")
         layout.operator("mhw.remove_vertex_groups")
+        layout.operator("mhw.unvertex_selected")
         layout.operator("mhw.unvertex_diamonds")
         layout.operator("mhw.delete_diamonds")
         layout.operator("mhw.recover_diamonds")
