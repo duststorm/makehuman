@@ -498,7 +498,7 @@ def matrix2Quaternion(m):
     if (t == 0.0):
       return q
     elif (t > 0):
-      r = sqrt(1.0 + m[0}[0] + m[1][1] + m[2][2]);
+      r = sqrt(1.0 + m[0][0] + m[1][1] + m[2][2]);
     else:
       if ((m[0][0] > m[1][1]) and (m[0][0] > m[2][2])):
         i = 1
