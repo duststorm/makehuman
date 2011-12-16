@@ -518,7 +518,9 @@ def matrix2Quaternion(m):
     q[(3 * sgn + i + 3) % 4] = (m[1][0] - m[0][1]) / (2 * r)
     
     return q
-
+ 
+def euler2Quaternion(e, axes='sxyz'):
+  return matrix2Quaternion(euler2matrix(e, axes))
     
 def quaternionLerp(q1, q2, alpha):
     
@@ -807,7 +809,7 @@ def invTransform(m):
             0.0, 0.0, 0.0, 1.0]
 
 # uses flat row-major 4x4 transformation matrices. Returned angles are in radians            
-def matrix2euler(m, axes='sxyz'):
+def matrix2euler(m, ):
     """
     See: http://www.lfd.uci.edu/~gohlke/code/transformations.py.html
     """
