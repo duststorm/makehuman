@@ -489,6 +489,37 @@ def quaternion2Matrix(q):
     m[2][2] = float(q[3]*q[3]-q[0]*q[0]-q[1]*q[1]+q[2]*q[2])
     return m
 
+def matrix2Quaternion(m):
+    q = [0.0, 0.0, 0.0, 1.0];
+    t = 1.0 + m[0][0] + m[1][1] + m[2][2]
+    r = 0.0;
+    i = 0;
+
+    if (t == 0.0):
+      return q
+    elif (t > 0):
+      r = sqrt(1.0 + m[0}[0] + m[1][1] + m[2][2]);
+    else:
+      if ((m[0][0] > m[1][1]) and (m[0][0] > m[2][2])):
+        i = 1
+      elif (m[1][1] > m[2][2]):
+        i = 2
+      else:
+        i = 3
+        
+      r = 2 * m[i - 1][i - 1] - m[0][0] - m[1][1] - m[2][2];
+  
+
+    sgn = 1 - 2 * (i % 2)
+
+    q[(i + 3) % 4] = r / 2.0
+    q[(sgn + i + 3) % 4] = (m[2][1] - m[1][2]) / (2 * r)
+    q[(2 * sgn + i + 3) % 4] = (m[0][2] - m[2][0]) / (2 * r)
+    q[(3 * sgn + i + 3) % 4] = (m[1][0] - m[0][1]) / (2 * r)
+    
+    return q
+
+    
 def quaternionLerp(q1, q2, alpha):
     
     return vnorm([q1[0] + alpha * (q2[0] - q1[0]),
