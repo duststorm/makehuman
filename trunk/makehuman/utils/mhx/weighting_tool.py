@@ -899,7 +899,7 @@ class VIEW3D_OT_JoinMeshesButton(bpy.types.Operator):
 
 the3dobjFolder = "C:/home/svn/makehuman/data/3dobjs"
 
-def fixBaseFile():
+def baseFileGroups():    
     fp = open(os.path.join(the3dobjFolder, "base0.obj"), "rU")
     grp = None
     grps = {}
@@ -912,7 +912,10 @@ def fixBaseFile():
         elif words[0] == "g":
             grp = words[1]
     fp.close()
+    return grps
     
+def fixBaseFile():
+    grps = baseFileGroups()
     infp = open(os.path.join(the3dobjFolder, "base1.obj"), "rU")
     outfp = open(os.path.join(the3dobjFolder, "base2.obj"), "w")
     fn = 0
@@ -970,16 +973,25 @@ class CProxy:
                 vw2 = CProxy.getWeight(verts[rv2], gn)
                 vw = w0*vw0 + w1*vw1 + w2*vw2
             else:
-                vw = getWeight(verts[rv0], gn)
+                vw = getWeight(verts[refVert], gn)
             grp.add([vert.index], vw, 'REPLACE')
         return
+
+    def cornerWeights(self, vn):
+        n = vn - self.firstVert
+        refVert = self.refVerts[n]
+        if type(refVert) == tuple:
+            (rv0, rv1, rv2, w0, w1, w2, d0, d1, d2) = refVert
+            return [(w0,rv0), (w1,rv1), (w2,rv2)]
+        else:
+            return [(1,refVert)]
         
     def getWeight(vert, gn):
         for grp in vert.groups:
             if grp.group == gn:
                 return grp.weight
-        return 0                
-
+        return 0             
+        
     def read(self, filepath):
         realpath = os.path.realpath(os.path.expanduser(filepath))
         folder = os.path.dirname(realpath)
@@ -1025,6 +1037,67 @@ class CProxy:
                     self.refVerts.append( (v0,v1,v2,w0,w1,w2,d0,d1,d2) )
         return
         
+#
+#   class VIEW3D_OT_ProjectMaterialsButton(bpy.types.Operator):
+#
+
+from random import random
+
+class VIEW3D_OT_ProjectMaterialsButton(bpy.types.Operator):
+    bl_idname = "mhw.project_materials"
+    bl_label = "Project materials from proxy"
+
+    def execute(self, context):
+        ob = context.object
+        proxy = CProxy()
+        proxy.read(os.path.join(the3dobjFolder, "base.mhclo"))
+        grps = baseFileGroups()
+        grpList = set(grps.values())
+        grpIndices = {}
+        grpNames = {}
+        n = 0
+        for grp in grpList:
+            mat = bpy.data.materials.new(grp)
+            ob.data.materials.append(mat)
+            mat.diffuse_color = (random(), random(), random())
+            grpIndices[grp] = n
+            grpNames[n] = grp
+            n += 1
+        
+        vertFaces = {}
+        for v in ob.data.vertices:
+            vertFaces[v.index] = []
+        
+        for f in ob.data.faces:
+            for vn in f.vertices:
+                vertFaces[vn].append(f)
+                if vn >= proxy.firstVert:
+                    grp = None
+                    continue
+                grp = grps[f.index]
+            if grp:
+                f.material_index = grpIndices[grp]
+        
+        for f in ob.data.faces:
+            if f.vertices[0] >= proxy.firstVert:
+                cwts = []
+                for vn in f.vertices:
+                    cwts += proxy.cornerWeights(vn)
+                cwts.sort()
+                cwts.reverse()
+                (w,vn) = cwts[0]
+                for f1 in vertFaces[vn]:
+                    mn = f1.material_index
+                    f.material_index = f1.material_index                
+                    continue
+
+        print("Material projected from proxy")
+        return{'FINISHED'}    
+
+#
+#   class VIEW3D_OT_ProjectWeightsButton(bpy.types.Operator):
+#
+
 class VIEW3D_OT_ProjectWeightsButton(bpy.types.Operator):
     bl_idname = "mhw.project_weights"
     bl_label = "Project weights from proxy"
@@ -1039,6 +1112,121 @@ class VIEW3D_OT_ProjectWeightsButton(bpy.types.Operator):
         print("Weights projected from proxy")
         return{'FINISHED'}    
 
+#
+#   exportObjFile(context):
+#   setupTexVerts(ob):
+#
+
+def exportObjFile(context):
+    fp = open(os.path.join(the3dobjFolder, "base3.obj"), "w")
+    scn = context.scene
+    me = context.object.data
+    for v in me.vertices:
+        fp.write("v %.4f %.4f %.4f\n" % (v.co[0], v.co[2], -v.co[1]))
+        
+    for v in me.vertices:
+        fp.write("vn %.4f %.4f %.4f\n" % (v.normal[0], v.normal[2], -v.normal[1]))
+        
+    if me.uv_textures:
+        (uvFaceVerts, texVerts, nTexVerts) = setupTexVerts(me)
+        for vtn in range(nTexVerts):
+            vt = texVerts[vtn]
+            fp.write("vt %.4f %.4f\n" % (vt[0], vt[1]))
+        n = 1
+        mn = -1
+        for f in me.faces:
+            if f.material_index != mn:
+                mn = f.material_index
+                fp.write("g %s\n" % me.materials[mn].name)
+            uvVerts = uvFaceVerts[f.index]
+            fp.write("f ")
+            for n,v in enumerate(f.vertices):
+                (vt, uv) = uvVerts[n]
+                fp.write("%d/%d " % (v+1, vt+1))
+            fp.write("\n")
+    else:
+        for f in me.faces:
+            fp.write("f ")
+            for vn in f.vertices:
+                fp.write("%d " % (vn+1))
+            fp.write("\n")
+
+    fp.close()
+    print("base3.obj written")
+    return
+    
+def setupTexVerts(me):
+    vertEdges = {}
+    vertFaces = {}
+    for v in me.vertices:
+        vertEdges[v.index] = []
+        vertFaces[v.index] = []
+    for e in me.edges:
+        for vn in e.vertices:
+            vertEdges[vn].append(e)
+    for f in me.faces:
+        for vn in f.vertices:
+            vertFaces[vn].append(f)
+    
+    edgeFaces = {}
+    for e in me.edges:
+        edgeFaces[e.index] = []
+    faceEdges = {}
+    for f in me.faces:
+        faceEdges[f.index] = []
+    for f in me.faces:
+        for vn in f.vertices:
+            for e in vertEdges[vn]:
+                v0 = e.vertices[0]
+                v1 = e.vertices[1]
+                if (v0 in f.vertices) and (v1 in f.vertices):
+                    if f not in edgeFaces[e.index]:
+                        edgeFaces[e.index].append(f)
+                    if e not in faceEdges[f.index]:
+                        faceEdges[f.index].append(e)
+        
+    faceNeighbors = {}
+    uvFaceVerts = {}
+    for f in me.faces:
+        faceNeighbors[f.index] = []
+        uvFaceVerts[f.index] = []
+    for f in me.faces:
+        for e in faceEdges[f.index]:
+            for f1 in edgeFaces[e.index]:
+                if f1 != f:
+                    faceNeighbors[f.index].append((e,f1))
+
+    uvtex = me.uv_textures[0]
+    vtn = 0
+    texVerts = {}    
+    for f in me.faces:
+        uvf = uvtex.data[f.index]
+        vtn = findTexVert(uvf.uv1, vtn, f, faceNeighbors, uvFaceVerts, texVerts)
+        vtn = findTexVert(uvf.uv2, vtn, f, faceNeighbors, uvFaceVerts, texVerts)
+        vtn = findTexVert(uvf.uv3, vtn, f, faceNeighbors, uvFaceVerts, texVerts)
+        if len(f.vertices) > 3:
+            vtn = findTexVert(uvf.uv4, vtn, f, faceNeighbors, uvFaceVerts, texVerts)
+    return (uvFaceVerts, texVerts, vtn)     
+
+def findTexVert(uv, vtn, f, faceNeighbors, uvFaceVerts, texVerts):
+    for (e,f1) in faceNeighbors[f.index]:
+        for (vtn1,uv1) in uvFaceVerts[f1.index]:
+            vec = uv - uv1
+            if vec.length < Epsilon:
+                uvFaceVerts[f.index].append((vtn1,uv))                
+                return vtn
+    uvFaceVerts[f.index].append((vtn,uv))
+    texVerts[vtn] = uv
+    return vtn+1
+    
+class VIEW3D_OT_ExportBaseObjButton(bpy.types.Operator):
+    bl_idname = "mhw.export_base_obj"
+    bl_label = "Export base3.obj"
+
+    def execute(self, context):
+        exportObjFile(context)
+        return{'FINISHED'}    
+    
                  
 #
 #    initInterface(context):
@@ -1155,6 +1343,8 @@ class MhxWeightToolsPanel(bpy.types.Panel):
         layout.operator("mhw.join_meshes")
         layout.operator("mhw.fix_base_file")
         layout.operator("mhw.project_weights")
+        layout.operator("mhw.project_materials")
+        layout.operator("mhw.export_base_obj")
 
 #
 #    Init and register
