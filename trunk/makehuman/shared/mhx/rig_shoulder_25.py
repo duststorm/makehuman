@@ -146,8 +146,8 @@ ShoulderArmature = [
     # Shoulder    
     ('ShoulderEnd_L',      0, 'Clavicle_L', 0, L_HELP, NoBB),
     ('ShoulderEnd_R',      0, 'Clavicle_R', 0, L_HELP, NoBB),
-    ('Shoulder_L',         0, 'ShoulderEnd_L', F_WIR+F_NOROT+F_DEF, L_TWEAK+L_DEF, NoBB),
-    ('Shoulder_R',         0, 'ShoulderEnd_R', F_WIR+F_NOROT+F_DEF, L_TWEAK+L_DEF, NoBB),
+    ('Shoulder_L',         0, 'ShoulderEnd_L', F_WIR+F_NOROT, L_TWEAK, NoBB),
+    ('Shoulder_R',         0, 'ShoulderEnd_R', F_WIR+F_NOROT, L_TWEAK, NoBB),
 
     # Scapula
     ('ShoulderPivot_L',    0, 'Sternum', 0, L_HELP, NoBB),
