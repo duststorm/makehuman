@@ -98,7 +98,7 @@ def plantFCurves(fcurves, first, last, useCrnt, values):
             ave = sum/nterms
         for kp in dellist:
             kp.co[1] = ave
-        kpts.insert(first, ave, options='FAST')
+        kpts.insert(first, ave, options={'FAST'})
         kpts.insert(last, ave)
     return
         
