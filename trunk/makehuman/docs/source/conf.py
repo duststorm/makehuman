@@ -108,7 +108,7 @@ pygments_style = 'sphinx'
 
 # mhtheme theme
 html_theme_path = ['.']
-html_theme = 'mhtheme2'
+html_theme = 'mhtheme3'
 
 #html_theme = 'haiku'
 
