@@ -17,6 +17,14 @@ functions with matrices as list of lists will have the same name without the und
 
 The name is a tribute to *Al-jabr wa'l muqabalah* the most important paper of Mohammed ibn-Musa al-Khuwarizmi (VII - VIII sec d.C.)
 The paper was so important that Al-jabr is the root of modern word *algebra* and al-Khuwarizmi is the root of word *algorithm*.
+
+Categories:
+  Vector Operations
+  Matrix Operations
+  Quaternions
+  Geometric Operations
+  Various Functions
+  
 """
 
 from math import sqrt, cos, sin, tan, atan2, fabs, acos, pi, exp
@@ -204,10 +212,22 @@ def vcross(vect1, vect2):
 
     return [vect1[1] * vect2[2] - vect1[2] * vect2[1], vect1[2] * vect2[0] - vect1[0] * vect2[2], vect1[0] * vect2[1] - vect1[1] * vect2[0]]
 
-
+def pseudoGrammSchmidt(v, w):
+  """
+  Given two linearly indeopendent vectors in 3D, this method perform the gramm-schmidt orthogonormalization of the set of vectors.
+  The output is a vector normal to the first vector and belonging to the plain defined by the two vectors.
+  See http://en.wikipedia.org/wiki/Gram–Schmidt_process.
+  
+  :rtype:    array of doubles
+  :return:   normal vector to the first input vector and belonging to the plain in which the two input vector generate
+  :type  v:  array of doubles
+  :param v:  first input vector
+  :type  w:  array of doubles
+  :param w:  first input vector
+  """
+  return vsub(w, vmul(v, vdot(w,v)/vdot(w,w)))
 
 #Matrix Operations
-
 
 def mmul(m2, m1):
     """
