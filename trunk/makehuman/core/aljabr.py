@@ -218,15 +218,31 @@ def pseudoGrammSchmidt(v, w):
   The output is a vector normal to the first vector and belonging to the plain defined by the two vectors.
   See http://en.wikipedia.org/wiki/Gram–Schmidt_process.
   
-  :rtype:    array of doubles
+  :rtype:    array of 3 doubles
   :return:   normal vector to the first input vector and belonging to the plain in which the two input vector generate
-  :type  v:  array of doubles
+  :type  v:  array of 3 doubles
   :param v:  first input vector
-  :type  w:  array of doubles
+  :type  w:  array of 3 doubles
   :param w:  first input vector
   """
   return vsub(w, vmul(v, vdot(w,v)/vdot(w,w)))
 
+def isPositive(vec, point):
+  """
+  Given a 3D vector and a point in space we want to determine whether the point lies in the direction of the vector or not. In other words, if the vector represent an exis of 
+  another coordinate system (with center still at 0,0,0) and if we project the point onto that axis, we want to determine if the projection is positive with respect to that 
+  axis or not.
+  
+  :rtype:    a bool
+  :return:   true if point lies in the direction of the vector
+  :type  vec: array of 3 doubles
+  :param vec: a vector in 3D
+  :type  point: array of 3 doubles
+  :param point: a point in 3d space
+  """
+  return (fabs(acos(vdot(vec,point)/(vlen(vec)*vlen(point)))) <= pi/2)
+
+  
 #Matrix Operations
 
 def mmul(m2, m1):
