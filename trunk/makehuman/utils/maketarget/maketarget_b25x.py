@@ -586,6 +586,48 @@ class VIEW3D_OT_SkipBatchButton(bpy.types.Operator):
         context.scene["Saving"] = False
         print("Batch fitting discarded")
         return{'FINISHED'}            
+ 
+#----------------------------------------------------------
+#   batch render
+#----------------------------------------------------------
+
+def batchRenderTargets(context, folder, opengl, outdir):
+    print("Batch render", folder)
+    for fname in os.listdir(folder):
+        (root, ext) = os.path.splitext(fname)
+        file = os.path.join(folder, fname)        
+        if os.path.isfile(file) and ext == ".target":
+            print(file)                    
+            context.scene.render.filepath = os.path.join(outdir, root)
+            loadTarget(file, context)        
+            if opengl:
+                bpy.ops.render.opengl(animation=True)
+            else:
+                bpy.ops.render.render(animation=True)
+            discardTarget(context)  
+        elif os.path.isdir(file):
+            batchRenderTargets(context, file, opengl, outdir)
+    return            
+
+class VIEW3D_OT_BatchRenderButton(bpy.types.Operator):
+    bl_idname = "mh.batch_render"
+    bl_label = "Batch render"
+    opengl = BoolProperty()
+
+    def execute(self, context):
+        global TargetSubPaths
+        scn = context.scene
+        folder = os.path.expanduser(scn["TargetPath"])
+        outdir = os.path.expanduser("~/makehuman/pictures/")        
+        if not os.path.isdir(outdir):
+            os.makedirs(outdir)
+        scn.frame_start = 1
+        scn.frame_end = 1
+        for subfolder in TargetSubPaths:
+            if scn["Mh%s" % subfolder]:
+                batchRenderTargets(context, os.path.join(folder, subfolder), self.opengl, outdir)
+        print("All targets rendered")
+        return {'FINISHED'}            
         
 #----------------------------------------------------------
 #   fitTarget(context):
@@ -789,6 +831,9 @@ class MakeTargetPanel(bpy.types.Panel):
             for fname in TargetSubPaths:
                 layout.prop(scn, "Mh%s" % fname)
             layout.operator("mh.batch_fix")
+            layout.operator("mh.batch_render", text="Batch render").opengl = False
+            layout.operator("mh.batch_render", text="Batch OpenGL render").opengl = True
+            
         elif isTarget(ob):
             layout.prop(ob, "show_only_shape_key")
             layout.prop(ob.active_shape_key, "value")
