@@ -956,7 +956,7 @@
 					./include/pythonwrapper/,
 					./include/sdlwrapper/,
 				);
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-lz";
 				PREBINDING = NO;
 				SDKROOT = macosx10.5;
@@ -983,7 +983,6 @@
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
 				INFOPLIST_FILE = resources/Info_NB.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
-				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = MakeHuman;
 				WARNING_CFLAGS = "-Wall";
 				WRAPPER_EXTENSION = app;
@@ -1114,7 +1113,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREFIX_HEADER = include/MakeHuman_Prefix.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					CHECK_PYTHON_VERSION,
+					XCHECK_PYTHON_VERSION,
 					DEBUG,
 				);
 				GCC_VERSION = 4.2;
