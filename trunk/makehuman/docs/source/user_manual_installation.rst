@@ -21,9 +21,13 @@ To install the MakeHuman files, download the MakeHuman Windows installer from th
 Mac OS X
 =========
 
-A zipped package which contains a Universal Binary of MakeHuman is available for Mac OS X 10.5 (aka. Leopard). Note that this version of MakeHuman does not run on Versions prior to Mac OS X 10.5!
+.. note::
 
-Download the archive and unzip it into a separate directory on your file system and unpack its Application Bundle named MakeHuman.app. A good location for this is the folder Application but this is not mandatory.
+    That this version of MakeHuman does not run on Versions prior to Mac OS X 10.5!
+
+Download the archive and unzip it into a separate directory on your file system and unpack its Application Bundle named MakeHuman.app. 
+
+A good location for this is the folder Application but this is not mandatory.
 
 Finally you may start MakeHuman by double clicking the Applications icon.
 
