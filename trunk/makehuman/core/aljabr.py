@@ -216,7 +216,7 @@ def pseudoGrammSchmidt(v, w):
   """
   Given two linearly indeopendent vectors in 3D, this method perform the gramm-schmidt orthogonormalization of the set of vectors.
   The output is a vector normal to the first vector and belonging to the plain defined by the two vectors.
-  See http://en.wikipedia.org/wiki/Gram–Schmidt_process.
+  See http://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process.
   
   :rtype:    array of 3 doubles
   :return:   normal vector to the first input vector and belonging to the plain in which the two input vector generate
