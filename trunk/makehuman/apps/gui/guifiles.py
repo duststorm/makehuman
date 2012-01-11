@@ -41,6 +41,7 @@ import mh2obj_proxy
 import mh2collada
 import mh2md5
 import mh2stl
+import mh2skel
 from shutil import copyfile
 from os.path import basename
 
@@ -265,6 +266,7 @@ class ExportTaskView(gui3d.TaskView):
         self.collada = self.formatBox.addView(gui3d.RadioButton(self.exportBodyGroup, label="Collada (dae)", style=gui3d.ButtonStyle));y+=24
         self.md5 = self.formatBox.addView(gui3d.RadioButton(self.exportBodyGroup, label="MD5", style=gui3d.ButtonStyle));y+=24
         self.stl = self.formatBox.addView(gui3d.RadioButton(self.exportBodyGroup, label="Stereolithography (stl)", style=gui3d.ButtonStyle));y+=24
+        self.skel = self.formatBox.addView(gui3d.RadioButton(self.exportBodyGroup, label="Skeleton (skel)", style=gui3d.ButtonStyle));y+=24
         y+=16
             
         # OBJ options
@@ -378,6 +380,12 @@ class ExportTaskView(gui3d.TaskView):
             
             gui3d.RadioButton.onClicked(self.stl, event)
             self.updateGui()
+            
+        @self.skel.event
+        def onClicked(event):
+            
+            gui3d.RadioButton.onClicked(self.skel, event)
+            self.updateGui()
         
         @self.fileentry.event
         def onFileSelected(filename):
@@ -466,6 +474,9 @@ class ExportTaskView(gui3d.TaskView):
                     mh2stl.exportStlAscii(mesh, os.path.join(exportPath, filename + ".stl"))
                 else:
                     mh2stl.exportStlBinary(mesh, os.path.join(exportPath, filename + ".stl"))
+            elif self.skel.selected:
+                mesh = gui3d.app.selectedHuman.getSubdivisionMesh() if self.exportSmooth.selected else gui3d.app.selectedHuman.meshData
+                mh2skel.exportSkel(mesh, os.path.join(exportPath, filename + ".skel"))
                     
             gui3d.app.prompt('Info', u'The mesh has been exported to %s.' % os.path.join(mh.getPath(''), u'exports'), 'OK', helpId='exportHelp')
 
