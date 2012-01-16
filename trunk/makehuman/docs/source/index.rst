@@ -1,30 +1,31 @@
-.. MakeHuman documentation master file, created by
+﻿.. MakeHuman documentation master file, created by
    sphinx-quickstart on Sun Oct 30 12:49:31 2011.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+
 Preface
 =========
 
-This manual, like the MakeHuman software, is under constant construction and will change with the software. The latest edition can always be found on the makehuman website. MakeHuman is a 3d modeling tool which is build for one single purpose: creating a professional 3d human model. 
+MakeHuman is a 3D modelling tool which is built for one single purpose: creating a professional 3D human model.  While the software is built with usability and simplicity in mind, there will always be questions, and we hope you will be able to find the answers here.
 
-While the software is build with usability and simplicity in mind, there will always be questions, that’s what Part I of this manual is for. It is modeled on the application and follows the menu system and options closely. 
+Part I describes and explains the application, menu system and options. 
 
-Part II focuses on developing with MakeHuman, to create your own plugin and add functionality to the main application. 
+Part II focuses on developing with MakeHuman: to create your own plugins and add functionality to the main application. 
+*To extend the software with new features and write a plugins, one should have a comfortable knowledge of Python and should read the part II: "Writing Plugins"*.
 
+Part III, "Application details", contains specific information about the Python engine written in C, and it is intended for developers that want to touch the core of MH only. It also contains coding style and key aspects of the development environment configuration and setup on the various supported platforms (Windows, Mac OS X and GNU/Linux).
 
+This manual, like the MakeHuman software, is under constant construction and will change with the software. The latest edition can always be found on the makehuman website.
 This manual is provided under an Attribution-NonCommercial-NoDerivs 3.0 Unported (CC BY-NC-ND 3.0) license_.
 
 .. _license: http://creativecommons.org/licenses/by-nc-nd/3.0/
 
-To extend the software with new features and write a plugins, *it'is comfortable the knowledge of python and the reading of chapter "Start from here: writing plugins"*. 
-
-The part III, "Application details", contains specific information about the Python engine written in C, and it's intended for developers that want to touch the core of MH only. 
-
-The part III, also, contain coding style and key aspects of the development environment configuration and setup on the various supported platforms (Windows, Mac OS X and GNU/Linux). 
 
 
-Part I: General usage
+
+
+Part I: User Manual
 ========================
 
 .. toctree::
