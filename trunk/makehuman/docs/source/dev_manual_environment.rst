@@ -66,7 +66,7 @@ An SDL program needs to be linked to a static library called SDLmain, which prov
 
 ::
 
-    f=open("outFile.txt", "w")
+    f=open("outfile.txt", "w")
     sys.stdout = f
 
     .. .. 
@@ -78,7 +78,7 @@ Adding this redirection is implemented in main.c, only when building on windows 
 ::
 
     #if defined(__GNUC__) && defined(__WIN32__)
-        err = PyRun_SimpleString("import sys\nf = open(\"outFile.txt\", \"w\")\nsys.stdout = f\nexecfile(\"main.py\")\nf.close()");
+        err = PyRun_SimpleString("import sys\nf = open(\"outfile.txt\", \"w\")\nsys.stdout = f\nexecfile(\"main.py\")\nf.close()");
     #else
         err = PyRun_SimpleString("execfile(\"main.py\")");
     #endif

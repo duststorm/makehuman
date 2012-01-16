@@ -4,7 +4,7 @@
    :linenothreshold: 5
 
 ############
-Files
+files
 ############
 
 .. figure::  _static/files.png
@@ -34,7 +34,7 @@ Wavefront (obj)
 ================
 
 This is a very simple format to export the mesh, with vertices, faces and UV coordinates. Originally invented by Alias/Wavefront, all major 3D packages have OBJ importers, so this format allows you to export to the greatest range of applications. However, the character is not rigged but rather a static prop.
-Wavefront obj is a good choice when you need a simple mesh for an external renderer. It comes with an mtl ﬁle deﬁning the material.
+Wavefront obj is a good choice when you need a simple mesh for an external renderer. It comes with an mtl file defining the material.
 
 
 Eyebrows
@@ -54,7 +54,7 @@ This option exports the skeleton in Biovision hierarchical data (bvh) format whi
 Groups
 ----------
 
-Whether groups are useful depends on the software used. Many importers also give the option to import the groups or not. Groups can be used to select speciﬁc body parts for modiﬁcation or deletion. If groups are not desired, uncheck it.
+Whether groups are useful depends on the software used. Many importers also give the option to import the groups or not. Groups can be used to select specific body parts for modification or deletion. If groups are not desired, uncheck it.
 
 Subdivide
 ----------
@@ -112,6 +112,6 @@ If a high poly mesh is needed, and the exernal modeler or renderer does not have
 Ethnics
 ==========
 
-Ethnics are models which try to closely resemble people from a speciﬁc region in the world. They are model ﬁles with a special ﬁnishing morph for features which cannot be created with the tools in MakeHuman. To load an ethnic, the main ethnic is selected, then one of the sub ethnics of that ethnic. 
+Ethnics are models which try to closely resemble people from a specific region in the world. They are model files with a special finishing morph for features which cannot be created with the tools in MakeHuman. To load an ethnic, the main ethnic is selected, then one of the sub ethnics of that ethnic. 
 
-The gender and age are also chosen before loading. While the these can, theoretically, be modiﬁed afterward, it is advised to choose the gender and age as close as to what you need.
+The gender and age are also chosen before loading. While the these can, theoretically, be modified afterward, it is advised to choose the gender and age as close as to what you need.

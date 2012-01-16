@@ -26,7 +26,7 @@ It may happen that you don’t have privileges to copy files to the Blender scri
 Import into Blender
 *********************
 
-When Blender starts up, there should a new entry in the File > Imports menu which says Makehuman (.mhx). If it is not there (after you have restarted Blender), just load the mhx_import.py file into a text editor in Blender and execute it from there.
+When Blender starts up, there should a new entry in the file > Imports menu which says Makehuman (.mhx). If it is not there (after you have restarted Blender), just load the mhx_import.py file into a text editor in Blender and execute it from there.
 
 .. figure::  _static/blender-import.png
    :align:   center
@@ -75,7 +75,7 @@ To convert a texture to PNG under Ubuntu:
 
 1. Double-click on the TIFF file, e.g. texture.tif.
 2. The file is opened in a program which calls itself Eye of GNOME - the GNOME image viewer.
-3. File > Save as.
+3. file > Save as.
 4. Change the filename to texture.png and click OK.
 
 Texture directory
@@ -88,11 +88,11 @@ The import script looks for the following files in order to find the image "text
 * ./data/textures/texture.png
 * ./data/textures/texture.tif
 
-Here "~" is the user's home directory, e.g. "/home/thomas" or "C:\Documents and Settings\Thomas", and "." is the directory where the MakeHuman program is located, e.g. "/usr/share/makehuman" or "C:\Program Files\Makehuman". The first two texture files can be changed by pressing button 10, "Texture Directory" in the MHX user interface above, and choosing a file in another directory.
+Here "~" is the user's home directory, e.g. "/home/thomas" or "C:\Documents and Settings\Thomas", and "." is the directory where the MakeHuman program is located, e.g. "/usr/share/makehuman" or "C:\Program files\Makehuman". The first two texture files can be changed by pressing button 10, "Texture Directory" in the MHX user interface above, and choosing a file in another directory.
 
 Note that the MakeHuman distribution comes with texture files in the TIFF format. The rationale for looking for the corresponding PNG files is to avoid the render bug on Linux mentioned above. This should not be a problem for Windows users, because the PNG files are simply ignored if they do not exist.
 
-Finally
+finally
 =========
 
 Once any texture problems have been fixed, rendering should produce an image similar to the one below. If you run into any problems, the first place to look is the MHX FAQ at TODO

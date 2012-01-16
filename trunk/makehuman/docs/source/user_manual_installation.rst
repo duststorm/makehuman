@@ -29,7 +29,7 @@ Download the archive and unzip it into a separate directory on your file system 
 
 A good location for this is the folder Application but this is not mandatory.
 
-Finally you may start MakeHuman by double clicking the Applications icon.
+finally you may start MakeHuman by double clicking the Applications icon.
 
 Linux
 =====

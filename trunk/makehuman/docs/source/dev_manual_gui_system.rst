@@ -48,11 +48,11 @@ However sometimes it can be bothersome to create a sub class each time you need 
 
     class MyParentClass:
         def __init__():
-            self.myFirstClass = MyClass()
+            self.myfirstClass = MyClass()
             
-            @self.myFirstClass.event
+            @self.myfirstClass.event
             def onMyEvent(event):
-                print("got onMyEvent in myFirstClass")
+                print("got onMyEvent in myfirstClass")
 
             self.mySecondClass = MyClass()
 
@@ -60,7 +60,7 @@ However sometimes it can be bothersome to create a sub class each time you need 
             def onMyEvent(event):
                 print("got onMyEvent in mySecondClass")
 
-However note that using self here, will always give MyParentClass. If you need the self of the MyClass instance, use self.myFirstClass or self.mySecondClass in the handler.
+However note that using self here, will always give MyParentClass. If you need the self of the MyClass instance, use self.myfirstClass or self.mySecondClass in the handler.
 View (EventHandler)
 A view is a container holding other views and objects. When it is shown or hidden, all the views and objects it contains are shown or hidden as well (providing they are not individually hidden themselves). Views also have the notion of a focus. There is only one view which can have the focus at a time. The focussed view will receive all keyboard input.
 

@@ -15,7 +15,7 @@ Start MakeHuman by double-clicking on the MakeHuman program (makehuman.exe under
    :align:   left   
 
 
-The MHX format allows us to export a rigged, textured and dressed character to Blender. To export Alia as an MHX file, press the Files, Export buttons.  Choose the .mhx Export option; for our purpose, the .bvh and group options 
+The MHX format allows us to export a rigged, textured and dressed character to Blender. To export Alia as an MHX file, press the files, Export buttons.  Choose the .mhx Export option; for our purpose, the .bvh and group options 
 are unimportant, nor does it matter whether Hair is exported as a mesh or as curves. Type in the name of character and press Save. 
 
 To do: options descrition.

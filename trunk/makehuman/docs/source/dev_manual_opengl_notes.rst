@@ -55,7 +55,7 @@ Both the projection transformation and the modelview transformation are stored i
 
 To apply transformations you need to first make one of these matrices the current matrix. Subsequent transformations are applied cumulatively to the current matrix. The glMatrixMode function is used to set the current matrix mode:
 
-* glMatrixMode(GL_PROJECTION) makes the projection transformation the current matrix so that projection settings can be applied, such as the Field of View angle and Aspect Ratio.
+* glMatrixMode(GL_PROJECTION) makes the projection transformation the current matrix so that projection settings can be applied, such as the field of View angle and Aspect Ratio.
 * glMatrixMode(GL_MODELVIEW) makes the modelview transformation matrix the current matrix so that subsequent translations and rotations move the current location through the 3D world.
 
 ************************************

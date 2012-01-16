@@ -54,7 +54,7 @@ The main toolbar along the top of the MakeHuman window allows you to change mode
 The main functions and the controls and options that they provide are detailed in their own sections of this document. The following paragraphs on this page provide a very brief summary.
 
 * The Modeling button open the modelling sub toolbar (default, macro modifiers mode). 
-* The Files button changes to File Mode to enable file interactions (see File Options). 
+* The files button changes to file Mode to enable file interactions (see file Options). 
 * The Posing button return you pose feature mode: expressions and body position (not yet completed in alpha 7) 
 * The Libraries button changes to Libraries mode to load hairs, clothes, backgrounds, skins, multi-resolution meshes and more.
 * The Render button changes to Render mode to access external rendering applications. 
@@ -74,7 +74,7 @@ There are 4 view options which might help during modeling: background, anaglyphs
 Background
 ------------
 
-The background mode shows an image ﬁle on top of the model. This is useful when the model should resemble an existing sketch, photograph or render. The ﬁrst time it is activated, it shows a list of ﬁles from the ~/makehuman/backgrounds folder to choose from. 
+The background mode shows an image file on top of the model. This is useful when the model should resemble an existing sketch, photograph or render. The first time it is activated, it shows a list of files from the ~/makehuman/backgrounds folder to choose from. 
 
 Afterward the background button toggles the background on and off. To choose another image go to library, background.
 
@@ -86,7 +86,7 @@ Anaglyphs mode renders the view from two viewpoints in red and cyan. When viewin
 Wireframe
 -----------
 
-Wireframe mode is good to see the topology and how vertices and faces are changed by certain modiﬁcations. 
+Wireframe mode is good to see the topology and how vertices and faces are changed by certain modifications. 
 
 Smooth
 ----------
@@ -105,6 +105,6 @@ There are two camera viewpoints between which can be quickly toggled, global cam
 Undo, redo and reset
 ----------------------
 
-These are not view options, but they appear throughout the application. Undo and redo are quite straightforward, they undo the last modiﬁcation or redo the last undone modiﬁcation. Reset removes all modiﬁcations, be careful as it is impossible to undo this action.
+These are not view options, but they appear throughout the application. Undo and redo are quite straightforward, they undo the last modification or redo the last undone modification. Reset removes all modifications, be careful as it is impossible to undo this action.
 
 

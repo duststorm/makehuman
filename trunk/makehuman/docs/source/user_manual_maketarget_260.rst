@@ -30,9 +30,9 @@ Maketarget for Blender 2.6x
 
 8. Assuming that the mhclo file exists and has been loaded, we can then load a target like before.
 
-.. image:: _static/8-child_target)loaded.png 
+.. image:: _static/8-child_target_loaded.png 
 
-9. Press Fit target.
+9. Press fit target.
 
 .. image:: _static/9-target_fitted.png 
 
@@ -42,6 +42,6 @@ Maketarget for Blender 2.6x
 
 .. image:: _static/10-partial_target_loaded.png  
 
-12. Fit target. The affected clothing verts have also been selected. Save the target with SelectedOnly = 1.
+12. fit target. The affected clothing verts have also been selected. Save the target with SelectedOnly = 1.
  
 .. image:: _static/11-partial_target_fitted.png

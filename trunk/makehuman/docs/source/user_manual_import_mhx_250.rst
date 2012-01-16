@@ -24,14 +24,14 @@ After Blender has been started, the MHX importer must be enabled before it can b
 Importing the MHX file
 ***********************
 
-Once the MHX importer has been enabled, you can import MHX files by  going to the File > Import > Import MHX menu.
+Once the MHX importer has been enabled, you can import MHX files by  going to the file > Import > Import MHX menu.
  
 In the file selector that appears, select the MHX file that we just  exported from MakeHuman. Since we are using version 2.56 of Blender,  the file to load is alia-25.mhx. The file alia-24.mhx is intended for the essentially obsolete Blender 2.49b.
 
 .. figure::  _static/import-menu.png
     :align:   center
    
-File > Import > Import MakeHuman (.mhx)
+file > Import > Import MakeHuman (.mhx)
 
 .. figure::  _static/import-mhx.png
     :align:   center

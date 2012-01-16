@@ -23,8 +23,8 @@ updates completely might help in making MakeHuman usable on low-end systems.
 Mouse behavior
 ==================
 
-This allows you to ﬁne-tune the speed of moving the model using the mouse. Both the
-normal speed and the speed when holding down shift can be modiﬁed.
+This allows you to fine-tune the speed of moving the model using the mouse. Both the
+normal speed and the speed when holding down shift can be modified.
 
 Units
 =========

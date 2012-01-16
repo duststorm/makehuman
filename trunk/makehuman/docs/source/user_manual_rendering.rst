@@ -49,7 +49,7 @@ There is both support for the older array format and the newer mesh2 format.
 Action
 --------
 
-Determines whether only the pov ﬁles are written or whether Povray is also launched to render the ﬁle.
+Determines whether only the pov files are written or whether Povray is also launched to render the file.
 
 
 Settings

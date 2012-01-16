@@ -20,7 +20,7 @@ When all that is done, main.py is called. This is done using::
 
     PyRun_SimpleString("execfile(\"main.py\")");
 
-The reason this method is preferred instead of PyRun_SimpleFile is that the latter might crash on windows because of incompatible structures. Python 2.6 is compiled with Visual Studio 9, which filestructures are different from MinGW or Visual Studio 8.
+The reason this method is preferred instead of PyRun_Simplefile is that the latter might crash on windows because of incompatible structures. Python 2.6 is compiled with Visual Studio 9, which filestructures are different from MinGW or Visual Studio 8.
 
 
 Python entry
