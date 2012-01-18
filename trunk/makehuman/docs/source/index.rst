@@ -40,7 +40,6 @@ Part I: User Manual
    user_manual_library.rst
    user_manual_rendering.rst  
    user_manual_setting.rst
-   user_manual_faq.rst
 
 
 Part II: Writing plugins
@@ -124,8 +123,22 @@ Part VIII: Licensing
 
    dev_manual_licensing1
    dev_manual_licensing2
-   
-Part IX: FAQ
+
+Part IX: History
+=================
+.. toctree::
+  :titlesonly:
+
+  history.rst   
+
+Part X: FAQ
+============
+
+.. toctree::
+  :titlesonly:
+
+  user_manual_faq.rst
+
 
 Indices and tables
 ==================
