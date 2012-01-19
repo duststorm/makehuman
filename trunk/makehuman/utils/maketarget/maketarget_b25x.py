@@ -57,6 +57,7 @@ import bpy
 import os
 import sys
 import math
+from mathutils import Vector
 from bpy.props import *
 from bpy_extras.io_utils import ExportHelper, ImportHelper
 
@@ -630,6 +631,53 @@ class VIEW3D_OT_BatchRenderButton(bpy.types.Operator):
         return {'FINISHED'}            
         
 #----------------------------------------------------------
+#   relaxTarget(context):
+#----------------------------------------------------------
+
+def relaxTarget(context):
+    ob = context.object
+    skey = ob.active_shape_key
+    if not skey:
+        print("No active shapekey")
+        return
+    relaxMesh(skey.data, ob.data.edges, NBodyVerts, context.scene["Relax"])
+
+def relaxMesh(verts, edges, first, k):
+    neighbors = {}
+    for e in edges:
+        v0 = e.vertices[0]
+        v1 = e.vertices[1]
+        if v0 >= first:
+            try:
+                neighbors[v0].append(v1)
+            except:
+                neighbors[v0] = [v1]
+            try:
+                neighbors[v1].append(v0)
+            except:
+                neighbors[v1] = [v0]
+    average = {}                
+    for v0 in neighbors.keys():
+        sum = Vector((0,0,0))
+        n = 0
+        for vn in neighbors[v0]:
+            sum += verts[vn].co
+            n += 1
+        average[v0] = sum/n            
+    for v in neighbors.keys():
+        verts[v].co = (1-k)*verts[v].co + k*average[v]
+    return
+    
+class VIEW3D_OT_RelaxTargetButton(bpy.types.Operator):
+    bl_idname = "mh.relax_target"
+    bl_label = "Relax target"
+
+    def execute(self, context):
+        relaxTarget(context)
+        return{'FINISHED'}      
+        
+    
+#----------------------------------------------------------
 #   fitTarget(context):
 #----------------------------------------------------------
 
@@ -840,6 +888,8 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.operator("mh.fit_target")
             layout.operator("mh.symmetrize_target", text="Symm Left->Right").left2right = True
             layout.operator("mh.symmetrize_target", text="Symm Right->Left").left2right = False
+            layout.prop(scn, '["Relax"]')
+            layout.operator("mh.relax_target")
             layout.operator("mh.discard_target")
             layout.prop(ob, '["SelectedOnly"]')
             if ob["FilePath"]:
@@ -854,6 +904,7 @@ class MakeTargetPanel(bpy.types.Panel):
 def initScene(scn):
     global TargetSubPaths
     scn["TargetPath"] = "/home/svn/makehuman/data/targets"            
+    scn["Relax"] = 0.5
     TargetSubPaths = []
     folder = os.path.realpath(os.path.expanduser(scn["TargetPath"]))
     for fname in os.listdir(folder):
