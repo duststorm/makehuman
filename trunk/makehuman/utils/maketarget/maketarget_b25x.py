@@ -205,7 +205,10 @@ def import_obj(filepath):
     faces = []
     texverts = []
     texfaces = []
+    groups = {}
 
+    group = []
+    nf = 0
     for line in fp:
         words = line.split()
         if len(words) == 0:
@@ -219,6 +222,15 @@ def import_obj(filepath):
             faces.append(f)
             if tf:
                 texfaces.append(tf)
+            group.append(nf)
+            nf += 1
+        elif words[0] == "g":
+            name = words[1]
+            try:
+                group = groups[name]
+            except KeyError:
+                group = []
+                groups[name] = group
         else:
             pass
     print("%s successfully imported" % filepath)
@@ -227,6 +239,7 @@ def import_obj(filepath):
     me = bpy.data.meshes.new(name)
     me.from_pydata(verts, [], faces)
     me.update()
+    ob = bpy.data.objects.new(name, me)
 
     if texverts:
         uvtex = me.uv_textures.new()
@@ -239,9 +252,15 @@ def import_obj(filepath):
             data[n].uv3 = texverts[tf[2]]
             if len(tf) == 4:
                 data[n].uv4 = texverts[tf[3]]
+                
+    for (name,group) in groups.items():
+        vgrp = ob.vertex_groups.new(name=name)
+        for nf in group:
+            f = me.faces[nf]
+            for v in f.vertices:
+                vgrp.add([v], 1.0, 'REPLACE')
 
     scn = bpy.context.scene
-    ob = bpy.data.objects.new(name, me)
     scn.objects.link(ob)
     ob.select = True
     scn.objects.active = ob
