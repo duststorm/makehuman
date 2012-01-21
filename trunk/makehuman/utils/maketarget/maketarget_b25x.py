@@ -280,7 +280,7 @@ class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
         theProxy = CProxy()
         theProxy.read(self.properties.filepath)
         ob = import_obj(theProxy.obj_file)
-        ob["MakeTarget"] = "Base"
+        ob["NTargets"] = 0
         ob["ProxyFile"] = self.properties.filepath
         ob["ObjFile"] = theProxy.obj_file
         setupVertexPairs(context)
@@ -310,7 +310,7 @@ class VIEW3D_OT_ImportBaseObjButton(bpy.types.Operator):
             deleteAll(context)
         theProxy = None
         ob = import_obj(self.properties.filepath)
-        ob["MakeTarget"] = "Base"
+        ob["NTargets"] = 0
         ob["ProxyFile"] = 0
         ob["ObjFile"] = self.properties.filepath
         setupVertexPairs(context)
@@ -394,10 +394,12 @@ def loadTarget(filepath, context):
     for v in ob.data.vertices:
         v.select = False
     name = os.path.basename(filepath)
-    #skey = ob.shape_key_add(name=name, from_mix=False)
-    bpy.ops.object.shape_key_add(from_mix=False)
-    skey = ob.active_shape_key
+    skey = ob.shape_key_add(name=name, from_mix=False)
+    ob.active_shape_key_index = shapeKeyLen(ob) - 1
+    #bpy.ops.object.shape_key_add(from_mix=False)
+    #skey = ob.active_shape_key
     skey.name = name
+    #print("Active", ob.active_shape_key.name)
     for line in fp:
         words = line.split()
         if len(words) == 0:
@@ -416,13 +418,19 @@ def loadTarget(filepath, context):
     fp.close()     
     skey.slider_min = -1.0
     skey.slider_max = 1.0
-    ob.show_only_shape_key = True
-    ob.use_shape_key_edit_mode = False
-    ob["MakeTarget"] = "Target"
+    skey.value = 1.0
+    ob.show_only_shape_key = False
+    ob.use_shape_key_edit_mode = True
+    ob["NTargets"] += 1
     ob["FilePath"] = realpath
     ob["SelectedOnly"] = False
     return
 
+def shapeKeyLen(ob):
+    n = 0
+    for skey in ob.data.shape_keys.key_blocks:
+        n += 1
+    return n
 
 class VIEW3D_OT_LoadTargetButton(bpy.types.Operator):
     bl_idname = "mh.load_target"
@@ -451,12 +459,15 @@ class VIEW3D_OT_LoadTargetButton(bpy.types.Operator):
 def newTarget(context):
     ob = context.object
     bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.shape_key_add(from_mix=False)
-    skey = ob.active_shape_key
-    skey.name = "Target"
-    ob.show_only_shape_key = True
-    ob.use_shape_key_edit_mode = False
-    ob["MakeTarget"] = "Target"
+    skey = ob.shape_key_add(name="Target", from_mix=False)
+    ob.active_shape_key_index = shapeKeyLen(ob) - 1
+    #bpy.ops.object.shape_key_add(from_mix=False)
+    #skey = ob.active_shape_key
+    #skey.name = name
+    skey.value = 1.0
+    ob.show_only_shape_key = False
+    ob.use_shape_key_edit_mode = True
+    ob["NTargets"] += 1
     ob["FilePath"] = 0
     ob["SelectedOnly"] = False
     return
@@ -490,6 +501,9 @@ def doSaveTarget(ob, filepath):
     print("Saving target %s to %s" % (ob, filepath))
 
     bpy.ops.object.mode_set(mode='OBJECT')
+    ob.active_shape_key_index = ob["NTargets"]
+    if not checkValid(ob):
+        return
     skey = ob.active_shape_key    
     skey.name = os.path.basename(filepath)
     saveAll = not ob["SelectedOnly"]
@@ -688,6 +702,9 @@ def fitTarget(context):
     scn = context.scene
     if not isTarget(ob):
         return
+    ob.active_shape_key_index = ob["NTargets"]
+    if not checkValid(ob):
+        return
     if not theProxy:
         path = ob["ProxyFile"]
         if path:
@@ -723,9 +740,19 @@ def discardTarget(context):
         ob["Discarding"] = True
         return    
     bpy.ops.object.mode_set(mode='OBJECT')
+    ob.active_shape_key_index = ob["NTargets"]
     bpy.ops.object.shape_key_remove()
-    ob["MakeTarget"] = "Base"
+    ob["NTargets"] -= 1
+    ob.active_shape_key_index = ob["NTargets"]
+    checkValid(ob)
     return
+    
+def checkValid(ob):
+    nShapes = shapeKeyLen(ob)
+    if nShapes != ob["NTargets"]+1:
+        print("Consistency problem:\n  %d shapes, %d targets" % (nShapes, ob["NTargets"]))
+        return False
+    return True
 
 class VIEW3D_OT_DiscardTargetButton(bpy.types.Operator):
     bl_idname = "mh.discard_target"
@@ -798,19 +825,19 @@ def findBase(context):
 
 def isBase(ob):
     try:
-        return (ob["MakeTarget"] == "Base")
+        return (ob["NTargets"] == 0)
     except:
         return False
 
 def isTarget(ob):
     try:
-        return (ob["MakeTarget"] == "Target")
+        return (ob["NTargets"] > 0)
     except:
         return False
         
 def isBaseOrTarget(ob):
     try:
-        ob["MakeTarget"]
+        ob["NTargets"]
         return True
     except:
         return False
@@ -883,13 +910,32 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.operator("mh.batch_render", text="Batch OpenGL render").opengl = True
             
         elif isTarget(ob):
+            layout.separator()
             layout.prop(ob, "show_only_shape_key")
-            layout.prop(ob.active_shape_key, "value")
+            box = layout.box()
+            n = 0
+            for skey in ob.data.shape_keys.key_blocks:
+                if n == 0:
+                    n += 1
+                    continue
+                row = box.row()
+                if n == ob.active_shape_key_index:
+                    icon='LAMP'
+                else:
+                    icon='X'
+                row.label("", icon=icon)
+                row.prop(skey, "value", text=skey.name)
+                n += 1
+            layout.separator()
+            layout.operator("mh.new_target", text="New secondary target")
+            layout.operator("mh.load_target", text="Load secondary target")            
             layout.operator("mh.fit_target")
             layout.operator("mh.symmetrize_target", text="Symm Left->Right").left2right = True
             layout.operator("mh.symmetrize_target", text="Symm Right->Left").left2right = False
-            layout.prop(scn, '["Relax"]')
-            layout.operator("mh.relax_target")
+            #layout.separator()
+            #layout.prop(scn, '["Relax"]')
+            #layout.operator("mh.relax_target")
+            layout.separator()
             layout.operator("mh.discard_target")
             layout.prop(ob, '["SelectedOnly"]')
             if ob["FilePath"]:
