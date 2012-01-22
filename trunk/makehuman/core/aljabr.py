@@ -277,19 +277,21 @@ def flatten(M):
     :type  M: double iterable
     :param M: Matrix to convert
     """
-    N=array('d')
+    #N=array('d')
+    N=[]
     for i in xrange(len(M)):
         for j in xrange(len(M[0])):
             N.append(M[i][j])
     return N
 
 def _unFlatten(M,rows,cols):
-    N=array('d')
+    N = []
+    #N=array('d')
     for i in xrange(rows):
         row = []
         n=i*cols
         for j in xrange(cols):
-            row.append(N[n+j])
+            row.append(M[n+j])
         N.append(row)
     return N
 
@@ -556,7 +558,7 @@ def matrix2Quaternion(m):
     return q
  
 def euler2Quaternion(e, axes='sxyz'):
-  return matrix2Quaternion(euler2matrix(e, axes))
+  return matrix2Quaternion(_unFlatten(euler2matrix(e, axes),4,4))
     
 def quaternionLerp(q1, q2, alpha):
     
@@ -774,6 +776,12 @@ def makeRotMatrix(angle, axis):
     M32 = (t * y) * z - s * x
     M33 = (t * z) * z + c
     return [[M11, M12, M13], [M21, M22, M23], [M31, M32, M33]]
+
+def rotMatrix2Matrix4(m):
+  return [ m[0][0], m[0][1], m[0][2], 0.0,
+           m[1][0], m[1][1], m[1][2], 0.0,
+           m[2][0], m[2][1], m[2][2], 0.0,
+           0.0, 0.0, 0.0, 1.0]
     
 def makeUnit():
     
@@ -882,7 +890,7 @@ def matrix2euler(m, ):
         ax, az = az, ax
     return [ax, ay, az]
 
-#angles are radians!
+#angles are radians!, returns flat matrix!
 def euler2matrix(rotation, axes='sxyz'):
     """
     Return homogeneous rotation matrix from Euler angles and axis sequence.
