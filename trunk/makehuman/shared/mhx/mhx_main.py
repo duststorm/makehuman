@@ -23,7 +23,7 @@ MakeHuman to MHX (MakeHuman eXchange format) exporter. MHX files can be loaded i
 """
 
 MAJOR_VERSION = 1
-MINOR_VERSION = 9
+MINOR_VERSION = 10
 BODY_LANGUAGE = True
 theHuman = 'Human'
 
@@ -434,11 +434,14 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
 def writeBaseMaterials(fp):                    
     fp.write(
 "  Material %sSkin ;\n" % theHuman +
-"  Material %sInvisio ;\n" % theHuman +
-"  Material %sHair ;\n" % theHuman +
 "  Material %sMouth ;\n" % theHuman +
 "  Material %sEye ;\n" % theHuman +
-"  Material %sBrows ;\n" % theHuman)
+"  Material %sBrows ;\n" % theHuman +
+"  Material %sInvisio ;\n" % theHuman +
+"  Material %sRed ;\n" % theHuman +
+"  Material %sGreen ;\n" % theHuman +
+"  Material %sBlue ;\n" % theHuman
+)
     
 def addMaskImage(fp, mask):            
     (folder, file) = mask
@@ -532,6 +535,11 @@ def writeVertexGroups(fp, rig, proxy):
             copyVertGroups("shared/mhx/templates/vertexgroups-breasts25.mhx", fp, proxy)    
         if theConfig.biceps:
             copyVertGroups("shared/mhx/templates/vertexgroups-biceps25.mhx", fp, proxy)    
+        copyVertGroups("shared/mhx/templates/vertexgroups-tight25.mhx", fp, proxy)    
+        if theConfig.skirtrig == "own":
+            copyVertGroups("shared/mhx/templates/vertexgroups-skirt-rigged.mhx", fp, proxy)    
+        elif theConfig.skirtrig == "inh":
+            copyVertGroups("shared/mhx/templates/vertexgroups-skirt25.mhx", fp, proxy)    
         for path in theConfig.customvertexgroups:
             print("    %s" % path)
             copyVertGroups(path, fp, proxy)    

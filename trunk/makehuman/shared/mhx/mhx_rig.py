@@ -47,7 +47,7 @@ bbMarg = 0.05
 #
 
 L_MAIN =    0x0001
-L_XPRT =    0x00010000
+L_CLO =     0x00010000
 
 L_UPSPNFK = 0x0002
 L_UPSPNIK = 0x00020000
@@ -1767,6 +1767,7 @@ def setupCircles(fp):
 import rig_joints_25, rig_body_25
 import rig_shoulder_25, rig_arm_25, rig_finger_25
 import rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
+import rig_skirt_25
 #import blenrig_rig        
 import rigify_rig
 
@@ -1886,6 +1887,11 @@ def setupRig(obj):
 
     else:
         raise NameError("Unknown rig %s" % mhx_main.theConfig.useRig)
+        
+    if mhx_main.theConfig.skirtrig == "own":
+        Joints += rig_skirt_25.SkirtJoints
+        HeadsTails += rig_skirt_25.SkirtHeadsTails
+        Armature += rig_skirt_25.SkirtArmature
 
     (custJoints, custHeadsTails, custArmature, CustomProps) = mhx_custom.setupCustomRig()
     Joints += custJoints
@@ -1944,6 +1950,8 @@ def writeControlPoses(fp):
         rig_arm_25.BicepsControlPoses(fp)
     if mhx_main.theConfig.malegenitalia:
         rig_body_25.MaleControlPoses(fp)
+    if mhx_main.theConfig.skirtrig == "own":
+        rig_skirt_25.SkirtControlPoses(fp)
     for (path, modname) in mhx_main.theConfig.customrigs:
         mod = sys.modules[modname]                
         mod.ControlPoses(fp)

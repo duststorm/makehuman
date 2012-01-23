@@ -32,7 +32,7 @@ def printVertNums(context):
     print("Verts in ", ob)
     for v in ob.data.vertices:
         if v.select:
-            print(v.index)
+            print("  ", v.index)
     print("End")
 
 class VIEW3D_OT_PrintVnumsButton(bpy.types.Operator):
@@ -42,6 +42,24 @@ class VIEW3D_OT_PrintVnumsButton(bpy.types.Operator):
     def execute(self, context):
         printVertNums(context)
         return{'FINISHED'}    
+        
+def printFirstVertNum(context):
+    ob = context.object
+    print("First vert in ", ob)
+    for v in ob.data.vertices:
+        if v.select:
+            print("  ", v.index)
+            return
+    print("None found")
+
+class VIEW3D_OT_PrintFirstVnumButton(bpy.types.Operator):
+    bl_idname = "mhw.print_first_vnum"
+    bl_label = "Print first vnum"
+
+    def execute(self, context):
+        printFirstVertNum(context)
+        return{'FINISHED'}    
+              
 
 #
 #    selectVertNum8m(context):
@@ -650,7 +668,9 @@ class VIEW3D_OT_RecoverDiamondsButton(bpy.types.Operator):
 #
 
 def exportVertexGroups(context):
-    filePath = context.scene['MhxVertexGroupFile']
+    scn = context.scene
+    filePath = scn['MhxVertexGroupFile']
+    exportAllVerts = not scn['MhxExportSelectedOnly']
     fileName = os.path.expanduser(filePath)
     fp = open(fileName, "w")
     ob = context.object
@@ -659,10 +679,10 @@ def exportVertexGroups(context):
         index = vg.index
         weights = []
         for v in me.vertices:
-            for grp in v.groups:
-                if grp.group == index and grp.weight > 0.005:
-                    weights.append((v.index, grp.weight))
-
+            if exportAllVerts or v.select:
+                for grp in v.groups:
+                    if grp.group == index and grp.weight > 0.005:
+                        weights.append((v.index, grp.weight))    
         exportList(context, weights, vg.name, fp)
     fp.close()
     print("Vertex groups exported to %s" % fileName)
@@ -708,19 +728,21 @@ def exportSumGroups(context):
     return
 
 def exportList(context, weights, name, fp):
-    #if len(weights) == 0:
-    #    return
-    if context.scene['MhxExportAsWeightFile']:
+    if len(weights) == 0:
+        return
+    scn = context.scene
+    offset = scn['MhxVertexOffset']        
+    if scn['MhxExportAsWeightFile']:
         if len(weights) > 0:
             fp.write("\n# weights %s\n" % name)
             for (vn,w) in weights:
                 if w > 0.005:
-                    fp.write("  %d %.3g\n" % (vn, w))
+                    fp.write("  %d %.3g\n" % (vn+offset, w))
     else:
         fp.write("\n  VertexGroup %s\n" % name)
         for (vn,w) in weights:
             if w > 0.005:
-                fp.write("    wv %d %.3g ;\n" % (vn, w))
+                fp.write("    wv %d %.3g ;\n" % (vn+offset, w))
         fp.write("  end VertexGroup %s\n" % name)
     return
 
@@ -1257,10 +1279,19 @@ def initInterface(context):
         name="Export as weight file", 
         default=False)
 
+    bpy.types.Scene.MhxExportSelectedOnly = BoolProperty(
+        name="Export selected verts only", 
+        default=False)
+
+    bpy.types.Scene.MhxVertexOffset = IntProperty(
+        name="Offset", 
+        description="Export vertex numbers with offset")
+
     bpy.types.Scene.MhxVertexGroupFile = StringProperty(
         name="Vertex group file", 
         maxlen=100,
         default='')
+
 
 
     scn = context.scene
@@ -1269,6 +1300,8 @@ def initInterface(context):
         scn['MhxBone1'] = 'Bone1'
         scn['MhxBone2'] = 'Bone2'
         scn['MhxExportAsWeightFile'] = False
+        scn['MhxExportSelectedOnly'] = False
+        scn['MhxVertexOffset'] = 0
         scn['MhxVertexGroupFile'] = '/home/vgroups.txt'
 
     return
@@ -1298,7 +1331,10 @@ class MhxWeightToolsPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
+        layout.operator("mhw.init_interface")
+        layout.separator()
         layout.operator("mhw.print_vnums")
+        layout.operator("mhw.print_first_vnum")
         layout.operator("mhw.print_enums")
         layout.operator("mhw.print_fnums")
         layout.operator("mhw.select_quads")
@@ -1324,6 +1360,8 @@ class MhxWeightToolsPanel(bpy.types.Panel):
         layout.separator()
         layout.prop(context.scene, 'MhxVertexGroupFile')
         layout.prop(context.scene, 'MhxExportAsWeightFile')
+        layout.prop(context.scene, 'MhxExportSelectedOnly')
+        layout.prop(context.scene, 'MhxVertexOffset')
         layout.operator("mhw.export_vertex_groups")    
         layout.operator("mhw.export_sum_groups")    
         

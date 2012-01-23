@@ -90,6 +90,7 @@ class CExportConfig:
         self.breasts = False
         self.biceps = False
         self.malegenitalia = False
+        self.skirtrig = "inherit"
         self.clothesvisibilitydrivers = False
         self.customrigs = []
         self.customshapes = []
@@ -217,6 +218,9 @@ def exportConfig(human, useHair, options=None):
                     exec("cfg.%s = %s" % (key, truthValue(words[2])))
                 except:
                     pass
+            elif key in ['skirtrig']:   
+                value = words[2][0:3].lower()
+                exec("cfg.%s = value" % key)
             elif key in ['customrigs', 'customshapes', 'customvertexgroups']:
                 status = key
             elif key == 'rig':

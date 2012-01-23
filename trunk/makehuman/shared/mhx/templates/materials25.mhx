@@ -482,81 +482,6 @@ end Material
   use_transparent_shadows False ;
 end Material
 
-
-*** Material Hair 
-  diffuse_color Array 0.04 0.04 0.04  ;
-  diffuse_intensity 0.5 ;
-  diffuse_shader 'LAMBERT' ;
-  specular_color Array 0.22 0.08 0.02  ;
-  specular_shader 'COOKTORR' ;
-  specular_intensity 0.3 ;
-  specular_hardness 250 ;
-  active_texture_index 0 ;
-  alpha 0.609195 ;
-  ambient 1 ;
-  use_cast_approximate True ;
-  use_cast_buffer_shadows True ;
-  use_cast_shadows_only False ;
-  use_cubic False ;
-  darkness 1 ;
-  diffuse_fresnel 0.1 ;
-  diffuse_fresnel_factor 0.5 ;
-  diffuse_ramp_blend 'MIX' ;
-  diffuse_ramp_factor 1 ;
-  diffuse_ramp_input 'SHADER' ;
-  diffuse_toon_size 0.5 ;
-  diffuse_toon_smooth 0.1 ;
-  emit 0 ;
-  use_face_texture False ;
-  use_face_texture_alpha False ;
-  use_full_oversampling False ;
-  invert_z False ;
-  use_light_group_exclusive False ;
-  mirror_color Array 1.0 1.0 1.0  ;
-  use_object_color False ;
-  use_only_shadow False ;
-  preview_render_type 'SPHERE' ;
-  use_ray_shadow_bias True ;
-  use_transparent_shadows False ;
-  roughness 0.5 ;
-  use_shadeless False ;
-  shadow_buffer_bias 0 ;
-  shadow_cast_alpha 1 ;
-  shadow_ray_bias 0 ;
-  use_shadows True ;
-  specular_alpha 0 ;
-  specular_ior 4 ;
-  specular_ramp_blend 'MIX' ;
-  specular_ramp_factor 1 ;
-  specular_ramp_input 'SHADER' ;
-  specular_slope 0.1 ;
-  specular_toon_size 0.5 ;
-  specular_toon_smooth 0.1 ;
-  strand Struct MaterialStrand None 
-    blend_distance 0 ;
-    use_blender_units True ;
-    size_min 0.001 ;
-    root_size 0.01 ;
-    tip_size 0.005 ;
-    shape 0 ;
-    use_tangent_shading False ;
-    width_fade 0 ;
-  end Struct
-  use_tangent_shading False ;
-  use_raytrace False ;
-  translucency 0 ;
-  use_transparency True ;
-  transparency_method 'Z_TRANSPARENCY' ;
-  use_diffuse_ramp False ;
-  use_nodes False ;
-  use_sky False ;
-  use_specular_ramp False ;
-  use_textures Array 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1  ;
-  use_vertex_color_light False ;
-  use_vertex_color_paint False ;
-  offset_z 0 ;
-end Material
-
 *** Material Invisio 
   diffuse_color Array 1.0 1.0 1.0  ;
   diffuse_shader 'LAMBERT' ;
@@ -595,7 +520,7 @@ end Material
   shadow_buffer_bias 0 ;
   shadow_cast_alpha 1 ;
   shadow_ray_bias 0 ;
-  use_shadows True ;
+  use_shadows False ;
   specular_alpha 0 ;
   specular_hardness 168 ;
   specular_intensity 0.5 ;
@@ -620,5 +545,41 @@ end Material
   use_vertex_color_light False ;
   use_vertex_color_paint False ;
   offset_z 0 ;
+end Material
+
+*** Material Red
+  diffuse_color Array 1 0 0  ;
+  use_shadeless True ;
+  use_shadows False ;
+  use_cast_buffer_shadows False ;
+  use_raytrace False ;
+  use_transparency True ;
+  transparency_method 'Z_TRANSPARENCY' ;
+  alpha 0 ;
+  specular_alpha 0 ;  
+end Material
+
+*** Material Green
+  diffuse_color Array 0 1 0  ;
+  use_shadeless True ;
+  use_shadows False ;
+  use_cast_buffer_shadows False ;
+  use_raytrace False ;
+  use_transparency True ;
+  transparency_method 'Z_TRANSPARENCY' ;
+  alpha 0 ;
+  specular_alpha 0 ;  
+end Material
+
+*** Material Blue
+  diffuse_color Array 0 0 1  ;
+  use_shadeless True ;
+  use_shadows False ;
+  use_cast_buffer_shadows False ;
+  use_raytrace False ;
+  use_transparency True ;
+  transparency_method 'Z_TRANSPARENCY' ;
+  alpha 0 ;
+  specular_alpha 0 ;  
 end Material
 
