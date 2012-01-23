@@ -90,7 +90,7 @@ class CExportConfig:
         self.breasts = False
         self.biceps = False
         self.malegenitalia = False
-        self.skirtrig = "inherit"
+        self.skirtrig = "inh"
         self.clothesvisibilitydrivers = False
         self.customrigs = []
         self.customshapes = []
