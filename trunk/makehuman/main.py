@@ -427,7 +427,8 @@ class MHApplication(gui3d.Application):
             'invertMouseWheel':False,
             'font':'arial',
             'language':'english',
-            'excludePlugins':[]
+            'excludePlugins':[],
+            'rtl': False
         }
         
         self.shortcuts = {
@@ -997,6 +998,9 @@ class MHApplication(gui3d.Application):
                 print('Error in language file %s' % language)
                 self.languageStrings = None
             f.close()
+            if '__options__' in self.languageStrings:
+                if 'rtl' in self.languageStrings['__options__']:
+                    self.settings['rtl'] = self.languageStrings['__options__']['rtl']
         else:
             self.languageStrings = None
             

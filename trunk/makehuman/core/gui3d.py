@@ -26,6 +26,7 @@ from catmull_clark_subdivision import createSubdivisionObject, updateSubdivision
 from geometry3d import NineSliceMesh, RectangleMesh, FrameMesh
 
 defaultFontFamily = 'arial'
+rtl = False;
 
 if os.path.isfile(os.path.join(mh.getPath(''), "settings.ini")):
     f = open(os.path.join(mh.getPath(''), "settings.ini"), 'r')
@@ -423,7 +424,7 @@ class TextObject(Object):
         self.alignment = alignment
         self.font = font
         
-        self.mesh = font3d.createMesh(self.font, text, wrapWidth = wrapWidth, alignment = alignment);
+        self.mesh = font3d.createMesh(self.font, text, wrapWidth = wrapWidth, alignment = alignment, rtl = app.settings.get('rtl', False))
         self.mesh.setCameraProjection(1)
         self.mesh.setShadeless(1)
         
@@ -446,7 +447,7 @@ class TextObject(Object):
         attached = self.view and self.view._View__attached
         
         self.mesh.clear()
-        self.mesh = font3d.createMesh(self.font, text, self.mesh, self.wrapWidth, self.alignment)
+        self.mesh = font3d.createMesh(self.font, text, self.mesh, self.wrapWidth, self.alignment, app.settings.get('rtl', False))
         self.mesh.setCameraProjection(1)
         self.mesh.setShadeless(1)
         if attached:

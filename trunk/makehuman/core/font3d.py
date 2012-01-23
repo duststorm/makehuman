@@ -188,9 +188,13 @@ def wrapText(font, text, width):
 AlignLeft = 0
 AlignCenter = 1
 AlignRight = 2
+
+def isRtl(ch):
+    index = ord(ch)
+    return True if index >= 0x600 and index <= 0x77F else False
             
 #returns font as object3d with 1 visibility
-def createMesh(font, text, object = None, wrapWidth=0, alignment=AlignLeft):
+def createMesh(font, text, object = None, wrapWidth=0, alignment=AlignLeft, rtl=False):
 
     if wrapWidth:
         text = wrapText(font, text, wrapWidth)
@@ -217,6 +221,33 @@ def createMesh(font, text, object = None, wrapWidth=0, alignment=AlignLeft):
             xoffset = (wrapWidth - font.stringWidth(line))
         
         zoffset = 0
+        
+        if rtl and line:
+            rtlLine = u''
+            section = u''
+            ltr = isRtl(line[0])
+            for char in line:
+                if ltr:
+                    if isRtl(char):
+                        rtlLine += section
+                        section = char
+                        ltr = False
+                    else:
+                        section += char
+                else:
+                    if isRtl(char):
+                        section += char
+                    else:
+                        for ch in reversed(section):
+                            rtlLine += ch
+                        section = char
+                        ltr = True
+            if ltr:
+                rtlLine += section
+            else:
+                for ch in reversed(section):
+                    rtlLine += ch
+            line = rtlLine
         
         for char in line:
 
