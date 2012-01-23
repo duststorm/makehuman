@@ -424,7 +424,9 @@ class TextObject(Object):
         self.alignment = alignment
         self.font = font
         
-        self.mesh = font3d.createMesh(self.font, text, wrapWidth = wrapWidth, alignment = alignment, rtl = app.settings.get('rtl', False))
+        rtl = app.settings.get('rtl', False)
+        
+        self.mesh = font3d.createMesh(self.font, text, wrapWidth = wrapWidth, alignment = alignment, rtl = rtl)
         self.mesh.setCameraProjection(1)
         self.mesh.setShadeless(1)
         

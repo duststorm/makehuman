@@ -212,16 +212,7 @@ def createMesh(font, text, object = None, wrapWidth=0, alignment=AlignLeft, rtl=
     previous = -1
 
     for line in text.splitlines():
-        
-        if alignment == AlignLeft:
-            xoffset = 0
-        elif alignment == AlignCenter:
-            xoffset = int(wrapWidth - font.stringWidth(line)) / 2
-        elif alignment == AlignRight:
-            xoffset = (wrapWidth - font.stringWidth(line))
-        
-        zoffset = 0
-        
+    
         if rtl and line:
             rtlLine = u''
             section = u''
@@ -248,6 +239,15 @@ def createMesh(font, text, object = None, wrapWidth=0, alignment=AlignLeft, rtl=
                 for ch in reversed(section):
                     rtlLine += ch
             line = rtlLine
+        
+        if alignment == AlignLeft:
+            xoffset = 0
+        elif alignment == AlignCenter:
+            xoffset = int(wrapWidth - font.stringWidth(line)) / 2
+        elif alignment == AlignRight:
+            xoffset = (wrapWidth - font.stringWidth(line))
+        
+        zoffset = 0
         
         for char in line:
 
