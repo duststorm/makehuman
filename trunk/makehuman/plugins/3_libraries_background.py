@@ -458,7 +458,7 @@ class settingsTaskView(gui3d.TaskView) :
         self.backgroundBox = self.addView(gui3d.GroupBox([10, y, 9], 'Background settings', gui3d.GroupBoxStyle._replace(height=25+36*3+24*1+6)));y+=25
 
         # sliders
-        self.opacitySlider = self.backgroundBox.addView(gui3d.Slider(value=taskview.opacity, min=0,max=255, label = "Opacity"))
+        self.opacitySlider = self.backgroundBox.addView(gui3d.Slider(value=taskview.opacity, min=0,max=255, label = "Opacity: %d"))
 
         @self.opacitySlider.event
         def onChanging(value):
