@@ -2055,7 +2055,8 @@ class TextView(View):
         
         View.__init__(self, style)
         
-        self.textObject = self.addObject(TextObject([self.style.left, self.style.top, self.style.zIndex], label,
+        translatedLabel = app.getLanguageString(label) if label else ''
+        self.textObject = self.addObject(TextObject([self.style.left, self.style.top, self.style.zIndex], translatedLabel,
             style.width, style.textAlign, app.getFont(style.fontFamily)))
         self.style.height = self.textObject.getHeight()
             
@@ -2069,9 +2070,15 @@ class TextView(View):
         self.textObject.setPosition(position)
 
     def setText(self, text):
-        self.textObject.setText(text)
+        translatedText = app.getLanguageString(text) if text else ''
+        self.textObject.setText(translatedText)
         self.style.height = self.textObject.getHeight()
-
+        
+    def setTextFormat(self, text, *values):
+        translatedText = app.getLanguageString(text) if text else ''
+        self.textObject.setText(translatedText % (values))
+        self.style.height = self.textObject.getHeight()
+        
 # TextEdit widget
 TextEditStyle = Style(**{
     'parent':ViewStyle,

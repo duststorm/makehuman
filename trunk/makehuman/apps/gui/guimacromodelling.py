@@ -113,29 +113,30 @@ class MacroModelingTaskView(gui3d.TaskView):
 
     def syncStatus(self):
         human = gui3d.app.selectedHuman
-        status = ''
+        
         if human.getGender() == 0.0:
-            gender = 'Gender: female, '
+            gender = gui3d.app.getLanguageString('female')
         elif human.getGender() == 1.0:
-            gender = 'Gender: male, '
+            gender = gui3d.app.getLanguageString('male')
         elif abs(human.getGender() - 0.5) < 0.01:
-            gender = 'Gender: neutral, '
+            gender = gui3d.app.getLanguageString('neutral')
         else:
-            gender = 'Gender: %.2f%% female, %.2f%% male, ' % ((1.0 - human.getGender()) * 100, human.getGender() * 100)
-        status += gender
+            gender = gui3d.app.getLanguageString('%.2f%% female, %.2f%% male') % ((1.0 - human.getGender()) * 100, human.getGender() * 100)
+        
         if human.getAge() < 0.5:
             age = 12 + ((25 - 12) * 2) * human.getAge()
         else:
             age = 25 + ((70 - 25) * 2) * (human.getAge() - 0.5)
-        status += 'Age: %d, ' % age
-        status += 'Muscle: %.2f%%, ' % (human.getMuscle() * 100.0)
-        status += 'Weight: %.2f%%, ' % (50 + (150 - 50) * human.getWeight())
+        
+        muscle = (human.getMuscle() * 100.0)
+        weight = (50 + (150 - 50) * human.getWeight())
         height = 10 * max(human.meshData.verts[8223].co[1] - human.meshData.verts[12361].co[1], human.meshData.verts[8223].co[1] - human.meshData.verts[13155].co[1])
         if gui3d.app.settings['units'] == 'metric':
-            status += 'Height: %.2f cm' % height
+            units = 'cm'
         else:
-            status += 'Height: %.2f in' % (height * 0.393700787)
-        self.status.setText(status)
+            units = 'in'
+            height *= 0.393700787
+        self.status.setTextFormat('Gender: %s, Age: %d, Muscle: %.2f%%, Weight: %.2f%%, Height: %.2f %s', gender, age, muscle, weight, height, units)
 
     def onShow(self, event):
         self.genderSlider.setFocus()

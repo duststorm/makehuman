@@ -288,10 +288,10 @@ class MeasureTaskView(gui3d.TaskView):
         else:
             height = '%.2f in' % (height * 0.393700787)
 
-        self.height.setText('Height: %s' % height)
-        self.chest.setText('Chest: %s' % self.getMeasure('bust'))
-        self.waist.setText('Waist: %s' % self.getMeasure('waist'))
-        self.hips.setText('Hips: %s' % self.getMeasure('hips'))
+        self.height.setTextFormat('Height: %s', height)
+        self.chest.setTextFormat('Chest: %s', self.getMeasure('bust'))
+        self.waist.setTextFormat('Waist: %s', self.getMeasure('waist'))
+        self.hips.setTextFormat('Hips: %s', self.getMeasure('hips'))
 
     def syncBraSizes(self):
 
