@@ -1001,6 +1001,10 @@ class MHApplication(gui3d.Application):
             if '__options__' in self.languageStrings:
                 if 'rtl' in self.languageStrings['__options__']:
                     self.settings['rtl'] = self.languageStrings['__options__']['rtl']
+                else:
+                    self.settings['rtl'] = False
+            else:
+                self.settings['rtl'] = False
         else:
             self.languageStrings = None
             

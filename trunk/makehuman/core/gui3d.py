@@ -417,16 +417,17 @@ class TextObject(Object):
     :type font: gui3d.Font
     """
     
-    def __init__(self, position, text = '', wrapWidth=0, alignment=AlignLeft, font=None):
+    def __init__(self, position, text = '', width=0, alignment=AlignLeft, wrap=False, font=None):
     
         self.text = text
-        self.wrapWidth = wrapWidth
+        self.width = width
         self.alignment = alignment
+        self.wrap = wrap
         self.font = font
         
         rtl = app.settings.get('rtl', False)
         
-        self.mesh = font3d.createMesh(self.font, text, wrapWidth = wrapWidth, alignment = alignment, rtl = rtl)
+        self.mesh = font3d.createMesh(self.font, text, width=width, alignment=alignment, wrap=wrap, rtl = rtl)
         self.mesh.setCameraProjection(1)
         self.mesh.setShadeless(1)
         
@@ -449,7 +450,7 @@ class TextObject(Object):
         attached = self.view and self.view._View__attached
         
         self.mesh.clear()
-        self.mesh = font3d.createMesh(self.font, text, self.mesh, self.wrapWidth, self.alignment, app.settings.get('rtl', False))
+        self.mesh = font3d.createMesh(self.font, text, self.mesh, self.width, self.alignment, self.wrap, app.settings.get('rtl', False))
         self.mesh.setCameraProjection(1)
         self.mesh.setShadeless(1)
         if attached:
@@ -1471,7 +1472,8 @@ class Slider(View):
             
         if isinstance(label, str) or isinstance(label, unicode):
             font = app.getFont(style.fontFamily)
-            self.label = self.addObject(TextObject([style.left, style.top + style.height / 4 - font.lineHeight / 2, style.zIndex + 0.2], app.getLanguageString(label), font = app.getFont(style.fontFamily)))
+            self.label = self.addObject(TextObject([style.left, style.top + style.height / 4 - font.lineHeight / 2, style.zIndex + 0.2],
+                app.getLanguageString(label), self.style.width, font = app.getFont(style.fontFamily)))
             if '%' in label:
                 self.labelFormat = app.getLanguageString(label)
                 self.edit = self.addView(TextEdit('',
@@ -1752,10 +1754,10 @@ class Button(View):
         self.button = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex], mesh))
         if isinstance(label, str):
             textAlign = self.style.textAlign
-            wrapWidth = width - self.style.padding[0] - self.style.padding[2] if textAlign else 0
+            wrapWidth = width - self.style.padding[0] - self.style.padding[2]
             self.label = self.addObject(TextObject([self.style.left + self.style.padding[0], 
                 self.style.top + height/2.0-font.lineHeight/2.0, self.style.zIndex + 0.001],
-                translatedLabel, wrapWidth, textAlign, font))
+                translatedLabel, wrapWidth, textAlign, False, font))
             
         self.selected = selected
         
@@ -2057,7 +2059,7 @@ class TextView(View):
         
         translatedLabel = app.getLanguageString(label) if label else ''
         self.textObject = self.addObject(TextObject([self.style.left, self.style.top, self.style.zIndex], translatedLabel,
-            style.width, style.textAlign, app.getFont(style.fontFamily)))
+            style.width, style.textAlign, True, app.getFont(style.fontFamily)))
         self.style.height = self.textObject.getHeight()
             
     def canFocus(self):
@@ -2114,7 +2116,8 @@ class TextEdit(View):
         self.background = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex], mesh))
             
         font = app.getFont(self.style.fontFamily)
-        self.textObject = self.addObject(TextObject([self.style.left + 10.0, self.style.top + self.style.height / 2 - font.lineHeight / 2 - 1, self.style.zIndex + 0.1], font=app.getFont(self.style.fontFamily)))
+        self.textObject = self.addObject(TextObject([self.style.left + self.style.margin[0], self.style.top + self.style.height / 2 - font.lineHeight / 2 - 1, self.style.zIndex + 0.1],
+            width=self.style.width - self.style.margin[0] - self.style.margin[2], font=app.getFont(self.style.fontFamily)))
 
         self.text = text
         self.__position = len(self.text)
@@ -2188,7 +2191,7 @@ class TextEdit(View):
     def setPosition(self, position):
         
         self.background.setPosition(position)
-        self.textObject.setPosition([position[0] + 10.0, position[1] + self.style.height / 2 - 6, position[2] + 0.1])
+        self.textObject.setPosition([position[0] + self.style.margin[0], position[1] + self.style.height / 2 - 6, position[2] + 0.1])
         
     def onMouseDragged(self, event):
         pass
@@ -2329,7 +2332,7 @@ class FileChooserRectangle(View):
         self.preview = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex], mesh))
         
         # Label
-        self.label = self.addObject(TextObject([self.style.left, self.style.top + self.style.height, self.style.zIndex], label, font=app.getFont(self.style.fontFamily)))
+        self.label = self.addObject(TextObject([self.style.left, self.style.top + self.style.height, self.style.zIndex], label, self.style.width, font=app.getFont(self.style.fontFamily)))
         
         self.file = file
         
@@ -2842,7 +2845,7 @@ class GroupBox(View):
         
         if isinstance(label, str):
             self.label = self.addObject(TextObject([position[0]+self.style.padding[0],position[1]+self.style.padding[1]/2-font.lineHeight/2-2,position[2]+0.001],
-                translatedLabel, alignment=self.style.textAlign, font=app.getFont(self.style.fontFamily)))
+                translatedLabel, self.style.width - self.style.padding[0] - self.style.padding[2], self.style.textAlign, False, app.getFont(self.style.fontFamily)))
                 
     def __str__(self):
         return "%s - %s" % (type(self), self.label.getText() if self.label else "")
@@ -2911,7 +2914,7 @@ class ShortcutEdit(View):
         self.background = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex], mesh))
         font = app.getFont(self.style.fontFamily)
         self.label = self.addObject(TextObject([self.style.left + 7 + 3, self.style.top+self.style.height/2.0-font.lineHeight/2.0, self.style.zIndex+0.001],
-            self.shortcutToLabel(shortcut[0], shortcut[1]), font=app.getFont(self.style.fontFamily)))
+            self.shortcutToLabel(shortcut[0], shortcut[1]), self.style.width - 20, font=app.getFont(self.style.fontFamily)))
             
     def getPosition(self):
         return self.background.getPosition()

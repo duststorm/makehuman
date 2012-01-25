@@ -194,10 +194,13 @@ def isRtl(ch):
     return True if index >= 0x600 and index <= 0x77F else False
             
 #returns font as object3d with 1 visibility
-def createMesh(font, text, object = None, wrapWidth=0, alignment=AlignLeft, rtl=False):
+def createMesh(font, text, object = None, width=0, alignment=AlignLeft, wrap=False, rtl=False):
 
-    if wrapWidth:
-        text = wrapText(font, text, wrapWidth)
+    if wrap:
+        text = wrapText(font, text, width)
+        
+    if rtl and alignment==AlignLeft:
+        alignment = AlignRight
         
     object = object or module3d.Object3D(text)
     object.uvValues = object.uvValues or []
@@ -243,9 +246,9 @@ def createMesh(font, text, object = None, wrapWidth=0, alignment=AlignLeft, rtl=
         if alignment == AlignLeft:
             xoffset = 0
         elif alignment == AlignCenter:
-            xoffset = int(wrapWidth - font.stringWidth(line)) / 2
+            xoffset = int(width - font.stringWidth(line)) / 2
         elif alignment == AlignRight:
-            xoffset = (wrapWidth - font.stringWidth(line))
+            xoffset = (width - font.stringWidth(line))
         
         zoffset = 0
         
