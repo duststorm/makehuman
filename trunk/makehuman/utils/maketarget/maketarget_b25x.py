@@ -516,19 +516,30 @@ def saveTarget(context):
     return
     
 def doSaveTarget(ob, filepath):    
-    fp = open(filepath, "w")  
-    print("Saving target %s to %s" % (ob, filepath))
-
     bpy.ops.object.mode_set(mode='OBJECT')
     ob.active_shape_key_index = ob["NTargets"]
     if not checkValid(ob):
         return
-    skey = ob.active_shape_key    
-    skey.name = os.path.basename(filepath)
     saveAll = not ob["SelectedOnly"]
-    for n,v in enumerate(skey.data):
+    skey = ob.active_shape_key    
+    if skey.name[0:6] == "Target":
+        skey.name = os.path.basename(filepath)
+    verts = {}
+    for v in ob.data.vertices:
+        verts[v.index] = v.co.copy()
+    for skey in ob.data.shape_keys.key_blocks:
+        if skey.name == "Basis":
+            continue       
+        for n,v in enumerate(skey.data):
+            bv = ob.data.vertices[n]
+            vec = v.co - bv.co
+            verts[n] += skey.value*vec
+
+    fp = open(filepath, "w")  
+    print("Saving target %s to %s" % (ob, filepath))
+    for n,vco in verts.items():
         bv = ob.data.vertices[n]
-        vec = v.co - bv.co
+        vec = vco - bv.co
         if vec.length > Epsilon and (saveAll or bv.select):
             fp.write("%d %.6f %.6f %.6f\n" % (n, vec[0], vec[2], -vec[1]))
     fp.close()    
@@ -897,8 +908,9 @@ class MakeTargetPanel(bpy.types.Panel):
         if not isInited(scn):
             layout.operator("mh.init")
             return
-        if isSaving(ob):
-            layout.label("Overwrite target file?")
+        if isSaving(ob):            
+            layout.label("Overwrite target file")            
+            layout.label(' "%s?"' % os.path.basename(ob["FilePath"]))
             layout.operator("mh.save_target", text="Yes") 
             layout.operator("mh.skip_save")
             return            
