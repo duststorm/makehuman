@@ -5,6 +5,16 @@ Frequently asked questions
 ###########################
 
 **********************
+Textures
+**********************
+
+A0:
+    Where should we put the custom textures, on order to see them in MH library?
+    
+A0:
+    Documents\\makehuman\\data\\skins on windows, ~\\makehuman\\data\\skins on linux. You can see that if you open the skins library and look left down, the path is written there.
+
+**********************
 Save/export questions
 **********************
 
