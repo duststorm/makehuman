@@ -17,9 +17,9 @@ Part II focuses on developing with MakeHuman: to create your own plugins and add
 Part III, "Application details", contains specific information about the Python engine written in C, and it is intended for developers that want to touch the core of MH only. It also contains coding style and key aspects of the development environment configuration and setup on the various supported platforms (Windows, Mac OS X and GNU/Linux).
 
 This manual, like the MakeHuman software, is under constant construction and will change with the software. The latest edition can always be found on the makehuman website.
-This manual is provided under an Attribution-NonCommercial-NoDerivs 3.0 Unported (CC BY-NC-ND 3.0) license_.
+This manual is provided under an Attribution-ShareAlike CC BY-SA  license_.
 
-.. _license: http://creativecommons.org/licenses/by-nc-nd/3.0/
+.. _license: http://creativecommons.org/licenses/by-sa/3.0/
 
 
 
