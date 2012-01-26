@@ -32,7 +32,7 @@ EXE = makehuman
 
 $(EXE) : $(OBJS)	
 	@echo "linking as $@ ."
-	@g++ $(EXTRALIBS) $(EXTRAFMWKS) $(OBJS) -o $@
+	@g++ $(OBJS) $(EXTRALIBS) $(EXTRAFMWKS) -o $@
 
 # ---------------------------------------------------------------------
 # Cleanup unused stuff
