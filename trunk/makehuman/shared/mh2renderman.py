@@ -301,27 +301,36 @@ class RMRHuman(RMRObject):
 
 
     def subObjectsInit(self):
+		
+		
+		#Because currently therea re no usemtl part in the wavefront obj, 
+		#we define only a subpart for the whole character
+		
         self.subObjects = []
-        self.eyeBall = RMRObject("eye_balls", self.meshData, 'eye')
-        self.eyeBall.material = self.eyeBallMat
-        self.subObjects.append(self.eyeBall)
+        self.wholebody = RMRObject("wholebody", self.meshData)
+        self.wholebody.material = self.skinMat
+        self.subObjects.append(self.wholebody)
+        
+        #self.eyeBall = RMRObject("eye_balls", self.meshData, 'eye')
+        #self.eyeBall.material = self.eyeBallMat
+        #self.subObjects.append(self.eyeBall)
 
-        self.cornea = RMRObject("cornea", self.meshData, 'cornea')
-        self.cornea.material = self.corneaMat
-        self.subObjects.append(self.cornea)
+        #self.cornea = RMRObject("cornea", self.meshData, 'cornea')
+        #self.cornea.material = self.corneaMat
+        #self.subObjects.append(self.cornea)
 
-        self.teeth = RMRObject("teeth", self.meshData, 'teeth')
-        self.teeth.material = self.teethMat
-        self.subObjects.append(self.teeth)
+        #self.teeth = RMRObject("teeth", self.meshData, 'teeth')
+        #self.teeth.material = self.teethMat
+        #self.subObjects.append(self.teeth)
 
-        self.nails = RMRObject("nails", self.meshData, 'nail')
-        self.nails.material = self.skinMat
-        self.subObjects.append(self.nails)
+        #self.nails = RMRObject("nails", self.meshData, 'nail')
+        #self.nails.material = self.skinMat
+        #self.subObjects.append(self.nails)
 
-        self.skin = RMRObject("skin", self.meshData, 'skin')
-        self.skin.material = self.skinMat
-        self.skin.materialBump = self.skinBump
-        self.subObjects.append(self.skin)
+        #self.skin = RMRObject("skin", self.meshData, 'skin')
+        #self.skin.material = self.skinMat
+        #self.skin.materialBump = self.skinBump
+        #self.subObjects.append(self.skin)
         
         if self.human.hairObj != None:
             self.hair = RMRObject("hair", self.human.hairObj.mesh)
