@@ -93,7 +93,7 @@ class AqsisTaskView(gui3d.TaskView):
         dstPath = os.path.join(self.sceneToRender.usrShaderPath, shader + '.slx')
         
         if not os.path.exists(dstPath) or os.stat(srcPath).st_mtime > os.stat(dstPath).st_mtime:
-            subprocess.Popen('aqsl %s -o "%s"' % (srcPath, dstPath), shell=True)
+            subprocess.Popen(u'aqsl %s -o "%s"' % (srcPath, dstPath), shell=True)
     
     def onShow(self, event):
         
