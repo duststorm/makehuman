@@ -17,6 +17,17 @@ Abstract
 Obj exporter
 """
 
+bl_info = {
+    "name": "MakeHuman obj exporter",
+    "author": "Thomas Larsson",
+    "version": "0.1",
+    "blender": (2, 6, 0),
+    "api": 40000,
+    'location': "File > Import > Export MH OBJ (.obj)",
+    'description': 'Export files in OBJ format (.obj). For internal MakeHuman use.',
+    'category': 'Import-Export'}
+
+
 import bpy, os, mathutils
 import math
 from mathutils import *
