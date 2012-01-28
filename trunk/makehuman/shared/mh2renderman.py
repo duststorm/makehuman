@@ -57,9 +57,9 @@ class RMRMaterial:
 
     def writeRibCode(self, file):
         file.write('\t\t%s "%s" '%(self.type,self.name))
-        print "Writing %s material"%(self.name)
+        #print "Writing %s material"%(self.name)
         for p in self.parameters:
-            print p.name, p.val
+            #print p.name, p.val
             if p.type == "float":
                 file.write('"%s %s" [%f] '%(p.type, p.name, p.val))
             if p.type == "string":
@@ -75,10 +75,10 @@ class RMRMaterial:
                 newParamater = False
                 p.val = val
         if newParamater == True:
-            print "Setting paramater %s with value %s"%(name, str(val))
+            #print "Setting paramater %s with value %s"%(name, str(val))
             self.parameters.append(MaterialParameter(pType, name, val))
-            for p in  self.parameters:
-                print p.name, p.val
+            #for p in  self.parameters:
+                #print p.name, p.val
 
 
 
@@ -185,8 +185,8 @@ class RMRLight:
 
     def placeShadowCamera(self, ribfile):
         direction = aljabr.vsub(self.lookAt, self.position)
-        print "VIEW",self.lookAt, self.position
-        print "DIRECTION: ", direction
+        #print "VIEW",self.lookAt, self.position
+        #print "DIRECTION: ", direction
         self.shadowProjection(ribfile)
         if self.roll:
             self.shadowRotate(ribfile,-self.roll, 0.0, 0.0, 1.0);
@@ -209,7 +209,7 @@ class RMRObject:
             self.facesIndices = [[(vert.idx,face.uv[index]) for index, vert in enumerate(face.verts)] for face in meshData.faces if face.mtl == mtl]
         else:
             self.facesIndices = [[(vert.idx,face.uv[index]) for index, vert in enumerate(face.verts)] for face in meshData.faces]
-        print("LEN FACEINDICES %s, %i" % (name, len(self.facesIndices)))
+        #print("LEN FACEINDICES %s, %i" % (name, len(self.facesIndices)))
 
 
 
@@ -217,7 +217,7 @@ class RMRObject:
 
     def writeRibCode(self, ribPath ):
 
-        print "ribPath = ", ribPath
+        #print "ribPath = ", ribPath
         facesUVvalues = self.meshData.uvValues #TODO usa direttamente self.
 
         ribObjFile = file(ribPath, 'w')
@@ -271,8 +271,8 @@ class RMRHuman(RMRObject):
             self.hairtexture =  os.path.splitext(os.path.basename(self.human.hairObj.getTexture()))[0]
             self.hairMat = RMRMaterial("hairpoly")
             self.hairMat.parameters.append(MaterialParameter("string", "colortexture", self.hairtexture+".tif"))
-            print "HAIRTEXTURE",  self.hairtexture
-        print "BASETEXTURE",  self.basetexture
+            #print "HAIRTEXTURE",  self.hairtexture
+        #print "BASETEXTURE",  self.basetexture
         
         
         
@@ -307,30 +307,30 @@ class RMRHuman(RMRObject):
 		#we define only a subpart for the whole character
 		
         self.subObjects = []
-        self.wholebody = RMRObject("wholebody", self.meshData)
-        self.wholebody.material = self.skinMat
-        self.subObjects.append(self.wholebody)
+        #self.wholebody = RMRObject("wholebody", self.meshData)
+        #self.wholebody.material = self.skinMat
+        #self.subObjects.append(self.wholebody)
         
-        #self.eyeBall = RMRObject("eye_balls", self.meshData, 'eye')
-        #self.eyeBall.material = self.eyeBallMat
-        #self.subObjects.append(self.eyeBall)
+        self.eyeBall = RMRObject("eye_balls", self.meshData, 'eye')
+        self.eyeBall.material = self.eyeBallMat
+        self.subObjects.append(self.eyeBall)
 
-        #self.cornea = RMRObject("cornea", self.meshData, 'cornea')
-        #self.cornea.material = self.corneaMat
-        #self.subObjects.append(self.cornea)
+        self.cornea = RMRObject("cornea", self.meshData, 'cornea')
+        self.cornea.material = self.corneaMat
+        self.subObjects.append(self.cornea)
 
-        #self.teeth = RMRObject("teeth", self.meshData, 'teeth')
-        #self.teeth.material = self.teethMat
-        #self.subObjects.append(self.teeth)
+        self.teeth = RMRObject("teeth", self.meshData, 'teeth')
+        self.teeth.material = self.teethMat
+        self.subObjects.append(self.teeth)
 
-        #self.nails = RMRObject("nails", self.meshData, 'nail')
-        #self.nails.material = self.skinMat
-        #self.subObjects.append(self.nails)
+        self.nails = RMRObject("nails", self.meshData, 'nail')
+        self.nails.material = self.skinMat
+        self.subObjects.append(self.nails)
 
-        #self.skin = RMRObject("skin", self.meshData, 'skin')
-        #self.skin.material = self.skinMat
-        #self.skin.materialBump = self.skinBump
-        #self.subObjects.append(self.skin)
+        self.skin = RMRObject("skin", self.meshData, 'skin')
+        self.skin.material = self.skinMat
+        self.skin.materialBump = self.skinBump
+        self.subObjects.append(self.skin)
         
         if self.human.hairObj != None:
             self.hair = RMRObject("hair", self.human.hairObj.mesh)
@@ -519,7 +519,7 @@ class RMRScene:
         fileDescriptor = open(path)
 
         for data in fileDescriptor:
-            print data
+            #print data
             dataList = data.split()
             fromX = float(dataList[0])
             fromY = float(dataList[1])
@@ -535,7 +535,7 @@ class RMRScene:
                 l.blur = float(dataList[8])
             if len(dataList) >= 10:
                 l.coneangle = float(dataList[9])
-            print l
+            #print l
             self.lights.append(l)
 
 
@@ -551,14 +551,14 @@ class RMRScene:
         self.humanCharacter.materialInit()
         self.humanCharacter.subObjectsInit()
 
-        if len(self.humanCharacter.subObjects) < 1:
-            print "Warning: AO calculation on 0 objects"
+        #if len(self.humanCharacter.subObjects) < 1:
+            #print "Warning: AO calculation on 0 objects"
 
         ribfile = file(fName, 'w')
         if not bakeMode:
-            print "Writing world"
+            #print "Writing world"
             for subObj in self.humanCharacter.subObjects:
-                print "rendering....", subObj.name
+                #print "rendering....", subObj.name
                 ribPath = os.path.join(self.ribsPath, subObj.name + '.rib')
                 ribfile.write('\tAttributeBegin\n')
                 subObj.writeRibCode(ribPath)
@@ -576,7 +576,7 @@ class RMRScene:
                 ribfile.write('\tSurface "null"\n')
             ribfile.write('\tAttributeEnd\n')
         else:
-            print "Writing bake world"
+            #print "Writing bake world"
             ribfile.write('\tAttributeBegin\n')
             ribfile.write('\tSurface "bakelightmap" "string bakefilename" "%s" "string texturename" "%s"\n'%(self.bakeTMPTexture, self.humanCharacter.basetexture+".tif"))
             ribPath = os.path.join(self.ribsPath, 'skin.rib')
@@ -777,7 +777,7 @@ class RenderThread(Thread):
         for filename, status in self.filenames:
 
             command = '%s "%s"' % ('aqsis -progress -progressformat="progress %f %p %s %S" -v 0', filename)
-            print command
+            #print command
             renderProc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
 
             mh.callAsync(lambda:self.app.progress(0.0, status))
