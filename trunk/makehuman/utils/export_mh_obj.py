@@ -40,16 +40,44 @@ GroupZOrderSuffix = {
     2: ["tights","skirt"]
 }
 
+#
+#   Alas, the MH GUI does not like tights and skirt, so disable for now.
+#   Z-order still works for the base mesh, because face order is preserved.
+#   Can perhaps lead to problems in the future.
+#
+
+GroupZOrderSuffix = {}
+
+#
+#   When materials represent face groups, we must figure out the real materials
+#   in some other way. Use this dict.
+#   If the group name contains the key string, assign it to the value material.
+#   If not, material is "skin".
+#
+#   Ignored when object has real materials.
+#
+
+GroupMaterials = {
+    "nail" : "nail", 
+    "eye-ball" : "eye", 
+    "teeth" : "teeth", 
+    "cornea" : "cornea", 
+    "joint" : "joint", 
+    "skirt" : "joint",
+    "tights" : "joint",
+}
+
 # Minimal distance for merging tex verts
 
 Epsilon = 1e-4
 
 #
-#   exportObjFile(path, context):
+#   exportObjFile(path, groupsAsMaterials, context):
 #
 
-def exportObjFile(path, context):
-    me = context.object.data
+def exportObjFile(path, groupsAsMaterials, context):
+    ob = context.object
+    me = ob.data
     if (not me) or (len(me.materials) < 2):
         raise NameError("Mesh must have groups as materials")
     (name,ext) = os.path.splitext(path)
@@ -65,17 +93,14 @@ def exportObjFile(path, context):
         
     orderedFaces = zOrderFaces(me)
     
+    info =  (-1, None)
     if me.uv_textures:
         (uvFaceVerts, texVerts, nTexVerts) = setupTexVerts(me)
         for vtn in range(nTexVerts):
             vt = texVerts[vtn]
             fp.write("vt %.4f %.4f\n" % (vt[0], vt[1]))
-        n = 1
-        mn = -1
         for f in orderedFaces:
-            if f.material_index != mn:
-                mn = f.material_index
-                fp.write("g %s\n" % me.materials[mn].name)
+            info = writeNewGroup(fp, f,info, me, ob, groupsAsMaterials)
             uvVerts = uvFaceVerts[f.index]
             fp.write("f ")
             for n,v in enumerate(f.vertices):
@@ -84,6 +109,7 @@ def exportObjFile(path, context):
             fp.write("\n")
     else:
         for f in orderedFaces:
+            info = writeNewGroup(fp, f, info, me, ob, groupsAsMaterials)
             fp.write("f ")
             for vn in f.vertices:
                 fp.write("%d " % (vn+1))
@@ -92,6 +118,52 @@ def exportObjFile(path, context):
     fp.close()
     print("%s written" % path)
     return
+
+def writeNewGroup(fp, f, info, me, ob, groupsAsMaterials):            
+    (gnum, mname) = info
+    if groupsAsMaterials:
+        if f.material_index != gnum:
+            gnum = f.material_index
+            gname = me.materials[gnum].name
+            mname1 = "skin"
+            for key in GroupMaterials.keys():
+                if key in gname:
+                    mname1 = GroupMaterials[key]
+                    break
+            if mname != mname1:                    
+                mname = mname1
+                fp.write("usemtl %s\n" % mname)
+            fp.write("g %s\n" % gname)
+            info = (gnum, mname)
+    else:
+        nhits = {}
+        for vn in f.vertices:
+            v = me.vertices[vn]
+            for grp in v.groups:
+                try:
+                    nhits[grp.group] += 1
+                except:
+                    nhits[grp.group] = 1
+        gn = -1
+        nverts = len(f.vertices)
+        for (gn1,n) in nhits.items():
+            if n == nverts:
+                gn = gn1
+                break
+        if gn < 0:
+            raise NameError("Did not find group for face %d" % f.index)
+        if gn != gnum:            
+            mat = me.materials[f.material_index]
+            if mname != mat.name:
+                mname = mat.name
+                fp.write("usemtl %s\n" % mname)
+            gnum = gn  
+            for vgrp in ob.vertex_groups:
+                if vgrp.index == gnum:                    
+                    fp.write("g %s\n" % vgrp.name)
+                    break
+            info = (gnum, mname)
+    return info       
 
 #
 #   zOrderFaces(me):
@@ -115,7 +187,6 @@ def zOrderFaces(me):
     zlist.sort()
     faces = []
     for (key, flist) in zlist:
-        print("order", key, len(flist))
         faces += flist
     return faces
 
@@ -206,9 +277,11 @@ class ExportObj(bpy.types.Operator, ImportHelper):
     filename_ext = ".obj"
     filter_glob = StringProperty(default="*.obj", options={'HIDDEN'})
     filepath = StringProperty(name="File Path", description="File path for the exported OBJ file", maxlen= 1024, default= "")
+    
+    groupsAsMaterials = BoolProperty(name="Groups as materials", default=False)
  
     def execute(self, context):        
-        exportObjFile(self.properties.filepath, context)
+        exportObjFile(self.properties.filepath, self.groupsAsMaterials, context)
         return {'FINISHED'}
  
     def invoke(self, context, event):

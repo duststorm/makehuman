@@ -199,7 +199,7 @@ def getScale(info, verts, index):
 
 def importObj(filepath, context):
     scn = context.scene
-    name = os.path.basename(filepath)
+    obname = os.path.basename(filepath)
     fp = open(filepath, "rU")  
     print("Importing %s" % filepath)
 
@@ -208,6 +208,7 @@ def importObj(filepath, context):
     texverts = []
     texfaces = []
     groups = {}
+    materials = {}
 
     group = []
     nf = 0
@@ -225,6 +226,7 @@ def importObj(filepath, context):
             if tf:
                 texfaces.append(tf)
             group.append(nf)
+            matlist.append(nf)
             nf += 1
         elif words[0] == "g":
             name = words[1]
@@ -233,19 +235,26 @@ def importObj(filepath, context):
             except KeyError:
                 group = []
                 groups[name] = group
+        elif words[0] == "usemtl":
+            name = words[1]
+            try:
+                matlist = materials[name]
+            except KeyError:
+                matlist = []
+                materials[name] = matlist
         else:
             pass
     print("%s successfully imported" % filepath)
     fp.close()
 
-    me = bpy.data.meshes.new(name)
+    me = bpy.data.meshes.new(obname)
     me.from_pydata(verts, [], faces)
     me.update()
-    ob = bpy.data.objects.new(name, me)
+    ob = bpy.data.objects.new(obname, me)
 
     if texverts:
         uvtex = me.uv_textures.new()
-        uvtex.name = name
+        uvtex.name = obname
         data = uvtex.data
         for n in range(len(texfaces)):
             tf = texfaces[n]
@@ -256,21 +265,9 @@ def importObj(filepath, context):
                 data[n].uv4 = texverts[tf[3]]
                 
     if scn.MhGroupsAsMats:
-        mn = 0
-        for (name,group) in groups.items():
-            try:
-                mat = bpy.data.materials[name]
-            except:
-                mat = bpy.data.materials.new(name=name)
-            if mat.name != name:
-                print("WARNING: Group name %s => %s" % (name, mat.name))
-            mat.diffuse_color = (random.random(), random.random(), random.random())
-            me.materials.append(mat)
-            for nf in group:
-                f = me.faces[nf]
-                f.material_index = mn
-            mn += 1
+        addMaterials(groups, me, "Group")
     else:
+        addMaterials(materials, me, "Material")
         for (name,group) in groups.items():
             vgrp = ob.vertex_groups.new(name=name)
             if vgrp.name != name:
@@ -279,7 +276,7 @@ def importObj(filepath, context):
                 f = me.faces[nf]
                 for v in f.vertices:
                     vgrp.add([v], 1.0, 'REPLACE')
-
+                    
     scn.objects.link(ob)
     ob.select = True
     scn.objects.active = ob
@@ -298,6 +295,23 @@ def parseFace(words):
         except:
             pass
     return (face, texface)
+
+def addMaterials(groups, me, string):        
+    mn = 0
+    for (name,group) in groups.items():
+        try:
+            mat = bpy.data.materials[name]
+        except:
+            mat = bpy.data.materials.new(name=name)
+        if mat.name != name:
+            print("WARNING: %s name %s => %s" % (string, name, mat.name))
+        mat.diffuse_color = (random.random(), random.random(), random.random())
+        me.materials.append(mat)
+        for nf in group:
+            f = me.faces[nf]
+            f.material_index = mn
+        mn += 1
+    return        
 
 class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
     bl_idname = "mh.import_base_mhclo"
