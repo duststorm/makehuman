@@ -57,6 +57,7 @@ import bpy
 import os
 import sys
 import math
+import random
 from mathutils import Vector
 from bpy.props import *
 from bpy_extras.io_utils import ExportHelper, ImportHelper
@@ -192,11 +193,12 @@ def getScale(info, verts, index):
     return num/den
     
 #----------------------------------------------------------
-#   import_obj(filepath):
+#   importObj(filepath, context):
 #   Simple obj importer which reads only verts, faces, and texture verts
 #----------------------------------------------------------
 
-def import_obj(filepath):
+def importObj(filepath, context):
+    scn = context.scene
     name = os.path.basename(filepath)
     fp = open(filepath, "rU")  
     print("Importing %s" % filepath)
@@ -253,14 +255,31 @@ def import_obj(filepath):
             if len(tf) == 4:
                 data[n].uv4 = texverts[tf[3]]
                 
-    for (name,group) in groups.items():
-        vgrp = ob.vertex_groups.new(name=name)
-        for nf in group:
-            f = me.faces[nf]
-            for v in f.vertices:
-                vgrp.add([v], 1.0, 'REPLACE')
+    if scn.MhGroupsAsMats:
+        mn = 0
+        for (name,group) in groups.items():
+            try:
+                mat = bpy.data.materials[name]
+            except:
+                mat = bpy.data.materials.new(name=name)
+            if mat.name != name:
+                print("WARNING: Group name %s => %s" % (name, mat.name))
+            mat.diffuse_color = (random.random(), random.random(), random.random())
+            me.materials.append(mat)
+            for nf in group:
+                f = me.faces[nf]
+                f.material_index = mn
+            mn += 1
+    else:
+        for (name,group) in groups.items():
+            vgrp = ob.vertex_groups.new(name=name)
+            if vgrp.name != name:
+                print("WARNING: Group name %s => %s" % (name, vgrp.name))
+            for nf in group:
+                f = me.faces[nf]
+                for v in f.vertices:
+                    vgrp.add([v], 1.0, 'REPLACE')
 
-    scn = bpy.context.scene
     scn.objects.link(ob)
     ob.select = True
     scn.objects.active = ob
@@ -298,7 +317,7 @@ class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
             deleteAll(context)
         theProxy = CProxy()
         theProxy.read(self.properties.filepath)
-        ob = import_obj(theProxy.obj_file)
+        ob = importObj(theProxy.obj_file, context)
         ob["NTargets"] = 0
         ob["ProxyFile"] = self.properties.filepath
         ob["ObjFile"] = theProxy.obj_file
@@ -328,7 +347,7 @@ class VIEW3D_OT_ImportBaseObjButton(bpy.types.Operator):
         if self.delete:
             deleteAll(context)
         theProxy = None
-        ob = import_obj(self.properties.filepath)
+        ob = importObj(self.properties.filepath, context)
         ob["NTargets"] = 0
         ob["ProxyFile"] = 0
         ob["ObjFile"] = self.properties.filepath
@@ -924,6 +943,8 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.operator("mh.batch_fix", text="Yes")
             layout.operator("mh.skip_batch")
             return
+
+        layout.prop(scn, "MhGroupsAsMats")
         if isBaseOrTarget(ob):
             layout.operator("mh.import_base_mhclo", text="Reimport base mhclo").delete = True
             layout.operator("mh.import_base_obj", text="Reimport base obj").delete = True
@@ -977,11 +998,12 @@ class MakeTargetPanel(bpy.types.Panel):
 #   Init
 #----------------------------------------------------------
 
-
 def initScene(scn):
     global TargetSubPaths
     scn["TargetPath"] = "/home/svn/makehuman/data/targets"            
     scn["Relax"] = 0.5
+    bpy.types.Scene.MhGroupsAsMats = BoolProperty(name="Groups as materials")
+    scn.MhGroupsAsMats = False
     TargetSubPaths = []
     folder = os.path.realpath(os.path.expanduser(scn["TargetPath"]))
     for fname in os.listdir(folder):
