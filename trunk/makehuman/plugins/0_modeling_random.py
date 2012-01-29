@@ -16,7 +16,7 @@ class RandomTaskView(gui3d.TaskView):
         
         @self.create.event
         def onClicked(event):
-            human = self.app.selectedHuman
+            human = gui3d.app.selectedHuman
             human.resetMeshValues()
             
             if self.macro.selected:
@@ -30,11 +30,11 @@ class RandomTaskView(gui3d.TaskView):
                                                       'data/targets/macrodetails/universal-stature-giant.target')
                 modifier.setValue(random.random() * 2 - 1, 0)
             
-            human.applyAllTargets(self.app.progress)
+            human.applyAllTargets(gui3d.app.progress)
             
         @self.modify.event
         def onClicked(event):
-            human = self.app.selectedHuman
+            human = gui3d.app.selectedHuman
             
             if self.macro.selected:
                 human.setGender(human.getGender() + random.random() - 0.5)
@@ -47,7 +47,7 @@ class RandomTaskView(gui3d.TaskView):
                                                       'data/targets/macrodetails/universal-stature-giant.target')
                 modifier.setValue(modifier.getValue() + random.random() - 0.5, 0)
                 
-            human.applyAllTargets(self.app.progress)
+            human.applyAllTargets(gui3d.app.progress)
 
 def load(app):
     category = app.getCategory('Modelling')
