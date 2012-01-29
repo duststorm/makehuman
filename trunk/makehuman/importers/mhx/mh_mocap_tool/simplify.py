@@ -25,7 +25,7 @@
 
 import bpy
 from math import pi
-from . import load
+from . import utils
 
 #
 #    simplifyFCurves(context, rig, useVisible, useMarkers):
@@ -33,8 +33,6 @@ from . import load
 
 def simplifyFCurves(context, rig, useVisible, useMarkers):
     scn = context.scene
-    if not scn.McpDoSimplify:
-        return
     act = utils.getAction(rig)
     if not act:
         return
@@ -44,7 +42,7 @@ def simplifyFCurves(context, rig, useVisible, useMarkers):
 
     for fcu in fcurves:
         simplifyFCurve(fcu, rig.animation_data.action, scn.McpErrorLoc, scn.McpErrorRot, minTime, maxTime)
-    load.setInterpolation(rig)
+    utils.setInterpolation(rig)
     print("Curves simplified")
     return
 
@@ -105,7 +103,7 @@ def simplifyFCurve(fcu, act, maxErrLoc, maxErrRot, minTime, maxTime):
     if words[-1] == 'location':
         maxErr = maxErrLoc
     elif words[-1] == 'rotation_quaternion':
-        maxErr = maxErrRot * pi/180
+        maxErr = maxErrRot * 1.0/180
     elif words[-1] == 'rotation_euler':
         maxErr = maxErrRot * pi/180
     else:
@@ -114,6 +112,8 @@ def simplifyFCurve(fcu, act, maxErrLoc, maxErrRot, minTime, maxTime):
     (points, before, after) = splitFCurvePoints(fcu, minTime, maxTime)
 
     nPoints = len(points)
+    nBefore = len(before)
+    nAfter = len(after)
     if nPoints <= 2:
         return
     keeps = []
@@ -122,29 +122,24 @@ def simplifyFCurve(fcu, act, maxErrLoc, maxErrRot, minTime, maxTime):
         keeps += new
         keeps.sort()
         new = iterateFCurves(points, keeps, maxErr)
-    newVerts = before
+    newVerts = []
     for n in keeps:
-        newVerts.append(points[n].co)
-    newVerts += after
+        newVerts.append(points[n].co.copy())
+    nNewPoints = len(newVerts)
     
-    path = fcu.data_path
-    index = fcu.array_index
-    grp = fcu.group.name
-    act.fcurves.remove(fcu)
-    nfcu = act.fcurves.new(path, index, grp)
-    for co in newVerts:
-        t = co[0]
-        try:
-            dt = t - int(t)
-        except:
-            dt = 0.5
-        if abs(dt) > 1e-5:
-            pass
-            # print(path, co, dt)
-        else:
-            nfcu.keyframe_points.insert(frame=co[0], value=co[1])
-
-    return
+    oldOffset = nBefore+nPoints
+    newOffset = nBefore+nNewPoints
+    for n in range(nAfter):
+        fcu.keyframe_points[n+newOffset].co = fcu.keyframe_points[n+oldOffset].co.copy()
+    n = nBefore+nPoints+nAfter
+    n1 = nBefore+nNewPoints+nAfter
+    while n > n1:
+        n -= 1
+        kp = fcu.keyframe_points[n]
+        fcu.keyframe_points.remove(kp)
+    for n in range(nNewPoints):
+        fcu.keyframe_points[n+nBefore].co = newVerts[n]
+    return        
 
 #
 #    iterateFCurves(points, keeps, maxErr):

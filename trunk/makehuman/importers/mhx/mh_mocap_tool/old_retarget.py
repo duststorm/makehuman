@@ -648,9 +648,9 @@ def loadRetargetSimplify(context, filepath):
     (srcRig, trgRig) = load.readBvhFile(context, filepath, scn, False)
     load.renameAndRescaleBvh(context, srcRig, trgRig)
     retargetMhxRig(context, srcRig, trgRig)
-    if scn['McpDoSimplify']:
+    if scn.McpDoSimplify:
         simplify.simplifyFCurves(context, trgRig, False, False)
-    if scn['McpRescale']:
+    if scn.McpRescale:
         simplify.rescaleFCurves(context, trgRig, scn.McpRescaleFactor)
     load.deleteSourceRig(context, srcRig, 'Y_')
     time2 = time.clock()
@@ -699,7 +699,7 @@ class VIEW3D_OT_OldLoadRetargetSimplifyButton(bpy.types.Operator, ImportHelper):
 #
 
 class OldRetargetPanel(bpy.types.Panel):
-    bl_label = "Mocap: Old retarget"
+    bl_label = "Mocap: Retarget"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     

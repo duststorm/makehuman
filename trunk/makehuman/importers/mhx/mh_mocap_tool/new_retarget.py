@@ -402,9 +402,9 @@ def loadRetargetSimplify(context, filepath):
     load.renameAndRescaleBvh(context, srcRig, trgRig)
     retargetMhxRig(context, srcRig, trgRig)
     scn = context.scene
-    if scn['McpDoSimplify']:
+    if scn.McpDoSimplify:
         simplify.simplifyFCurves(context, trgRig, False, False)
-    if scn['McpRescale']:
+    if scn.McpRescale:
         simplify.rescaleFCurves(context, trgRig, scn.McpRescaleFactor)
     load.deleteSourceRig(context, srcRig, 'Y_')
     time2 = time.clock()
@@ -416,7 +416,7 @@ def loadRetargetSimplify(context, filepath):
 #
 #   class VIEW3D_OT_NewRetargetMhxButton(bpy.types.Operator):
 #
-
+"""
 class VIEW3D_OT_NewRetargetMhxButton(bpy.types.Operator):
     bl_idname = "mcp.new_retarget_mhx"
     bl_label = "Retarget selected to active"
@@ -482,3 +482,4 @@ if __name__ == "__main__":
     register()
 
 
+"""
