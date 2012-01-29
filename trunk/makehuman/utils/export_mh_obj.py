@@ -52,14 +52,6 @@ GroupZOrderSuffix = {
 }
 
 #
-#   Alas, the MH GUI does not like tights and skirt, so disable for now.
-#   Z-order still works for the base mesh, because face order is preserved.
-#   Can perhaps lead to problems in the future.
-#
-
-GroupZOrderSuffix = {}
-
-#
 #   When materials represent face groups, we must figure out the real materials
 #   in some other way. Use this dict.
 #   If the group name contains the key string, assign it to the value material.
