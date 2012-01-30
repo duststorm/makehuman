@@ -23,10 +23,13 @@ class MediaSync(Thread):
             filenames = f.readlines()
             n = float(len(filenames))
             for index, filename in enumerate(filenames):
-                filename = filename.split()[0]
-                mh.callAsync(lambda:self.app.progress(index/n, 'Downloading %s' % filename))
-                url = os.path.join(self.url, filename)
-                success, code = cache.download(url)
+                try:
+                    filename = filename.split()[0]
+                    mh.callAsync(lambda:self.app.progress(index/n, 'Downloading %s' % filename))
+                    url = os.path.join(self.url, filename)
+                    success, code = cache.download(url)
+                except:
+                    pass
             f.close()
             mh.callAsync(lambda:self.app.progress(1.0))
         else:
