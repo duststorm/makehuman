@@ -132,7 +132,8 @@ def createSubdivisionObject(object, progressCallback=None):
             
         for f in g.faces:
             
-            if 'joint' in f.group.name:
+            if ('joint' in f.group.name or
+                'helper' in f.group.name):
                 continue
             
             # Create centroid vertex

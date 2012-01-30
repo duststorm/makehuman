@@ -1063,7 +1063,7 @@ def exportMesh(ob, fp):
 	for g in vertgroups:
 		save = True
 		n = len(g)
-		if g[:5] == "joint":
+		if g[:5] in ["joint", "helpe"]:
 			save = False
 		#elif g[n-2:] == "_L":
 		#	g1 = g[:n-2] + "_R"

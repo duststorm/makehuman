@@ -2467,6 +2467,12 @@ class Bvh2MhxPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
+        layout.label("The old mocap tool has been deprecated.")
+        layout.label("Use the new one instead.")
+        layout.label("Copy the folder mh_mocap_tool from")
+        layout.label("MH/importers/mhx to Blender addons folder")
+        layout.label("and enable MH Mocap tool add-on")
+        
         scn = context.scene
         ob = context.object
                 

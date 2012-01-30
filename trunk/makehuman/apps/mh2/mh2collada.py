@@ -47,19 +47,13 @@ Delta = [0,0.01,0]
 Root = 'MasterFloor'
 
 #
-# exportCollada(human, filename, options=None):
+# exportCollada(human, filename, options):
 #
 
-def exportCollada(human, name, options=None):
-    global useRotate90, useCopyImages, useRig
-    if options:
-        useRig = options["useRig"]
-        useRotate90 = options["rotate90"]
-        useCopyImages = options["copyImages"]
-    else:
-        useRig = "game"
-        useRotate90 = False
-        useCopyImages = False
+def exportCollada(human, name, options):
+    global useRotate90, theOptions
+    useRotate90 = options["rotate90"]
+    theOptions = options
     filename = name+".dae"
     time1 = time.clock()
     try:
@@ -375,66 +369,57 @@ class CStuff:
         return
 
 #
-#    filterMesh(mesh1):
+#    filterMesh(mesh1, obj):
 #
 
-def filterMesh(mesh1):
+def filterMesh(mesh1, obj):
     (verts1, vnormals1, uvValues1, faces1, weights1, targets1) = mesh1
     
     killVerts = {}
     killUvs = {}
-    for f in faces1:
-        if len(f) == 3:
-            for v in f:
-                killVerts[v[0]] = True
-                killUvs[v[1]] = True
+    killFaces = {}    
+    for v in obj.verts:
+        killVerts[v.idx] = False
+    for f in obj.faces:
+        killFaces[f.idx] = False        
+        for vt in f.uv:
+            killUvs[vt] = False
     
-    FixBadFaces = False
-    if FixBadFaces:            
-        badFace1 = 8603
-        badFace2 = 8629
-        badVert = 7410
-        badUvVert = 10758
-        newFace = [7404,7406,7411,2819]
-        newUvFace = [10757,12791,5360,10756]
-        killVerts[badVert] = True
-        killUvs[badUvVert] = True
-        badFaces = [badFace1, badFace2]
-    else:
-        badFaces = []
-
+    for fg in obj.faceGroups:
+        if ("joint" in fg.name) or ("helper" in fg.name):
+            for f in fg.faces:
+                killFaces[f.idx] = True
+                for v in f.verts:
+                    killVerts[v.idx] = True
+                for vt in f.uv:                    
+                    killUvs[vt] = True
+    
     n = 0
     nv = {}
     verts2 = []
     for m,v in enumerate(verts1):
-        try:
-            killVerts[m]
-        except:
+        if not killVerts[m]:
             verts2.append(v)
             nv[m] = n
             n += 1
 
     vnormals2 = []
     for m,vn in enumerate(vnormals1):
-        try:
-            killVerts[m]
-        except:
+        if not killVerts[m]:
             vnormals2.append(vn)
 
     n = 0
     uvValues2 = []
     nuv = {}
     for m,uv in enumerate(uvValues1):
-        try:
-            killUvs[m]
-        except:
+        if not killUvs[m]:
             uvValues2.append(uv)
             nuv[m] = n
             n += 1    
 
     faces2 = []
     for fn,f in enumerate(faces1):
-        if (len(f) == 4) and (fn not in badFaces):
+        if not killFaces[fn]:
             f2 = []
             for c in f:
                 v2 = nv[c[0]]
@@ -442,21 +427,11 @@ def filterMesh(mesh1):
                 f2.append([v2, uv2])
             faces2.append(f2)
 
-    if FixBadFaces:
-        f2 = []        
-        for n in range(4):
-            v2 = nv[newFace[n]]
-            uv2 = nuv[newUvFace[n]]
-            f2.append([v2, uv2])
-        faces2.append(f2)
-        
     weights2 = {}
     for (b, wts1) in weights1.items():
         wts2 = []
         for (v1,w) in wts1:
-            try:
-                killVerts[v1]
-            except:
+            if not killVerts[v1]:
                 wts2.append((nv[v1],w))
         weights2[b] = wts2
 
@@ -464,9 +439,7 @@ def filterMesh(mesh1):
     for (name, morphs1) in targets1:
         morphs2 = []
         for (v1,dx) in morphs1:
-            try:
-                killVerts[v1]
-            except:
+            if not killVerts[v1]:
                 morphs2.append((nv[v1],dx))
         targets2.append(name, morphs2)
 
@@ -477,16 +450,16 @@ def filterMesh(mesh1):
 #
 
 def exportDae(human, fp):
-    global theStuff, Root, useRotate90, useRig
+    global theStuff, Root, useRotate90, theOptions
     cfg = export_config.exportConfig(human, True)
     obj = human.meshData
-    if useRig == "game":
+    if theOptions["useRig"] == "game":
         amt = getArmatureFromRigFile('data/templates/game.rig', obj)
         Root = 'MasterFloor'
-    elif useRig == "daz":
+    elif theOptions["useRig"] == "daz":
         amt = getArmatureFromRigFile('data/templates/daz.rig', obj)
         Root = "hip"
-    elif useRig == "mb":
+    elif theOptions["useRig"] == "mb":
         amt = getArmatureFromRigFile('data/templates/mb.rig', obj)
         Root = "hips"
     #rawTargets = loadShapeKeys("data/templates/shapekeys-facial25.mhx")
@@ -499,7 +472,10 @@ def exportDae(human, fp):
     foundProxy = setupProxies('Proxy', obj, stuffs, amt, rawTargets, cfg.proxyList)
     if not foundProxy:
         mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
-        mesh2 = filterMesh(mesh1)
+        if theOptions["keepHelpers"]:
+            mesh2 = mesh1
+        else:
+            mesh2 = filterMesh(mesh1, obj)
         stuff.setMesh(mesh2)
         stuffs.append(stuff)
     setupProxies('Clothes', obj, stuffs, amt, rawTargets, cfg.proxyList)
@@ -629,13 +605,13 @@ def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
 #
 
 def writeImages(obj, fp, stuff):
-    global useCopyImages
+    global theOptions
     if stuff.type:
         return
     for fname in ["texture", "texture_ref"]:
         srcfile = os.path.realpath(os.path.expanduser("data/textures/%s.tif" % fname))
         print("Image %s" % srcfile)
-        if useCopyImages:    
+        if theOptions["copyImages"]:    
             destdir = mh.getPath('exports')
             #destdir = "/Users/Thomas/Documents"
             destfile = os.path.realpath(os.path.expanduser("%s/%s.tif" % (destdir,fname)))

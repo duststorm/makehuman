@@ -307,7 +307,7 @@ class BackgroundTaskView(gui3d.TaskView):
 
         for g in mesh.faceGroups:
 
-            if g.name.startswith("joint"):
+            if g.name.startswith("joint") or g.name.startswith("helper"):
                 continue
 
             for f in g.faces:
@@ -357,7 +357,7 @@ class BackgroundTaskView(gui3d.TaskView):
 
         for g in mesh.faceGroups:
 
-            if g.name.startswith("joint"):
+            if g.name.startswith("joint") or g.name.startswith("helper"):
                 continue
 
             for f in g.faces:

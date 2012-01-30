@@ -307,10 +307,11 @@ class ExportTaskView(gui3d.TaskView):
         y = yy
         self.colladaOptions = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*8+6)));y+=25
         self.colladaRot90 = self.colladaOptions.addView(gui3d.CheckBox("Rotate 90", False));y+=24
+        self.keepHelpers = self.colladaOptions.addView(gui3d.CheckBox("Keep helper geometry", False));y+=24
         self.colladaCopyImages = self.colladaOptions.addView(gui3d.CheckBox("Copy images", False));y+=24
         rigs = []
         self.gameDae = self.colladaOptions.addView(gui3d.RadioButton(rigs, "Default rig", True));y+=24
-        self.dazDae = self.colladaOptions.addView(gui3d.RadioButton(rigs, "Poser/DAZ rig"));y+=24
+        #self.dazDae = self.colladaOptions.addView(gui3d.RadioButton(rigs, "Poser/DAZ rig"));y+=24
         #self.mbDae = self.colladaOptions.addView(gui3d.RadioButton(rigs, "Motionbuilder rig"));y+=24
         self.colladaOptions.hide()
 
@@ -399,11 +400,11 @@ class ExportTaskView(gui3d.TaskView):
                 if self.exportEyebrows.selected and self.exportDiamonds.selected:
                     filter = None
                 elif self.exportEyebrows.selected:
-                    filter = lambda fg: not 'joint' in fg.name
+                    filter = lambda fg: not ('joint' in fg.name or 'helper' in fg.name)
                 elif self.exportDiamonds.selected:
                     filter = lambda fg: not 'eyebrown' in fg.name
                 else:
-                    filter = lambda fg: not ('joint' in fg.name or 'eyebrown' in fg.name)
+                    filter = lambda fg: not ('joint' in fg.name or 'helper' in fg.name or 'eyebrown' in fg.name)
                     
                 human = gui3d.app.selectedHuman
                     
@@ -463,6 +464,7 @@ class ExportTaskView(gui3d.TaskView):
                 options = {
                     "useRig": rig,
                     "rotate90" : self.colladaRot90.selected,
+                    "keepHelpers" : self.keepHelpers.selected,
                     "copyImages" : self.colladaCopyImages.selected,
                 }
                 mh2collada.exportCollada(gui3d.app.selectedHuman, os.path.join(exportPath, filename), options)
