@@ -300,7 +300,7 @@ def findClothes(context, bob, pob, log):
     useProjection = False
     
     bestFaces = []
-    print("Optimal triangles not found for the following verts")
+    badVerts = []
     for (pv, bindex, exact, mverts, fcs) in bestVerts:
         #print(pv.index)
         pv.select = False
@@ -315,7 +315,7 @@ def findClothes(context, bob, pob, log):
                 bWts = wts
                 bVerts = fverts
         if minmax < theThreshold:
-            print(pv.index)
+            badVerts.append(pv.index)
             pv.select = True
             """
             if scn['MakeClothesForbidFailures']:
@@ -346,7 +346,19 @@ def findClothes(context, bob, pob, log):
         else:
             bestFaces.append((pv, False, bVerts, bWts, diff))    
 
-    print("Done")
+    if badVerts:
+        print("Optimal triangles not found for the following verts")
+        n = 0
+        nmax = len(badVerts)
+        string = ""
+        for vn in badVerts:
+            string += "%6d " % vn
+            n += 1
+            if n%8 == 0:
+                print(string)
+                string = ""
+        print(string)                
+        print("Done")
     return bestFaces
 
 #
@@ -1757,7 +1769,7 @@ def setZDepthItems():
 def setZDepth(scn):    
     global ZDepthItems
     (name1, name2, name3) = ZDepthItems[scn["MakeClothesZDepthName"]]
-    print(name1)
+    #print(name1)
     scn["MakeClothesZDepth"] = ZDepth[name1]
     return
     
@@ -1859,17 +1871,22 @@ def checkAndVertexDiamonds(ob):
     bpy.ops.mesh.select_all(action='DESELECT')
     bpy.ops.object.mode_set(mode='OBJECT')
     me = ob.data
+    nverts = len(me.vertices)
+    if nverts < 15340:
+        raise NameError("Base object %s has only %d verts. A MH human must have at least 15340" % (ob, nverts))
+    """        
     hasDiamonds = False
     for f in me.faces:        
         if len(f.vertices) < 4:
             hasDiamonds = True
             for vn in f.vertices:
                 me.vertices[vn].select = True
+    if not hasDiamonds:
+        raise NameError("Base object %s does not have any joint diamonds" % ob.name)
+    """        
     bpy.ops.object.mode_set(mode='EDIT')
     bpy.ops.object.vertex_group_remove_from(all=True)
     bpy.ops.object.mode_set(mode='OBJECT')
-    if not hasDiamonds:
-        raise NameError("Base object %s does not have any joint diamonds" % ob.name)
     return            
 
 ###################################################################################    
