@@ -1072,32 +1072,14 @@ static PyObject *Texture_loadImage(Texture *texture, PyObject *args)
 
 static PyObject *Texture_loadSubImage(Texture *texture, PyObject *args)
 {
-  PyObject *path;
+  Image *img;
   int x, y;
 
-  if (!PyArg_ParseTuple(args, "Oii", &path, &x, &y))
+  if (!PyArg_ParseTuple(args, "O!ii", &ImageType, &img, &x, &y))
     return NULL;
 
-  if (PyString_Check(path))
-  {
-    if (!mhLoadSubTexture(PyString_AsString(path), texture->textureId, x, y))
-      return NULL;
-  }
-  else if (PyUnicode_Check(path))
-  {
-    path = PyUnicode_AsUTF8String(path);
-    if (!mhLoadSubTexture(PyString_AsString(path), texture->textureId, x, y))
-    {
-      Py_DECREF(path);
-      return NULL;
-    }
-    Py_DECREF(path);
-  }
-  else
-  {
-    PyErr_SetString(PyExc_TypeError, "String or Unicode object expected");
-    return NULL;
-  }
+  if (!mhLoadSubTexture(img, texture->textureId, x, y))
+	return NULL;
 
   return Py_BuildValue("");
 }
@@ -1275,12 +1257,12 @@ GLuint mhLoadTexture(const Image *img, GLuint texture, int *width, int *height)
 #endif // ! __APPLE__
 }
 
-GLuint mhLoadSubTexture(const char *fname, GLuint texture, int x, int y)
+GLuint mhLoadSubTexture(const Image *img, GLuint texture, int x, int y)
 {
 #ifdef __APPLE__
     return textureCacheLoadSubTexture(fname, texture, x, y);
 #else
-    SDL_Surface *surface;
+    SDL_Surface *surface, *flippedSurface;
     int internalFormat, format;
 
     if (!texture)
@@ -1289,7 +1271,7 @@ GLuint mhLoadSubTexture(const char *fname, GLuint texture, int x, int y)
         return 0;
     }
 
-    surface = mhLoadImage(fname);
+	surface = img->surface;
 
     if (!surface)
         return 0;
@@ -1315,26 +1297,26 @@ GLuint mhLoadSubTexture(const char *fname, GLuint texture, int x, int y)
             format = GL_RGBA;
         break;
     default:
-        SDL_FreeSurface(surface);
-        PyErr_Format(PyExc_RuntimeError, "Could not load %s, unsupported pixel format", fname);
+        PyErr_Format(PyExc_RuntimeError, "Could not load image, unsupported pixel format");
         return 0;
     }
 
     // For some reason we need to flip the surface vertically
-    mhFlipSurface(surface);
+	flippedSurface = SDL_ConvertSurface(surface, surface->format, SDL_SWSURFACE);
+    mhFlipSurface(flippedSurface);
 
     if (surface->h == 1)
     {
         glBindTexture(GL_TEXTURE_1D, texture);
-        glTexSubImage1D(GL_TEXTURE_1D, 0, x, surface->w, format, GL_UNSIGNED_BYTE, surface->pixels);
+        glTexSubImage1D(GL_TEXTURE_1D, 0, x, flippedSurface->w, format, GL_UNSIGNED_BYTE, flippedSurface->pixels);
     }
     else
     {
         glBindTexture(GL_TEXTURE_2D, texture);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, surface->w, surface->h, format, GL_UNSIGNED_BYTE, surface->pixels);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, flippedSurface->w, surface->h, format, GL_UNSIGNED_BYTE, flippedSurface->pixels);
     }
 
-    SDL_FreeSurface(surface);
+    SDL_FreeSurface(flippedSurface);
 
     return texture;
 #endif // ! __APPLE__

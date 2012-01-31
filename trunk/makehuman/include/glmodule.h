@@ -51,7 +51,7 @@ typedef struct
 
 // Text, shader and texture services
     GLuint mhLoadTexture(const Image *img, GLuint texture, int *width, int *height);
-    GLuint mhLoadSubTexture(const char *fname, GLuint texture, int x, int y);
+    GLuint mhLoadSubTexture(const Image *img, GLuint texture, int x, int y);
     GLuint mhCreateVertexShader(const char *source);
     GLuint mhCreateFragmentShader(const char *source);
     GLuint mhCreateShader(GLuint vertexShader, GLuint fragmentShader);

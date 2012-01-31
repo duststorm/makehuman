@@ -246,25 +246,6 @@ static PyObject *mh_setClearColor(PyObject *self, PyObject *args)
     return Py_BuildValue("");
 }
 
-/** \brief Load texture of an object from file.
- *
- *  This function passes a string containing the file system path to a texture file
- *  into OpenGL.
- *  The texture from this file is applied to the specified object.
- *  It returns a null value.
- */
-/*static PyObject* mh_LoadTexture(PyObject *self, PyObject *args)
-{
-    int texture;
-    char *filename;
-    if (!PyArg_ParseTuple(args, "si", &filename, &texture))
-        return NULL;
-    else if (!(texture = mhLoadTexture(filename, texture, NULL, NULL)))
-        return NULL;
-    else
-        return Py_BuildValue("i", texture);
-}*/
-
 static PyObject* mh_CreateVertexShader(PyObject *self, PyObject *args)
 {
     int shader;
@@ -707,7 +688,6 @@ static PyMethodDef EmbMethods[] =
     {"setFullscreen", mh_setFullscreen, METH_VARARGS, ""},
     {"setCaption", mh_setCaption, METH_VARARGS, ""},
     {"setClearColor", mh_setClearColor, METH_VARARGS, ""},
-    //{"loadTexture", mh_LoadTexture, METH_VARARGS, ""},
     {"createVertexShader", mh_CreateVertexShader, METH_VARARGS, ""},
     {"createFragmentShader", mh_CreateFragmentShader, METH_VARARGS, ""},
     {"createShader", mh_CreateShader, METH_VARARGS, ""},

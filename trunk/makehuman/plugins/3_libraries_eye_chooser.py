@@ -58,7 +58,8 @@ class EyesTaskView(gui3d.TaskView):
             x, y = subTexture['dst']
             img.blit(subImg, x, y)
             
-        texture.loadImage(img)
+        texture.loadSubImage(img, 0, 0)
+        #texture.loadImage(img)
 
     def onShow(self, event):
         # When the task gets shown, set the focus to the file chooser
