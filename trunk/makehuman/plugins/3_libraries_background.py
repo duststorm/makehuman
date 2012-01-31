@@ -222,7 +222,7 @@ class BackgroundTaskView(gui3d.TaskView):
             elif self.bgImageBottomRadioButton.selected:
                 self.filenames['bottom'] = filename
 
-            self.texture.loadImage(os.path.join(self.backgroundsFolder, filename))
+            self.texture.loadImage(mh.Image(os.path.join(self.backgroundsFolder, filename)))
 
             bg = self.backgroundImage
             bg.mesh.setTexture(os.path.join(self.backgroundsFolder, filename))

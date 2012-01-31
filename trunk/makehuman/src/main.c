@@ -253,7 +253,7 @@ static PyObject *mh_setClearColor(PyObject *self, PyObject *args)
  *  The texture from this file is applied to the specified object.
  *  It returns a null value.
  */
-static PyObject* mh_LoadTexture(PyObject *self, PyObject *args)
+/*static PyObject* mh_LoadTexture(PyObject *self, PyObject *args)
 {
     int texture;
     char *filename;
@@ -263,7 +263,7 @@ static PyObject* mh_LoadTexture(PyObject *self, PyObject *args)
         return NULL;
     else
         return Py_BuildValue("i", texture);
-}
+}*/
 
 static PyObject* mh_CreateVertexShader(PyObject *self, PyObject *args)
 {
@@ -707,7 +707,7 @@ static PyMethodDef EmbMethods[] =
     {"setFullscreen", mh_setFullscreen, METH_VARARGS, ""},
     {"setCaption", mh_setCaption, METH_VARARGS, ""},
     {"setClearColor", mh_setClearColor, METH_VARARGS, ""},
-    {"loadTexture", mh_LoadTexture, METH_VARARGS, ""},
+    //{"loadTexture", mh_LoadTexture, METH_VARARGS, ""},
     {"createVertexShader", mh_CreateVertexShader, METH_VARARGS, ""},
     {"createFragmentShader", mh_CreateFragmentShader, METH_VARARGS, ""},
     {"createShader", mh_CreateShader, METH_VARARGS, ""},

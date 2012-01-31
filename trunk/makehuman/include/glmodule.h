@@ -42,9 +42,15 @@
 extern "C"
 {
 #endif
+	
+typedef struct
+{
+    PyObject_HEAD
+    SDL_Surface *surface;
+} Image;
 
 // Text, shader and texture services
-    GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height);
+    GLuint mhLoadTexture(const Image *img, GLuint texture, int *width, int *height);
     GLuint mhLoadSubTexture(const char *fname, GLuint texture, int x, int y);
     GLuint mhCreateVertexShader(const char *source);
     GLuint mhCreateFragmentShader(const char *source);

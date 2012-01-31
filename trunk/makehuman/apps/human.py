@@ -44,6 +44,7 @@ class Human(gui3d.Object):
     def __init__(self, mesh, hairObj=None):
 
         gui3d.Object.__init__(self, [0, 0, 0], mesh, True)
+        
         self.mesh.setCameraProjection(0)
         self.mesh.setShadeless(0)
         self.meshData = self.mesh

@@ -324,12 +324,6 @@ static SDL_Surface *mhLoadImage(const char *fname)
  *  The constructor of the Image object.
  */
 
-typedef struct
-{
-    PyObject_HEAD
-    SDL_Surface *surface;
-} Image;
-
 static PyObject *Image_getItem(Image *self, PyObject *xy);
 static int Image_setItem(Image *self, PyObject *xy, PyObject *color);
 
@@ -342,8 +336,9 @@ static PyMappingMethods Image_as_mapping[] = {
 
 static PyObject *Image_load(Image *image, PyObject *path);
 static PyObject *Image_save(Image *image, PyObject *path);
-static PyObject *Image_resize(Image *image, PyObject *path);
-static PyObject *Image_resized(Image *image, PyObject *path);
+static PyObject *Image_resize(Image *image, PyObject *args);
+static PyObject *Image_resized(Image *image, PyObject *args);
+static PyObject *Image_blit(Image *image, PyObject *args);
 
 // Image Methods
 static PyMethodDef Image_methods[] =
@@ -363,6 +358,10 @@ static PyMethodDef Image_methods[] =
 	{
         "resized", (PyCFunction)Image_resized, METH_VARARGS,
         "returns a resized copy of the specified image"
+    },
+	{
+        "blit", (PyCFunction)Image_blit, METH_VARARGS,
+        "Blits an image in the specified image at the given coordinates"
     },
     {NULL}  /* Sentinel */
 };
@@ -843,6 +842,40 @@ static PyObject *Image_resized(Image *self, PyObject *args)
 	return (PyObject*)img;
 }
 
+static PyObject *Image_blit(Image *self, PyObject *args)
+{
+	int x, y;
+	Image *img = NULL;
+	SDL_Rect src, dst;
+
+	if (!self->surface)
+	{
+		PyErr_SetString(PyExc_RuntimeError, "image not initialized");
+		return NULL;
+	}
+
+	if (!PyArg_ParseTuple(args, "O!ii", &ImageType, &img, &x, &y))
+		return NULL;
+
+	src.x = 0;
+	src.y = 0;
+	src.w = img->surface->w;
+	src.h = img->surface->h;
+
+	dst.x = x;
+	dst.y = y;
+	dst.w = img->surface->w;
+	dst.h = img->surface->h;
+
+	if (SDL_BlitSurface(img->surface, &src, self->surface, &dst))
+	{
+		PyErr_SetString(PyExc_RuntimeError, "SDL_BlitSurface failed");
+		return NULL;
+	}
+
+	return Py_BuildValue("");
+}
+
 static PyObject *Image_getWidth(Image *self, void *closure)
 {
 	if (!self->surface)
@@ -891,14 +924,14 @@ static PyMemberDef Texture_members[] =
     {NULL}  /* Sentinel */
 };
 
-static PyObject *Texture_loadImage(Texture *texture, PyObject *path);
+static PyObject *Texture_loadImage(Texture *texture, PyObject *args);
 static PyObject *Texture_loadSubImage(Texture *texture, PyObject *args);
 
 // Texture Methods
 static PyMethodDef Texture_methods[] =
 {
     {
-        "loadImage", (PyCFunction)Texture_loadImage, METH_O,
+        "loadImage", (PyCFunction)Texture_loadImage, METH_VARARGS,
         "Loads the specified image from file"
     },
     {
@@ -1013,39 +1046,26 @@ static PyObject *Texture_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
  */
 static int Texture_init(Texture *self, PyObject *args, PyObject *kwds)
 {
-    char *path = NULL;
+    Image *img = NULL;
 
-    if (!PyArg_ParseTuple(args, "|s", &path))
+    if (!PyArg_ParseTuple(args, "|O!", &ImageType, &img))
         return -1;
 
-    if (path && !mhLoadTexture(path, self->textureId, &self->width, &self->height))
+    if (img && !mhLoadTexture(img, self->textureId, &self->width, &self->height))
         return -1;
 
     return 0;
 }
 
-static PyObject *Texture_loadImage(Texture *texture, PyObject *path)
+static PyObject *Texture_loadImage(Texture *texture, PyObject *args)
 {
-    if (PyString_Check(path))
-    {
-        if (!mhLoadTexture(PyString_AsString(path), texture->textureId, &texture->width, &texture->height))
-            return NULL;
-    }
-    else if (PyUnicode_Check(path))
-    {
-        path = PyUnicode_AsUTF8String(path);
-        if (!mhLoadTexture(PyString_AsString(path), texture->textureId, &texture->width, &texture->height))
-        {
-            Py_DECREF(path);
-            return NULL;
-        }
-        Py_DECREF(path);
-    }
-    else
-    {
-        PyErr_SetString(PyExc_TypeError, "String or Unicode object expected");
+	Image *img;
+
+	if (!PyArg_ParseTuple(args, "O!", &ImageType, &img))
         return NULL;
-    }
+
+    if (!mhLoadTexture(img, texture->textureId, &texture->width, &texture->height))
+            return NULL;
 
     return Py_BuildValue("");
 }
@@ -1172,18 +1192,18 @@ static void mhFlipSurface(SDL_Surface *surface)
  *
  *  This function loads a texture from a texture file and binds it into the OpenGL textures array.
  */
-GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
+GLuint mhLoadTexture(const Image *img, GLuint texture, int *width, int *height)
 {
 #ifdef __APPLE__
     return textureCacheLoadTexture(fname, texture, width, height);
 #else /* !__APPLE__ */
-    SDL_Surface *surface;
+    SDL_Surface *surface, *flippedSurface;
     int internalFormat, format;
 
     if (!texture)
         glGenTextures(1, &texture);
 
-    surface = mhLoadImage(fname);
+	surface = img->surface;
 
     if (!surface)
         return 0;
@@ -1209,13 +1229,13 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
             format = GL_RGBA;
         break;
     default:
-        SDL_FreeSurface(surface);
-        PyErr_Format(PyExc_RuntimeError, "Could not load %s, unsupported pixel format", fname);
+        PyErr_Format(PyExc_RuntimeError, "Could not load image, unsupported pixel format");
         return 0;
     }
 
     // For some reason we need to flip the surface vertically
-    mhFlipSurface(surface);
+	flippedSurface = SDL_ConvertSurface(surface, surface->format, SDL_SWSURFACE);
+    mhFlipSurface(flippedSurface);
 
     if (surface->h == 1)
     {
@@ -1225,8 +1245,8 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
         //glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        //gluBuild1DMipmaps(GL_TEXTURE_1D, internalFormat, surface->w, format, GL_UNSIGNED_BYTE, surface->pixels);
-		glTexImage1D(GL_TEXTURE_1D, 0, internalFormat, surface->w, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
+        //gluBuild1DMipmaps(GL_TEXTURE_1D, internalFormat, flippedSurface->w, format, GL_UNSIGNED_BYTE, flippedSurface->pixels);
+		glTexImage1D(GL_TEXTURE_1D, 0, internalFormat, flippedSurface->w, 0, format, GL_UNSIGNED_BYTE, flippedSurface->pixels);
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
     else
@@ -1239,17 +1259,17 @@ GLuint mhLoadTexture(const char *fname, GLuint texture, int *width, int *height)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        //gluBuild2DMipmaps(GL_TEXTURE_2D, internalFormat, surface->w, surface->h, format, GL_UNSIGNED_BYTE, surface->pixels);
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
+        //gluBuild2DMipmaps(GL_TEXTURE_2D, internalFormat, flippedSurface->w, surface->h, format, GL_UNSIGNED_BYTE, flippedSurface->pixels);
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, flippedSurface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, flippedSurface->pixels);
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
 
     if (width)
-        *width = surface->w;
+        *width = flippedSurface->w;
     if (height)
-        *height = surface->h;
+        *height = flippedSurface->h;
 
-    SDL_FreeSurface(surface);
+	SDL_FreeSurface(flippedSurface);
 
     return texture;
 #endif // ! __APPLE__

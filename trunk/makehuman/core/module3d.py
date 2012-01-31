@@ -47,8 +47,8 @@ class Texture(mh.Texture):
     A subclass of the base texture class extended to hold a modification date.
     """
 
-    def __init__(self):
-        mh.Texture.__init__(self)
+    def __init__(self, *args, **kwargs):
+        mh.Texture.__init__(self, *args, **kwargs)
         self.modified = None
         
 def getTexture(path, cache=None):
@@ -65,7 +65,8 @@ def getTexture(path, cache=None):
             print 'reloading ' + path
             
             try:
-                texture.loadImage(path)
+                img = mh.Image(path=path)
+                texture.loadImage(img)
             except RuntimeError, text:
                 print text
                 return
@@ -74,8 +75,8 @@ def getTexture(path, cache=None):
     else:
         
         try:
-            texture = Texture()
-            texture.loadImage(path)
+            img = mh.Image(path=path)
+            texture = Texture(img)
             #texture.loadSubImage('data/themes/default/images/slider_focused.png', 0, 0)
         except RuntimeError, text:
             print text

@@ -50,13 +50,15 @@ class EyesTaskView(gui3d.TaskView):
         f.close()
         
         texture = module3d.getTexture(human.getTexture())
+        img = mh.Image(human.getTexture())
         
         for subTexture in subTextures:
             path = os.path.join('data/eyes', subTexture['txt'])
-            txt = mh.Texture()
-            txt.loadImage(path)
+            subImg = mh.Image(path)
             x, y = subTexture['dst']
-            texture.loadSubImage(path, x, texture.height - y - txt.height)
+            img.blit(subImg, x, y)
+            
+        texture.loadImage(img)
 
     def onShow(self, event):
         # When the task gets shown, set the focus to the file chooser
