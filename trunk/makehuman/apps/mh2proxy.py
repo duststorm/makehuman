@@ -44,12 +44,18 @@ class CProxy:
         self.faces = []
         self.texFaces = []
         self.texVerts = []
+        self.texFacesLayers = {}
+        self.texVertsLayers = {}
         self.useBaseMaterials = False
         self.faceNumbers = []
         self.mask = None
         self.texture = None
         self.obj_file = None
         self.material_file = None
+        self.maskLayer = 0
+        self.textureLayer = 0
+        self.objFileLayer = 0
+        self.uvtexLayerName = {0 : "UVTex"}
         self.materials = []
         self.constraints = []
         self.wire = False
@@ -159,6 +165,7 @@ def readProxyFile(obj, file, evalOnLoad):
     doWeights = 6
     doRefVerts = 7
     doFaceNumbers = 8
+    doTexFaces = 9
 
     vn = 0
     for line in tmpl:
@@ -191,8 +198,26 @@ def readProxyFile(obj, file, evalOnLoad):
                 status = doFaceNumbers
             elif words[1] == 'texVerts':
                 status = doTexVerts
+                if len(words) > 2:
+                    layer = int(words[2])
+                else:
+                    layer = 0
+                proxy.texVerts = []
+                proxy.texVertsLayers[layer] = proxy.texVerts
+            elif words[1] == 'texFaces':
+                status = doTexFaces
+                if len(words) > 2:
+                    layer = int(words[2])
+                else:
+                    layer = 0
+                proxy.texFaces = []
+                proxy.texFacesLayers[layer] = proxy.texFaces
             elif words[1] == 'obj_data':
                 status = doObjData
+                proxy.texVerts = []
+                proxy.texFaces = []
+                proxy.texVertsLayers[0] = proxy.texVerts
+                proxy.texFacesLayers[0] = proxy.texFaces                
             elif words[1] == 'name':
                 proxy.name = words[2]
             elif words[1] == 'z_depth':
@@ -217,8 +242,16 @@ def readProxyFile(obj, file, evalOnLoad):
                 proxy.weightfile = (words[2], words[3])
             elif words[1] == 'mask':
                 proxy.mask = getFileName(folder, words[2], ".png")
+                if len(words) > 3:
+                    proxy.maskLayer = int(words[3])
             elif words[1] == 'texture':
                 proxy.texture = getFileName(folder, words[2], ".tif")
+                if len(words) > 3:
+                    proxy.textureLayer = int(words[3])
+            elif words[1] == 'objfile_layer':
+                proxy.objFileLayer = int(words[2])
+            elif words[1] == 'uvtex_layer':
+                proxy.uvtexLayerName[int(words[2])] = words[3]
             elif words[1] == 'material_file':
                 proxy.material_file = getFileName(folder, words[2], ".mhx")
             elif words[1] == 'obj_file':
@@ -304,6 +337,8 @@ def readProxyFile(obj, file, evalOnLoad):
             newFace(0, words, theGroup, proxy)
         elif status == doTexVerts:
             newTexVert(0, words, proxy)
+        elif status == doTexFaces:
+            newTexFace(words, proxy)
         elif status == doMaterial:
             readMaterial(line, proxy.material)
         elif status == doWeights:
@@ -332,6 +367,11 @@ def copyObjFile(proxy):
         print("*** Cannot open %s" % objpath)
         return False
 
+    proxy.texVerts = []
+    proxy.texFaces = []
+    layer = proxy.objFileLayer
+    proxy.texVertsLayers[layer] = proxy.texVerts
+    proxy.texFacesLayers[layer] = proxy.texFaces
     theGroup = None    
     for line in tmpl:
         words= line.split()        
@@ -538,6 +578,14 @@ def newFace(first, words, group, proxy):
             raise NameError("texface %s %s", face, texface)
     return
 
+def newTexFace(words, proxy):
+    texface = []
+    nCoords = len(words)
+    for n in range(nCoords):
+        texface.append(int(words[n]))
+    proxy.texFaces.append(texface)
+    return
+
 def newTexVert(first, words, proxy):
     vt = []
     nCoords = len(words)
@@ -583,9 +631,11 @@ def getMeshInfo(obj, proxy, rawWeights, rawShapes, rigname):
 
         faces = []
         if proxy.texVerts:
+            texVerts = proxy.texVertsLayers[proxy.objFileLayer]
+            texFaces = proxy.texFacesLayers[proxy.objFileLayer]        
             fn = 0
             for (f,g) in proxy.faces:
-                texFace = proxy.texFaces[fn]
+                texFace = texFaces[fn]
                 face = []
                 for (vn,v) in enumerate(f):
                     face.append((v, texFace[vn]))

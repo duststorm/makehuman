@@ -523,8 +523,9 @@ def printClothes(context, path, file, bob, pob, data):
     if scn["MakeClothesSelfClothed"]:
         firstVert = NBodyVerts
     else:
-        printStuff(fp, pob, scn)
+        printStuff(fp, pob, context)
         firstVert = 0
+
     useProjection = False
     fp.write("# use_projection %d\n" % useProjection)
     fp.write("# verts %d\n" % firstVert)
@@ -545,14 +546,38 @@ def printClothes(context, path, file, bob, pob, data):
                 fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f %.5f %.5f\n" % (
                     verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], diff[0], diff[2], -diff[1]))
     fp.write('\n')
+    
+    me = pob.data
+    if me.uv_textures:
+        for layer,uvtex in enumerate(me.uv_textures):
+            if layer == scn["MakeClothesObjLayer"]:
+                continue
+            (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVertsList, texVertsList, nTexVerts) = setupTexVerts(pob)
+            texVerts = texVertsList[layer]
+            uvFaceVerts = uvFaceVertsList[layer]
+            nTexVerts = len(texVerts)
+            fp.write("# texVerts %d\n" % layer)
+            for vtn in range(nTexVerts):
+                vt = texVerts[vtn]
+                fp.write("%.4f %.4f\n" % (vt[0], vt[1]))
+            fp.write("# texFaces %d\n" % layer)
+            for f in me.faces:
+                uvVerts = uvFaceVerts[f.index]
+                for n,v in enumerate(f.vertices):
+                    (vt, uv) = uvVerts[n]
+                    fp.write("%d " % vt)
+                fp.write("\n")
+    return        
+    
     fp.close()
     return
       
 #
-#   printStuff(fp, pob, scn):    
+#   printStuff(fp, pob, context):    
 #
 
-def printStuff(fp, pob, scn):    
+def printStuff(fp, pob, context):
+    scn = context.scene
     fp.write("# z_depth %d\n" % scn["MakeClothesZDepth"])
     
     for mod in pob.modifiers:
@@ -565,14 +590,20 @@ def printStuff(fp, pob, scn):
         if scn['MakeClothes' + skey]:
             fp.write("# shapekey %s\n" % skey)            
             
-    fp.write("# texture %s_texture.tif\n" % pob.name.lower())
+    me = pob.data            
+    if me.uv_textures:
+        for layer,uvtex in enumerate(me.uv_textures):
+            fp.write("# uvtex_layer %d %s\n" % (layer, uvtex.name.replace(" ","_")))
+        fp.write("# objfile_layer %d\n" % scn["MakeClothesObjLayer"])
+
+    fp.write("# texture %s_texture.tif %d\n" % (pob.name.lower(), scn["MakeClothesTextureLayer"]))
     #if scn['MakeClothesMask']:
-    fp.write("# mask %s_mask.png\n" % pob.name.lower())
+    fp.write("# mask %s_mask.png %d\n" % (pob.name.lower(), scn["MakeClothesMaskLayer"]))
            
     if scn['MakeClothesHairMaterial']:
         fp.write(
 "# material %s\n" % pob.name +
-"texture data/hairstyles/%s_texture.tif\n" % pob.name +
+"texture data/hairstyles/%s_texture.tif %d\n" % (pob.name, scn["MakeClothesTextureLayer"]) +
 "diffuse_intensity 0.8\n" +
 "specular_intensity 0.0\n" +
 "specular_hardness 1\n" +
@@ -603,7 +634,8 @@ def printStuff(fp, pob, scn):
             fp.write('specular_shader %s\n' % mat.specular_shader)
             fp.write('specular_intensity %.4f\n' % mat.specular_intensity)
         if useBlender:
-            mhxfile = exportBlenderMaterial(me, path)
+            (outpath, outfile) = getFileName(pob, context, "mhx")
+            mhxfile = exportBlenderMaterial(me, outpath)
             fp.write("# material_file %s\n" % mhxfile)
     return            
 
@@ -627,17 +659,9 @@ def exportObjFile(context):
         fp.write("vn %.4f %.4f %.4f\n" % (v.normal[0], v.normal[2], -v.normal[1]))
         
     if me.uv_textures:
-        (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVerts, texVerts, nTexVerts) = setupTexVerts(ob)
-        for vtn in range(nTexVerts):
-                vt = texVerts[vtn]
-                fp.write("vt %.4f %.4f\n" % (vt[0], vt[1]))
-        for f in me.faces:
-            uvVerts = uvFaceVerts[f.index]
-            fp.write("f ")
-            for n,v in enumerate(f.vertices):
-                (vt, uv) = uvVerts[n]
-                fp.write("%d/%d " % (v+1, vt+1))
-            fp.write("\n")
+        (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVertsList, texVertsList, nTexVerts) = setupTexVerts(ob)
+        layer = scn["MakeClothesObjLayer"]
+        writeObjTextureData(fp, me, texVertsList[layer], uvFaceVertsList[layer])
     else:
         for f in me.faces:
             fp.write("f ")
@@ -648,6 +672,20 @@ def exportObjFile(context):
     fp.close()
     print(objfile, "closed")
     return
+        
+def writeObjTextureData(fp, me, texVerts, uvFaceVerts):    
+    nTexVerts = len(texVerts)
+    for vtn in range(nTexVerts):
+        vt = texVerts[vtn]
+        fp.write("vt %.4f %.4f\n" % (vt[0], vt[1]))
+    for f in me.faces:
+        uvVerts = uvFaceVerts[f.index]
+        fp.write("f ")
+        for n,v in enumerate(f.vertices):
+            (vt, uv) = uvVerts[n]
+            fp.write("%d/%d " % (v+1, vt+1))
+        fp.write("\n")
+    return        
 
 def writeColor(fp, string, color):
     fp.write("%s %.4f %.4f %.4f\n" % (string, color[0], color[1], color[2]))
@@ -697,27 +735,33 @@ def setupTexVerts(ob):
                         faceEdges[f.index].append(e)
             
     faceNeighbors = {}
-    uvFaceVerts = {}
     for f in ob.data.faces:
         faceNeighbors[f.index] = []
-        uvFaceVerts[f.index] = []
     for f in ob.data.faces:
         for e in faceEdges[f.index]:
             for f1 in edgeFaces[e.index]:
                 if f1 != f:
                     faceNeighbors[f.index].append((e,f1))
 
-    uvtex = ob.data.uv_textures[0]
-    vtn = 0
-    texVerts = {}    
-    for f in ob.data.faces:
-        uvf = uvtex.data[f.index]
-        vtn = findTexVert(uvf.uv1, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
-        vtn = findTexVert(uvf.uv2, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
-        vtn = findTexVert(uvf.uv3, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
-        if len(f.vertices) > 3:
-            vtn = findTexVert(uvf.uv4, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
-    return (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVerts, texVerts, vtn)     
+    uvFaceVertsList = []
+    texVertsList = []
+    for uvtex in ob.data.uv_textures:
+        uvFaceVerts = {}
+        uvFaceVertsList.append(uvFaceVerts)
+        for f in ob.data.faces:
+            uvFaceVerts[f.index] = []
+        vtn = 0
+        texVerts = {}    
+        texVertsList.append(texVerts)
+        for f in ob.data.faces:
+            uvf = uvtex.data[f.index]
+            vtn = findTexVert(uvf.uv1, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
+            vtn = findTexVert(uvf.uv2, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
+            vtn = findTexVert(uvf.uv3, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
+            if len(f.vertices) > 3:
+                vtn = findTexVert(uvf.uv4, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
+                
+    return (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVertsList, texVertsList, vtn)     
 
 def findTexVert(uv, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob):
     for (e,f1) in faceNeighbors[f.index]:
@@ -824,7 +868,9 @@ def projectUVs(bob, pob, context):
     (bob1, data) = restoreData(context)
     print("Projecting %s => %s" % (bob.name, pob.name))
 
-    (bVertEdges, bVertFaces, bEdgeFaces, bFaceEdges, bFaceNeighbors, bUvFaceVerts, bTexVerts, bNTexVerts) = setupTexVerts(bob)
+    (bVertEdges, bVertFaces, bEdgeFaces, bFaceEdges, bFaceNeighbors, bUvFaceVertsList, bTexVertsList, bNTexVerts) = setupTexVerts(bob)
+    bUvFaceVerts = bUvFaceVertsList[0]
+    bTexVerts = bTexVertsList[0]
     table = {}
     bUvTex = bob.data.uv_textures[0].data
     for (pv, exact, verts, wts, diff) in data:
@@ -857,7 +903,9 @@ def projectUVs(bob, pob, context):
                                 uv2 = getUvLoc(vn2, f0.vertices, bUvTex[f0.index])
                                 table[pv.index] = (0, [uv0,uv1,uv2], wts)
         
-    (pVertEdges, pVertFaces, pEdgeFaces, pFaceEdges, pFaceNeighbors, pUvFaceVerts, pTexVerts, pNTexVerts) = setupTexVerts(pob)
+    (pVertEdges, pVertFaces, pEdgeFaces, pFaceEdges, pFaceNeighbors, pUvFaceVertsList, pTexVertsList, pNTexVerts) = setupTexVerts(pob)
+    pUvFaceVerts = pUvFaceVertsList[0]
+    pTexVerts = pTexVertsList[0]
     (pSeamEdgeFaces, pSeamVertEdges, pBoundaryVertEdges, pVertTexVerts) = getSeamData(pob.data, pUvFaceVerts, pEdgeFaces)
     pTexVertUv = {}
     for vtn in range(pNTexVerts):
@@ -1467,7 +1515,8 @@ def exportMaterial(mat, fp):
     exportDefault("Strand", mat.strand, [], [], exclude, [], '  ', fp)
     writeDir(mat, prio+['texture_slots', 'volume', 'node_tree',
         'diffuse_ramp', 'specular_ramp', 'use_diffuse_ramp', 'use_specular_ramp', 
-        'halo', 'raytrace_transparency', 'subsurface_scattering', 'strand'], "  ", fp)
+        'halo', 'raytrace_transparency', 'subsurface_scattering', 'strand',
+        'is_updated', 'is_updated_data'], "  ", fp)
     fp.write("end Material\n\n")
     return
 
@@ -1507,7 +1556,8 @@ def exportMTex(index, mtex, use, fp):
             prio.append(ext)    
     fp.write("  MTex %d %s %s %s\n" % (index, texname, mtex.texture_coords, mapto))
     writePrio(mtex, ['texture']+prio, "    ", fp)
-    writeDir(mtex, list(MapToTypes.keys()) + ['texture', 'type', 'texture_coords', 'offset'], "    ", fp)
+    writeDir(mtex, list(MapToTypes.keys()) + [
+        'texture', 'type', 'texture_coords', 'offset', 'is_updated', 'is_updated_data'], "    ", fp)
     fp.write("  end MTex\n\n")
     return
 
@@ -1522,17 +1572,21 @@ def exportTexture(tex, matname, fp):
         fp.write("Texture %s %s\n" % (tex.name, tex.type))
 
     exportRamp(tex.color_ramp, "color_ramp", fp)
-    writeDir(tex, ['color_ramp', 'node_tree', 'image_user', 'use_nodes', 'use_textures', 'type', 'users_material'], "  ", fp)
+    writeDir(tex, [
+        'color_ramp', 'node_tree', 'image_user', 'use_nodes', 'use_textures', 'type', 
+        'users_material', 'is_updated', 'is_updated_data'], "  ", fp)
     fp.write("end Texture\n\n")
 
 def exportImage(img, matname, fp):
     imgName = img.name
     if imgName == 'Render_Result':
         return
-    fp.write("Image %s\n" % imgName)
-    fp.write("  Filename %s ;\n" % os.path.basename(img.filepath))
-    writeDir(img, ['bindcode', 'filename','filepath', 'filepath_raw', 'is_dirty'], "  ", fp)
-    fp.write("end Image\n\n")
+    fp.write(
+"Image %s\n" % imgName +
+"  Filename %s ;\n" % os.path.basename(img.filepath) +
+"    use_premultiply %s ;\n" %  img.use_premultiply +
+"end Image\n\n")
+    return
 
 def exportRamp(ramp, name, fp):
     if ramp == None:
@@ -1979,6 +2033,21 @@ def initInterface(scn):
         description="Use materials")
     scn['MakeClothesMaterials'] = False
 
+    bpy.types.Scene.MakeClothesObjLayer = IntProperty(
+        name="Obj UV layer", 
+        description="UV layer to include in obj export, starting with 0")
+    scn['MakeClothesObjLayer'] = 0
+
+    bpy.types.Scene.MakeClothesMaskLayer = IntProperty(
+        name="Mask UV layer", 
+        description="UV layer for mask, starting with 0")
+    scn['MakeClothesMaskLayer'] = 0
+
+    bpy.types.Scene.MakeClothesTextureLayer = IntProperty(
+        name="Texture UV layer", 
+        description="UV layer for textures, starting with 0")
+    scn['MakeClothesTextureLayer'] = 0
+
     bpy.types.Scene.MakeClothesBlenderMaterials = BoolProperty(
         name="Blender materials", 
         description="Save materials as mhx file")
@@ -2157,10 +2226,16 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.prop(scn, "MakeClothesHairMaterial")
         layout.prop(scn, "MakeClothesListLength")
         layout.prop(scn, "MakeClothesLogging")
-        layout.prop(scn, "MakeClothesSelfClothed")
+        # For internal use only
+        #layout.prop(scn, "MakeClothesSelfClothed")
         layout.operator("mhclo.make_human", text="Make Human").isHuman = True
         layout.operator("mhclo.make_human", text="Make Clothing").isHuman = False
         
+        layout.separator()
+        layout.prop(scn, "MakeClothesMaskLayer")   
+        layout.prop(scn, "MakeClothesTextureLayer")   
+        layout.prop(scn, "MakeClothesObjLayer")   
+
         layout.separator()
         layout.operator("mhclo.make_clothes")
         layout.operator("mhclo.export_obj_file")

@@ -49,12 +49,18 @@ def exportProxyObj1(obj, filename, proxy):
         (x,y,z) = mh2proxy.proxyCoord(bary)
         fp.write("v %.4f %.4f %.4f\n" % (x, y, z))
 
-    for uv in proxy.texVerts:
-        fp.write("vt %s %s\n" % (uv[0], uv[1]))
+    if proxy.texVerts:
+        texVerts = proxy.texVertsLayers[proxy.objFileLayer]
+        for uv in texVerts:
+            fp.write("vt %s %s\n" % (uv[0], uv[1]))
 
     mat = -1
     fn = 0
     grp = None
+    if proxy.texFaces:
+        texFaces = proxy.texFacesLayers[proxy.objFileLayer]
+    else:
+        texFaces = []
     for (f,g) in proxy.faces:
         if proxy.materials and proxy.materials[fn] != mat:
             mat = proxy.materials[fn]
@@ -63,8 +69,8 @@ def exportProxyObj1(obj, filename, proxy):
             fp.write("g %s\n" % g)
             grp = g
         fp.write("f")
-        if proxy.texFaces:
-            ft = proxy.texFaces[fn]
+        if texFaces:
+            ft = texFaces[fn]
             vn = 0
             for v in f:
                 vt = ft[vn]

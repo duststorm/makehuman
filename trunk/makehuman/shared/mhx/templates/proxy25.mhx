@@ -45,13 +45,9 @@ end Object
   Faces
   *** ProxyFaces
   end Faces
-  MeshTextureFaceLayer UVTex
-    Data 
-    *** ProxyUVCoords
-    end Data
-  end MeshTextureFaceLayer
-  *** ProxyMaterials
+  *** ProxyUVCoords
   *** VertexGroup
+  *** ProxyMaterials
 end Mesh
 
 *** ProxyObject
