@@ -623,7 +623,7 @@ def writeProxyMesh(fp, proxy, proxyData):
     mat = proxy.material
     if mat:
         if proxy.material_file:
-            copyProxyMaterialFile(proxy.material_file, proxy, fp)
+            copyProxyMaterialFile(fp, proxy.material_file, mat, proxy, proxyData)
         else:
             writeProxyMaterial(fp, mat, proxy, proxyData)
     name = theHuman + proxy.name
@@ -691,29 +691,41 @@ def writeHideAnimationData(fp, prefix, name):
     return    
        
 #
-#    copyProxyMaterialFile(pair, proxy, fp):
+#   copyProxyMaterialFile(fp, pair, mat, proxy, proxyData):
 #
 
-def copyProxyMaterialFile(pair, proxy, fp):
-    (dir, file) = pair
-    infile = os.path.realpath(os.path.expanduser("%s/%s" % (dir, file)))
+def copyProxyMaterialFile(fp, pair, mat, proxy, proxyData):
+    prxList = sortedMasks(proxyData)
+    nMasks = countMasks(proxy, prxList)
+    tex = None
+    
+    (folder, file) = pair
+    folder = os.path.realpath(os.path.expanduser(folder))
+    infile = os.path.join(folder, file)
     tmpl = open(infile, "rU")
     for line in tmpl:
         words= line.split()
         if len(words) == 0:
             fp.write(line)
-        elif words[0] in ['Texture', 'Material']:
+        elif words[0] == 'Texture':
             words[1] = theHuman + words[1]
             for word in words:
                 fp.write("%s " % word)
             fp.write("\n")
+            tex = os.path.join(folder,words[1])
+        elif words[0] == 'Material':
+            words[1] = theHuman + words[1]
+            for word in words:
+                fp.write("%s " % word)
+            fp.write("\n")
+            addProxyMaskMTexs(fp, mat, proxy, prxList, tex)
         elif words[0] == 'MTex':
             words[2] = theHuman + words[2]
             for word in words:
                 fp.write("%s " % word)
             fp.write("\n")                
         elif words[0] == 'Filename':
-            file = getOutFileName(words[1], "./data/clothes/%s/" % proxy.name, False)
+            file = getOutFileName(words[1], folder, True)
             fp.write("  Filename %s ;\n" % file)
         else:
             fp.write(line)
