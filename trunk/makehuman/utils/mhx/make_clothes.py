@@ -45,7 +45,7 @@ theThreshold = -0.2
 theListLength = 3
 Epsilon = 1e-4
 # Number of verts which are body, not clothes
-NBodyVerts = 15340
+NBodyVerts = [15340, 18528]
 
 
 #
@@ -95,13 +95,14 @@ def getObjectPair(context):
                     clothing = ob
     if not human:
         raise NameError("No human selected")
-    if scn["MakeClothesSelfClothed"]:
+    if scn["MakeClothesSelfClothed"] >= 0:
         if clothing:
             raise NameError("Clothing %s selected but human %s is self-clothed" % (clothing.name, human.name))
         checkObjectOK(human, context)
         nverts = len(human.data.vertices)
-        clothing = copyObject(human, NBodyVerts, nverts, context, "Clothing")
-        base = copyObject(human, 0, NBodyVerts, context, "Base")
+        nBodyVerts = NBodyVerts[scn["MakeClothesSelfClothed"]]
+        clothing = copyObject(human, nBodyVerts, nverts, context, "Clothing")
+        base = copyObject(human, 0, nBodyVerts, context, "Base")
         return (base, clothing)
     elif not clothing:
         raise NameError("No clothing selected")
@@ -520,15 +521,15 @@ def printClothes(context, path, file, bob, pob, data):
     printScale(fp, bob, scn, 'z_scale', 1, 'MakeClothesY1', 'MakeClothesY2')
     printScale(fp, bob, scn, 'y_scale', 2, 'MakeClothesZ1', 'MakeClothesZ2')
 
-    if scn["MakeClothesSelfClothed"]:
-        firstVert = NBodyVerts
+    if scn["MakeClothesSelfClothed"] >= 0:
+        firstVert = NBodyVerts[scn["MakeClothesSelfClothed"]]
     else:
         printStuff(fp, pob, context)
         firstVert = 0
 
     useProjection = False
     fp.write("# use_projection %d\n" % useProjection)
-    fp.write("# verts %d\n" % firstVert)
+    fp.write("# verts %d\n" % (firstVert))
     if useProjection:
         for (pv, exact, verts, wts, proj) in data:
             if exact:
@@ -1307,7 +1308,7 @@ def makeClothes(context):
     printClothes(context, outpath, outfile, bob, pob, data)
     if log:
         log.close()
-    if scn["MakeClothesSelfClothed"]:
+    if scn["MakeClothesSelfClothed"] >= 0:
         scn.objects.unlink(bob)
         scn.objects.unlink(pob)
     print("%s done" % outfile)
@@ -1900,7 +1901,7 @@ def autoVertexGroups(context):
             right.add([vn], 1.0, 'REPLACE')
         else:
             mid.add([vn], 1.0, 'REPLACE')
-            if ishuman and (vn < NBodyVerts):
+            if ishuman and (vn < NBodyVerts[-1]):
                 left.add([vn], 1.0, 'REPLACE')
                 right.add([vn], 1.0, 'REPLACE')
     return
@@ -1926,18 +1927,10 @@ def checkAndVertexDiamonds(ob):
     bpy.ops.object.mode_set(mode='OBJECT')
     me = ob.data
     nverts = len(me.vertices)
-    if nverts < 15340:
-        raise NameError("Base object %s has only %d verts. A MH human must have at least 15340" % (ob, nverts))
-    """        
-    hasDiamonds = False
-    for f in me.faces:        
-        if len(f.vertices) < 4:
-            hasDiamonds = True
-            for vn in f.vertices:
-                me.vertices[vn].select = True
-    if not hasDiamonds:
-        raise NameError("Base object %s does not have any joint diamonds" % ob.name)
-    """        
+    if nverts not in NBodyVerts:
+        raise NameError(
+            "Base object %s has %d vertices. The number of verts in an MH human must be one of %s" % 
+            (ob, nverts, NBodyVerts))
     bpy.ops.object.mode_set(mode='EDIT')
     bpy.ops.object.vertex_group_remove_from(all=True)
     bpy.ops.object.mode_set(mode='OBJECT')
@@ -2086,10 +2079,10 @@ def initInterface(scn):
         description="Write a log file for debugging")
     scn['MakeClothesLogging'] = False
 
-    bpy.types.Scene.MakeClothesSelfClothed = BoolProperty(
+    bpy.types.Scene.MakeClothesSelfClothed = IntProperty(
         name="Self clothed", 
         description="Clothes included in body mesh")
-    scn['MakeClothesSelfClothed'] = False
+    scn['MakeClothesSelfClothed'] = -1
 
     bpy.types.Scene.MakeClothesX1 = IntProperty(
         name="X1", 
@@ -2226,8 +2219,6 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.prop(scn, "MakeClothesHairMaterial")
         layout.prop(scn, "MakeClothesListLength")
         layout.prop(scn, "MakeClothesLogging")
-        # For internal use only
-        #layout.prop(scn, "MakeClothesSelfClothed")
         layout.operator("mhclo.make_human", text="Make Human").isHuman = True
         layout.operator("mhclo.make_human", text="Make Clothing").isHuman = False
         
@@ -2250,7 +2241,6 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.operator("mhclo.set_zdepth")
         layout.prop(scn, "MakeClothesZDepth")   
 
-
         layout.label("Boundary")
         layout.prop(scn, "MakeClothesBodyPart")   
         layout.prop(scn, "MakeClothesExamineBoundary")           
@@ -2261,10 +2251,12 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.prop(scn, "MakeClothesY2")
         layout.prop(scn, "MakeClothesZ1")
         layout.prop(scn, "MakeClothesZ2")   
-        return
-        layout.separator()
-        layout.prop(scn, "MakeClothesVertexGroups")
-        layout.operator("mhclo.offset_clothes")
+        #return
+
+        layout.label("For internal use")
+        layout.prop(scn, "MakeClothesSelfClothed")
+        #layout.prop(scn, "MakeClothesVertexGroups")
+        #layout.operator("mhclo.offset_clothes")
         return
 
 #
