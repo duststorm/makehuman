@@ -20,22 +20,12 @@ For more info see: http://sites.google.com/site/makehumandocs/blender-export-and
 
 """
 
-bl_addon_info = {
-    "name": "Make clothes to MakeHuman",
-    "author": "Thomas Larsson",
-    "version": 0.5,
-    "blender": (2, 5, 9),
-    "api": 40000,
-    "location": "View3D > Properties > Make MH clothes",
-    "description": "Make clothes for MakeHuman characters",
-    "warning": "",
-    "category": "MakeHuman"}
-
-
 import bpy
 import os
-import mathutils
 import random
+from bpy.props import *
+from mathutils import Vector
+from . import base_uv
 
 #
 #   Global variables
@@ -45,8 +35,10 @@ theThreshold = -0.2
 theListLength = 3
 Epsilon = 1e-4
 # Number of verts which are body, not clothes
-NBodyVerts = [15340, 18528]
-
+NOldVerts = [15340, 18528]
+NBodyVerts = NOldVerts[0]
+NBodyFaces = 14812
+UseInternal = True
 
 #
 #   isHuman(ob):
@@ -56,6 +48,12 @@ NBodyVerts = [15340, 18528]
 #   getObjectPair(context):
 #
 
+def isSelfClothed(context):
+    if UseInternal:
+        return (context.scene["MCSelfClothed"] >= 0)
+    else:
+        return False
+        
 def isHuman(ob):
     try:
         return ob["MhxMesh"]
@@ -95,14 +93,14 @@ def getObjectPair(context):
                     clothing = ob
     if not human:
         raise NameError("No human selected")
-    if scn["MakeClothesSelfClothed"] >= 0:
+    if isSelfClothed(context):
         if clothing:
             raise NameError("Clothing %s selected but human %s is self-clothed" % (clothing.name, human.name))
         checkObjectOK(human, context)
         nverts = len(human.data.vertices)
-        nBodyVerts = NBodyVerts[scn["MakeClothesSelfClothed"]]
-        clothing = copyObject(human, nBodyVerts, nverts, context, "Clothing")
-        base = copyObject(human, 0, nBodyVerts, context, "Base")
+        nOldVerts = NOldVerts[scn["MCSelfClothed"]]
+        clothing = copyObject(human, nOldVerts, nverts, context, "Clothing")
+        base = copyObject(human, 0, nOldVerts, context, "Base")
         return (base, clothing)
     elif not clothing:
         raise NameError("No clothing selected")
@@ -153,6 +151,7 @@ def selectVert(context, vn, ob):
     bpy.ops.mesh.select_all(action='DESELECT')
     bpy.ops.object.mode_set(mode='OBJECT')
     ob.data.vertices[vn].select = True
+    bpy.ops.object.mode_set(mode='EDIT')
     return    
 
 #
@@ -166,7 +165,7 @@ def goodName(name):
     
 def getFileName(pob, context, ext):            
     name = goodName(pob.name)
-    outpath = '%s/%s' % (context.scene['MakeClothesDirectory'], name)
+    outpath = '%s/%s' % (context.scene['MCDirectory'], name)
     outpath = os.path.realpath(os.path.expanduser(outpath))
     if not os.path.exists(outpath):
         print("Creating directory %s" % outpath)
@@ -245,11 +244,23 @@ def findClothes(context, bob, pob, log):
                 log.write("%d %d %.5f %s %d %d\n" % (pv.index, mv.index, mindist, gname, pindex, bindex))
             #printMverts("  ", mverts)
         else:
-            print("*** %d (%.4f %.4f %.4f) %s" % (pv.index, pv.co[0], pv.co[1], pv.co[2], gname))
-            raise NameError("Failed to find vert %d in group %s %d %d" % (pv.index, gname, pindex, bindex))
+            vn = pv.index
+            msg = (
+            "Failed to find vert %d in group %s.\n" % (vn, gname) +
+            "Proxy index %d, Base index %d\n" % (pindex, bindex) +
+            "Vertex coordinates (%.4f %.4f %.4f)\n" % (pv.co[0], pv.co[1], pv.co[2])
+            )
+            selectVert(context, vn, pob)
+            raise NameError(msg)
         if mindist > 5:
-            print("*** %d (%.4f %.4f %.4f) %s" % (pv.index, pv.co[0], pv.co[1], pv.co[2], gname))
-            raise NameError("Minimal distance %f > 5.0. Check base and proxy scales." % mindist)
+            vn = pv.index
+            msg = (
+            "Vertex %d is %f dm away from closest body vertex in group %s.\n" % (vn, mindist, gname) +
+            "Max allowed value is 5dm. Check base and proxy scales.\n" +
+            "Vertex coordinates (%.4f %.4f %.4f)\n" % (pv.co[0], pv.co[1], pv.co[2])
+            )
+            selectVert(context, vn, pob)
+            raise NameError(msg)
 
         if gname[0:3] != "Mid":
             bindex = -1
@@ -319,7 +330,7 @@ def findClothes(context, bob, pob, log):
             badVerts.append(pv.index)
             pv.select = True
             """
-            if scn['MakeClothesForbidFailures']:
+            if scn['MCForbidFailures']:
                 vn = pv.index
                 selectVert(context, vn, pob)
                 print("Tried", mverts)
@@ -498,12 +509,20 @@ def proxyFilePtr(name):
     return None
 
 #
-#    printClothes(context, path, file, bob, pob, data):    
+#    printClothes(context, bob, pob, data):
 #
         
-def printClothes(context, path, file, bob, pob, data):
+def printClothes(context, bob, pob, data):
     scn = context.scene
-    fp= open(file, "w")
+    if isSelfClothed(context):
+        firstVert = NOldVerts[scn["MCSelfClothed"]]
+        folder = scn["MCMakeHumanDirectory"]
+        outfile = os.path.join(folder, "data/3dobjs/base.mhclo")
+    else:
+        firstVert = 0
+        (outpath, outfile) = getFileName(pob, context, "mhclo")
+    print("Creating clothes file %s" % outfile)
+    fp= open(outfile, "w")
 
     infp = proxyFilePtr('proxy_header.txt')
     if infp:
@@ -517,15 +536,12 @@ def printClothes(context, path, file, bob, pob, data):
 
     fp.write("# name %s\n" % pob.name)
     fp.write("# obj_file %s.obj\n" % goodName(pob.name))
-    printScale(fp, bob, scn, 'x_scale', 0, 'MakeClothesX1', 'MakeClothesX2')
-    printScale(fp, bob, scn, 'z_scale', 1, 'MakeClothesY1', 'MakeClothesY2')
-    printScale(fp, bob, scn, 'y_scale', 2, 'MakeClothesZ1', 'MakeClothesZ2')
+    printScale(fp, bob, scn, 'x_scale', 0, 'MCX1', 'MCX2')
+    printScale(fp, bob, scn, 'z_scale', 1, 'MCY1', 'MCY2')
+    printScale(fp, bob, scn, 'y_scale', 2, 'MCZ1', 'MCZ2')
 
-    if scn["MakeClothesSelfClothed"] >= 0:
-        firstVert = NBodyVerts[scn["MakeClothesSelfClothed"]]
-    else:
+    if not isSelfClothed(context):
         printStuff(fp, pob, context)
-        firstVert = 0
 
     useProjection = False
     fp.write("# use_projection %d\n" % useProjection)
@@ -551,9 +567,9 @@ def printClothes(context, path, file, bob, pob, data):
     me = pob.data
     if me.uv_textures:
         for layer,uvtex in enumerate(me.uv_textures):
-            if layer == scn["MakeClothesObjLayer"]:
+            if layer == scn["MCObjLayer"]:
                 continue
-            (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVertsList, texVertsList, nTexVerts) = setupTexVerts(pob)
+            (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVertsList, texVertsList) = setupTexVerts(pob)
             texVerts = texVertsList[layer]
             uvFaceVerts = uvFaceVertsList[layer]
             nTexVerts = len(texVerts)
@@ -568,9 +584,8 @@ def printClothes(context, path, file, bob, pob, data):
                     (vt, uv) = uvVerts[n]
                     fp.write("%d " % vt)
                 fp.write("\n")
-    return        
-    
     fp.close()
+    print("%s done" % outfile)    
     return
       
 #
@@ -579,7 +594,7 @@ def printClothes(context, path, file, bob, pob, data):
 
 def printStuff(fp, pob, context):
     scn = context.scene
-    fp.write("# z_depth %d\n" % scn["MakeClothesZDepth"])
+    fp.write("# z_depth %d\n" % scn["MCZDepth"])
     
     for mod in pob.modifiers:
         if mod.type == 'SHRINKWRAP':
@@ -588,23 +603,23 @@ def printStuff(fp, pob, context):
             fp.write("# subsurf %d %d\n" % (mod.levels, mod.render_levels))
             
     for skey in ShapeKeys:            
-        if scn['MakeClothes' + skey]:
+        if scn['MC' + skey]:
             fp.write("# shapekey %s\n" % skey)            
             
     me = pob.data            
     if me.uv_textures:
         for layer,uvtex in enumerate(me.uv_textures):
             fp.write("# uvtex_layer %d %s\n" % (layer, uvtex.name.replace(" ","_")))
-        fp.write("# objfile_layer %d\n" % scn["MakeClothesObjLayer"])
+        fp.write("# objfile_layer %d\n" % scn["MCObjLayer"])
 
-    fp.write("# texture %s_texture.tif %d\n" % (pob.name.lower(), scn["MakeClothesTextureLayer"]))
-    #if scn['MakeClothesMask']:
-    fp.write("# mask %s_mask.png %d\n" % (pob.name.lower(), scn["MakeClothesMaskLayer"]))
+    fp.write("# texture %s_texture.tif %d\n" % (pob.name.lower(), scn["MCTextureLayer"]))
+    #if scn['MCMask']:
+    fp.write("# mask %s_mask.png %d\n" % (pob.name.lower(), scn["MCMaskLayer"]))
            
-    if scn['MakeClothesHairMaterial']:
+    if scn['MCHairMaterial']:
         fp.write(
 "# material %s\n" % pob.name +
-"texture data/hairstyles/%s_texture.tif %d\n" % (pob.name, scn["MakeClothesTextureLayer"]) +
+"texture data/hairstyles/%s_texture.tif %d\n" % (pob.name, scn["MCTextureLayer"]) +
 "diffuse_intensity 0.8\n" +
 "specular_intensity 0.0\n" +
 "specular_hardness 1\n" +
@@ -622,8 +637,8 @@ def printStuff(fp, pob, context):
 
     me = pob.data
 
-    useMats = scn['MakeClothesMaterials']
-    useBlender = scn['MakeClothesBlenderMaterials']
+    useMats = scn['MCMaterials']
+    useBlender = scn['MCBlenderMaterials']
     if me.materials and (useMats or useBlender) and me.materials[0]:
         mat = me.materials[0]
         fp.write("# material %s\n" % mat.name)
@@ -660,8 +675,8 @@ def exportObjFile(context):
         fp.write("vn %.4f %.4f %.4f\n" % (v.normal[0], v.normal[2], -v.normal[1]))
         
     if me.uv_textures:
-        (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVertsList, texVertsList, nTexVerts) = setupTexVerts(ob)
-        layer = scn["MakeClothesObjLayer"]
+        (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVertsList, texVertsList) = setupTexVerts(ob)
+        layer = scn["MCObjLayer"]
         writeObjTextureData(fp, me, texVertsList[layer], uvFaceVertsList[layer])
     else:
         for f in me.faces:
@@ -762,7 +777,7 @@ def setupTexVerts(ob):
             if len(f.vertices) > 3:
                 vtn = findTexVert(uvf.uv4, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
                 
-    return (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVertsList, texVertsList, vtn)     
+    return (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVertsList, texVertsList)     
 
 def findTexVert(uv, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob):
     for (e,f1) in faceNeighbors[f.index]:
@@ -774,6 +789,45 @@ def findTexVert(uv, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob):
     uvFaceVerts[f.index].append((vtn,uv))
     texVerts[vtn] = uv
     return vtn+1
+
+#
+#   exportBaseUvsPy(context):
+#
+
+def exportBaseUvsPy(context):
+    ob = context.object
+    scn = context.scene
+    (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVertsList, texVertsList) = setupTexVerts(ob)
+    maskLayer = scn["MCMaskLayer"]
+    texVerts = texVertsList[maskLayer]
+    uvFaceVerts = uvFaceVertsList[maskLayer]    
+    nTexVerts = len(texVerts)
+
+    folder = scn["MCMakeHumanDirectory"]
+    fname = os.path.join(folder, "utils/makeclothes/base_uv.py")
+    print("Creating", fname)
+    fp = open(fname, "w")
+    fp.write("firstVert = %d\n" % NBodyVerts)
+    fp.write("firstFace = %d\n" % NBodyFaces)
+    
+    fp.write("texVerts = [\n")
+    for vtn in range(nTexVerts):
+        vt = texVerts[vtn]
+        fp.write("(%.4f, %.4f),\n" % (vt[0], vt[1]))
+    fp.write("]\n")
+    
+    fp.write("texFaces = [\n")
+    for f in ob.data.faces:
+        uvVerts = uvFaceVerts[f.index]
+        fp.write("  ( ")
+        for n,v in enumerate(f.vertices):
+            (vt, uv) = uvVerts[n]
+            fp.write("(%.4f, %.4f), " % (uv[0], uv[1]))
+        fp.write("),\n")
+    fp.write("]\n")
+    fp.close()
+    return
+        
 
 #
 #   storeData(pob, bob, data):
@@ -836,7 +890,7 @@ def restoreData(context):
             wts = eval(line)
             status = 4
         elif status == 4:
-            diff = mathutils.Vector( eval(line) )
+            diff = Vector( eval(line) )
             data.append((pv, exact, verts, wts, diff))
             status = 1
     bob = context.scene.objects[bname]
@@ -869,11 +923,12 @@ def projectUVs(bob, pob, context):
     (bob1, data) = restoreData(context)
     print("Projecting %s => %s" % (bob.name, pob.name))
 
-    (bVertEdges, bVertFaces, bEdgeFaces, bFaceEdges, bFaceNeighbors, bUvFaceVertsList, bTexVertsList, bNTexVerts) = setupTexVerts(bob)
+    (bVertEdges, bVertFaces, bEdgeFaces, bFaceEdges, bFaceNeighbors, bUvFaceVertsList, bTexVertsList) = setupTexVerts(bob)
     bUvFaceVerts = bUvFaceVertsList[0]
     bTexVerts = bTexVertsList[0]
+    bNTexVerts = len(bTexVerts)
     table = {}
-    bUvTex = bob.data.uv_textures[0].data
+    bUvTex = getModifiedUvTex(bob)
     for (pv, exact, verts, wts, diff) in data:
         if exact:
             print("Exact", pv.index)
@@ -904,15 +959,17 @@ def projectUVs(bob, pob, context):
                                 uv2 = getUvLoc(vn2, f0.vertices, bUvTex[f0.index])
                                 table[pv.index] = (0, [uv0,uv1,uv2], wts)
         
-    (pVertEdges, pVertFaces, pEdgeFaces, pFaceEdges, pFaceNeighbors, pUvFaceVertsList, pTexVertsList, pNTexVerts) = setupTexVerts(pob)
-    pUvFaceVerts = pUvFaceVertsList[0]
-    pTexVerts = pTexVertsList[0]
+    (pVertEdges, pVertFaces, pEdgeFaces, pFaceEdges, pFaceNeighbors, pUvFaceVertsList, pTexVertsList) = setupTexVerts(pob)
+    maskLayer = context.scene["MCMaskLayer"]
+    pUvFaceVerts = pUvFaceVertsList[maskLayer]
+    pTexVerts = pTexVertsList[maskLayer]
+    pNTexVerts = len(pTexVerts)
     (pSeamEdgeFaces, pSeamVertEdges, pBoundaryVertEdges, pVertTexVerts) = getSeamData(pob.data, pUvFaceVerts, pEdgeFaces)
     pTexVertUv = {}
     for vtn in range(pNTexVerts):
         pTexVertUv[vtn] = None
-
-    pUvtex = pob.data.uv_textures[0]
+        
+    pUvtex = pob.data.uv_textures[maskLayer]
     pverts = pob.data.vertices
     bverts = bob.data.vertices
     bedges = bob.data.edges
@@ -994,7 +1051,37 @@ def projectUVs(bob, pob, context):
     
     print("Projection %s => %s done" % (bob.name, pob.name))
     return
- 
+
+#
+#   getModifiedUvTex(bob):
+#
+
+class CUvTex:
+    def __init__(self, uvs):
+        self.uv1 = Vector(uvs[0])
+        self.uv2 = Vector(uvs[1])
+        self.uv3 = Vector(uvs[2])
+        if len(uvs) > 3:
+            self.uv4 = Vector(uvs[3])
+            
+    def __repr__(self):
+        return ("<CUvTex uv1 %.4f %.4f uv2 %.4f %.4f uv3 %.4f %.4f uv4 %.4f %.4f>" %
+            (self.uv1[0], self.uv1[1], self.uv2[0], self.uv2[1], self.uv3[0], self.uv3[1], self.uv4[0], self.uv4[1]))
+        
+def getModifiedUvTex(bob):
+    bUvTex0 = bob.data.uv_textures[0].data    
+    bUvTex = {}
+    for fn in range(NBodyFaces):
+        bUvTex[fn] = bUvTex0[fn]
+    faces = bob.data.faces
+    nFaces = len(faces)
+    nModFaces = len(base_uv.texFaces)
+    for n in range(nModFaces):
+        bUvTex[n+NBodyFaces] = CUvTex(base_uv.texFaces[n])
+    for fn in range(NBodyFaces+nModFaces, nFaces):        
+        bUvTex[fn] = bUvTex0[fn]
+    return bUvTex
+     
 #
 #   trySetUv(pv, fn, uvf, rmd, n, uv, vertTexVerts, texVertUv, seamVertEdges):        
 #
@@ -1199,18 +1286,22 @@ def getSingleUvLoc(vn, table):
     elif exact == 2:
         return buvs[0]
     else:
-        return buvs[0]*wts[0] + buvs[1]*wts[1] + buvs[2]*wts[2] 
- 
-def getUvLoc(v, f, uvface):
-    if v == f[0]:
+        try:
+            return buvs[0]*wts[0] + buvs[1]*wts[1] + buvs[2]*wts[2]
+        except:
+            print(buvs[0], wts[0])
+            halt
+        
+def getUvLoc(vn, f, uvface):
+    if vn == f[0]:
         return uvface.uv1
-    if v == f[1]:
+    elif vn == f[1]:
         return uvface.uv2
-    if v == f[2]:
+    elif vn == f[2]:
         return uvface.uv3
-    if v == f[3]:
+    elif vn == f[3]:
         return uvface.uv4
-    raise NameError("Vertex %d not in face %d??" % (v,f))
+    raise NameError("Vertex %d not in face %d??" % (vn,f))
 
 
 #
@@ -1296,22 +1387,19 @@ def makeClothes(context):
     checkAndVertexDiamonds(bob)
     checkObjectOK(pob, context)
     checkSingleVGroups(pob)
-    (outpath, outfile) = getFileName(pob, context, "mhclo")
-    print("Creating clothes file %s" % outfile)
-    if scn['MakeClothesLogging']:
-        logfile = '%s/clothes.log' % scn['MakeClothesDirectory']
+    if scn['MCLogging']:
+        logfile = '%s/clothes.log' % scn['MCDirectory']
         log = open(logfile, "w")
     else:
         log = None
     data = findClothes(context, bob, pob, log)
     storeData(pob, bob, data)
-    printClothes(context, outpath, outfile, bob, pob, data)
+    printClothes(context, bob, pob, data)
     if log:
         log.close()
-    if scn["MakeClothesSelfClothed"] >= 0:
+    if isSelfClothed(context):
         scn.objects.unlink(bob)
         scn.objects.unlink(pob)
-    print("%s done" % outfile)
     return
     
 #
@@ -1330,7 +1418,7 @@ def checkObjectOK(ob, context):
     if abs(eu.x) + abs(eu.y) + abs(eu.z) > Epsilon:
         word = "object rotation"
         bpy.ops.object.transform_apply(location=False, rotation=True, scale=False)
-    vec = ob.scale - mathutils.Vector((1,1,1))
+    vec = ob.scale - Vector((1,1,1))
     if vec.length > Epsilon:
         word = "object scaling"
         bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
@@ -1381,17 +1469,17 @@ def offsetCloth(context):
     pverts = pob.data.vertices    
     print("Offset %s to %s" % (bob.name, pob.name))
 
-    inpath = '%s/%s.mhclo' % (context.scene['MakeClothesDirectory'], bob.name.lower())
+    inpath = '%s/%s.mhclo' % (context.scene['MCDirectory'], bob.name.lower())
     infile = os.path.realpath(os.path.expanduser(inpath))
-    outpath = '%s/%s.mhclo' % (context.scene['MakeClothesDirectory'], pob.name.lower())
+    outpath = '%s/%s.mhclo' % (context.scene['MCDirectory'], pob.name.lower())
     outfile = os.path.realpath(os.path.expanduser(outpath))
     print("Modifying clothes file %s => %s" % (infile, outfile))
     infp = open(infile, "r")
     outfp = open(outfile, "w")
 
     status = 0
-    alwaysOutside = context.scene['MakeClothesOutside']
-    minOffset = context.scene['MakeClothesMinOffset']
+    alwaysOutside = context.scene['MCOutside']
+    minOffset = context.scene['MCMinOffset']
 
     for line in infp:
         words = line.split()
@@ -1405,7 +1493,7 @@ def offsetCloth(context):
                 status = 1
                 outfp.write(line)
             elif words[1] == "obj_data":
-                if context.scene['MakeClothesVertexGroups']:
+                if context.scene['MCVertexGroups']:
                     infp.close()
                     writeFaces(pob, outfp) 
                     writeVertexGroups(pob, outfp)
@@ -1699,7 +1787,7 @@ def writeValue(ext, arg, exclude, pad, depth, fp):
             writeValue("[%d]" % n, elt, [], pad+"  ", depth+1, fp)
             n += 1
         fp.write("%send List\n" % pad)
-    elif typ == mathutils.Vector:
+    elif typ == Vector:
         c = '('
         fp.write("%s%s " % (pad, ext))
         for elt in arg:
@@ -1766,10 +1854,10 @@ BodyPartVerts = [
     ]
 
 def setBoundaryVerts(scn):
-    (x, y, z) = BodyPartVerts[scn['MakeClothesBodyPart']]
-    setAxisVerts(scn, 'MakeClothesX1', 'MakeClothesX2', x)
-    setAxisVerts(scn, 'MakeClothesY1', 'MakeClothesY2', y)
-    setAxisVerts(scn, 'MakeClothesZ1', 'MakeClothesZ2', z)
+    (x, y, z) = BodyPartVerts[scn['MCBodyPart']]
+    setAxisVerts(scn, 'MCX1', 'MCX2', x)
+    setAxisVerts(scn, 'MCY1', 'MCY2', y)
+    setAxisVerts(scn, 'MCZ1', 'MCZ2', z)
     
 def setAxisVerts(scn, prop1, prop2, x):
     (x1, x2) = x
@@ -1783,11 +1871,19 @@ def selectBoundary(ob, scn):
         v.select = False
     for xyz in ['X','Y','Z']:
         for n in [1,2]:
-            n = scn['MakeClothes%s%d' % (xyz, n)]
+            n = scn['MC%s%d' % (xyz, n)]
             print(n)
             verts[n].select = True
     bpy.ops.object.mode_set(mode='EDIT')
-    return                    
+    return    
+    
+def setBoundary(context):       
+    scn = context.scene
+    setBoundaryVerts(scn)
+    if scn['MCExamineBoundary']:
+        ob = getHuman(context)
+        selectBoundary(ob, scn)
+    return            
 
 ###################################################################################    
 #
@@ -1798,7 +1894,6 @@ def selectBoundary(ob, scn):
 #
 #   getZDepthItems():
 #   setZDepth(scn):    
-#    class OBJECT_OT_SetZDepthButton(bpy.types.Operator):
 #
 
 ZDepth = {
@@ -1823,19 +1918,12 @@ def setZDepthItems():
 
 def setZDepth(scn):    
     global ZDepthItems
-    (name1, name2, name3) = ZDepthItems[scn["MakeClothesZDepthName"]]
+    (name1, name2, name3) = ZDepthItems[scn["MCZDepthName"]]
     #print(name1)
-    scn["MakeClothesZDepth"] = ZDepth[name1]
+    scn["MCZDepth"] = ZDepth[name1]
     return
     
-class OBJECT_OT_SetZDepthButton(bpy.types.Operator):
-    bl_idname = "mhclo.set_zdepth"
-    bl_label = "Set Z depth"
-
-    def execute(self, context):
-        setZDepth(context.scene)
-        return{'FINISHED'}    
-    
+ 
 ###################################################################################    
 #
 #   Utilities
@@ -1843,7 +1931,6 @@ class OBJECT_OT_SetZDepthButton(bpy.types.Operator):
 ###################################################################################    
 #
 #    printVertNums(context):
-#    class VIEW3D_OT_MhxPrintVnumsButton(bpy.types.Operator):
 #
  
 def printVertNums(context):
@@ -1854,17 +1941,8 @@ def printVertNums(context):
             print(v.index)
     print("End verts")
 
-class VIEW3D_OT_MhxPrintVnumsButton(bpy.types.Operator):
-    bl_idname = "mhclo.print_vnums"
-    bl_label = "Print vertex numbers"
-
-    def execute(self, context):
-        printVertNums(context)
-        return{'FINISHED'}    
-
 #
 #    removeVertexGroups(context):
-#    class VIEW3D_OT_MhxRemoveVertexGroupsButton(bpy.types.Operator):
 #
 
 def removeVertexGroups(context):
@@ -1873,18 +1951,8 @@ def removeVertexGroups(context):
     bpy.ops.object.vertex_group_remove(all=True)
     return
 
-class VIEW3D_OT_MhxRemoveVertexGroupsButton(bpy.types.Operator):
-    bl_idname = "mhclo.remove_vertex_groups"
-    bl_label = "Remove vertex groups"
-
-    def execute(self, context):
-        removeVertexGroups(context)
-        print("All vertex groups removed")
-        return{'FINISHED'}    
-
 #
 #   autoVertexGroups(context):
-#   class VIEW3D_OT_MhxAutoVertexGroupsButton(bpy.types.Operator):
 #
 
 def autoVertexGroups(context):
@@ -1893,6 +1961,10 @@ def autoVertexGroups(context):
     mid = ob.vertex_groups.new("Mid")
     left = ob.vertex_groups.new("Left")
     right = ob.vertex_groups.new("Right")
+    if isSelfClothed(context):
+        nOldVerts = NOldVerts[context.scene["MCSelfClothed"]]
+    else:
+        nOldVerts = NOldVerts[-1]
     for v in ob.data.vertices:
         vn = v.index
         if v.co[0] > 0.01:
@@ -1901,20 +1973,10 @@ def autoVertexGroups(context):
             right.add([vn], 1.0, 'REPLACE')
         else:
             mid.add([vn], 1.0, 'REPLACE')
-            if ishuman and (vn < NBodyVerts[-1]):
+            if ishuman and (vn < nOldVerts):
                 left.add([vn], 1.0, 'REPLACE')
                 right.add([vn], 1.0, 'REPLACE')
     return
-
-class VIEW3D_OT_MhxAutoVertexGroupsButton(bpy.types.Operator):
-    bl_idname = "mhclo.auto_vertex_groups"
-    bl_label = "Auto vertex groups"
-
-    def execute(self, context):
-        removeVertexGroups(context)
-        autoVertexGroups(context)
-        print("Vertex groups auto assigned")
-        return{'FINISHED'}    
 
 #
 #   checkAndVertexDiamonds(ob):
@@ -1927,23 +1989,14 @@ def checkAndVertexDiamonds(ob):
     bpy.ops.object.mode_set(mode='OBJECT')
     me = ob.data
     nverts = len(me.vertices)
-    if nverts not in NBodyVerts:
+    if nverts not in NOldVerts:
         raise NameError(
             "Base object %s has %d vertices. The number of verts in an MH human must be one of %s" % 
-            (ob, nverts, NBodyVerts))
+            (ob, nverts, NOldVerts))
     bpy.ops.object.mode_set(mode='EDIT')
     bpy.ops.object.vertex_group_remove_from(all=True)
     bpy.ops.object.mode_set(mode='OBJECT')
     return            
-
-###################################################################################    
-#    User interface
-#
-#    initInterface()
-#
-###################################################################################    
-
-from bpy.props import *
 
 #
 #   readDefaultSettings(context):
@@ -1977,7 +2030,7 @@ def saveDefaultSettings(context):
     fp = open(fname, "w")
     scn = context.scene
     for (prop, value) in scn.items():
-        if prop[0:11] == "MakeClothes":
+        if prop[0:2] == "MC":
             if type(value) == int:
                 fp.write("%s int %s\n" % (prop, value))
             elif type(value) == float:
@@ -1987,138 +2040,137 @@ def saveDefaultSettings(context):
     fp.close()
     return
     
+#
+#   isInited(scn):
+#   initInterface(scn):
+#
+
 def isInited(scn):
     try:
-        scn["MakeClothesDirectory"]
+        scn.MCDirectory
         return True
     except:
         return False
     
-###################################################################################    
-#    User interface
-#
-#    initInterface()
-#
-###################################################################################    
-
-from bpy.props import *
-
 def initInterface(scn):
-    global ZDepthItems
-
     for skey in ShapeKeys:
         expr = (
-    'bpy.types.Scene.MakeClothes%s = BoolProperty(\n' % skey +
+    'bpy.types.Scene.MC%s = BoolProperty(\n' % skey +
     '   name="%s", \n' % skey +
     '   description="Shapekey %s affects clothes")' % skey)
         #print(expr)
         exec(expr)
-        scn['MakeClothes%s' % skey] = False
+        scn['MC%s' % skey] = False
 
-    bpy.types.Scene.MakeClothesDirectory = StringProperty(
+    bpy.types.Scene.MCDirectory = StringProperty(
         name="Directory", 
         description="Directory", 
         maxlen=1024)
-    scn['MakeClothesDirectory'] = "~"
+    scn['MCDirectory'] = "~"
     
-    bpy.types.Scene.MakeClothesMaterials = BoolProperty(
+    bpy.types.Scene.MCMaterials = BoolProperty(
         name="Materials", 
         description="Use materials")
-    scn['MakeClothesMaterials'] = False
+    scn['MCMaterials'] = False
 
-    bpy.types.Scene.MakeClothesObjLayer = IntProperty(
+    bpy.types.Scene.MCObjLayer = IntProperty(
         name="Obj UV layer", 
         description="UV layer to include in obj export, starting with 0")
-    scn['MakeClothesObjLayer'] = 0
+    scn['MCObjLayer'] = 0
 
-    bpy.types.Scene.MakeClothesMaskLayer = IntProperty(
+    bpy.types.Scene.MCMaskLayer = IntProperty(
         name="Mask UV layer", 
         description="UV layer for mask, starting with 0")
-    scn['MakeClothesMaskLayer'] = 0
+    scn['MCMaskLayer'] = 0
 
-    bpy.types.Scene.MakeClothesTextureLayer = IntProperty(
+    bpy.types.Scene.MCTextureLayer = IntProperty(
         name="Texture UV layer", 
         description="UV layer for textures, starting with 0")
-    scn['MakeClothesTextureLayer'] = 0
+    scn['MCTextureLayer'] = 0
 
-    bpy.types.Scene.MakeClothesBlenderMaterials = BoolProperty(
+    bpy.types.Scene.MCBlenderMaterials = BoolProperty(
         name="Blender materials", 
         description="Save materials as mhx file")
-    scn['MakeClothesBlenderMaterials'] = False
+    scn['MCBlenderMaterials'] = False
 
-    bpy.types.Scene.MakeClothesHairMaterial = BoolProperty(
+    bpy.types.Scene.MCHairMaterial = BoolProperty(
         name="Hair material", 
         description="Fill in hair material")
-    scn['MakeClothesHairMaterial'] = False
+    scn['MCHairMaterial'] = False
 
-    bpy.types.Scene.MakeClothesVertexGroups = BoolProperty(
+    bpy.types.Scene.MCVertexGroups = BoolProperty(
         name="Save vertex groups", 
         description="Save vertex groups but not texverts")
-    scn['MakeClothesVertexGroups'] = True
+    scn['MCVertexGroups'] = True
 
-    bpy.types.Scene.MakeClothesThreshold = FloatProperty(
+    bpy.types.Scene.MCThreshold = FloatProperty(
         name="Threshold", 
         description="Minimal allowed value of normal-vector dot product",
         min=-1.0, max=0.0)
-    scn['MakeClothesThreshold'] = theThreshold
+    scn['MCThreshold'] = theThreshold
 
-    bpy.types.Scene.MakeClothesListLength = IntProperty(
+    bpy.types.Scene.MCListLength = IntProperty(
         name="List length", 
         description="Max number of verts considered")
-    scn['MakeClothesListLength'] = theListLength
+    scn['MCListLength'] = theListLength
 
     """
-    bpy.types.Scene.MakeClothesForbidFailures = BoolProperty(
+    bpy.types.Scene.MCForbidFailures = BoolProperty(
         name="Forbid failures", 
         description="Raise error if not found optimal triangle")
-    scn['MakeClothesForbidFailures'] = True
+    scn['MCForbidFailures'] = True
     """
     
-    bpy.types.Scene.MakeClothesLogging = BoolProperty(
+    bpy.types.Scene.MCLogging = BoolProperty(
         name="Log", 
         description="Write a log file for debugging")
-    scn['MakeClothesLogging'] = False
+    scn['MCLogging'] = False
 
-    bpy.types.Scene.MakeClothesSelfClothed = IntProperty(
+    bpy.types.Scene.MCMakeHumanDirectory = StringProperty(
+        name="MakeHuman Directory", 
+        maxlen=1024)
+    scn['MCMakeHumanDirectory'] = "/home/svn/makehuman"
+
+    bpy.types.Scene.MCSelfClothed = IntProperty(
         name="Self clothed", 
         description="Clothes included in body mesh")
-    scn['MakeClothesSelfClothed'] = -1
+    scn['MCSelfClothed'] = -1
 
-    bpy.types.Scene.MakeClothesX1 = IntProperty(
+    bpy.types.Scene.MCX1 = IntProperty(
         name="X1", 
         description="First X vert for clothes rescaling")
-    scn['MakeClothesX1'] = 4302
+    scn['MCX1'] = 4302
 
-    bpy.types.Scene.MakeClothesX2 = IntProperty(
+    bpy.types.Scene.MCX2 = IntProperty(
         name="X2", 
         description="Second X vert for clothes rescaling")
-    scn['MakeClothesX2'] = 8697
+    scn['MCX2'] = 8697
 
-    bpy.types.Scene.MakeClothesY1 = IntProperty(
+    bpy.types.Scene.MCY1 = IntProperty(
         name="Y1", 
         description="First Y vert for clothes rescaling")
-    scn['MakeClothesY1'] = 8208
+    scn['MCY1'] = 8208
 
-    bpy.types.Scene.MakeClothesY2 = IntProperty(
+    bpy.types.Scene.MCY2 = IntProperty(
         name="Y2", 
         description="Second Y vert for clothes rescaling")
-    scn['MakeClothesY2'] = 8220
+    scn['MCY2'] = 8220
 
-    bpy.types.Scene.MakeClothesZ1 = IntProperty(
+    bpy.types.Scene.MCZ1 = IntProperty(
         name="Z1", 
         description="First Z vert for clothes rescaling")
-    scn['MakeClothesZ1'] = 8289
+    scn['MCZ1'] = 8289
 
-    bpy.types.Scene.MakeClothesZ2 = IntProperty(
+    bpy.types.Scene.MCZ2 = IntProperty(
         name="Z2", 
         description="Second Z vert for clothes rescaling")
     
-    bpy.types.Scene.MakeClothesExamineBoundary = BoolProperty(
+    bpy.types.Scene.MCExamineBoundary = BoolProperty(
         name="Examine", 
         description="Examine boundary when set")
-    scn['MakeClothesExamineBoundary'] = False
+    scn['MCExamineBoundary'] = False
 
-    bpy.types.Scene.MakeClothesBodyPart = EnumProperty(
+    bpy.types.Scene.MCBodyPart = EnumProperty(
         items = [('Head', 'Head', 'Head'),
                  ('Torso', 'Torso', 'Torso'),
                  ('Arm', 'Arm', 'Arm'),
@@ -2126,313 +2178,18 @@ def initInterface(scn):
                  ('Leg', 'Leg', 'Leg'),
                  ('Foot', 'Foot', 'Foot')]
         )
-    scn['MakeClothesBodyPart'] = 0
+    scn['MCBodyPart'] = 0
     setBoundaryVerts(scn)
 
     setZDepthItems()
-    bpy.types.Scene.MakeClothesZDepthName = EnumProperty(
+    bpy.types.Scene.MCZDepthName = EnumProperty(
         items = ZDepthItems)
-    scn['MakeClothesZDepthName'] = 4
+    scn['MCZDepthName'] = 4
 
-    bpy.types.Scene.MakeClothesZDepth = IntProperty(
+    bpy.types.Scene.MCZDepth = IntProperty(
         name="Z depth", 
         description="Location in the Z buffer")
     setZDepth(scn)
 
     return
-
-#
-#   readDefaultSettings(context):
-#   saveDefaultSettings(context):
-#
-
-def readDefaultSettings(context):
-    fname = os.path.realpath(os.path.expanduser("~/make_clothes.settings"))
-    try:
-        fp = open(fname, "rU")
-    except:
-        print("Did not find %s. Using default settings" % fname)
-        return
     
-    scn = context.scene
-    for line in fp:
-        words = line.split()
-        prop = words[0]
-        type = words[1]        
-        if type == "int":
-            scn[prop] = int(words[2])
-        elif type == "float":
-            scn[prop] = float(words[2])
-        elif type == "str":
-            scn[prop] = words[2]
-    fp.close()
-    return
-    
-def saveDefaultSettings(context):
-    fname = os.path.realpath(os.path.expanduser("~/make_clothes.settings"))
-    fp = open(fname, "w")
-    scn = context.scene
-    for (prop, value) in scn.items():
-        if prop[0:11] == "MakeClothes":
-            if type(value) == int:
-                fp.write("%s int %s\n" % (prop, value))
-            elif type(value) == float:
-                fp.write("%s float %.4f\n" % (prop, value))
-            elif type(value) == str:
-                fp.write("%s str %s\n" % (prop, value))
-    fp.close()
-    return
-    
-#
-#    class MakeClothesPanel(bpy.types.Panel):
-#
-
-class MakeClothesPanel(bpy.types.Panel):
-    bl_label = "Make clothes"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    
-    @classmethod
-    def poll(cls, context):
-        return (context.object and context.object.type == 'MESH')
-
-    def draw(self, context):
-        layout = self.layout
-        layout.label("The single-file make_clothes is deprecated")
-        layout.label("Try the makeclothes package instead")
-        layout.label("Copy utils/makeclothes folder to addons and")
-        layout.label("enable addon in MakeHuman category")
-        scn = context.scene
-        layout.label("Initialization")
-        layout.operator("mhclo.init_interface")
-        if not isInited(scn):
-            return
-        layout.operator("mhclo.save_settings")
-        layout.label("Utilities")
-        layout.operator("mhclo.print_vnums")
-        layout.operator("mhclo.remove_vertex_groups")
-        layout.operator("mhclo.auto_vertex_groups")
-        layout.operator("mhclo.copy_vert_locs")
-        layout.label("UVs")
-        layout.operator("mhclo.recover_seams")
-        layout.operator("mhclo.project_uvs")
-        layout.label("Make clothes")
-        layout.prop(scn, "MakeClothesDirectory")
-        layout.prop(scn, "MakeClothesMaterials")
-        layout.prop(scn, "MakeClothesBlenderMaterials")
-        layout.prop(scn, "MakeClothesHairMaterial")
-        layout.prop(scn, "MakeClothesListLength")
-        layout.prop(scn, "MakeClothesLogging")
-        layout.operator("mhclo.make_human", text="Make Human").isHuman = True
-        layout.operator("mhclo.make_human", text="Make Clothing").isHuman = False
-        
-        layout.separator()
-        layout.prop(scn, "MakeClothesMaskLayer")   
-        layout.prop(scn, "MakeClothesTextureLayer")   
-        layout.prop(scn, "MakeClothesObjLayer")   
-
-        layout.separator()
-        layout.operator("mhclo.make_clothes")
-        layout.operator("mhclo.export_obj_file")
-        layout.operator("mhclo.export_blender_material")
-        
-        layout.label("Shapekeys")
-        for skey in ShapeKeys:
-            layout.prop(scn, "MakeClothes%s" % skey)   
-        
-        layout.label("Z depth")
-        layout.prop(scn, "MakeClothesZDepthName")   
-        layout.operator("mhclo.set_zdepth")
-        layout.prop(scn, "MakeClothesZDepth")   
-
-        layout.label("Boundary")
-        layout.prop(scn, "MakeClothesBodyPart")   
-        layout.prop(scn, "MakeClothesExamineBoundary")           
-        layout.operator("mhclo.set_boundary")        
-        layout.prop(scn, "MakeClothesX1")
-        layout.prop(scn, "MakeClothesX2")
-        layout.prop(scn, "MakeClothesY1")
-        layout.prop(scn, "MakeClothesY2")
-        layout.prop(scn, "MakeClothesZ1")
-        layout.prop(scn, "MakeClothesZ2")   
-        #return
-
-        layout.label("For internal use")
-        layout.prop(scn, "MakeClothesSelfClothed")
-        #layout.prop(scn, "MakeClothesVertexGroups")
-        #layout.operator("mhclo.offset_clothes")
-        return
-
-#
-#    class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
-#
-
-class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
-    bl_idname = "mhclo.init_interface"
-    bl_label = "Reinitialize"
-
-    def execute(self, context):
-        initInterface(context.scene)
-        readDefaultSettings(context)
-        print("Interface initialized")
-        return{'FINISHED'}    
-
-#
-#    class OBJECT_OT_SaveSettingsButton(bpy.types.Operator):
-#
-
-class OBJECT_OT_SaveSettingsButton(bpy.types.Operator):
-    bl_idname = "mhclo.save_settings"
-    bl_label = "Save settings"
-
-    def execute(self, context):
-        saveDefaultSettings(context)
-        return{'FINISHED'}    
-
-#
-#    class OBJECT_OT_RecoverSeamsButton(bpy.types.Operator):
-#
-
-class OBJECT_OT_RecoverSeamsButton(bpy.types.Operator):
-    bl_idname = "mhclo.recover_seams"
-    bl_label = "Recover seams"
-
-    def execute(self, context):
-        recoverSeams(context)
-        return{'FINISHED'}    
-
-#
-#    class OBJECT_OT_MakeClothesButton(bpy.types.Operator):
-#
-
-class OBJECT_OT_MakeClothesButton(bpy.types.Operator):
-    bl_idname = "mhclo.make_clothes"
-    bl_label = "Make clothes"
-
-    def execute(self, context):     
-        makeClothes(context)
-        return{'FINISHED'}    
-        
-#
-#    class OBJECT_OT_ProjectUVsButton(bpy.types.Operator):
-#
-
-class OBJECT_OT_ProjectUVsButton(bpy.types.Operator):
-    bl_idname = "mhclo.project_uvs"
-    bl_label = "Project UVs"
-
-    def execute(self, context):
-        (human, clothing) = getObjectPair(context)
-        unwrapObject(clothing, context)
-        projectUVs(human, clothing, context)
-        return{'FINISHED'}    
-        
-#
-#   class OBJECT_OT_CopyVertLocsButton(bpy.types.Operator):
-#
-
-class OBJECT_OT_CopyVertLocsButton(bpy.types.Operator):
-    bl_idname = "mhclo.copy_vert_locs"
-    bl_label = "Copy vertex locations"
-
-    def execute(self, context):
-        src = context.object
-        for trg in context.scene.objects:
-            if trg != src and trg.select and trg.type == 'MESH':
-                print("Copy vertex locations from %s to %s" % (src.name, trg.name))
-                for n,sv in enumerate(src.data.vertices):
-                    tv = trg.data.vertices[n]
-                    tv.co = sv.co
-                print("Vertex locations copied")
-        return{'FINISHED'}    
-
-        
-#
-#   class OBJECT_OT_ExportObjFileButton(bpy.types.Operator):
-#
-
-class OBJECT_OT_ExportObjFileButton(bpy.types.Operator):
-    bl_idname = "mhclo.export_obj_file"
-    bl_label = "Export Obj file"
-
-    def execute(self, context):
-        exportObjFile(context)
-        return{'FINISHED'}    
-
-#
-#    class OBJECT_OT_ExportBlenderMaterialsButton(bpy.types.Operator):
-#
-
-class OBJECT_OT_ExportBlenderMaterialButton(bpy.types.Operator):
-    bl_idname = "mhclo.export_blender_material"
-    bl_label = "Export Blender material"
-
-    def execute(self, context):
-        pob = getClothing(context)
-        (outpath, outfile) = getFileName(pob, context, "mhx")
-        exportBlenderMaterial(pob.data, outpath)
-        return{'FINISHED'}    
-
-#
-#    class OBJECT_OT_MakeHumanButton(bpy.types.Operator):
-#
-
-class OBJECT_OT_MakeHumanButton(bpy.types.Operator):
-    bl_idname = "mhclo.make_human"
-    bl_label = "Make human"
-    isHuman = BoolProperty()
-
-    def execute(self, context):
-        ob = context.object
-        ob["MhxMesh"] = self.isHuman
-        print("Object %s: Human = %s" % (ob.name, ob["MhxMesh"]))
-        return{'FINISHED'}    
-
-#
-#    class OBJECT_OT_SetBoundaryButton(bpy.types.Operator):
-#
-
-class OBJECT_OT_SetBoundaryButton(bpy.types.Operator):
-    bl_idname = "mhclo.set_boundary"
-    bl_label = "Set boundary"
-
-    def execute(self, context):
-        scn = context.scene
-        setBoundaryVerts(scn)
-        if scn['MakeClothesExamineBoundary']:
-            ob = getHuman(context)
-            selectBoundary(ob, scn)
-        return{'FINISHED'}    
-
-#
-#    class OBJECT_OT_OffsetClothesButton(bpy.types.Operator):
-#
-
-class OBJECT_OT_OffsetClothesButton(bpy.types.Operator):
-    bl_idname = "mhclo.offset_clothes"
-    bl_label = "Offset clothes"
-
-    def execute(self, context):     
-        offsetCloth(context)
-        return{'FINISHED'}    
-
-#
-#    Init and register
-#
-
-
-def register():
-    initInterface(bpy.context.scene)
-    readDefaultSettings(bpy.context)
-    bpy.utils.register_module(__name__)
-    pass
-
-def unregister():
-    bpy.utils.unregister_module(__name__)
-    pass
-
-if __name__ == "__main__":
-    register()
-
-
-

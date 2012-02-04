@@ -50,7 +50,7 @@ bl_info = {
     "description": "Make MakeHuman target",
     "warning": "",
     'wiki_url': '',
-    "category": "3D View"}
+    "category": "MakeHuman"}
 
 
 import bpy

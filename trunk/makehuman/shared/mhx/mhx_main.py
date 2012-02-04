@@ -121,8 +121,14 @@ def getOutFileName(filePath, fromDir, isTexture):
             toPath = os.path.join(theConfig.outFolder, filename)
         try:
             theCopiedFiles[fromPath]
+            done = True
         except:
-            shutil.copyfile(fromPath, toPath)
+            done = False
+        if not done:
+            try:
+                shutil.copyfile(fromPath, toPath)
+            except:
+                pass    
             theCopiedFiles[fromPath] = True
         return toPath
     else:

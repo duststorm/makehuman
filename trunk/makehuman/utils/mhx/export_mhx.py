@@ -29,7 +29,7 @@ bl_addon_info = {
     'location': 'File > Export',
     'description': 'Export files in the MakeHuman eXchange format (.mhx)',
     'url': 'http://www.makehuman.org',
-    'category': 'Import/Export'}
+    'category': 'MakeHuman'}
 
 """
 Place this file in the .blender/scripts/addons dir
