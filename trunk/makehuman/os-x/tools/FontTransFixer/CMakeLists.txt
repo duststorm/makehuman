@@ -11,7 +11,7 @@ PROJECT(FontTransFixer)
 ####################################################################################
 IF(NOT APPLE)
     MESSAGE(FATAL_ERROR "This app is for Mac OS X only!")
-ENDIF(APPLE)
+ENDIF(NOT APPLE)
 
 # Flags for universal build.
 SET(CMAKE_OSX_ARCHITECTURES ppc;i386)
@@ -40,4 +40,4 @@ TARGET_LINK_LIBRARIES(fontTransFixer ${EXTRA_LIBS})
 
 SET_TARGET_PROPERTIES(fontTransFixer PROPERTIES LINK_FLAGS -mmacosx-version-min=${OSX_SDK})
 
-# INSTALL(TARGETS fontTransFixer DESTINATION /usr/bin)
+INSTALL(TARGETS fontTransFixer DESTINATION ${PROJECT_SOURCE_DIR}/bin/)
