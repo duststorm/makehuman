@@ -8,11 +8,11 @@
 
 #import "GeneralPreferences.h"
 
-const NSString *kUserDefaultsKeyExportPath = @"MHExportPath";
-const NSString *kUserDefaultsKeyModelPath  = @"MHModelPath";
-const NSString *kUserDefaultsKeyGrabPath   = @"MHGrabPath";
-const NSString *kUserDefaultsKeyRenderPath = @"MHRendermanPath";
-const NSString *kUserDefaultsKeyDocumentsPath = @"MHDocumentsPath";
+NSString *kUserDefaultsKeyExportPath = @"MHExportPath";
+NSString *kUserDefaultsKeyModelPath  = @"MHModelPath";
+NSString *kUserDefaultsKeyGrabPath   = @"MHGrabPath";
+NSString *kUserDefaultsKeyRenderPath = @"MHRendermanPath";
+NSString *kUserDefaultsKeyDocumentsPath = @"MHDocumentsPath";
 
 @interface GeneralPreferences (Private)
 +(void)createPathIfNotExists:(NSString*)inPath;

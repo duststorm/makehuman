@@ -85,7 +85,7 @@ int isRunningOnSnowLeopardAndAbove()
     return (major == 10 && minor >= 6) ? 1 : 0;
 }
 
-const int getPathForTypedString(const char* inTypeStr, char * const storage, int sizeOfStorge)
+int getPathForTypedString(const char* inTypeStr, char * const storage, int sizeOfStorge)
 {
     std::string pathStr;
 
@@ -114,7 +114,7 @@ const int getPathForTypedString(const char* inTypeStr, char * const storage, int
         return -1; // not found!
     }
 
-    const size_t bytesNeedToStore(pathStr.length() + 1);
+    const int bytesNeedToStore(pathStr.length() + 1);
     if ( NULL != storage )
     {
         if (bytesNeedToStore > sizeOfStorge)

@@ -10,7 +10,11 @@
 		6806287A0FC136C9006C372E /* data in Resources */ = {isa = PBXBuildFile; fileRef = 68061C9B0FC136AB006C372E /* data */; };
 		680EA9CF11A432B000DDEFEB /* glew.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 680EA9CE11A432B000DDEFEB /* glew.framework */; };
 		680EAADA11A4394300DDEFEB /* glew.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 680EA9CE11A432B000DDEFEB /* glew.framework */; };
-		6819FC001452E7B2002D5925 /* arial-larger_0_trans.png in Resources */ = {isa = PBXBuildFile; fileRef = 6819FBFF1452E7B2002D5925 /* arial-larger_0_trans.png */; };
+		6818897714DD8BA400CCF240 /* arial_0.png in Resources */ = {isa = PBXBuildFile; fileRef = 6818897214DD8BA400CCF240 /* arial_0.png */; };
+		6818897814DD8BA400CCF240 /* arial-larger_0.png in Resources */ = {isa = PBXBuildFile; fileRef = 6818897314DD8BA400CCF240 /* arial-larger_0.png */; };
+		6818897914DD8BA400CCF240 /* courier_0.png in Resources */ = {isa = PBXBuildFile; fileRef = 6818897414DD8BA400CCF240 /* courier_0.png */; };
+		6818897A14DD8BA400CCF240 /* ubuntu_0.png in Resources */ = {isa = PBXBuildFile; fileRef = 6818897514DD8BA400CCF240 /* ubuntu_0.png */; };
+		6818897B14DD8BA400CCF240 /* verdana_0.png in Resources */ = {isa = PBXBuildFile; fileRef = 6818897614DD8BA400CCF240 /* verdana_0.png */; };
 		68225FAA13DC5C830021F48A /* TextureCache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 68225FA913DC5C830021F48A /* TextureCache.cpp */; };
 		683926C312A3DC1400008F37 /* AppIcon_nb.icns in Resources */ = {isa = PBXBuildFile; fileRef = 683926C212A3DC1400008F37 /* AppIcon_nb.icns */; };
 		6839A7AF10179EFF008AF603 /* HelpLinks.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6839A7AD10179EFF008AF603 /* HelpLinks.strings */; };
@@ -64,7 +68,6 @@
 		68D349FA12098883008E9DD6 /* apps in Resources */ = {isa = PBXBuildFile; fileRef = 68D349CF12098883008E9DD6 /* apps */; };
 		68D34A0E120988C0008E9DD6 /* plugins in Resources */ = {isa = PBXBuildFile; fileRef = 68D34A01120988C0008E9DD6 /* plugins */; };
 		68D34A29120988D0008E9DD6 /* pythonmodules in Resources */ = {isa = PBXBuildFile; fileRef = 68D34A0F120988D0008E9DD6 /* pythonmodules */; };
-		68E53136118C2EAC0077AF3A /* arial_0_trans.png in Resources */ = {isa = PBXBuildFile; fileRef = 68E53135118C2EAC0077AF3A /* arial_0_trans.png */; };
 		68E6B3DC1036C9B100BAA9F5 /* AppPreferences.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68E6B3DB1036C9B100BAA9F5 /* AppPreferences.mm */; };
 		68E6B8B01038175A00BAA9F5 /* UpdatePreferences.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 68E6B8AF1038175A00BAA9F5 /* UpdatePreferences.tiff */; };
 		68E6B8DF103820F500BAA9F5 /* UpdatePreferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 68E6B8DE103820F500BAA9F5 /* UpdatePreferences.xib */; };
@@ -79,9 +82,6 @@
 		68EA2BAE0FC836DB0052A87E /* NSFont_OpenGL.m in Sources */ = {isa = PBXBuildFile; fileRef = 68EA2BAD0FC836DB0052A87E /* NSFont_OpenGL.m */; };
 		68EF10D413D97A590000AAD3 /* OSXTools.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68EF10D313D97A590000AAD3 /* OSXTools.mm */; };
 		68F6D3F80E640E6A00D27961 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 68F6D3F60E640E6A00D27961 /* AppIcon.icns */; };
-		68FAB546140C1FA400C1B9A1 /* ubuntu_0_trans.png in Resources */ = {isa = PBXBuildFile; fileRef = 68FAB543140C1FA400C1B9A1 /* ubuntu_0_trans.png */; };
-		68FAB547140C1FA400C1B9A1 /* courier_0_trans.png in Resources */ = {isa = PBXBuildFile; fileRef = 68FAB544140C1FA400C1B9A1 /* courier_0_trans.png */; };
-		68FAB548140C1FA400C1B9A1 /* verdana_0_trans.png in Resources */ = {isa = PBXBuildFile; fileRef = 68FAB545140C1FA400C1B9A1 /* verdana_0_trans.png */; };
 		68FC683D144FF62200CD1E65 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6850794B13AE1C2C004C0164 /* Python.framework */; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
@@ -131,7 +131,11 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		68061C9B0FC136AB006C372E /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; name = data; path = ../data; sourceTree = SOURCE_ROOT; };
 		680EA9CE11A432B000DDEFEB /* glew.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = glew.framework; path = frameworks/glew.framework; sourceTree = SOURCE_ROOT; };
-		6819FBFF1452E7B2002D5925 /* arial-larger_0_trans.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "arial-larger_0_trans.png"; path = "resources/arial-larger_0_trans.png"; sourceTree = "<group>"; };
+		6818897214DD8BA400CCF240 /* arial_0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = arial_0.png; path = resources/arial_0.png; sourceTree = "<group>"; };
+		6818897314DD8BA400CCF240 /* arial-larger_0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "arial-larger_0.png"; path = "resources/arial-larger_0.png"; sourceTree = "<group>"; };
+		6818897414DD8BA400CCF240 /* courier_0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = courier_0.png; path = resources/courier_0.png; sourceTree = "<group>"; };
+		6818897514DD8BA400CCF240 /* ubuntu_0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ubuntu_0.png; path = resources/ubuntu_0.png; sourceTree = "<group>"; };
+		6818897614DD8BA400CCF240 /* verdana_0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = verdana_0.png; path = resources/verdana_0.png; sourceTree = "<group>"; };
 		68225FA813DC5C7C0021F48A /* TextureCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TextureCache.h; path = include/TextureCache.h; sourceTree = "<group>"; };
 		68225FA913DC5C830021F48A /* TextureCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextureCache.cpp; path = src/TextureCache.cpp; sourceTree = "<group>"; };
 		683926C212A3DC1400008F37 /* AppIcon_nb.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = AppIcon_nb.icns; path = resources/AppIcon_nb.icns; sourceTree = "<group>"; };
@@ -178,7 +182,6 @@
 		68D8631C0FA5D1810097F73F /* SDLMain.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SDLMain.mm; path = src/SDLMain.mm; sourceTree = "<group>"; };
 		68D8631E0FA5D1880097F73F /* SDLMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SDLMain.h; path = include/SDLMain.h; sourceTree = "<group>"; };
 		68DFFDA40FC1F059009CA434 /* data */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = folder; name = data; path = ../data; sourceTree = SOURCE_ROOT; };
-		68E53135118C2EAC0077AF3A /* arial_0_trans.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = arial_0_trans.png; path = resources/arial_0_trans.png; sourceTree = "<group>"; };
 		68E6B39E1036B40300BAA9F5 /* Acknowledgments.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Acknowledgments.rtf; path = resources/Acknowledgments.rtf; sourceTree = "<group>"; };
 		68E6B3DA1036C9B100BAA9F5 /* AppPreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppPreferences.h; path = include/AppPreferences.h; sourceTree = "<group>"; };
 		68E6B3DB1036C9B100BAA9F5 /* AppPreferences.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppPreferences.mm; path = src/AppPreferences.mm; sourceTree = "<group>"; };
@@ -200,9 +203,6 @@
 		68EF10D313D97A590000AAD3 /* OSXTools.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = OSXTools.mm; path = src/OSXTools.mm; sourceTree = "<group>"; };
 		68F6D3F50E640E6A00D27961 /* AppIcon.psd */ = {isa = PBXFileReference; lastKnownFileType = file; name = AppIcon.psd; path = resources/AppIcon.psd; sourceTree = "<group>"; };
 		68F6D3F60E640E6A00D27961 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = AppIcon.icns; path = resources/AppIcon.icns; sourceTree = "<group>"; };
-		68FAB543140C1FA400C1B9A1 /* ubuntu_0_trans.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ubuntu_0_trans.png; path = resources/ubuntu_0_trans.png; sourceTree = "<group>"; };
-		68FAB544140C1FA400C1B9A1 /* courier_0_trans.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = courier_0_trans.png; path = resources/courier_0_trans.png; sourceTree = "<group>"; };
-		68FAB545140C1FA400C1B9A1 /* verdana_0_trans.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = verdana_0_trans.png; path = resources/verdana_0_trans.png; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* MakeHuman.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MakeHuman.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -446,11 +446,11 @@
 		68FAB54A140C1FBF00C1B9A1 /* patched fonts */ = {
 			isa = PBXGroup;
 			children = (
-				6819FBFF1452E7B2002D5925 /* arial-larger_0_trans.png */,
-				68E53135118C2EAC0077AF3A /* arial_0_trans.png */,
-				68FAB543140C1FA400C1B9A1 /* ubuntu_0_trans.png */,
-				68FAB544140C1FA400C1B9A1 /* courier_0_trans.png */,
-				68FAB545140C1FA400C1B9A1 /* verdana_0_trans.png */,
+				6818897214DD8BA400CCF240 /* arial_0.png */,
+				6818897314DD8BA400CCF240 /* arial-larger_0.png */,
+				6818897414DD8BA400CCF240 /* courier_0.png */,
+				6818897514DD8BA400CCF240 /* ubuntu_0.png */,
+				6818897614DD8BA400CCF240 /* verdana_0.png */,
 			);
 			name = "patched fonts";
 			sourceTree = "<group>";
@@ -571,6 +571,7 @@
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "MakeHuman" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -620,15 +621,15 @@
 				68E6BA1610384AF100BAA9F5 /* Localizable.strings in Resources */,
 				68E6BB1C10395B2C00BAA9F5 /* GeneralPreferences.tiff in Resources */,
 				68E6BB471039619700BAA9F5 /* GeneralPreferences.xib in Resources */,
-				68E53136118C2EAC0077AF3A /* arial_0_trans.png in Resources */,
 				68C96CE711933EA800CE9C5C /* splash_nb.png in Resources */,
 				68D349F912098883008E9DD6 /* apps in Resources */,
 				686CEBB612A3D4F500F4324D /* Info_nb.plist in Resources */,
 				683926C312A3DC1400008F37 /* AppIcon_nb.icns in Resources */,
-				68FAB546140C1FA400C1B9A1 /* ubuntu_0_trans.png in Resources */,
-				68FAB547140C1FA400C1B9A1 /* courier_0_trans.png in Resources */,
-				68FAB548140C1FA400C1B9A1 /* verdana_0_trans.png in Resources */,
-				6819FC001452E7B2002D5925 /* arial-larger_0_trans.png in Resources */,
+				6818897714DD8BA400CCF240 /* arial_0.png in Resources */,
+				6818897814DD8BA400CCF240 /* arial-larger_0.png in Resources */,
+				6818897914DD8BA400CCF240 /* courier_0.png in Resources */,
+				6818897A14DD8BA400CCF240 /* ubuntu_0.png in Resources */,
+				6818897B14DD8BA400CCF240 /* verdana_0.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -662,7 +663,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "# This Function copies the files of a given subpath (relative to makehuman) to the\n# Apps resource folder.\ncopyResourceFiles()\n{\n    # Copy the directory 'data' into the Application Folder (Resources/$1)\n    if [ ! -e \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/$1\" ]\n    then\n        mkdir -p \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/$1\"\n        cp -rf \"${PROJECT_DIR}/../$1\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\n        cd \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/$1\"\n        find . -name \"Makefile*\" -delete\n        find . -name \"*.zip\" -delete\n        find . -name \"empty.txt\" -delete\n        find . -name \".svn\" -type d | xargs rm -rf\n        find . -name \"CVS\" -type d | xargs rm -rf\n        find . -name \"*.pyc\" -delete\n    fi\n}\n\ncopyPythonExtension()\n{\n\tcp \"${CONFIGURATION_BUILD_DIR}/$1\" \"${CONFIGURATION_BUILD_DIR}/${PROJECT_NAME}.app/Contents/Resources/$1\"\n}\n\npatchFont()\n{\n\tmv \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/$1_0_trans.png\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/data/fonts/$1_0.png\"\n}\n\n# copy python extensions....\ncopyPythonExtension linalg_module.so\n\ncopyResourceFiles data\ncopyResourceFiles plugins\ncopyResourceFiles core\ncopyResourceFiles importers\ncopyResourceFiles utils\ncopyResourceFiles shared\n\ncp -f \"${PROJECT_DIR}/../main.py\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\ncp -f \"${PROJECT_DIR}/../mh_export.config\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\n\n# Patch the fonts\npatchFont arial\npatchFont arial-larger\npatchFont courier\npatchFont verdana\npatchFont ubuntu\n\n# do stuff which is relevant for a nightly build only.\nif [ ${BUILD_STYLE} == \"NightlyBuild\" ]; then \n\tcp -f \"${PROJECT_DIR}/resources/splash_nb.png\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/data/themes/default/images/splash.png\"\n\tcp -f \"${PROJECT_DIR}/resources/Info_nb.plist\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/Info.plist\"\nfi\n\n# do stuff which is relevant for a release build only.\nif [ ${BUILD_STYLE} == \"Release\" ]; then \n\t# clean up all \"pyc\" files\n\tcd \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources\"\n\tfind . -name \"*.pyc\" -delete\n\tfind . -name \".svn\" -type d | xargs rm -rf\n     find . -name \"CVS\" -type d | xargs rm -rf\nfi\n";
+			shellScript = "# This Function copies the files of a given subpath (relative to makehuman) to the\n# Apps resource folder.\ncopyResourceFiles()\n{\n    # Copy the directory 'data' into the Application Folder (Resources/$1)\n    if [ ! -e \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/$1\" ]\n    then\n        mkdir -p \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/$1\"\n        cp -rf \"${PROJECT_DIR}/../$1\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\n        cd \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/$1\"\n        find . -name \"Makefile*\" -delete\n        find . -name \"*.zip\" -delete\n        find . -name \"empty.txt\" -delete\n        find . -name \".svn\" -type d | xargs rm -rf\n        find . -name \"CVS\" -type d | xargs rm -rf\n        find . -name \"*.pyc\" -delete\n    fi\n}\n\ncopyPythonExtension()\n{\n\tcp \"${CONFIGURATION_BUILD_DIR}/$1\" \"${CONFIGURATION_BUILD_DIR}/${PROJECT_NAME}.app/Contents/Resources/$1\"\n}\n\npatchFont()\n{\n\tmv \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/$1_0.png\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/data/fonts/$1_0.png\"\n}\n\n# copy python extensions....\ncopyPythonExtension linalg_module.so\n\ncopyResourceFiles data\ncopyResourceFiles plugins\ncopyResourceFiles core\ncopyResourceFiles importers\ncopyResourceFiles utils\ncopyResourceFiles shared\n\ncp -f \"${PROJECT_DIR}/../main.py\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\ncp -f \"${PROJECT_DIR}/../mh_export.config\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\n\n# Patch the fonts\npatchFont arial\npatchFont arial-larger\npatchFont courier\npatchFont verdana\npatchFont ubuntu\n\n# do stuff which is relevant for a nightly build only.\nif [ ${BUILD_STYLE} == \"NightlyBuild\" ]; then \n\tcp -f \"${PROJECT_DIR}/resources/splash_nb.png\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/data/themes/default/images/splash.png\"\n\tcp -f \"${PROJECT_DIR}/resources/Info_nb.plist\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/Info.plist\"\nfi\n\n# do stuff which is relevant for a release build only.\nif [ ${BUILD_STYLE} == \"Release\" ]; then \n\t# clean up all \"pyc\" files\n\tcd \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources\"\n\tfind . -name \"*.pyc\" -delete\n\tfind . -name \".svn\" -type d | xargs rm -rf\n     find . -name \"CVS\" -type d | xargs rm -rf\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -757,6 +758,144 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		6818892014DD6E1600CCF240 /* DebugXCode4 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = NO;
+				EXTRA_FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS = (
+					/Library/Frameworks,
+					"$(EXTRA_FRAMEWORK_SEARCH_PATHS)",
+				);
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREFIX_HEADER = include/MakeHuman_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					XCHECK_PYTHON_VERSION,
+					DEBUG,
+				);
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../include/,
+					./include/,
+					./include/pythonwrapper/,
+					./include/sdlwrapper/,
+				);
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "-lz";
+				PREBINDING = NO;
+				SDKROOT = "";
+				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
+				VALID_ARCHS = i386;
+			};
+			name = DebugXCode4;
+		};
+		6818892114DD6E1600CCF240 /* DebugXCode4 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				INFOPLIST_FILE = resources/Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = MakeHuman;
+				WARNING_CFLAGS = "-Wall";
+				WRAPPER_EXTENSION = app;
+			};
+			name = DebugXCode4;
+		};
+		6818892214DD6E1600CCF240 /* DebugXCode4 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/frameworks\"";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PREPROCESSOR_DEFINITIONS = MAKEHUMAN_AS_MODULE;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = MakeHumanDLib;
+			};
+			name = DebugXCode4;
+		};
+		6818892314DD6E1600CCF240 /* DebugXCode4 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_VERSION = A;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				GCC_PREPROCESSOR_DEFINITIONS = MAKEHUMAN_AS_MODULE;
+				INFOPLIST_FILE = "MakeHumanFramework-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = MakeHuman;
+			};
+			name = DebugXCode4;
+		};
+		6818892414DD6E1600CCF240 /* DebugXCode4 */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_EXTENSION = so;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREFIX_HEADER = "";
+				INSTALL_PATH = /usr/local/lib;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				PRODUCT_NAME = linalg_module;
+			};
+			name = DebugXCode4;
+		};
 		6850794213AE1C06004C0164 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1172,6 +1311,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6850794213AE1C06004C0164 /* Debug */,
+				6818892414DD6E1600CCF240 /* DebugXCode4 */,
 				6850794313AE1C06004C0164 /* NightlyBuild */,
 				6850794413AE1C06004C0164 /* Release */,
 			);
@@ -1182,6 +1322,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				685701AD1001D78000F9C649 /* Debug */,
+				6818892214DD6E1600CCF240 /* DebugXCode4 */,
 				686C9AE3116601BE0050C414 /* NightlyBuild */,
 				685701AE1001D78000F9C649 /* Release */,
 			);
@@ -1192,6 +1333,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6857022910031DA200F9C649 /* Debug */,
+				6818892314DD6E1600CCF240 /* DebugXCode4 */,
 				686C9AE4116601BE0050C414 /* NightlyBuild */,
 				6857022A10031DA200F9C649 /* Release */,
 			);
@@ -1202,6 +1344,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01FCF4B08A954540054247B /* Debug */,
+				6818892114DD6E1600CCF240 /* DebugXCode4 */,
 				686C9AE2116601BE0050C414 /* NightlyBuild */,
 				C01FCF4C08A954540054247B /* Release */,
 			);
@@ -1212,6 +1355,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01FCF4F08A954540054247B /* Debug */,
+				6818892014DD6E1600CCF240 /* DebugXCode4 */,
 				686C9AE1116601BE0050C414 /* NightlyBuild */,
 				C01FCF5008A954540054247B /* Release */,
 			);

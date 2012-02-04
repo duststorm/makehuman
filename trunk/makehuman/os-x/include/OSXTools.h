@@ -80,7 +80,7 @@ extern "C"
      *         NUL byte) or -1 if a path for the requestend Key in \p inTypeStr does not
      *         exists or -2 if \p sizeOfStorge is less than the storage actually needed.
      */
-    const int getPathForTypedString(const char* inTypeStr, char * const storage, int sizeOfStorge);
+    int getPathForTypedString(const char* inTypeStr, char * const storage, int sizeOfStorge);
 
     /** Checks if the main window is the active one, which means that it has the focus:
      * \return true if the main window has the focus.
