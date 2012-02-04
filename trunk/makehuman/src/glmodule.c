@@ -1176,8 +1176,8 @@ static void mhFlipSurface(SDL_Surface *surface)
  */
 GLuint mhLoadTexture(const Image *img, GLuint texture, int *width, int *height)
 {
-#ifdef __APPLE__
-    return textureCacheLoadTexture(fname, texture, width, height);
+#ifdef __XAPPLE__
+    return textureCacheLoadTexture(img->surface, texture, width, height);
 #else /* !__APPLE__ */
     SDL_Surface *surface, *flippedSurface;
     int internalFormat, format;
@@ -1259,8 +1259,8 @@ GLuint mhLoadTexture(const Image *img, GLuint texture, int *width, int *height)
 
 GLuint mhLoadSubTexture(const Image *img, GLuint texture, int x, int y)
 {
-#ifdef __APPLE__
-    return textureCacheLoadSubTexture(fname, texture, x, y);
+#ifdef __XAPPLE__
+    return textureCacheLoadSubTexture(img->surface, texture, x, y);
 #else
     SDL_Surface *surface, *flippedSurface;
     int internalFormat, format;
