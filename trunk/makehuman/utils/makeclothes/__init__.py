@@ -68,33 +68,40 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.operator("mhclo.init_interface", text="ReInitialize")
         layout.operator("mhclo.factory_settings")
         layout.operator("mhclo.save_settings")
+
         layout.label("Utilities")
         layout.operator("mhclo.print_vnums")
         layout.operator("mhclo.remove_vertex_groups")
         layout.operator("mhclo.auto_vertex_groups")
         layout.operator("mhclo.copy_vert_locs")
-        layout.label("UVs")
-        layout.operator("mhclo.recover_seams")
-        layout.operator("mhclo.project_uvs")
-        layout.label("Make clothes")
+        
+        layout.label("Settings")
         layout.prop(scn, "MCDirectory")
         layout.prop(scn, "MCMaterials")
         layout.prop(scn, "MCBlenderMaterials")
         layout.prop(scn, "MCHairMaterial")
-        layout.prop(scn, "MCListLength")
-        layout.prop(scn, "MCLogging")
-        layout.operator("mhclo.make_human", text="Make Human").isHuman = True
-        layout.operator("mhclo.make_human", text="Make Clothing").isHuman = False
+        layout.label("Set mesh type")
+        row = layout.row()
+        row.operator("mhclo.make_human", text="Human").isHuman = True
+        row.operator("mhclo.make_human", text="Clothing").isHuman = False
         
-        layout.separator()
-        layout.prop(scn, "MCMaskLayer")   
-        layout.prop(scn, "MCTextureLayer")   
-        layout.prop(scn, "MCObjLayer")   
+        layout.label("UV layers")
+        row = layout.row()
+        row.prop(scn, "MCMaskLayer", text="Mask")   
+        row.prop(scn, "MCTextureLayer", text = "Texture")   
+        row.prop(scn, "MCObjLayer", text="Obj")   
 
         layout.separator()
+        layout.label("Make clothes")
         layout.operator("mhclo.make_clothes")
+        layout.separator()
         layout.operator("mhclo.export_obj_file")
         layout.operator("mhclo.export_blender_material")
+        
+        layout.label("UVs")
+        layout.operator("mhclo.recover_seams")
+        layout.operator("mhclo.project_uvs")
+        layout.operator("mhclo.reexport_mhclo")        
         
         layout.label("Shapekeys")
         for skey in main.ShapeKeys:
@@ -109,17 +116,22 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.prop(scn, "MCBodyPart")   
         layout.prop(scn, "MCExamineBoundary")           
         layout.operator("mhclo.set_boundary")        
-        layout.prop(scn, "MCX1")
-        layout.prop(scn, "MCX2")
-        layout.prop(scn, "MCY1")
-        layout.prop(scn, "MCY2")
-        layout.prop(scn, "MCZ1")
-        layout.prop(scn, "MCZ2")   
+        row = layout.row()
+        row.prop(scn, "MCX1")
+        row.prop(scn, "MCX2")
+        row = layout.row()
+        row.prop(scn, "MCY1")
+        row.prop(scn, "MCY2")
+        row = layout.row()
+        row.prop(scn, "MCZ1")
+        row.prop(scn, "MCZ2")   
         if not main.UseInternal:
             return
 
         layout.separator()
         layout.label("For internal use")
+        layout.prop(scn, "MCListLength")
+        layout.prop(scn, "MCLogging")
         layout.prop(scn, "MCSelfClothed")
         layout.prop(scn, "MCMakeHumanDirectory")
         layout.operator("mhclo.split_human")
@@ -235,6 +247,18 @@ class OBJECT_OT_ExportObjFileButton(bpy.types.Operator):
 
     def execute(self, context):
         main.exportObjFile(context)
+        return{'FINISHED'}    
+
+#
+#   class OBJECT_OT_ReexportMhcloButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_ReexportMhcloButton(bpy.types.Operator):
+    bl_idname = "mhclo.reexport_mhclo"
+    bl_label = "Reexport Mhclo file"
+
+    def execute(self, context):
+        main.reexportMhclo(context)
         return{'FINISHED'}    
 
 #

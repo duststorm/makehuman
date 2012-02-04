@@ -264,9 +264,9 @@ def importObj(filepath, context):
             if len(tf) == 4:
                 data[n].uv4 = texverts[tf[3]]
                 
-    if scn.MhGroupsAsMats:
+    if scn.MhLoadMaterial == 'Groups':
         addMaterials(groups, me, "Group")
-    else:
+    elif scn.MhLoadMaterial == 'Materials':
         addMaterials(materials, me, "Material")
         for (name,group) in groups.items():
             vgrp = ob.vertex_groups.new(name=name)
@@ -958,7 +958,9 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.operator("mh.skip_batch")
             return
 
-        layout.prop(scn, "MhGroupsAsMats")
+        layout.label("Load materials from")
+        layout.prop(scn, "MhLoadMaterial", expand=True)
+        layout.separator()
         if isBaseOrTarget(ob):
             layout.operator("mh.import_base_mhclo", text="Reimport base mhclo").delete = True
             layout.operator("mh.import_base_obj", text="Reimport base obj").delete = True
@@ -968,12 +970,6 @@ class MakeTargetPanel(bpy.types.Panel):
         if isBase(ob):
             layout.operator("mh.new_target")
             layout.operator("mh.load_target")            
-            layout.label("Batch fix targets")
-            for fname in TargetSubPaths:
-                layout.prop(scn, "Mh%s" % fname)
-            layout.operator("mh.batch_fix")
-            layout.operator("mh.batch_render", text="Batch render").opengl = False
-            layout.operator("mh.batch_render", text="Batch OpenGL render").opengl = True
             
         elif isTarget(ob):
             layout.separator()
@@ -1008,6 +1004,26 @@ class MakeTargetPanel(bpy.types.Panel):
                 layout.operator("mh.save_target")           
             layout.operator("mh.saveas_target")           
 
+class MakeTargetBatchPanel(bpy.types.Panel):
+    bl_label = "Batch make targets"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_options = {'DEFAULT_CLOSED'}
+    
+    @classmethod
+    def poll(self, context):
+        return False and isInited(context.scene)
+        
+    def draw(self, context):
+        if isBase(context.object):
+            layout = self.layout
+            scn = context.scene
+            for fname in TargetSubPaths:
+                layout.prop(scn, "Mh%s" % fname)
+            layout.operator("mh.batch_fix")
+            layout.operator("mh.batch_render", text="Batch render").opengl = False
+            layout.operator("mh.batch_render", text="Batch OpenGL render").opengl = True
+
 #----------------------------------------------------------
 #   Init
 #----------------------------------------------------------
@@ -1016,8 +1032,10 @@ def initScene(scn):
     global TargetSubPaths
     scn["TargetPath"] = "/home/svn/makehuman/data/targets"            
     scn["Relax"] = 0.5
-    bpy.types.Scene.MhGroupsAsMats = BoolProperty(name="Groups as materials")
-    scn.MhGroupsAsMats = False
+    bpy.types.Scene.MhLoadMaterial = EnumProperty(
+        items = [('None','None','None'), ('Groups','Groups','Groups'), ('Materials','Materials','Materials')],
+        name="Load as materials")
+    scn.MhLoadMaterial = 'None'
     TargetSubPaths = []
     folder = os.path.realpath(os.path.expanduser(scn["TargetPath"]))
     for fname in os.listdir(folder):

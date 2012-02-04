@@ -543,27 +543,21 @@ def printClothes(context, bob, pob, data):
     if not isSelfClothed(context):
         printStuff(fp, pob, context)
 
-    useProjection = False
-    fp.write("# use_projection %d\n" % useProjection)
     fp.write("# verts %d\n" % (firstVert))
-    if useProjection:
-        for (pv, exact, verts, wts, proj) in data:
-            if exact:
-                (bv, dist) = verts[0]
-                fp.write("%5d\n" % bv.index)
-            else:
-                fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f\n" % (
-                    verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], proj))
-    else:                
-        for (pv, exact, verts, wts, diff) in data:
-            if exact:
-                (bv, dist) = verts[0]
-                fp.write("%5d\n" % bv.index)
-            else:
-                fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f %.5f %.5f\n" % (
-                    verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], diff[0], diff[2], -diff[1]))
+    for (pv, exact, verts, wts, diff) in data:
+        if exact:
+            (bv, dist) = verts[0]
+            fp.write("%5d\n" % bv.index)
+        else:
+            fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f %.5f %.5f\n" % (
+                verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], diff[0], diff[2], -diff[1]))
     fp.write('\n')
+    printMhcloUvLayers(fp, pob, scn)
+    fp.close()
+    print("%s done" % outfile)    
+    return
     
+def printMhcloUvLayers(fp, pob, scn):
     me = pob.data
     if me.uv_textures:
         for layer,uvtex in enumerate(me.uv_textures):
@@ -584,12 +578,50 @@ def printClothes(context, bob, pob, data):
                     (vt, uv) = uvVerts[n]
                     fp.write("%d " % vt)
                 fp.write("\n")
-    fp.close()
-    print("%s done" % outfile)    
     return
+    
+def reexportMhclo(context):
+    pob = getClothing(context)
+    scn = context.scene
+    (outpath, outfile) = getFileName(pob, context, "mhclo")
+        
+    lines = []
+    print("Reading clothes file %s" % outfile)
+    fp = open(outfile, "r")
+    for line in fp:
+        lines.append(line)
+    fp.close()        
+            
+    print("Creating new clothes file %s" % outfile)
+    fp = open(outfile, "w")
+    doingStuff = False
+    for line in lines:
+        words = line.split()
+        if len(words) == 0:
+            fp.write(line)                
+        elif (words[0] == "#"):
+            if words[1] in ["texVerts", "texFaces"]:
+                break
+            elif words[1] == "z_depth":
+                printStuff(fp, pob, context)
+                doingStuff = True
+            elif words[1] == "use_projection":
+                doingStuff = False
+            elif doingStuff:
+                pass
+            else:            
+                fp.write(line)                
+        else:                
+            fp.write(line)                
+    printMhcloUvLayers(fp, pob, scn)
+    fp.close()
+    print("%s written" % outfile)    
+    return
+    
       
 #
-#   printStuff(fp, pob, context):    
+#   printStuff(fp, pob, context): 
+#   From z_depth to use_projection
 #
 
 def printStuff(fp, pob, context):
@@ -653,6 +685,8 @@ def printStuff(fp, pob, context):
             (outpath, outfile) = getFileName(pob, context, "mhx")
             mhxfile = exportBlenderMaterial(me, outpath)
             fp.write("# material_file %s\n" % mhxfile)
+            
+    fp.write("# use_projection False\n")            
     return            
 
 #

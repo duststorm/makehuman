@@ -25,7 +25,7 @@ bl_info = {
     "api": 40000,
     'location': "File > Import > Export MH OBJ (.obj)",
     'description': 'Export files in OBJ format (.obj). For internal MakeHuman use.',
-    'category': 'Import-Export'}
+    'category': 'MakeHuman'}
 
 
 import bpy, os, mathutils

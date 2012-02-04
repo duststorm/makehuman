@@ -327,6 +327,7 @@ class MhxSourceBonesPanel(bpy.types.Panel):
     bl_label = "Mocap: Source armature"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
+    bl_options = {'DEFAULT_CLOSED'}
     
     @classmethod
     def poll(cls, context):

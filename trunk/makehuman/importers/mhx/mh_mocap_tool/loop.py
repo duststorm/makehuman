@@ -394,6 +394,7 @@ class LoopStitchPanel(bpy.types.Panel):
     bl_label = "Mocap: Loop and stitch"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
+    bl_options = {'DEFAULT_CLOSED'}
     
     @classmethod
     def poll(cls, context):

@@ -203,6 +203,7 @@ class ToggleConstraintPanel(bpy.types.Panel):
     bl_label = "Mocap: Toggle constraints"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
+    bl_options = {'DEFAULT_CLOSED'}
     
     @classmethod
     def poll(cls, context):
