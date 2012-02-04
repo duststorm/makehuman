@@ -1,0 +1,14 @@
+//
+//  Project.pch
+//
+//  Created by Dusel Hans-Peter on 17.01.12.
+//  Copyright (c) 2012 Tangerine Software. All rights reserved.
+//
+
+
+#include <Cocoa/Cocoa.h>
+#import <Carbon/Carbon.h>
+#import <CoreServices/CoreServices.h>
+
+#include <AppKit/AppKit.h>
+#include <sys/sysctl.h>

@@ -1,0 +1,213 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		688CB85814C80DC9001307DD /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 688CB85714C80DC9001307DD /* main.mm */; };
+		68E0478A14C61E0E0079F9E3 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68E0478914C61E0E0079F9E3 /* AppKit.framework */; };
+		68E0478D14C6B24D0079F9E3 /* Capabilities.mm in Sources */ = {isa = PBXBuildFile; fileRef = 68E0478C14C6B24D0079F9E3 /* Capabilities.mm */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		68E0477A14C61C940079F9E3 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		688CB85614C80DC9001307DD /* Project.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Project.pch; sourceTree = "<group>"; };
+		688CB85714C80DC9001307DD /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
+		68E0477C14C61C940079F9E3 /* PythonChecker */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PythonChecker; sourceTree = BUILT_PRODUCTS_DIR; };
+		68E0478914C61E0E0079F9E3 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		68E0478B14C6B24D0079F9E3 /* Capabilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Capabilities.h; sourceTree = "<group>"; };
+		68E0478C14C6B24D0079F9E3 /* Capabilities.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Capabilities.mm; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		68E0477914C61C940079F9E3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				68E0478A14C61E0E0079F9E3 /* AppKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		68E0477114C61C930079F9E3 = {
+			isa = PBXGroup;
+			children = (
+				688CB85614C80DC9001307DD /* Project.pch */,
+				688CB85714C80DC9001307DD /* main.mm */,
+				68E0478B14C6B24D0079F9E3 /* Capabilities.h */,
+				68E0478C14C6B24D0079F9E3 /* Capabilities.mm */,
+				68E0477D14C61C940079F9E3 /* Products */,
+				68E0478914C61E0E0079F9E3 /* AppKit.framework */,
+			);
+			sourceTree = "<group>";
+		};
+		68E0477D14C61C940079F9E3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				68E0477C14C61C940079F9E3 /* PythonChecker */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		68E0477B14C61C940079F9E3 /* PythonChecker */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 68E0478614C61C940079F9E3 /* Build configuration list for PBXNativeTarget "PythonChecker" */;
+			buildPhases = (
+				68E0477814C61C940079F9E3 /* Sources */,
+				68E0477914C61C940079F9E3 /* Frameworks */,
+				68E0477A14C61C940079F9E3 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PythonChecker;
+			productName = PythonChecker;
+			productReference = 68E0477C14C61C940079F9E3 /* PythonChecker */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		68E0477314C61C930079F9E3 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+				ORGANIZATIONNAME = "Tangerine Software";
+			};
+			buildConfigurationList = 68E0477614C61C930079F9E3 /* Build configuration list for PBXProject "PythonChecker" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 68E0477114C61C930079F9E3;
+			productRefGroup = 68E0477D14C61C940079F9E3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				68E0477B14C61C940079F9E3 /* PythonChecker */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		68E0477814C61C940079F9E3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				68E0478D14C6B24D0079F9E3 /* Capabilities.mm in Sources */,
+				688CB85814C80DC9001307DD /* main.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		68E0478414C61C940079F9E3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = 4.2;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx10.5;
+			};
+			name = Debug;
+		};
+		68E0478514C61C940079F9E3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = 4.2;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				SDKROOT = macosx10.5;
+			};
+			name = Release;
+		};
+		68E0478714C61C940079F9E3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Project.pch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		68E0478814C61C940079F9E3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Project.pch;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		68E0477614C61C930079F9E3 /* Build configuration list for PBXProject "PythonChecker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				68E0478414C61C940079F9E3 /* Debug */,
+				68E0478514C61C940079F9E3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		68E0478614C61C940079F9E3 /* Build configuration list for PBXNativeTarget "PythonChecker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				68E0478714C61C940079F9E3 /* Debug */,
+				68E0478814C61C940079F9E3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 68E0477314C61C930079F9E3 /* Project object */;
+}
