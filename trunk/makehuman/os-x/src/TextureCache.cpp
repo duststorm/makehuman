@@ -54,11 +54,13 @@ void textureCacheRestoreTextures()
 
 GLuint textureCacheLoadTexture(const char* inFileName, GLuint textureId, int *width, int *height)
 {
+    assert(inFileName);
     return CTextureCache::instance()->loadTexture(inFileName, textureId, width, height);
 }
 
 GLuint textureCacheLoadSubTexture(const char * inFileName, GLuint textureId, int x, int y)
 {
+    assert(inFileName);
     return CTextureCache::instance()->loadSubTexture(inFileName, textureId, x, y);
 }
 
@@ -182,6 +184,7 @@ static void flipSurface(SDL_Surface *surface)
 
 static SDL_Surface *loadImage(const char *fname)
 {
+    assert(fname);
     SDL_Surface *surface;
 
     surface = (SDL_Surface*)IMG_Load(fname);

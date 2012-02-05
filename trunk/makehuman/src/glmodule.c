@@ -453,6 +453,13 @@ static void Image_dealloc(Image *self)
 	{
 		SDL_FreeSurface(self->surface);
 		self->surface = NULL;
+#ifdef __APPLE__ /* see comments in glmodule.h in struct Image! */
+        if (self->imageFileName)
+        {
+            free((void*)self->imageFileName);
+            self->imageFileName = NULL;
+        }
+#endif
 	}
 
     // Free Python data
@@ -473,6 +480,9 @@ static PyObject *Image_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     if (self)
     {
 		self->surface = NULL;
+#ifdef __APPLE__ /* see comments in glmodule.h in struct Image! */
+		self->imageFileName = NULL;
+#endif
     }
 
     return (PyObject*)self;
@@ -635,13 +645,25 @@ static PyObject *Image_load(Image *self, PyObject *path)
 
     if (PyString_Check(path))
     {
-        if (!(self->surface = mhLoadImage(PyString_AsString(path))))
+        const char* pathStr = PyString_AsString(path);
+
+#ifdef __APPLE__ /* see comments in glmodule.h in struct Image! */
+        self->imageFileName = pathStr = strdup(pathStr);
+#endif
+        if (!(self->surface = mhLoadImage(pathStr)))
             return NULL;
     }
     else if (PyUnicode_Check(path))
     {
+        const char* pathStr;
+        
         path = PyUnicode_AsUTF8String(path);
-        if (!(self->surface = mhLoadImage(PyString_AsString(path))))
+        pathStr = PyString_AsString(path);
+
+#ifdef __APPLE__ /* see comments in glmodule.h in struct Image! */
+        self->imageFileName = pathStr = strdup(pathStr);
+#endif
+        if (!(self->surface = mhLoadImage(pathStr)))
         {
             Py_DECREF(path);
             return NULL;
@@ -1176,8 +1198,8 @@ static void mhFlipSurface(SDL_Surface *surface)
  */
 GLuint mhLoadTexture(const Image *img, GLuint texture, int *width, int *height)
 {
-#ifdef __XAPPLE__
-    return textureCacheLoadTexture(img->surface, texture, width, height);
+#ifdef __APPLE__
+    return textureCacheLoadTexture(img->imageFileName, texture, width, height);
 #else /* !__APPLE__ */
     SDL_Surface *surface, *flippedSurface;
     int internalFormat, format;
@@ -1259,8 +1281,8 @@ GLuint mhLoadTexture(const Image *img, GLuint texture, int *width, int *height)
 
 GLuint mhLoadSubTexture(const Image *img, GLuint texture, int x, int y)
 {
-#ifdef __XAPPLE__
-    return textureCacheLoadSubTexture(img->surface, texture, x, y);
+#ifdef __APPLE__
+    return textureCacheLoadSubTexture(img->imageFileName, texture, x, y);
 #else
     SDL_Surface *surface, *flippedSurface;
     int internalFormat, format;

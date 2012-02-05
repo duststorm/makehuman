@@ -47,6 +47,22 @@ typedef struct
 {
     PyObject_HEAD
     SDL_Surface *surface;
+#ifdef __APPLE__
+    
+    /* For Mac OS-X:
+     * ============
+     *
+     * Extend the Image struct by a pointer which holds the file name of the 
+     * texture if this belongs to a file. 
+     *
+     * This is NULL if it a synthetic Image which does not belong to a certain file.
+     * OS X - or better the SDL Implementation for OS X -  needs this because
+     * SDL 1.2 for OS X still has an bug which causes the to loose all SDL_Surface 
+     * contextes on a Window resize. So this will use the TextureCache which has been
+     * implemented expecially for OS X (see file os-x/src/TextureCache.cpp etc.).
+     */
+    const char* imageFileName; 
+#endif
 } Image;
 
 // Text, shader and texture services
