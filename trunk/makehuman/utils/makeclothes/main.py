@@ -38,7 +38,7 @@ Epsilon = 1e-4
 NOldVerts = [15340, 18528]
 NBodyVerts = NOldVerts[0]
 NBodyFaces = 14812
-UseInternal = True
+UseInternal = False
 
 #
 #   isHuman(ob):
@@ -160,7 +160,7 @@ def selectVert(context, vn, ob):
 #
 
 def goodName(name):    
-    newName = name.replace('-','_')
+    newName = name.replace('-','_').replace(' ','_')
     return newName.lower()
     
 def getFileName(pob, context, ext):            
@@ -534,7 +534,7 @@ def printClothes(context, bob, pob, data):
 "# license GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)\n" +
 "# homepage http://www.makehuman.org/\n")
 
-    fp.write("# name %s\n" % pob.name)
+    fp.write("# name %s\n" % pob.name.replace(" ","_"))
     fp.write("# obj_file %s.obj\n" % goodName(pob.name))
     printScale(fp, bob, scn, 'x_scale', 0, 'MCX1', 'MCX2')
     printScale(fp, bob, scn, 'z_scale', 1, 'MCY1', 'MCY2')
@@ -646,9 +646,9 @@ def printStuff(fp, pob, context):
             fp.write("# uvtex_layer %d %s\n" % (layer, uvtex.name.replace(" ","_")))
         fp.write("# objfile_layer %d\n" % scn["MCObjLayer"])
 
-    fp.write("# texture %s_texture.tif %d\n" % (pob.name.lower(), scn["MCTextureLayer"]))
+    fp.write("# texture %s_texture.tif %d\n" % (goodName(pob.name), scn["MCTextureLayer"]))
     #if scn['MCMask']:
-    fp.write("# mask %s_mask.png %d\n" % (pob.name.lower(), scn["MCMaskLayer"]))
+    fp.write("# mask %s_mask.png %d\n" % (goodName(pob.name), scn["MCMaskLayer"]))
            
     if scn['MCHairMaterial']:
         fp.write(
@@ -687,6 +687,8 @@ def printStuff(fp, pob, context):
             (outpath, outfile) = getFileName(pob, context, "mhx")
             mhxfile = exportBlenderMaterial(me, outpath)
             fp.write("# material_file %s\n" % mhxfile)
+    elif not scn['MCHairMaterial']:
+        fp.write("# material %s\n" % pob.name.replace(" ","_"))
             
     fp.write("# use_projection 0\n")            
     return            
@@ -1506,9 +1508,9 @@ def offsetCloth(context):
     pverts = pob.data.vertices    
     print("Offset %s to %s" % (bob.name, pob.name))
 
-    inpath = '%s/%s.mhclo' % (context.scene['MCDirectory'], bob.name.lower())
+    inpath = '%s/%s.mhclo' % (context.scene['MCDirectory'], goodName(bob.name))
     infile = os.path.realpath(os.path.expanduser(inpath))
-    outpath = '%s/%s.mhclo' % (context.scene['MCDirectory'], pob.name.lower())
+    outpath = '%s/%s.mhclo' % (context.scene['MCDirectory'], goodName(pob.name))
     outfile = os.path.realpath(os.path.expanduser(outpath))
     print("Modifying clothes file %s => %s" % (infile, outfile))
     infp = open(infile, "r")
@@ -1540,7 +1542,7 @@ def offsetCloth(context):
                 outfp.write(line)
                 status = 0
             elif words[1] == "name":
-                outfp.write("# name %s\n" % pob.name)
+                outfp.write("# name %s\n" % pob.name.replace(" ","_"))
             else:
                 outfp.write(line)
             vn = 0
