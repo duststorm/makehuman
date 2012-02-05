@@ -583,6 +583,8 @@ def printMhcloUvLayers(fp, pob, scn):
 def reexportMhclo(context):
     pob = getClothing(context)
     scn = context.scene
+    scn.objects.active = pob    
+    bpy.ops.object.mode_set(mode='OBJECT')
     (outpath, outfile) = getFileName(pob, context, "mhclo")
         
     lines = []
@@ -611,7 +613,7 @@ def reexportMhclo(context):
                 pass
             else:            
                 fp.write(line)                
-        else:                
+        elif not doingStuff:                
             fp.write(line)                
     printMhcloUvLayers(fp, pob, scn)
     fp.close()
@@ -686,7 +688,7 @@ def printStuff(fp, pob, context):
             mhxfile = exportBlenderMaterial(me, outpath)
             fp.write("# material_file %s\n" % mhxfile)
             
-    fp.write("# use_projection False\n")            
+    fp.write("# use_projection 0\n")            
     return            
 
 #
@@ -830,6 +832,7 @@ def findTexVert(uv, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob):
 
 def exportBaseUvsPy(context):
     ob = context.object
+    bpy.ops.object.mode_set(mode='OBJECT')
     scn = context.scene
     (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVertsList, texVertsList) = setupTexVerts(ob)
     maskLayer = scn["MCMaskLayer"]
@@ -1976,13 +1979,21 @@ def printVertNums(context):
     print("End verts")
 
 #
-#    removeVertexGroups(context):
+#    removeVertexGroups(context, removeType):
 #
 
-def removeVertexGroups(context):
+def removeVertexGroups(context, removeType):
     ob = context.object
     bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.vertex_group_remove(all=True)
+    if removeType == 'All':
+        bpy.ops.object.vertex_group_remove(all=True)
+        print("All vertex groups removed")
+    else:
+        for v in ob.data.vertices:
+            if v.select:
+                for vgrp in ob.vertex_groups:
+                    vgrp.remove([v.index])
+        print("Selected verts removed from all vertex groups")
     return
 
 #
@@ -1991,15 +2002,20 @@ def removeVertexGroups(context):
 
 def autoVertexGroups(context):
     ob = context.object
+    scn = context.scene
     ishuman = isHuman(ob)
     mid = ob.vertex_groups.new("Mid")
     left = ob.vertex_groups.new("Left")
     right = ob.vertex_groups.new("Right")
     if isSelfClothed(context):
-        nOldVerts = NOldVerts[context.scene["MCSelfClothed"]]
+        nOldVerts = NOldVerts[scn["MCSelfClothed"]]
     else:
         nOldVerts = NOldVerts[-1]
-    for v in ob.data.vertices:
+    if ishuman:
+        verts = getHumanVerts(ob.data, scn)
+    else:
+        verts = ob.data.vertices
+    for v in verts.values():
         vn = v.index
         if v.co[0] > 0.01:
             left.add([vn], 1.0, 'REPLACE')
@@ -2010,7 +2026,38 @@ def autoVertexGroups(context):
             if ishuman and (vn < nOldVerts):
                 left.add([vn], 1.0, 'REPLACE')
                 right.add([vn], 1.0, 'REPLACE')
+    print("Vertex groups auto assigned to %s" % scn.MCAutoGroupType.lower())
     return
+
+def getHumanVerts(me, scn):
+    verts = {}
+    if scn.MCAutoGroupType == 'Selected':
+        for v in me.vertices:
+            if v.select:
+                verts[v.index] = v
+    elif scn.MCAutoGroupType == 'Helpers':
+        addHelperVerts(me, verts)
+    elif scn.MCAutoGroupType == 'Body':
+        addBodyVerts(me, verts)
+    elif scn.MCAutoGroupType == 'All':
+        addHelperVerts(me, verts)
+        addBodyVerts(me, verts)
+    return verts        
+        
+def addHelperVerts(me, verts):
+    for v in me.vertices:
+        if v.index >= NBodyVerts:
+            verts[v.index] = v
+    return
+    
+def addBodyVerts(me, verts):
+    for f in me.faces:
+        if len(f.vertices) < 4:
+            continue
+        for vn in f.vertices:
+            if vn < NBodyVerts:
+                verts[vn] = me.vertices[vn]
+    return                
 
 #
 #   checkAndVertexDiamonds(ob):
@@ -2224,6 +2271,19 @@ def initInterface(scn):
         name="Z depth", 
         description="Location in the Z buffer")
     setZDepth(scn)
+    
+    bpy.types.Scene.MCAutoGroupType = EnumProperty(
+        items = [('Helpers','Helpers','Helpers'),
+                 ('Body','Body','Body'),
+                 ('Selected','Selected','Selected'),
+                 ('All','All','All')])
+    scn.MCAutoGroupType = 'Helpers'
+                 
+    bpy.types.Scene.MCRemoveGroupType = EnumProperty(
+        items = [('Selected','Selected','Selected'),
+                 ('All','All','All')])
+    scn.MCRemoveGroupType = 'All'              
+
 
     return
     

@@ -303,7 +303,7 @@ def register():
     bpy.types.INFO_MT_file_export.append(menu_func)
   
 def unregister():
-    bpy.utils.register_module(__name__)
+    bpy.utils.unregister_module(__name__)
     bpy.types.INFO_MT_file_export.remove(menu_func)
  
 if __name__ == "__main__":

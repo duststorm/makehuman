@@ -71,9 +71,13 @@ class MakeClothesPanel(bpy.types.Panel):
 
         layout.label("Utilities")
         layout.operator("mhclo.print_vnums")
-        layout.operator("mhclo.remove_vertex_groups")
-        layout.operator("mhclo.auto_vertex_groups")
         layout.operator("mhclo.copy_vert_locs")
+        layout.separator()
+        layout.prop(scn, "MCRemoveGroupType", expand=True)
+        layout.operator("mhclo.remove_vertex_groups")
+        layout.separator()
+        layout.prop(scn, "MCAutoGroupType", expand=True)
+        layout.operator("mhclo.auto_vertex_groups")
         
         layout.label("Settings")
         layout.prop(scn, "MCDirectory")
@@ -98,7 +102,7 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.operator("mhclo.export_obj_file")
         layout.operator("mhclo.export_blender_material")
         
-        layout.label("UVs")
+        layout.label("UV projection")
         layout.operator("mhclo.recover_seams")
         layout.operator("mhclo.project_uvs")
         layout.operator("mhclo.reexport_mhclo")        
@@ -368,8 +372,7 @@ class VIEW3D_OT_MhxRemoveVertexGroupsButton(bpy.types.Operator):
     bl_label = "Remove vertex groups"
 
     def execute(self, context):
-        main.removeVertexGroups(context)
-        print("All vertex groups removed")
+        main.removeVertexGroups(context, context.scene.MCRemoveGroupType)
         return{'FINISHED'}    
 
 #
@@ -381,9 +384,8 @@ class VIEW3D_OT_MhxAutoVertexGroupsButton(bpy.types.Operator):
     bl_label = "Auto vertex groups"
 
     def execute(self, context):
-        main.removeVertexGroups(context)
+        main.removeVertexGroups(context, 'All')
         main.autoVertexGroups(context)
-        print("Vertex groups auto assigned")
         return{'FINISHED'}    
 
 
