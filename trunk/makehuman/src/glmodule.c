@@ -813,7 +813,7 @@ static PyObject *Image_resize(Image *self, PyObject *args)
 
 	if (self->surface->format->BitsPerPixel != 32 && self->surface->format->BitsPerPixel != 24)
 	{
-		PyErr_Format(PyExc_RuntimeError, "unknown image type %d bits per pixel", self->surface->format);
+		PyErr_Format(PyExc_RuntimeError, "unknown image type %d bits per pixel", self->surface->format->BitsPerPixel);
 		return NULL;
 	}
 
@@ -846,7 +846,7 @@ static PyObject *Image_resized(Image *self, PyObject *args)
 
 	if (self->surface->format->BitsPerPixel != 32 && self->surface->format->BitsPerPixel != 24)
 	{
-		PyErr_Format(PyExc_RuntimeError, "unknown image type %d bits per pixel", self->surface->format);
+		PyErr_Format(PyExc_RuntimeError, "unknown image type %d bits per pixel", self->surface->format->BitsPerPixel);
 		return NULL;
 	}
 
