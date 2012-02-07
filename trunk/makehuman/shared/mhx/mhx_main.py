@@ -87,7 +87,7 @@ def exportMhx(human, filename, options):
 #
 #   getSubFolder(path, name):
 #   goodName(name)
-#   getOutFileName(filePath, fromDir, isTexture):
+#   getOutFileName(filePath, fromDir, isTexture, human):
 #
 
 def getSubFolder(path, name):
@@ -110,10 +110,15 @@ def goodName(name):
 
 import shutil
 
-def getOutFileName(filePath, fromDir, isTexture):
+def getOutFileName(filePath, fromDir, isTexture, human):
     srcDir = os.path.realpath(os.path.expanduser(fromDir))
     filename = os.path.basename(filePath)
-    fromPath = os.path.join(srcDir, filename)
+    if (filename == "texture.tif"):
+        texname = human.getTexture()
+        fromPath = texname.replace("png", "tif")
+        filename = os.path.basename(fromPath)
+    else:
+        fromPath = os.path.join(srcDir, filename)
     if theConfig.separatefolder:
         if isTexture:
             toPath = os.path.join(theConfig.texFolder, filename)
@@ -125,6 +130,13 @@ def getOutFileName(filePath, fromDir, isTexture):
         except:
             done = False
         if not done:
+            if 0 and human:
+                texture = module3d.getTexture(human.getTexture())
+                print(dir(texture))
+                img = mh.Image(human.getTexture())
+                print(dir(img))
+                img.save(toPath)
+                halt
             try:
                 shutil.copyfile(fromPath, toPath)
             except:
@@ -133,6 +145,8 @@ def getOutFileName(filePath, fromDir, isTexture):
         return toPath
     else:
         return fromPath
+        
+        
 
 #
 #    exportMhx_25(human, fp):
@@ -435,7 +449,7 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                 writeMaskDrivers(fp, proxyData)
                 fp.write("  end AnimationData\n")
             elif key == 'Filename':
-                file = getOutFileName(words[2], words[3], True)
+                file = getOutFileName(words[2], words[3], True, human)
                 fp.write("  Filename %s ;\n" % file)
             else:
                 raise NameError("Unknown *** %s" % words[1])
@@ -465,7 +479,7 @@ def writeBaseMaterials(fp):
     
 def addMaskImage(fp, mask):            
     (folder, file) = mask
-    path = getOutFileName(file, folder, True)
+    path = getOutFileName(file, folder, True, None)
     fp.write(
 "Image %s\n" % file +
 "  Filename %s ;\n" % path +
@@ -731,7 +745,7 @@ def copyProxyMaterialFile(fp, pair, mat, proxy, proxyData):
                 fp.write("%s " % word)
             fp.write("\n")                
         elif words[0] == 'Filename':
-            file = getOutFileName(words[1], folder, True)
+            file = getOutFileName(words[1], folder, True, None)
             fp.write("  Filename %s ;\n" % file)
         else:
             fp.write(line)
@@ -755,7 +769,7 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
         print("Tex", tex)
         texname = theHuman + os.path.basename(tex)
         fromDir = os.path.dirname(tex)
-        texfile = getOutFileName(tex, fromDir, True)
+        texfile = getOutFileName(tex, fromDir, True, None)
         fp.write(
 "Image %s\n" % texname +
 "  Filename %s ;\n" % texfile +
