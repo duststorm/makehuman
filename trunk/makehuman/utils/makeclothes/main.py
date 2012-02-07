@@ -317,6 +317,7 @@ def findClothes(context, bob, pob, log):
         #print(pv.index)
         pv.select = False
         if exact:
+            (mv, mdist) = mverts[0]
             bestFaces.append((pv, True, mverts, 0, 0))
             continue
         minmax = -1e6
@@ -879,14 +880,13 @@ def storeData(pob, bob, data):
     fp.write("%s\n" % pob.name)
     fp.write("%s\n" % bob.name)
     for (pv, exact, verts, wts, diff) in data:
-        #print(pv,exact)
         fp.write("%d %d\n" % (pv.index, exact))
-        #print(verts)
-        fp.write("%s\n" % verts)
-        if not exact:
-            #print(wts)
+        if exact:
+            (v0,d0) = verts[0]
+            fp.write("[%d, 0, 1]\n" % (v0.index))
+        else:
+            fp.write("%s\n" % verts)
             fp.write("(%s,%s,%s)\n" % wts)
-            #print(diff)
             fp.write("(%s,%s,%s)\n" % (diff[0],diff[1],diff[2]))
     fp.close()
     return
@@ -970,12 +970,10 @@ def projectUVs(bob, pob, context):
     bUvTex = getModifiedUvTex(bob)
     for (pv, exact, verts, wts, diff) in data:
         if exact:
-            print("Exact", pv.index)
             vn0 = verts[0]
             for f0 in bVertFaces[vn0]:
-                uv0 = getUvLoc(v0, f0.vertices, bUvTex[f.index])
+                uv0 = getUvLoc(vn0, f0.vertices, bUvTex[f0.index])
                 table[pv.index] = (1, uv0, 1)
-                print(pv.index, table[pv.index])
                 break
         else:
             vn0 = verts[0]
