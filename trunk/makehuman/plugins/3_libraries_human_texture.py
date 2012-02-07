@@ -70,8 +70,7 @@ class HumanTextureTaskView(gui3d.TaskView):
 
         @self.filechooser.event
         def onFileSelected(filename):
-            print 'Loading %s' % filename
-            
+
             gui3d.app.do(Action(gui3d.app.selectedHuman,
                 gui3d.app.selectedHuman.getTexture(),
                 os.path.join(mh.getPath(''), 'data', 'skins', filename), self.syncTexture))
