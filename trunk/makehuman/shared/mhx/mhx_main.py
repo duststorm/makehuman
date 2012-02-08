@@ -567,7 +567,7 @@ def writeVertexGroups(fp, rig, proxy):
             mh2proxy.writeRigWeights(fp, weights)
         fp.write("#endif\n")
 
-        if theConfig.breasts:
+        if theConfig.breastrig:
             copyVertGroups("shared/mhx/templates/vertexgroups-breasts25.mhx", fp, proxy)    
         if theConfig.biceps:
             copyVertGroups("shared/mhx/templates/vertexgroups-biceps25.mhx", fp, proxy)    

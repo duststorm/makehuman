@@ -289,13 +289,16 @@ class ExportTaskView(gui3d.TaskView):
         y+=16
         
         self.mhxOptions = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*14+6)));y+=25
-        self.version24 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.4", True));y+=24
+        self.version24 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.4", False));y+=24
         self.version25 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.5", True));y+=24
         self.exportExpressions = self.mhxOptions.addView(gui3d.CheckBox("Expressions", True));y+=24
         self.exportFaceShapes = self.mhxOptions.addView(gui3d.CheckBox("Face shapes", True));y+=24
         self.exportBodyShapes = self.mhxOptions.addView(gui3d.CheckBox("Body shapes", False));y+=24
         self.exportClothes = self.mhxOptions.addView(gui3d.CheckBox("Clothes", True));y+=24
         self.exportCage = self.mhxOptions.addView(gui3d.CheckBox("Cage", False));y+=24
+        self.exportBreastRig = self.mhxOptions.addView(gui3d.CheckBox("Breast rig", False));y+=24
+        self.exportMaleRig = self.mhxOptions.addView(gui3d.CheckBox("Male rig", False));y+=24
+        self.exportSkirtRig = self.mhxOptions.addView(gui3d.CheckBox("Skirt rig", False));y+=24
         rigs = []
         self.mhxRig = self.mhxOptions.addView(gui3d.RadioButton(rigs, "Use mhx rig", True));y+=24
         self.rigifyRig = self.mhxOptions.addView(gui3d.RadioButton(rigs, "Use rigify rig"));y+=24
@@ -450,9 +453,12 @@ class ExportTaskView(gui3d.TaskView):
                         'bodyshapes':self.exportBodyShapes.selected,
                         'clothes':self.exportClothes.selected,
                         'cage':self.exportCage.selected,
+                        'breastrig':self.exportBreastRig.selected,
+                        'malerig':self.exportMaleRig.selected,
+                        'skirtrig':self.exportSkirtRig.selected,
                         'useRig': rig,
                     }
-                # TL 2011.02.08: exportMhx uses the human instead of his meshData
+
                 mh2mhx.exportMhx(gui3d.app.selectedHuman, os.path.join(exportPath, filename + ".mhx"), options)
             elif self.collada.selected:
                 if self.gameDae.selected:

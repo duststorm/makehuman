@@ -1794,7 +1794,7 @@ def setupRig(obj):
         ArmatureProps = []
         HeadName = 'Head'
         
-        if mhx_main.theConfig.malegenitalia:
+        if mhx_main.theConfig.malerig:
             genitalia = "./shared/mhx/templates/vertexgroups-male25.mhx"
         else:
             genitalia = "./shared/mhx/templates/vertexgroups-female25.mhx"
@@ -1917,11 +1917,11 @@ def swapParentName(bones, old, new):
     
 def writeControlArmature(fp):
     amt = Armature    
-    if mhx_main.theConfig.breasts:
+    if mhx_main.theConfig.breastrig:
         amt += rig_body_25.BreastArmature
     if mhx_main.theConfig.biceps:
         amt += rig_arm_25.BicepsArmature
-    if mhx_main.theConfig.malegenitalia:
+    if mhx_main.theConfig.malerig:
         amt += rig_body_25.MaleArmature
     writeArmature(fp, amt, True)
     return
@@ -1944,11 +1944,11 @@ def writeControlPoses(fp):
         rig_face_25.FaceControlPoses(fp)
         rig_panel_25.PanelControlPoses(fp)
         
-    if mhx_main.theConfig.breasts:
+    if mhx_main.theConfig.breastrig:
         rig_body_25.BreastControlPoses(fp)
     if mhx_main.theConfig.biceps:
         rig_arm_25.BicepsControlPoses(fp)
-    if mhx_main.theConfig.malegenitalia:
+    if mhx_main.theConfig.malerig:
         rig_body_25.MaleControlPoses(fp)
     if mhx_main.theConfig.skirtrig == "own":
         rig_skirt_25.SkirtControlPoses(fp)

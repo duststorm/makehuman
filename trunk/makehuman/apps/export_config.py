@@ -78,7 +78,7 @@ class CExportConfig:
     def __init__(self):
         self.mainmesh = ['obj', 'mhx', 'dae']
         self.useRig = 'mhx'
-        self.mhxversion = ['24', '25']
+        self.mhxversion = ['25']
         self.separatefolder = False
         self.outFolder = None
         self.texFolder = None
@@ -87,9 +87,9 @@ class CExportConfig:
         self.faceshapes = True
         self.bodyshapes = True
         self.cage = False
-        self.breasts = False
+        self.breastrig = False
         self.biceps = False
-        self.malegenitalia = False
+        self.malerig = False
         self.skirtrig = "inh"
         self.clothesvisibilitydrivers = False
         self.customrigs = []
@@ -100,7 +100,7 @@ class CExportConfig:
         return (
 "<CExportConfig use:%s rig:%s version%s\n" % (self.mainmesh, self.useRig, self.mhxversion) +
 "  expr:%s face:%s body:%s cage:%s\n" % (self.expressions, self.faceshapes, self.bodyshapes, self.cage) +
-"  breasts:%s biceps:%s gen:%s vis:%s>" % (self.breasts, self.biceps, self.malegenitalia, self.clothesvisibilitydrivers))
+"  breastrig:%s biceps:%s gen:%s vis:%s>" % (self.breastrig, self.biceps, self.malerig, self.clothesvisibilitydrivers))
 
 #
 #   class CProxyFile:
@@ -132,8 +132,6 @@ class CProxyFile:
 #
 #   exportConfig(human, useHair, options=None):
 #
-#[('mhxversion', ['25']), ('expressions', True), ('useRig', 'mhx')]
-#[('mhxversion', ['24', '25']), ('expressions', False), ('useRig', 'game')]
 
 def exportConfig(human, useHair, options=None):
     cfg = CExportConfig()
@@ -152,6 +150,12 @@ def exportConfig(human, useHair, options=None):
         cfg.faceshapes = options['faceshapes']
         cfg.bodyshapes = options['bodyshapes']
         cfg.cage = options['cage']
+        cfg.breastrig = options['breastrig']
+        cfg.malerig = options['malerig']
+        if options['skirtrig']:
+            cfg.skirtrig = "own"
+        else:
+            cfg.skirtrig = None
         cfg.useRig = options['useRig']
         fp = 0
     else:    
@@ -211,7 +215,7 @@ def exportConfig(human, useHair, options=None):
             elif key in [
                 'separatefolder',
                 'expressions', 'faceshapes', 'bodyshapes', 
-                'breasts', 'biceps', 'malegenitalia',
+                'breastrig', 'biceps', 'malerig',
                 'clothesvisibilitydrivers'
                 ]:
                 try:
