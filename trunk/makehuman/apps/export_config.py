@@ -149,6 +149,7 @@ def exportConfig(human, useHair, options=None):
         cfg.expressions = options['expressions']
         cfg.faceshapes = options['faceshapes']
         cfg.bodyshapes = options['bodyshapes']
+        cfg.separatefolder = options['separatefolder']
         cfg.cage = options['cage']
         cfg.breastrig = options['breastrig']
         cfg.malerig = options['malerig']

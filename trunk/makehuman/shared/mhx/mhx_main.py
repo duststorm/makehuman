@@ -116,7 +116,11 @@ def getOutFileName(filePath, fromDir, isTexture, human):
     if (filename == "texture.tif"):
         texname = human.getTexture()
         fromPath = texname.replace("png", "tif")
+        fileDir = os.path.dirname(fromPath)         
         filename = os.path.basename(fromPath)
+        #print(filePath, fromDir, fileDir, fromPath)
+        if fileDir == fromDir:
+            fromPath = os.path.join(srcDir, filename)
     else:
         fromPath = os.path.join(srcDir, filename)
     if theConfig.separatefolder:

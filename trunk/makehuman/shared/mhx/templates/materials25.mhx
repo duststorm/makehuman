@@ -2,12 +2,12 @@
 # --------------- Images and textures ----------------------------- # 
  
 Image texture.tif
-  *** Filename texture.tif ./data/textures/ ;
+  *** Filename texture.tif data/textures ;
   use_premultiply True ;
 end Image
 
 Image texture_ref.tif
-  *** Filename texture_ref.tif ./data/textures/ ;
+  *** Filename texture_ref.tif data/textures ;
   use_premultiply True ;
 end Image
 

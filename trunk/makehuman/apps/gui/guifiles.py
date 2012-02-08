@@ -291,6 +291,7 @@ class ExportTaskView(gui3d.TaskView):
         self.mhxOptions = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*14+6)));y+=25
         self.version24 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.4", False));y+=24
         self.version25 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.5", True));y+=24
+        self.exportSeparateFolder = self.mhxOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
         self.exportExpressions = self.mhxOptions.addView(gui3d.CheckBox("Expressions", True));y+=24
         self.exportFaceShapes = self.mhxOptions.addView(gui3d.CheckBox("Face shapes", True));y+=24
         self.exportBodyShapes = self.mhxOptions.addView(gui3d.CheckBox("Body shapes", False));y+=24
@@ -453,6 +454,7 @@ class ExportTaskView(gui3d.TaskView):
                         'bodyshapes':self.exportBodyShapes.selected,
                         'clothes':self.exportClothes.selected,
                         'cage':self.exportCage.selected,
+                        'separatefolder':self.exportSeparateFolder.selected,
                         'breastrig':self.exportBreastRig.selected,
                         'malerig':self.exportMaleRig.selected,
                         'skirtrig':self.exportSkirtRig.selected,
