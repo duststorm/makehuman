@@ -28,6 +28,14 @@
 #ifndef GLMODULE_H
 #define GLMODULE_H 1
 
+#ifdef _DEBUG
+    #undef _DEBUG
+    #include <Python.h>
+    #define _DEBUG
+#else
+    #include <Python.h>
+#endif
+
 #if defined(__APPLE__)
 #	include <glew/glew.h> // OS X uses the glew.framework -> special include ;)
 #else

@@ -28,13 +28,6 @@
  (Simple DirectMedia Layer) libraries.
 
  */
-#ifdef _DEBUG
-    #undef _DEBUG
-    #include <Python.h>
-    #define _DEBUG
-#else
-    #include <Python.h>
-#endif
 
 #include "glmodule.h"
 #include "core.h"
