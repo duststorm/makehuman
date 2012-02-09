@@ -127,7 +127,7 @@ def povrayExport(obj, app, settings):
 
         # pathHandle = subprocess.Popen(cwd = outputDirectory, args = mh2povray_ini.povray_path + " /RENDER " + baseName)
     
-        print mh2povray_ini.povray_path + cmdLineOpt
+        #print mh2povray_ini.povray_path + cmdLineOpt
 
         pathHandle = subprocess.Popen(cwd=outputDirectory, args=mh2povray_ini.povray_path + cmdLineOpt)
 
