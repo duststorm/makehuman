@@ -43,7 +43,7 @@ hand-crafted models.
 bl_info = {
     "name": "Make target",
     "author": "Manuel Bastioni, Thomas Larsson",
-    "version": "0.1",
+    "version": "0.2",
     "blender": (2, 6, 0),
     "api": 40000,
     "location": "View3D > Properties > Make target",
@@ -73,7 +73,6 @@ Epsilon = 1e-3
 NBodyVerts = 15340
 
 theProxy = None
-
         
 #----------------------------------------------------------
 # 
@@ -505,6 +504,48 @@ class VIEW3D_OT_LoadTargetButton(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
 #----------------------------------------------------------
+#   loadTargetFromMesh(context):
+#----------------------------------------------------------
+
+def loadTargetFromMesh(context):
+    ob = context.object
+    if not isBaseOrTarget(ob):
+        raise NameError("Active object %s is not a base object" % ob.name)
+    scn = context.scene
+    trg = None
+    for ob1 in scn.objects:
+        if ob1.select and ob1.type == 'MESH' and ob1 != ob:
+            trg = ob1
+            break
+    if not trg:
+        raise NameError("Two meshes must be selected")        
+    bpy.ops.object.mode_set(mode='OBJECT')
+    name = trg.name
+    skey = ob.shape_key_add(name=name, from_mix=False)
+    ob.active_shape_key_index = shapeKeyLen(ob) - 1
+    skey.name = name
+    for v in trg.data.vertices:
+        skey.data[v.index].co = v.co
+    skey.slider_min = -1.0
+    skey.slider_max = 1.0
+    skey.value = 1.0
+    ob.show_only_shape_key = False
+    ob.use_shape_key_edit_mode = True
+    ob["NTargets"] += 1
+    ob["FilePath"] = 0
+    ob["SelectedOnly"] = False
+    scn.objects.unlink(trg)
+    return
+
+class VIEW3D_OT_LoadTargetFromMeshButton(bpy.types.Operator):
+    bl_idname = "mh.load_target_from_mesh"
+    bl_label = "Load target from mesh"
+
+    def execute(self, context):
+        loadTargetFromMesh(context)
+        return {'FINISHED'}
+
+#----------------------------------------------------------
 #   newTarget(context):
 #----------------------------------------------------------
 
@@ -513,9 +554,8 @@ def newTarget(context):
     bpy.ops.object.mode_set(mode='OBJECT')
     skey = ob.shape_key_add(name="Target", from_mix=False)
     ob.active_shape_key_index = shapeKeyLen(ob) - 1
-    #bpy.ops.object.shape_key_add(from_mix=False)
-    #skey = ob.active_shape_key
-    #skey.name = name
+    skey.slider_min = -1.0
+    skey.slider_max = 1.0
     skey.value = 1.0
     ob.show_only_shape_key = False
     ob.use_shape_key_edit_mode = True
@@ -557,17 +597,10 @@ def doSaveTarget(ob, filepath):
     skey = ob.active_shape_key    
     if skey.name[0:6] == "Target":
         skey.name = os.path.basename(filepath)
-    verts = {}
-    for v in ob.data.vertices:
-        verts[v.index] = v.co.copy()
-    for skey in ob.data.shape_keys.key_blocks:
-        if skey.name == "Basis":
-            continue       
-        for n,v in enumerate(skey.data):
-            bv = ob.data.vertices[n]
-            vec = v.co - bv.co
-            verts[n] += skey.value*vec
-
+    verts = evalVertLocations(ob)
+    
+    (fname,ext) = os.path.splitext(filepath)
+    filepath = fname + ".target"
     fp = open(filepath, "w")  
     print("Saving target %s to %s" % (ob, filepath))
     for n,vco in verts.items():
@@ -578,7 +611,21 @@ def doSaveTarget(ob, filepath):
     fp.close()    
     ob["FilePath"] = filepath
     return
-                            
+       
+def evalVertLocations(ob):    
+    verts = {}
+    for v in ob.data.vertices:
+        verts[v.index] = v.co.copy()
+    for skey in ob.data.shape_keys.key_blocks:
+        if skey.name == "Basis":
+            continue       
+        for n,v in enumerate(skey.data):
+            bv = ob.data.vertices[n]
+            vec = v.co - bv.co
+            verts[n] += skey.value*vec
+    return verts            
+
+       
 class VIEW3D_OT_SaveTargetButton(bpy.types.Operator):
     bl_idname = "mh.save_target"
     bl_label = "Save target"
@@ -615,6 +662,35 @@ class VIEW3D_OT_SkipSaveButton(bpy.types.Operator):
     def execute(self, context):
         context.object["Saving"] = False
         print("Target not saved")
+        return{'FINISHED'}            
+
+#----------------------------------------------------------
+#   Apply targets
+#----------------------------------------------------------
+
+def applyTargets(context):
+    ob = context.object
+    bpy.ops.object.mode_set(mode='OBJECT')
+    verts = evalVertLocations(ob)   
+    skeys = ob.data.shape_keys.key_blocks
+    n = len(skeys)
+    while n >= 0:
+        ob.active_shape_key_index = n
+        bpy.ops.object.shape_key_remove()
+        n -= 1
+    for prop in ob.keys():
+        del ob[prop]
+    for v in ob.data.vertices:
+        v.co = verts[v.index]
+    print("All targets applied")
+    return
+
+class VIEW3D_OT_ApplyTargetsButton(bpy.types.Operator):
+    bl_idname = "mh.apply_targets"
+    bl_label = "Apply targets"
+
+    def execute(self, context):
+        applyTargets(context)
         return{'FINISHED'}            
 
 #----------------------------------------------------------
@@ -970,6 +1046,7 @@ class MakeTargetPanel(bpy.types.Panel):
         if isBase(ob):
             layout.operator("mh.new_target")
             layout.operator("mh.load_target")            
+            layout.operator("mh.load_target_from_mesh")            
             
         elif isTarget(ob):
             layout.separator()
@@ -1003,6 +1080,7 @@ class MakeTargetPanel(bpy.types.Panel):
             if ob["FilePath"]:
                 layout.operator("mh.save_target")           
             layout.operator("mh.saveas_target")           
+            layout.operator("mh.apply_targets")
 
 class MakeTargetBatchPanel(bpy.types.Panel):
     bl_label = "Batch make targets"
