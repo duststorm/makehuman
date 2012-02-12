@@ -728,7 +728,7 @@ class Object3D(object):
         mh.world.append(self.object3d)
 
         for g in self.faceGroups:
-            if 'joint' in g.name:
+            if 'joint' in g.name or 'helper' in g.name:
                 continue
             groupVerts = set()
             for f in g.faces:
@@ -804,7 +804,7 @@ class Object3D(object):
         del self.__indexBuffer[:]
         fullArrayIndex = 0
         for g in self.__faceGroups:
-          if 'joint' in g.name:
+          if 'joint' in g.name or 'helper' in g.name:
             continue
           g._FaceGroup__elementIndex = fullArrayIndex  # first index in opengl array
           groupVerts = {}
