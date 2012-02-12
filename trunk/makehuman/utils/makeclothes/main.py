@@ -49,7 +49,7 @@ ClothingEnums = [
 
 NBodyVerts = LastVertices["Body"]
 NBodyFaces = 14812
-UseInternal = True
+UseInternal = False
 
 #
 #   isHuman(ob):
@@ -174,7 +174,7 @@ def goodName(name):
     
 def getFileName(pob, context, ext):            
     name = goodName(pob.name)
-    outpath = '%s/%s' % (context.scene['MCDirectory'], name)
+    outpath = '%s/%s' % (context.scene.MCDirectory, name)
     outpath = os.path.realpath(os.path.expanduser(outpath))
     if not os.path.exists(outpath):
         print("Creating directory %s" % outpath)
@@ -524,7 +524,7 @@ def printClothes(context, bob, pob, data):
     scn = context.scene
     if isSelfClothed(context):
         firstVert = LastVertices[scn.MCSelfClothed]
-        folder = scn["MCMakeHumanDirectory"]
+        folder = scn.MCMakeHumanDirectory
         outfile = os.path.join(folder, "data/3dobjs/base.mhclo")
     else:
         firstVert = 0
@@ -575,7 +575,7 @@ def printMhcloUvLayers(fp, pob, scn):
     me = pob.data
     if me.uv_textures:
         for layer,uvtex in enumerate(me.uv_textures):
-            if layer == scn["MCObjLayer"]:
+            if layer == scn.MCObjLayer:
                 continue
             (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVertsList, texVertsList) = setupTexVerts(pob)
             texVerts = texVertsList[layer]
@@ -642,7 +642,7 @@ def reexportMhclo(context):
 
 def printStuff(fp, pob, context):
     scn = context.scene
-    fp.write("# z_depth %d\n" % scn["MCZDepth"])
+    fp.write("# z_depth %d\n" % scn.MCZDepth)
     
     for mod in pob.modifiers:
         if mod.type == 'SHRINKWRAP':
@@ -658,16 +658,16 @@ def printStuff(fp, pob, context):
     if me.uv_textures:
         for layer,uvtex in enumerate(me.uv_textures):
             fp.write("# uvtex_layer %d %s\n" % (layer, uvtex.name.replace(" ","_")))
-        fp.write("# objfile_layer %d\n" % scn["MCObjLayer"])
+        fp.write("# objfile_layer %d\n" % scn.MCObjLayer)
 
-    fp.write("# texture %s_texture.tif %d\n" % (goodName(pob.name), scn["MCTextureLayer"]))
+    fp.write("# texture %s_texture.tif %d\n" % (goodName(pob.name), scn.MCTextureLayer))
     #if scn['MCMask']:
-    fp.write("# mask %s_mask.png %d\n" % (goodName(pob.name), scn["MCMaskLayer"]))
+    fp.write("# mask %s_mask.png %d\n" % (goodName(pob.name), scn.MCMaskLayer))
            
-    if scn['MCHairMaterial']:
+    if scn.MCHairMaterial:
         fp.write(
 "# material %s\n" % pob.name +
-"texture data/hairstyles/%s_texture.tif %d\n" % (pob.name, scn["MCTextureLayer"]) +
+"texture data/hairstyles/%s_texture.tif %d\n" % (pob.name, scn.MCTextureLayer) +
 "diffuse_intensity 0.8\n" +
 "specular_intensity 0.0\n" +
 "specular_hardness 1\n" +
@@ -685,8 +685,8 @@ def printStuff(fp, pob, context):
 
     me = pob.data
 
-    useMats = scn['MCMaterials']
-    useBlender = scn['MCBlenderMaterials']
+    useMats = scn.MCMaterials
+    useBlender = scn.MCBlenderMaterials
     if me.materials and (useMats or useBlender) and me.materials[0]:
         mat = me.materials[0]
         fp.write("# material %s\n" % mat.name)
@@ -701,7 +701,7 @@ def printStuff(fp, pob, context):
             (outpath, outfile) = getFileName(pob, context, "mhx")
             mhxfile = exportBlenderMaterial(me, outpath)
             fp.write("# material_file %s\n" % mhxfile)
-    elif not scn['MCHairMaterial']:
+    elif not scn.MCHairMaterial:
         fp.write("# material %s\n" % pob.name.replace(" ","_"))
             
     fp.write("# use_projection 0\n")            
@@ -728,7 +728,7 @@ def exportObjFile(context):
         
     if me.uv_textures:
         (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVertsList, texVertsList) = setupTexVerts(ob)
-        layer = scn["MCObjLayer"]
+        layer = scn.MCObjLayer
         writeObjTextureData(fp, me, texVertsList[layer], uvFaceVertsList[layer])
     else:
         for f in me.faces:
@@ -851,24 +851,24 @@ def exportBaseUvsPy(context):
     bpy.ops.object.mode_set(mode='OBJECT')
     scn = context.scene
     (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVertsList, texVertsList) = setupTexVerts(ob)
-    maskLayer = scn["MCMaskLayer"]
+    maskLayer = scn.MCMaskLayer
     texVerts = texVertsList[maskLayer]
     uvFaceVerts = uvFaceVertsList[maskLayer]    
     nTexVerts = len(texVerts)
 
-    folder = scn["MCMakeHumanDirectory"]
+    folder = scn.MCMakeHumanDirectory
     fname = os.path.join(folder, "utils/makeclothes/base_uv.py")
     print("Creating", fname)
     fp = open(fname, "w")
     fp.write("firstVert = %d\n" % NBodyVerts)
     fp.write("firstFace = %d\n" % NBodyFaces)
-    
+    """
     fp.write("texVerts = [\n")
     for vtn in range(nTexVerts):
         vt = texVerts[vtn]
         fp.write("(%.4f, %.4f),\n" % (vt[0], vt[1]))
     fp.write("]\n")
-    
+    """
     fp.write("texFaces = [\n")
     for f in ob.data.faces:
         uvVerts = uvFaceVerts[f.index]
@@ -1013,7 +1013,7 @@ def projectUVs(bob, pob, context):
                                 table[pv.index] = (0, [uv0,uv1,uv2], wts)
         
     (pVertEdges, pVertFaces, pEdgeFaces, pFaceEdges, pFaceNeighbors, pUvFaceVertsList, pTexVertsList) = setupTexVerts(pob)
-    maskLayer = context.scene["MCMaskLayer"]
+    maskLayer = context.scene.MCMaskLayer
     pUvFaceVerts = pUvFaceVertsList[maskLayer]
     pTexVerts = pTexVertsList[maskLayer]
     pNTexVerts = len(pTexVerts)
@@ -1440,8 +1440,8 @@ def makeClothes(context):
     checkAndVertexDiamonds(bob)
     checkObjectOK(pob, context)
     checkSingleVGroups(pob)
-    if scn['MCLogging']:
-        logfile = '%s/clothes.log' % scn['MCDirectory']
+    if scn.MCLogging:
+        logfile = '%s/clothes.log' % scn.MCDirectory
         log = open(logfile, "w")
     else:
         log = None
@@ -1522,9 +1522,9 @@ def offsetCloth(context):
     pverts = pob.data.vertices    
     print("Offset %s to %s" % (bob.name, pob.name))
 
-    inpath = '%s/%s.mhclo' % (context.scene['MCDirectory'], goodName(bob.name))
+    inpath = '%s/%s.mhclo' % (context.scene.MCDirectory, goodName(bob.name))
     infile = os.path.realpath(os.path.expanduser(inpath))
-    outpath = '%s/%s.mhclo' % (context.scene['MCDirectory'], goodName(pob.name))
+    outpath = '%s/%s.mhclo' % (context.scene.MCDirectory, goodName(pob.name))
     outfile = os.path.realpath(os.path.expanduser(outpath))
     print("Modifying clothes file %s => %s" % (infile, outfile))
     infp = open(infile, "r")
@@ -1546,7 +1546,7 @@ def offsetCloth(context):
                 status = 1
                 outfp.write(line)
             elif words[1] == "obj_data":
-                if context.scene['MCVertexGroups']:
+                if context.scene.MCVertexGroups:
                     infp.close()
                     writeFaces(pob, outfp) 
                     writeVertexGroups(pob, outfp)
@@ -1897,17 +1897,17 @@ def exportDefault(typ, data, header, prio, exclude, arrays, pad, fp):
 #
 ###################################################################################    
 
-BodyPartVerts = [
-    ((4302, 8697), (8208, 8220), (8223, 6827)), # Head
-    ((3464, 10305), (6930, 7245), (14022, 14040)), # Torso
-    ((14058, 14158), (4550, 4555), (4543, 4544)), # Arm
-    ((14058, 15248), (3214, 3264), (4629, 5836)), # Hand
-    ((3936, 3972), (3840, 3957), (14165, 14175)), # Leg
-    ((4909, 4943), (5728, 12226), (4684, 5732)), # Foot
-    ]
+BodyPartVerts = {
+    "Head" : ((4302, 8697), (8208, 8220), (8223, 6827)), 
+    "Torso" : ((3464, 10305), (6930, 7245), (14022, 14040)),
+    "Arm" : ((14058, 14158), (4550, 4555), (4543, 4544)), 
+    "Hand" : ((14058, 15248), (3214, 3264), (4629, 5836)),
+    "Leg" : ((3936, 3972), (3840, 3957), (14165, 14175)), 
+    "Foot" : ((4909, 4943), (5728, 12226), (4684, 5732)), 
+    }
 
-def setBoundaryVerts(scn):
-    (x, y, z) = BodyPartVerts[scn['MCBodyPart']]
+def setBoundaryVerts(scn): 
+    (x, y, z) = BodyPartVerts[scn.MCBodyPart]
     setAxisVerts(scn, 'MCX1', 'MCX2', x)
     setAxisVerts(scn, 'MCY1', 'MCY2', y)
     setAxisVerts(scn, 'MCZ1', 'MCZ2', z)
@@ -1933,7 +1933,7 @@ def selectBoundary(ob, scn):
 def setBoundary(context):       
     scn = context.scene
     setBoundaryVerts(scn)
-    if scn['MCExamineBoundary']:
+    if scn.MCExamineBoundary:
         ob = getHuman(context)
         selectBoundary(ob, scn)
     return            
@@ -1973,7 +1973,7 @@ def setZDepth(scn):
     global ZDepthItems
     (name1, name2, name3) = ZDepthItems[scn["MCZDepthName"]]
     #print(name1)
-    scn["MCZDepth"] = ZDepth[name1]
+    scn.MCZDepth = ZDepth[name1]
     return
     
  
@@ -2179,56 +2179,56 @@ def initInterface(scn):
     bpy.types.Scene.MCDirectory = StringProperty(
         name="Directory", 
         description="Directory", 
-        maxlen=1024)
-    scn['MCDirectory'] = "~"
+        maxlen=1024,
+        default="~")
     
     bpy.types.Scene.MCMaterials = BoolProperty(
         name="Materials", 
-        description="Use materials")
-    scn['MCMaterials'] = False
+        description="Use materials",
+        default=False)
 
     bpy.types.Scene.MCObjLayer = IntProperty(
         name="Obj UV layer", 
-        description="UV layer to include in obj export, starting with 0")
-    scn['MCObjLayer'] = 0
+        description="UV layer to include in obj export, starting with 0",
+        default=0)
 
     bpy.types.Scene.MCMaskLayer = IntProperty(
         name="Mask UV layer", 
-        description="UV layer for mask, starting with 0")
-    scn['MCMaskLayer'] = 0
+        description="UV layer for mask, starting with 0",
+        default=0)
 
     bpy.types.Scene.MCTextureLayer = IntProperty(
         name="Texture UV layer", 
-        description="UV layer for textures, starting with 0")
-    scn['MCTextureLayer'] = 0
+        description="UV layer for textures, starting with 0",
+        default=0)
 
     bpy.types.Scene.MCBlenderMaterials = BoolProperty(
         name="Blender materials", 
-        description="Save materials as mhx file")
-    scn['MCBlenderMaterials'] = False
+        description="Save materials as mhx file",
+        default=False)
 
     bpy.types.Scene.MCHairMaterial = BoolProperty(
         name="Hair material", 
-        description="Fill in hair material")
-    scn['MCHairMaterial'] = False
+        description="Fill in hair material",
+        default=False)
 
     bpy.types.Scene.MCVertexGroups = BoolProperty(
         name="Save vertex groups", 
-        description="Save vertex groups but not texverts")
-    scn['MCVertexGroups'] = True
+        description="Save vertex groups but not texverts",
+        default=True)
 
+    """
     bpy.types.Scene.MCThreshold = FloatProperty(
         name="Threshold", 
         description="Minimal allowed value of normal-vector dot product",
-        min=-1.0, max=0.0)
-    scn['MCThreshold'] = theThreshold
+        min=-1.0, max=0.0,
+        default=theThreshold)
 
     bpy.types.Scene.MCListLength = IntProperty(
         name="List length", 
-        description="Max number of verts considered")
-    scn['MCListLength'] = theListLength
+        description="Max number of verts considered",
+        default=theListLength)
 
-    """
     bpy.types.Scene.MCForbidFailures = BoolProperty(
         name="Forbid failures", 
         description="Raise error if not found optimal triangle")
@@ -2237,25 +2237,25 @@ def initInterface(scn):
     
     bpy.types.Scene.MCLogging = BoolProperty(
         name="Log", 
-        description="Write a log file for debugging")
-    scn['MCLogging'] = False
+        description="Write a log file for debugging",
+        default=False)
 
     bpy.types.Scene.MCMakeHumanDirectory = StringProperty(
         name="MakeHuman Directory", 
-        maxlen=1024)
-    scn['MCMakeHumanDirectory'] = "/home/svn/makehuman"
+        maxlen=1024,
+        default="/home/svn/makehuman")
 
     bpy.types.Scene.MCSelfClothed = EnumProperty(
         items = ClothingEnums,
         name="Self clothed", 
-        description="Clothes included in body mesh")
-    scn['MCSelfClothed'] = LastClothing
+        description="Clothes included in body mesh",
+        default=LastClothing)
 
     bpy.types.Scene.MCKeepVertsUntil = EnumProperty(
         items = ClothingEnums,
         name="Keep verts untils", 
-        description="Last clothing to keep vertices for")
-    scn['MCKeepVertsUntil'] = LastClothing
+        description="Last clothing to keep vertices for",
+        default=LastClothing)
 
     bpy.types.Scene.MCX1 = IntProperty(
         name="X1", 
@@ -2288,8 +2288,8 @@ def initInterface(scn):
     
     bpy.types.Scene.MCExamineBoundary = BoolProperty(
         name="Examine", 
-        description="Examine boundary when set")
-    scn['MCExamineBoundary'] = False
+        description="Examine boundary when set",
+        default=False)
 
     bpy.types.Scene.MCBodyPart = EnumProperty(
         items = [('Head', 'Head', 'Head'),
@@ -2297,15 +2297,14 @@ def initInterface(scn):
                  ('Arm', 'Arm', 'Arm'),
                  ('Hand', 'Hand', 'Hand'),
                  ('Leg', 'Leg', 'Leg'),
-                 ('Foot', 'Foot', 'Foot')]
-        )
-    scn['MCBodyPart'] = 0
+                 ('Foot', 'Foot', 'Foot')],
+        default='Head')                 
     setBoundaryVerts(scn)
 
     setZDepthItems()
     bpy.types.Scene.MCZDepthName = EnumProperty(
         items = ZDepthItems)
-    scn['MCZDepthName'] = 4
+    scn["MCZDepthName"] = 4
 
     bpy.types.Scene.MCZDepth = IntProperty(
         name="Z depth", 
@@ -2316,13 +2315,13 @@ def initInterface(scn):
         items = [('Helpers','Helpers','Helpers'),
                  ('Body','Body','Body'),
                  ('Selected','Selected','Selected'),
-                 ('All','All','All')])
-    scn.MCAutoGroupType = 'Helpers'
+                 ('All','All','All')],
+    default='Helpers')
                  
     bpy.types.Scene.MCRemoveGroupType = EnumProperty(
         items = [('Selected','Selected','Selected'),
-                 ('All','All','All')])
-    scn.MCRemoveGroupType = 'All'     
+                 ('All','All','All')],
+    default='All')
     
     bpy.types.Scene.MCAuthor = StringProperty(
         name="Author", 
