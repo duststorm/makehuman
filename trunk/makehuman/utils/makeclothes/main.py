@@ -34,11 +34,22 @@ from . import base_uv
 theThreshold = -0.2
 theListLength = 3
 Epsilon = 1e-4
-# Number of verts which are body, not clothes
-NOldVerts = [15340, 18528]
-NBodyVerts = NOldVerts[0]
+
+LastVertices = {
+    "Body" : 15340,
+    "Skirt" : 16096,
+    "Tights" : 18528,
+}
+LastClothing = "Tights"
+ClothingEnums = [
+    ("Body", "Body", "Body"),
+    ("Skirt", "Skirt", "Skirt"),
+    ("Tights", "Tights", "Tights")
+]
+
+NBodyVerts = LastVertices["Body"]
 NBodyFaces = 14812
-UseInternal = False
+UseInternal = True
 
 #
 #   isHuman(ob):
@@ -50,7 +61,7 @@ UseInternal = False
 
 def isSelfClothed(context):
     if UseInternal:
-        return (context.scene["MCSelfClothed"] >= 0)
+        return (context.scene.MCSelfClothed != LastClothing)
     else:
         return False
         
@@ -98,7 +109,7 @@ def getObjectPair(context):
             raise NameError("Clothing %s selected but human %s is self-clothed" % (clothing.name, human.name))
         checkObjectOK(human, context)
         nverts = len(human.data.vertices)
-        nOldVerts = NOldVerts[scn["MCSelfClothed"]]
+        nOldVerts = LastVertices[scn.MCSelfClothed]
         clothing = copyObject(human, nOldVerts, nverts, context, "Clothing")
         base = copyObject(human, 0, nOldVerts, context, "Base")
         return (base, clothing)
@@ -142,16 +153,14 @@ def printMverts(stuff, mverts):
             print(stuff, v.index, dist)
 
 #
-#    selectVert(context, vn, ob):
+#    selectVerts(verts, ob):
 #
 
-def selectVert(context, vn, ob):
-    context.scene.objects.active = ob
-    bpy.ops.object.mode_set(mode='EDIT')
-    bpy.ops.mesh.select_all(action='DESELECT')
-    bpy.ops.object.mode_set(mode='OBJECT')
-    ob.data.vertices[vn].select = True
-    bpy.ops.object.mode_set(mode='EDIT')
+def selectVerts(verts, ob):
+    for v in ob.data.vertices:
+        v.select = False
+    for v in verts:
+        v.select = True
     return    
 
 #
@@ -197,9 +206,8 @@ def findClothes(context, bob, pob, log):
         except:
             pindex = -1
         if pindex < 0:
-            vn = pv.index
-            selectVert(context, vn, pob)
-            raise NameError("Clothes %s vert %d not member of any group" % (pob.name, vn))
+            selectVerts([pv], pob)
+            raise NameError("Clothes %s vert %d not member of any group" % (pob.name, pv.index))
 
         gname = pob.vertex_groups[pindex].name
         bindex = None
@@ -244,22 +252,20 @@ def findClothes(context, bob, pob, log):
                 log.write("%d %d %.5f %s %d %d\n" % (pv.index, mv.index, mindist, gname, pindex, bindex))
             #printMverts("  ", mverts)
         else:
-            vn = pv.index
             msg = (
-            "Failed to find vert %d in group %s.\n" % (vn, gname) +
+            "Failed to find vert %d in group %s.\n" % (pv.index, gname) +
             "Proxy index %d, Base index %d\n" % (pindex, bindex) +
             "Vertex coordinates (%.4f %.4f %.4f)\n" % (pv.co[0], pv.co[1], pv.co[2])
             )
-            selectVert(context, vn, pob)
+            selectVerts([pv], pob)
             raise NameError(msg)
         if mindist > 5:
-            vn = pv.index
             msg = (
-            "Vertex %d is %f dm away from closest body vertex in group %s.\n" % (vn, mindist, gname) +
+            "Vertex %d is %f dm away from closest body vertex in group %s.\n" % (pv.index, mindist, gname) +
             "Max allowed value is 5dm. Check base and proxy scales.\n" +
             "Vertex coordinates (%.4f %.4f %.4f)\n" % (pv.co[0], pv.co[1], pv.co[2])
             )
-            selectVert(context, vn, pob)
+            selectVerts([pv], pob)
             raise NameError(msg)
 
         if gname[0:3] != "Mid":
@@ -301,9 +307,9 @@ def findClothes(context, bob, pob, log):
                     v1 = base.vertices[f[1]]
                     v2 = base.vertices[f[2]]
                     if (bindex >= 0) and (pv.co[0] < 0.01) and (pv.co[0] > -0.01):
-                        wts = midWeights(pv, bindex, v0, v1, v2, pob)    
+                        wts = midWeights(pv, bindex, v0, v1, v2, bob, pob)    
                     else:
-                        wts = cornerWeights(pv, v0.co, v1.co, v2.co, pob)
+                        wts = cornerWeights(pv, v0, v1, v2, bob, pob)
                     fcs.append((f, wts))
 
     print("Finding best weights")
@@ -317,7 +323,6 @@ def findClothes(context, bob, pob, log):
         #print(pv.index)
         pv.select = False
         if exact:
-            (mv, mdist) = mverts[0]
             bestFaces.append((pv, True, mverts, 0, 0))
             continue
         minmax = -1e6
@@ -332,11 +337,10 @@ def findClothes(context, bob, pob, log):
             pv.select = True
             """
             if scn['MCForbidFailures']:
-                vn = pv.index
-                selectVert(context, vn, pob)
+                selectVerts([pv], pob)
                 print("Tried", mverts)
                 msg = (
-                "Did not find optimal triangle for %s vert %d.\n" % (pob.name, vn) +
+                "Did not find optimal triangle for %s vert %d.\n" % (pob.name, pv.index) +
                 "Avoid the message by unchecking Forbid failures.")
                 raise NameError(msg)
             """
@@ -386,7 +390,7 @@ def minWeight(wts):
     return best
 
 #
-#    cornerWeights(pv, r0, r1, r2, pob):
+#    cornerWeights(pv, v0, v1, v2, bob, pob):
 #
 #    px = w0*x0 + w1*x1 + w2*x2
 #    py = w0*y0 + w1*y1 + w2*y2
@@ -406,7 +410,10 @@ def minWeight(wts):
 #    det*w1 = -a10*b0 + a00*b1
 #
 
-def cornerWeights(pv, r0, r1, r2, pob):
+def cornerWeights(pv, v0, v1, v2, bob, pob):
+    r0 = v0.co
+    r1 = v1.co
+    r2 = v2.co
     u01 = r1-r0
     u02 = r2-r0
     n = u01.cross(u02)
@@ -415,29 +422,40 @@ def cornerWeights(pv, r0, r1, r2, pob):
     u = pv.co-r0
     r = r0 + u - n*u.dot(n)
 
-    '''
-    print(list(pv))
-    print(" r  ", list(r))
-    print(" r0 ", list(r0))
-    print(" r1 ", list(r1))
-    print(" r2 ", list(r2))
-    print(" n  ", list(n))
-    '''
-
+    """
     a00 = r0[0]-r2[0]
     a01 = r1[0]-r2[0]
     a10 = r0[1]-r2[1]
     a11 = r1[1]-r2[1]
     b0 = r[0]-r2[0]
     b1 = r[1]-r2[1]
+    """    
+    
+    e0 = u01
+    e0.normalize()
+    e1 = n.cross(e0)
+    e1.normalize()
+    
+    u20 = r0-r2
+    u21 = r1-r2
+    ur2 = r-r2
+    
+    a00 = u20.dot(e0)
+    a01 = u21.dot(e0)
+    a10 = u20.dot(e1)
+    a11 = u21.dot(e1)
+    b0 = ur2.dot(e0)
+    b1 = ur2.dot(e1)
     
     det = a00*a11 - a01*a10
     if abs(det) < 1e-20:
         print("Clothes vert %d mapped to degenerate triangle (det = %g) with corners" % (pv.index, det))
-        print("r0", r0[0], r0[1], r0[2])
-        print("r1", r1[0], r1[1], r1[2])
-        print("r2", r2[0], r2[1], r2[2])
-        highlight(pv, pob)
+        print("r0 ( %.6f  %.6f  %.6f )" % (r0[0], r0[1], r0[2]))
+        print("r1 ( %.6f  %.6f  %.6f )" % (r1[0], r1[1], r1[2]))
+        print("r2 ( %.6f  %.6f  %.6f )" % (r2[0], r2[1], r2[2]))
+        print("A [ %.6f %.6f ]\n  [ %.6f %.6f ]" % (a00,a01,a10,a11))
+        selectVerts([pv], pob)
+        selectVerts([v0, v1, v2], bob)
         raise NameError("Singular matrix in cornerWeights")
 
     w0 = (a11*b0 - a01*b1)/det
@@ -446,10 +464,10 @@ def cornerWeights(pv, r0, r1, r2, pob):
     return (w0, w1, 1-w0-w1)
 
 #
-#   midWeights(pv, bindex, v0, v1, v2, pob):
+#   midWeights(pv, bindex, v0, v1, v2, bob, pob):
 #
 
-def midWeights(pv, bindex, v0, v1, v2, pob):
+def midWeights(pv, bindex, v0, v1, v2, bob, pob):
     #print("Mid", pv.index, bindex)
     pv.select = True
     if isInGroup(v0, bindex):
@@ -467,7 +485,7 @@ def midWeights(pv, bindex, v0, v1, v2, pob):
         v2.select = True
         return (w0, w1, w2)
     #print("  Failed mid")
-    return cornerWeights(pv, v0.co, v1.co, v2.co, pob)
+    return cornerWeights(pv, v0, v1, v2, bob, pob)
     
 def isInGroup(v, bindex):
     for g in v.groups:
@@ -484,20 +502,9 @@ def midWeight(pv, r0, r1):
     return (1-w, w, 0)
 
 #
-#    highlight(pv, ob):
-#
-
-def highlight(pv, ob):
-    me = ob.data
-    for v in me.vertices:
-        v.select = False
-    pv.select = True
-    return
-    
-#
 #    proxyFilePtr(name):
 #
-
+"""
 def proxyFilePtr(name):
     for path in ['~/makehuman/', '~/documents/makehuman/', '/']:
         fileName = os.path.realpath(os.path.expanduser(path+name))
@@ -508,7 +515,7 @@ def proxyFilePtr(name):
         except:
             print("No file %s" % fileName)
     return None
-
+"""
 #
 #    printClothes(context, bob, pob, data):
 #
@@ -516,7 +523,7 @@ def proxyFilePtr(name):
 def printClothes(context, bob, pob, data):
     scn = context.scene
     if isSelfClothed(context):
-        firstVert = NOldVerts[scn["MCSelfClothed"]]
+        firstVert = LastVertices[scn.MCSelfClothed]
         folder = scn["MCMakeHumanDirectory"]
         outfile = os.path.join(folder, "data/3dobjs/base.mhclo")
     else:
@@ -525,6 +532,7 @@ def printClothes(context, bob, pob, data):
     print("Creating clothes file %s" % outfile)
     fp= open(outfile, "w")
 
+    """
     infp = proxyFilePtr('proxy_header.txt')
     if infp:
         for line in infp:
@@ -534,6 +542,11 @@ def printClothes(context, bob, pob, data):
 "# author Unknown\n" +
 "# license GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)\n" +
 "# homepage http://www.makehuman.org/\n")
+    """
+    fp.write(
+"# author %s\n" % scn.MCAuthor +
+"# license %s\n" % scn.MCLicense +
+"# homepage %s\n" % scn.MCHomePage)
 
     fp.write("# name %s\n" % pob.name.replace(" ","_"))
     fp.write("# obj_file %s.obj\n" % goodName(pob.name))
@@ -880,13 +893,14 @@ def storeData(pob, bob, data):
     fp.write("%s\n" % pob.name)
     fp.write("%s\n" % bob.name)
     for (pv, exact, verts, wts, diff) in data:
+        #print(pv,exact)
         fp.write("%d %d\n" % (pv.index, exact))
-        if exact:
-            (v0,d0) = verts[0]
-            fp.write("[%d, 0, 1]\n" % (v0.index))
-        else:
-            fp.write("%s\n" % verts)
+        #print(verts)
+        fp.write("%s\n" % verts)
+        if not exact:
+            #print(wts)
             fp.write("(%s,%s,%s)\n" % wts)
+            #print(diff)
             fp.write("(%s,%s,%s)\n" % (diff[0],diff[1],diff[2]))
     fp.close()
     return
@@ -970,10 +984,12 @@ def projectUVs(bob, pob, context):
     bUvTex = getModifiedUvTex(bob)
     for (pv, exact, verts, wts, diff) in data:
         if exact:
+            print("Exact", pv.index)
             vn0 = verts[0]
             for f0 in bVertFaces[vn0]:
-                uv0 = getUvLoc(vn0, f0.vertices, bUvTex[f0.index])
+                uv0 = getUvLoc(v0, f0.vertices, bUvTex[f.index])
                 table[pv.index] = (1, uv0, 1)
+                print(pv.index, table[pv.index])
                 break
         else:
             vn0 = verts[0]
@@ -1979,6 +1995,28 @@ def printVertNums(context):
     print("End verts")
 
 #
+#   deleteHelpers(context):
+#
+
+def deleteHelpers(context):
+    ob = context.object
+    scn = context.scene
+    #if not isHuman(ob):
+    #    return
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='DESELECT')
+    bpy.ops.object.mode_set(mode='OBJECT')
+    nmax = LastVertices[scn.MCKeepVertsUntil]
+    for v in ob.data.vertices:
+        if v.index >= nmax:
+            v.select = True
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.delete(type='VERT')    
+    bpy.ops.object.mode_set(mode='OBJECT')
+    print("Vertices deleted")
+    return                
+            
+#
 #    removeVertexGroups(context, removeType):
 #
 
@@ -2008,9 +2046,9 @@ def autoVertexGroups(context):
     left = ob.vertex_groups.new("Left")
     right = ob.vertex_groups.new("Right")
     if isSelfClothed(context):
-        nOldVerts = NOldVerts[scn["MCSelfClothed"]]
+        nOldVerts = LastVertices[scn.MCSelfClothed]
     else:
-        nOldVerts = NOldVerts[-1]
+        nOldVerts = LastVertices[LastClothing]
     if ishuman:
         verts = getHumanVerts(ob.data, scn)
     else:
@@ -2070,10 +2108,10 @@ def checkAndVertexDiamonds(ob):
     bpy.ops.object.mode_set(mode='OBJECT')
     me = ob.data
     nverts = len(me.vertices)
-    if nverts not in NOldVerts:
+    if nverts not in LastVertices.values():
         raise NameError(
             "Base object %s has %d vertices. The number of verts in an MH human must be one of %s" % 
-            (ob, nverts, NOldVerts))
+            (ob, nverts, LastVertices.values()))
     bpy.ops.object.mode_set(mode='EDIT')
     bpy.ops.object.vertex_group_remove_from(all=True)
     bpy.ops.object.mode_set(mode='OBJECT')
@@ -2102,7 +2140,10 @@ def readDefaultSettings(context):
         elif type == "float":
             scn[prop] = float(words[2])
         elif type == "str":
-            scn[prop] = words[2]
+            string = words[2]
+            for word in words[3:]:
+                string += " " + word
+            scn[prop] = string
     fp.close()
     return
     
@@ -2122,17 +2163,9 @@ def saveDefaultSettings(context):
     return
     
 #
-#   isInited(scn):
 #   initInterface(scn):
 #
 
-def isInited(scn):
-    try:
-        scn.MCDirectory
-        return True
-    except:
-        return False
-    
 def initInterface(scn):
     for skey in ShapeKeys:
         expr = (
@@ -2212,10 +2245,17 @@ def initInterface(scn):
         maxlen=1024)
     scn['MCMakeHumanDirectory'] = "/home/svn/makehuman"
 
-    bpy.types.Scene.MCSelfClothed = IntProperty(
+    bpy.types.Scene.MCSelfClothed = EnumProperty(
+        items = ClothingEnums,
         name="Self clothed", 
         description="Clothes included in body mesh")
-    scn['MCSelfClothed'] = -1
+    scn['MCSelfClothed'] = LastClothing
+
+    bpy.types.Scene.MCKeepVertsUntil = EnumProperty(
+        items = ClothingEnums,
+        name="Keep verts untils", 
+        description="Last clothing to keep vertices for")
+    scn['MCKeepVertsUntil'] = LastClothing
 
     bpy.types.Scene.MCX1 = IntProperty(
         name="X1", 
@@ -2282,8 +2322,23 @@ def initInterface(scn):
     bpy.types.Scene.MCRemoveGroupType = EnumProperty(
         items = [('Selected','Selected','Selected'),
                  ('All','All','All')])
-    scn.MCRemoveGroupType = 'All'              
-
+    scn.MCRemoveGroupType = 'All'     
+    
+    bpy.types.Scene.MCAuthor = StringProperty(
+        name="Author", 
+        default="Unknown",
+        maxlen=32)
+    
+    bpy.types.Scene.MCLicense = StringProperty(
+        name="License", 
+        default="GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)",
+        maxlen=256)
+    
+    bpy.types.Scene.MCHomePage = StringProperty(
+        name="HomePage", 
+        default="http://www.makehuman.org/",
+        maxlen=256)
+    
 
     return
     

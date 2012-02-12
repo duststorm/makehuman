@@ -86,7 +86,7 @@ def exportMhx(human, filename, options):
 
 #
 #   getSubFolder(path, name):
-#   goodName(name)
+#   export_config.goodName(name)
 #   getOutFileName(filePath, fromDir, isTexture, human):
 #
 
@@ -103,11 +103,6 @@ def getSubFolder(path, name):
             return None
     return folder        
     
-def goodName(name):    
-    name = name.replace('- ','_')
-    name = name.replace(' ','_')
-    return name.lower()    
-
 import shutil
 
 def getOutFileName(filePath, fromDir, isTexture, human):

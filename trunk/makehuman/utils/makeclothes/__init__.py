@@ -49,6 +49,20 @@ else:
 #    class MakeClothesPanel(bpy.types.Panel):
 #
 
+Confirm = None
+ConfirmString = "?"
+
+def isInited(scn):
+    global Confirm
+    try:
+        scn.MCDirectory
+        Confirm
+        return True
+    except:
+        return False
+    
+
+
 class MakeClothesPanel(bpy.types.Panel):
     bl_label = "Make clothes"
     bl_space_type = "VIEW_3D"
@@ -59,12 +73,18 @@ class MakeClothesPanel(bpy.types.Panel):
         return (context.object and context.object.type == 'MESH')
 
     def draw(self, context):
+        global Confirm, ConfirmString
         layout = self.layout
         scn = context.scene
-        layout.label("Initialization")
-        if not main.isInited(scn):
+        if not isInited(scn):
             layout.operator("mhclo.init_interface", text="Initialize")
             return
+        if Confirm:
+            layout.label(ConfirmString)
+            layout.operator(Confirm, text="yes").answer="yes"
+            layout.operator(Confirm, text="no").answer="no"
+            return
+        layout.label("Initialization")
         layout.operator("mhclo.init_interface", text="ReInitialize")
         layout.operator("mhclo.factory_settings")
         layout.operator("mhclo.save_settings")
@@ -77,7 +97,10 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.operator("mhclo.remove_vertex_groups")
         layout.separator()
         layout.prop(scn, "MCAutoGroupType", expand=True)
-        layout.operator("mhclo.auto_vertex_groups")
+        layout.operator("mhclo.auto_vertex_groups")        
+        layout.separator()
+        layout.prop(scn, "MCKeepVertsUntil", expand=True)
+        layout.operator("mhclo.delete_helpers")        
         
         layout.label("Settings")
         layout.prop(scn, "MCDirectory")
@@ -129,9 +152,15 @@ class MakeClothesPanel(bpy.types.Panel):
         row = layout.row()
         row.prop(scn, "MCZ1")
         row.prop(scn, "MCZ2")   
+
+        layout.separator()
+        layout.label("Licensing")
+        layout.prop(scn, "MCAuthor")
+        layout.prop(scn, "MCLicense")
+        layout.prop(scn, "MCHomePage")
+            
         if not main.UseInternal:
             return
-
         layout.separator()
         layout.label("For internal use")
         layout.prop(scn, "MCListLength")
@@ -352,10 +381,10 @@ class OBJECT_OT_SetZDepthButton(bpy.types.Operator):
         return{'FINISHED'}    
    
 #
-#    class VIEW3D_OT_MhxPrintVnumsButton(bpy.types.Operator):
+#    class VIEW3D_OT_PrintVnumsButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_MhxPrintVnumsButton(bpy.types.Operator):
+class VIEW3D_OT_PrintVnumsButton(bpy.types.Operator):
     bl_idname = "mhclo.print_vnums"
     bl_label = "Print vertex numbers"
 
@@ -364,10 +393,36 @@ class VIEW3D_OT_MhxPrintVnumsButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
-#    class VIEW3D_OT_MhxRemoveVertexGroupsButton(bpy.types.Operator):
+#    class VIEW3D_OT_DeleteHelpersButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_MhxRemoveVertexGroupsButton(bpy.types.Operator):
+class VIEW3D_OT_DeleteHelpersButton(bpy.types.Operator):
+    bl_idname = "mhclo.delete_helpers"
+    bl_label = "Delete helpers until above"
+    answer = StringProperty()
+
+    def execute(self, context):
+        global Confirm, ConfirmString
+        ob = context.object
+        scn = context.scene
+        if main.isHuman(ob):
+            ConfirmString = "?"
+            if self.answer == "":
+                nmax = main.LastVertices[scn.MCKeepVertsUntil]
+                ConfirmString = "Delete vertices until %d?" % nmax
+                Confirm = self.bl_idname
+            elif self.answer == "yes":
+                Confirm = ""
+                main.deleteHelpers(context)
+            else:
+                Confirm = ""
+        return{'FINISHED'}    
+
+#
+#    class VIEW3D_OT_RemoveVertexGroupsButton(bpy.types.Operator):
+#
+
+class VIEW3D_OT_RemoveVertexGroupsButton(bpy.types.Operator):
     bl_idname = "mhclo.remove_vertex_groups"
     bl_label = "Remove vertex groups"
 
@@ -376,18 +431,17 @@ class VIEW3D_OT_MhxRemoveVertexGroupsButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
-#   class VIEW3D_OT_MhxAutoVertexGroupsButton(bpy.types.Operator):
+#   class VIEW3D_OT_AutoVertexGroupsButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_MhxAutoVertexGroupsButton(bpy.types.Operator):
+class VIEW3D_OT_AutoVertexGroupsButton(bpy.types.Operator):
     bl_idname = "mhclo.auto_vertex_groups"
     bl_label = "Auto vertex groups"
 
     def execute(self, context):
         main.removeVertexGroups(context, 'All')
         main.autoVertexGroups(context)
-        return{'FINISHED'}    
-
+        return{'FINISHED'}   
 
 #
 #    Init and register

@@ -166,33 +166,26 @@ def exportConfig(human, useHair, options=None):
         words = human.hairObj.mesh.name.split('.')
         pfile = CProxyFile()
         pfile.set('Clothes', 2, useMhx, useObj, useDae)
-        pfile.file = os.path.expanduser("./data/hairstyles/%s.mhclo" % words[0].lower())
+        name = goodName(words[0])
+        pfile.file = os.path.expanduser("./data/hairstyles/%s.mhclo" % name)
         cfg.proxyList.append(pfile)
 
     for (name,clo) in human.clothesObjs.items():
         if clo:
-            name = name.lower()
+            name = goodName(name)
             pfile = CProxyFile()
-            pfile.set('Clothes', 3, useMhx, useObj, useDae)
+            pfile.set('Clothes', 3, useMhx, useObj, useDae)            
             pfile.file = os.path.expanduser("./data/clothes/%s/%s.mhclo" % (name, name))
             cfg.proxyList.append(pfile)
             
     if human.proxy:
-        name = human.proxy.name.lower()
+        name = goodName(human.proxy.name)
         pfile = CProxyFile()
         pfile.set('Proxy', 4, useMhx, useObj, useDae)
         pfile.file = os.path.expanduser("./data/proxymeshes/%s/%s.proxy" % (name, name))
         cfg.proxyList.append(pfile)    
 
     if not fp: 
-        """
-        if useClothes:
-            for name in ['sweater', 'jeans']:
-                pfile = CProxyFile()
-                pfile.set('Clothes', 4, useMhx, useObj, useDae)
-                pfile.file = os.path.expanduser("./data/clothes/%s/%s.mhclo" % (name,name))
-                cfg.proxyList.append(pfile)
-        """
         if useProxy:
             pfile = CProxyFile()
             pfile.set('Proxy', 3, useMhx, useObj, useDae)
@@ -279,7 +272,8 @@ def exportConfig(human, useHair, options=None):
         elif typ == 'Cage':
             pfile = CProxyFile()
             pfile.set(typ, layer, useMhx, useObj, useDae)
-            pfile.file = os.path.realpath(os.path.expanduser(words[0]))
+            name = goodName(words[0])
+            pfile.file = os.path.realpath(os.path.expanduser(name))
             if len(words) > 1:
                 pfile.name = words[1]
             if typ == 'Cage':
@@ -291,3 +285,5 @@ def exportConfig(human, useHair, options=None):
         print "  ", elt
     return cfg
 
+def goodName(name):
+    return name.replace(" ", "_").replace("-","_").lower()
