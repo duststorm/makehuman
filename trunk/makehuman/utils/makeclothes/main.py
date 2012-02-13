@@ -657,7 +657,7 @@ def printStuff(fp, pob, context):
             fp.write("# subsurf %d %d\n" % (mod.levels, mod.render_levels))
             
     for skey in ShapeKeys:            
-        if scn['MC' + skey]:
+        if eval("scn.MC" + skey):
             fp.write("# shapekey %s\n" % skey)            
             
     me = pob.data            
@@ -774,8 +774,8 @@ def writeColor(fp, string, color):
 
 def printScale(fp, bob, scn, name, index, prop1, prop2):
     verts = bob.data.vertices
-    n1 = scn[prop1]
-    n2 = scn[prop2]
+    n1 = eval("scn.%s" % prop1)
+    n2 = eval("scn.%s" % prop2)
     if n1 >=0 and n2 >= 0:
         x1 = verts[n1].co[index]     
         x2 = verts[n2].co[index]
@@ -1947,7 +1947,7 @@ def selectBoundary(ob, scn):
         v.select = False
     for xyz in ['X','Y','Z']:
         for n in [1,2]:
-            n = scn['MC%s%d' % (xyz, n)]
+            n = eval("scn.MC%s%d" % (xyz, n))
             print(n)
             verts[n].select = True
     bpy.ops.object.mode_set(mode='EDIT')
