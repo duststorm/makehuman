@@ -577,15 +577,21 @@ def printMhcloUvLayers(fp, pob, scn):
         for layer,uvtex in enumerate(me.uv_textures):
             if layer == scn.MCObjLayer:
                 continue
+            if scn.MCAllUVLayers:
+                printLayer = layer
+            else:
+                printLayer = 1
+                if layer != scn.MCMaskLayer:
+                    continue
             (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVertsList, texVertsList) = setupTexVerts(pob)
             texVerts = texVertsList[layer]
             uvFaceVerts = uvFaceVertsList[layer]
             nTexVerts = len(texVerts)
-            fp.write("# texVerts %d\n" % layer)
+            fp.write("# texVerts %d\n" % printLayer)
             for vtn in range(nTexVerts):
                 vt = texVerts[vtn]
                 fp.write("%.4f %.4f\n" % (vt[0], vt[1]))
-            fp.write("# texFaces %d\n" % layer)
+            fp.write("# texFaces %d\n" % printLayer)
             for f in me.faces:
                 uvVerts = uvFaceVerts[f.index]
                 for n,v in enumerate(f.vertices):
@@ -655,14 +661,22 @@ def printStuff(fp, pob, context):
             fp.write("# shapekey %s\n" % skey)            
             
     me = pob.data            
-    if me.uv_textures:
-        for layer,uvtex in enumerate(me.uv_textures):
-            fp.write("# uvtex_layer %d %s\n" % (layer, uvtex.name.replace(" ","_")))
-        fp.write("# objfile_layer %d\n" % scn.MCObjLayer)
-
-    fp.write("# texture %s_texture.tif %d\n" % (goodName(pob.name), scn.MCTextureLayer))
-    #if scn['MCMask']:
-    fp.write("# mask %s_mask.png %d\n" % (goodName(pob.name), scn.MCMaskLayer))
+    if scn.MCAllUVLayers:
+        if me.uv_textures:
+            for layer,uvtex in enumerate(me.uv_textures):
+                fp.write("# uvtex_layer %d %s\n" % (layer, uvtex.name.replace(" ","_")))
+            fp.write("# objfile_layer %d\n" % scn.MCObjLayer)
+        fp.write("# texture %s_texture.tif %d\n" % (goodName(pob.name), scn.MCTextureLayer))
+        fp.write("# mask %s_mask.png %d\n" % (goodName(pob.name), scn.MCMaskLayer))
+    else:        
+        if me.uv_textures:
+            uvtex = me.uv_textures[scn.MCTextureLayer]
+            fp.write("# uvtex_layer 0 %s\n" % uvtex.name.replace(" ","_"))
+            uvtex = me.uv_textures[scn.MCMaskLayer]
+            fp.write("# uvtex_layer 1 %s\n" % uvtex.name.replace(" ","_"))
+            fp.write("# objfile_layer 0\n")
+        fp.write("# texture %s_texture.tif 0\n" % (goodName(pob.name)))
+        fp.write("# mask %s_mask.png 1\n" % (goodName(pob.name)))
            
     if scn.MCHairMaterial:
         fp.write(
@@ -1914,8 +1928,8 @@ def setBoundaryVerts(scn):
     
 def setAxisVerts(scn, prop1, prop2, x):
     (x1, x2) = x
-    scn[prop1] = x1
-    scn[prop2] = x2
+    exec("scn.%s = x1" % prop1)
+    exec("scn.%s = x2" % prop2)
     
 def selectBoundary(ob, scn):
     verts = ob.data.vertices
@@ -2163,18 +2177,17 @@ def saveDefaultSettings(context):
     return
     
 #
-#   initInterface(scn):
+#   initInterface():
 #
 
-def initInterface(scn):
+def initInterface():
     for skey in ShapeKeys:
         expr = (
     'bpy.types.Scene.MC%s = BoolProperty(\n' % skey +
     '   name="%s", \n' % skey +
-    '   description="Shapekey %s affects clothes")' % skey)
-        #print(expr)
+    '   description="Shapekey %s affects clothes",\n' % skey +
+    '   default=False)')
         exec(expr)
-        scn['MC%s' % skey] = False
 
     bpy.types.Scene.MCDirectory = StringProperty(
         name="Directory", 
@@ -2201,6 +2214,11 @@ def initInterface(scn):
         name="Texture UV layer", 
         description="UV layer for textures, starting with 0",
         default=0)
+
+    bpy.types.Scene.MCAllUVLayers = BoolProperty(
+        name="All UV layers", 
+        description="Include all UV layers in export",
+        default=False)
 
     bpy.types.Scene.MCBlenderMaterials = BoolProperty(
         name="Blender materials", 
@@ -2259,32 +2277,33 @@ def initInterface(scn):
 
     bpy.types.Scene.MCX1 = IntProperty(
         name="X1", 
-        description="First X vert for clothes rescaling")
-    scn['MCX1'] = 4302
+        description="First X vert for clothes rescaling",
+        default=4302)
 
     bpy.types.Scene.MCX2 = IntProperty(
         name="X2", 
-        description="Second X vert for clothes rescaling")
-    scn['MCX2'] = 8697
+        description="Second X vert for clothes rescaling",
+        default=8697)
 
     bpy.types.Scene.MCY1 = IntProperty(
         name="Y1", 
-        description="First Y vert for clothes rescaling")
-    scn['MCY1'] = 8208
+        description="First Y vert for clothes rescaling",
+        default=8208)
 
     bpy.types.Scene.MCY2 = IntProperty(
         name="Y2", 
-        description="Second Y vert for clothes rescaling")
-    scn['MCY2'] = 8220
+        description="Second Y vert for clothes rescaling",
+        default=8220)
 
     bpy.types.Scene.MCZ1 = IntProperty(
         name="Z1", 
-        description="First Z vert for clothes rescaling")
-    scn['MCZ1'] = 8289
+        description="First Z vert for clothes rescaling",
+        default=8289)
 
     bpy.types.Scene.MCZ2 = IntProperty(
         name="Z2", 
-        description="Second Z vert for clothes rescaling")
+        description="Second Z vert for clothes rescaling",
+        default=6827)
     
     bpy.types.Scene.MCExamineBoundary = BoolProperty(
         name="Examine", 
@@ -2299,17 +2318,17 @@ def initInterface(scn):
                  ('Leg', 'Leg', 'Leg'),
                  ('Foot', 'Foot', 'Foot')],
         default='Head')                 
-    setBoundaryVerts(scn)
+    #setBoundaryVerts(scn)
 
     setZDepthItems()
     bpy.types.Scene.MCZDepthName = EnumProperty(
-        items = ZDepthItems)
-    scn["MCZDepthName"] = 4
+        items = ZDepthItems,
+        default='Sweater')
 
     bpy.types.Scene.MCZDepth = IntProperty(
         name="Z depth", 
-        description="Location in the Z buffer")
-    setZDepth(scn)
+        description="Location in the Z buffer",
+        default=ZDepth['Sweater'])
     
     bpy.types.Scene.MCAutoGroupType = EnumProperty(
         items = [('Helpers','Helpers','Helpers'),
@@ -2321,7 +2340,7 @@ def initInterface(scn):
     bpy.types.Scene.MCRemoveGroupType = EnumProperty(
         items = [('Selected','Selected','Selected'),
                  ('All','All','All')],
-    default='All')
+        default='All')
     
     bpy.types.Scene.MCAuthor = StringProperty(
         name="Author", 

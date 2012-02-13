@@ -116,7 +116,9 @@ class MakeClothesPanel(bpy.types.Panel):
         row = layout.row()
         row.prop(scn, "MCMaskLayer", text="Mask")   
         row.prop(scn, "MCTextureLayer", text = "Texture")   
+        row = layout.row()
         row.prop(scn, "MCObjLayer", text="Obj")   
+        row.prop(scn, "MCAllUVLayers")   
 
         layout.separator()
         layout.label("Make clothes")
@@ -183,7 +185,7 @@ class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
     bl_label = "Init"
 
     def execute(self, context):
-        main.initInterface(context.scene)
+        main.initInterface()
         main.readDefaultSettings(context)
         print("Interface initialized")
         return{'FINISHED'}    
@@ -197,7 +199,7 @@ class OBJECT_OT_FactorySettingsButton(bpy.types.Operator):
     bl_label = "Restore factory settings"
 
     def execute(self, context):
-        main.initInterface(context.scene)
+        main.initInterface()
         return{'FINISHED'}    
 
 #
@@ -448,6 +450,7 @@ class VIEW3D_OT_AutoVertexGroupsButton(bpy.types.Operator):
 #
 
 def register():
+    main.initInterface()
     bpy.utils.register_module(__name__)
 
 def unregister():
