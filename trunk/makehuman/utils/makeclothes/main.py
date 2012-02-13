@@ -971,6 +971,15 @@ def unwrapObject(ob, context):
     scn = context.scene
     old = scn.objects.active
     scn.objects.active = ob
+    uvtexs = ob.data.uv_textures
+    
+    n = len(uvtexs)-1
+    if n < scn.MCMaskLayer:
+        while n < scn.MCMaskLayer:
+            uvtexs.new()
+            n += 1
+        uvtexs[n].name = "Mask"
+    uvtexs.active_index = scn.MCMaskLayer        
     
     bpy.ops.object.mode_set(mode='EDIT')
     bpy.ops.mesh.select_all(action='SELECT')
