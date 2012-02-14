@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # We need this for gui controls
 
-import gui3d, mh, os
+import gui3d, mh, os, module3d
 
 class FontRadioButton(gui3d.RadioButton):
 
@@ -42,7 +42,7 @@ class SettingsTaskView(gui3d.TaskView):
         self.shaderNo = shaderBox.addView(gui3d.RadioButton(self.shaderGroup, "No shader", True));y+=24
         self.shaderPhong = shaderBox.addView(gui3d.RadioButton(self.shaderGroup, "Phong shader"));y+=24
         self.shaderToon = shaderBox.addView(gui3d.RadioButton(self.shaderGroup, "Toon shader"));y+=24
-        self.shaderSkin = shaderBox.addView(gui3d.RadioButton(self.shaderGroup, "Skin shader"));y+=24
+        #self.shaderSkin = shaderBox.addView(gui3d.RadioButton(self.shaderGroup, "Skin shader"));y+=24
         y+=16
         
         sliderBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Slider behavior'));y+=25
@@ -101,12 +101,12 @@ class SettingsTaskView(gui3d.TaskView):
             gui3d.RadioButton.onClicked(self.shaderToon, event)
             self.setShader("data/shaders/glsl/toon_vertex_shader.txt", "data/shaders/glsl/toon_fragment_shader.txt")
             
-        @self.shaderSkin.event
-        def onClicked(event):
-            gui3d.RadioButton.onClicked(self.shaderSkin, event)
-            self.setShader("data/shaders/glsl/skin_vertex_shader.txt", "data/shaders/glsl/skin_fragment_shader.txt")
-            gui3d.app.selectedHuman.mesh.setShaderParameter("gradientMap", mh.loadTexture("data/textures/color_temperature.png", 0))
-            gui3d.app.selectedHuman.mesh.setShaderParameter("ambientOcclusionMap", mh.loadTexture("data/textures/female_young.tif", 0))
+        #@self.shaderSkin.event
+        #def onClicked(event):
+            #gui3d.RadioButton.onClicked(self.shaderSkin, event)
+            #self.setShader("data/shaders/glsl/skin_vertex_shader.txt", "data/shaders/glsl/skin_fragment_shader.txt")
+            #gui3d.app.selectedHuman.mesh.setShaderParameter("gradientMap", module3d.getTexture("data/textures/color_temperature.png").textureId)
+            #gui3d.app.selectedHuman.mesh.setShaderParameter("ambientOcclusionMap", module3d.getTexture("data/textures/female_young.tif").textureId)
                 
         @self.realtimeUpdates.event
         def onClicked(event):

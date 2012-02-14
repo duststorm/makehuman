@@ -2437,12 +2437,13 @@ class FileChooser(View):
         
         View.__init__(self, style, None)
         
-        self.path = path
+        self.path = path if isinstance(path, str) or isinstance(path, unicode) else path[0]
+        self.paths = path if isinstance(path, list) else [path]
         self.extension = extension
         self.previewExtension = previewExtension
         self.slider = self.addView(Slider(0, 0, 0, style=SliderStyle._replace(left=10, top=600-35, zIndex=9.1)))
         font = app.getFont(TextViewStyle.fontFamily)
-        self.location = self.slider.addView(TextView(os.path.abspath(path), style=TextViewStyle._replace(left=10 + 112 + 10, top=600-2-font.lineHeight, zIndex=9.1)))
+        self.location = self.slider.addView(TextView(os.path.abspath(self.path), style=TextViewStyle._replace(left=10 + 112 + 10, top=600-2-font.lineHeight, zIndex=9.1)))
         self.sortBox = self.slider.addView(GroupBox([10, 80, 9.0], 'Sort'))
         sortgroup = []
         self.sort = sort
@@ -2500,16 +2501,18 @@ class FileChooser(View):
         
         # Filter
         if isinstance(self.extension, str):
-            for root, dirs, files in os.walk(self.path):
-                for f in files:
-                    if f.lower().endswith('.' + self.extension):
-                        self.files.append(os.path.join(root, f))
-        elif isinstance(self.extension, list):
-            for root, dirs, files in os.walk(self.path):
-                for f in files:
-                    for ext in self.extension:
-                        if f.lower().endswith('.' + ext):
+            for path in self.paths:
+                for root, dirs, files in os.walk(path):
+                    for f in files:
+                        if f.lower().endswith('.' + self.extension):
                             self.files.append(os.path.join(root, f))
+        elif isinstance(self.extension, list):
+            for path in self.paths:
+                for root, dirs, files in os.walk(path):
+                    for f in files:
+                        for ext in self.extension:
+                            if f.lower().endswith('.' + ext):
+                                self.files.append(os.path.join(root, f))
         
         # Sort         
         self.files = self.sort.sort(self.sortBy, self.files)

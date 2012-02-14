@@ -21,6 +21,7 @@ TO DO
 """
 
 import gui3d, mh, os
+import download
 import files3d
 import mh2proxy
 
@@ -28,8 +29,13 @@ class ClothesTaskView(gui3d.TaskView):
     
     def __init__(self, category):
         
+        self.systemClothes = os.path.join('data', 'clothes')
+        self.userClothes = os.path.join(mh.getPath(''), 'data', 'clothes')
+        
         gui3d.TaskView.__init__(self, category, 'Clothes')
-        self.filechooser = self.addView(gui3d.FileChooser('data/clothes', 'mhclo', 'png', 'notfound.png'))
+        self.filechooser = self.addView(gui3d.FileChooser([self.systemClothes, self.userClothes], 'mhclo', 'png', 'notfound.png'))
+        self.update = self.filechooser.sortBox.addView(gui3d.Button('Check for updates'))
+        self.mediaSync = None
 
         @self.filechooser.event
         def onFileSelected(filename):
@@ -37,6 +43,10 @@ class ClothesTaskView(gui3d.TaskView):
             self.setClothes(gui3d.app.selectedHuman, filename)
 
             gui3d.app.switchCategory('Modelling')
+            
+        @self.update.event
+        def onClicked(event):
+            self.syncMedia()
         
     def setClothes(self, human, mhclo):
 
@@ -93,6 +103,9 @@ class ClothesTaskView(gui3d.TaskView):
         gui3d.app.selectedHuman.hide()
         gui3d.TaskView.onShow(self, event)
         self.filechooser.setFocus()
+        
+        #if not os.path.isdir(self.userClothes) or not len([filename for filename in os.listdir(self.userClothes) if filename.lower().endswith('mhclo')]):    
+        #    gui3d.app.prompt('No user clothes found', 'You don\'t seem to have any user clothes, download them from the makehuman media repository?\nNote: this can take some time depending on your connection speed.', 'Yes', 'No', self.syncMedia)
 
     def onHide(self, event):
         gui3d.app.selectedHuman.show()
@@ -127,6 +140,19 @@ class ClothesTaskView(gui3d.TaskView):
         for clo in human.clothesObjs.values():
             if clo:
                 file.write('clothes %s\n' % clo.mesh.name)
+                
+    def syncMedia(self):
+        
+        if self.mediaSync:
+            return
+        if not os.path.isdir(self.userClothes):
+            os.makedirs(self.userClothes)
+        self.mediaSync = download.MediaSync(gui3d.app, self.userClothes, 'http://download.tuxfamily.org/makehuman/clothes/', self.syncMediaFinished)
+        self.mediaSync.start()
+        
+    def syncMediaFinished(self):
+        
+        self.mediaSync = None
 
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements

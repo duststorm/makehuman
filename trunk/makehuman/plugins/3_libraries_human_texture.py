@@ -130,7 +130,10 @@ class HumanTextureTaskView(gui3d.TaskView):
         
         if self.mediaSync:
             return
-        self.mediaSync = download.MediaSync(gui3d.app, os.path.join(mh.getPath(''), 'data', 'skins'), 'http://download.tuxfamily.org/makehuman/skins/', self.syncMediaFinished)
+        skinsFolder = os.path.join(mh.getPath(''), 'data', 'skins')
+        if not os.path.isdir(skinsFolder):
+            os.makedirs(skinsFolder)
+        self.mediaSync = download.MediaSync(gui3d.app, skinsFolder, 'http://download.tuxfamily.org/makehuman/skins/', self.syncMediaFinished)
         self.mediaSync.start()
         
     def syncMediaFinished(self):
