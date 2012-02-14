@@ -335,6 +335,7 @@ class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
         ob["ProxyFile"] = self.properties.filepath
         ob["ObjFile"] = theProxy.obj_file
         setupVertexPairs(context)
+        makeRestorePoint()
         print("Base object imported")
         print(theProxy)
         return{'FINISHED'}    
@@ -365,6 +366,7 @@ class VIEW3D_OT_ImportBaseObjButton(bpy.types.Operator):
         ob["ProxyFile"] = 0
         ob["ObjFile"] = self.properties.filepath
         setupVertexPairs(context)
+        makeRestorePoint()
         print("Base object imported")
         return{'FINISHED'}    
 
@@ -496,6 +498,7 @@ class VIEW3D_OT_LoadTargetButton(bpy.types.Operator):
 
     def execute(self, context):
         loadTarget(self.properties.filepath, context)
+        makeRestorePoint()
         print("Target loaded")
         return {'FINISHED'}
 
@@ -543,6 +546,7 @@ class VIEW3D_OT_LoadTargetFromMeshButton(bpy.types.Operator):
 
     def execute(self, context):
         loadTargetFromMesh(context)
+        makeRestorePoint()
         return {'FINISHED'}
 
 #----------------------------------------------------------
@@ -570,25 +574,16 @@ class VIEW3D_OT_NewTargetButton(bpy.types.Operator):
 
     def execute(self, context):
         newTarget(context)
+        makeRestorePoint()
         return {'FINISHED'}
 
 #----------------------------------------------------------
 #   saveTarget(context):
 #----------------------------------------------------------
-
-def saveTarget(context):
-    ob = context.object
-    if not isTarget(ob):
-        raise NameError("%s is not a target")
-    if isSaving(ob):
-        ob["Saving"] = False
-    else:
-        ob["Saving"] = True
-        return    
-    doSaveTarget(ob, ob["FilePath"])
-    return
     
 def doSaveTarget(ob, filepath):    
+    if not isTarget(ob):
+        raise NameError("%s is not a target")
     bpy.ops.object.mode_set(mode='OBJECT')
     ob.active_shape_key_index = ob["NTargets"]
     if not checkValid(ob):
@@ -631,8 +626,17 @@ class VIEW3D_OT_SaveTargetButton(bpy.types.Operator):
     bl_label = "Save target"
 
     def execute(self, context):
-        saveTarget(context)
-        print("Target saved")
+        global Confirm, ConfirmString, ConfirmString2
+        ob = context.object
+        path = ob["FilePath"]
+        if Confirm:
+            Confirm = None
+            doSaveTarget(ob, path)
+            print("Target saved")
+        else:
+            Confirm = "mh.save_target"
+            ConfirmString = "Overwrite target file?"
+            ConfirmString2 = ' "%s?"' % os.path.basename(path)
         return{'FINISHED'}            
 
 class VIEW3D_OT_SaveasTargetButton(bpy.types.Operator):
@@ -655,15 +659,6 @@ class VIEW3D_OT_SaveasTargetButton(bpy.types.Operator):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
 
-class VIEW3D_OT_SkipSaveButton(bpy.types.Operator):
-    bl_idname = "mh.skip_save"
-    bl_label = "No"
-
-    def execute(self, context):
-        context.object["Saving"] = False
-        print("Target not saved")
-        return{'FINISHED'}            
-
 #----------------------------------------------------------
 #   Apply targets
 #----------------------------------------------------------
@@ -682,7 +677,6 @@ def applyTargets(context):
         del ob[prop]
     for v in ob.data.vertices:
         v.co = verts[v.index]
-    print("All targets applied")
     return
 
 class VIEW3D_OT_ApplyTargetsButton(bpy.types.Operator):
@@ -690,7 +684,16 @@ class VIEW3D_OT_ApplyTargetsButton(bpy.types.Operator):
     bl_label = "Apply targets"
 
     def execute(self, context):
-        applyTargets(context)
+        global Confirm, ConfirmString, ConfirmString2
+        if Confirm:
+            Confirm = None
+            applyTargets(context)
+            makeRestorePoint()
+            print("All targets applied")
+        else:
+            Confirm = "mh.apply_targets"
+            ConfirmString = "Apply all targets to mesh?"
+            ConfirmString2 = None
         return{'FINISHED'}            
 
 #----------------------------------------------------------
@@ -718,28 +721,20 @@ class VIEW3D_OT_BatchFixButton(bpy.types.Operator):
     bl_label = "Batch fix targets"
 
     def execute(self, context):
-        global TargetSubPaths
+        global TargetSubPaths, Confirm, ConfirmString, ConfirmString2
         scn = context.scene
-        if isSaving(scn):
-            scn["Saving"] = False
-        else:
-            scn["Saving"] = True
-            return {'FINISHED'}  
+        if not Confirm:
+            ConfirmString = "Really batch fix targets?"
+            ConfirmString2 = None
+            Confirm = "mh.batch_fix"
+            return
+        Confirm = None
         folder = os.path.expanduser(scn["TargetPath"])
         for subfolder in TargetSubPaths:
             if scn["Mh%s" % subfolder]:
                 batchFixTargets(context, os.path.join(folder, subfolder))
         print("All targets fixed")
         return {'FINISHED'}            
-
-class VIEW3D_OT_SkipBatchButton(bpy.types.Operator):
-    bl_idname = "mh.skip_batch"
-    bl_label = "No"
-
-    def execute(self, context):
-        context.scene["Saving"] = False
-        print("Batch fitting discarded")
-        return{'FINISHED'}            
  
 #----------------------------------------------------------
 #   batch render
@@ -873,11 +868,6 @@ def discardTarget(context):
     ob = context.object
     if not isTarget(ob):
         return
-    if isDiscarding(ob):
-        ob["Discarding"] = False
-    else:
-        ob["Discarding"] = True
-        return    
     bpy.ops.object.mode_set(mode='OBJECT')
     ob.active_shape_key_index = ob["NTargets"]
     bpy.ops.object.shape_key_remove()
@@ -898,17 +888,15 @@ class VIEW3D_OT_DiscardTargetButton(bpy.types.Operator):
     bl_label = "Discard target"
 
     def execute(self, context):
-        discardTarget(context)
+        global Confirm, ConfirmString, ConfirmString2
+        if Confirm:        
+            Confirm = None
+            discardTarget(context)
+        else:
+            Confirm = "mh.discard_target"
+            ConfirmString = "Really discard target?"
+            ConfirmString2 = None
         return{'FINISHED'}                
-
-class VIEW3D_OT_SkipDiscardButton(bpy.types.Operator):
-    bl_idname = "mh.skip_discard"
-    bl_label = "No"
-
-    def execute(self, context):
-        context.object["Discarding"] = False
-        return{'FINISHED'}            
-
 
 #----------------------------------------------------------
 # symmetrizeTarget(context, left2right):
@@ -950,8 +938,39 @@ class VIEW3D_OT_SymmetrizeTargetButton(bpy.types.Operator):
 
     def execute(self, context):
         symmetrizeTarget(context, self.left2right)
+        makeRestorePoint()
         return{'FINISHED'}                
                         
+#----------------------------------------------------------
+#   Skip
+#----------------------------------------------------------
+
+class VIEW3D_OT_SkipButton(bpy.types.Operator):
+    bl_idname = "mh.skip"
+    bl_label = "No"
+
+    def execute(self, context):
+        global Confirm, ConfirmString, ConfirmString2
+        print("Skipped:", ConfirmString)
+        Confirm = None
+        ConfirmString = "?"
+        ConfirmString2 = None
+        return{'FINISHED'}            
+
+class VIEW3D_OT_FixInconsistencyButton(bpy.types.Operator):
+    bl_idname = "mh.fix_inconsistency"
+    bl_label = "Fix it!"
+
+    def execute(self, context):
+        ob = context.object
+        if ob.data.shape_keys:
+            ob["NTargets"] = len(ob.data.shape_keys.key_blocks)
+        else:
+            ob.shape_key_add(name="Basis")
+            ob["NTargets"] = 0
+        return{'FINISHED'}            
+
+
 #----------------------------------------------------------
 #   Utililies
 #----------------------------------------------------------
@@ -1000,6 +1019,9 @@ def deleteAll(context):
             scn.objects.unlink(ob)
     return                    
 
+def makeRestorePoint():
+    bpy.ops.transform.translate(value=(0,0,0))
+
 #----------------------------------------------------------
 #   class MakeTargetPanel(bpy.types.Panel):
 #----------------------------------------------------------
@@ -1017,23 +1039,14 @@ class MakeTargetPanel(bpy.types.Panel):
         if not isInited(scn):
             layout.operator("mh.init")
             return
-        if isSaving(ob):            
-            layout.label("Overwrite target file")            
-            layout.label(' "%s?"' % os.path.basename(ob["FilePath"]))
-            layout.operator("mh.save_target", text="Yes") 
-            layout.operator("mh.skip_save")
+        if Confirm:
+            layout.label("Hej")
+            layout.label(ConfirmString)            
+            if ConfirmString2:
+                layout.label(ConfirmString2)            
+            layout.operator(Confirm, text="Yes") 
+            layout.operator("mh.skip")
             return            
-        if isDiscarding(ob):
-            layout.label("Really discard target?")
-            layout.operator("mh.discard_target", text="Yes") 
-            layout.operator("mh.skip_discard")
-            return            
-        if isSaving(scn):
-            layout.label("Really batch fix targets?")
-            layout.operator("mh.batch_fix", text="Yes")
-            layout.operator("mh.skip_batch")
-            return
-
         layout.label("Load materials from")
         layout.prop(scn, "MhLoadMaterial", expand=True)
         layout.separator()
@@ -1046,9 +1059,12 @@ class MakeTargetPanel(bpy.types.Panel):
         if isBase(ob):
             layout.operator("mh.new_target")
             layout.operator("mh.load_target")            
-            layout.operator("mh.load_target_from_mesh")            
-            
+            layout.operator("mh.load_target_from_mesh")                        
         elif isTarget(ob):
+            if not ob.data.shape_keys:
+                layout.label("Warning: Internal inconsistency")
+                layout.operator("mh.fix_inconsistency")
+                return
             layout.separator()
             layout.prop(ob, "show_only_shape_key")
             box = layout.box()
@@ -1076,11 +1092,13 @@ class MakeTargetPanel(bpy.types.Panel):
             #layout.operator("mh.relax_target")
             layout.separator()
             layout.operator("mh.discard_target")
+            layout.separator()
+            layout.operator("mh.apply_targets")
+            layout.separator()
             layout.prop(ob, '["SelectedOnly"]')
             if ob["FilePath"]:
                 layout.operator("mh.save_target")           
             layout.operator("mh.saveas_target")           
-            layout.operator("mh.apply_targets")
 
 class MakeTargetBatchPanel(bpy.types.Panel):
     bl_label = "Batch make targets"
@@ -1107,13 +1125,15 @@ class MakeTargetBatchPanel(bpy.types.Panel):
 #----------------------------------------------------------
 
 def initScene(scn):
-    global TargetSubPaths
+    global TargetSubPaths, Confirm, ConfirmString, ConfirmString2
     scn["TargetPath"] = "/home/svn/makehuman/data/targets"            
     scn["Relax"] = 0.5
     bpy.types.Scene.MhLoadMaterial = EnumProperty(
         items = [('None','None','None'), ('Groups','Groups','Groups'), ('Materials','Materials','Materials')],
         name="Load as materials")
     scn.MhLoadMaterial = 'None'
+    Confirm = None
+    ConfirmString = "?"
     TargetSubPaths = []
     folder = os.path.realpath(os.path.expanduser(scn["TargetPath"]))
     for fname in os.listdir(folder):
