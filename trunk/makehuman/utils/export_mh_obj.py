@@ -82,7 +82,7 @@ def exportObjFile(path, groupsAsMaterials, context):
     ob = context.object
     me = ob.data
     if (not me) or (len(me.materials) < 2):
-        raise NameError("Mesh must have groups as materials")
+        raise NameError("Mesh must have materials")
     (name,ext) = os.path.splitext(path)
     if ext.lower() != ".obj":
         path = path + ".obj"

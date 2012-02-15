@@ -198,7 +198,7 @@ def getScale(info, verts, index):
 
 def importObj(filepath, context):
     scn = context.scene
-    obname = os.path.basename(filepath)
+    obname = nameFromPath(filepath)
     fp = open(filepath, "rU")  
     print("Importing %s" % filepath)
 
@@ -334,6 +334,7 @@ class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
         ob["NTargets"] = 0
         ob["ProxyFile"] = self.properties.filepath
         ob["ObjFile"] = theProxy.obj_file
+        ob["MhxMesh"] = True
         setupVertexPairs(context)
         makeRestorePoint()
         print("Base object imported")
@@ -365,6 +366,7 @@ class VIEW3D_OT_ImportBaseObjButton(bpy.types.Operator):
         ob["NTargets"] = 0
         ob["ProxyFile"] = 0
         ob["ObjFile"] = self.properties.filepath
+        ob["MhxMesh"] = True
         setupVertexPairs(context)
         makeRestorePoint()
         print("Base object imported")
@@ -373,6 +375,10 @@ class VIEW3D_OT_ImportBaseObjButton(bpy.types.Operator):
     def invoke(self, context, event):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
+
+def nameFromPath(filepath):
+    (name,ext) = os.path.splitext(os.path.basename(filepath))
+    return name
 
 #----------------------------------------------------------
 #   setupVertexPairs(ob):
@@ -446,7 +452,7 @@ def loadTarget(filepath, context):
     bpy.ops.object.mode_set(mode='OBJECT')
     for v in ob.data.vertices:
         v.select = False
-    name = os.path.basename(filepath)
+    name = nameFromPath(filepath)
     skey = ob.shape_key_add(name=name, from_mix=False)
     ob.active_shape_key_index = shapeKeyLen(ob) - 1
     #bpy.ops.object.shape_key_add(from_mix=False)
@@ -591,7 +597,7 @@ def doSaveTarget(ob, filepath):
     saveAll = not ob["SelectedOnly"]
     skey = ob.active_shape_key    
     if skey.name[0:6] == "Target":
-        skey.name = os.path.basename(filepath)
+        skey.name = nameFromPath(filepath)
     verts = evalVertLocations(ob)
     
     (fname,ext) = os.path.splitext(filepath)
@@ -1040,7 +1046,6 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.operator("mh.init")
             return
         if Confirm:
-            layout.label("Hej")
             layout.label(ConfirmString)            
             if ConfirmString2:
                 layout.label(ConfirmString2)            
