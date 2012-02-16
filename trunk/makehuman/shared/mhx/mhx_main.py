@@ -171,23 +171,21 @@ def exportMhx_25(human, fp):
 "  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;\n" +
 "end Object\n\n")
 
-    if theConfig.useRig in ['mhx', 'rigify', 'blenrig']:
-        rig = theConfig.useRig
+    if theConfig.mhxrig in ['mhx', 'rigify', 'blenrig']:
+        rig = theConfig.mhxrig
         fp.write("#if toggle&T_Armature\n")
         for fname in mhx_rig.GizmoFiles:
             copyFile25(human, fname, rig, fp, None, proxyData)    
         mhx_rig.setupCircles(fp)
         copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", rig, fp, None, proxyData)    
         fp.write("#endif\n")
-    elif theConfig.useRig in ['game']:
+    else:
         rig = mh2proxy.CProxy('Rig', 0)
         rig.name = theHuman
-        (locs, rig.bones, rig.weights) = read_rig.readRigFile('./data/templates/%s.rig' % theConfig.useRig, obj)
-        fp.write("#if toggle&T_Armature\n")
-        copyFile25(human, "shared/mhx/templates/rig-game25.mhx", rig, fp, None, proxyData)    
-        fp.write("#endif\n")
-    else:
-        raise NameError("Unknown base rig %s" % rig)
+        (locs, rig.bones, rig.weights) = read_rig.readRigFile('./data/rigs/%s.rig' % theConfig.mhxrig, obj)
+        #fp.write("#if toggle&T_Armature\n")
+        #copyFile25(human, "shared/mhx/templates/rig-game25.mhx", rig, fp, None, proxyData)    
+        #fp.write("#endif\n")
         
     fp.write("\nNoScale False ;\n\n")
 
@@ -205,7 +203,7 @@ def exportMhx_25(human, fp):
 
     copyFile25(human, "shared/mhx/templates/rig-poses25.mhx", rig, fp, None, proxyData) 
 
-    if theConfig.useRig == 'rigify':
+    if theConfig.mhxrig == 'rigify':
         fp.write("Rigify %s ;\n" % theHuman)
     return
 
@@ -332,7 +330,7 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
             elif key == 'ProxyReferRig':
                 if proxy.rig:
                     fp.write("      object Refer Object %s ;\n" % proxy.name)
-                elif True or theConfig.useRig == 'game':
+                elif True or theConfig.mhxrig == 'game':
                     fp.write("      object Refer Object %s ;\n" % theHuman)
                 else:
                     fp.write("      object Refer Object %sDeformRig ;\n" % theHuman)

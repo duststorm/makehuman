@@ -55,6 +55,12 @@ def setupRigJoint (words, obj, locations):
 		y = float(words[4])
 		z = float(words[5])
 		locations[key] = vadd(locations[words[2]], [x,y,z])
+	elif typ == 'voffset':
+		v = int(words[2])
+		x = float(words[3])
+		y = float(words[4])
+		z = float(words[5])
+		locations[key] = vadd(obj.verts[v].co, [x,y,z])
 	else:
 		raise NameError("Unknown %s" % typ)
 

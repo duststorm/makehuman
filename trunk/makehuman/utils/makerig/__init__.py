@@ -79,19 +79,26 @@ class MakeRigPanel(bpy.types.Panel):
             return
         if Confirm:
             layout.label(ConfirmString)
-            layout.operator(Confirm, text="yes").answer="yes"
-            layout.operator(Confirm, text="no").answer="no"
+            layout.operator(Confirm, text="yes")
+            layout.operator("mhrig.skip")
             return
         layout.label("Initialization")
         layout.operator("mhrig.init_interface", text="ReInitialize")
         layout.operator("mhrig.factory_settings")
         layout.operator("mhrig.save_settings")
 
-        layout.label("Make rig")      
-        layout.prop(scn, "MRDirectory")
+        layout.separator()
+        layout.label("Weighting")      
         layout.prop(scn, "MRMakeHumanDir")
         layout.operator("mhrig.auto_weight_body")
         layout.operator("mhrig.auto_weight_helpers")
+        layout.operator("mhrig.unvertex_diamonds")
+        layout.operator("mhrig.unvertex_selected")
+        layout.operator("mhrig.unvertex_all")
+
+        layout.separator()
+        layout.label("Export rig")      
+        layout.prop(scn, "MRDirectory")
         layout.operator("mhrig.export_rig_file")
 
         layout.separator()
@@ -155,6 +162,62 @@ class OBJECT_OT_AutoWeightHelpersButton(bpy.types.Operator):
     def execute(self, context):
         main.autoWeightHelpers(context)
         return{'FINISHED'}    
+
+class VIEW3D_OT_UnvertexDiamondsButton(bpy.types.Operator):
+    bl_idname = "mhrig.unvertex_diamonds"
+    bl_label = "Unvertex diamonds"
+
+    def execute(self, context):
+        main.unVertexDiamonds(context)
+        print("Diamonds unvertexed")
+        return{'FINISHED'}    
+
+class VIEW3D_OT_UnvertexSelectedButton(bpy.types.Operator):
+    bl_idname = "mhrig.unvertex_selected"
+    bl_label = "Unvertex selected"
+
+    def execute(self, context):
+        global Confirm, ConfirmString
+        if not Confirm:
+            Confirm = "mhrig.unvertex_selected"
+            ConfirmString = "Really unvertex selected?"
+            return{'FINISHED'}
+        else:
+            Confirm = None
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.object.vertex_group_remove_from(all=True)
+        bpy.ops.object.mode_set(mode='OBJECT')
+        print("Selected unvertexed")
+        return{'FINISHED'}    
+
+class VIEW3D_OT_UnvertexAllGroupsButton(bpy.types.Operator):
+    bl_idname = "mhrig.unvertex_all"
+    bl_label = "Unvertex all"
+
+    def execute(self, context):
+        global Confirm, ConfirmString
+        if not Confirm:
+            Confirm = "mhrig.unvertex_all"
+            ConfirmString = "Really remove all vertex groups?"
+            return{'FINISHED'}
+        else:
+            Confirm = None
+        ob = context.object
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.vertex_group_remove(all=True)
+        print("All vertex groups removed")
+        return{'FINISHED'}    
+
+class VIEW3D_OT_SkipButton(bpy.types.Operator):
+    bl_idname = "mhrig.skip"
+    bl_label = "No"
+
+    def execute(self, context):
+        global Confirm, ConfirmString
+        print("Skipped:", ConfirmString)
+        Confirm = None
+        ConfirmString = "?"
+        return{'FINISHED'}            
 
 #
 #    Init and register

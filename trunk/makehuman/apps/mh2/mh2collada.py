@@ -43,9 +43,6 @@ import read_rig
 # 
 Delta = [0,0.01,0]
 
-#    Root bone
-Root = 'MasterFloor'
-
 #
 # exportCollada(human, filename, options):
 #
@@ -222,67 +219,25 @@ def printNode(fp, name, vec, extra, pad):
 '%s        <scale sid="scale">1.0 1.0 1.0</scale>' % pad)
     
 
-
-#
-#    getArmatureFromMhx(obj):
-#
-
-def getArmatureFromMhx(obj):
-    mhx_rig.newSetupJoints(obj, 
-        rig_body_25.BodyJoints +
-        rig_arm_25.ArmJoints +
-        rig_finger_25.FingerJoints +
-        rig_leg_25.LegJoints +
-        rig_toe_25.ToeJoints +
-        rig_face_25.FaceJoints,
-        
-        rig_body_25.BodyHeadsTails +
-        rig_arm_25.ArmHeadsTails +
-        rig_finger_25.FingerHeadsTails +
-        rig_leg_25.LegHeadsTails +
-        rig_toe_25.ToeHeadsTails +
-        rig_face_25.FaceHeadsTails)
-        
-    hier = []
-    armature = rig_body_25.BodyArmature + rig_arm_25.ArmArmature + rig_finger_25.FingerArmature + rig_leg_25.LegArmature + rig_toe_25.ToeArmature + rig_face_25.FaceArmature
-
-    for (bone, cond, roll, parent, flags, layers, bbone) in armature:
-        par = boneOK(flags, bone, parent)
-        if par:
-            if par == 'None':
-                hier.append((bone, []))
-            else:
-                parHier = findInHierarchy(par, hier)
-                try:
-                    (p, children) = parHier
-                except:
-                    raise NameError("Did not find %s parent %s" % (bone, parent))
-                children.append((bone, []))
-    #print("hier", rigHier)
-    
-    bones = []
-    flatten(hier, bones)    
-
-    weights = {}
-    readSkinWeights(weights, "data/templates/vertexgroups-minimal.mhx")    
-    # fixTwistWeights(fp, weights)
-    return (mhx_rig.rigHead, mhx_rig.rigTail, hier, bones, weights)
-
 #
 #    getArmatureFromRigFile(fileName, obj):    
 #
 
-def getArmatureFromRigFile(fileName, obj):    
+def getArmatureFromRigFile(fileName, obj):
+    global Root
     (locations, armature, weights) = read_rig.readRigFile(fileName, obj)
     
     hier = []
     heads = {}
     tails = {}
+    Root = None
     for (bone, head, tail, roll, parent, options) in armature:
         heads[bone] = head
         tails[bone] = tail
         if parent == '-':
             hier.append((bone, []))
+            if not Root:
+                Root = bone
         else:
             parHier = findInHierarchy(parent, hier)
             try:
@@ -291,6 +246,8 @@ def getArmatureFromRigFile(fileName, obj):
                 raise NameError("Did not find %s parent %s" % (bone, parent))
             children.append((bone, []))
     
+    if not Root:
+        raise NameError("No root bone found in rig file %s" % fileName)
     # newHier = addInvBones(hier, heads, tails)
     newHier = hier
     bones = []
@@ -453,15 +410,9 @@ def exportDae(human, fp):
     global theStuff, Root, useRotate90, theOptions
     cfg = export_config.exportConfig(human, True)
     obj = human.meshData
-    if theOptions["useRig"] == "game":
-        amt = getArmatureFromRigFile('data/templates/game.rig', obj)
-        Root = 'MasterFloor'
-    elif theOptions["useRig"] == "daz":
-        amt = getArmatureFromRigFile('data/templates/daz.rig', obj)
-        Root = "hip"
-    elif theOptions["useRig"] == "mb":
-        amt = getArmatureFromRigFile('data/templates/mb.rig', obj)
-        Root = "hips"
+    rigfile = "data/rigs/%s.rig" % theOptions["daerig"]
+    print("Using rig file %s" % rigfile)
+    amt = getArmatureFromRigFile(rigfile, obj)
     #rawTargets = loadShapeKeys("data/templates/shapekeys-facial25.mhx")
     rawTargets = []
 

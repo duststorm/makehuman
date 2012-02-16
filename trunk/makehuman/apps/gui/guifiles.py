@@ -301,10 +301,10 @@ class ExportTaskView(gui3d.TaskView):
         self.exportMaleRig = self.mhxOptions.addView(gui3d.CheckBox("Male rig", False));y+=24
         self.exportSkirtRig = self.mhxOptions.addView(gui3d.CheckBox("Skirt rig", False));y+=24
         rigs = []
-        self.mhxRig = self.mhxOptions.addView(gui3d.RadioButton(rigs, "Use mhx rig", True));y+=24
-        self.rigifyRig = self.mhxOptions.addView(gui3d.RadioButton(rigs, "Use rigify rig"));y+=24
-        self.gameRig = self.mhxOptions.addView(gui3d.RadioButton(rigs, "Use game rig"));y+=24
-
+        self.mhxMhx = self.mhxOptions.addView(gui3d.RadioButton(rigs, "Use mhx rig", True));y+=24
+        self.rigifyMhx = self.mhxOptions.addView(gui3d.RadioButton(rigs, "Use rigify rig", False));y+=24
+        (y, addedRigs) = self.addRigs( self.mhxOptions, rigs, "Mhx", False, y)
+        self.mhxRigs = [(self.mhxMhx, "mhx"), (self.rigifyMhx, "rigify")] + addedRigs
         self.mhxOptions.hide()
         
         # Collada options
@@ -314,9 +314,7 @@ class ExportTaskView(gui3d.TaskView):
         self.keepHelpers = self.colladaOptions.addView(gui3d.CheckBox("Keep helper geometry", False));y+=24
         self.colladaCopyImages = self.colladaOptions.addView(gui3d.CheckBox("Copy images", False));y+=24
         rigs = []
-        self.gameDae = self.colladaOptions.addView(gui3d.RadioButton(rigs, "Default rig", True));y+=24
-        #self.dazDae = self.colladaOptions.addView(gui3d.RadioButton(rigs, "Poser/DAZ rig"));y+=24
-        #self.mbDae = self.colladaOptions.addView(gui3d.RadioButton(rigs, "Motionbuilder rig"));y+=24
+        (y, self.daeRigs) = self.addRigs( self.colladaOptions, rigs, "Dae", True, y)
         self.colladaOptions.hide()
 
         # STL options
@@ -441,12 +439,11 @@ class ExportTaskView(gui3d.TaskView):
                     mhxversion = []
                     if self.version24.selected: mhxversion.append('24')
                     if self.version25.selected: mhxversion.append('25')
-                    if self.mhxRig.selected:
-                        rig = 'mhx'
-                    elif self.rigifyRig.selected:
-                        rig = 'rigify'
-                    elif self.gameRig.selected:
-                        rig = 'game'                    
+                    print(self.mhxRigs)
+                    for (button, rig) in self.mhxRigs:
+                        if button.selected:
+                            break
+                    print("Selected", rig)                            
                     options = {
                         'mhxversion':mhxversion,
                         'expressions':self.exportExpressions.selected,
@@ -458,19 +455,18 @@ class ExportTaskView(gui3d.TaskView):
                         'breastrig':self.exportBreastRig.selected,
                         'malerig':self.exportMaleRig.selected,
                         'skirtrig':self.exportSkirtRig.selected,
-                        'useRig': rig,
+                        'mhxrig': rig,
                     }
 
                 mh2mhx.exportMhx(gui3d.app.selectedHuman, os.path.join(exportPath, filename + ".mhx"), options)
             elif self.collada.selected:
-                if self.gameDae.selected:
-                    rig = 'game'
-                elif self.dazDae.selected:
-                    rig = 'daz'
-                #elif self.mbDae.selected:
-                #    rig = 'mb'                    
+                print(self.daeRigs)
+                for (button, rig) in self.daeRigs:
+                    if button.selected:
+                        break
+                print("Selected", rig)                            
                 options = {
-                    "useRig": rig,
+                    "daerig": rig,
                     "rotate90" : self.colladaRot90.selected,
                     "keepHelpers" : self.keepHelpers.selected,
                     "copyImages" : self.colladaCopyImages.selected,
@@ -556,6 +552,22 @@ class ExportTaskView(gui3d.TaskView):
         camera.focusY = self.focusY
         camera.focusZ = self.focusZ
         human.setRotation(self.rotation)
+        
+    def addRigs(self, options, rigs, suffix, check, y):
+        path = "data/rigs"
+        addedRigs = []
+        for fname in os.listdir(path):
+            (name, ext) = os.path.splitext(fname)
+            if ext == ".rig":
+                expr = 'self.%s%s = options.addView(gui3d.RadioButton(rigs, "Use %s rig", check))' % (name, suffix, name)
+                #print(expr)
+                exec(expr)
+                check = False
+                y += 24
+                addedRig = eval('self.%s%s' % (name, suffix))
+                addedRigs.append((addedRig,name))
+        return (y, addedRigs)                
+        
 
 class FilesCategory(gui3d.Category):
 

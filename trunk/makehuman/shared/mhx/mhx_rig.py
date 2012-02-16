@@ -1776,7 +1776,7 @@ def setupRig(obj):
     global ObjectProps, ArmatureProps, CustomProps
     global Joints, HeadsTails, Armature, HeadName
 
-    if mhx_main.theConfig.useRig in ['mhx', 'game']:
+    if mhx_main.theConfig.mhxrig in ['mhx', 'game']:
         BoneGroups = [
             ('Master', 'THEME13'),
             ('Spine', 'THEME05'),
@@ -1838,7 +1838,7 @@ def setupRig(obj):
             rig_panel_25.PanelArmature
         )
 
-    elif mhx_main.theConfig.useRig == "blenrig":
+    elif mhx_main.theConfig.mhxrig == "blenrig":
         BoneGroups = [('GEN', 'THEME13'),
                       ('IK', 'THEME05'),
                       ('FK', 'THEME09'),
@@ -1853,7 +1853,7 @@ def setupRig(obj):
         ObjectProps = blenrig_rig.BlenrigObjectProps + [("MhxRig", '"Blenrig"')]
         ArmatureProps = blenrig_rig.BlenrigArmatureProps
 
-    elif mhx_main.theConfig.useRig == "rigify":
+    elif mhx_main.theConfig.mhxrig == "rigify":
         BoneGroups = []
         RecalcRoll = []              
         VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
@@ -1886,12 +1886,24 @@ def setupRig(obj):
         ArmatureProps = rigify_rig.RigifyArmatureProps
 
     else:
-        raise NameError("Unknown rig %s" % mhx_main.theConfig.useRig)
+        BoneGroups = []
+        RecalcRoll = []              
+        VertexGroupFiles = []
+        GizmoFiles = []
+        HeadName = 'Head'
+        Joints = []
+        HeadsTails = []
+        Armature = []
+        ObjectProps = []
+        ArmatureProps = []
+        print("Default rig %s" % mhx_main.theConfig.mhxrig)
+        return
         
-    if mhx_main.theConfig.skirtrig == "own":
-        Joints += rig_skirt_25.SkirtJoints
-        HeadsTails += rig_skirt_25.SkirtHeadsTails
-        Armature += rig_skirt_25.SkirtArmature
+    if mhx_main.theConfig.mhxrig == "mhx":   
+        if mhx_main.theConfig.skirtrig == "own":
+            Joints += rig_skirt_25.SkirtJoints
+            HeadsTails += rig_skirt_25.SkirtHeadsTails
+            Armature += rig_skirt_25.SkirtArmature
 
     (custJoints, custHeadsTails, custArmature, CustomProps) = mhx_custom.setupCustomRig()
     Joints += custJoints
@@ -1899,7 +1911,7 @@ def setupRig(obj):
     Armature += custArmature
     
     newSetupJoints(obj, Joints, True)
-    if mhx_main.theConfig.useRig in ['mhx', 'game']:
+    if mhx_main.theConfig.mhxrig in ['mhx', 'game']:
         rig_body_25.BodyDynamicLocations()
     setupHeadsTails(HeadsTails)
     return
@@ -1928,7 +1940,7 @@ def writeControlArmature(fp):
 
 def writeControlPoses(fp):
     writeBoneGroups(fp)
-    if mhx_main.theConfig.useRig == 'mhx':            
+    if mhx_main.theConfig.mhxrig == 'mhx':            
         rig_body_25.BodyControlPoses(fp)
         rig_shoulder_25.ShoulderControlPoses(fp)
         rig_arm_25.ArmControlPoses(fp)
@@ -1937,9 +1949,9 @@ def writeControlPoses(fp):
         #rig_toe_25.ToeControlPoses(fp)
         rig_face_25.FaceControlPoses(fp)
         rig_panel_25.PanelControlPoses(fp)
-    elif mhx_main.theConfig.useRig == 'blenrig':
+    elif mhx_main.theConfig.mhxrig == 'blenrig':
         blenrig_rig.BlenrigWritePoses(fp)
-    elif mhx_main.theConfig.useRig == 'rigify':
+    elif mhx_main.theConfig.mhxrig == 'rigify':
         rigify_rig.RigifyWritePoses(fp)
         rig_face_25.FaceControlPoses(fp)
         rig_panel_25.PanelControlPoses(fp)
@@ -1965,7 +1977,7 @@ def writeAllActions(fp):
     return
 
 def writeAllDrivers(fp):
-    if mhx_main.theConfig.useRig == 'mhx':      
+    if mhx_main.theConfig.mhxrig == 'mhx':      
         writePropDrivers(fp, rig_arm_25.ArmPropDrivers, "", "&")
         writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_L", "&")
         writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_R", "&")
@@ -1982,10 +1994,10 @@ def writeAllDrivers(fp):
         writeMuscleDrivers(fp, rig_arm_25.ArmDeformDrivers, mhx_main.theHuman)
         writeMuscleDrivers(fp, rig_leg_25.LegDeformDrivers, mhx_main.theHuman)
         rig_face_25.FaceDeformDrivers(fp)
-    elif mhx_main.theConfig.useRig == 'blenrig':            
+    elif mhx_main.theConfig.mhxrig == 'blenrig':            
         drivers = blenrig_rig.getBlenrigDrivers()
         writeDrivers(fp, True, drivers)
-    elif mhx_main.theConfig.useRig == 'rigify':            
+    elif mhx_main.theConfig.mhxrig == 'rigify':            
         rig_face_25.FaceDeformDrivers(fp)        
     return
 

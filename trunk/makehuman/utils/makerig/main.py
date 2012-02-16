@@ -161,11 +161,52 @@ def exportList(fp, weights, name, offset):
     
 
 #
+#   checkObjectOK(ob, context):
+#
+
+def checkObjectOK(ob, context):
+    old = context.object
+    context.scene.objects.active = ob
+    word = None
+    error = False
+    epsilon = 1e-4
+    if ob.location.length > epsilon:
+        word = "object translation"
+        bpy.ops.object.transform_apply(location=True, rotation=False, scale=False)
+    eu = ob.rotation_euler
+    if abs(eu.x) + abs(eu.y) + abs(eu.z) > epsilon:
+        word = "object rotation"
+        bpy.ops.object.transform_apply(location=False, rotation=True, scale=False)
+    vec = ob.scale - Vector((1,1,1))
+    if vec.length > epsilon:
+        word = "object scaling"
+        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    if ob.constraints:
+        word = "constraints"
+        error = True
+    if ob.parent:
+        word = "parent"
+        ob.parent = None
+    if word:
+        msg = "Object %s can not be used for rig creation because it has %s.\n" % (ob.name, word)
+        if error:
+            msg +=  "Apply or delete before continuing.\n"
+            print(msg)
+            raise NameError(msg)
+        else:
+            print(msg)
+            print("Fixed automatically")
+    context.scene.objects.active = old
+    return    
+
+#
 #   exportRigFile(context):
 #
 
 def exportRigFile(context):
     (rig,ob) = getRigAndMesh(context)
+    checkObjectOK(rig, context)
+    checkObjectOK(ob, context)
     (rigpath, rigfile) = getFileName(rig, context, "rig")
     print("Open", rigfile)
     fp = open(rigfile, "w")
@@ -333,6 +374,26 @@ def autoWeightHelpers(context):
     return     
     
 #
+#    unVertexDiamonds(context):
+#
+
+def unVertexDiamonds(context):
+    ob = context.object
+    print("Unvertex diamonds in %s" % ob)
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='DESELECT')
+    bpy.ops.object.mode_set(mode='OBJECT')
+    me = ob.data
+    for f in me.faces:        
+        if len(f.vertices) < 4:
+            for vn in f.vertices:
+                me.vertices[vn].select = True
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.object.vertex_group_remove_from(all=True)
+    bpy.ops.object.mode_set(mode='OBJECT')
+    return
+    
+#
 #   goodName(name):    
 #   getFileName(pob, context, ext):            
 #
@@ -343,8 +404,8 @@ def goodName(name):
     
 def getFileName(ob, context, ext):            
     name = goodName(ob.name)
-    outpath = '%s/%s' % (context.scene.MRDirectory, name)
-    outpath = os.path.realpath(os.path.expanduser(outpath))
+    #outpath = '%s/%s' % (context.scene.MRDirectory, name)
+    outpath = os.path.realpath(os.path.expanduser(context.scene.MRDirectory))
     if not os.path.exists(outpath):
         print("Creating directory %s" % outpath)
         os.mkdir(outpath)
