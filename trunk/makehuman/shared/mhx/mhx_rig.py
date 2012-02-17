@@ -24,142 +24,30 @@ Limit angles from http://hippydrome.com/
 import aljabr
 from aljabr import *
 import math
+import mhx_globals as the
+from mhx_globals import *
 import mhxbones
 import mhx_main
 import read_expression
 import sys
 import mhx_custom
         
-pi = 3.14159
-D = pi/180
-yunit = [0,1,0]
-ysmall = [0,0.5,0]
-zunit = [0,0,-1]
-ybis = [0,2,0]
-
-unlimited = (-pi,pi, -pi,pi, -pi,pi)
-NoBB = (1,1,1)
-NoBB = None
-bbMarg = 0.05
-
-#
-#    Bone layers
-#
-
-L_MAIN =    0x0001
-L_CLO =     0x00010000
-
-L_UPSPNFK = 0x0002
-L_UPSPNIK = 0x00020000
-
-L_LARMIK =  0x0004
-L_LARMFK =  0x0008
-L_LLEGIK =  0x0010
-L_LLEGFK =  0x0020
-L_LHANDIK = 0x0040
-L_LHANDFK = 0x0080
-
-L_RARMIK =  0x00040000
-L_RARMFK =  0x00080000
-L_RLEGIK =  0x00100000
-L_RLEGFK =  0x00200000
-L_RHANDIK = 0x00400000
-L_RHANDFK = 0x00800000
-
-L_PANEL =   0x0100
-L_TWEAK =   0x0200
-L_TOE =     0x0200
-L_HEAD =    0x0400
-
-L_LPALM =   0x0800
-L_LEXTRA =  0x1000
-L_RPALM =   0x08000000
-L_REXTRA =  0x10000000
-
-L_DNSPNFK = 0x2000
-L_DNSPNIK = 0x20000000
-
-L_HELP =    0x4000
-L_DEF =     0x8000
-L_MSCL =    0x40000000
-L_DMAIN =   0x80000000
-
-#
-#    Flags
-#
-
-
-F_CON = 0x0001
-F_DEF = 0x0002
-F_RES = 0x0004
-#F_RES = 0
-F_WIR = 0x0008
-F_NOLOC = 0x0020
-F_LOCK = 0x0040
-F_HID = 0x0080
-F_NOCYC = 0x0100
-
-F_NOSCALE = 0x0200
-F_NOROT = 0x0400
-F_SCALE = 0x0800
-
-
-P_LKROT4 = 0x0001
-P_LKROTW = 0x0002
-P_IKLIN = 0x0004
-P_IKROT = 0x0008
-P_HID = 0x0020
-
-P_ROTMODE = 0x0f00
-P_QUAT = 0x0000
-P_XYZ = 0x0100
-P_XZY = 0x0200
-P_YXZ = 0x0300
-P_YZX = 0x0400
-P_ZXY = 0x0500
-P_ZYX = 0x0600
-
 def rotationMode(flags):
     modes = ['QUATERNION', 'XYZ', 'XZY', 'YXZ', 'YZX', 'ZXY', 'ZYX']
     return modes[(flags&P_ROTMODE) >> 8]
-
-C_ACT = 0x0004
-C_EXP = 0x0008
-C_LTRA = 0x0010
-C_LOC = 0x0020
-C_STRVOL = 0x0040
-C_PLANEZ = 0x0080
-
-C_OW_MASK = 0x0300
-C_OW_WORLD = 0x0000
-C_OW_LOCAL = 0x0100
-C_OW_LOCPAR = 0x0200
-C_OW_POSE = 0x0300
-
-C_DEFRIG = 0x0400
-C_TAIL = 0x0800
-
-C_TG_MASK = 0x3000
-C_TG_WORLD = 0x0000
-C_TG_LOCAL = 0x1000
-C_TG_LOCPAR = 0x2000
-C_TG_POSE = 0x3000
-
-C_CHILDOF = C_OW_POSE+C_TG_WORLD
-C_LOCAL = C_OW_LOCAL+C_TG_LOCAL
-
+        
 # Fix for ChildOf bug
 
-Master = 'MasterFloor'
-rootChildOfConstraints = []
+the.Master = 'MasterFloor'
+the.RootChildOfConstraints = []
 
 #        ('ChildOf', C_CHILDOF, 1, ['Floor', 'MasterFloor', (1,1,1), (1,1,1), (1,1,1)]),
 #        ('ChildOf', C_CHILDOF, 0, ['Hips', 'MasterHips', (1,1,1), (1,1,1), (1,1,1)]),
 #        ('ChildOf', C_CHILDOF, 0, ['Neck', 'MasterNeck', (1,1,1), (1,1,1), (1,1,1)])
 #]
 
-#Master = None
-Origin = [0,0,0]
+#the.Master = None
+the.Origin = [0,0,0]
 
 #
 #    newSetupJoints (obj, joints, moveOrigin):
@@ -167,33 +55,32 @@ Origin = [0,0,0]
 #    findLocation(joint):
 #
 def newSetupJoints (obj, joints, moveOrigin):
-    global locations, Origin
-    locations = {}
+    the.Locations = {}
     for (key, typ, data) in joints:
         #print(key)
         if typ == 'j':
             loc = mhxbones.calcJointPos(obj, data)
-            locations[key] = loc
-            locations[data] = loc
+            the.Locations[key] = loc
+            the.Locations[data] = loc
         elif typ == 'v':
             v = int(data)
-            locations[key] = obj.verts[v].co
+            the.Locations[key] = obj.verts[v].co
         elif typ == 'x':
-            locations[key] = [float(data[0]), float(data[2]), -float(data[1])]
+            the.Locations[key] = [float(data[0]), float(data[2]), -float(data[1])]
         elif typ == 'vo':
             v = int(data[0])
             loc = obj.verts[v].co
-            locations[key] = [loc[0]+float(data[1]), loc[1]+float(data[3]), loc[2]-float(data[2])]
+            the.Locations[key] = [loc[0]+float(data[1]), loc[1]+float(data[3]), loc[2]-float(data[2])]
         elif typ == 'vl':
             ((k1, v1), (k2, v2)) = data
             loc1 = obj.verts[int(v1)].co
             loc2 = obj.verts[int(v2)].co
-            locations[key] = vadd(vmul(loc1, k1), vmul(loc2, k2))
+            the.Locations[key] = vadd(vmul(loc1, k1), vmul(loc2, k2))
         elif typ == 'f':
             (raw, head, tail, offs) = data
-            rloc = locations[raw]
-            hloc = locations[head]
-            tloc = locations[tail]
+            rloc = the.Locations[raw]
+            hloc = the.Locations[head]
+            tloc = the.Locations[tail]
             #print(raw, rloc)
             vec = aljabr.vsub(tloc, hloc)
             vec2 = aljabr.vdot(vec, vec)
@@ -202,45 +89,44 @@ def newSetupJoints (obj, joints, moveOrigin):
             rvec = aljabr.vmul(vec, x)
             nloc = aljabr.vadd(hloc, rvec, offs)
             #print(key, nloc)
-            locations[key] = nloc
+            the.Locations[key] = nloc
         elif typ == 'b':
-            locations[key] = locations[data]
+            the.Locations[key] = the.Locations[data]
         elif typ == 'p':
-            x = locations[data[0]]
-            y = locations[data[1]]
-            z = locations[data[2]]
-            locations[key] = [x[0],y[1],z[2]]
+            x = the.Locations[data[0]]
+            y = the.Locations[data[1]]
+            z = the.Locations[data[2]]
+            the.Locations[key] = [x[0],y[1],z[2]]
         elif typ == 'X':
-            r = locations[data[0]]
+            r = the.Locations[data[0]]
             (x,y,z) = data[1]
             r1 = [float(x), float(y), float(z)]
-            locations[key] = aljabr.vcross(r, r1)
+            the.Locations[key] = aljabr.vcross(r, r1)
         elif typ == 'l':
             ((k1, joint1), (k2, joint2)) = data
-            locations[key] = vadd(vmul(locations[joint1], k1), vmul(locations[joint2], k2))
+            the.Locations[key] = vadd(vmul(the.Locations[joint1], k1), vmul(the.Locations[joint2], k2))
         elif typ == 'o':
             (joint, offsSym) = data
             if type(offsSym) == str:
-                offs = locations[offsSym]
+                offs = the.Locations[offsSym]
             else:
                 offs = offsSym
-            locations[key] = vadd(locations[joint], offs)
+            the.Locations[key] = vadd(the.Locations[joint], offs)
         else:
             raise NameError("Unknown %s" % typ)
 
     if moveOrigin:
-        Origin = locations['floor']
-        for key in locations.keys():
-            locations[key] = aljabr.vsub(locations[key], Origin)
+        the.Origin = the.Locations['floor']
+        for key in the.Locations.keys():
+            the.Locations[key] = aljabr.vsub(the.Locations[key], the.Origin)
     return
 
 def setupHeadsTails(headsTails):
-    global rigHead, rigTail
-    rigHead = {}
-    rigTail = {}
+    the.RigHead = {}
+    the.RigTail = {}
     for (bone, head, tail) in headsTails:
-        rigHead[bone] = findLocation(head)
-        rigTail[bone] = findLocation(tail)
+        the.RigHead[bone] = findLocation(head)
+        the.RigTail[bone] = findLocation(tail)
     return 
 
 def findLocation(joint):
@@ -249,9 +135,9 @@ def findLocation(joint):
     except:
         offs = 0
     if offs:
-        return vadd(locations[bone], offs)
+        return vadd(the.Locations[bone], offs)
     else:
-        return locations[joint]
+        return the.Locations[joint]
 
 #
 #    writeArmature(fp, armature, mhx25):
@@ -261,9 +147,8 @@ def findLocation(joint):
 #
 
 def writeArmature(fp, armature, mhx25):
-    global Mhx25
-    Mhx25 = mhx25
-    if Mhx25:
+    the.Mhx25 = mhx25
+    if the.Mhx25:
         for (bone, roll, parent, flags, layers, bbone) in armature:
             addBone25(bone, True, roll, parent, flags, layers, bbone, fp)
     else:
@@ -278,8 +163,6 @@ def boolString(val):
         return "False"
 
 def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
-    global rigHead, rigTail
-
     conn = boolString(flags & F_CON)
     deform = boolString(flags & F_DEF)
     restr = boolString(flags & F_RES)
@@ -289,9 +172,9 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
     cyc = boolString(flags & F_NOCYC == 0)
 
     fp.write("\n  Bone %s %s\n" % (bone, cond))
-    (x, y, z) = rigHead[bone]
+    (x, y, z) = the.RigHead[bone]
     fp.write("    head  %.6g %.6g %.6g  ;\n" % (x,-z,y))
-    (x, y, z) = rigTail[bone]
+    (x, y, z) = the.RigTail[bone]
     fp.write("    tail %.6g %.6g %.6g  ;\n" % (x,-z,y))
     if parent:
         fp.write("    parent Refer Bone %s ; \n" % (parent))
@@ -336,8 +219,6 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 "  end Bone \n")
 
 def addBone24(bone, cond, roll, parent, flags, layers, bbone, fp):
-    global rigHead, rigTail
-
     flags24 = 0
     if flags & F_CON:
         flags24 += 0x001
@@ -347,9 +228,9 @@ def addBone24(bone, cond, roll, parent, flags, layers, bbone, fp):
         flags24 += 0x0e0
 
     fp.write("\n\tbone %s %s %x %x\n" % (bone, parent, flags24, layers))
-    (x, y, z) = rigHead[bone]
+    (x, y, z) = the.RigHead[bone]
     fp.write("    head  %.6g %.6g %.6g  ;\n" % (x,y,z))
-    (x, y, z) = rigTail[bone]
+    (x, y, z) = the.RigTail[bone]
     fp.write("    tail %.6g %.6g %.6g  ;\n" % (x,y,z))
     fp.write("    roll %.6g %.6g ; \n" % (roll, roll))
     fp.write("\tend bone\n")
@@ -361,18 +242,18 @@ def addBone24(bone, cond, roll, parent, flags, layers, bbone, fp):
 
 def boneGroupIndex(grp):
     index = 1
-    for (name, theme) in BoneGroups:
+    for (name, the.me) in the.BoneGroups:
         if name == grp:
             return index
         index += 1
     raise NameError("Unknown bonegroup %s" % grp)
 
 def writeBoneGroups(fp):
-    for (name, theme) in BoneGroups:
+    for (name, the.me) in the.BoneGroups:
         fp.write(
 "    BoneGroup %s\n" % name +
 "      name '%s' ;\n" % name +
-"      color_set '%s' ;\n" % theme +
+"      color_set '%s' ;\n" % the.me +
 "    end BoneGroup\n")
     return
 
@@ -447,10 +328,6 @@ def addXSlider(fp, bone, mn, mx, dflt):
 #
 #
 
-U_LOC = 1
-U_ROT = 2
-U_SCALE = 4
-
 def copyDeformPartial(fp, dbone, cbone, channels, flags, copy, customShape, constraints):
     fp.write("\n  Posebone %s %s \n" % (dbone, True))
     rotMode = rotationMode(flags)
@@ -481,8 +358,6 @@ def copyDeform(fp, dbone, cbone, flags, copy, customShape, constraints):
 #
 
 def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik_dof, flags, constraints):
-    global BoneGroups, Mhx25
-
     try:
         (lockLoc, location) = locArg
     except:
@@ -500,7 +375,7 @@ def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik
     lkRotW = boolString(flags & P_LKROTW)
     hide = boolString(flags & P_HID)
 
-    if Mhx25:
+    if the.Mhx25:
         fp.write("\n  Posebone %s %s \n" % (bone, True))
     else:
         # limitX = flags & 1
@@ -520,7 +395,7 @@ def addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik
 
     addConstraints(fp, bone, constraints, lockLoc, lockRot)
 
-    if not Mhx25:
+    if not the.Mhx25:
         fp.write("\tend posebone\n")
         return
     
@@ -647,7 +522,6 @@ def addConstraints(fp, bone, constraints, lockLoc, lockRot):
 #    addIkConstraint(fp, flags, inf, data, lockLoc, lockRot)
 #
 def addIkConstraint(fp, flags, inf, data, lockLoc, lockRot):
-    global Mhx25
     name = data[0]
     subtar = data[1]
     chainlen = data[2]
@@ -657,13 +531,13 @@ def addIkConstraint(fp, flags, inf, data, lockLoc, lockRot):
     (lockLocX, lockLocY, lockLocZ) = lockLoc
     (lockRotX, lockRotY, lockRotZ) = lockRot
 
-    if Mhx25:
+    if the.Mhx25:
         fp.write(
 "    Constraint %s IK True\n" % name)
 
         if subtar:
             fp.write(
-"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
+"      target Refer Object %s ;\n" % (the.Human) +
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ;\n" % targsp +
 "      use_tail True ;\n" +
@@ -692,7 +566,7 @@ def addIkConstraint(fp, flags, inf, data, lockLoc, lockRot):
             fp.write(
 "      pole_angle %.6g ;\n" % angle +
 "      pole_subtarget '%s' ;\n" % ptar +
-"      pole_target Refer Object %s ;\n" % (mhx_main.theHuman))
+"      pole_target Refer Object %s ;\n" % (the.Human))
 
         fp.write(
 "      is_proxy_local False ;\n" +
@@ -716,7 +590,6 @@ def addIkConstraint(fp, flags, inf, data, lockLoc, lockRot):
 #    addActionConstraint(fp, flags, inf, data):
 #
 def addActionConstraint(fp, flags, inf, data):
-    global Mhx25
     name = data[0]
     action = data[1]
     subtar = data[2]
@@ -728,7 +601,7 @@ def addActionConstraint(fp, flags, inf, data):
 
     fp.write(
 "    Constraint %s ACTION True\n" % name +
-"      target Refer Object %s ;\n" % (mhx_main.theHuman)+
+"      target Refer Object %s ;\n" % (the.Human)+
 "      action Refer Action %s ; \n" % action+
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
@@ -758,7 +631,6 @@ def addActionConstraint(fp, flags, inf, data):
 #    addCopyRotConstraint(fp, flags, inf, data):
 #
 def addCopyRotConstraint(fp, flags, inf, data):
-    global Mhx25
     name = data[0]
     subtar = data[1]
     (useX, useY, useZ) = data[2]
@@ -766,10 +638,10 @@ def addCopyRotConstraint(fp, flags, inf, data):
     useOffs = data[4]
     (ownsp, targsp, active, expanded) = constraintFlags(flags)
 
-    if Mhx25:
+    if the.Mhx25:
         fp.write(
 "    Constraint %s COPY_ROTATION True\n" % name +
-"      target Refer Object %s ;\n" % (mhx_main.theHuman)+
+"      target Refer Object %s ;\n" % (the.Human)+
 "      invert Array %d %d %d ; \n" % (invertX, invertY, invertZ)+
 "      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
 "      active %s ;\n" % active +
@@ -796,7 +668,6 @@ def addCopyRotConstraint(fp, flags, inf, data):
 #    addCopyLocConstraint(fp, flags, inf, data):
 #
 def addCopyLocConstraint(fp, flags, inf, data):
-    global Mhx25
     name = data[0]
     subtar = data[1]
     (useX, useY, useZ) = data[2]
@@ -805,10 +676,10 @@ def addCopyLocConstraint(fp, flags, inf, data):
     useOffs = data[5]
     (ownsp, targsp, active, expanded) = constraintFlags(flags)
 
-    if Mhx25:
+    if the.Mhx25:
         fp.write(
 "    Constraint %s COPY_LOCATION True\n" % name +
-"      target Refer Object %s ;\n" % (mhx_main.theHuman)+
+"      target Refer Object %s ;\n" % (the.Human)+
 "      invert Array %d %d %d ; \n" % (invertX, invertY, invertZ)+
 "      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
 "      active %s ;\n" % active +
@@ -834,7 +705,6 @@ def addCopyLocConstraint(fp, flags, inf, data):
 #    addCopyScaleConstraint(fp, flags, inf, data):
 #
 def addCopyScaleConstraint(fp, flags, inf, data):
-    global Mhx25
     name = data[0]
     subtar = data[1]
     (useX, useY, useZ) = data[2]
@@ -843,7 +713,7 @@ def addCopyScaleConstraint(fp, flags, inf, data):
 
     fp.write(
 "    Constraint %s COPY_SCALE True\n" % name +
-"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
+"      target Refer Object %s ;\n" % (the.Human) +
 "      use Array %d %d %d  ; \n" % (useX, useY, useZ)+
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
@@ -860,7 +730,6 @@ def addCopyScaleConstraint(fp, flags, inf, data):
 #    addCopyTransConstraint(fp, flags, inf, data):
 #
 def addCopyTransConstraint(fp, flags, inf, data):
-    global Mhx25
     name = data[0]
     subtar = data[1]
     head_tail = data[2]
@@ -868,7 +737,7 @@ def addCopyTransConstraint(fp, flags, inf, data):
     
     fp.write(
 "    Constraint %s COPY_TRANSFORMS True\n" % name +
-"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
+"      target Refer Object %s ;\n" % (the.Human) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -884,14 +753,13 @@ def addCopyTransConstraint(fp, flags, inf, data):
 #    addLimitRotConstraint(fp, flags, inf, data):
 #
 def addLimitRotConstraint(fp, flags, inf, data):
-    global Mhx25
     name = data[0]
     (xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
     (usex, usey, usez) = data[2]
     (ownsp, targsp, active, expanded) = constraintFlags(flags)
     ltra = boolString(flags & C_LTRA)
     
-    if Mhx25:
+    if the.Mhx25:
         fp.write(    
 "    Constraint %s LIMIT_ROTATION True\n" % name +
 "      active %s ;\n" % active +
@@ -931,13 +799,12 @@ def addLimitRotConstraint(fp, flags, inf, data):
 #    addLimitLocConstraint(fp, flags, inf, data):
 #
 def addLimitLocConstraint(fp, flags, inf, data):
-    global Mhx25
     name = data[0]
     (xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
     (useminx, usemaxx, useminy, usemaxy, useminz, usemaxz) = data[2]
     (ownsp, targsp, active, expanded) = constraintFlags(flags)
     
-    if Mhx25:
+    if the.Mhx25:
         fp.write(
 "    Constraint %s LIMIT_LOCATION True\n" % name +
 "      active %s ;\n" % active +
@@ -981,13 +848,12 @@ def addLimitLocConstraint(fp, flags, inf, data):
 #    addLimitScaleConstraint(fp, flags, inf, data):
 #
 def addLimitScaleConstraint(fp, flags, inf, data):
-    global Mhx25
     name = data[0]
     (xmin, xmax, ymin, ymax, zmin, zmax) = data[1]
     (usex, usey, usez) = data[2]
     (ownsp, targsp, active, expanded) = constraintFlags(flags)
     
-    if Mhx25:
+    if the.Mhx25:
         fp.write(
 "    Constraint %s LIMIT_SCALE True\n" % name +
 "      active %s ;\n" % active +
@@ -1016,7 +882,6 @@ def addLimitScaleConstraint(fp, flags, inf, data):
 #    addTransformConstraint(fp, flags, inf, data):
 #
 def addTransformConstraint(fp, flags, inf, data):
-    global Mhx25
     name = data[0]
     subtar = data[1]
     map_from = data[2]
@@ -1030,7 +895,7 @@ def addTransformConstraint(fp, flags, inf, data):
 
     fp.write(
 "    Constraint %s TRANSFORM True\n" % name +
-"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
+"      target Refer Object %s ;\n" % (the.Human) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -1063,7 +928,6 @@ def addTransformConstraint(fp, flags, inf, data):
 #    addDampedTrackConstraint(fp, flags, inf, data):
 #
 def addDampedTrackConstraint(fp, flags, inf, data):
-    global Mhx25
     name = data[0]
     subtar = data[1]
     track = data[2]
@@ -1071,7 +935,7 @@ def addDampedTrackConstraint(fp, flags, inf, data):
 
     fp.write(
 "    Constraint %s DAMPED_TRACK True\n" % name +
-"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
+"      target Refer Object %s ;\n" % (the.Human) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -1088,7 +952,6 @@ def addDampedTrackConstraint(fp, flags, inf, data):
 #    addLockedTrackConstraint(fp, flags, inf, data):
 #
 def addLockedTrackConstraint(fp, flags, inf, data):
-    global Mhx25
     name = data[0]
     subtar = data[1]
     trackAxis = data[2]
@@ -1096,7 +959,7 @@ def addLockedTrackConstraint(fp, flags, inf, data):
 
     fp.write(
 "    Constraint %s LOCKED_TRACK True\n" % name +
-"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
+"      target Refer Object %s ;\n" % (the.Human) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -1112,7 +975,6 @@ def addLockedTrackConstraint(fp, flags, inf, data):
 #    addStretchToConstraint(fp, flags, inf, data):
 #
 def addStretchToConstraint(fp, flags, inf, data):
-    global Mhx25
     name = data[0]
     subtar = data[1]
     head_tail = data[2]
@@ -1127,10 +989,10 @@ def addStretchToConstraint(fp, flags, inf, data):
     else:
         axis = 'PLANE_X'
 
-    if Mhx25:
+    if the.Mhx25:
         fp.write(
 "    Constraint %s STRETCH_TO True\n" % name +
-"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
+"      target Refer Object %s ;\n" % (the.Human) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      bulge %.2f ;\n" % bulge +
@@ -1167,7 +1029,7 @@ def addTrackToConstraint(fp, flags, inf, data):
 
     fp.write(
 "    Constraint %s TRACK_TO True\n" % name +
-"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
+"      target Refer Object %s ;\n" % (the.Human) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      head_tail %s ;\n" % head_tail +
@@ -1186,16 +1048,15 @@ def addTrackToConstraint(fp, flags, inf, data):
 #    addLimitDistConstraint(fp, flags, inf, data):
 #
 def addLimitDistConstraint(fp, flags, inf, data):
-    global Mhx25
     name = data[0]
     subtar = data[1]
     typ = data[2]
     (ownsp, targsp, active, expanded) = constraintFlags(flags)
 
-    if Mhx25:
+    if the.Mhx25:
         fp.write(
 "    Constraint %s LIMIT_DISTANCE True\n" % name +
-"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
+"      target Refer Object %s ;\n" % (the.Human) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -1218,7 +1079,6 @@ def addLimitDistConstraint(fp, flags, inf, data):
 #    addChildOfConstraint(fp, flags, inf, data):
 #
 def addChildOfConstraint(fp, flags, inf, data):
-    global Mhx25
     # return
     name = data[0]
     subtar = data[1]
@@ -1230,10 +1090,10 @@ def addChildOfConstraint(fp, flags, inf, data):
     #ownsp = 'WORLD'
     #targsp = 'WORLD'
 
-    if Mhx25:
+    if the.Mhx25:
         fp.write(
 "    Constraint %s CHILD_OF True\n" % name +
-"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
+"      target Refer Object %s ;\n" % (the.Human) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -1260,7 +1120,6 @@ def addChildOfConstraint(fp, flags, inf, data):
 #"      joint_bindings Array 1.0 0.741504311562 0.483008384705 0.253476023674 -5.96046447754e-08  ;\n" +
 
 def addSplineIkConstraint(fp, flags, inf, data):
-    global Mhx25, rigHead, rigTail
     # return
     name = data[0]
     target = data[1]
@@ -1299,7 +1158,7 @@ def addFloorConstraint(fp, flags, inf, data):
 
     fp.write(
 "    Constraint %s FLOOR True\n" % name +
-"      target Refer Object %s ;\n" % (mhx_main.theHuman) +
+"      target Refer Object %s ;\n" % (the.Human) +
 "      active %s ;\n" % active +
 "      show_expanded %s ;\n" % expanded +
 "      influence %s ;\n" % inf +
@@ -1390,7 +1249,7 @@ def writeFCurves(fp, name, quats):
 
 def writeFkIkSwitch(fp, drivers):
     for (bone, cond, cnsFK, cnsIK, targ, channel, mx) in drivers:
-        cnsData = ("ik", 'TRANSFORMS', [('OBJECT', mhx_main.theHuman, targ, channel, C_LOC)])
+        cnsData = ("ik", 'TRANSFORMS', [('OBJECT', the.Human, targ, channel, C_LOC)])
         for cnsName in cnsFK:
             writeDriver(fp, cond, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (mx,-mx), [cnsData])
         for cnsName in cnsIK:
@@ -1402,7 +1261,7 @@ def writeFkIkSwitch(fp, drivers):
 """
 def writeEnumDrivers(fp, drivers):
     for (bone, cns, targ, channel) in drivers:
-        drvVars = [("x", 'TRANSFORMS', [('OBJECT', mhx_main.theHuman, targ, channel, C_LOC)])]
+        drvVars = [("x", 'TRANSFORMS', [('OBJECT', the.Human, targ, channel, C_LOC)])]
         for n, cnsName in enumerate(cns):
             expr = '(x>%.1f)*(x<%.1f)' % (n-0.5, n+0.5)
             writeDriver(fp, True, ('SCRIPTED', expr), "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, (0,1), drvVars)
@@ -1417,7 +1276,7 @@ def writePropDrivers(fp, drivers, suffix, prefix):
         drvVars = []
         n = 1
         for prop in props:
-            drvVars.append( ("x%d" % n, 'SINGLE_PROP', [('OBJECT', mhx_main.theHuman, '["%s%s%s"]' % (prefix,prop,suffix))]) )
+            drvVars.append( ("x%d" % n, 'SINGLE_PROP', [('OBJECT', the.Human, '["%s%s%s"]' % (prefix,prop,suffix))]) )
             n += 1
         writeDriver(fp, True, ('SCRIPTED', expr), "",
             "pose.bones[\"%s%s\"].constraints[\"%s\"].influence" % (bone, suffix, cns), 
@@ -1430,7 +1289,7 @@ def writePropDrivers(fp, drivers, suffix, prefix):
 def writeShapePropDrivers(fp, skeys, proxy, prefix):
     for skey in skeys:
         if mhx_main.useThisShape(skey, proxy):
-            drvVar = ("x", 'SINGLE_PROP', [('OBJECT', mhx_main.theHuman, '["%s%s"]' % (prefix, skey))])
+            drvVar = ("x", 'SINGLE_PROP', [('OBJECT', the.Human, '["%s%s"]' % (prefix, skey))])
             writeDriver(fp, True, ('SCRIPTED', "x"), "",
                 "key_blocks[\"%s\"].value" % (skey), 
                 -1, (0,1), [drvVar])
@@ -1444,7 +1303,7 @@ def writePropDriver(fp, props, expr, dataPath, index):
     drvVars = []
     n = 1
     for prop in props:
-        drvVars.append( ("x%d" % n, 'SINGLE_PROP', [('OBJECT', mhx_main.theHuman, '["%s"]' % (prop))]) )
+        drvVars.append( ("x%d" % n, 'SINGLE_PROP', [('OBJECT', the.Human, '["%s"]' % (prop))]) )
         n += 1
     writeDriver(fp, True, ('SCRIPTED', expr), "", dataPath, index, (0,1), drvVars)
     return            
@@ -1457,7 +1316,7 @@ def writeTextureDrivers(fp, drivers):
     for (tex, vlist) in drivers.items():
         drvVars = []
         (texnum, targ, channel, coeff) = vlist
-        drvVars.append( (targ, 'TRANSFORMS', [('OBJECT', mhx_main.theHuman, targ, channel, C_LOC)]) )
+        drvVars.append( (targ, 'TRANSFORMS', [('OBJECT', the.Human, targ, channel, C_LOC)]) )
         writeDriver(fp, 'toggle&T_Face', 'AVERAGE', "", "texture_slots[%d].normal_factor" % (texnum), -1, coeff, drvVars)
     return
 
@@ -1471,7 +1330,7 @@ def writeShapeDrivers(fp, drivers, proxy):
         if mhx_main.useThisShape(shape, proxy):
             drvVars = []
             (targ, channel, coeff) = vlist
-            drvVars.append( (targ, 'TRANSFORMS', [('OBJECT', mhx_main.theHuman, targ, channel, C_LOC)]) )
+            drvVars.append( (targ, 'TRANSFORMS', [('OBJECT', the.Human, targ, channel, C_LOC)]) )
             writeDriver(fp, 'toggle&T_Face', 'AVERAGE', "", "key_blocks[\"%s\"].value" % (shape), -1, coeff, drvVars)
     return
 
@@ -1502,8 +1361,8 @@ def writeRotDiffDrivers(fp, drivers, proxy):
         if mhx_main.useThisShape(shape, proxy):
             (targ1, targ2, keypoints) = vlist
             drvVars = [(targ2, 'ROTATION_DIFF', [
-            ('OBJECT', mhx_main.theHuman, targ1, C_LOC),
-            ('OBJECT', mhx_main.theHuman, targ2, C_LOC)] )]
+            ('OBJECT', the.Human, targ1, C_LOC),
+            ('OBJECT', the.Human, targ2, C_LOC)] )]
             writeDriver(fp, True, 'MIN', "", "key_blocks[\"%s\"].value" % (shape), -1, keypoints, drvVars)
     return
 
@@ -1772,12 +1631,8 @@ import rig_skirt_25
 import rigify_rig
 
 def setupRig(obj):
-    global BoneGroups, RecalcRoll, GizmoFiles, VertexGroupFiles
-    global ObjectProps, ArmatureProps, CustomProps
-    global Joints, HeadsTails, Armature, HeadName
-
-    if mhx_main.theConfig.mhxrig in ['mhx', 'game']:
-        BoneGroups = [
+    if the.Config.mhxrig in ['mhx', 'game']:
+        the.BoneGroups = [
             ('Master', 'THEME13'),
             ('Spine', 'THEME05'),
             ('FK_L', 'THEME09'),
@@ -1785,26 +1640,26 @@ def setupRig(obj):
             ('IK_L', 'THEME03'),
             ('IK_R', 'THEME04'),
         ]
-        RecalcRoll = "['Foot_L','Toe_L','Foot_R','Toe_R','DfmFoot_L','DfmToe_L','DfmFoot_R','DfmToe_R']"
-        GizmoFiles = ["./shared/mhx/templates/custom-shapes25.mhx", 
+        the.RecalcRoll = "['Foot_L','Toe_L','Foot_R','Toe_R','DfmFoot_L','DfmToe_L','DfmFoot_R','DfmToe_R']"
+        the.GizmoFiles = ["./shared/mhx/templates/custom-shapes25.mhx", 
                       "./shared/mhx/templates/panel_gizmo25.mhx",
                       "./shared/mhx/templates/gizmos25.mhx"]
 
-        ObjectProps = [("MhxRig", '"MHX"')]
-        ArmatureProps = []
-        HeadName = 'Head'
+        the.ObjectProps = [("MhxRig", '"MHX"')]
+        the.ArmatureProps = []
+        the.HeadName = 'Head'
         
-        if mhx_main.theConfig.malerig:
+        if the.Config.malerig:
             genitalia = "./shared/mhx/templates/vertexgroups-male25.mhx"
         else:
             genitalia = "./shared/mhx/templates/vertexgroups-female25.mhx"
 
-        VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
+        the.VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
                             "./shared/mhx/templates/vertexgroups-bones25.mhx",
                             genitalia,
                             "./shared/mhx/templates/vertexgroups-palm25.mhx"]
                                                         
-        Joints = (
+        the.Joints = (
             rig_joints_25.DeformJoints +
             rig_body_25.BodyJoints +
             rig_arm_25.ArmJoints +
@@ -1816,7 +1671,7 @@ def setupRig(obj):
             rig_panel_25.PanelJoints
         )
         
-        HeadsTails = (
+        the.HeadsTails = (
             rig_body_25.BodyHeadsTails +
             rig_shoulder_25.ShoulderHeadsTails +
             rig_arm_25.ArmHeadsTails +
@@ -1827,7 +1682,7 @@ def setupRig(obj):
             rig_panel_25.PanelHeadsTails
         )
 
-        Armature = (
+        the.Armature = (
             rig_body_25.BodyArmature +
             rig_shoulder_25.ShoulderArmature +
             rig_arm_25.ArmArmature +            
@@ -1838,31 +1693,31 @@ def setupRig(obj):
             rig_panel_25.PanelArmature
         )
 
-    elif mhx_main.theConfig.mhxrig == "blenrig":
-        BoneGroups = [('GEN', 'THEME13'),
+    elif the.Config.mhxrig == "blenrig":
+        the.BoneGroups = [('GEN', 'THEME13'),
                       ('IK', 'THEME05'),
                       ('FK', 'THEME09'),
                       ('FACIAL', 'THEME02')]
-        RecalcRoll = []              
-        VertexGroupFiles = ["./shared/mhx/templates/blenrigmesh_weights.mhx"]
-        GizmoFiles = ["./shared/mhx/templates/blenrig_gizmos.mhx"]
+        the.RecalcRoll = []              
+        the.VertexGroupFiles = ["./shared/mhx/templates/blenrigmesh_weights.mhx"]
+        the.GizmoFiles = ["./shared/mhx/templates/blenrig_gizmos.mhx"]
             
-        Joints = blenrig_rig.BlenrigJoints
-        HeadsTails = blenrig_rig.BlenrigHeadsTails
-        Armature = blenrig_rig.BlenrigArmature
-        ObjectProps = blenrig_rig.BlenrigObjectProps + [("MhxRig", '"Blenrig"')]
-        ArmatureProps = blenrig_rig.BlenrigArmatureProps
+        the.Joints = blenrig_rig.BlenrigJoints
+        the.HeadsTails = blenrig_rig.BlenrigHeadsTails
+        the.Armature = blenrig_rig.BlenrigArmature
+        the.ObjectProps = blenrig_rig.BlenrigObjectProps + [("MhxRig", '"Blenrig"')]
+        the.ArmatureProps = blenrig_rig.BlenrigArmatureProps
 
-    elif mhx_main.theConfig.mhxrig == "rigify":
-        BoneGroups = []
-        RecalcRoll = []              
-        VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
+    elif the.Config.mhxrig == "rigify":
+        the.BoneGroups = []
+        the.RecalcRoll = []              
+        the.VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
                             "./shared/mhx/templates/rigifymesh_weights.mhx"]
-        GizmoFiles = ["./shared/mhx/templates/panel_gizmo25.mhx"]
-        HeadName = 'head'
+        the.GizmoFiles = ["./shared/mhx/templates/panel_gizmo25.mhx"]
+        the.HeadName = 'head'
         faceArmature = swapParentName(rig_face_25.FaceArmature, 'Head', 'head')
             
-        Joints = (
+        the.Joints = (
             rig_joints_25.DeformJoints +
             rig_body_25.BodyJoints +
             rigify_rig.RigifyJoints +
@@ -1870,50 +1725,50 @@ def setupRig(obj):
             rig_panel_25.PanelJoints
         )
         
-        HeadsTails = (
+        the.HeadsTails = (
             rigify_rig.RigifyHeadsTails +
             rig_face_25.FaceHeadsTails +
             rig_panel_25.PanelHeadsTails
         )
 
-        Armature = (
+        the.Armature = (
             rigify_rig.RigifyArmature +
             faceArmature +
             rig_panel_25.PanelArmature
         )
 
-        ObjectProps = rigify_rig.RigifyObjectProps + [("MhxRig", '"Rigify"')]
-        ArmatureProps = rigify_rig.RigifyArmatureProps
+        the.ObjectProps = rigify_rig.RigifyObjectProps + [("MhxRig", '"Rigify"')]
+        the.ArmatureProps = rigify_rig.RigifyArmatureProps
 
     else:
-        BoneGroups = []
-        RecalcRoll = []              
-        VertexGroupFiles = []
-        GizmoFiles = []
-        HeadName = 'Head'
-        Joints = []
-        HeadsTails = []
-        Armature = []
-        ObjectProps = []
-        ArmatureProps = []
-        print("Default rig %s" % mhx_main.theConfig.mhxrig)
+        the.BoneGroups = []
+        the.RecalcRoll = []              
+        the.VertexGroupFiles = []
+        the.GizmoFiles = []
+        the.HeadName = 'Head'
+        the.Joints = []
+        the.HeadsTails = []
+        the.Armature = []
+        the.ObjectProps = []
+        the.ArmatureProps = []
+        print("Default rig %s" % the.Config.mhxrig)
         return
         
-    if mhx_main.theConfig.mhxrig == "mhx":   
-        if mhx_main.theConfig.skirtrig == "own":
-            Joints += rig_skirt_25.SkirtJoints
-            HeadsTails += rig_skirt_25.SkirtHeadsTails
-            Armature += rig_skirt_25.SkirtArmature
+    if the.Config.mhxrig == "mhx":   
+        if the.Config.skirtrig == "own":
+            the.Joints += rig_skirt_25.SkirtJoints
+            the.HeadsTails += rig_skirt_25.SkirtHeadsTails
+            the.Armature += rig_skirt_25.SkirtArmature
 
-    (custJoints, custHeadsTails, custArmature, CustomProps) = mhx_custom.setupCustomRig()
-    Joints += custJoints
-    HeadsTails += custHeadsTails
-    Armature += custArmature
+    (custJoints, custHeadsTails, custArmature, the.CustomProps) = mhx_custom.setupCustomRig()
+    the.Joints += custJoints
+    the.HeadsTails += custHeadsTails
+    the.Armature += custArmature
     
-    newSetupJoints(obj, Joints, True)
-    if mhx_main.theConfig.mhxrig in ['mhx', 'game']:
+    newSetupJoints(obj, the.Joints, True)
+    if the.Config.mhxrig in ['mhx', 'game']:
         rig_body_25.BodyDynamicLocations()
-    setupHeadsTails(HeadsTails)
+    setupHeadsTails(the.HeadsTails)
     return
     
         
@@ -1928,19 +1783,19 @@ def swapParentName(bones, old, new):
     return nbones
     
 def writeControlArmature(fp):
-    amt = Armature    
-    if mhx_main.theConfig.breastrig:
+    amt = the.Armature    
+    if the.Config.breastrig:
         amt += rig_body_25.BreastArmature
-    if mhx_main.theConfig.biceps:
+    if the.Config.biceps:
         amt += rig_arm_25.BicepsArmature
-    if mhx_main.theConfig.malerig:
+    if the.Config.malerig:
         amt += rig_body_25.MaleArmature
     writeArmature(fp, amt, True)
     return
 
 def writeControlPoses(fp):
     writeBoneGroups(fp)
-    if mhx_main.theConfig.mhxrig == 'mhx':            
+    if the.Config.mhxrig == 'mhx':            
         rig_body_25.BodyControlPoses(fp)
         rig_shoulder_25.ShoulderControlPoses(fp)
         rig_arm_25.ArmControlPoses(fp)
@@ -1949,22 +1804,22 @@ def writeControlPoses(fp):
         #rig_toe_25.ToeControlPoses(fp)
         rig_face_25.FaceControlPoses(fp)
         rig_panel_25.PanelControlPoses(fp)
-    elif mhx_main.theConfig.mhxrig == 'blenrig':
+    elif the.Config.mhxrig == 'blenrig':
         blenrig_rig.BlenrigWritePoses(fp)
-    elif mhx_main.theConfig.mhxrig == 'rigify':
+    elif the.Config.mhxrig == 'rigify':
         rigify_rig.RigifyWritePoses(fp)
         rig_face_25.FaceControlPoses(fp)
         rig_panel_25.PanelControlPoses(fp)
         
-    if mhx_main.theConfig.breastrig:
+    if the.Config.breastrig:
         rig_body_25.BreastControlPoses(fp)
-    if mhx_main.theConfig.biceps:
+    if the.Config.biceps:
         rig_arm_25.BicepsControlPoses(fp)
-    if mhx_main.theConfig.malerig:
+    if the.Config.malerig:
         rig_body_25.MaleControlPoses(fp)
-    if mhx_main.theConfig.skirtrig == "own":
+    if the.Config.skirtrig == "own":
         rig_skirt_25.SkirtControlPoses(fp)
-    for (path, modname) in mhx_main.theConfig.customrigs:
+    for (path, modname) in the.Config.customrigs:
         mod = sys.modules[modname]                
         mod.ControlPoses(fp)
 
@@ -1977,7 +1832,7 @@ def writeAllActions(fp):
     return
 
 def writeAllDrivers(fp):
-    if mhx_main.theConfig.mhxrig == 'mhx':      
+    if the.Config.mhxrig == 'mhx':      
         writePropDrivers(fp, rig_arm_25.ArmPropDrivers, "", "&")
         writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_L", "&")
         writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_R", "&")
@@ -1990,27 +1845,27 @@ def writeAllDrivers(fp):
         writePropDrivers(fp, fingDrivers, "_L", "&")            
         writePropDrivers(fp, fingDrivers, "_R", "&")            
         #rig_panel_25.FingerControlDrivers(fp)
-        writeMuscleDrivers(fp, rig_shoulder_25.ShoulderDeformDrivers, mhx_main.theHuman)
-        writeMuscleDrivers(fp, rig_arm_25.ArmDeformDrivers, mhx_main.theHuman)
-        writeMuscleDrivers(fp, rig_leg_25.LegDeformDrivers, mhx_main.theHuman)
+        writeMuscleDrivers(fp, rig_shoulder_25.ShoulderDeformDrivers, the.Human)
+        writeMuscleDrivers(fp, rig_arm_25.ArmDeformDrivers, the.Human)
+        writeMuscleDrivers(fp, rig_leg_25.LegDeformDrivers, the.Human)
         rig_face_25.FaceDeformDrivers(fp)
-    elif mhx_main.theConfig.mhxrig == 'blenrig':            
+    elif the.Config.mhxrig == 'blenrig':            
         drivers = blenrig_rig.getBlenrigDrivers()
         writeDrivers(fp, True, drivers)
-    elif mhx_main.theConfig.mhxrig == 'rigify':            
+    elif the.Config.mhxrig == 'rigify':            
         rig_face_25.FaceDeformDrivers(fp)        
     return
 
 def writeAllProperties(fp, typ):
     if typ != 'Object':
         return
-    for (key, val) in ObjectProps:
+    for (key, val) in the.ObjectProps:
         fp.write("  Property %s %s ;\n" % (key, val))
-    for (key, val, string, min, max) in CustomProps:
+    for (key, val, string, min, max) in the.CustomProps:
         fp.write(
 '  Property &%s %.2f %s ;\n' % (key, val, string) +
 '  PropKeys &%s "min":-%.2f,"max":%.2f, ;\n\n' % (key, min, max) )        
-    if mhx_main.theConfig.expressions:
+    if the.Config.expressions:
         fp.write("#if toggle&T_Face\n")
         for skey in read_expression.Expressions:
             fp.write(

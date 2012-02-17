@@ -19,8 +19,9 @@ Finger bone definitions
 
 """
 
-import mhx_rig
-from mhx_rig import *
+import mhx_globals as the
+from mhx_globals import *
+from mhx_rig import addPoseBone
 
 FingerJoints = [
     #('l-hand-2',       'j', 'l-hand-2'),

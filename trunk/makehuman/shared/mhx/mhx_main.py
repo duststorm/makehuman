@@ -25,7 +25,6 @@ MakeHuman to MHX (MakeHuman eXchange format) exporter. MHX files can be loaded i
 MAJOR_VERSION = 1
 MINOR_VERSION = 10
 BODY_LANGUAGE = True
-theHuman = 'Human'
 
 import module3d
 import aljabr
@@ -36,6 +35,7 @@ import time
 
 import mh2proxy
 import export_config
+import mhx_globals as the
 import mhx_24
 import mhx_rig
 import rig_panel_25
@@ -45,31 +45,32 @@ import rig_body_25
 import read_expression
 import read_rig
 
+the.Human = 'Human'
+
 #
 #    exportMhx(human, filename, options):
 #
 
 def exportMhx(human, filename, options):    
-    global theConfig, theHuman, theCopiedFiles
-    theConfig = export_config.exportConfig(human, True, options)
+    the.Config = export_config.exportConfig(human, True, options)
     (fpath, ext) = os.path.splitext(filename)
 
-    if '24' in theConfig.mhxversion:
+    if '24' in the.Config.mhxversion:
         mhx_24.exportMhx(human, filename, options)
    
-    if '25' in theConfig.mhxversion:
+    if '25' in the.Config.mhxversion:
         fname = os.path.basename(fpath)
-        theHuman = fname.capitalize().replace(' ','_')
-        fname = theHuman.lower()
+        the.Human = fname.capitalize().replace(' ','_')
+        fname = the.Human.lower()
         time1 = time.clock()
-        if theConfig.separatefolder:
-            theConfig.outFolder = getSubFolder(os.path.dirname(filename), fname)
-            if theConfig.outFolder:
-                outfile = os.path.join(theConfig.outFolder, "%s%s" % (fname, ext)) 
-            theConfig.texFolder = getSubFolder(theConfig.outFolder, "textures")
-            theCopiedFiles = {}
-        if not theConfig.texFolder:
-            outfile = fpath+"-25"+ext
+        if the.Config.separatefolder:
+            the.Config.outFolder = getSubFolder(os.path.dirname(filename), fname)
+            if the.Config.outFolder:
+                outfile = os.path.join(the.Config.outFolder, "%s%s" % (fname, ext)) 
+            the.Config.texFolder = getSubFolder(the.Config.outFolder, "textures")
+            the.CopiedFiles = {}
+        if not the.Config.texFolder:
+            outfile = fpath+ext
         try:
             fp = open(outfile, 'w')
             export_config.safePrint("Writing MHX 2.5x file",  outfile )
@@ -108,7 +109,7 @@ import shutil
 def getOutFileName(filePath, fromDir, isTexture, human):
     srcDir = os.path.realpath(os.path.expanduser(fromDir))
     filename = os.path.basename(filePath)
-    if (filename == "texture.tif"):
+    if human and (filename == "texture.tif"):
         texname = human.getTexture()
         fromPath = texname.replace("png", "tif")
         fileDir = os.path.dirname(fromPath)         
@@ -118,13 +119,13 @@ def getOutFileName(filePath, fromDir, isTexture, human):
             fromPath = os.path.join(srcDir, filename)
     else:
         fromPath = os.path.join(srcDir, filename)
-    if theConfig.separatefolder:
+    if the.Config.separatefolder:
         if isTexture:
-            toPath = os.path.join(theConfig.texFolder, filename)
+            toPath = os.path.join(the.Config.texFolder, filename)
         else:
-            toPath = os.path.join(theConfig.outFolder, filename)
+            toPath = os.path.join(the.Config.outFolder, filename)
         try:
-            theCopiedFiles[fromPath]
+            the.CopiedFiles[fromPath]
             done = True
         except:
             done = False
@@ -140,7 +141,7 @@ def getOutFileName(filePath, fromDir, isTexture, human):
                 shutil.copyfile(fromPath, toPath)
             except:
                 pass    
-            theCopiedFiles[fromPath] = True
+            the.CopiedFiles[fromPath] = True
         return toPath
     else:
         return fromPath
@@ -171,18 +172,18 @@ def exportMhx_25(human, fp):
 "  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;\n" +
 "end Object\n\n")
 
-    if theConfig.mhxrig in ['mhx', 'rigify', 'blenrig']:
-        rig = theConfig.mhxrig
+    if the.Config.mhxrig in ['mhx', 'rigify', 'blenrig']:
+        rig = the.Config.mhxrig
         fp.write("#if toggle&T_Armature\n")
-        for fname in mhx_rig.GizmoFiles:
+        for fname in the.GizmoFiles:
             copyFile25(human, fname, rig, fp, None, proxyData)    
         mhx_rig.setupCircles(fp)
         copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", rig, fp, None, proxyData)    
         fp.write("#endif\n")
     else:
         rig = mh2proxy.CProxy('Rig', 0)
-        rig.name = theHuman
-        (locs, rig.bones, rig.weights) = read_rig.readRigFile('./data/rigs/%s.rig' % theConfig.mhxrig, obj)
+        rig.name = the.Human
+        (locs, rig.bones, rig.weights) = read_rig.readRigFile('./data/rigs/%s.rig' % the.Config.mhxrig, obj)
         #fp.write("#if toggle&T_Armature\n")
         #copyFile25(human, "shared/mhx/templates/rig-game25.mhx", rig, fp, None, proxyData)    
         #fp.write("#endif\n")
@@ -193,7 +194,7 @@ def exportMhx_25(human, fp):
 
     proxyCopy('Cage', human, rig, proxyData, fp)
 
-    if theConfig.mainmesh:
+    if the.Config.mainmesh:
         fp.write("#if toggle&T_Mesh\n")
         copyFile25(human, "shared/mhx/templates/meshes25.mhx", rig, fp, None, proxyData)    
         fp.write("#endif\n")
@@ -203,8 +204,8 @@ def exportMhx_25(human, fp):
 
     copyFile25(human, "shared/mhx/templates/rig-poses25.mhx", rig, fp, None, proxyData) 
 
-    if theConfig.mhxrig == 'rigify':
-        fp.write("Rigify %s ;\n" % theHuman)
+    if the.Config.mhxrig == 'rigify':
+        fp.write("Rigify %s ;\n" % the.Human)
     return
 
 #
@@ -212,7 +213,7 @@ def exportMhx_25(human, fp):
 #
 
 def scanProxies(obj, proxyData):
-    for pfile in theConfig.proxyList:
+    for pfile in the.Config.proxyList:
         if pfile.useMhx:
             proxy = mh2proxy.readProxyFile(obj, pfile, True)
             if proxy:
@@ -255,9 +256,9 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                     suffix = words[3]
                 else:
                     suffix = ""
-                fp.write("    %s Refer Object %s%s ;\n" % (words[2], theHuman, suffix))
+                fp.write("    %s Refer Object %s%s ;\n" % (words[2], the.Human, suffix))
             elif key == 'rig-bones':
-                fp.write("Armature %s %s   Normal \n" % (theHuman, theHuman))
+                fp.write("Armature %s %s   Normal \n" % (the.Human, the.Human))
                 if type(rig) == str:
                     mhx_rig.writeControlArmature(fp)
                 else:
@@ -265,47 +266,47 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
             elif key == 'human-object':
                 if words[2] == 'Mesh':
                     fp.write(
-"Object %sMesh MESH %sMesh\n"  % (theHuman, theHuman) +
-"  Property MhxOffsetX %.4f ;\n" % mhx_rig.Origin[0] +
-"  Property MhxOffsetY %.4f ;\n" % mhx_rig.Origin[1] +
-"  Property MhxOffsetZ %.4f ;\n" % mhx_rig.Origin[2])
+"Object %sMesh MESH %sMesh\n"  % (the.Human, the.Human) +
+"  Property MhxOffsetX %.4f ;\n" % the.Origin[0] +
+"  Property MhxOffsetY %.4f ;\n" % the.Origin[1] +
+"  Property MhxOffsetZ %.4f ;\n" % the.Origin[2])
                 elif words[2] == 'ControlRig':
-                    fp.write("Object %s ARMATURE %s\n"  % (theHuman, theHuman))
+                    fp.write("Object %s ARMATURE %s\n"  % (the.Human, the.Human))
             elif key == 'rig-poses':
                 if type(rig) == str:
-                    fp.write("Pose %s\n" % theHuman)
+                    fp.write("Pose %s\n" % the.Human)
                     mhx_rig.writeControlPoses(fp)
                     fp.write("  ik_solver 'LEGACY' ;\nend Pose\n")
                 else:
                     mh2proxy.writeRigPose(fp, rig.name, rig.bones)
             elif key == 'rig-actions':
                 if type(rig) == str:
-                    fp.write("Pose %s\nend Pose\n" % theHuman)
+                    fp.write("Pose %s\nend Pose\n" % the.Human)
                     mhx_rig.writeAllActions(fp)
             elif key == 'rig-drivers':
                 if type(rig) == str:
-                    fp.write("AnimationData %s True\n" % theHuman)
+                    fp.write("AnimationData %s True\n" % the.Human)
                     mhx_rig.writeAllDrivers(fp)
                     rigDriversEnd(fp)
             elif key == 'rig-correct':
-                fp.write("CorrectRig %s ;\n" % theHuman)
+                fp.write("CorrectRig %s ;\n" % the.Human)
             elif key == 'recalc-roll':
-                fp.write("  RecalcRoll %s ;\n" % mhx_rig.RecalcRoll)
+                fp.write("  RecalcRoll %s ;\n" % the.RecalcRoll)
             elif key == 'ProxyRigStart':
                 if proxy.rig:
-                    name = theHuman + proxy.name
+                    name = the.Human + proxy.name
                     fp.write("#if True\n")
                     fp.write("Armature %s %s   Normal \n" % (name, name))
                     mh2proxy.writeProxyArmature(fp, obj, proxy)
                 else:
                     fp.write("#if False\n")
             elif key == 'ProxyRigObject':
-                name = theHuman + proxy.name
+                name = the.Human + proxy.name
                 fp.write("Object %s ARMATURE %s \n" % (name, name))
                 if proxy.rig:
                     fp.write("  Property MhxRigType '%s' ;\n" % name)
             elif key == 'ProxyPose':
-                mh2proxy.writeRigPose(fp, theHuman + proxy.name, proxy.bones)
+                mh2proxy.writeRigPose(fp, the.Human + proxy.name, proxy.bones)
             elif key == 'ProxyMesh':
                 writeProxyMesh(fp, proxy, proxyData)
             elif key == 'ProxyObject':
@@ -319,35 +320,35 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                         fp.write("0 ")
                 fp.write(";\n")
             elif key == 'MeshAnimationData':
-                writeHideAnimationData(fp, "", theHuman)
+                writeHideAnimationData(fp, "", the.Human)
             elif key == 'ProxyAnimationData':
-                writeHideAnimationData(fp, theHuman, proxy.name)
+                writeHideAnimationData(fp, the.Human, proxy.name)
             elif key == 'toggleCage':
-                if theConfig.cage and not (proxy and proxy.cage):
+                if the.Config.cage and not (proxy and proxy.cage):
                     fp.write("  #if toggle&T_Cage\n")
                 else:
                     fp.write("  #if False\n")
             elif key == 'ProxyReferRig':
                 if proxy.rig:
                     fp.write("      object Refer Object %s ;\n" % proxy.name)
-                elif True or theConfig.mhxrig == 'game':
-                    fp.write("      object Refer Object %s ;\n" % theHuman)
+                elif True or the.Config.mhxrig == 'game':
+                    fp.write("      object Refer Object %s ;\n" % the.Human)
                 else:
-                    fp.write("      object Refer Object %sDeformRig ;\n" % theHuman)
+                    fp.write("      object Refer Object %sDeformRig ;\n" % the.Human)
             elif key == 'ProxyVerts':
-                ox = mhx_rig.Origin[0]
-                oy = mhx_rig.Origin[1]
-                oz = mhx_rig.Origin[2]
+                ox = the.Origin[0]
+                oy = the.Origin[1]
+                oz = the.Origin[2]
                 for bary in proxy.realVerts:
                     (x,y,z) = mh2proxy.proxyCoord(bary)
                     fp.write("  v %.4f %.4f %.4f ;\n" % (x-ox, -z+oz, y-oy))
 
             elif key == 'Verts':
                 proxy = None
-                fp.write("Mesh %sMesh %sMesh\n  Verts\n" % (theHuman, theHuman))
-                ox = mhx_rig.Origin[0]
-                oy = mhx_rig.Origin[1]
-                oz = mhx_rig.Origin[2]
+                fp.write("Mesh %sMesh %sMesh\n  Verts\n" % (the.Human, the.Human))
+                ox = the.Origin[0]
+                oy = the.Origin[1]
+                oz = the.Origin[2]
                 for v in obj.verts:
                     fp.write("  v %.4f %.4f %.4f ;\n" % (v.co[0]-ox, -v.co[2]+oz, v.co[1]-oy))
             elif key == 'ProxyFaces':
@@ -397,21 +398,21 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                         fp.write(" %.6g %.6g" %(uv[0], uv[1]))
                     fp.write(" ;\n")
             elif key == 'Material':
-                fp.write("Material %s%s\n" % (theHuman, words[2]))
+                fp.write("Material %s%s\n" % (the.Human, words[2]))
             elif key == 'Materials':
                 writeBaseMaterials(fp)
             elif key == 'ProxyMaterials':
                 if proxy.useBaseMaterials:
                     writeBaseMaterials(fp)
                 elif proxy.material:
-                    fp.write("  Material %s%s ;\n" % (theHuman, proxy.material.name))
+                    fp.write("  Material %s%s ;\n" % (the.Human, proxy.material.name))
             elif key == 'VertexGroup':
                 writeVertexGroups(fp, rig, proxy)
             elif key == 'group':
                 writeGroups(fp, proxyData)
             elif key == 'mesh-shapeKey':
                 pass
-                writeShapeKeys(fp, human, rig, "%sMesh" % theHuman, None)
+                writeShapeKeys(fp, human, rig, "%sMesh" % the.Human, None)
             elif key == 'proxy-shapeKey':
                 fp.write("#if toggle&T_Cage\n")
                 proxyShapes('Cage', human, rig, proxyData, fp)
@@ -431,7 +432,7 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                 mhx_rig.writeAllCurves(fp)
             elif key == 'properties':
                 mhx_rig.writeAllProperties(fp, words[2])
-                writeHideProp(fp, theHuman)
+                writeHideProp(fp, the.Human)
                 for proxy in proxyData.values():
                     writeHideProp(fp, proxy.name)
             elif key == 'material-drivers':
@@ -441,7 +442,7 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                 for n in range(3):
                     fp.write(" 1")
                 fp.write(" ;\n")
-                fp.write("  AnimationData %sMesh True\n" % theHuman)
+                fp.write("  AnimationData %sMesh True\n" % the.Human)
                 #mhx_rig.writeTextureDrivers(fp, rig_panel_25.BodyLanguageTextureDrivers)
                 writeMaskDrivers(fp, proxyData)
                 fp.write("  end AnimationData\n")
@@ -464,14 +465,14 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
 
 def writeBaseMaterials(fp):                    
     fp.write(
-"  Material %sSkin ;\n" % theHuman +
-"  Material %sMouth ;\n" % theHuman +
-"  Material %sEye ;\n" % theHuman +
-"  Material %sBrows ;\n" % theHuman +
-"  Material %sInvisio ;\n" % theHuman +
-"  Material %sRed ;\n" % theHuman +
-"  Material %sGreen ;\n" % theHuman +
-"  Material %sBlue ;\n" % theHuman
+"  Material %sSkin ;\n" % the.Human +
+"  Material %sMouth ;\n" % the.Human +
+"  Material %sEye ;\n" % the.Human +
+"  Material %sBrows ;\n" % the.Human +
+"  Material %sInvisio ;\n" % the.Human +
+"  Material %sRed ;\n" % the.Human +
+"  Material %sGreen ;\n" % the.Human +
+"  Material %sBlue ;\n" % the.Human
 )
     
 def addMaskImage(fp, mask):            
@@ -511,7 +512,7 @@ def addMaskMTex(fp, mask, proxy, blendtype, n):
 
 def writeSkinStart(fp, proxy, proxyData):
     if proxy:
-        fp.write("Material %s%sSkin\n" % (theHuman, proxy.name))
+        fp.write("Material %s%sSkin\n" % (the.Human, proxy.name))
         return 0
     nMasks = 0
     prxList = list(proxyData.values())
@@ -520,7 +521,7 @@ def writeSkinStart(fp, proxy, proxyData):
         if prx.mask:
             addMaskImage(fp, prx.mask)
             nMasks += 1
-    fp.write("Material %sSkin\n" % theHuman +
+    fp.write("Material %sSkin\n" % the.Human +
 "  MTex 0 diffuse UV COLOR\n" +
 #"    texture Refer Texture diffuse ;\n" +
 "  end MTex\n")
@@ -554,7 +555,7 @@ def writeVertexGroups(fp, rig, proxy):
     else:
         fp.write("#if toggle&T_Armature\n")
         if type(rig) == str:
-            for file in mhx_rig.VertexGroupFiles:
+            for file in the.VertexGroupFiles:
                 copyVertGroups(file, fp, proxy)
         else:
             if proxy:
@@ -564,20 +565,20 @@ def writeVertexGroups(fp, rig, proxy):
             mh2proxy.writeRigWeights(fp, weights)
         fp.write("#endif\n")
 
-        if theConfig.breastrig:
+        if the.Config.breastrig:
             copyVertGroups("shared/mhx/templates/vertexgroups-breasts25.mhx", fp, proxy)    
-        if theConfig.biceps:
+        if the.Config.biceps:
             copyVertGroups("shared/mhx/templates/vertexgroups-biceps25.mhx", fp, proxy)    
         copyVertGroups("shared/mhx/templates/vertexgroups-tight25.mhx", fp, proxy)    
-        if theConfig.skirtrig == "own":
+        if the.Config.skirtrig == "own":
             copyVertGroups("shared/mhx/templates/vertexgroups-skirt-rigged.mhx", fp, proxy)    
-        elif theConfig.skirtrig == "inh":
+        elif the.Config.skirtrig == "inh":
             copyVertGroups("shared/mhx/templates/vertexgroups-skirt25.mhx", fp, proxy)    
-        for path in theConfig.customvertexgroups:
+        for path in the.Config.customvertexgroups:
             print("    %s" % path)
             copyVertGroups(path, fp, proxy)    
         copyVertGroups("shared/mhx/templates/vertexgroups-leftright25.mhx", fp, proxy)    
-        if theConfig.cage and not (proxy and proxy.cage):
+        if the.Config.cage and not (proxy and proxy.cage):
             fp.write("#if toggle&T_Cage\n")
             copyVertGroups("shared/mhx/templates/vertexgroups-cage25.mhx", fp, proxy)    
             fp.write("#endif\n")
@@ -602,14 +603,14 @@ def rigDriversEnd(fp):
 
 def writeGroups(fp, proxyData):                
     fp.write(
-"PostProcess %sMesh %s 0000003f 00080000 0068056b 0000c000 ;\n" % (theHuman, theHuman) + 
-"Group %s\n"  % theHuman +
+"PostProcess %sMesh %s 0000003f 00080000 0068056b 0000c000 ;\n" % (the.Human, the.Human) + 
+"Group %s\n"  % the.Human +
 "  Objects\n" +
 "#if toggle&T_Armature\n" +
-"    ob %s ;\n" % theHuman +
+"    ob %s ;\n" % the.Human +
 "#endif\n" +
 "#if toggle&T_Mesh\n" +
-"    ob %sMesh ;\n" % theHuman +
+"    ob %sMesh ;\n" % the.Human +
 "#endif\n")
     groupProxy('Cage', fp, proxyData)
     groupProxy('Proxy', fp, proxyData)
@@ -625,7 +626,7 @@ def groupProxy(typ, fp, proxyData):
     fp.write("#if toggle&T_%s\n" % typ)
     for proxy in proxyData.values():
         if proxy.type == typ:
-            name = theHuman + proxy.name
+            name = the.Human + proxy.name
             fp.write("    ob %sMesh ;\n" % name)
             if proxy.rig:
                 fp.write("    ob %s ;\n" % name)
@@ -643,7 +644,7 @@ def writeProxyMesh(fp, proxy, proxyData):
             copyProxyMaterialFile(fp, proxy.material_file, mat, proxy, proxyData)
         else:
             writeProxyMaterial(fp, mat, proxy, proxyData)
-    name = theHuman + proxy.name
+    name = the.Human + proxy.name
     fp.write("Mesh %sMesh %sMesh \n" % (name, name))
     return
 
@@ -652,13 +653,13 @@ def writeProxyMesh(fp, proxy, proxyData):
 #
 
 def writeProxyObject(fp, proxy): 
-    name = theHuman + proxy.name
+    name = the.Human + proxy.name
     fp.write("Object %sMesh MESH %sMesh \n" % (name, name))
     fp.write("#if toggle&T_Armature\n")
     if proxy.rig:
         fp.write("  parent Refer Object %s ;\n" % name)
     else:
-        fp.write("  parent Refer Object %s ;\n" % theHuman)
+        fp.write("  parent Refer Object %s ;\n" % the.Human)
     fp.write(
 "  hide False ;\n" +
 "  hide_render False ;\n")
@@ -683,7 +684,7 @@ def writeProxyModifiers(fp, proxy):
             offset = mod[1]
             fp.write(
 "    Modifier ShrinkWrap SHRINKWRAP\n" +
-"      target Refer Object %sMesh ;\n" % theHuman +
+"      target Refer Object %sMesh ;\n" % the.Human +
 "      offset %.4f ;\n" % offset +
 "      use_keep_above_surface True ;\n" +
 "    end Modifier\n")
@@ -725,19 +726,19 @@ def copyProxyMaterialFile(fp, pair, mat, proxy, proxyData):
         if len(words) == 0:
             fp.write(line)
         elif words[0] == 'Texture':
-            words[1] = theHuman + words[1]
+            words[1] = the.Human + words[1]
             for word in words:
                 fp.write("%s " % word)
             fp.write("\n")
             tex = os.path.join(folder,words[1])
         elif words[0] == 'Material':
-            words[1] = theHuman + words[1]
+            words[1] = the.Human + words[1]
             for word in words:
                 fp.write("%s " % word)
             fp.write("\n")
             addProxyMaskMTexs(fp, mat, proxy, prxList, tex)
         elif words[0] == 'MTex':
-            words[2] = theHuman + words[2]
+            words[2] = the.Human + words[2]
             for word in words:
                 fp.write("%s " % word)
             fp.write("\n")                
@@ -762,9 +763,9 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
     else:
         tex = None
     if tex:
-        #print(theHuman)
+        #print(the.Human)
         print("Tex", tex)
-        texname = theHuman + os.path.basename(tex)
+        texname = the.Human + os.path.basename(tex)
         fromDir = os.path.dirname(tex)
         texfile = getOutFileName(tex, fromDir, True, None)
         fp.write(
@@ -780,7 +781,7 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
     prxList = sortedMasks(proxyData)
     nMasks = countMasks(proxy, prxList)
     
-    fp.write("Material %s%s \n" % (theHuman, mat.name))
+    fp.write("Material %s%s \n" % (the.Human, mat.name))
     addProxyMaskMTexs(fp, mat, proxy, prxList, tex)
     writeProxyMaterialSettings(fp, mat.settings)   
     if tex:
@@ -1007,8 +1008,8 @@ def setShapeScale(words):
     if not scales:
         raise NameError("No scale for %s" % key)
     (p1, p2, length0) = scales
-    x1 = mhx_rig.locations[p1]
-    x2 = mhx_rig.locations[p2]
+    x1 = the.Locations[p1]
+    x2 = the.Locations[p2]
     dist = aljabr.vsub(x1, x2)
     length = aljabr.vlen(dist)
     scale = length/length0
@@ -1048,7 +1049,7 @@ def writeShapeKeys(fp, human, rig, name, proxy):
 "  end ShapeKey\n")
 
     if (not proxy or proxy.type == 'Proxy'):
-        if theConfig.faceshapes:
+        if the.Config.faceshapes:
             fp.write("#if toggle&T_Face\n")  
             if BODY_LANGUAGE:
                 copyShapeKeys("shared/mhx/templates/shapekeys-bodylanguage25.mhx", fp, proxy, True)    
@@ -1057,7 +1058,7 @@ def writeShapeKeys(fp, human, rig, name, proxy):
             fp.write("#endif\n")    
 
     if not proxy:
-        if theConfig.expressions:
+        if the.Config.expressions:
             exprList = read_expression.readExpressions(human)
             fp.write("#if toggle&T_Face\n")        
             for (name, verts) in exprList:
@@ -1068,12 +1069,12 @@ def writeShapeKeys(fp, human, rig, name, proxy):
                 fp.write("end ShapeKey\n")
             fp.write("#endif\n")
 
-    if theConfig.bodyshapes:
+    if the.Config.bodyshapes:
         fp.write("#if toggle&T_Shape\n")
         copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
         fp.write("#endif\n")
 
-    for path in theConfig.customshapes:
+    for path in the.Config.customshapes:
         print("    %s" % path)
         copyShapeKeys(path, fp, proxy, False)   
 
@@ -1086,7 +1087,7 @@ def writeShapeKeys(fp, human, rig, name, proxy):
     fp.write(
 "  AnimationData None (toggle&T_Symm==0)\n")
 
-    if theConfig.bodyshapes:
+    if the.Config.bodyshapes:
         fp.write("#if toggle&T_Shape\n")
         mhx_rig.writeRotDiffDrivers(fp, rig_arm_25.ArmShapeDrivers, proxy)
         mhx_rig.writeRotDiffDrivers(fp, rig_leg_25.LegShapeDrivers, proxy)
@@ -1094,7 +1095,7 @@ def writeShapeKeys(fp, human, rig, name, proxy):
         fp.write("#endif\n")
 
     if (not proxy or proxy.type == 'Proxy'):
-        if theConfig.faceshapes:
+        if the.Config.faceshapes:
             fp.write("#if toggle&T_Face\n")
             if BODY_LANGUAGE:
                 mhx_rig.writeShapeDrivers(fp, rig_panel_25.BodyLanguageShapeDrivers, None)
@@ -1103,13 +1104,13 @@ def writeShapeKeys(fp, human, rig, name, proxy):
             fp.write("#endif\n")
 
     if not proxy:
-        if theConfig.expressions and not proxy:
+        if the.Config.expressions and not proxy:
             fp.write("#if toggle&T_Face\n")
             mhx_rig.writeShapePropDrivers(fp, read_expression.Expressions, proxy, "*")
             fp.write("#endif\n")
             
         skeys = []
-        for (skey, val, string, min, max) in  mhx_rig.CustomProps:
+        for (skey, val, string, min, max) in  the.CustomProps:
             skeys.append(skey)
         mhx_rig.writeShapePropDrivers(fp, skeys, proxy, "&")
 
@@ -1127,7 +1128,7 @@ def proxyShapes(typ, human, rig, proxyData, fp):
     fp.write("#if toggle&T_%s\n" % typ)
     for proxy in proxyData.values():
         if proxy.name and proxy.type == typ and not proxy.rig:
-            writeShapeKeys(fp, human, rig, theHuman+proxy.name+"Mesh", proxy)
+            writeShapeKeys(fp, human, rig, the.Human+proxy.name+"Mesh", proxy)
     fp.write("#endif\n")
         
 #
@@ -1180,7 +1181,7 @@ def loadFacesIndices(obj):
 
 """
 #
-#   Can not use the face info in obj.faceGroups, because diamonds are not there
+#   Can not use the. face info in obj.faceGroups, because diamonds are not the.re
 #
 def loadFacesIndices(obj):
     faces = []

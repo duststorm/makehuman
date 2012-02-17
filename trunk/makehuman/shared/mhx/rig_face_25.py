@@ -19,8 +19,9 @@ Face bone definitions
 
 """
 
-import mhx_rig, mhx_main
-from mhx_rig import *
+import mhx_globals as the
+from mhx_globals import *
+from mhx_rig import addPoseBone, writeDrivers
 
 FaceJoints = [
 	('head-end',		'l', ((2.0, 'head'), (-1.0, 'neck'))),
@@ -125,7 +126,7 @@ def FaceDeformDrivers(fp):
 	drivers = []
 	for (driven, driver, coeff) in lidBones:
 		drivers.append(	(driven, 'ROTQ', 'AVERAGE', None, 1, coeff,
-		 [("var", 'TRANSFORMS', [('OBJECT', mhx_main.theHuman, driver, 'LOC_Z', C_LOC)])]) )
+		 [("var", 'TRANSFORMS', [('OBJECT', the.Human, driver, 'LOC_Z', C_LOC)])]) )
 	writeDrivers(fp, True, drivers)
 	return
 

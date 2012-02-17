@@ -35,7 +35,7 @@ import shutil
 import mh2proxy, mh2mhx
 import export_config
 import mhx_rig, rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
-from mhx_rig import *
+import mhx_globals as the
 import read_rig
 
 #

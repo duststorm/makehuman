@@ -19,8 +19,9 @@ Leg bone definitions
 
 """
 
-import mhx_rig
-from mhx_rig import *
+import mhx_globals as the
+from mhx_globals import *
+from mhx_rig import addPoseBone, copyDeform, copyDeformPartial
 
 offs = [0,0.6,0]
 prcLegTrg = 0.2
@@ -87,8 +88,8 @@ LegJoints = [
 
 LegHeadsTails = [
     # Hip = leg location
-    ('Hip_L',           'r-upper-leg', ('r-upper-leg', ysmall)),
-    ('Hip_R',           'l-upper-leg', ('l-upper-leg', ysmall)),
+    ('Hip_L',           'r-upper-leg', ('r-upper-leg', the.ysmall)),
+    ('Hip_R',           'l-upper-leg', ('l-upper-leg', the.ysmall)),
 
     # Leg
     ('UpLeg_L',         'r-upper-leg', 'r-knee'),
@@ -140,9 +141,9 @@ LegHeadsTails = [
     ('UpLegRot_R',      'l-upper-leg', 'l-upleg1'),
 
     ('DfmButt_L',       'r-upper-leg', 'r-butt'),
-    ('Butt_L',          'r-butt', ('r-butt', yunit)),
+    ('Butt_L',          'r-butt', ('r-butt', the.yunit)),
     ('DfmButt_R',       'l-upper-leg', 'l-butt'),
-    ('Butt_R',          'l-butt', ('l-butt', yunit)),
+    ('Butt_R',          'l-butt', ('l-butt', the.yunit)),
 
     # Muscles
     ('DfmLegback_L',    'r-legback-head', 'r-legback-tail'),
@@ -165,9 +166,9 @@ LegHeadsTails = [
 
     # Knee deform
     ('DfmKnee_L',       'r-knee-head', 'r-knee-tail'),
-    ('KneeTrg_L',       'r-knee-tail', ('r-knee-tail', ysmall)),
+    ('KneeTrg_L',       'r-knee-tail', ('r-knee-tail', the.ysmall)),
     ('DfmKnee_R',       'l-knee-head', 'l-knee-tail'),
-    ('KneeTrg_R',       'l-knee-tail', ('l-knee-tail', ysmall)),
+    ('KneeTrg_R',       'l-knee-tail', ('l-knee-tail', the.ysmall)),
 
     # Pole Targets
     ('LegTrg_L',        'r-upper-leg', 'r-legtrg'),
@@ -401,12 +402,12 @@ def LegControlPoses(fp):
         [('IK', 0, 1, ['LegIK', 'Ankle_R', 2, (-90*D-deltaKnee, 'KneePT_R'), (1,0,1)])])
 
     addPoseBone(fp, 'LegIK_L', 'MHFootCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-        mhx_rig.rootChildOfConstraints + [
+        the.RootChildOfConstraints + [
         ('ChildOf', C_CHILDOF, 0, ['Hip', 'Hip_L', (1,1,1), (1,1,1), (1,1,1)]),
         ('LimitDist', 0, 1, ['DistHip', 'Hip_L', 'LIMITDIST_INSIDE'])])
 
     addPoseBone(fp, 'LegIK_R', 'MHFootCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-        mhx_rig.rootChildOfConstraints + [
+        the.RootChildOfConstraints + [
         ('ChildOf', C_CHILDOF, 0, ['Hip', 'Hip_R', (1,1,1), (1,1,1), (1,1,1)]),
         ('LimitDist', 0, 1, ['DistHip', 'Hip_R', 'LIMITDIST_INSIDE'])])
 

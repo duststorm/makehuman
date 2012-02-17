@@ -19,8 +19,9 @@ Panel bone definitions
 
 """
 
-import mhx_rig
-from mhx_rig import *
+import mhx_globals as the
+from mhx_globals import *
+from mhx_rig import addPoseBone, addYSlider, addCSlider
 
 offs = [0, 0, 0.3]
 
@@ -437,7 +438,7 @@ def FingerWriteDrivers(fp):
                 first = 1
             for lnum in range(first,4):
                 driven = "Finger-%d-%d%s" % (fnum, lnum, suffix)
-                cnsData = ("var", 'TRANSFORMS', [(mhx_main.theHuman, driver, 'LOC_X', C_LOC)])
+                cnsData = ("var", 'TRANSFORMS', [(the.Human, driver, 'LOC_X', C_LOC)])
                 writeDriver(fp, True, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"Rot\"].influence" % driven, -1, coeff, [cnsData])
     return
 """

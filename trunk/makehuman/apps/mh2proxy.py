@@ -25,6 +25,7 @@ import module3d, aljabr
 import os
 from aljabr import *
 import export_config
+import mhx_globals as the
 import read_rig, mhx_rig, mhx_main
 
 #
@@ -453,9 +454,9 @@ def writeProxyArmature(fp, obj, proxy):
     return
 
 def writeRigBones(fp, bones):
-    ox = mhx_rig.Origin[0]
-    oy = mhx_rig.Origin[1]
-    oz = mhx_rig.Origin[2]
+    ox = the.Origin[0]
+    oy = the.Origin[1]
+    oz = the.Origin[2]
     for (bone, head, tail, roll, parent, options) in bones:
         fp.write("\n  Bone %s True\n" % bone)
         (x, y, z) = head

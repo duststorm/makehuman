@@ -19,8 +19,9 @@ Body bone definitions
 
 """
 
-import mhx_rig
-from mhx_rig import *
+import mhx_globals as the
+from mhx_globals import *
+from mhx_rig import addPoseBone, copyDeform
 
 BodyJoints = [
     ('root-tail',      'o', ('spine3', [0,-1,0])),
@@ -60,11 +61,11 @@ BodyJoints = [
 ]
 
 BodyHeadsTails = [
-    ('MasterFloor',    'floor', ('floor', zunit)),
+    ('MasterFloor',    'floor', ('floor', the.zunit)),
 
     ('Root',           'root-tail', 'spine3'),
     ('Shoulders',      'neck', ('neck', [0,-1,0])),
-    ('BendRoot',       'spine3', ('spine3', yunit)),
+    ('BendRoot',       'spine3', ('spine3', the.yunit)),
 
     # Up spine
     ('Pelvis',         'root-tail', 'spine3'),
@@ -75,7 +76,7 @@ BodyHeadsTails = [
     ('Neck',           'neck', 'neck2'),
     ('Head',           'neck2', 'head-end'),
 
-    ('SpinePT',        'spine-pt', ('spine-pt', yunit)),
+    ('SpinePT',        'spine-pt', ('spine-pt', the.yunit)),
     ('SpineLinkPT',    'spine2', 'spine-pt'),
 
     # Down spine    
@@ -103,7 +104,7 @@ BodyHeadsTails = [
     # Deform torso
     ('DfmRib',         'rib-top', 'rib-bot'),
     ('DfmStomach1',    'rib-bot', 'stomach-mid'),
-    ('Stomach',        'stomach-mid', ('stomach-mid', ysmall)),
+    ('Stomach',        'stomach-mid', ('stomach-mid', the.ysmall)),
     ('DfmStomach2',    'stomach-mid', 'stomach-bot'),
     ('StomachTrg',     'root-tail', 'stomach-bot'),
     ('StomachPar',     'rib-bot', 'stomach-mid'),
@@ -111,14 +112,14 @@ BodyHeadsTails = [
 
     ('DfmWaist_L',     'r-waist-up', 'r-waist-down'),
     ('DfmWaist_R',     'l-waist-up', 'l-waist-down'),
-    ('WaistTrg_L',     'r-waist-down', ('r-waist-down', yunit)),
-    ('WaistTrg_R',     'l-waist-down', ('l-waist-down', yunit)),
+    ('WaistTrg_L',     'r-waist-down', ('r-waist-down', the.yunit)),
+    ('WaistTrg_R',     'l-waist-down', ('l-waist-down', the.yunit)),
 
     ('Breast_L',       'r-breast', 'r-tit'),
     ('Breast_R',       'l-breast', 'l-tit'),
 
-    ('Pubis',          'pubis', ('pubis', ysmall)),
-    ('Pubis_L',        'r-pubis', ('r-pubis', yunit)),
+    ('Pubis',          'pubis', ('pubis', the.ysmall)),
+    ('Pubis_L',        'r-pubis', ('r-pubis', the.yunit)),
     ('Pubis_R',        'l-pubis', 'r-pubis'),
 
     # Male genitalia
@@ -222,7 +223,7 @@ def BodyControlPoses(fp):
     addPoseBone(fp,  'MasterFloor', 'GZM_Root', 'Master', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
     addPoseBone(fp,  'Root', 'MHCrown', 'Master', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
-        mhx_rig.rootChildOfConstraints +
+        the.RootChildOfConstraints +
         [('LimitRot', C_OW_LOCAL, 0, ['LimitRot', (0,0, -45*D,45*D, 0,0), (1,1,1)]) ])
 
     addPoseBone(fp,  'Shoulders', 'MHCrown', 'Master', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
@@ -349,7 +350,7 @@ def BodyControlPoses(fp):
     addPoseBone(fp,  'Pubis_R',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'Pubis_L', 0, 1]),
         ])
-    #print(mhx_rig.locations.keys())
+    #print(the.Locations.keys())
     addPoseBone(fp,  'Pubis', 'MHBall025', None, (0,0,0), (1,1,1), (0,0,0), (1,1,1), 0, 
         [('CopyLoc', 0, 1, ['MidPoint', 'Pubis_R', (1,1,1), (0,0,0), 0.5, False]),
         ])
@@ -361,7 +362,7 @@ def BodyControlPoses(fp):
 #
 
 def BodyDynamicLocations():    
-    locs = mhx_rig.locations
+    locs = the.Locations
     p = locs['pubis']
     x0 = locs['r-upper-leg']
     x1 = locs['r-upleg1']

@@ -33,6 +33,7 @@ import time
 
 import mh2proxy
 import export_config
+import mhx_globals as the
 import mhxbones 
 import mhx_main
 
@@ -44,7 +45,7 @@ splitLeftRight = True
 
 def exportMhx(human, filename, options):    
     (name, ext) = os.path.splitext(filename)
-    mhx_main.theHuman = 'Human'
+    the.Human = 'Human'
     time1 = time.clock()
     filename = name+"-24"+ext
     try:
@@ -123,7 +124,7 @@ def copyMeshFile249(obj, tmpl, fp):
                 fp.write("#endif\n")
                 mainMesh = False
                 fp.write("#if useProxy\n")
-                for plist in mhx_main.theConfig.proxyList:
+                for plist in the.Config.proxyList:
                     if plist.useMhx:
                         exportProxy24(obj, plist, fp)
                 fp.write("#endif\n")
@@ -143,7 +144,7 @@ def copyMeshFile249(obj, tmpl, fp):
             inZone = True
             mainMesh = True
             fp.write("#if useMesh\n")
-        elif words[0] == 'object' and words[1] == '%sMesh' % mhx_main.theHuman:
+        elif words[0] == 'object' and words[1] == '%sMesh' % the.Human:
             mainMesh = True
             fp.write("#if useMesh\n")
         elif words[0] == 'vertgroup':
@@ -428,7 +429,7 @@ def writeIcu(fp, shape, expr):
     fp.write(
 "\ticu %s 0 1\n" % shape +
 "\t\tdriver 2 ;\n" +
-"\t\tdriverObject _object['%sMesh' % mhx_main.theHuman] ;\n" +
+"\t\tdriverObject _object['%sMesh' % the.Human] ;\n" +
 "\t\tdriverChannel 1 ;\n" +
 "\t\tdriverExpression '%s' ;\n" % expr +
 "\tend icu\n")

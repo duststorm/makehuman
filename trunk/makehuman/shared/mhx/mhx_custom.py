@@ -22,7 +22,7 @@ Abstract
 """
 
 import sys
-import mhx_main
+import mhx_globals as the
 
 def setupCustomRig(): 
     joints = []
@@ -30,7 +30,7 @@ def setupCustomRig():
     armature = []
     props = []
     
-    for (path, modname) in mhx_main.theConfig.customrigs:
+    for (path, modname) in the.Config.customrigs:
         print("Custom rig %s %s" % (path, modname))
         if path not in sys.path:
             sys.path.append(path)

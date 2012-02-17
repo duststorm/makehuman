@@ -19,8 +19,9 @@ Arm bone definitions
 
 """
 
-import mhx_rig
-from mhx_rig import *
+import mhx_globals as the
+from mhx_globals import *
+from mhx_rig import addPoseBone, copyDeform, copyDeformPartial
 
 prcArmTrg    = 0.15
 prcBicepsTail = 0.2
@@ -126,33 +127,33 @@ ArmHeadsTails = [
 
      # Elbow bend
     ('DfmElbowBend_L',     'r-elbow-head', 'r-elbow-tail'),
-    ('ElbowBendTrg_L',     'r-elbow-tail', ('r-elbow-tail', yunit)),
+    ('ElbowBendTrg_L',     'r-elbow-tail', ('r-elbow-tail', the.yunit)),
     ('DfmElbowBend_R',     'l-elbow-head', 'l-elbow-tail'),
-    ('ElbowBendTrg_R',     'l-elbow-tail', ('l-elbow-tail', yunit)),
+    ('ElbowBendTrg_R',     'l-elbow-tail', ('l-elbow-tail', the.yunit)),
 
     # Elbow deform
     ('DfmElbowCompress_L', 'r-elbow-compress1', 'r-elbow-compress2'),
-    ('ElbowCompressTrg_L', 'r-elbow-compress2', ('r-elbow-compress2', yunit)),
+    ('ElbowCompressTrg_L', 'r-elbow-compress2', ('r-elbow-compress2', the.yunit)),
     ('DfmElbowCompress_R', 'l-elbow-compress1', 'l-elbow-compress2'),
-    ('ElbowCompressTrg_R', 'l-elbow-compress2', ('l-elbow-compress2', yunit)),
+    ('ElbowCompressTrg_R', 'l-elbow-compress2', ('l-elbow-compress2', the.yunit)),
 
    # Pole Targets
 
-    ('UpArmDir_L',         'r-uparm1', ('r-uparm1', yunit)),
-    ('UpArm2PT_L',         ('r-uparm1', yunit), ('r-uparm1', ybis)),
-    ('UpArm3PT_L',         ('r-uparm2', yunit), ('r-uparm2', ybis)),
+    ('UpArmDir_L',         'r-uparm1', ('r-uparm1', the.yunit)),
+    ('UpArm2PT_L',         ('r-uparm1', the.yunit), ('r-uparm1', ybis)),
+    ('UpArm3PT_L',         ('r-uparm2', the.yunit), ('r-uparm2', ybis)),
 
-    ('UpArmDir_R',         'l-uparm1', ('l-uparm1', yunit)),
-    ('UpArm2PT_R',         ('l-uparm1', yunit), ('l-uparm1', ybis)),
-    ('UpArm3PT_R',         ('l-uparm2', yunit), ('l-uparm2', ybis)),
+    ('UpArmDir_R',         'l-uparm1', ('l-uparm1', the.yunit)),
+    ('UpArm2PT_R',         ('l-uparm1', the.yunit), ('l-uparm1', ybis)),
+    ('UpArm3PT_R',         ('l-uparm2', the.yunit), ('l-uparm2', ybis)),
 
-    ('LoArm2PT_L',         ('r-loarm1', yunit), ('r-loarm1', ybis)),
-    ('LoArm3PT_L',         ('r-loarm2', yunit), ('r-loarm2', ybis)),
-    ('LoArm2PT_R',         ('l-loarm1', yunit), ('l-loarm1', ybis)),
-    ('LoArm3PT_R',         ('l-loarm2', yunit), ('l-loarm2', ybis)),
+    ('LoArm2PT_L',         ('r-loarm1', the.yunit), ('r-loarm1', ybis)),
+    ('LoArm3PT_L',         ('r-loarm2', the.yunit), ('r-loarm2', ybis)),
+    ('LoArm2PT_R',         ('l-loarm1', the.yunit), ('l-loarm1', ybis)),
+    ('LoArm3PT_R',         ('l-loarm2', the.yunit), ('l-loarm2', ybis)),
 
-    ('ElbowPT_L',         'r-elbow-pt', ('r-elbow-pt', yunit)),
-    ('ElbowPT_R',         'l-elbow-pt', ('l-elbow-pt', yunit)),
+    ('ElbowPT_L',         'r-elbow-pt', ('r-elbow-pt', the.yunit)),
+    ('ElbowPT_R',         'l-elbow-pt', ('l-elbow-pt', the.yunit)),
     ('ElbowLinkPT_L',     'r-elbow', 'r-elbow-pt'),
     ('ElbowLinkPT_R',     'l-elbow', 'l-elbow-pt'),
     
@@ -335,7 +336,7 @@ def ArmControlPoses(fp):
         ])
 
     addPoseBone(fp, 'Wrist_R', 'MHHandCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), CmodHand, 
-        mhx_rig.rootChildOfConstraints + [
+        the.RootChildOfConstraints + [
         ('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Clavicle_R', (1,1,1), (1,1,1), (1,1,1)]),
         ('LimitDist', 0, 0, ['DistShoulder', 'Shoulder_R', 'LIMITDIST_INSIDE']),
         ('LimitDist', 0, 0, ['DistElbow', 'Elbow_R', 'LIMITDIST_ONSURFACE']),
@@ -359,7 +360,7 @@ def ArmControlPoses(fp):
         ])
 
     addPoseBone(fp, 'Wrist_L', 'MHHandCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), CmodHand, 
-        mhx_rig.rootChildOfConstraints + [
+        the.RootChildOfConstraints + [
         ('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Clavicle_L', (1,1,1), (1,1,1), (1,1,1)]),
          ('LimitDist', 0, 0, ['DistShoulder', 'Shoulder_L', 'LIMITDIST_INSIDE']),
          ('LimitDist', 0, 0, ['DistElbow', 'Elbow_L', 'LIMITDIST_ONSURFACE']),
@@ -374,7 +375,7 @@ def ArmControlPoses(fp):
         ])
 
     addPoseBone(fp, 'Wrist_R', 'MHHandCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), CmodHand, 
-        mhx_rig.rootChildOfConstraints + [
+        the.RootChildOfConstraints + [
         ('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Clavicle_R', (1,1,1), (1,1,1), (1,1,1)]),
         ('LimitDist', 0, 0, ['DistShoulder', 'Shoulder_R', 'LIMITDIST_INSIDE']),
         ('LimitDist', 0, 0, ['DistElbow', 'Elbow_R', 'LIMITDIST_ONSURFACE']),

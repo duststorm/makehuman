@@ -19,8 +19,9 @@ Arm bone definitions
 
 """
 
-import mhx_rig
-from mhx_rig import *
+import mhx_globals as the
+from mhx_globals import *
+from mhx_rig import addPoseBone, copyDeform
 
 ShoulderJoints = [
     ('r-pect1',             'vl', ((0.96, 2870), (0.04, 2591))),
@@ -69,21 +70,21 @@ ShoulderHeadsTails = [
 
     ('Clavicle_L',          'r-clavicle', 'r-clav-tail'),
     ('ShoulderPivot_L',     'r-clavicle', 'r-clav-tail'),
-    ('ShoulderUp_L',        ('r-clav-tail', yunit), ('r-clav-tail', ybis)),
+    ('ShoulderUp_L',        ('r-clav-tail', the.yunit), ('r-clav-tail', the.ybis)),
     ('ShoulderAim_L',       'r-clav-tail', 'r-clav-aim'),
     ('DfmClavicle_L',       'r-clavicle', 'r-clav-tail'),
 
     ('Clavicle_R',          'l-clavicle', 'l-clav-tail'),
     ('ShoulderPivot_R',     'l-clavicle', 'l-clav-tail'),
-    ('ShoulderUp_R',        ('l-clav-tail', yunit), ('l-clav-tail', ybis)),
+    ('ShoulderUp_R',        ('l-clav-tail', the.yunit), ('l-clav-tail', the.ybis)),
     ('ShoulderAim_R',       'l-clav-tail', 'l-clav-aim'),
     ('DfmClavicle_R',       'l-clavicle', 'l-clav-tail'),
 
     # Shoulder
-    ('ShoulderEnd_L',       'r-uparm0', ('r-uparm0', yunit)),
-    ('ShoulderEnd_R',       'l-uparm0', ('l-uparm0', yunit)),
-    ('Shoulder_L',          'r-uparm0', ('r-uparm0', ysmall)),
-    ('Shoulder_R',          'l-uparm0', ('l-uparm0', ysmall)),
+    ('ShoulderEnd_L',       'r-uparm0', ('r-uparm0', the.yunit)),
+    ('ShoulderEnd_R',       'l-uparm0', ('l-uparm0', the.yunit)),
+    ('Shoulder_L',          'r-uparm0', ('r-uparm0', the.ysmall)),
+    ('Shoulder_R',          'l-uparm0', ('l-uparm0', the.ysmall)),
 
     # Scapula
     
@@ -107,13 +108,13 @@ ShoulderHeadsTails = [
     
     # Elbow lock
 
-    ('Elbow_L',              'r-elbow', ('r-elbow',yunit)),
+    ('Elbow_L',              'r-elbow', ('r-elbow',the.yunit)),
     ('ELClavicle_L',         'r-clavicle', 'r-clav-tail'),
     ('ELUpArm_L',            'r-uparm0', 'r-elbow'),
     ('ELClavPT_L',           ('r-clav-tail', [0,2,0]), ('r-clav-tail', [0,3,0])),
     ('ELClavLinkPT_L',       'r-clav-tail', ('r-clav-tail', [0,2,0])),
     
-    ('Elbow_R',              'l-elbow', ('l-elbow',yunit)),
+    ('Elbow_R',              'l-elbow', ('l-elbow',the.yunit)),
     ('ELClavicle_R',         'l-clavicle', 'l-clav-tail'),
     ('ELUpArm_R',            'l-uparm0', 'l-elbow'),
     ('ELClavPT_R',           ('l-clav-tail', [0,2,0]), ('l-clav-tail', [0,3,0])),
@@ -299,7 +300,7 @@ def ShoulderControlPoses(fp):
     # Elbow lock
     
     addPoseBone(fp, 'Elbow_L', 'MHBall025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
-        mhx_rig.rootChildOfConstraints + [
+        the.RootChildOfConstraints + [
         ('LimitDist', 0, 0, ['DistSternum', 'Sternum', 'LIMITDIST_INSIDE']),
         ])
         
@@ -317,7 +318,7 @@ def ShoulderControlPoses(fp):
         
 
     addPoseBone(fp, 'Elbow_R', 'MHBall025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-        mhx_rig.rootChildOfConstraints + [
+        the.RootChildOfConstraints + [
         ('LimitDist', 0, 0, ['DistSternum', 'Sternum', 'LIMITDIST_INSIDE']),
         ])
         

@@ -7,7 +7,7 @@
 import os
 import rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
 import mhx_rig, mh2collada
-from mhx_rig import *
+import mhx_globals as the
 
 '''
 rigFiles = ['
