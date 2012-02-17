@@ -171,7 +171,7 @@ def copyMeshFile249(obj, tmpl, fp):
 #
 
 def exportProxy24(obj, plist, fp):
-    proxy = mh2proxy.readProxyFile(obj, plist)
+    proxy = mh2proxy.readProxyFile(obj, plist, True)
     if not proxy:
     	return
     faces = mhx_main.loadFacesIndices(obj)
