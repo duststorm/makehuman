@@ -32,9 +32,8 @@ import files3d
 import mh2bvh
 import os, time
 import shutil
-import mh2proxy, mh2mhx
+import mh2proxy
 import export_config
-import mhx_rig, rig_body_25, rig_arm_25, rig_finger_25, rig_leg_25, rig_toe_25, rig_face_25, rig_panel_25
 import mhx_globals as the
 import read_rig
 
@@ -48,9 +47,8 @@ Delta = [0,0.01,0]
 #
 
 def exportCollada(human, name, options):
-    global useRotate90, theOptions
-    useRotate90 = options["rotate90"]
-    theOptions = options
+    the.Rotate90 = options["rotate90"]
+    the.Options = options
     filename = name+".dae"
     time1 = time.clock()
     try:
@@ -95,8 +93,7 @@ def flatten(hier, bones):
 #
 
 def printLoc(fp, loc):
-    global useRotate90
-    if useRotate90:
+    if the.Rotate90:
         fp.write("%.4f %.4f %.4f " % (loc[0], -loc[2], loc[1]))
     else:
         fp.write("%.4f %.4f %.4f " % (loc[0], loc[1], loc[2]))
@@ -105,7 +102,7 @@ def printLoc(fp, loc):
 #    boneOK(flags, bone, parent):
 #
 
-reparents = {
+Reparents = {
     'UpArm_L'     : 'Clavicle_L',
     'UpArm_R'     : 'Clavicle_R',
     'UpLeg_L'     : 'Hip_L',
@@ -117,7 +114,7 @@ reparents = {
     'UpLegTwist_R'     : 'Hip_R',
 }
 
-twistBones = {
+TwistBones = {
     'UpArmTwist_L'     : 'UpArm_L',
     'UpArmTwist_R'     : 'UpArm_R',
     'LoArmTwist_L'     : 'LoArm_L',
@@ -126,17 +123,17 @@ twistBones = {
     'UpLegTwist_R'     : 'UpLeg_R',
 }
 
-skipBones = [ 'Rib_L', 'Rib_R', 'Stomach_L', 'Stomach_R', 'Scapula_L', 'Scapula_R']
+SkipBones = [ 'Rib_L', 'Rib_R', 'Stomach_L', 'Stomach_R', 'Scapula_L', 'Scapula_R']
 
 def boneOK(flags, bone, parent):
-    if bone == Root:
+    if bone == the.Root:
         return 'None'
-    elif bone in twistBones.keys():
+    elif bone in TwistBones.keys():
         return None
-    elif bone in skipBones:
+    elif bone in SkipBones:
         return None
-    elif bone in reparents.keys():
-        return reparents[bone]
+    elif bone in Reparents.keys():
+        return Reparents[bone]
     elif flags & F_DEF:
         return parent
     elif bone in ['HipsInv']:
@@ -167,7 +164,7 @@ def readSkinWeights(weights, tmplName):
     return
 
 def fixTwistWeights(fp, weights):
-    for (twist, bone) in twistBones.items():
+    for (twist, bone) in TwistBones.items():
         wts = weights[twist] + weights[bone]
         wts.sort()
         nwts = []
@@ -224,20 +221,19 @@ def printNode(fp, name, vec, extra, pad):
 #
 
 def getArmatureFromRigFile(fileName, obj):
-    global Root
     (locations, armature, weights) = read_rig.readRigFile(fileName, obj)
     
     hier = []
     heads = {}
     tails = {}
-    Root = None
+    the.Root = None
     for (bone, head, tail, roll, parent, options) in armature:
         heads[bone] = head
         tails[bone] = tail
         if parent == '-':
             hier.append((bone, []))
-            if not Root:
-                Root = bone
+            if not the.Root:
+                the.Root = bone
         else:
             parHier = findInHierarchy(parent, hier)
             try:
@@ -246,7 +242,7 @@ def getArmatureFromRigFile(fileName, obj):
                 raise NameError("Did not find %s parent %s" % (bone, parent))
             children.append((bone, []))
     
-    if not Root:
+    if not the.Root:
         raise NameError("No root bone found in rig file %s" % fileName)
     # newHier = addInvBones(hier, heads, tails)
     newHier = hier
@@ -407,10 +403,9 @@ def filterMesh(mesh1, obj):
 #
 
 def exportDae(human, fp):
-    global theStuff, Root, useRotate90, theOptions
     cfg = export_config.exportConfig(human, True)
     obj = human.meshData
-    rigfile = "data/rigs/%s.rig" % theOptions["daerig"]
+    rigfile = "data/rigs/%s.rig" % the.Options["daerig"]
     print("Using rig file %s" % rigfile)
     amt = getArmatureFromRigFile(rigfile, obj)
     #rawTargets = loadShapeKeys("data/templates/shapekeys-facial25.mhx")
@@ -419,11 +414,11 @@ def exportDae(human, fp):
     stuffs = []
     stuff = CStuff('Human', None)
     stuff.setBones(amt)
-    theStuff = stuff
+    the.Stuff = stuff
     foundProxy = setupProxies('Proxy', obj, stuffs, amt, rawTargets, cfg.proxyList)
     if not foundProxy:
         mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
-        if theOptions["keepHelpers"]:
+        if the.Options["keepHelpers"]:
             mesh2 = mesh1
         else:
             mesh2 = filterMesh(mesh1, obj)
@@ -431,11 +426,11 @@ def exportDae(human, fp):
         stuffs.append(stuff)
     setupProxies('Clothes', obj, stuffs, amt, rawTargets, cfg.proxyList)
 
-    if theStuff.verts == None:
+    if the.Stuff.verts == None:
         raise NameError("No rig found. Neither main mesh nor rigged proxy enabled")
         
     date = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime())
-    if useRotate90:
+    if the.Rotate90:
         upaxis = 'Z_UP'
     else:
         upaxis = 'Y_UP'
@@ -489,8 +484,8 @@ def exportDae(human, fp):
 '  <library_visual_scenes>\n' +
 '    <visual_scene id="Scene" name="Scene">\n' +
 '      <node id="Scene_root">\n')
-    for root in theStuff.rigHier:
-        writeBone(fp, root, [0,0,0], 'layer="L1"', '  ', theStuff)
+    for root in the.Stuff.rigHier:
+        writeBone(fp, root, [0,0,0], 'layer="L1"', '  ', the.Stuff)
     for stuff in stuffs:
         writeNode(obj, fp, "        ", stuff)
 
@@ -509,7 +504,6 @@ def exportDae(human, fp):
 #
 
 def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
-    global theStuff
     foundProxy = False    
     for pfile in proxyList:
         if pfile.useDae and pfile.type == typename:
@@ -521,29 +515,29 @@ def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
                 if proxy.rig:
                     amtProxy = getArmatureFromRigFile(proxy.rig, obj)
                     stuff.setBones(amtProxy)
-                    if theStuff.verts:
+                    if the.Stuff.verts:
                         print("WARNING: Collada export with several meshes. Ignored %s" % proxy.name)
                         stuff = None
                     else:
-                        theStuff = stuff    
+                        the.Stuff = stuff    
                 elif proxy.weightfile:
                     (rigname, filename) = proxy.weightfile
-                    if theStuff and rigname == theStuff.name:
+                    if the.Stuff and rigname == the.Stuff.name:
                         print("copy")
-                        stuff.copyBones(theStuff)
+                        stuff.copyBones(the.Stuff)
                     else:
                         print("amt")
                         stuff.setBones(amt)
                 else:
                     print("amt2")
                     stuff.setBones(amt)
-                    #theStuff.verts = True
+                    #the.Stuff.verts = True
                 if stuff:
-                    print("Stuff", stuff.name, theStuff.name)
+                    print("Stuff", stuff.name, the.Stuff.name)
                     if pfile.type == 'Proxy':
-                        theStuff = stuff
-                    if theStuff:
-                        stuffname = theStuff.name
+                        the.Stuff = stuff
+                    if the.Stuff:
+                        stuffname = the.Stuff.name
                     else:
                         stuffname = None
                     mesh = mh2proxy.getMeshInfo(obj, proxy, stuff.rawWeights, rawTargets, stuffname)
@@ -556,13 +550,12 @@ def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
 #
 
 def writeImages(obj, fp, stuff):
-    global theOptions
     if stuff.type:
         return
     for fname in ["texture", "texture_ref"]:
         srcfile = os.path.realpath(os.path.expanduser("data/textures/%s.tif" % fname))
         print("Image %s" % srcfile)
-        if theOptions["copyImages"]:    
+        if the.Options["copyImages"]:    
             destdir = mh.getPath('exports')
             #destdir = "/Users/Thomas/Documents"
             destfile = os.path.realpath(os.path.expanduser("%s/%s.tif" % (destdir,fname)))
@@ -770,7 +763,7 @@ def writeController(obj, fp, stuff):
     mat = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
     for b in stuff.bones:
         vec = stuff.rigHead[b]
-        if useRotate90:
+        if the.Rotate90:
             mat[0][3] = -vec[0]
             mat[1][3] = vec[2]
             mat[2][3] = -vec[1]
@@ -1058,7 +1051,7 @@ def writeNode(obj, fp, pad, stuff):
 '%s  <rotate sid="rotateX">1 0 0 0</rotate>\n' % pad+
 #'%s  <scale sid="scale">1 1 1</scale>\n' % pad+
 '%s  <instance_controller url="#%s-skin">\n' % (pad, stuff.name) +
-'%s    <skeleton>#%s</skeleton>\n' % (pad, Root))
+'%s    <skeleton>#%s</skeleton>\n' % (pad, the.Root))
 
     if stuff.type == None:
         matname = 'SSS_skinshader'

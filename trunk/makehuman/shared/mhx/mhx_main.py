@@ -172,22 +172,24 @@ def exportMhx_25(human, fp):
 "  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;\n" +
 "end Object\n\n")
 
+    rig = the.Config.mhxrig
+    fp.write("#if toggle&T_Armature\n")
     if the.Config.mhxrig in ['mhx', 'rigify', 'blenrig']:
-        rig = the.Config.mhxrig
-        fp.write("#if toggle&T_Armature\n")
         for fname in the.GizmoFiles:
             copyFile25(human, fname, rig, fp, None, proxyData)    
         mhx_rig.setupCircles(fp)
-        copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", rig, fp, None, proxyData)    
-        fp.write("#endif\n")
+    copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", rig, fp, None, proxyData)    
+    fp.write("#endif\n")
+    """        
     else:
         rig = mh2proxy.CProxy('Rig', 0)
         rig.name = the.Human
         (locs, rig.bones, rig.weights) = read_rig.readRigFile('./data/rigs/%s.rig' % the.Config.mhxrig, obj)
-        #fp.write("#if toggle&T_Armature\n")
-        #copyFile25(human, "shared/mhx/templates/rig-game25.mhx", rig, fp, None, proxyData)    
-        #fp.write("#endif\n")
-        
+        fp.write("#if toggle&T_Armature\n")
+        copyFile25(human, "shared/mhx/templates/rig-game25.mhx", rig, fp, None, proxyData)    
+        fp.write("#endif\n")
+    """
+    
     fp.write("\nNoScale False ;\n\n")
 
     copyFile25(human, "shared/mhx/templates/materials25.mhx", rig, fp, None, proxyData)    
@@ -552,6 +554,15 @@ def writeMaskDrivers(fp, proxyData):
 def writeVertexGroups(fp, rig, proxy):                
     if proxy and proxy.weights:
         mh2proxy.writeRigWeights(fp, proxy.weights)
+    elif the.VertexWeights:
+        fp.write("#if toggle&T_Armature\n")
+        if proxy:
+            weights = mh2proxy.getProxyWeights(the.VertexWeights, proxy)
+        else:
+            weights = the.VertexWeights                    
+        mh2proxy.writeRigWeights(fp, weights)
+        fp.write("#endif\n")
+        copyVertGroups("shared/mhx/templates/vertexgroups-leftright25.mhx", fp, proxy)        
     else:
         fp.write("#if toggle&T_Armature\n")
         if type(rig) == str:
@@ -565,6 +576,9 @@ def writeVertexGroups(fp, rig, proxy):
             mh2proxy.writeRigWeights(fp, weights)
         fp.write("#endif\n")
 
+        #if the.Config.mhxrig != 'mhx':
+        #    copyVertGroups("shared/mhx/templates/vertexgroups-leftright25.mhx", fp, proxy)    
+        #    return
         if the.Config.breastrig:
             copyVertGroups("shared/mhx/templates/vertexgroups-breasts25.mhx", fp, proxy)    
         if the.Config.biceps:
@@ -577,11 +591,11 @@ def writeVertexGroups(fp, rig, proxy):
         for path in the.Config.customvertexgroups:
             print("    %s" % path)
             copyVertGroups(path, fp, proxy)    
-        copyVertGroups("shared/mhx/templates/vertexgroups-leftright25.mhx", fp, proxy)    
         if the.Config.cage and not (proxy and proxy.cage):
             fp.write("#if toggle&T_Cage\n")
             copyVertGroups("shared/mhx/templates/vertexgroups-cage25.mhx", fp, proxy)    
             fp.write("#endif\n")
+        copyVertGroups("shared/mhx/templates/vertexgroups-leftright25.mhx", fp, proxy)    
     return
     
 #

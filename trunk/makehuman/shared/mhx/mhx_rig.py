@@ -31,6 +31,7 @@ import mhx_main
 import read_expression
 import sys
 import mhx_custom
+import read_rig
         
 def rotationMode(flags):
     modes = ['QUATERNION', 'XYZ', 'XZY', 'YXZ', 'YZX', 'ZXY', 'ZYX']
@@ -1631,7 +1632,7 @@ import rig_skirt_25
 import rigify_rig
 
 def setupRig(obj):
-    if the.Config.mhxrig in ['mhx', 'game']:
+    if the.Config.mhxrig == 'mhx':
         the.BoneGroups = [
             ('Master', 'THEME13'),
             ('Spine', 'THEME05'),
@@ -1659,7 +1660,7 @@ def setupRig(obj):
                             genitalia,
                             "./shared/mhx/templates/vertexgroups-palm25.mhx"]
                                                         
-        the.Joints = (
+        joints = (
             rig_joints_25.DeformJoints +
             rig_body_25.BodyJoints +
             rig_arm_25.ArmJoints +
@@ -1671,7 +1672,7 @@ def setupRig(obj):
             rig_panel_25.PanelJoints
         )
         
-        the.HeadsTails = (
+        headsTails = (
             rig_body_25.BodyHeadsTails +
             rig_shoulder_25.ShoulderHeadsTails +
             rig_arm_25.ArmHeadsTails +
@@ -1702,8 +1703,8 @@ def setupRig(obj):
         the.VertexGroupFiles = ["./shared/mhx/templates/blenrigmesh_weights.mhx"]
         the.GizmoFiles = ["./shared/mhx/templates/blenrig_gizmos.mhx"]
             
-        the.Joints = blenrig_rig.BlenrigJoints
-        the.HeadsTails = blenrig_rig.BlenrigHeadsTails
+        joints = blenrig_rig.BlenrigJoints
+        headsTails = blenrig_rig.BlenrigHeadsTails
         the.Armature = blenrig_rig.BlenrigArmature
         the.ObjectProps = blenrig_rig.BlenrigObjectProps + [("MhxRig", '"Blenrig"')]
         the.ArmatureProps = blenrig_rig.BlenrigArmatureProps
@@ -1717,7 +1718,7 @@ def setupRig(obj):
         the.HeadName = 'head'
         faceArmature = swapParentName(rig_face_25.FaceArmature, 'Head', 'head')
             
-        the.Joints = (
+        joints = (
             rig_joints_25.DeformJoints +
             rig_body_25.BodyJoints +
             rigify_rig.RigifyJoints +
@@ -1725,7 +1726,7 @@ def setupRig(obj):
             rig_panel_25.PanelJoints
         )
         
-        the.HeadsTails = (
+        headsTails = (
             rigify_rig.RigifyHeadsTails +
             rig_face_25.FaceHeadsTails +
             rig_panel_25.PanelHeadsTails
@@ -1741,34 +1742,49 @@ def setupRig(obj):
         the.ArmatureProps = rigify_rig.RigifyArmatureProps
 
     else:
+        rigfile = "data/rigs/%s.rig" % the.Config.mhxrig
+        print("Rigfile", rigfile)
+        (locations, armature, the.VertexWeights) = read_rig.readRigFile(rigfile, obj)        
+        the.Armature = []
+        the.RigHead = {}
+        the.RigTail = {}
+        for data in armature:
+            (bone, head, tail, roll, parent, options) = data
+            if parent == "-":
+                parent = None
+            flags = F_DEF
+            if "-nc" not in options.keys():
+                flags |= F_CON
+            the.Armature.append((bone, roll, parent, flags, L_MAIN, NoBB))
+            the.RigHead[bone] = head
+            the.RigTail[bone] = tail
         the.BoneGroups = []
         the.RecalcRoll = []              
         the.VertexGroupFiles = []
         the.GizmoFiles = []
         the.HeadName = 'Head'
-        the.Joints = []
-        the.HeadsTails = []
-        the.Armature = []
         the.ObjectProps = []
         the.ArmatureProps = []
+        the.CustomProps = []
         print("Default rig %s" % the.Config.mhxrig)
         return
         
     if the.Config.mhxrig == "mhx":   
         if the.Config.skirtrig == "own":
-            the.Joints += rig_skirt_25.SkirtJoints
-            the.HeadsTails += rig_skirt_25.SkirtHeadsTails
+            joints += rig_skirt_25.SkirtJoints
+            headsTails += rig_skirt_25.SkirtHeadsTails
             the.Armature += rig_skirt_25.SkirtArmature
 
     (custJoints, custHeadsTails, custArmature, the.CustomProps) = mhx_custom.setupCustomRig()
-    the.Joints += custJoints
-    the.HeadsTails += custHeadsTails
+    joints += custJoints
+    headsTails += custHeadsTails
     the.Armature += custArmature
     
-    newSetupJoints(obj, the.Joints, True)
+    newSetupJoints(obj, joints, True)
     if the.Config.mhxrig in ['mhx', 'game']:
         rig_body_25.BodyDynamicLocations()
-    setupHeadsTails(the.HeadsTails)
+    setupHeadsTails(headsTails)
+    the.VertexWeights = []
     return
     
         
@@ -1784,6 +1800,9 @@ def swapParentName(bones, old, new):
     
 def writeControlArmature(fp):
     amt = the.Armature    
+    if the.VertexWeights:
+        writeArmature(fp, amt, True)
+        return    
     if the.Config.breastrig:
         amt += rig_body_25.BreastArmature
     if the.Config.biceps:
@@ -1811,6 +1830,8 @@ def writeControlPoses(fp):
         rig_face_25.FaceControlPoses(fp)
         rig_panel_25.PanelControlPoses(fp)
         
+    if the.VertexWeights:
+        return
     if the.Config.breastrig:
         rig_body_25.BreastControlPoses(fp)
     if the.Config.biceps:
