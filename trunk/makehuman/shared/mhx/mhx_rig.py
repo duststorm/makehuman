@@ -1632,6 +1632,12 @@ import rig_skirt_25
 import rigify_rig
 
 def setupRig(obj):
+    the.RigHead = {}
+    the.RigTail = {}
+    the.VertexWeights = []
+    the.CustomShapes = {}
+    the.PoseInfo = {}
+
     if the.Config.mhxrig == 'mhx':
         the.BoneGroups = [
             ('Master', 'THEME13'),
@@ -1649,6 +1655,7 @@ def setupRig(obj):
         the.ObjectProps = [("MhxRig", '"MHX"')]
         the.ArmatureProps = []
         the.HeadName = 'Head'
+        moveOrigin = True
         
         if the.Config.malerig:
             genitalia = "./shared/mhx/templates/vertexgroups-male25.mhx"
@@ -1716,6 +1723,7 @@ def setupRig(obj):
                             "./shared/mhx/templates/rigifymesh_weights.mhx"]
         the.GizmoFiles = ["./shared/mhx/templates/panel_gizmo25.mhx"]
         the.HeadName = 'head'
+        moveOrigin = True
         faceArmature = swapParentName(rig_face_25.FaceArmature, 'Head', 'head')
             
         joints = (
@@ -1745,16 +1753,31 @@ def setupRig(obj):
         rigfile = "data/rigs/%s.rig" % the.Config.mhxrig
         print("Rigfile", rigfile)
         (locations, armature, the.VertexWeights) = read_rig.readRigFile(rigfile, obj)        
+        joints = []
+        headsTails = []
         the.Armature = []
-        the.RigHead = {}
-        the.RigTail = {}
         for data in armature:
             (bone, head, tail, roll, parent, options) = data
             if parent == "-":
                 parent = None
-            flags = F_DEF
-            if "-nc" not in options.keys():
-                flags |= F_CON
+            flags = F_DEF|F_CON
+            for (key, value) in options.items():
+                if key == "-nc":
+                    flags &= ~F_CON
+                elif key == "-nc":
+                    flags &= ~F_DEF
+                elif key == "-circ":
+                    name = "Circ"+value[0]
+                    the.CustomShapes[name] = (key, int(value[0]))
+                    addPoseInfo(bone, ("CS", name))
+                    flags |= F_WIR
+                elif key == "-box":
+                    name = "Box" + value[0]
+                    the.CustomShapes[name] = (key, int(value[0]))
+                    addPoseInfo(bone, ("CS", name))
+                    flags |= F_WIR
+                elif key == "-ik":
+                    addPoseInfo(bone, ("IK", value))
             the.Armature.append((bone, roll, parent, flags, L_MAIN, NoBB))
             the.RigHead[bone] = head
             the.RigTail[bone] = tail
@@ -1763,30 +1786,45 @@ def setupRig(obj):
         the.VertexGroupFiles = []
         the.GizmoFiles = []
         the.HeadName = 'Head'
+        moveOrigin = False
         the.ObjectProps = []
         the.ArmatureProps = []
         the.CustomProps = []
         print("Default rig %s" % the.Config.mhxrig)
         return
         
-    if the.Config.mhxrig == "mhx":   
+    if the.Config.mhxrig == 'mhx':
         if the.Config.skirtrig == "own":
             joints += rig_skirt_25.SkirtJoints
             headsTails += rig_skirt_25.SkirtHeadsTails
-            the.Armature += rig_skirt_25.SkirtArmature
+            the.Armature += rig_skirt_25.SkirtArmature        
+        if the.Config.breastrig:
+            the.Armature += rig_body_25.BreastArmature
+        if the.Config.biceps:
+            the.Armature += rig_arm_25.BicepsArmature
+        if the.Config.malerig:
+            the.Armature += rig_body_25.MaleArmature        
 
     (custJoints, custHeadsTails, custArmature, the.CustomProps) = mhx_custom.setupCustomRig()
     joints += custJoints
     headsTails += custHeadsTails
     the.Armature += custArmature
     
-    newSetupJoints(obj, joints, True)
-    if the.Config.mhxrig in ['mhx', 'game']:
+    newSetupJoints(obj, joints, moveOrigin)
+    if the.Config.mhxrig == 'mhx':
         rig_body_25.BodyDynamicLocations()
-    setupHeadsTails(headsTails)
-    the.VertexWeights = []
+    for (bone, head, tail) in headsTails:
+        the.RigHead[bone] = findLocation(head)
+        the.RigTail[bone] = findLocation(tail)
     return
     
+def addPoseInfo(bone, info):
+    try:
+        the.PoseInfo[bone]
+    except:
+        the.PoseInfo[bone] = []
+    the.PoseInfo[bone].append(info)
+    return        
         
 def swapParentName(bones, old, new):
     nbones = []
@@ -1797,20 +1835,6 @@ def swapParentName(bones, old, new):
         else:
             nbones.append(bone)
     return nbones
-    
-def writeControlArmature(fp):
-    amt = the.Armature    
-    if the.VertexWeights:
-        writeArmature(fp, amt, True)
-        return    
-    if the.Config.breastrig:
-        amt += rig_body_25.BreastArmature
-    if the.Config.biceps:
-        amt += rig_arm_25.BicepsArmature
-    if the.Config.malerig:
-        amt += rig_body_25.MaleArmature
-    writeArmature(fp, amt, True)
-    return
 
 def writeControlPoses(fp):
     writeBoneGroups(fp)
@@ -1823,6 +1847,14 @@ def writeControlPoses(fp):
         #rig_toe_25.ToeControlPoses(fp)
         rig_face_25.FaceControlPoses(fp)
         rig_panel_25.PanelControlPoses(fp)
+        if the.Config.breastrig:
+            rig_body_25.BreastControlPoses(fp)
+        if the.Config.biceps:
+            rig_arm_25.BicepsControlPoses(fp)
+        if the.Config.malerig:
+            rig_body_25.MaleControlPoses(fp)
+        if the.Config.skirtrig == "own":
+            rig_skirt_25.SkirtControlPoses(fp)
     elif the.Config.mhxrig == 'blenrig':
         blenrig_rig.BlenrigWritePoses(fp)
     elif the.Config.mhxrig == 'rigify':
@@ -1830,16 +1862,19 @@ def writeControlPoses(fp):
         rig_face_25.FaceControlPoses(fp)
         rig_panel_25.PanelControlPoses(fp)
         
-    if the.VertexWeights:
-        return
-    if the.Config.breastrig:
-        rig_body_25.BreastControlPoses(fp)
-    if the.Config.biceps:
-        rig_arm_25.BicepsControlPoses(fp)
-    if the.Config.malerig:
-        rig_body_25.MaleControlPoses(fp)
-    if the.Config.skirtrig == "own":
-        rig_skirt_25.SkirtControlPoses(fp)
+    for (bone, info) in the.PoseInfo.items():
+        cs = None
+        constraints = []
+        for (key, value) in info:
+            if key == "CS":
+                cs = value
+            elif key == "IK":
+                goal = value[0]
+                n = int(value[1])
+                inf = float(value[2])
+                constraints =  [('IK', 0, inf, ['IK', goal, n, None, (True,False,True)])]
+        addPoseBone(fp, bone, cs, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, constraints)       
+        
     for (path, modname) in the.Config.customrigs:
         mod = sys.modules[modname]                
         mod.ControlPoses(fp)

@@ -143,27 +143,27 @@
   Neck neck head 0.0 Spine3 -circ 10
   Head head head2 0.0 Neck -circ 10
 
-  Jaw mouth jaw 0.0 Head
-  TongueBase tongue-1 tongue-2 0.0 Jaw
+  Jaw mouth jaw 0.0 Head -nc
+  TongueBase tongue-1 tongue-2 0.0 Jaw -nc
   TongueMid tongue-2 tongue-3 0.0 TongueBase
   TongueTip tongue-3 tongue-4 0.0 TongueMid
 
-  Eye_R l-eye l-eye-target 0.0 Head
-  Eye_L r-eye r-eye-target 0.0 Head
-  UpLid_R l-eye l-upperlid 0.2793 Head
-  LoLid_R l-eye l-lowerlid 0.0 Head
-  UpLid_L r-eye r-upperlid -0.2793 Head
-  LoLid_L r-eye r-lowerlid 0.0 Head
+  Eye_R l-eye l-eye-target 0.0 Head -nc
+  Eye_L r-eye r-eye-target 0.0 Head -nc
+  UpLid_R l-eye l-upperlid 0.2793 Head -nc
+  LoLid_R l-eye l-lowerlid 0.0 Head -nc
+  UpLid_L r-eye r-upperlid -0.2793 Head -nc
+  LoLid_L r-eye r-lowerlid 0.0 Head -nc
 
-  Clavicle_L r-clavicle r-shoulder 0.0 Spine3 -circ 3
+  Clavicle_L r-clavicle r-shoulder 0.0 Spine3 -circ 3 -nc
   UpArm_L r-shoulder r-elbow 0.0 Clavicle_L -circ 3
-  LoArm_L r-elbow r-hand 0.0 UpArm_L -circ 3 -ik Wrist_L 2 1.0
+  LoArm_L r-elbow r-hand 0.0 UpArm_L -circ 3 -ik Wrist_L 2 0.0
   Hand_L r-hand r-finger-3-1 0.0 LoArm_L -circ 5
   Wrist_L r-hand r-wrist-tail 0.0 MasterFloor -box 3 -nc -nd
 
-  Clavicle_R l-clavicle l-shoulder 0.0 Spine3 -circ 3
+  Clavicle_R l-clavicle l-shoulder 0.0 Spine3 -circ 3 -nc
   UpArm_R l-shoulder l-elbow 0.0 Clavicle_R -circ 3
-  LoArm_R l-elbow l-hand 0.0 UpArm_R -circ 3 -ik Wrist_R 2 1.0
+  LoArm_R l-elbow l-hand 0.0 UpArm_R -circ 3 -ik Wrist_R 2 0.0
   Hand_R l-hand l-finger-3-1 0.0 LoArm_R -circ 5
   Wrist_R l-hand l-wrist-tail 0.0 MasterFloor -box 3 -nc -nd
 
@@ -183,46 +183,46 @@
   Palm-4_R l-hand-2 l-finger-4-1 0.0 Wrist-2_R
   Palm-5_R l-hand-2 l-finger-5-1 0.0 Wrist-2_R
 
-  Finger-1-1_L r-finger-1-1 r-finger-1-2 1.5708 Palm-1_L
+  Finger-1-1_L r-finger-1-1 r-finger-1-2 1.5708 Palm-1_L -nc
   Finger-1-2_L r-finger-1-2 r-finger-1-3 1.5708 Finger-1-1_L
   Finger-1-3_L r-finger-1-3 r-finger-1-4 1.5708 Finger-1-2_L
-  Finger-2-1_L r-finger-2-1 r-finger-2-2 0.0 Palm-2_L
+  Finger-2-1_L r-finger-2-1 r-finger-2-2 0.0 Palm-2_L -nc
   Finger-2-2_L r-finger-2-2 r-finger-2-3 0.0 Finger-2-1_L
   Finger-2-3_L r-finger-2-3 r-finger-2-4 0.0 Finger-2-2_L
-  Finger-3-1_L r-finger-3-1 r-finger-3-2 0.0 Palm-3_L
+  Finger-3-1_L r-finger-3-1 r-finger-3-2 0.0 Palm-3_L -nc
   Finger-3-2_L r-finger-3-2 r-finger-3-3 0.0 Finger-3-1_L
   Finger-3-3_L r-finger-3-3 r-finger-3-4 0.0 Finger-3-2_L
-  Finger-4-1_L r-finger-4-1 r-finger-4-2 0.0 Palm-4_L
+  Finger-4-1_L r-finger-4-1 r-finger-4-2 0.0 Palm-4_L -nc
   Finger-4-2_L r-finger-4-2 r-finger-4-3 0.0 Finger-4-1_L
   Finger-4-3_L r-finger-4-3 r-finger-4-4 0.0 Finger-4-2_L
-  Finger-5-1_L r-finger-5-1 r-finger-5-2 0.0 Palm-5_L
+  Finger-5-1_L r-finger-5-1 r-finger-5-2 0.0 Palm-5_L -nc
   Finger-5-2_L r-finger-5-2 r-finger-5-3 0.0 Finger-5-1_L
   Finger-5-3_L r-finger-5-3 r-finger-5-4 0.0 Finger-5-2_L
 
-  Finger-1-1_R l-finger-1-1 l-finger-1-2 -1.5708 Palm-1_R
+  Finger-1-1_R l-finger-1-1 l-finger-1-2 -1.5708 Palm-1_R -nc
   Finger-1-2_R l-finger-1-2 l-finger-1-3 -1.5708 Finger-1-1_R
   Finger-1-3_R l-finger-1-3 l-finger-1-4 -1.5708 Finger-1-2_R
-  Finger-2-1_R l-finger-2-1 l-finger-2-2 0.0 Palm-2_R
+  Finger-2-1_R l-finger-2-1 l-finger-2-2 0.0 Palm-2_R -nc
   Finger-2-2_R l-finger-2-2 l-finger-2-3 0.0 Finger-2-1_R
   Finger-2-3_R l-finger-2-3 l-finger-2-4 0.0 Finger-2-2_R
-  Finger-3-1_R l-finger-3-1 l-finger-3-2 0.0 Palm-3_R
+  Finger-3-1_R l-finger-3-1 l-finger-3-2 0.0 Palm-3_R -nc
   Finger-3-2_R l-finger-3-2 l-finger-3-3 0.0 Finger-3-1_R
   Finger-3-3_R l-finger-3-3 l-finger-3-4 0.0 Finger-3-2_R
-  Finger-4-1_R l-finger-4-1 l-finger-4-2 0.0 Palm-4_R
+  Finger-4-1_R l-finger-4-1 l-finger-4-2 0.0 Palm-4_R -nc
   Finger-4-2_R l-finger-4-2 l-finger-4-3 0.0 Finger-4-1_R
   Finger-4-3_R l-finger-4-3 l-finger-4-4 0.0 Finger-4-2_R
-  Finger-5-1_R l-finger-5-1 l-finger-5-2 0.0 Palm-5_R
+  Finger-5-1_R l-finger-5-1 l-finger-5-2 0.0 Palm-5_R -nc
   Finger-5-2_R l-finger-5-2 l-finger-5-3 0.0 Finger-5-1_R
   Finger-5-3_R l-finger-5-3 l-finger-5-4 0.0 Finger-5-2_R
 
-  UpLeg_L r-upper-leg r-knee 0.0 Hips -circ 3
-  LoLeg_L r-knee r-ankle 0.0 UpLeg_L -circ 3 -ik Ankle_L 2 1.0
+  UpLeg_L r-upper-leg r-knee 0.0 Hips -circ 3 -nc
+  LoLeg_L r-knee r-ankle 0.0 UpLeg_L -circ 3 -ik Ankle_L 2 0.0
   Foot_L r-ankle r-foot-1 0.0 LoLeg_L -circ 3
   Toe_L r-foot-1 r-foot-2 0.0 Foot_L -circ 3
   Ankle_L r-ankle r-ankle-tail 0.0 MasterFloor -box 3 -nd -nc
 
-  UpLeg_R l-upper-leg l-knee 0.0 Hips -circ 3
-  LoLeg_R l-knee l-ankle 0.0 UpLeg_R -circ 3 -ik Ankle_R 2 1.0
+  UpLeg_R l-upper-leg l-knee 0.0 Hips -circ 3 -nc
+  LoLeg_R l-knee l-ankle 0.0 UpLeg_R -circ 3 -ik Ankle_R 2 0.0
   Foot_R l-ankle l-foot-1 0.0 LoLeg_R -circ 3
   Toe_R l-foot-1 l-foot-2 0.0 Foot_R -circ 3
   Ankle_R l-ankle l-ankle-tail 0.0 MasterFloor -box 3 -nd -nc
