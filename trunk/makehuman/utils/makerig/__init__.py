@@ -96,6 +96,9 @@ class MakeRigPanel(bpy.types.Panel):
         layout.operator("mhrig.unvertex_selected")
         layout.operator("mhrig.unvertex_all")
 
+        layout.operator("mhrig.symmetrize_weights", text="Symm weights L=>R").left2right = True
+        layout.operator("mhrig.symmetrize_weights", text="Symm weights R=>L").left2right = False
+
         layout.separator()
         layout.label("Export rig")      
         layout.prop(scn, "MRDirectory")
@@ -218,6 +221,18 @@ class VIEW3D_OT_SkipButton(bpy.types.Operator):
         Confirm = None
         ConfirmString = "?"
         return{'FINISHED'}            
+
+class VIEW3D_OT_SymmetrizeWeightsButton(bpy.types.Operator):
+    bl_idname = "mhrig.symmetrize_weights"
+    bl_label = "Symmetrize weights"
+    left2right = BoolProperty()
+
+    def execute(self, context):
+        import bpy
+        n = main.symmetrizeWeights(context, self.left2right)
+        print("Weights symmetrized, %d vertices" % n)
+        return{'FINISHED'}    
+        
 
 #
 #    Init and register

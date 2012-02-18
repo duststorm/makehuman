@@ -413,6 +413,176 @@ def getFileName(ob, context, ext):
     return (outpath, outfile)
 
 #
+#    symmetrizeWeights(context):
+#    class VIEW3D_OT_SymmetrizeWeightsButton(bpy.types.Operator):
+#
+
+Epsilon = 1e-3
+
+def symmetrizeWeights(context, left2right):
+    ob = context.object
+    bpy.ops.object.mode_set(mode='OBJECT')
+    scn = context.scene
+
+    left = {}
+    left01 = {}
+    left02 = {}
+    leftIndex = {}
+    left01Index = {}
+    left02Index = {}
+    right = {}
+    right01 = {}
+    right02 = {}
+    rightIndex = {}
+    right01Index = {}
+    right02Index = {}
+    symm = {}
+    symmIndex = {}
+    for vgrp in ob.vertex_groups:
+        if vgrp.name[-2:] in ['_L', '.L', '_l', '.l']:
+            nameStripped = vgrp.name[:-2]
+            left[nameStripped] = vgrp
+            leftIndex[vgrp.index] = nameStripped
+        elif vgrp.name[-2:] in ['_R', '.R', '_r', '.r']:
+            nameStripped = vgrp.name[:-2]
+            right[nameStripped] = vgrp
+            rightIndex[vgrp.index] = nameStripped
+        elif vgrp.name[-5:] in ['.L.01', '.l.01']:
+            nameStripped = vgrp.name[:-5]
+            left01[nameStripped] = vgrp
+            left01Index[vgrp.index] = nameStripped
+        elif vgrp.name[-5:] in ['.R.01', '.r.01']:
+            nameStripped = vgrp.name[:-5]
+            right01[nameStripped] = vgrp
+            right01Index[vgrp.index] = nameStripped
+        elif vgrp.name[-5:] in ['.L.02', '.l.02']:
+            nameStripped = vgrp.name[:-5]
+            left02[nameStripped] = vgrp
+            left02Index[vgrp.index] = nameStripped
+        elif vgrp.name[-5:] in ['.R.02', '.r.02']:
+            nameStripped = vgrp.name[:-5]
+            right02[nameStripped] = vgrp
+            right02Index[vgrp.index] = nameStripped
+        else:
+            symm[vgrp.name] = vgrp
+            symmIndex[vgrp.index] = vgrp.name
+
+    printGroups('Left', left, leftIndex, ob.vertex_groups)
+    printGroups('Right', right, rightIndex, ob.vertex_groups)
+    printGroups('Left01', left01, left01Index, ob.vertex_groups)
+    printGroups('Right01', right01, right01Index, ob.vertex_groups)
+    printGroups('Left02', left02, left02Index, ob.vertex_groups)
+    printGroups('Right02', right02, right02Index, ob.vertex_groups)
+    printGroups('Symm', symm, symmIndex, ob.vertex_groups)
+
+    (lverts, rverts, mverts) = setupVertexPairs(context)
+    if left2right:
+        factor = 1
+        fleft = left
+        fright = right
+        groups = list(right.values()) + list(right01.values()) + list(right02.values())
+        cleanGroups(ob.data, groups)
+    else:
+        factor = -1
+        fleft = right
+        fright = left
+        rverts = lverts
+        groups = list(left.values()) + list(left01.values()) + list(left02.values())
+        cleanGroups(ob.data, groups)
+
+    for (vn, rvn) in rverts.items():
+        v = ob.data.vertices[vn]
+        rv = ob.data.vertices[rvn]
+        #print(v.index, rv.index)
+        for rgrp in rv.groups:
+            rgrp.weight = 0
+        for grp in v.groups:
+            rgrp = None
+            for (indices, groups) in [
+                (leftIndex, right), (rightIndex, left),
+                (left01Index, right01), (right01Index, left01),
+                (left02Index, right02), (right02Index, left02),
+                (symmIndex, symm)
+                ]:
+                try:
+                    name = indices[grp.group]
+                    rgrp = groups[name]
+                except:
+                    pass
+            if rgrp:
+                #print("  ", name, grp.group, rgrp.name, rgrp.index, v.index, rv.index, grp.weight)
+                rgrp.add([rv.index], grp.weight, 'REPLACE')
+            else:                
+                gn = grp.group
+                print("*** No rgrp for %s %s %s" % (grp, gn, ob.vertex_groups[gn]))
+    return len(rverts)
+
+def printGroups(name, groups, indices, vgroups):
+    print(name)
+    for (nameStripped, grp) in groups.items():
+        print("  ", nameStripped, grp.name, indices[grp.index])
+    return
+
+def cleanGroups(me, groups):
+    for grp in groups:
+        print(grp)
+        for v in me.vertices:
+            grp.remove([v.index])
+    return
+    
+#----------------------------------------------------------
+#   setupVertexPairs(ob):
+#----------------------------------------------------------
+
+def setupVertexPairs(context):
+    ob = context.object
+    verts = []
+    for v in ob.data.vertices:
+        x = v.co[0]
+        y = v.co[1]
+        z = v.co[2]
+        verts.append((z,y,x,v.index))
+    verts.sort()        
+    lverts = {}
+    rverts = {}
+    mverts = {}
+    nmax = len(verts)
+    notfound = []
+    for n,data in enumerate(verts):
+        (z,y,x,vn) = data
+        n1 = n - 20
+        n2 = n + 20
+        if n1 < 0: n1 = 0
+        if n2 >= nmax: n2 = nmax
+        vmir = findVert(verts[n1:n2], vn, -x, y, z, notfound)
+        if vmir < 0:
+            mverts[vn] = vn
+        elif x > Epsilon:
+            rverts[vn] = vmir
+        elif x < -Epsilon:
+            lverts[vn] = vmir
+        else:
+            mverts[vn] = vmir
+    if notfound:            
+        print("Did not find mirror image for vertices:")
+        for msg in notfound:
+            print(msg)
+    print("Left-right-mid", len(lverts.keys()), len(rverts.keys()), len(mverts.keys()))
+    return (lverts, rverts, mverts)
+    
+def findVert(verts, v, x, y, z, notfound):
+    for (z1,y1,x1,v1) in verts:
+        dx = x-x1
+        dy = y-y1
+        dz = z-z1
+        dist = math.sqrt(dx*dx + dy*dy + dz*dz)
+        if dist < Epsilon:
+            return v1
+    if abs(x) > Epsilon:            
+        notfound.append("  %d at (%.4f %.4f %.4f)" % (v, x, y, z))
+    return -1                    
+
+#
 #   readDefaultSettings(context):
 #   saveDefaultSettings(context):
 #

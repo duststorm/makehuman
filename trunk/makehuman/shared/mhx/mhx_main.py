@@ -175,7 +175,7 @@ def exportMhx_25(human, fp):
     fp.write("#if toggle&T_Armature\n")
     if the.Config.mhxrig in ['mhx', 'rigify', 'blenrig']:
         for fname in the.GizmoFiles:
-            copyFile25(human, fname, the.Config.mhxrig, fp, None, proxyData)    
+            copyFile25(human, fname, fp, None, proxyData)    
         mhx_rig.setupCircles(fp)
     else:
         for (name, data) in the.CustomShapes.items():
@@ -186,24 +186,24 @@ def exportMhx_25(human, fp):
                 mhx_rig.setupCube(fp, name, 0.1*r, (0,0,0))
             else:
                 halt
-    copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", the.Config.mhxrig, fp, None, proxyData)    
+    copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", fp, None, proxyData)    
     fp.write("#endif\n")
     
     fp.write("\nNoScale False ;\n\n")
 
-    copyFile25(human, "shared/mhx/templates/materials25.mhx", the.Config.mhxrig, fp, None, proxyData)    
+    copyFile25(human, "shared/mhx/templates/materials25.mhx", fp, None, proxyData)    
 
-    proxyCopy('Cage', human, the.Config.mhxrig, proxyData, fp)
+    proxyCopy('Cage', human, proxyData, fp)
 
     if the.Config.mainmesh:
         fp.write("#if toggle&T_Mesh\n")
-        copyFile25(human, "shared/mhx/templates/meshes25.mhx", the.Config.mhxrig, fp, None, proxyData)    
+        copyFile25(human, "shared/mhx/templates/meshes25.mhx", fp, None, proxyData)    
         fp.write("#endif\n")
 
-    proxyCopy('Proxy', human, the.Config.mhxrig, proxyData, fp)
-    proxyCopy('Clothes', human, the.Config.mhxrig, proxyData, fp)
+    proxyCopy('Proxy', human, proxyData, fp)
+    proxyCopy('Clothes', human, proxyData, fp)
 
-    copyFile25(human, "shared/mhx/templates/rig-poses25.mhx", the.Config.mhxrig, fp, None, proxyData) 
+    copyFile25(human, "shared/mhx/templates/rig-poses25.mhx", fp, None, proxyData) 
 
     if the.Config.mhxrig == 'rigify':
         fp.write("Rigify %s ;\n" % the.Human)
@@ -222,21 +222,21 @@ def scanProxies(obj, proxyData):
     return
     
 #
-#    proxyCopy(name, human, rig, proxyData, fp)
+#    proxyCopy(name, human, proxyData, fp)
 #
 
-def proxyCopy(name, human, rig, proxyData, fp):
+def proxyCopy(name, human, proxyData, fp):
     for proxy in proxyData.values():
         if proxy.type == name:
             fp.write("#if toggle&T_%s\n" % proxy.type)
-            copyFile25(human, "shared/mhx/templates/proxy25.mhx", rig, fp, proxy, proxyData)    
+            copyFile25(human, "shared/mhx/templates/proxy25.mhx", fp, proxy, proxyData)    
             fp.write("#endif\n")
         
 #
-#    copyFile25(human, tmplName, rig, fp, proxy, proxyData):
+#    copyFile25(human, tmplName, fp, proxy, proxyData):
 #
 
-def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
+def copyFile25(human, tmplName, fp, proxy, proxyData):
     tmpl = open(tmplName)
     if tmpl == None:
         print("*** Cannot open "+tmplName)
@@ -260,10 +260,7 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                 fp.write("    %s Refer Object %s%s ;\n" % (words[2], the.Human, suffix))
             elif key == 'rig-bones':
                 fp.write("Armature %s %s   Normal \n" % (the.Human, the.Human))
-                if type(rig) == str:
-                    mhx_rig.writeArmature(fp, the.Armature, True)
-                else:
-                    mh2proxy.writeRigBones(fp, rig.bones)
+                mhx_rig.writeArmature(fp, the.Armature, True)
             elif key == 'human-object':
                 if words[2] == 'Mesh':
                     fp.write(
@@ -274,21 +271,16 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                 elif words[2] == 'ControlRig':
                     fp.write("Object %s ARMATURE %s\n"  % (the.Human, the.Human))
             elif key == 'rig-poses':
-                if type(rig) == str:
-                    fp.write("Pose %s\n" % the.Human)
-                    mhx_rig.writeControlPoses(fp)
-                    fp.write("  ik_solver 'LEGACY' ;\nend Pose\n")
-                else:
-                    mh2proxy.writeRigPose(fp, rig.name, rig.bones)
+                fp.write("Pose %s\n" % the.Human)
+                mhx_rig.writeControlPoses(fp)
+                fp.write("  ik_solver 'LEGACY' ;\nend Pose\n")
             elif key == 'rig-actions':
-                if type(rig) == str:
-                    fp.write("Pose %s\nend Pose\n" % the.Human)
-                    mhx_rig.writeAllActions(fp)
+                fp.write("Pose %s\nend Pose\n" % the.Human)
+                mhx_rig.writeAllActions(fp)
             elif key == 'rig-drivers':
-                if type(rig) == str:
-                    fp.write("AnimationData %s True\n" % the.Human)
-                    mhx_rig.writeAllDrivers(fp)
-                    rigDriversEnd(fp)
+                fp.write("AnimationData %s True\n" % the.Human)
+                mhx_rig.writeAllDrivers(fp)
+                rigDriversEnd(fp)
             elif key == 'rig-correct':
                 fp.write("CorrectRig %s ;\n" % the.Human)
             elif key == 'recalc-roll':
@@ -332,10 +324,8 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
             elif key == 'ProxyReferRig':
                 if proxy.rig:
                     fp.write("      object Refer Object %s ;\n" % proxy.name)
-                elif True or the.Config.mhxrig == 'game':
-                    fp.write("      object Refer Object %s ;\n" % the.Human)
                 else:
-                    fp.write("      object Refer Object %sDeformRig ;\n" % the.Human)
+                    fp.write("      object Refer Object %s ;\n" % the.Human)
             elif key == 'ProxyVerts':
                 ox = the.Origin[0]
                 oy = the.Origin[1]
@@ -408,19 +398,19 @@ def copyFile25(human, tmplName, rig, fp, proxy, proxyData):
                 elif proxy.material:
                     fp.write("  Material %s%s ;\n" % (the.Human, proxy.material.name))
             elif key == 'VertexGroup':
-                writeVertexGroups(fp, rig, proxy)
+                writeVertexGroups(fp, proxy)
             elif key == 'group':
                 writeGroups(fp, proxyData)
             elif key == 'mesh-shapeKey':
                 pass
-                writeShapeKeys(fp, human, rig, "%sMesh" % the.Human, None)
+                writeShapeKeys(fp, human, "%sMesh" % the.Human, None)
             elif key == 'proxy-shapeKey':
                 fp.write("#if toggle&T_Cage\n")
-                proxyShapes('Cage', human, rig, proxyData, fp)
+                proxyShapes('Cage', human, proxyData, fp)
                 fp.write("#endif\n#if toggle&T_Proxy\n")
-                proxyShapes('Proxy', human, rig, proxyData, fp)
+                proxyShapes('Proxy', human, proxyData, fp)
                 fp.write("#endif\n#if toggle&T_Clothes\n")
-                proxyShapes('Clothes', human, rig, proxyData, fp)
+                proxyShapes('Clothes', human, proxyData, fp)
                 fp.write("#endif\n")
             elif key == 'ProxyModifiers':
                 writeProxyModifiers(fp, proxy)
@@ -547,10 +537,10 @@ def writeMaskDrivers(fp, proxyData):
     return
     
 #
-#   writeVertexGroups(fp, rig, proxy):                
+#   writeVertexGroups(fp, proxy):                
 #
 
-def writeVertexGroups(fp, rig, proxy):                
+def writeVertexGroups(fp, proxy):                
     if proxy and proxy.weights:
         mh2proxy.writeRigWeights(fp, proxy.weights)
         return
@@ -562,15 +552,8 @@ def writeVertexGroups(fp, rig, proxy):
             weights = the.VertexWeights                    
         mh2proxy.writeRigWeights(fp, weights)
     else:
-        if type(rig) == str:
-            for file in the.VertexGroupFiles:
-                copyVertGroups(file, fp, proxy)
-        else:
-            if proxy:
-                weights = mh2proxy.getProxyWeights(rig.weights, proxy)
-            else:
-                weights = rig.weights                    
-            mh2proxy.writeRigWeights(fp, weights)
+        for file in the.VertexGroupFiles:
+            copyVertGroups(file, fp, proxy)
             
     if the.Config.mhxrig == 'mhx':            
         copyVertGroups("shared/mhx/templates/vertexgroups-tight25.mhx", fp, proxy)    
@@ -1049,10 +1032,10 @@ def printProxyShape(fp, shapes):
     return
 
 #
-#    writeShapeKeys(fp, human, rig, name, proxy):
+#    writeShapeKeys(fp, human, name, proxy):
 #
 
-def writeShapeKeys(fp, human, rig, name, proxy):
+def writeShapeKeys(fp, human, name, proxy):
     fp.write(
 "#if toggle&(T_Face+T_Shape)\n" +
 "ShapeKeys %s\n" % name +
@@ -1088,12 +1071,6 @@ def writeShapeKeys(fp, human, rig, name, proxy):
     for path in the.Config.customshapes:
         print("    %s" % path)
         copyShapeKeys(path, fp, proxy, False)   
-
-    if 0 and rig != 'mhx':
-        fp.write(
-"end ShapeKeys\n" +
-"#endif\n")
-        return
 
     fp.write(
 "  AnimationData None (toggle&T_Symm==0)\n")
@@ -1132,14 +1109,14 @@ def writeShapeKeys(fp, human, rig, name, proxy):
     return    
 
 #
-#    proxyShapes(typ, human, rig, proxyData, fp):
+#    proxyShapes(typ, human, proxyData, fp):
 #
 
-def proxyShapes(typ, human, rig, proxyData, fp):
+def proxyShapes(typ, human, proxyData, fp):
     fp.write("#if toggle&T_%s\n" % typ)
     for proxy in proxyData.values():
         if proxy.name and proxy.type == typ and not proxy.rig:
-            writeShapeKeys(fp, human, rig, the.Human+proxy.name+"Mesh", proxy)
+            writeShapeKeys(fp, human, the.Human+proxy.name+"Mesh", proxy)
     fp.write("#endif\n")
         
 #
