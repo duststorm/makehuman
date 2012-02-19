@@ -59,18 +59,10 @@ def exportMhx(human, filename, options):
         mhx_24.exportMhx(human, filename, options)
    
     if '25' in the.Config.mhxversion:
+        time1 = time.clock()
         fname = os.path.basename(fpath)
         the.Human = fname.capitalize().replace(' ','_')
-        fname = the.Human.lower()
-        time1 = time.clock()
-        if the.Config.separatefolder:
-            the.Config.outFolder = getSubFolder(os.path.dirname(filename), fname)
-            if the.Config.outFolder:
-                outfile = os.path.join(the.Config.outFolder, "%s%s" % (fname, ext)) 
-            the.Config.texFolder = getSubFolder(the.Config.outFolder, "textures")
-            the.CopiedFiles = {}
-        if not the.Config.texFolder:
-            outfile = fpath+ext
+        outfile = export_config.getOutFileFolder(filename, the.Config)        
         try:
             fp = open(outfile, 'w')
             export_config.safePrint("Writing MHX 2.5x file",  outfile )
@@ -83,70 +75,7 @@ def exportMhx(human, filename, options):
             time2 = time.clock()
             export_config.safePrint("Wrote MHX 2.5x file in %g s:" % (time2-time1), outfile)
 
-    return
-
-#
-#   getSubFolder(path, name):
-#   export_config.goodName(name)
-#   getOutFileName(filePath, fromDir, isTexture, human):
-#
-
-def getSubFolder(path, name):
-    folder = os.path.join(path, name)
-    #print(path, name)
-    #print("Using folder", folder)
-    if not os.path.exists(folder):
-        print("Creating folder", folder)
-        try:
-            os.mkdir(folder)
-        except:
-            print("Unable to create separate folder %s" % folder)
-            return None
-    return folder        
-    
-import shutil
-
-def getOutFileName(filePath, fromDir, isTexture, human):
-    srcDir = os.path.realpath(os.path.expanduser(fromDir))
-    filename = os.path.basename(filePath)
-    if human and (filename == "texture.tif"):
-        texname = human.getTexture()
-        fromPath = texname.replace("png", "tif")
-        fileDir = os.path.dirname(fromPath)         
-        filename = os.path.basename(fromPath)
-        #print(filePath, fromDir, fileDir, fromPath)
-        if fileDir == fromDir:
-            fromPath = os.path.join(srcDir, filename)
-    else:
-        fromPath = os.path.join(srcDir, filename)
-    if the.Config.separatefolder:
-        if isTexture:
-            toPath = os.path.join(the.Config.texFolder, filename)
-        else:
-            toPath = os.path.join(the.Config.outFolder, filename)
-        try:
-            the.CopiedFiles[fromPath]
-            done = True
-        except:
-            done = False
-        if not done:
-            if 0 and human:
-                texture = module3d.getTexture(human.getTexture())
-                print(dir(texture))
-                img = mh.Image(human.getTexture())
-                print(dir(img))
-                img.save(toPath)
-                halt
-            try:
-                shutil.copyfile(fromPath, toPath)
-            except:
-                pass    
-            the.CopiedFiles[fromPath] = True
-        return toPath
-    else:
-        return fromPath
-        
-        
+    return        
 
 #
 #    exportMhx_25(human, fp):
@@ -418,7 +347,7 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
                 writeMaskDrivers(fp, proxyData)
                 fp.write("  end AnimationData\n")
             elif key == 'Filename':
-                file = getOutFileName(words[2], words[3], True, human)
+                file = export_config.getOutFileName(words[2], words[3], True, human, the.Config)
                 fp.write("  Filename %s ;\n" % file)
             else:
                 raise NameError("Unknown *** %s" % words[1])
@@ -448,7 +377,7 @@ def writeBaseMaterials(fp):
     
 def addMaskImage(fp, mask):            
     (folder, file) = mask
-    path = getOutFileName(file, folder, True, None)
+    path = export_config.getOutFileName(file, folder, True, None, the.Config)
     fp.write(
 "Image %s\n" % file +
 "  Filename %s ;\n" % path +
@@ -712,7 +641,7 @@ def copyProxyMaterialFile(fp, pair, mat, proxy, proxyData):
                 fp.write("%s " % word)
             fp.write("\n")                
         elif words[0] == 'Filename':
-            file = getOutFileName(words[1], folder, True, None)
+            file = export_config.getOutFileName(words[1], folder, True, None, the.Config)
             fp.write("  Filename %s ;\n" % file)
         else:
             fp.write(line)
@@ -736,7 +665,7 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
         print("Tex", tex)
         texname = the.Human + os.path.basename(tex)
         fromDir = os.path.dirname(tex)
-        texfile = getOutFileName(tex, fromDir, True, None)
+        texfile = export_config.getOutFileName(tex, fromDir, True, None, the.Config)
         fp.write(
 "Image %s\n" % texname +
 "  Filename %s ;\n" % texfile +

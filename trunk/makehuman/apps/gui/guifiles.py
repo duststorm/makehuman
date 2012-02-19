@@ -312,7 +312,7 @@ class ExportTaskView(gui3d.TaskView):
         self.colladaOptions = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*8+6)));y+=25
         self.colladaRot90 = self.colladaOptions.addView(gui3d.CheckBox("Rotate 90", False));y+=24
         self.keepHelpers = self.colladaOptions.addView(gui3d.CheckBox("Keep helper geometry", False));y+=24
-        self.colladaCopyImages = self.colladaOptions.addView(gui3d.CheckBox("Copy images", False));y+=24
+        self.colladaSeparateFolder = self.colladaOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
         rigs = []
         (y, self.daeRigs) = self.addRigs( self.colladaOptions, rigs, "Dae", True, y)
         self.colladaOptions.hide()
@@ -469,7 +469,7 @@ class ExportTaskView(gui3d.TaskView):
                     "daerig": rig,
                     "rotate90" : self.colladaRot90.selected,
                     "keepHelpers" : self.keepHelpers.selected,
-                    "copyImages" : self.colladaCopyImages.selected,
+                    "separatefolder":self.colladaSeparateFolder.selected,
                 }
                 mh2collada.exportCollada(gui3d.app.selectedHuman, os.path.join(exportPath, filename), options)
             elif self.md5.selected:

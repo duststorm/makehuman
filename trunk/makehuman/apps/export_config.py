@@ -21,6 +21,7 @@ Configure export options by reading mh_export.config.
 
 import os
 import mh
+import shutil
 
 #
 #    safePrint( string, filename ):
@@ -96,6 +97,7 @@ class CExportConfig:
         self.customrigs = []
         self.customshapes = []
         self.customvertexgroups = []
+        self.copiedFiles = {}
         
     def __repr__(self):
         return (
@@ -291,5 +293,77 @@ def exportConfig(human, useHair, options=None):
         print "  ", elt
     return cfg
 
+#
+#   goodName(name):
+#   getSubFolder(path, name):
+#   getOutFileName(filePath, fromDir, isTexture, human, config):
+#
+
+def getOutFileFolder(filename, config):
+    (fname, ext) = os.path.splitext(filename)
+    fname = goodName(os.path.basename(fname))
+    if config.separatefolder:
+        config.outFolder = getSubFolder(os.path.dirname(filename), fname)
+        if config.outFolder:
+            outfile = os.path.join(config.outFolder, "%s%s" % (fname, ext)) 
+        config.texFolder = getSubFolder(config.outFolder, "textures")
+        config.copiedFiles = {}
+    if not config.texFolder:
+        outfile = filename
+    return outfile
+
+def getSubFolder(path, name):
+    folder = os.path.join(path, name)
+    print(path, name)
+    print("Using folder", folder)
+    if not os.path.exists(folder):
+        print("Creating folder", folder)
+        try:
+            os.mkdir(folder)
+        except:
+            print("Unable to create separate folder %s" % folder)
+            return None
+    return folder        
+    
+def getOutFileName(filePath, fromDir, isTexture, human, config):
+    srcDir = os.path.realpath(os.path.expanduser(fromDir))
+    filename = os.path.basename(filePath)
+    if human and (filename == "texture.tif"):
+        texname = human.getTexture()
+        fromPath = texname.replace("png", "tif")
+        fileDir = os.path.dirname(fromPath)         
+        filename = os.path.basename(fromPath)
+        #print(filePath, fromDir, fileDir, fromPath)
+        if fileDir == fromDir:
+            fromPath = os.path.join(srcDir, filename)
+    else:
+        fromPath = os.path.join(srcDir, filename)
+    if config.separatefolder:
+        if isTexture:
+            toPath = os.path.join(config.texFolder, filename)
+        else:
+            toPath = os.path.join(config.outFolder, filename)
+        try:
+            config.copiedFiles[fromPath]
+            done = True
+        except:
+            done = False
+        if not done:
+            if 0 and human:
+                texture = module3d.getTexture(human.getTexture())
+                print(dir(texture))
+                img = mh.Image(human.getTexture())
+                print(dir(img))
+                img.save(toPath)
+                halt
+            try:
+                shutil.copyfile(fromPath, toPath)
+            except:
+                pass    
+            config.copiedFiles[fromPath] = True
+        return toPath
+    else:
+        return fromPath
+        
 def goodName(name):
     return name.replace(" ", "_").replace("-","_").lower()

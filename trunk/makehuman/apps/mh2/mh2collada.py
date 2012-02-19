@@ -47,19 +47,21 @@ Delta = [0,0.01,0]
 #
 
 def exportCollada(human, name, options):
+    time1 = time.clock()
+    the.Config = export_config.exportConfig(human, True, [])
+    the.Config.separatefolder = options["separatefolder"]
     the.Rotate90 = options["rotate90"]
     the.Options = options
-    filename = name+".dae"
-    time1 = time.clock()
+    outfile = export_config.getOutFileFolder(name+".dae", the.Config)        
     try:
-        fp = open(filename, 'w')
-        export_config.safePrint("Writing Collada file", filename)
+        fp = open(outfile, 'w')
+        export_config.safePrint("Writing Collada file", outfile)
     except:
-        export_config.safePrint("Unable to open file for writing", filename)
+        export_config.safePrint("Unable to open file for writing", outfile)
     exportDae(human, fp)
     fp.close()
     time2 = time.clock()
-    export_config.safePrint("Wrote Collada file in %g s:" % (time2-time1), filename)
+    export_config.safePrint("Wrote Collada file in %g s:" % (time2-time1), outfile)
     return
 
 #
@@ -292,9 +294,14 @@ class CStuff:
         self.vertexWeights = None
         self.skinWeights = None
         self.material = None
+        self.texture = None
         if proxy:
             self.type = proxy.type
             self.material = proxy.material
+            self.texture = proxy.texture
+            
+    def __repr__(self):
+        return "<CStuff %s %s mat %s tex %s>" % (self.name, self.type, self.material, self.texture)
 
     def setBones(self, amt):
         (rigHead, rigTail, rigHier, bones, rawWeights) = amt
@@ -449,7 +456,7 @@ def exportDae(human, fp):
 '  <library_images>\n')
 
     for stuff in stuffs:
-        writeImages(obj, fp, stuff)
+        writeImages(obj, fp, stuff, human)
 
     fp.write(
 '  </library_images>\n' +
@@ -526,28 +533,29 @@ def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
     return foundProxy
 
 #
-#    writeImages(obj, fp, stuff):
+#    writeImages(obj, fp, stuff, human):
 #
 
-def writeImages(obj, fp, stuff):
+def writeImages(obj, fp, stuff, human):
+    print(stuff)
     if stuff.type:
-        return
-    for fname in ["texture", "texture_ref"]:
-        srcfile = os.path.realpath(os.path.expanduser("data/textures/%s.tif" % fname))
-        print("Image %s" % srcfile)
-        if the.Options["copyImages"]:    
-            destdir = mh.getPath('exports')
-            #destdir = "/Users/Thomas/Documents"
-            destfile = os.path.realpath(os.path.expanduser("%s/%s.tif" % (destdir,fname)))
-            texfile = "./%s.tif" % (fname)
-            shutil.copy2(srcfile, destfile)
-            print("  copied to export directory")
+        if stuff.material and stuff.material.texture:
+            textures = [stuff.material.texture]
+        elif stuff.texture:
+            textures = [stuff.texture]
         else:
-            texfile = srcfile
-            
+            return
+        human = None
+    else:
+        path = "data/textures"
+        textures = [(path, "texture.tif"), (path, "texture_ref.tif")]
+    for (folder, texfile) in textures:  
+        path = export_config.getOutFileName(texfile, folder, True, human, the.Config)        
+        (fname, ext) = os.path.splitext(texfile)  
+        ext = ext[1:]
         fp.write(
-'    <image id="%s_tif" name="%s_tif">\n' % (fname, fname) +
-'      <init_from>"%s"</init_from>\n' % texfile +
+'    <image id="%s_%s" name="%s_%s">\n' % (fname, ext, fname, ext) +
+'      <init_from>"%s"</init_from>\n' % path +
 '    </image>\n')
     return
 
@@ -569,6 +577,13 @@ def writeColor(fp, name, color, insist):
 '            </%s>\n' %name)
     return 
 
+BlenderDaeColor = {
+    'diffuse_color' : 'diffuse',
+    'specular_color' : 'specular',
+    'emit_color' : 'emission',
+    'ambient_color' : 'ambient'
+}
+
 def writeEffects(obj, fp, stuff):
     mat = stuff.material
     if mat:
@@ -577,13 +592,8 @@ def writeEffects(obj, fp, stuff):
 '      <profile_COMMON>\n' +
 '        <technique sid="common">\n' +
 '          <phong>\n')
-        BlenderDaeColor = {
-            'diffuse_color' : 'diffuse',
-            'specular_color' : 'specular',
-            'emit_color' : 'emission',
-            'ambient_color' : 'ambient'
-        }
         for (key, value) in mat.settings:
+            print("mat", key,value)
             try:
                 daeKey = BlenderDaeColor[key]
             except:
@@ -604,44 +614,44 @@ def writeEffects(obj, fp, stuff):
 '    </effect>\n')
     elif not stuff.type:
         fp.write(
-'    <effect id="SSS_skinshader-effect">\n' +
-'      <profile_COMMON>\n' +
-'        <newparam sid="texture_tif-surface">\n' +
-'          <surface type="2D">\n' +
-'            <init_from>texture_tif</init_from>\n' +
-'          </surface>\n' +
-'        </newparam>\n' +
-'        <newparam sid="texture_tif-sampler">\n' +
-'          <sampler2D>\n' +
-'            <source>texture_tif-surface</source>\n' +
-'          </sampler2D>\n' +
-'        </newparam>\n' +
-'        <newparam sid="texture_ref_tif-surface">\n' +
-'          <surface type="2D">\n' +
-'            <init_from>texture_ref_tif</init_from>\n' +
-'          </surface>\n' +
-'        </newparam>\n' +
-'        <newparam sid="texture_ref_tif-sampler">\n' +
-'          <sampler2D>\n' +
-'            <source>texture_ref_tif-surface</source>\n' +
-'          </sampler2D>\n' +
-'        </newparam>\n' +
-'        <technique sid="common">\n' +
-'          <lambert>\n' +
-'            <diffuse>\n' +
-'              <texture texture="texture_tif-sampler" texcoord="UVTex"/>\n' +
-'            </diffuse>\n' +
-'            <transparency>\n' +
-'              <texture texture="texture_tif-sampler" texcoord="UVTex"/>\n' +
-'            </transparency>\n' +
-'            <index_of_refraction>\n' +
-'              <float>1</float>\n' +
-'            </index_of_refraction>\n' +
-'          </lambert>\n' +
-'        </technique>\n' +
+'    <effect id="SkinShader-effect">\n' +
+'      <profile_COMMON>\n')
+        writeSurfaceSampler(fp, "texture_tif")
+        writeSurfaceSampler(fp, "texture_ref_tif")
+        writePhongTechniques(fp, "texture_tif", ["diffuse", "transparency"])
+        fp.write(
 '      </profile_COMMON>\n' +
 '    </effect>\n')
     return
+
+def writeSurfaceSampler(fp, tex):
+    fp.write(
+'        <newparam sid="%s-surface">\n' % tex +
+'          <surface type="2D">\n' +
+'            <init_from>%s</init_from>\n' % tex +
+'          </surface>\n' +
+'        </newparam>\n' +
+'        <newparam sid="%s-sampler">\n' % tex +
+'          <sampler2D>\n' +
+'            <source>%s-surface</source>\n' % tex +
+'          </sampler2D>\n' +
+'        </newparam>\n')
+
+def writePhongTechniques(fp, tex, techniques):        
+    fp.write(
+'        <technique sid="common">\n' +
+'          <phong>\n')
+    for tech in techniques:
+        fp.write(
+'            <%s>\n' % tech +
+'              <texture texture="%s-sampler" texcoord="UVTex"/>\n' % tex +
+'            </%s>\n' % tech)
+    fp.write(
+'            <index_of_refraction>\n' +
+'              <float>1</float>\n' +
+'            </index_of_refraction>\n' +
+'          </phong>\n' +
+'        </technique>\n')
 
 #
 #    writeMaterials(obj, fp, stuff):
@@ -656,8 +666,8 @@ def writeMaterials(obj, fp, stuff):
 '    </material>\n')
     elif not stuff.type:
         fp.write(
-'    <material id="SSS_skinshader" name="SSS_skinshader">\n' +
-'      <instance_effect url="#SSS_skinshader-effect"/>\n' +
+'    <material id="SkinShader" name="SkinShader">\n' +
+'      <instance_effect url="#SkinShader-effect"/>\n' +
 '    </material>\n')
     return
 
@@ -1034,7 +1044,7 @@ def writeNode(obj, fp, pad, stuff):
 '%s    <skeleton>#%s</skeleton>\n' % (pad, the.Root))
 
     if stuff.type == None:
-        matname = 'SSS_skinshader'
+        matname = 'SkinShader'
     elif stuff.material:
         matname = stuff.material.name
     else:
