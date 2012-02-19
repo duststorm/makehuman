@@ -51,11 +51,11 @@ the.RootChildOfConstraints = []
 the.Origin = [0,0,0]
 
 #
-#    newSetupJoints (obj, joints, moveOrigin):
+#    newSetupJoints (obj, joints):
 #    setupHeadsTails(headsTails):
 #    findLocation(joint):
 #
-def newSetupJoints (obj, joints, moveOrigin):
+def newSetupJoints (obj, joints):
     the.Locations = {}
     for (key, typ, data) in joints:
         #print(key)
@@ -115,11 +115,12 @@ def newSetupJoints (obj, joints, moveOrigin):
             the.Locations[key] = vadd(the.Locations[joint], offs)
         else:
             raise NameError("Unknown %s" % typ)
+    return
 
-    if moveOrigin:
-        the.Origin = the.Locations['floor']
-        for key in the.Locations.keys():
-            the.Locations[key] = aljabr.vsub(the.Locations[key], the.Origin)
+def moveOriginToFloor():
+    the.Origin = the.Locations['floor']
+    for key in the.Locations.keys():
+        the.Locations[key] = aljabr.vsub(the.Locations[key], the.Origin)
     return
 
 def setupHeadsTails(headsTails):
@@ -1655,7 +1656,6 @@ def setupRig(obj):
         the.ObjectProps = [("MhxRig", '"MHX"')]
         the.ArmatureProps = []
         the.HeadName = 'Head'
-        moveOrigin = True
         
         if the.Config.malerig:
             genitalia = "./shared/mhx/templates/vertexgroups-male25.mhx"
@@ -1670,6 +1670,7 @@ def setupRig(obj):
         joints = (
             rig_joints_25.DeformJoints +
             rig_body_25.BodyJoints +
+            rig_body_25.FloorJoints +
             rig_arm_25.ArmJoints +
             rig_shoulder_25.ShoulderJoints +
             rig_finger_25.FingerJoints +
@@ -1723,12 +1724,12 @@ def setupRig(obj):
                             "./shared/mhx/templates/rigifymesh_weights.mhx"]
         the.GizmoFiles = ["./shared/mhx/templates/panel_gizmo25.mhx"]
         the.HeadName = 'head'
-        moveOrigin = True
         faceArmature = swapParentName(rig_face_25.FaceArmature, 'Head', 'head')
             
         joints = (
             rig_joints_25.DeformJoints +
             rig_body_25.BodyJoints +
+            rig_body_25.FloorJoints +
             rigify_rig.RigifyJoints +
             rig_face_25.FaceJoints +
             rig_panel_25.PanelJoints
@@ -1753,7 +1754,14 @@ def setupRig(obj):
         rigfile = "data/rigs/%s.rig" % the.Config.mhxrig
         print("Rigfile", rigfile)
         (locations, armature, the.VertexWeights) = read_rig.readRigFile(rigfile, obj)        
-        joints = []
+        joints = (
+            rig_joints_25.DeformJoints +
+            rig_body_25.FloorJoints +
+            rig_face_25.FaceJoints
+        )
+        newSetupJoints(obj, joints)
+        moveOriginToFloor()
+
         headsTails = []
         the.Armature = []
         for data in armature:
@@ -1779,14 +1787,13 @@ def setupRig(obj):
                 elif key == "-ik":
                     addPoseInfo(bone, ("IK", value))
             the.Armature.append((bone, roll, parent, flags, L_MAIN, NoBB))
-            the.RigHead[bone] = head
-            the.RigTail[bone] = tail
+            the.RigHead[bone] = aljabr.vsub(head, the.Origin)
+            the.RigTail[bone] = aljabr.vsub(tail, the.Origin)
         the.BoneGroups = []
         the.RecalcRoll = []              
         the.VertexGroupFiles = []
         the.GizmoFiles = []
         the.HeadName = 'Head'
-        moveOrigin = False
         the.ObjectProps = []
         the.ArmatureProps = []
         the.CustomProps = []
@@ -1810,7 +1817,8 @@ def setupRig(obj):
     headsTails += custHeadsTails
     the.Armature += custArmature
     
-    newSetupJoints(obj, joints, moveOrigin)
+    newSetupJoints(obj, joints)
+    moveOriginToFloor()    
     if the.Config.mhxrig == 'mhx':
         rig_body_25.BodyDynamicLocations()
     for (bone, head, tail) in headsTails:

@@ -292,7 +292,7 @@ def oldExportArmature24(obj, fp):
 #    newExportArmature4(obj, fp):
 #
 def newExportArmature24(obj, fp):
-    mhx_rig.newSetupJoints(obj, classic_bones.ClassicJoints, False)
+    mhx_rig.newSetupJoints(obj, classic_bones.ClassicJoints)
     mhx_rig.setupHeadsTails(classic_bones.ClassicHeadsTails)
     
     fp.write(

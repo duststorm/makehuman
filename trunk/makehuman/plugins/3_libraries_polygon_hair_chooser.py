@@ -90,7 +90,7 @@ class HairTaskView(gui3d.TaskView):
 
     def adaptHairToHuman(self, human):
 
-        if human.hairObj:
+        if human.hairObj and human.hairProxy:
             
             mesh = human.hairObj.getSeedMesh()
             human.hairProxy.update(mesh, human.meshData)

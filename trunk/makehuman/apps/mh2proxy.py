@@ -37,7 +37,6 @@ class CProxy:
         self.name = None
         self.type = typ
         self.z_depth = 50
-        self.rig = None
         self.layer = layer
         self.material = None
         self.verts = {}
@@ -61,7 +60,6 @@ class CProxy:
         self.constraints = []
         self.wire = False
         self.cage = False
-        self.weightfile = None
         self.modifiers = []
         self.shapekeys = []
         self.bones = []
@@ -223,8 +221,6 @@ def readProxyFile(obj, file, evalOnLoad):
                 proxy.name = words[2]
             elif words[1] == 'z_depth':
                 proxy.z_depth = int(words[2])
-            elif words[1] == 'rig':
-                proxy.rig = words[2]
             elif words[1] == 'wire':
                 proxy.wire = True
             elif words[1] == 'cage':
@@ -239,8 +235,6 @@ def readProxyFile(obj, file, evalOnLoad):
                 useProjection = int(words[2])
             elif words[1] == 'ignoreOffset':
                 ignoreOffset = int(words[2])
-            elif words[1] == 'weightfile':
-                proxy.weightfile = (words[2], words[3])
             elif words[1] == 'mask':
                 proxy.mask = getFileName(folder, words[2], ".png")
                 if len(words) > 3:
@@ -440,18 +434,10 @@ def getJoint(joint, obj, locations):
     return loc
 
 #
-#    writeProxyArmature(fp, obj, proxy)
 #    writeRigBones(fp, bones):
 #    writeRigPose(fp, name, bones):
 #    writeRigWeights(fp, weights):
 #
-
-def writeProxyArmature(fp, obj, proxy):
-    if not proxy.rig:
-        return
-    (locs, proxy.bones, proxy.weights) = read_rig.readRigFile(proxy.rig, obj)
-    writeRigBones(fp, proxy.bones)
-    return
 
 def writeRigBones(fp, bones):
     ox = the.Origin[0]
@@ -645,19 +631,8 @@ def getMeshInfo(obj, proxy, rawWeights, rawShapes, rigname):
         else:
             faces = proxy.faces
 
-        weights = None
-        shapes = []
-        if proxy.rig:
-            weights = rawWeights
-            shapes = rawShapes
-        elif rigname and proxy.weightfile:
-            (name, fileName) = proxy.weightfile
-            if rigname == name:
-                (locs, amt, weights) = read_rig.readRigFile(fileName, obj)
-
-        if not weights:
-            weights = getProxyWeights(rawWeights, proxy)
-            shapes = getProxyShapes(rawShapes, proxy.verts)
+        weights = getProxyWeights(rawWeights, proxy)
+        shapes = getProxyShapes(rawShapes, proxy.verts)
         return (verts, vnormals, proxy.texVerts, faces, weights, shapes)
     else:
         verts = []

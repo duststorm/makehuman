@@ -53,7 +53,9 @@ BodyJoints = [
     ('pubis',          'l', ((1.5, 'penis-top'), (-0.5, 'penis-mid'))),
     ('scrotum-tip',    'v', 7444),
     ('scrotum-root',   'vl', ((0.5, 2807), (0.5, 7425))),
+]
 
+FloorJoints = [
     ('r-toe-1-1',      'j', 'r-toe-1-1'),
     ('l-toe-1-1',      'j', 'l-toe-1-1'),
     ('mid-feet',       'l', ((0.5, 'l-toe-1-1'), (0.5, 'r-toe-1-1'))),

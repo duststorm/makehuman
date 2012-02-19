@@ -285,21 +285,6 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
                 fp.write("CorrectRig %s ;\n" % the.Human)
             elif key == 'recalc-roll':
                 fp.write("  RecalcRoll %s ;\n" % the.RecalcRoll)
-            elif key == 'ProxyRigStart':
-                if proxy.rig:
-                    name = the.Human + proxy.name
-                    fp.write("#if True\n")
-                    fp.write("Armature %s %s   Normal \n" % (name, name))
-                    mh2proxy.writeProxyArmature(fp, obj, proxy)
-                else:
-                    fp.write("#if False\n")
-            elif key == 'ProxyRigObject':
-                name = the.Human + proxy.name
-                fp.write("Object %s ARMATURE %s \n" % (name, name))
-                if proxy.rig:
-                    fp.write("  Property MhxRigType '%s' ;\n" % name)
-            elif key == 'ProxyPose':
-                mh2proxy.writeRigPose(fp, the.Human + proxy.name, proxy.bones)
             elif key == 'ProxyMesh':
                 writeProxyMesh(fp, proxy, proxyData)
             elif key == 'ProxyObject':
@@ -321,11 +306,6 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
                     fp.write("  #if toggle&T_Cage\n")
                 else:
                     fp.write("  #if False\n")
-            elif key == 'ProxyReferRig':
-                if proxy.rig:
-                    fp.write("      object Refer Object %s ;\n" % proxy.name)
-                else:
-                    fp.write("      object Refer Object %s ;\n" % the.Human)
             elif key == 'ProxyVerts':
                 ox = the.Origin[0]
                 oy = the.Origin[1]
@@ -622,8 +602,6 @@ def groupProxy(typ, fp, proxyData):
         if proxy.type == typ:
             name = the.Human + proxy.name
             fp.write("    ob %sMesh ;\n" % name)
-            if proxy.rig:
-                fp.write("    ob %s ;\n" % name)
     fp.write("#endif\n")
     return
 
@@ -648,16 +626,13 @@ def writeProxyMesh(fp, proxy, proxyData):
 
 def writeProxyObject(fp, proxy): 
     name = the.Human + proxy.name
-    fp.write("Object %sMesh MESH %sMesh \n" % (name, name))
-    fp.write("#if toggle&T_Armature\n")
-    if proxy.rig:
-        fp.write("  parent Refer Object %s ;\n" % name)
-    else:
-        fp.write("  parent Refer Object %s ;\n" % the.Human)
     fp.write(
-"  hide False ;\n" +
-"  hide_render False ;\n")
-    fp.write("#endif\n")
+    "Object %sMesh MESH %sMesh \n" % (name, name) +
+    "#if toggle&T_Armature\n" +
+    "  parent Refer Object %s ;\n" % the.Human +
+    "  hide False ;\n" +
+    "  hide_render False ;\n" +
+    "#endif\n")
     if proxy.wire:
         fp.write("  draw_type 'WIRE' ;\n")    
     return
@@ -842,8 +817,6 @@ def countMasks(proxy, prxList):
 #
 
 def copyVertGroups(tmplName, fp, proxy):
-    if proxy and proxy.rig:
-        return
     tmpl = open(tmplName)
     shapes = []
     vgroups = []
@@ -909,8 +882,6 @@ def printProxyVGroup(fp, vgroups):
 #
 
 def copyShapeKeys(tmplName, fp, proxy, doScale):
-    if proxy and proxy.rig:
-        return
     tmpl = open(tmplName)
     shapes = []
     vgroups = []
@@ -1115,7 +1086,7 @@ def writeShapeKeys(fp, human, name, proxy):
 def proxyShapes(typ, human, proxyData, fp):
     fp.write("#if toggle&T_%s\n" % typ)
     for proxy in proxyData.values():
-        if proxy.name and proxy.type == typ and not proxy.rig:
+        if proxy.name and proxy.type == typ:
             writeShapeKeys(fp, human, the.Human+proxy.name+"Mesh", proxy)
     fp.write("#endif\n")
         

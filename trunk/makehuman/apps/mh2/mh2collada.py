@@ -511,27 +511,7 @@ def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
             if proxy and proxy.name and proxy.texVerts:
                 foundProxy = True
                 stuff = CStuff(proxy.name, proxy)
-                print(proxy.name, proxy.rig, proxy.weightfile)
-                if proxy.rig:
-                    amtProxy = getArmatureFromRigFile(proxy.rig, obj)
-                    stuff.setBones(amtProxy)
-                    if the.Stuff.verts:
-                        print("WARNING: Collada export with several meshes. Ignored %s" % proxy.name)
-                        stuff = None
-                    else:
-                        the.Stuff = stuff    
-                elif proxy.weightfile:
-                    (rigname, filename) = proxy.weightfile
-                    if the.Stuff and rigname == the.Stuff.name:
-                        print("copy")
-                        stuff.copyBones(the.Stuff)
-                    else:
-                        print("amt")
-                        stuff.setBones(amt)
-                else:
-                    print("amt2")
-                    stuff.setBones(amt)
-                    #the.Stuff.verts = True
+                stuff.setBones(amt)
                 if stuff:
                     print("Stuff", stuff.name, the.Stuff.name)
                     if pfile.type == 'Proxy':
