@@ -105,7 +105,7 @@ class CMaterial:
         self.translucency = 0.0
         self.ambient_color = (0,0,0)
         self.emit_color = (0,0,0)
-	self.alpha = 0.0
+        self.alpha = 0.0
         
         return
                 
@@ -415,8 +415,8 @@ def readMaterial(line, mat, proxy):
     elif key in ['use_alpha']:
         mat.textureSettings.append( (key, int(words[1])) )
     elif key == 'texture':
-    	tex = os.path.realpath(os.path.expanduser(words[1]))
-    	proxy.texture = os.path.split(tex)
+        tex = os.path.realpath(os.path.expanduser(words[1]))
+        proxy.texture = os.path.split(tex)
     else:
         raise NameError("Material %s?" % key)
 
@@ -650,6 +650,8 @@ def getMeshInfo(obj, proxy, rawWeights, rawShapes, rigname):
 #
 
 def getProxyWeights(rawWeights, proxy):
+    if not rawWeights:
+        return {}
     weights = {}
     for key in rawWeights.keys():
         vgroup = []
@@ -690,6 +692,8 @@ def fixProxyVGroup(vgroup):
 #
 
 def getProxyShapes(rawShapes, proxy):
+    if not rawShapes:
+        return []
     shapes = []
     for (key, rawShape) in rawShapes:
         shape = []

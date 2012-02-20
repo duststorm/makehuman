@@ -387,21 +387,27 @@ def filterMesh(mesh1, obj):
                 f2.append([v2, uv2])
             faces2.append(f2)
 
-    weights2 = {}
-    for (b, wts1) in weights1.items():
-        wts2 = []
-        for (v1,w) in wts1:
-            if not killVerts[v1]:
-                wts2.append((nv[v1],w))
-        weights2[b] = wts2
+    if weights1:
+        weights2 = {}
+        for (b, wts1) in weights1.items():
+            wts2 = []
+            for (v1,w) in wts1:
+                if not killVerts[v1]:
+                    wts2.append((nv[v1],w))
+            weights2[b] = wts2
+    else:
+        weights2 = weights1
 
-    targets2 = []
-    for (name, morphs1) in targets1:
-        morphs2 = []
-        for (v1,dx) in morphs1:
-            if not killVerts[v1]:
-                morphs2.append((nv[v1],dx))
-        targets2.append(name, morphs2)
+    if targets1:
+        targets2 = []
+        for (name, morphs1) in targets1:
+            morphs2 = []
+            for (v1,dx) in morphs1:
+                if not killVerts[v1]:
+                    morphs2.append((nv[v1],dx))
+            targets2.append(name, morphs2)
+    else:
+        targets2 = targets1
 
     return (verts2, vnormals2, uvValues2, faces2, weights2, targets2)
 
@@ -417,21 +423,7 @@ def exportDae(human, fp):
     amt = getArmatureFromRigFile(rigfile, obj)
     #rawTargets = loadShapeKeys("data/templates/shapekeys-facial25.mhx")
     rawTargets = []
-
-    stuffs = []
-    stuff = CStuff('Human', None)
-    stuff.setBones(amt)
-    the.Stuff = stuff
-    foundProxy = setupProxies('Proxy', obj, stuffs, amt, rawTargets, cfg.proxyList)
-    if not foundProxy:
-        mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
-        if the.Options["keepHelpers"]:
-            mesh2 = mesh1
-        else:
-            mesh2 = filterMesh(mesh1, obj)
-        stuff.setMesh(mesh2)
-        stuffs.append(stuff)
-    setupProxies('Clothes', obj, stuffs, amt, rawTargets, cfg.proxyList)
+    (the.Stuff, stuffs) = setupStuff(obj, amt, rawTargets, cfg)
 
     if the.Stuff.verts == None:
         raise NameError("No rig found. Neither main mesh nor rigged proxy enabled")
@@ -507,6 +499,28 @@ def exportDae(human, fp):
     return
 
 #
+#   setupStuff(obj, amt, rawTargets, cfg):
+#
+
+def setupStuff(obj, amt, rawTargets, cfg):
+    stuffs = []
+    stuff = CStuff('Human', None)
+    if amt:
+        stuff.setBones(amt)
+    the.Stuff = stuff
+    foundProxy = setupProxies('Proxy', obj, stuffs, amt, rawTargets, cfg.proxyList)
+    if not foundProxy:
+        mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
+        if the.Options["keepHelpers"]:
+            mesh2 = mesh1
+        else:
+            mesh2 = filterMesh(mesh1, obj)
+        stuff.setMesh(mesh2)
+        stuffs.append(stuff)
+    setupProxies('Clothes', obj, stuffs, amt, rawTargets, cfg.proxyList)
+    return (stuff, stuffs)
+
+#
 #    setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
 #
 
@@ -518,7 +532,8 @@ def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
             if proxy and proxy.name and proxy.texVerts:
                 foundProxy = True
                 stuff = CStuff(proxy.name, proxy)
-                stuff.setBones(amt)
+                if amt:
+                    stuff.setBones(amt)
                 if stuff:
                     print("Stuff", stuff.name, the.Stuff.name)
                     if pfile.type == 'Proxy':

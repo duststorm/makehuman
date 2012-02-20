@@ -21,6 +21,8 @@ Exports proxy mesh to obj
 
 import export_config
 import mh2proxy
+import mh2collada
+import mhx_globals as the
 
 #
 #    exportProxyObj(human, filename):    
@@ -30,58 +32,39 @@ import mh2proxy
 def exportProxyObj(human, name):
     obj = human.meshData
     cfg = export_config.exportConfig(human, False)
-    for pfile in cfg.proxyList:
-        if pfile.useObj:
-            proxy = mh2proxy.readProxyFile(obj, pfile, True)
-            if proxy and proxy.name:
-                filename = "%s_%s.obj" % (name.lower(), proxy.name.lower())
-                exportProxyObj1(obj, filename, proxy)
-    return
-
-def exportProxyObj1(obj, filename, proxy):
+    the.Options = {}
+    the.Options["keepHelpers"] = False
+    (the.Stuff, stuffs) = mh2collada.setupStuff(obj, {}, [], cfg)
+    filename = "%s_clothed.obj" % name
     fp = open(filename, 'w')
     fp.write(
-"# MakeHuman exported OBJ for proxy mesh\n" +
+"# MakeHuman exported OBJ with clothes\n" +
 "# www.makehuman.org\n\n")
-
-    print("OBJ", len(proxy.realVerts))
-    for bary in proxy.realVerts:
-        (x,y,z) = mh2proxy.proxyCoord(bary)
-        fp.write("v %.4f %.4f %.4f\n" % (x, y, z))
-
-    if proxy.texVerts:
-        texVerts = proxy.texVertsLayers[proxy.objFileLayer]
-        for uv in texVerts:
-            fp.write("vt %s %s\n" % (uv[0], uv[1]))
-
-    mat = -1
-    fn = 0
-    grp = None
-    if proxy.texFaces:
-        texFaces = proxy.texFacesLayers[proxy.objFileLayer]
-    else:
-        texFaces = []
-    for (f,g) in proxy.faces:
-        if proxy.materials and proxy.materials[fn] != mat:
-            mat = proxy.materials[fn]
-            fp.write("usemtl %s\n" % matNames[mat])
-        if g != grp:
-            fp.write("g %s\n" % g)
-            grp = g
-        fp.write("f")
-        if texFaces:
-            ft = texFaces[fn]
-            vn = 0
-            for v in f:
-                vt = ft[vn]
-                fp.write(" %d/%d" % (v+1, vt+1))
-                vn += 1
-        else:
-            for v in f:
-                fp.write(" %d" % (v+1))
-        fp.write("\n")
-        fn += 1
+    for stuff in stuffs:
+        writeGeometry(obj, fp, stuff)
     fp.close()
     return
-    
 
+#
+#    writeGeometry(obj, fp, stuff):
+#
+        
+def writeGeometry(obj, fp, stuff):
+    nVerts = len(stuff.verts)
+    nUvVerts = len(stuff.uvValues)
+    fp.write("usemtl %s\n" % stuff.name)
+    fp.write("g %s\n" % stuff.name)    
+    for v in stuff.verts:
+        fp.write("v %.4f %.4f %.4f\n" % (v[0], v[1], v[2]))
+    #for no in stuff.vnormals:
+    #    fp.write("vn %.4f %.4f %.4f\n" % (no[0], no[1], no[2]))
+    for uv in stuff.uvValues:
+        fp.write("vt %.4f %.4f\n" %(uv[0], uv[1]))
+    for fc in stuff.faces:
+        fp.write('f ')
+        for vs in fc:
+            v = vs[0]
+            uv = vs[1]
+            fp.write("%d/%d " % (v-nVerts, uv-nUvVerts))
+        fp.write('\n')
+    return        
