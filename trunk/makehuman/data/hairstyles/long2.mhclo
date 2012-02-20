@@ -3,8 +3,8 @@
 # homepage http://www.makehuman.org/
 # name long2
 # subsurf 1 1
+# texture long2_texture.tif
 # material long2
-texture data/hairstyles/long2_texture.tif
 diffuse_intensity 0.8
 specular_intensity 0.0
 specular_hardness 1

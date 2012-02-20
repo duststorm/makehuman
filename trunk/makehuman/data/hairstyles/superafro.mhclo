@@ -3,8 +3,8 @@
 # homepage http://www.makehuman.org/
 # name superafro
 # subsurf 1 1
+# texture superafro_texture.tif
 # material superafro
-texture data/hairstyles/superafro_texture.tif
 diffuse_intensity 0.8
 specular_intensity 0.0
 specular_hardness 1

@@ -38,7 +38,7 @@ class CProxy:
         self.type = typ
         self.z_depth = 50
         self.layer = layer
-        self.material = None
+        self.material = CMaterial()
         self.verts = {}
         self.realVerts = []
         self.faces = []
@@ -90,25 +90,25 @@ class CProxy:
 #
 
 class CMaterial:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self):
+        self.name = None
         self.settings = []
-        self.texture = None
         self.textureSettings = []
         self.mtexSettings = []
-        return
-        """
-        self.diffuse_color = None
-        self.diffuse_intensity = None
-        self.diffuse_shader = None
-        self.specular_color = None
-        self.specular_intensity = None
-        self.specular_shader = None
+
+        self.diffuse_color = (0.8,0.8,0.8)
+        self.diffuse_intensity = 0.8
+        self.specular_color = (1,1,1)
+        self.specular_intensity = 0.1
+        self.specular_hardness = 25
+        self.transparency = 1
         self.translucency = 0.0
-        self.ambient_color = None
-        self.emit_color = None
+        self.ambient_color = (0,0,0)
+        self.emit_color = (0,0,0)
+	self.alpha = 0.0
+        
         return
-        """
+                
 
 def getFileName(folder, file, suffix):
     folder = os.path.realpath(os.path.expanduser(folder))
@@ -190,7 +190,7 @@ def readProxyFile(obj, file, evalOnLoad):
                 proxy.weights[words[2]] = weights
             elif words[1] == 'material':
                 status = doMaterial
-                proxy.material = CMaterial(words[2])
+                proxy.material.name = words[2]
             elif words[1] == 'useBaseMaterials':
                 proxy.useBaseMaterials = True
             elif words[1] == 'faceNumbers':
@@ -335,7 +335,7 @@ def readProxyFile(obj, file, evalOnLoad):
         elif status == doTexFaces:
             newTexFace(words, proxy)
         elif status == doMaterial:
-            readMaterial(line, proxy.material)
+            readMaterial(line, proxy.material, proxy)
         elif status == doWeights:
             v = int(words[0])
             w = float(words[1])
@@ -393,10 +393,10 @@ def getScale(words, verts, index):
     return num/den
 
 #
-#    readMaterial(line, mat):
+#    readMaterial(line, mat, proxy):
 #
 
-def readMaterial(line, mat):
+def readMaterial(line, mat, proxy):
     words= line.split()
     key = words[0]
     if key in ['diffuse_color', 'specular_color', 'ambient', 'emit']:
@@ -408,14 +408,15 @@ def readMaterial(line, mat):
     elif key in ['diffuse_intensity', 'specular_intensity', 'specular_hardness', 'translucency', 
         'alpha', 'specular_alpha']:
         mat.settings.append( (key, float(words[1])) )
-    elif key == 'texture':
-        mat.texture = words[1]
     elif key in ['diffuse_color_factor', 'alpha_factor', 'translucency_factor']:
         mat.mtexSettings.append( (key, float(words[1])) )
     elif key in ['use_map_color_diffuse', 'use_map_alpha']:
         mat.mtexSettings.append( (key, int(words[1])) )
     elif key in ['use_alpha']:
         mat.textureSettings.append( (key, int(words[1])) )
+    elif key == 'texture':
+    	tex = os.path.realpath(os.path.expanduser(words[1]))
+    	proxy.texture = os.path.split(tex)
     else:
         raise NameError("Material %s?" % key)
 

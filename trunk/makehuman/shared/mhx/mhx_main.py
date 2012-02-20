@@ -653,9 +653,7 @@ def copyProxyMaterialFile(fp, pair, mat, proxy, proxyData):
 #
 
 def writeProxyMaterial(fp, mat, proxy, proxyData):
-    if mat.texture:
-        tex = mat.texture
-    elif proxy.texture:
+    if proxy.texture:
         (folder,name) = proxy.texture
         tex = os.path.join(folder,name)
     else:

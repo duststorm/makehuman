@@ -3,9 +3,15 @@
 # homepage http://www.makehuman.org/
 # name Rorkimaru
 # obj_file rorkimaru.obj
-# texture ./data/textures/texture.tif
 # material Skin
 texture ./data/textures/texture.tif
+diffuse_color 0.8 0.54 0.35
+diffuse_shader LAMBERT
+diffuse_intensity 0.7
+specular_color 1.0000 1.0000 1.0000
+specular_shader COOKTORR
+specular_intensity 0.25
+specular_hardness 10
 # x_scale 4302 8697 1.3379
 # z_scale 8208 8220 1.7896
 # y_scale 8223 6827 1.7689

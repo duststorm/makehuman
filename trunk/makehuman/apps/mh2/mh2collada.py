@@ -539,9 +539,7 @@ def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
 def writeImages(obj, fp, stuff, human):
     print(stuff)
     if stuff.type:
-        if stuff.material and stuff.material.texture:
-            textures = [stuff.material.texture]
-        elif stuff.texture:
+        if stuff.texture:
             textures = [stuff.texture]
         else:
             return
@@ -549,57 +547,144 @@ def writeImages(obj, fp, stuff, human):
     else:
         path = "data/textures"
         textures = [(path, "texture.tif"), (path, "texture_ref.tif")]
+    print("TX", textures)
     for (folder, texfile) in textures:  
         path = export_config.getOutFileName(texfile, folder, True, human, the.Config)        
         (fname, ext) = os.path.splitext(texfile)  
-        ext = ext[1:]
+        name = "%s_%s" % (fname, ext[1:])
+        if the.Config.separatefolder:
+            texpath = "textures/"+texfile
+        else:
+            texpath = path
         fp.write(
-'    <image id="%s_%s" name="%s_%s">\n' % (fname, ext, fname, ext) +
-'      <init_from>"%s"</init_from>\n' % path +
-'    </image>\n')
+        '    <image id="%s" name="%s">\n' % (name, name) +
+        '      <init_from>%s</init_from>\n' % texpath +
+        '    </image>\n'
+        )
     return
 
 #
 #    writeEffects(obj, fp, stuff):
-#    writeColor(fp, name, color, insist):
+#    writeColor(fp, tech, tex, color):
+#   writeIntensity(fp, tech, tex, value):
 #
 
-def writeColor(fp, name, color, insist):
-    if color:
-        (r,g,b) = color
-    elif insist:
-        (r,g,b) = insist
-    else:
-        return
-    fp.write(
-'            <%s>\n' % name +
-'              <color>%.4f %.4f %.4f 1</color>\n' % (r,g,b) +
-'            </%s>\n' %name)
+def writeColor(fp, tech, tex, color):
+    (r,g,b) = color
+    fp.write('            <%s><color>%.4f %.4f %.4f 1</color> \n' % (tech, r, g, b) )
+    if tex:
+        fp.write('              <texture texture="%s-sampler" texcoord="UVTex"/>\n' % tex)
+    fp.write('            </%s>\n' % tech)
     return 
-
+    
+def writeIntensity(fp, tech, tex, value):
+    fp.write('            <%s><float>%s</float>\n' % (tech, value))
+    if tex:
+        fp.write('              <texture texture="%s-sampler" texcoord="UVTex"/>\n' % tex)
+    fp.write('            </%s>\n' % tech)
+    
 BlenderDaeColor = {
     'diffuse_color' : 'diffuse',
     'specular_color' : 'specular',
     'emit_color' : 'emission',
-    'ambient_color' : 'ambient'
+    'ambient_color' : 'ambient',
 }
 
+BlenderDaeIntensity = {
+    'specular_hardness' : 'shininess',
+    'alpha' : 'transparency',
+}
+
+DefaultMaterialSettings = {    
+    'diffuse': (0.8,0.8,0.8),
+    'specular': (1,1,1),
+    'transparency' : 0,
+    'shininess' : 10,
+}
+
+def getNamesFromStuff(stuff):
+    print("get", stuff)
+    if not stuff.type:
+        return ("SkinShader", None, "SkinShader")
+    texname = None
+    texfile = None
+    matname = None
+    if stuff.texture:        
+        print("tex", stuff.texture)
+        (folder, fname) = stuff.texture
+        (texname, ext) = os.path.splitext(fname)
+        texfile = ("%s_%s" % (texname, ext[1:]))
+    if stuff.material:
+        print("mat", stuff.material)
+        matname = stuff.material.name
+    return (texname, texfile, matname)
+
 def writeEffects(obj, fp, stuff):
-    mat = stuff.material
-    if mat:
-        fp.write(
-'    <effect id="%s-effect">\n' % mat.name +
-'      <profile_COMMON>\n' +
-'        <technique sid="common">\n' +
-'          <phong>\n')
-        for (key, value) in mat.settings:
+    (texname, texfile, matname) = getNamesFromStuff(stuff)
+    if not stuff.type:
+        tex = "texture_tif"
+        writeEffectStart(fp, "SkinShader")
+        writeSurfaceSampler(fp, tex)
+        writeSurfaceSampler(fp, "texture_ref_tif")
+        writePhongStart(fp)
+        for tech in ["diffuse", "transparent"]:
+            fp.write(
+'            <%s>\n' % tech +
+'              <texture texture="%s-sampler" texcoord="UVTex"/>\n' % tex +
+'            </%s>\n' % tech)
+        for tech in ["specular"]:
+            writeColor(fp, tech, None, DefaultMaterialSettings[tech])        
+        for (tech, value) in [("shininess", 10), ("transparency", 0)]:
+            writeIntensity(fp, tech, None, value)
+        writePhongEnd(fp)            
+    elif matname:
+        print("Mat", matname, texname, texfile)
+        writeEffectStart(fp, matname)
+        writeSurfaceSampler(fp, texfile)
+        writePhongStart(fp)
+        doneTex = False
+        print("MS", stuff.material.settings)
+        for (key, value) in stuff.material.settings:
             print("mat", key,value)
             try:
-                daeKey = BlenderDaeColor[key]
+                tech = BlenderDaeColor[key]
             except:
-                daeKey = None
-            if daeKey:
-                writeColor(fp, daeKey, value, (0.8,0.8,0.8))
+                tech = None
+            if tech:
+                if tech == "diffuse":
+                    writeColor(fp, tech, texfile, value)
+                    doneTex = True
+                else:
+                    writeColor(fp, tech, None, value)
+            try:
+                tech = BlenderDaeIntensity[tech]
+            except:
+                tech = None
+            if tech:
+                writeIntensity(fp, tech, None, value)
+        if not doneTex and texfile:   
+            for (tech, value) in DefaultMaterialSettings.items():
+                if tech == "diffuse":
+                    writeColor(fp, tech, texfile, value)
+                elif type(value) == tuple:
+                    writeColor(fp, tech, None, value)
+                else:
+                    writeIntensity(fp, tech, None, value)
+                
+        writePhongEnd(fp)
+    return
+
+def writeEffectStart(fp, name):        
+        fp.write(
+'    <effect id="%s-effect">\n' % name +
+'      <profile_COMMON>\n')
+
+def writePhongStart(fp): 
+        fp.write(
+'        <technique sid="common">\n' +
+'          <phong>\n')
+
+def writePhongEnd(fp):        
         fp.write(
 '          </phong>\n' +
 '          <extra/>\n' +
@@ -612,17 +697,6 @@ def writeEffects(obj, fp, stuff):
 '      </profile_COMMON>\n' +
 '      <extra><technique profile="MAX3D"><double_sided>1</double_sided></technique></extra>\n' +
 '    </effect>\n')
-    elif not stuff.type:
-        fp.write(
-'    <effect id="SkinShader-effect">\n' +
-'      <profile_COMMON>\n')
-        writeSurfaceSampler(fp, "texture_tif")
-        writeSurfaceSampler(fp, "texture_ref_tif")
-        writePhongTechniques(fp, "texture_tif", ["diffuse", "transparency"])
-        fp.write(
-'      </profile_COMMON>\n' +
-'    </effect>\n')
-    return
 
 def writeSurfaceSampler(fp, tex):
     fp.write(
@@ -637,37 +711,17 @@ def writeSurfaceSampler(fp, tex):
 '          </sampler2D>\n' +
 '        </newparam>\n')
 
-def writePhongTechniques(fp, tex, techniques):        
-    fp.write(
-'        <technique sid="common">\n' +
-'          <phong>\n')
-    for tech in techniques:
-        fp.write(
-'            <%s>\n' % tech +
-'              <texture texture="%s-sampler" texcoord="UVTex"/>\n' % tex +
-'            </%s>\n' % tech)
-    fp.write(
-'            <index_of_refraction>\n' +
-'              <float>1</float>\n' +
-'            </index_of_refraction>\n' +
-'          </phong>\n' +
-'        </technique>\n')
-
 #
 #    writeMaterials(obj, fp, stuff):
 #
 
 def writeMaterials(obj, fp, stuff):
-    mat = stuff.material
-    if mat:
+    (texname, texfile, matname) = getNamesFromStuff(stuff)
+    print(texname, matname)
+    if matname:
         fp.write(
-'    <material id="%s" name="%s">\n' % (mat.name, mat.name) +
-'      <instance_effect url="#%s-effect"/>\n' % mat.name +
-'    </material>\n')
-    elif not stuff.type:
-        fp.write(
-'    <material id="SkinShader" name="SkinShader">\n' +
-'      <instance_effect url="#SkinShader-effect"/>\n' +
+'    <material id="%s" name="%s">\n' % (matname, matname) +
+'      <instance_effect url="#%s-effect"/>\n' % matname +
 '    </material>\n')
     return
 
@@ -1043,13 +1097,7 @@ def writeNode(obj, fp, pad, stuff):
 '%s  <instance_controller url="#%s-skin">\n' % (pad, stuff.name) +
 '%s    <skeleton>#%s</skeleton>\n' % (pad, the.Root))
 
-    if stuff.type == None:
-        matname = 'SkinShader'
-    elif stuff.material:
-        matname = stuff.material.name
-    else:
-        matname = None
-
+    (texname, texfile, matname) = getNamesFromStuff(stuff)    
     if matname:
         fp.write(
 '%s    <bind_material>\n' % pad +

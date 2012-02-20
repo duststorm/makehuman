@@ -3,8 +3,8 @@
 # homepage http://www.makehuman.org/
 # name curly
 # subsurf 1 1
+# texture curly_texture.tif
 # material curly
-texture data/hairstyles/curly_texture.tif
 diffuse_intensity 0.8
 specular_intensity 0.0
 specular_hardness 1
