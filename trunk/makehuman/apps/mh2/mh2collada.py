@@ -46,20 +46,21 @@ Delta = [0,0.01,0]
 # exportCollada(human, filename, options):
 #
 
-def exportCollada(human, name, options):
+def exportCollada(human, filename, options):
     time1 = time.clock()
     the.Config = export_config.exportConfig(human, True, [])
     the.Config.separatefolder = True
     the.Rotate90 = options["rotate90"]
     the.Config.pngTexture = options["pngTexture"]
     the.Options = options
-    outfile = export_config.getOutFileFolder(name+".dae", the.Config)        
+    outfile = export_config.getOutFileFolder(filename+".dae", the.Config)        
     try:
         fp = open(outfile, 'w')
         export_config.safePrint("Writing Collada file", outfile)
     except:
         export_config.safePrint("Unable to open file for writing", outfile)
-    exportDae(human, fp)
+    (name,ext) = os.path.splitext(os.path.basename(outfile))
+    exportDae(human, name, fp)
     fp.close()
     time2 = time.clock()
     export_config.safePrint("Wrote Collada file in %g s:" % (time2-time1), outfile)
@@ -414,10 +415,10 @@ def filterMesh(mesh1, obj):
     return (verts2, vnormals2, uvValues2, faces2, weights2, targets2)
 
 #
-#    exportDae(human, fp):
+#    exportDae(human, name, fp):
 #
 
-def exportDae(human, fp):
+def exportDae(human, name, fp):
     cfg = export_config.exportConfig(human, True)
     obj = human.meshData
     rigfile = "data/rigs/%s.rig" % the.Options["daerig"]
@@ -425,11 +426,8 @@ def exportDae(human, fp):
     amt = getArmatureFromRigFile(rigfile, obj)
     #rawTargets = loadShapeKeys("data/templates/shapekeys-facial25.mhx")
     rawTargets = []
-    (the.Stuff, stuffs) = setupStuff(obj, amt, rawTargets, cfg)
+    (the.Stuff, stuffs) = setupStuff(name, obj, amt, rawTargets, cfg)
 
-    if the.Stuff.verts == None:
-        raise NameError("No rig found. Neither main mesh nor rigged proxy enabled")
-        
     date = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime())
     if the.Rotate90:
         upaxis = 'Z_UP'
@@ -502,16 +500,16 @@ def exportDae(human, fp):
     return
 
 #
-#   setupStuff(obj, amt, rawTargets, cfg):
+#   setupStuff(name, obj, amt, rawTargets, cfg):
 #
 
-def setupStuff(obj, amt, rawTargets, cfg):
+def setupStuff(name, obj, amt, rawTargets, cfg):
     stuffs = []
-    stuff = CStuff('Human', None)
+    stuff = CStuff(name, None)
     if amt:
         stuff.setBones(amt)
     the.Stuff = stuff
-    foundProxy = setupProxies('Proxy', obj, stuffs, amt, rawTargets, cfg.proxyList)
+    foundProxy = setupProxies('Proxy', name, obj, stuffs, amt, rawTargets, cfg.proxyList)
     if not foundProxy:
         mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
         if the.Options["keepHelpers"]:
@@ -520,21 +518,24 @@ def setupStuff(obj, amt, rawTargets, cfg):
             mesh2 = filterMesh(mesh1, obj)
         stuff.setMesh(mesh2)
         stuffs.append(stuff)
-    setupProxies('Clothes', obj, stuffs, amt, rawTargets, cfg.proxyList)
+    setupProxies('Clothes', None, obj, stuffs, amt, rawTargets, cfg.proxyList)
     return (stuff, stuffs)
 
 #
-#    setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
+#    setupProxies(typename, name, obj, stuffs, amt, rawTargets, proxyList):
 #
 
-def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
+def setupProxies(typename, name, obj, stuffs, amt, rawTargets, proxyList):
     foundProxy = False    
     for pfile in proxyList:
         if pfile.useDae and pfile.type == typename:
             proxy = mh2proxy.readProxyFile(obj, pfile, True)
             if proxy and proxy.name and proxy.texVerts:
                 foundProxy = True
-                stuff = CStuff(proxy.name, proxy)
+                if name:
+                    stuff = CStuff(name, proxy)
+                else:
+                    stuff = CStuff(proxy.name, proxy)
                 if amt:
                     stuff.setBones(amt)
                 if stuff:
