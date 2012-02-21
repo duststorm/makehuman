@@ -49,7 +49,7 @@ Delta = [0,0.01,0]
 def exportCollada(human, name, options):
     time1 = time.clock()
     the.Config = export_config.exportConfig(human, True, [])
-    the.Config.separatefolder = options["separatefolder"]
+    the.Config.separatefolder = True
     the.Rotate90 = options["rotate90"]
     the.Options = options
     outfile = export_config.getOutFileFolder(name+".dae", the.Config)        
@@ -94,11 +94,11 @@ def flatten(hier, bones):
 #
 #
 
-def printLoc(fp, loc):
+def printLoc(fp, loc, scale):
     if the.Rotate90:
-        fp.write("%.4f %.4f %.4f " % (loc[0], -loc[2], loc[1]))
+        fp.write("%.4f %.4f %.4f " % (scale*loc[0], -scale*loc[2], scale*loc[1]))
     else:
-        fp.write("%.4f %.4f %.4f " % (loc[0], loc[1], loc[2]))
+        fp.write("%.4f %.4f %.4f " % (scale*loc[0], scale*loc[1], scale*loc[2]))
 
 #
 #    boneOK(flags, bone, parent):
@@ -210,7 +210,8 @@ def printNode(fp, name, vec, extra, pad):
     fp.write('\n'+
 '%s      <node %s %s type="JOINT" %s>\n' % (pad, extra, nameStr, idStr) +
 '%s        <translate sid="translate"> ' % pad)
-    printLoc(fp, vec)
+    (scale, name) = the.Options["scale"]
+    printLoc(fp, vec, scale)
     fp.write('</translate>\n' +
 '%s        <rotate sid="rotateZ">0 0 1 0.0</rotate>\n' % pad +
 '%s        <rotate sid="rotateY">0 1 0 0.0</rotate>\n' % pad +
@@ -433,6 +434,7 @@ def exportDae(human, fp):
         upaxis = 'Z_UP'
     else:
         upaxis = 'Y_UP'
+    (scale, unit) = the.Options["scale"]        
         
     fp.write('<?xml version="1.0" encoding="utf-8"?>\n' +
 '<COLLADA version="1.4.0" xmlns="http://www.collada.org/2005/11/COLLADASchema">\n' +
@@ -442,7 +444,7 @@ def exportDae(human, fp):
 '    </contributor>\n' +
 '    <created>%s</created>\n' % date +
 '    <modified>%s</modified>\n' % date +
-'    <unit meter="0.1" name="decimeter"/>\n' +
+'    <unit meter="%.4f" name="%s"/>\n' % (0.1/scale, unit) +
 '    <up_axis>%s</up_axis>\n' % upaxis+
 '  </asset>\n' +
 '  <library_images>\n')
@@ -775,6 +777,7 @@ def writeController(obj, fp, stuff):
     nWeights = len(stuff.skinWeights)
     nBones = len(stuff.bones)
     nTargets = len(stuff.targets)
+    (scale, unit) = the.Options["scale"]
 
     fp.write('\n' +
 '    <controller id="%s-skin">\n' % stuff.name +
@@ -823,13 +826,13 @@ def writeController(obj, fp, stuff):
     for b in stuff.bones:
         vec = stuff.rigHead[b]
         if the.Rotate90:
-            mat[0][3] = -vec[0]
-            mat[1][3] = vec[2]
-            mat[2][3] = -vec[1]
+            mat[0][3] = -scale*vec[0]
+            mat[1][3] = scale*vec[2]
+            mat[2][3] = -scale*vec[1]
         else:            
-            mat[0][3] = -vec[0]
-            mat[1][3] = -vec[1]
-            mat[2][3] = -vec[2]
+            mat[0][3] = -scale*vec[0]
+            mat[1][3] = -scale*vec[1]
+            mat[2][3] = -scale*vec[2]
         fp.write('\n            ')
         for i in range(4):
             for j in range(4):
@@ -931,6 +934,7 @@ def writeGeometry(obj, fp, stuff):
     nWeights = len(stuff.skinWeights)
     nBones = len(stuff.bones)
     nTargets = len(stuff.targets)
+    (scale, unit) = the.Options["scale"]
 
     fp.write('\n' +
 '    <geometry id="%sMesh" name="%s">\n' % (stuff.name,stuff.name) +
@@ -941,7 +945,7 @@ def writeGeometry(obj, fp, stuff):
 
 
     for v in stuff.verts:
-        printLoc(fp, v)
+        printLoc(fp, v, scale)
 
     fp.write('\n' +
 '          </float_array>\n' +
@@ -958,7 +962,7 @@ def writeGeometry(obj, fp, stuff):
 '          ')
 
     for no in stuff.vnormals:
-        printLoc(fp, no)
+        printLoc(fp, no, scale)
 
     fp.write('\n' +
 '          </float_array>\n' +

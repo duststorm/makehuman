@@ -278,6 +278,8 @@ class ExportTaskView(gui3d.TaskView):
         self.exportGroups = self.objOptions.addView(gui3d.CheckBox("Groups", True));y+=24
         self.exportSmooth = self.objOptions.addView(gui3d.CheckBox( "Subdivide", False));y+=24
         self.exportHair = self.objOptions.addView(gui3d.CheckBox("Hair as mesh", selected=True));y+=24
+        scales = []
+        (y, self.objScales) = self.addScales( self.objOptions, scales, "Obj", True, y)
         
         # MHX options
         y = yy
@@ -313,6 +315,8 @@ class ExportTaskView(gui3d.TaskView):
         self.colladaRot90 = self.colladaOptions.addView(gui3d.CheckBox("Rotate 90", False));y+=24
         self.keepHelpers = self.colladaOptions.addView(gui3d.CheckBox("Keep helper geometry", False));y+=24
         self.colladaSeparateFolder = self.colladaOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
+        scales = []
+        (y, self.daeScales) = self.addScales( self.colladaOptions, scales, "Dae", True, y)
         rigs = []
         (y, self.daeRigs) = self.addRigs( self.colladaOptions, rigs, "Dae", True, y)
         self.colladaOptions.hide()
@@ -416,7 +420,12 @@ class ExportTaskView(gui3d.TaskView):
                     os.path.join(exportPath, filename + ".obj"),
                     self.exportGroups.selected,
                     filter)
-                mh2obj_proxy.exportProxyObj(human, os.path.join(exportPath, filename))
+                    
+                options = {
+                    "keepHelpers" : self.exportDiamonds.selected,
+                    "scale": self.getScale(self.objScales)
+                }                    
+                mh2obj_proxy.exportProxyObj(human, os.path.join(exportPath, filename), options)
                 
                 if self.exportSkeleton.selected:
                     mh2bvh.exportSkeleton(human.meshData, os.path.join(exportPath, filename + ".bvh"))
@@ -464,12 +473,13 @@ class ExportTaskView(gui3d.TaskView):
                 for (button, rig) in self.daeRigs:
                     if button.selected:
                         break
-                print("Selected", rig)                            
+                print("Selected", rig)    
+                
                 options = {
                     "daerig": rig,
                     "rotate90" : self.colladaRot90.selected,
                     "keepHelpers" : self.keepHelpers.selected,
-                    "separatefolder":self.colladaSeparateFolder.selected,
+                    "scale": self.getScale(self.daeScales)
                 }
                 mh2collada.exportCollada(gui3d.app.selectedHuman, os.path.join(exportPath, filename), options)
             elif self.md5.selected:
@@ -555,7 +565,7 @@ class ExportTaskView(gui3d.TaskView):
         
     def addRigs(self, options, rigs, suffix, check, y):
         path = "data/rigs"
-        addedRigs = []
+        buttons = []
         for fname in os.listdir(path):
             (name, ext) = os.path.splitext(fname)
             if ext == ".rig":
@@ -564,11 +574,35 @@ class ExportTaskView(gui3d.TaskView):
                 exec(expr)
                 check = False
                 y += 24
-                addedRig = eval('self.%s%s' % (name, suffix))
-                addedRigs.append((addedRig,name))
-        return (y, addedRigs)                
-        
+                button = eval('self.%s%s' % (name, suffix))
+                buttons.append((button,name))
+        return (y, buttons)                
 
+    def addScales(self, options, scales, suffix, check, y):
+        buttons = []
+        for name in ["decimeter", "meter", "inch", "centimeter"]:
+            expr = 'self.%s%s = options.addView(gui3d.RadioButton(scales, "%s", check))' % (name, suffix, name)
+            print(expr)
+            exec(expr)
+            check = False
+            y += 24
+            button = eval('self.%s%s' % (name, suffix))
+            buttons.append((button,name))
+        return (y, buttons)   
+        
+    def getScale(self, buttons):
+        for (button, name) in buttons:
+            if button.selected:
+                if name == "decimeter":
+                    return (1.0, name)
+                elif name == "meter":
+                    return (0.1, name)
+                elif name == "inch":
+                    return (0.254, name)
+                elif name == "centimeter":
+                    return (10, name)
+        return (1, "decimeter")                    
+        
 class FilesCategory(gui3d.Category):
 
     def __init__(self, parent):

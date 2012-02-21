@@ -26,36 +26,35 @@ import mhx_globals as the
 
 #
 #    exportProxyObj(human, filename):    
-#    exportProxyObj1(obj, filename, proxy):
 #
 
-def exportProxyObj(human, name):
+def exportProxyObj(human, name, options):
     obj = human.meshData
     cfg = export_config.exportConfig(human, False)
-    the.Options = {}
-    the.Options["keepHelpers"] = False
+    the.Options = options
     (the.Stuff, stuffs) = mh2collada.setupStuff(obj, {}, [], cfg)
+    (scale, unit) = options["scale"]
     filename = "%s_clothed.obj" % name
     fp = open(filename, 'w')
     fp.write(
 "# MakeHuman exported OBJ with clothes\n" +
 "# www.makehuman.org\n\n")
     for stuff in stuffs:
-        writeGeometry(obj, fp, stuff)
+        writeGeometry(obj, fp, stuff, scale)
     fp.close()
     return
 
 #
-#    writeGeometry(obj, fp, stuff):
+#    writeGeometry(obj, fp, stuff, scale):
 #
         
-def writeGeometry(obj, fp, stuff):
+def writeGeometry(obj, fp, stuff, scale):
     nVerts = len(stuff.verts)
     nUvVerts = len(stuff.uvValues)
     fp.write("usemtl %s\n" % stuff.name)
     fp.write("g %s\n" % stuff.name)    
     for v in stuff.verts:
-        fp.write("v %.4f %.4f %.4f\n" % (v[0], v[1], v[2]))
+        fp.write("v %.4f %.4f %.4f\n" % (scale*v[0], scale*v[1], scale*v[2]))
     #for no in stuff.vnormals:
     #    fp.write("vn %.4f %.4f %.4f\n" % (no[0], no[1], no[2]))
     for uv in stuff.uvValues:
