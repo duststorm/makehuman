@@ -31,7 +31,7 @@ import mhx_globals as the
 
 def exportProxyObj(human, name, options):
     obj = human.meshData
-    the.Config = export_config.exportConfig(human, False)
+    the.Config = export_config.exportConfig(human, True)
     the.Options = options
     the.Config.separatefolder = True
     print(options.items())
