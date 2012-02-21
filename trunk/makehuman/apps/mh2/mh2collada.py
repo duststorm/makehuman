@@ -537,7 +537,6 @@ def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
                 if amt:
                     stuff.setBones(amt)
                 if stuff:
-                    print("Stuff", stuff.name, the.Stuff.name)
                     if pfile.type == 'Proxy':
                         the.Stuff = stuff
                     if the.Stuff:
@@ -554,7 +553,6 @@ def setupProxies(typename, obj, stuffs, amt, rawTargets, proxyList):
 #
 
 def writeImages(obj, fp, stuff, human):
-    print(stuff)
     if stuff.type:
         if stuff.texture:
             textures = [stuff.texture]
@@ -564,7 +562,6 @@ def writeImages(obj, fp, stuff, human):
     else:
         path = "data/textures"
         textures = [(path, "texture.tif"), (path, "texture_ref.tif")]
-    print("TX", textures)
     for (folder, texfile) in textures:  
         path = export_config.getOutFileName(texfile, folder, True, human, the.Config)        
         (fname, ext) = os.path.splitext(texfile)  
@@ -620,19 +617,16 @@ DefaultMaterialSettings = {
 }
 
 def getNamesFromStuff(stuff):
-    print("get", stuff)
     if not stuff.type:
         return ("SkinShader", None, "SkinShader")
     texname = None
     texfile = None
     matname = None
     if stuff.texture:        
-        print("tex", stuff.texture)
         (folder, fname) = stuff.texture
         (texname, ext) = os.path.splitext(fname)
         texfile = ("%s_%s" % (texname, ext[1:]))
     if stuff.material:
-        print("mat", stuff.material)
         matname = stuff.material.name
     return (texname, texfile, matname)
 
@@ -655,14 +649,11 @@ def writeEffects(obj, fp, stuff):
             writeIntensity(fp, tech, None, value)
         writePhongEnd(fp)            
     elif matname:
-        print("Mat", matname, texname, texfile)
         writeEffectStart(fp, matname)
         writeSurfaceSampler(fp, texfile)
         writePhongStart(fp)
         doneTex = False
-        print("MS", stuff.material.settings)
         for (key, value) in stuff.material.settings:
-            print("mat", key,value)
             try:
                 tech = BlenderDaeColor[key]
             except:
@@ -734,7 +725,6 @@ def writeSurfaceSampler(fp, tex):
 
 def writeMaterials(obj, fp, stuff):
     (texname, texfile, matname) = getNamesFromStuff(stuff)
-    print(texname, matname)
     if matname:
         fp.write(
 '    <material id="%s" name="%s">\n' % (matname, matname) +
