@@ -584,13 +584,11 @@ def writeImages(obj, fp, stuff, human):
 
 #
 #    writeEffects(obj, fp, stuff):
-#    writeColor(fp, tech, tex, color):
-#   writeIntensity(fp, tech, tex, value):
 #
 
-def writeColor(fp, tech, tex, color):
+def writeColor(fp, tech, tex, color, s):
     (r,g,b) = color
-    fp.write('            <%s><color>%.4f %.4f %.4f 1</color> \n' % (tech, r, g, b) )
+    fp.write('            <%s><color>%.4f %.4f %.4f 1</color> \n' % (tech, r*s, g*s, b*s) )
     if tex:
         fp.write('              <texture texture="%s-sampler" texcoord="UVTex"/>\n' % tex)
     fp.write('            </%s>\n' % tech)
@@ -601,6 +599,14 @@ def writeIntensity(fp, tech, tex, value):
     if tex:
         fp.write('              <texture texture="%s-sampler" texcoord="UVTex"/>\n' % tex)
     fp.write('            </%s>\n' % tech)
+    return
+    
+def writeTexture(fp, tech, tex):            
+    fp.write(
+'            <%s>\n' % tech +
+'              <texture texture="%s-sampler" texcoord="UVTex"/>\n' % tex +
+'            </%s>\n' % tech)
+    return    
     
 BlenderDaeColor = {
     'diffuse_color' : 'diffuse',
@@ -611,13 +617,12 @@ BlenderDaeColor = {
 
 BlenderDaeIntensity = {
     'specular_hardness' : 'shininess',
-    'alpha' : 'transparency',
 }
 
 DefaultMaterialSettings = {    
     'diffuse': (0.8,0.8,0.8),
-    'specular': (1,1,1),
-    'transparency' : 0,
+    'specular': (0.1,0.1,0.1),
+    'transparency' : 1,
     'shininess' : 10,
 }
 
@@ -643,47 +648,57 @@ def writeEffects(obj, fp, stuff):
         writeSurfaceSampler(fp, tex)
         writeSurfaceSampler(fp, "texture_ref_tif")
         writePhongStart(fp)
-        for tech in ["diffuse", "transparent"]:
-            fp.write(
-'            <%s>\n' % tech +
-'              <texture texture="%s-sampler" texcoord="UVTex"/>\n' % tex +
-'            </%s>\n' % tech)
-        for tech in ["specular"]:
-            writeColor(fp, tech, None, DefaultMaterialSettings[tech])        
-        for (tech, value) in [("shininess", 10), ("transparency", 0)]:
-            writeIntensity(fp, tech, None, value)
+        writeTexture(fp, 'diffuse', tex)
+        writeTexture(fp, 'transparent', tex)
+        writeColor(fp, 'specular', None, (1,1,1), 0.1)        
+        writeIntensity(fp, 'shininess', None, 10)
+        writeIntensity(fp, 'transparency', None, 0)
         writePhongEnd(fp)            
     elif matname:
+        mat = stuff.material
         writeEffectStart(fp, matname)
         writeSurfaceSampler(fp, texfile)
         writePhongStart(fp)
-        doneTex = False
-        for (key, value) in stuff.material.settings:
-            try:
-                tech = BlenderDaeColor[key]
-            except:
-                tech = None
-            if tech:
-                if tech == "diffuse":
-                    writeColor(fp, tech, texfile, value)
-                    doneTex = True
-                else:
-                    writeColor(fp, tech, None, value)
-            try:
-                tech = BlenderDaeIntensity[tech]
-            except:
-                tech = None
-            if tech:
-                writeIntensity(fp, tech, None, value)
-        if not doneTex and texfile:   
-            for (tech, value) in DefaultMaterialSettings.items():
-                if tech == "diffuse":
-                    writeColor(fp, tech, texfile, value)
-                elif type(value) == tuple:
-                    writeColor(fp, tech, None, value)
-                else:
-                    writeIntensity(fp, tech, None, value)
-                
+        doneDiffuse = False
+        doneSpec = False
+        diffInt = 1
+        specInt = 0.1
+        for (key, value) in mat.settings:
+            if key == "diffuse_intensity":
+                diffInt = value
+            elif key == "specular_intensity":
+                specInt = value
+        for (key, value) in mat.settings:
+            if key == "diffuse_color":
+                writeColor(fp, 'diffuse', texfile, value, diffInt)
+                if mat.use_transparency:
+                    writeTexture(fp, 'transparent', texfile)
+                    writeIntensity(fp, 'transparency', None, mat.alpha)
+                doneDiffuse = True
+            elif key == "specular_color":
+                writeColor(fp, 'specular', None, value, specInt)
+                doneSpec = True
+            else:                
+                try:
+                    tech = BlenderDaeColor[key]
+                except:
+                    tech = None
+                if tech:
+                    writeColor(fp, tech, None, value, 1)
+                try:
+                    tech = BlenderDaeIntensity[tech]
+                except:
+                    tech = None
+                if tech:
+                    writeIntensity(fp, tech, None, value, 1)
+        if not doneDiffuse:   
+            writeColor(fp, "diffuse", texfile, (1,1,1), 0.8)
+            if mat.use_transparency:
+                writeTexture(fp, 'transparent', texfile)
+                writeIntensity(fp, 'transparency', None, mat.alpha)
+        if not doneSpec:
+            writeColor(fp, 'specular', None, (1,1,1), 0.1)        
+            writeIntensity(fp, 'shininess', None, 10)                
         writePhongEnd(fp)
     return
 

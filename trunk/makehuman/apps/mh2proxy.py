@@ -105,7 +105,8 @@ class CMaterial:
         self.translucency = 0.0
         self.ambient_color = (0,0,0)
         self.emit_color = (0,0,0)
-        self.alpha = 0.0
+        self.use_transparency = False
+        self.alpha = 1
         
         return
                 
@@ -419,6 +420,9 @@ def readMaterial(line, mat, proxy):
         proxy.texture = os.path.split(tex)
     else:
         raise NameError("Material %s?" % key)
+    if key == 'alpha':
+    	mat.alpha = float(words[1])
+    	mat.use_transparency = True
 
 #
 #    getLoc(joint, obj):
