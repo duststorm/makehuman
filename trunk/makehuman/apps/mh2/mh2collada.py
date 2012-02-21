@@ -51,6 +51,7 @@ def exportCollada(human, name, options):
     the.Config = export_config.exportConfig(human, True, [])
     the.Config.separatefolder = True
     the.Rotate90 = options["rotate90"]
+    the.Config.pngTexture = options["pngTexture"]
     the.Options = options
     outfile = export_config.getOutFileFolder(name+".dae", the.Config)        
     try:
@@ -561,11 +562,14 @@ def writeImages(obj, fp, stuff, human):
         human = None
     else:
         path = "data/textures"
-        textures = [(path, "texture.tif"), (path, "texture_ref.tif")]
+        if the.Config.pngTexture:
+            textures = [(path, "texture.png")]
+        else:
+            textures = [(path, "texture.tif")]
     for (folder, texfile) in textures:  
         path = export_config.getOutFileName(texfile, folder, True, human, the.Config)        
         (fname, ext) = os.path.splitext(texfile)  
-        name = "%s_%s" % (fname, ext[1:])
+        name = "%s_tif" % fname
         if the.Config.separatefolder:
             texpath = "textures/"+texfile
         else:

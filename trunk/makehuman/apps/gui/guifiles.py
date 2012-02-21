@@ -278,9 +278,10 @@ class ExportTaskView(gui3d.TaskView):
         self.exportGroups = self.objOptions.addView(gui3d.CheckBox("Groups", True));y+=24
         self.exportSmooth = self.objOptions.addView(gui3d.CheckBox( "Subdivide", False));y+=24
         self.exportHair = self.objOptions.addView(gui3d.CheckBox("Hair as mesh", selected=True));y+=24
+        self.exportPngTexture = self.objOptions.addView(gui3d.CheckBox("PNG texture", selected=True));y+=24
         scales = []
         (y, self.objScales) = self.addScales( self.objOptions, scales, "Obj", True, y)
-        
+
         # MHX options
         y = yy
         self.mhxOptionsSource = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options source', gui3d.GroupBoxStyle._replace(height=25+24*2+6)));y+=25
@@ -314,7 +315,8 @@ class ExportTaskView(gui3d.TaskView):
         self.colladaOptions = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*8+6)));y+=25
         self.colladaRot90 = self.colladaOptions.addView(gui3d.CheckBox("Rotate 90", False));y+=24
         self.keepHelpers = self.colladaOptions.addView(gui3d.CheckBox("Keep helper geometry", False));y+=24
-        self.colladaSeparateFolder = self.colladaOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
+        #self.colladaSeparateFolder = self.colladaOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
+        self.colladaPngTexture = self.colladaOptions.addView(gui3d.CheckBox("PNG texture", selected=True));y+=24
         scales = []
         (y, self.daeScales) = self.addScales( self.colladaOptions, scales, "Dae", True, y)
         rigs = []
@@ -423,9 +425,10 @@ class ExportTaskView(gui3d.TaskView):
                     
                 options = {
                     "keepHelpers" : self.exportDiamonds.selected,
-                    "scale": self.getScale(self.objScales)
+                    "scale": self.getScale(self.objScales),
+                    "pngTexture": self.exportPngTexture.selected
                 }                    
-                mh2obj_proxy.exportProxyObj(human, os.path.join(exportPath, filename), options)
+                mh2obj_proxy.exportProxyObj(gui3d.app.selectedHuman, os.path.join(exportPath, filename), options)
                 
                 if self.exportSkeleton.selected:
                     mh2bvh.exportSkeleton(human.meshData, os.path.join(exportPath, filename + ".bvh"))
@@ -479,7 +482,8 @@ class ExportTaskView(gui3d.TaskView):
                     "daerig": rig,
                     "rotate90" : self.colladaRot90.selected,
                     "keepHelpers" : self.keepHelpers.selected,
-                    "scale": self.getScale(self.daeScales)
+                    "scale": self.getScale(self.daeScales),
+                    "pngTexture": self.colladaPngTexture.selected
                 }
                 mh2collada.exportCollada(gui3d.app.selectedHuman, os.path.join(exportPath, filename), options)
             elif self.md5.selected:

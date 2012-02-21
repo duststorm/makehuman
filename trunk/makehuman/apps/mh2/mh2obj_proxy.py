@@ -34,8 +34,11 @@ def exportProxyObj(human, name, options):
     the.Config = export_config.exportConfig(human, False)
     the.Options = options
     the.Config.separatefolder = True
+    print(options.items())
+    the.Config.pngTexture = options["pngTexture"]
     (the.Stuff, stuffs) = mh2collada.setupStuff(obj, {}, [], the.Config)
-    (scale, unit) = options["scale"]    
+    (scale, unit) = options["scale"]   
+    #name = export_config.goodName(name)
     outfile = export_config.getOutFileFolder(name+".obj", the.Config)   
     (path, ext) = os.path.splitext(outfile)
 
@@ -44,7 +47,7 @@ def exportProxyObj(human, name, options):
     fp.write(
 "# MakeHuman exported OBJ with clothes\n" +
 "# www.makehuman.org\n\n" +
-"mtllib foo_clothed.obj.mtl\n")
+"mtllib %s_clothed.obj.mtl\n" % os.path.basename(path))
     for stuff in stuffs:
         print(stuff.name)
         writeGeometry(obj, fp, stuff, scale)
@@ -109,7 +112,10 @@ def writeMaterial(fp, stuff, human):
             return
     else:
         path = "data/textures"
-        textures = [(path, "texture.tif")]
+        if the.Config.pngTexture:
+            textures = [(path, "texture.png")]
+        else:
+            textures = [(path, "texture.tif")]
     for (folder, texfile) in textures:  
         path = export_config.getOutFileName(texfile, folder, True, human, the.Config)        
         (fname, ext) = os.path.splitext(texfile)  
