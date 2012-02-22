@@ -273,6 +273,7 @@ class ExportTaskView(gui3d.TaskView):
         yy = y
         self.objOptions = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*10+6)));y+=25
         self.exportEyebrows = self.objOptions.addView(gui3d.CheckBox("Eyebrows", True));y+=24
+        self.exportLashes = self.objOptions.addView(gui3d.CheckBox("Eyelashes", True));y+=24
         self.exportDiamonds = self.objOptions.addView(gui3d.CheckBox("Diamonds", False));y+=24
         self.exportSkeleton = self.objOptions.addView(gui3d.CheckBox("Skeleton", True));y+=24
         self.exportGroups = self.objOptions.addView(gui3d.CheckBox("Groups", True));y+=24
@@ -314,8 +315,10 @@ class ExportTaskView(gui3d.TaskView):
         y = yy
         self.colladaOptions = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*8+6)));y+=25
         self.colladaRot90 = self.colladaOptions.addView(gui3d.CheckBox("Rotate 90", False));y+=24
-        self.keepHelpers = self.colladaOptions.addView(gui3d.CheckBox("Keep helper geometry", False));y+=24
-        #self.colladaSeparateFolder = self.colladaOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
+        self.colladaEyebrows = self.colladaOptions.addView(gui3d.CheckBox("Eyebrows", True));y+=24
+        self.colladaLashes = self.colladaOptions.addView(gui3d.CheckBox("Eyelashes", True));y+=24
+        self.colladaHelpers = self.colladaOptions.addView(gui3d.CheckBox("Helper geometry", False));y+=24
+        # self.colladaSeparateFolder = self.colladaOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
         self.colladaPngTexture = self.colladaOptions.addView(gui3d.CheckBox("PNG texture", selected=True));y+=24
         scales = []
         (y, self.daeScales) = self.addScales( self.colladaOptions, scales, "Dae", True, y)
@@ -424,7 +427,9 @@ class ExportTaskView(gui3d.TaskView):
                     filter)
                     
                 options = {
-                    "keepHelpers" : self.exportDiamonds.selected,
+                    "helpers" : self.exportDiamonds.selected,
+                    "eyebrows" : self.exportEyebrows.selected,
+                    "lashes" : self.exportLashes.selected,
                     "scale": self.getScale(self.objScales),
                     "pngTexture": self.exportPngTexture.selected
                 }                    
@@ -481,7 +486,9 @@ class ExportTaskView(gui3d.TaskView):
                 options = {
                     "daerig": rig,
                     "rotate90" : self.colladaRot90.selected,
-                    "keepHelpers" : self.keepHelpers.selected,
+                    "eyebrows" : self.colladaEyebrows.selected,
+                    "lashes" : self.colladaLashes.selected,
+                    "helpers" : self.colladaHelpers.selected,
                     "scale": self.getScale(self.daeScales),
                     "pngTexture": self.colladaPngTexture.selected
                 }

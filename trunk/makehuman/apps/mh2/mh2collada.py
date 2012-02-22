@@ -349,8 +349,14 @@ def filterMesh(mesh1, obj):
             killUvs[vt] = False
     
     for fg in obj.faceGroups:
-        if ("joint" in fg.name) or ("helper" in fg.name):
-            for f in fg.faces:
+        if (((not the.Options["helpers"]) and 
+             (("joint" in fg.name) or ("helper" in fg.name))) or
+            ((not the.Options["eyebrows"]) and 
+             (("eyebrown" in fg.name) or ("cornea" in fg.name))) or
+            ((not the.Options["lashes"]) and 
+             ("lash" in fg.name))):
+            print("  kill %s" % fg.name) 
+            for f in fg.faces:            
                 killFaces[f.idx] = True
                 for v in f.verts:
                     killVerts[v.idx] = True
@@ -512,7 +518,7 @@ def setupStuff(name, obj, amt, rawTargets, cfg):
     foundProxy = setupProxies('Proxy', name, obj, stuffs, amt, rawTargets, cfg.proxyList)
     if not foundProxy:
         mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
-        if the.Options["keepHelpers"]:
+        if the.Options["helpers"] and the.Options["eyebrows"] and  the.Options["lashes"]:
             mesh2 = mesh1
         else:
             mesh2 = filterMesh(mesh1, obj)
