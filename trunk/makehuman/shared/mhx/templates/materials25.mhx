@@ -246,6 +246,7 @@ end Texture
   use_vertex_color_light False ;
   use_vertex_color_paint False ;
   offset_z 0 ;
+  Property MhxDriven True ;
 
 *** material-drivers
 

@@ -440,7 +440,7 @@ def writeMaskDrivers(fp, proxyData):
     for prx in proxyData.values():
         if prx.mask:
             (dir, file) = prx.mask
-            mhx_rig.writePropDriver(fp, ["Hide%s" % prx.name], "x1", 'use_textures', n+1)
+            mhx_rig.writePropDriver(fp, ["Hide%s" % prx.name], "1-x1", 'use_textures', n+1)
             n += 1            
     fp.write("#endif\n")
     return
@@ -699,7 +699,9 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
         fp.write(
 "  use_shadows True ;\n" +
 "  use_transparent_shadows True ;\n")
-    fp.write("end Material\n\n")
+    fp.write(
+"  Property MhxDriven True ;\n" +
+"end Material\n\n")
 
 def writeProxyMaterialSettings(fp, settings):
     for (key, value) in settings:        
