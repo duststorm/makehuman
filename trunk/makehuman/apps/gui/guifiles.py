@@ -314,7 +314,8 @@ class ExportTaskView(gui3d.TaskView):
         # Collada options
         y = yy
         self.colladaOptions = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*8+6)));y+=25
-        self.colladaRot90 = self.colladaOptions.addView(gui3d.CheckBox("Rotate 90", False));y+=24
+        self.colladaRot90X = self.colladaOptions.addView(gui3d.CheckBox("Rotate 90 X", False));y+=24
+        self.colladaRot90Y = self.colladaOptions.addView(gui3d.CheckBox("Rotate 90 Y", False));y+=24
         self.colladaEyebrows = self.colladaOptions.addView(gui3d.CheckBox("Eyebrows", True));y+=24
         self.colladaLashes = self.colladaOptions.addView(gui3d.CheckBox("Eyelashes", True));y+=24
         self.colladaHelpers = self.colladaOptions.addView(gui3d.CheckBox("Helper geometry", False));y+=24
@@ -485,7 +486,8 @@ class ExportTaskView(gui3d.TaskView):
                 
                 options = {
                     "daerig": rig,
-                    "rotate90" : self.colladaRot90.selected,
+                    "rotate90X" : self.colladaRot90X.selected,
+                    "rotate90Y" : self.colladaRot90Y.selected,
                     "eyebrows" : self.colladaEyebrows.selected,
                     "lashes" : self.colladaLashes.selected,
                     "helpers" : self.colladaHelpers.selected,

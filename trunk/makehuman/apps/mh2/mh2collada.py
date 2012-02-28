@@ -50,7 +50,8 @@ def exportCollada(human, filename, options):
     time1 = time.clock()
     the.Config = export_config.exportConfig(human, True, [])
     the.Config.separatefolder = True
-    the.Rotate90 = options["rotate90"]
+    the.Rotate90X = options["rotate90X"]
+    the.Rotate90Y = options["rotate90Y"]
     the.Config.pngTexture = options["pngTexture"]
     the.Options = options
     outfile = export_config.getOutFileFolder(filename+".dae", the.Config)        
@@ -96,11 +97,17 @@ def flatten(hier, bones):
 #
 #
 
-def printLoc(fp, loc, scale):
-    if the.Rotate90:
-        fp.write("%.4f %.4f %.4f " % (scale*loc[0], -scale*loc[2], scale*loc[1]))
-    else:
-        fp.write("%.4f %.4f %.4f " % (scale*loc[0], scale*loc[1], scale*loc[2]))
+def rotateLoc(loc, scale):    
+    (x,y,z) = (scale*loc[0], scale*loc[1], scale*loc[2])
+    if the.Rotate90X:
+        yy = -z
+        z = y
+        y = yy
+    if the.Rotate90Y:
+        yy = x
+        x = -y
+        y = yy        
+    return (x,y,z)        
 
 #
 #    boneOK(flags, bone, parent):
@@ -213,7 +220,8 @@ def printNode(fp, name, vec, extra, pad):
 '%s      <node %s %s type="JOINT" %s>\n' % (pad, extra, nameStr, idStr) +
 '%s        <translate sid="translate"> ' % pad)
     (scale, name) = the.Options["scale"]
-    printLoc(fp, vec, scale)
+    (x,y,z) = rotateLoc(vec, scale)
+    fp.write("%.4f %.4f %.4f " % (x,y,z))
     fp.write('</translate>\n' +
 '%s        <rotate sid="rotateZ">0 0 1 0.0</rotate>\n' % pad +
 '%s        <rotate sid="rotateY">0 1 0 0.0</rotate>\n' % pad +
@@ -435,7 +443,7 @@ def exportDae(human, name, fp):
     (the.Stuff, stuffs) = setupStuff(name, obj, amt, rawTargets, cfg)
 
     date = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime())
-    if the.Rotate90:
+    if the.Rotate90X:
         upaxis = 'Z_UP'
     else:
         upaxis = 'Y_UP'
@@ -841,14 +849,10 @@ def writeController(obj, fp, stuff):
     mat = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
     for b in stuff.bones:
         vec = stuff.rigHead[b]
-        if the.Rotate90:
-            mat[0][3] = -scale*vec[0]
-            mat[1][3] = scale*vec[2]
-            mat[2][3] = -scale*vec[1]
-        else:            
-            mat[0][3] = -scale*vec[0]
-            mat[1][3] = -scale*vec[1]
-            mat[2][3] = -scale*vec[2]
+        (x,y,z) = rotateLoc(vec, scale)
+        mat[0][3] = -x
+        mat[1][3] = -y
+        mat[2][3] = -z
         fp.write('\n            ')
         for i in range(4):
             for j in range(4):
@@ -961,7 +965,8 @@ def writeGeometry(obj, fp, stuff):
 
 
     for v in stuff.verts:
-        printLoc(fp, v, scale)
+        (x,y,z) = rotateLoc(v, scale)
+        fp.write("%.4f %.4f %.4f " % (x,y,z))
 
     fp.write('\n' +
 '          </float_array>\n' +
@@ -978,7 +983,8 @@ def writeGeometry(obj, fp, stuff):
 '          ')
 
     for no in stuff.vnormals:
-        printLoc(fp, no, scale)
+        (x,y,z) = rotateLoc(no, scale)
+        fp.write("%.4f %.4f %.4f " % (x,y,z))
 
     fp.write('\n' +
 '          </float_array>\n' +
@@ -1035,7 +1041,8 @@ def writeGeometry(obj, fp, stuff):
                 loc = vadd(v, offs)
             except:
                 loc = v
-            printLoc(fp, loc)
+            (x,y,z) = rotateLoc(v, scale)
+            fp.write("%.4f %.4f %.4f " % (x,y,z))
 
         fp.write('\n'+
 '         </float_array>\n' +
