@@ -210,6 +210,7 @@ def importObj(filepath, context):
     materials = {}
 
     group = []
+    matlist = []
     nf = 0
     for line in fp:
         words = line.split()
