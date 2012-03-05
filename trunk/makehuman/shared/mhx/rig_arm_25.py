@@ -322,7 +322,7 @@ def ArmControlPoses(fp):
          ('CopyRot', 0, 0, ['WristRot', 'Wrist_L', (1,1,1), (0,0,0), False])
         ])
         
-
+        
     addPoseBone(fp, 'UpArm_R', 'GZM_Circle025', 'FK_R', (1,1,1), (0,0,0), (1,0,1), (1,1,1), CmodUpArm, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpArm_R, (True, True, True)]),
          ('CopyTrans', 0, 0, ['ArmIK', 'UpArmIK_R', 0]),
@@ -333,13 +333,6 @@ def ArmControlPoses(fp):
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoArm_R, (True, True, True)]),
          ('CopyTrans', 0, 0, ['ArmIK', 'LoArmIK_R', 0]),
          ('IK', 0, 0, ['Wrist', 'Wrist_R', 1, None, (True, False,True)]),
-        ])
-
-    addPoseBone(fp, 'Wrist_R', 'MHHandCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), CmodHand, 
-        the.RootChildOfConstraints + [
-        ('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Clavicle_R', (1,1,1), (1,1,1), (1,1,1)]),
-        ('LimitDist', 0, 0, ['DistShoulder', 'Shoulder_R', 'LIMITDIST_INSIDE']),
-        ('LimitDist', 0, 0, ['DistElbow', 'Elbow_R', 'LIMITDIST_ONSURFACE']),
         ])
 
     addPoseBone(fp, 'Hand_R', 'MHHand', 'FK_R', (0,0,0), (0,1,0), (1,1,1), (1,1,1), CmodHand,
