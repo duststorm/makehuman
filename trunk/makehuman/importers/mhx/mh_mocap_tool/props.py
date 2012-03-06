@@ -319,10 +319,16 @@ def ensureInited(context):
 #    loadDefaults(context):
 #
 
+def settingsFile():
+    outdir = os.path.expanduser("~/makehuman/settings/")        
+    if not os.path.isdir(outdir):
+        os.makedirs(outdir)
+    return os.path.join(outdir, "mocap.defaults")
+
 def loadDefaults(context):
     if not context.scene:
         return
-    filename = os.path.realpath(os.path.expanduser("~/mh_mocap_defaults.txt"))
+    filename = settingsFile()
     try:
         fp = open(filename, "r")
     except:
@@ -330,6 +336,8 @@ def loadDefaults(context):
         return
     for line in fp:
         words = line.split()
+        if len(words) < 2:
+            continue
         try:
             val = eval(words[1])
         except:
@@ -346,7 +354,7 @@ def loadDefaults(context):
 def saveDefaults(context):
     if not context.scene:
         return
-    filename = os.path.realpath(os.path.expanduser("~/mh_mocap_defaults.txt"))
+    filename = settingsFile()
     try:
 
         fp = open(filename, "w")

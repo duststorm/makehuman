@@ -587,8 +587,14 @@ def findVert(verts, v, x, y, z, notfound):
 #   saveDefaultSettings(context):
 #
 
+def settingsFile():
+    outdir = os.path.expanduser("~/makehuman/settings/")        
+    if not os.path.isdir(outdir):
+        os.makedirs(outdir)
+    return os.path.join(outdir, "make_rig.settings")
+
 def readDefaultSettings(context):
-    fname = os.path.realpath(os.path.expanduser("~/make_rig.settings"))
+    fname = settingsFile() 
     try:
         fp = open(fname, "rU")
     except:
@@ -613,11 +619,11 @@ def readDefaultSettings(context):
     return
     
 def saveDefaultSettings(context):
-    fname = os.path.realpath(os.path.expanduser("~/make_rig.settings"))
+    fname = settingsFile() 
     fp = open(fname, "w")
     scn = context.scene
     for (prop, value) in scn.items():
-        if prop[0:2] == "MC":
+        if prop[0:2] == "MR":
             if type(value) == int:
                 fp.write("%s int %s\n" % (prop, value))
             elif type(value) == float:

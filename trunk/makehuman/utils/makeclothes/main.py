@@ -902,7 +902,7 @@ def exportBaseUvsPy(context):
 #
 
 def storeData(pob, bob, data):
-    fname = os.path.realpath(os.path.expanduser("~/mh_makeclo_stored.txt"))
+    fname = settingsFile("stored")
     fp = open(fname, "w")
     fp.write("%s\n" % pob.name)
     fp.write("%s\n" % bob.name)
@@ -921,7 +921,7 @@ def storeData(pob, bob, data):
     
 def restoreData(context): 
     (bob, pob) = getObjectPair(context)
-    fname = os.path.realpath(os.path.expanduser("~/mh_makeclo_stored.txt"))
+    fname = settingsFile("stored")
     fp = open(fname, "rU")
     status = 0
     data = []
@@ -2145,8 +2145,14 @@ def checkAndVertexDiamonds(ob):
 #   saveDefaultSettings(context):
 #
 
+def settingsFile(name):
+    outdir = os.path.expanduser("~/makehuman/settings/")        
+    if not os.path.isdir(outdir):
+        os.makedirs(outdir)
+    return os.path.join(outdir, "make_clothes.%s" % name)
+    
 def readDefaultSettings(context):
-    fname = os.path.realpath(os.path.expanduser("~/make_clothes.settings"))
+    fname = settingsFile("settings")
     try:
         fp = open(fname, "rU")
     except:
@@ -2171,7 +2177,7 @@ def readDefaultSettings(context):
     return
     
 def saveDefaultSettings(context):
-    fname = os.path.realpath(os.path.expanduser("~/make_clothes.settings"))
+    fname = settingsFile("settings")
     fp = open(fname, "w")
     scn = context.scene
     for (prop, value) in scn.items():
