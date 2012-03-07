@@ -114,11 +114,14 @@ class MakeClothesPanel(bpy.types.Panel):
         
         layout.label("UV layers")
         row = layout.row()
+        row.prop(scn, "MCUseBump")   
+        row.prop(scn, "MCUseNormal")   
+        row = layout.row()
+        row.prop(scn, "MCUseMask")   
+        row.prop(scn, "MCAllUVLayers")   
+        row = layout.row()
         row.prop(scn, "MCMaskLayer", text="Mask")   
         row.prop(scn, "MCTextureLayer", text = "Texture")   
-        row = layout.row()
-        row.prop(scn, "MCObjLayer", text="Obj")   
-        row.prop(scn, "MCAllUVLayers")   
 
         layout.separator()
         layout.label("Make clothes")

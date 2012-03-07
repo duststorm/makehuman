@@ -457,11 +457,9 @@ class ExportTaskView(gui3d.TaskView):
                     mhxversion = []
                     if self.version24.selected: mhxversion.append('24')
                     if self.version25.selected: mhxversion.append('25')
-                    print(self.mhxRigs)
                     for (button, rig) in self.mhxRigs:
                         if button.selected:
                             break
-                    print("Selected", rig)                            
                     options = {
                         'mhxversion':mhxversion,
                         'expressions':self.exportExpressions.selected,
@@ -478,12 +476,9 @@ class ExportTaskView(gui3d.TaskView):
 
                 mh2mhx.exportMhx(gui3d.app.selectedHuman, os.path.join(exportPath, filename + ".mhx"), options)
             elif self.collada.selected:
-                print(self.daeRigs)
                 for (button, rig) in self.daeRigs:
                     if button.selected:
-                        break
-                print("Selected", rig)    
-                
+                        break                
                 options = {
                     "daerig": rig,
                     "rotate90X" : self.colladaRot90X.selected,
@@ -595,7 +590,7 @@ class ExportTaskView(gui3d.TaskView):
         buttons = []
         for name in ["decimeter", "meter", "inch", "centimeter"]:
             expr = 'self.%s%s = options.addView(gui3d.RadioButton(scales, "%s", check))' % (name, suffix, name)
-            print(expr)
+            #print(expr)
             exec(expr)
             check = False
             y += 24

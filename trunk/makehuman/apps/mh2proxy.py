@@ -50,6 +50,8 @@ class CProxy:
         self.faceNumbers = []
         self.mask = None
         self.texture = None
+        self.bump = None
+        self.normal = None
         self.obj_file = None
         self.material_file = None
         self.maskLayer = 0
@@ -132,6 +134,7 @@ def readProxyFile(obj, file, evalOnLoad):
         pfile.file = file
     else:
         pfile = file
+    print(pfile)
     folder = os.path.dirname(pfile.file)
     objfile = None
     
@@ -175,28 +178,29 @@ def readProxyFile(obj, file, evalOnLoad):
         elif words[0] == '#':
             theGroup = None
             if len(words) == 1:
-                pass
-            elif words[1] == 'verts':
+                continue
+            key = words[1]
+            if key == 'verts':
                 if evalOnLoad:
                     status = doVerts
                 else:
                     status = doRefVerts
-            elif words[1] == 'faces':
+            elif key == 'faces':
                 status = doFaces
-            elif words[1] == 'weights':
+            elif key == 'weights':
                 status = doWeights
                 if proxy.weights == None:
                     proxy.weights = {}
                 weights = []
                 proxy.weights[words[2]] = weights
-            elif words[1] == 'material':
+            elif key == 'material':
                 status = doMaterial
                 proxy.material.name = words[2]
-            elif words[1] == 'useBaseMaterials':
+            elif key == 'useBaseMaterials':
                 proxy.useBaseMaterials = True
-            elif words[1] == 'faceNumbers':
+            elif key == 'faceNumbers':
                 status = doFaceNumbers
-            elif words[1] == 'texVerts':
+            elif key == 'texVerts':
                 status = doTexVerts
                 if len(words) > 2:
                     layer = int(words[2])
@@ -204,7 +208,7 @@ def readProxyFile(obj, file, evalOnLoad):
                     layer = 0
                 proxy.texVerts = []
                 proxy.texVertsLayers[layer] = proxy.texVerts
-            elif words[1] == 'texFaces':
+            elif key == 'texFaces':
                 status = doTexFaces
                 if len(words) > 2:
                     layer = int(words[2])
@@ -212,61 +216,65 @@ def readProxyFile(obj, file, evalOnLoad):
                     layer = 0
                 proxy.texFaces = []
                 proxy.texFacesLayers[layer] = proxy.texFaces
-            elif words[1] == 'obj_data':
+            elif key == 'obj_data':
                 status = doObjData
                 proxy.texVerts = []
                 proxy.texFaces = []
                 proxy.texVertsLayers[0] = proxy.texVerts
                 proxy.texFacesLayers[0] = proxy.texFaces                
-            elif words[1] == 'name':
+            elif key == 'name':
                 proxy.name = words[2]
-            elif words[1] == 'z_depth':
+            elif key == 'z_depth':
                 proxy.z_depth = int(words[2])
-            elif words[1] == 'wire':
+            elif key == 'wire':
                 proxy.wire = True
-            elif words[1] == 'cage':
+            elif key == 'cage':
                 proxy.cage = True
-            elif words[1] == 'x_scale':
+            elif key == 'x_scale':
                 xScale = getScale(words, verts, 0)
-            elif words[1] == 'y_scale':
+            elif key == 'y_scale':
                 yScale = getScale(words, verts, 1)
-            elif words[1] == 'z_scale':
+            elif key == 'z_scale':
                 zScale = getScale(words, verts, 2)                
-            elif words[1] == 'use_projection':
+            elif key == 'use_projection':
                 useProjection = int(words[2])
-            elif words[1] == 'ignoreOffset':
+            elif key == 'ignoreOffset':
                 ignoreOffset = int(words[2])
-            elif words[1] == 'mask':
+            elif key == 'mask':
                 proxy.mask = getFileName(folder, words[2], ".png")
                 if len(words) > 3:
                     proxy.maskLayer = int(words[3])
-            elif words[1] == 'texture':
+            elif key == 'bump':
+                proxy.bump = getFileName(folder, words[2], ".tif")
+            elif key == 'normal':
+                proxy.normal = getFileName(folder, words[2], ".tif")
+            elif key == 'texture':
                 proxy.texture = getFileName(folder, words[2], ".tif")
                 if len(words) > 3:
                     proxy.textureLayer = int(words[3])
-            elif words[1] == 'objfile_layer':
+            elif key == 'objfile_layer':
                 proxy.objFileLayer = int(words[2])
-            elif words[1] == 'uvtex_layer':
+            elif key == 'uvtex_layer':
                 proxy.uvtexLayerName[int(words[2])] = words[3]
-            elif words[1] == 'material_file':
+            elif key == 'material_file':
                 proxy.material_file = getFileName(folder, words[2], ".mhx")
-            elif words[1] == 'obj_file':
+            elif key == 'obj_file':
                 proxy.obj_file = getFileName(folder, words[2], ".obj")
-            elif words[1] == 'subsurf':
+            elif key == 'subsurf':
                 levels = int(words[2])
                 if len(words) > 3:
                     render = int(words[3])
                 else:
                     render = levels+1
                 proxy.modifiers.append( ['subsurf', levels, render] )
-            elif words[1] == 'shrinkwrap':
+            elif key == 'shrinkwrap':
                 offset = float(words[2])
                 proxy.modifiers.append( ['shrinkwrap', offset] )
-            elif words[1] == 'shapekey':
+            elif key == 'shapekey':
                 proxy.shapekeys.append( words[2] )
             else:
                 pass
-                #print("Ignored proxy keyword " + words[1])
+                #print("Ignored proxy keyword " + key)
         elif status == doObjData:
             if words[0] == 'vt':
                 newTexVert(1, words, proxy)

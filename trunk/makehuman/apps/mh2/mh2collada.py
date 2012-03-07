@@ -542,7 +542,7 @@ def setupStuff(name, obj, amt, rawTargets, cfg):
 def setupProxies(typename, name, obj, stuffs, amt, rawTargets, proxyList):
     foundProxy = False    
     for pfile in proxyList:
-        if pfile.useDae and pfile.type == typename:
+        if pfile.useDae and pfile.type == typename and pfile.file:
             proxy = mh2proxy.readProxyFile(obj, pfile, True)
             if proxy and proxy.name and proxy.texVerts:
                 foundProxy = True

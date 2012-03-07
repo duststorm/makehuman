@@ -144,7 +144,7 @@ def exportMhx_25(human, fp):
 
 def scanProxies(obj, proxyData):
     for pfile in the.Config.proxyList:
-        if pfile.useMhx:
+        if pfile.useMhx and pfile.file:
             proxy = mh2proxy.readProxyFile(obj, pfile, True)
             if proxy:
                 proxyData[proxy.name] = proxy        
@@ -652,43 +652,78 @@ def copyProxyMaterialFile(fp, pair, mat, proxy, proxyData):
 #   writeProxyMaterial(fp, mat, proxy, proxyData):
 #
 
-def writeProxyMaterial(fp, mat, proxy, proxyData):
-    if proxy.texture:
-        (folder,name) = proxy.texture
-        tex = os.path.join(folder,name)
-    else:
-        tex = None
-    if tex:
-        #print(the.Human)
-        print("Tex", tex)
-        texname = the.Human + os.path.basename(tex)
-        fromDir = os.path.dirname(tex)
-        texfile = export_config.getOutFileName(tex, fromDir, True, None, the.Config)
-        fp.write(
+def writeProxyTexture(fp, texture, mat):        
+    (folder,name) = texture
+    tex = os.path.join(folder,name)
+    #print(the.Human)
+    print("Tex", tex)
+    texname = the.Human + os.path.basename(tex)
+    fromDir = os.path.dirname(tex)
+    texfile = export_config.getOutFileName(tex, fromDir, True, None, the.Config)
+    fp.write(
 "Image %s\n" % texname +
 "  Filename %s ;\n" % texfile +
 "  use_premultiply True ;\n" +
 "end Image\n\n" +
 "Texture %s IMAGE\n" % texname +
 "  Image %s ;\n" % texname)
-        writeProxyMaterialSettings(fp, mat.textureSettings)             
-        fp.write("end Texture\n")
+    writeProxyMaterialSettings(fp, mat.textureSettings)             
+    fp.write("end Texture\n\n")
+    return (tex, texname)
     
+def writeProxyMaterial(fp, mat, proxy, proxyData):
+    tex = None
+    bump = None
+    normal = None
+    if proxy.texture:
+        (tex,texname) = writeProxyTexture(fp, proxy.texture, mat)
+    if proxy.bump:
+        (bump,bumpname) = writeProxyTexture(fp, proxy.bump, mat)
+    if proxy.normal:
+        (normal,normalname) = writeProxyTexture(fp, proxy.normal, mat)
+           
     prxList = sortedMasks(proxyData)
     nMasks = countMasks(proxy, prxList)
+    slot = nMasks
     
     fp.write("Material %s%s \n" % (the.Human, mat.name))
     addProxyMaskMTexs(fp, mat, proxy, prxList, tex)
     writeProxyMaterialSettings(fp, mat.settings)   
+    uvlayer = proxy.uvtexLayerName[proxy.textureLayer]
+
     if tex:
         fp.write(
-"  MTex %d diffuse UV COLOR\n" % nMasks +
+"  MTex %d %s UV COLOR\n" % (slot, texname) +
 "    texture Refer Texture %s ;\n" % texname +
 "    use_map_alpha True ;\n" +
-"    uv_layer '%s' ;\n" % proxy.uvtexLayerName[proxy.textureLayer])
-
+"    uv_layer '%s' ;\n" % uvlayer)
         writeProxyMaterialSettings(fp, mat.mtexSettings)             
         fp.write("  end MTex\n")
+        slot += 1
+        
+    if bump:
+        fp.write(
+"  MTex %d %s UV NORMAL\n" % (slot, bumpname) +
+"    texture Refer Texture %s ;\n" % bumpname +
+"    use_map_normal True ;\n" +
+"    use_map_color_diffuse False ;\n" +
+"    use_rgb_to_intensity True ;\n" +
+"    uv_layer '%s' ;\n" % uvlayer +
+"  end MTex\n")
+        slot += 1
+        
+    if normal:
+        fp.write(
+"  MTex %d %s UV NORMAL\n" % (slot, normalname) +
+"    texture Refer Texture %s ;\n" % normalname +
+"    use_map_normal True ;\n" +
+"    use_map_color_diffuse False ;\n" +
+"    use_normal_map True ;\n" +
+"    normal_map_space 'TANGENT' ;\n" +
+"    uv_layer '%s' ;\n" % uvlayer +
+"  end MTex\n")
+        slot += 1
+        
     if nMasks > 0:
         fp.write(
 "  use_transparency True ;\n" +

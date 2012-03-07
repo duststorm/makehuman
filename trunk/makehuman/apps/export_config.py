@@ -136,6 +136,31 @@ class CProxyFile:
 #   exportConfig(human, useHair, options=None):
 #
 
+def findExistingProxyFile(folder, subfolder, fname):
+    path = findExistingProxyFile1(folder, subfolder, fname, 4)
+    if not path:
+        print("Did not find %s" % fname)                
+    return path
+
+def findExistingProxyFile1(folder, subfolder, fname, depth):
+    if depth < 0:
+        return None
+    if subfolder:
+        path = os.path.realpath("%s/%s/%s" % (folder, subfolder, fname))
+    else:
+        path = os.path.realpath("%s/%s" % (folder, fname))
+    if os.path.isfile(path):
+        print("Found %s" % path)
+        return path
+    files = os.listdir(folder)        
+    for file in files:
+        newfolder = os.path.join(folder, file)
+        if os.path.isdir(newfolder):
+            path = findExistingProxyFile1(newfolder, subfolder, fname, depth-1)
+            if path:
+                return path
+    return None                
+
 def exportConfig(human, useHair, options=None):
     cfg = CExportConfig()
     type = 'Proxy'
@@ -170,7 +195,7 @@ def exportConfig(human, useHair, options=None):
         pfile = CProxyFile()
         pfile.set('Clothes', 2, useMhx, useObj, useDae)
         name = goodName(words[0])
-        pfile.file = os.path.expanduser("./data/hairstyles/%s.mhclo" % name)
+        pfile.file = findExistingProxyFile("./data/hairstyles", None, "%s.mhclo" % name)
         cfg.proxyList.append(pfile)
 
     for (name,clo) in human.clothesObjs.items():
@@ -178,14 +203,14 @@ def exportConfig(human, useHair, options=None):
             name = goodName(name)
             pfile = CProxyFile()
             pfile.set('Clothes', 3, useMhx, useObj, useDae)            
-            pfile.file = os.path.expanduser("./data/clothes/%s/%s.mhclo" % (name, name))
+            pfile.file = findExistingProxyFile("./data/clothes", name, "%s.mhclo" % name)
             cfg.proxyList.append(pfile)
             
     if human.proxy:
         name = goodName(human.proxy.name)
         pfile = CProxyFile()
         pfile.set('Proxy', 4, useMhx, useObj, useDae)
-        pfile.file = os.path.expanduser("./data/proxymeshes/%s/%s.proxy" % (name, name))
+        pfile.file = findExistingProxyFile("./data/proxymeshes", name, "%s.proxy" % name)
         cfg.proxyList.append(pfile)    
 
     if not fp: 

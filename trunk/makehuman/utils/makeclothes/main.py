@@ -575,7 +575,7 @@ def printMhcloUvLayers(fp, pob, scn):
     me = pob.data
     if me.uv_textures:
         for layer,uvtex in enumerate(me.uv_textures):
-            if layer == scn.MCObjLayer:
+            if layer == scn.MCTextureLayer:
                 continue
             if scn.MCAllUVLayers:
                 printLayer = layer
@@ -665,9 +665,8 @@ def printStuff(fp, pob, context):
         if me.uv_textures:
             for layer,uvtex in enumerate(me.uv_textures):
                 fp.write("# uvtex_layer %d %s\n" % (layer, uvtex.name.replace(" ","_")))
-            fp.write("# objfile_layer %d\n" % scn.MCObjLayer)
-        fp.write("# texture %s_texture.tif %d\n" % (goodName(pob.name), scn.MCTextureLayer))
-        fp.write("# mask %s_mask.png %d\n" % (goodName(pob.name), scn.MCMaskLayer))
+            fp.write("# objfile_layer %d\n" % scn.MCTextureLayer)
+        writeTextures(fp, goodName(pob.name), scn)
     else:        
         if me.uv_textures:
             uvtex = me.uv_textures[scn.MCTextureLayer]
@@ -675,8 +674,7 @@ def printStuff(fp, pob, context):
             uvtex = me.uv_textures[scn.MCMaskLayer]
             fp.write("# uvtex_layer 1 %s\n" % uvtex.name.replace(" ","_"))
             fp.write("# objfile_layer 0\n")
-        fp.write("# texture %s_texture.tif 0\n" % (goodName(pob.name)))
-        fp.write("# mask %s_mask.png 1\n" % (goodName(pob.name)))
+        writeTextures(fp, goodName(pob.name), scn)
            
     if scn.MCHairMaterial:
         fp.write(
@@ -719,7 +717,18 @@ def printStuff(fp, pob, context):
         fp.write("# material %s\n" % pob.name.replace(" ","_"))
             
     fp.write("# use_projection 0\n")            
-    return            
+    return  
+    
+def writeTextures(fp, name, scn):        
+    fp.write("# texture %s_texture.tif %d\n" % (name, scn.MCTextureLayer))
+    if scn.MCUseMask:
+        fp.write("# mask %s_mask.png %d\n" % (name, scn.MCMaskLayer))
+    if scn.MCUseBump:
+        fp.write("# bump %s_bump.tif %d\n" % (name, scn.MCTextureLayer))
+    if scn.MCUseNormal:
+        fp.write("# normal %s_normal.tif %d\n" % (name, scn.MCTextureLayer))
+    return
+    
 
 #
 #   exportObjFile(context):
@@ -742,7 +751,7 @@ def exportObjFile(context):
         
     if me.uv_textures:
         (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVertsList, texVertsList) = setupTexVerts(ob)
-        layer = scn.MCObjLayer
+        layer = scn.MCTextureLayer
         writeObjTextureData(fp, me, texVertsList[layer], uvFaceVertsList[layer])
     else:
         for f in me.faces:
@@ -2215,10 +2224,20 @@ def initInterface():
         description="Use materials",
         default=False)
 
-    bpy.types.Scene.MCObjLayer = IntProperty(
-        name="Obj UV layer", 
-        description="UV layer to include in obj export, starting with 0",
-        default=0)
+    bpy.types.Scene.MCUseBump = BoolProperty(
+        name="Bump", 
+        description="Use bump map",
+        default=False)
+
+    bpy.types.Scene.MCUseNormal = BoolProperty(
+        name="Normal", 
+        description="Use normal map",
+        default=False)
+
+    bpy.types.Scene.MCUseMask = BoolProperty(
+        name="Mask", 
+        description="Use mask map",
+        default=True)
 
     bpy.types.Scene.MCMaskLayer = IntProperty(
         name="Mask UV layer", 
