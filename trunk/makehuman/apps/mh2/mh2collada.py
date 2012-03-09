@@ -51,7 +51,7 @@ def exportCollada(human, filename, options):
     the.Config = export_config.exportConfig(human, True, [])
     the.Config.separatefolder = True
     the.Rotate90X = options["rotate90X"]
-    the.Rotate90Y = options["rotate90Y"]
+    the.Rotate90Z = options["rotate90Z"]
     the.Config.pngTexture = options["pngTexture"]
     the.Options = options
     outfile = export_config.getOutFileFolder(filename+".dae", the.Config)        
@@ -103,7 +103,7 @@ def rotateLoc(loc, scale):
         yy = -z
         z = y
         y = yy
-    if the.Rotate90Y:
+    if the.Rotate90Z:
         yy = x
         x = -y
         y = yy        
