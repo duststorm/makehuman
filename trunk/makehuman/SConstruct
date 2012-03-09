@@ -19,8 +19,8 @@ if not env.GetOption('clean'):
     # Append to CPPPATH and LIBPATH if on windows
     if platform.system() == "Windows":
         if 'msvc' in env['TOOLS']:
-            env.Append(CPPPATH = [os.path.join(pydir, 'include'), 'd:/sdl/include', 'd:/glew/include'])
-            env.Append(LIBPATH = [os.path.join(pydir, 'libs'), 'd:/sdl/lib', 'd:/glew/lib'])
+            env.Append(CPPPATH = [os.path.join(pydir, 'include'), 'd:/sdl/include', 'd:/glew/include', 'c:/sdl/include', 'c:/glew/include'])
+            env.Append(LIBPATH = [os.path.join(pydir, 'libs'), 'd:/sdl/lib', 'd:/glew/lib', 'c:/sdl/lib', 'c:/glew/lib'])
         else:
             mingwinc = 'c:/mingw/include'
             mingwlib = 'c:/mingw/lib'
