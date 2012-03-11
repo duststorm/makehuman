@@ -296,7 +296,7 @@ class ExportTaskView(gui3d.TaskView):
         self.version24 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.4", False));y+=24
         self.version25 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.5", True));y+=24
         self.exportSeparateFolder = self.mhxOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
-        self.exportExpressions = self.mhxOptions.addView(gui3d.CheckBox("Expressions", True));y+=24
+        self.exportExpressions = self.mhxOptions.addView(gui3d.CheckBox("Expressions", False));y+=24
         self.exportFaceShapes = self.mhxOptions.addView(gui3d.CheckBox("Face shapes", True));y+=24
         self.exportBodyShapes = self.mhxOptions.addView(gui3d.CheckBox("Body shapes", False));y+=24
         self.exportClothes = self.mhxOptions.addView(gui3d.CheckBox("Clothes", True));y+=24

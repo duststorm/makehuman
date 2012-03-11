@@ -168,8 +168,6 @@ def exportConfig(human, useHair, options=None):
     useMhx = True
     useObj = True
     useDae = True
-    #useClothes = False
-    useProxy = 'Rorkimaru'
 
     if options:
         print(options)
@@ -213,12 +211,11 @@ def exportConfig(human, useHair, options=None):
         pfile.file = findExistingProxyFile("./data/proxymeshes", name, "%s.proxy" % name)
         cfg.proxyList.append(pfile)    
 
+    if cfg.cage:
+        pfile = getCageFile("./data/templates/cage/cage.mhclo", 4, useMhx, useObj, useDae)
+        cfg.proxyList.append(pfile)    
+        
     if not fp: 
-        if useProxy:
-            pfile = CProxyFile()
-            pfile.set('Proxy', 3, useMhx, useObj, useDae)
-            pfile.file = os.path.expanduser("./data/templates/%s.proxy" % useProxy)
-            cfg.proxyList.append(pfile)
         return cfg
 
     status = None
@@ -303,20 +300,25 @@ def exportConfig(human, useHair, options=None):
                 path = os.path.realpath(os.path.expanduser(words[0]))
                 cfg.customvertexgroups.append(path)
         elif typ == 'Cage':
-            pfile = CProxyFile()
-            pfile.set(typ, layer, useMhx, useObj, useDae)
-            name = goodName(words[0])
-            pfile.file = os.path.realpath(os.path.expanduser(name))
-            if len(words) > 1:
-                pfile.name = words[1]
-            if typ == 'Cage':
-                cfg.cage = True
+            if len(words) > 0:
+                name = words[0]
+            else:
+                name = "./data/templates/cage/cage.mhclo"
+            pfile = getCageFile(name, layer, useMhx, useObj, useDae)
+            cfg.cage = True
             cfg.proxyList.append(pfile)
     fp.close()
     print "Proxy configuration: Use %s" % cfg.mainmesh
     for elt in cfg.proxyList:
         print "  ", elt
     return cfg
+
+def getCageFile(name, layer, useMhx, useObj, useDae):
+    pfile = CProxyFile()
+    pfile.set('Cage', layer, useMhx, useObj, useDae)
+    name = goodName(name)
+    pfile.file = os.path.realpath(os.path.expanduser(name))
+    return pfile
 
 #
 #   goodName(name):

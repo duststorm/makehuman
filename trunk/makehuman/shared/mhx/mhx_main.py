@@ -94,6 +94,12 @@ def exportMhx_25(human, fp):
     mhx_rig.setupRig(obj)
     proxyData = {}
     scanProxies(obj, proxyData)
+    
+    if not the.Config.cage:
+        fp.write(
+    "#if toggle&T_Cage\n" +
+    "  error 'This MHX file does not contain a cage. Unselect the Cage import option.' ;\n" +
+    "#endif\n")
 
     fp.write(
 "NoScale True ;\n" +
@@ -122,8 +128,9 @@ def exportMhx_25(human, fp):
 
     copyFile25(human, "shared/mhx/templates/materials25.mhx", fp, None, proxyData)    
 
-    proxyCopy('Cage', human, proxyData, fp)
-
+    if the.Config.cage:
+        proxyCopy('Cage', human, proxyData, fp)
+    
     if the.Config.mainmesh:
         fp.write("#if toggle&T_Mesh\n")
         copyFile25(human, "shared/mhx/templates/meshes25.mhx", fp, None, proxyData)    
@@ -231,7 +238,11 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
             elif key == 'ProxyAnimationData':
                 writeHideAnimationData(fp, the.Human, proxy.name)
             elif key == 'toggleCage':
-                if the.Config.cage and not (proxy and proxy.cage):
+                if proxy and proxy.cage:
+                    fp.write(
+                    "  draw_type 'WIRE' ;\n" +
+                    "  #if False\n")
+                elif the.Config.cage:                    
                     fp.write("  #if toggle&T_Cage\n")
                 else:
                     fp.write("  #if False\n")
