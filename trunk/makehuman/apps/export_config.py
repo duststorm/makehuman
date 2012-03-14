@@ -182,7 +182,7 @@ def exportConfig(human, useHair, options=None):
         if options['skirtrig']:
             cfg.skirtrig = "own"
         else:
-            cfg.skirtrig = None
+            cfg.skirtrig = "inh"
         cfg.mhxrig = options['mhxrig']
         fp = 0
     else:    
