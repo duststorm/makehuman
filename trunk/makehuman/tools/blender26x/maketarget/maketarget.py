@@ -638,7 +638,7 @@ class VIEW3D_OT_SaveTargetButton(bpy.types.Operator):
             ConfirmString2 = ' "%s?"' % os.path.basename(path)
         return{'FINISHED'}            
 
-class VIEW3D_OT_SaveasTargetButton(bpy.types.Operator):
+class VIEW3D_OT_SaveasTargetButton(bpy.types.Operator, ExportHelper):
     bl_idname = "mh.saveas_target"
     bl_label = "Save target as"
 

@@ -44,7 +44,7 @@ else:
     import bpy
     import os
     from bpy.props import *
-    from bpy_extras.io_utils import ImportHelper
+    from bpy_extras.io_utils import ImportHelper, ExportHelper
     from . import maketarget
     from . import export_mh_obj
   
@@ -149,10 +149,10 @@ class MakeTargetBatchPanel(bpy.types.Panel):
             layout.operator("mh.batch_render", text="Batch OpenGL render").opengl = True
   
 #----------------------------------------------------------
-#   class ExportObj(bpy.types.Operator, ImportHelper):
+#   class ExportObj(bpy.types.Operator, ExportHelper):
 #----------------------------------------------------------
 
-class ExportObj(bpy.types.Operator, ImportHelper):
+class ExportObj(bpy.types.Operator, ExportHelper):
     '''Export to OBJ file format (.obj)''' 
     bl_idname = "mh.export_obj"
     bl_description = 'Export to OBJ file format (.obj)'
