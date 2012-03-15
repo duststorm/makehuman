@@ -494,7 +494,7 @@ def shapeKeyLen(ob):
 
 class VIEW3D_OT_LoadTargetButton(bpy.types.Operator):
     bl_idname = "mh.load_target"
-    bl_label = "Load target"
+    bl_label = "Load target file"
 
     filename_ext = ".target"
     filter_glob = StringProperty(default="*.target", options={'HIDDEN'})
@@ -530,6 +530,11 @@ def loadTargetFromMesh(context):
     if not trg:
         raise NameError("Two meshes must be selected")        
     bpy.ops.object.mode_set(mode='OBJECT')
+    
+    scn.objects.active = trg
+    bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+
+    scn.objects.active = ob
     name = trg.name
     skey = ob.shape_key_add(name=name, from_mix=False)
     ob.active_shape_key_index = shapeKeyLen(ob) - 1
