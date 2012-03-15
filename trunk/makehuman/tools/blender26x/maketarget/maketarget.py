@@ -40,19 +40,6 @@ hand-crafted models.
 
 """
 
-bl_info = {
-    "name": "Make target",
-    "author": "Manuel Bastioni, Thomas Larsson",
-    "version": "0.2",
-    "blender": (2, 6, 0),
-    "api": 40000,
-    "location": "View3D > Properties > Make target",
-    "description": "Make MakeHuman target",
-    "warning": "",
-    'wiki_url': '',
-    "category": "MakeHuman"}
-
-
 import bpy
 import os
 import sys
@@ -957,6 +944,22 @@ class VIEW3D_OT_SymmetrizeTargetButton(bpy.types.Operator):
 #   Skip
 #----------------------------------------------------------
 
+def fixInconsistency(context):
+    ob = context.object
+    if ob.data.shape_keys:
+        ob["NTargets"] = len(ob.data.shape_keys.key_blocks)
+    else:
+        ob.shape_key_add(name="Basis")
+        ob["NTargets"] = 0
+
+class VIEW3D_OT_FixInconsistencyButton(bpy.types.Operator):
+    bl_idname = "mh.fix_inconsistency"
+    bl_label = "Fix it!"
+
+    def execute(self, context):
+        fixInconsistency(context)
+        return{'FINISHED'}            
+
 class VIEW3D_OT_SkipButton(bpy.types.Operator):
     bl_idname = "mh.skip"
     bl_label = "No"
@@ -967,19 +970,6 @@ class VIEW3D_OT_SkipButton(bpy.types.Operator):
         Confirm = None
         ConfirmString = "?"
         ConfirmString2 = None
-        return{'FINISHED'}            
-
-class VIEW3D_OT_FixInconsistencyButton(bpy.types.Operator):
-    bl_idname = "mh.fix_inconsistency"
-    bl_label = "Fix it!"
-
-    def execute(self, context):
-        ob = context.object
-        if ob.data.shape_keys:
-            ob["NTargets"] = len(ob.data.shape_keys.key_blocks)
-        else:
-            ob.shape_key_add(name="Basis")
-            ob["NTargets"] = 0
         return{'FINISHED'}            
 
 
@@ -1034,102 +1024,6 @@ def deleteAll(context):
 def makeRestorePoint():
     bpy.ops.transform.translate(value=(0,0,0))
 
-#----------------------------------------------------------
-#   class MakeTargetPanel(bpy.types.Panel):
-#----------------------------------------------------------
-
-
-class MakeTargetPanel(bpy.types.Panel):
-    bl_label = "Make target"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    
-    def draw(self, context):
-        layout = self.layout
-        ob = context.object
-        scn = context.scene
-        if not isInited(scn):
-            layout.operator("mh.init")
-            return
-        if Confirm:
-            layout.label(ConfirmString)            
-            if ConfirmString2:
-                layout.label(ConfirmString2)            
-            layout.operator(Confirm, text="Yes") 
-            layout.operator("mh.skip")
-            return            
-        layout.label("Load materials from")
-        layout.prop(scn, "MhLoadMaterial", expand=True)
-        layout.separator()
-        if isBaseOrTarget(ob):
-            layout.operator("mh.import_base_mhclo", text="Reimport base mhclo").delete = True
-            layout.operator("mh.import_base_obj", text="Reimport base obj").delete = True
-        else:
-            layout.operator("mh.import_base_mhclo", text="Import base mhclo").delete = False
-            layout.operator("mh.import_base_obj", text="Import base obj").delete = False
-        if isBase(ob):
-            layout.operator("mh.new_target")
-            layout.operator("mh.load_target")            
-            layout.operator("mh.load_target_from_mesh")                        
-        elif isTarget(ob):
-            if not ob.data.shape_keys:
-                layout.label("Warning: Internal inconsistency")
-                layout.operator("mh.fix_inconsistency")
-                return
-            layout.separator()
-            layout.prop(ob, "show_only_shape_key")
-            box = layout.box()
-            n = 0
-            for skey in ob.data.shape_keys.key_blocks:
-                if n == 0:
-                    n += 1
-                    continue
-                row = box.row()
-                if n == ob.active_shape_key_index:
-                    icon='LAMP'
-                else:
-                    icon='X'
-                row.label("", icon=icon)
-                row.prop(skey, "value", text=skey.name)
-                n += 1
-            layout.separator()
-            layout.operator("mh.new_target", text="New secondary target")
-            layout.operator("mh.load_target", text="Load secondary target")            
-            layout.operator("mh.fit_target")
-            layout.operator("mh.symmetrize_target", text="Symm Left->Right").left2right = True
-            layout.operator("mh.symmetrize_target", text="Symm Right->Left").left2right = False
-            #layout.separator()
-            #layout.prop(scn, '["Relax"]')
-            #layout.operator("mh.relax_target")
-            layout.separator()
-            layout.operator("mh.discard_target")
-            layout.separator()
-            layout.operator("mh.apply_targets")
-            layout.separator()
-            layout.prop(ob, '["SelectedOnly"]')
-            if ob["FilePath"]:
-                layout.operator("mh.save_target")           
-            layout.operator("mh.saveas_target")           
-
-class MakeTargetBatchPanel(bpy.types.Panel):
-    bl_label = "Batch make targets"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_options = {'DEFAULT_CLOSED'}
-    
-    @classmethod
-    def poll(self, context):
-        return False and isInited(context.scene)
-        
-    def draw(self, context):
-        if isBase(context.object):
-            layout = self.layout
-            scn = context.scene
-            for fname in TargetSubPaths:
-                layout.prop(scn, "Mh%s" % fname)
-            layout.operator("mh.batch_fix")
-            layout.operator("mh.batch_render", text="Batch render").opengl = False
-            layout.operator("mh.batch_render", text="Batch OpenGL render").opengl = True
 
 #----------------------------------------------------------
 #   Init
@@ -1163,7 +1057,7 @@ def isInited(scn):
         return True
     except:
         return False    
-
+        
 class VIEW3D_OT_InitButton(bpy.types.Operator):
     bl_idname = "mh.init"
     bl_label = "Initialize"
@@ -1172,19 +1066,3 @@ class VIEW3D_OT_InitButton(bpy.types.Operator):
         initScene(context.scene)
         return{'FINISHED'}                
 
-#----------------------------------------------------------
-#   Register
-#----------------------------------------------------------
-
-def register():
-    try:
-        initScene(bpy.context.scene)
-    except:
-        pass
-    bpy.utils.register_module(__name__)
-
-def unregister():
-    bpy.utils.unregister_module(__name__)
-
-if __name__ == "__main__":
-    register()
