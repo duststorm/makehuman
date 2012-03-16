@@ -49,7 +49,6 @@ ClothingEnums = [
 
 NBodyVerts = LastVertices["Body"]
 NBodyFaces = 14812
-UseInternal = False
 
 #
 #   isHuman(ob):
@@ -60,7 +59,7 @@ UseInternal = False
 #
 
 def isSelfClothed(context):
-    if UseInternal:
+    if context.scene.MCUseInternal:
         return (context.scene.MCSelfClothed != LastClothing)
     else:
         return False
@@ -724,9 +723,11 @@ def writeTextures(fp, name, scn):
     if scn.MCUseMask:
         fp.write("# mask %s_mask.png %d\n" % (name, scn.MCMaskLayer))
     if scn.MCUseBump:
-        fp.write("# bump %s_bump.tif %d\n" % (name, scn.MCTextureLayer))
+        fp.write("# bump %s_bump.tif %d %.3f\n" % (name, scn.MCTextureLayer, scn.MCBumpStrength))
     if scn.MCUseNormal:
-        fp.write("# normal %s_normal.tif %d\n" % (name, scn.MCTextureLayer))
+        fp.write("# normal %s_normal.tif %d %.3f\n" % (name, scn.MCTextureLayer, scn.MCNormalStrength))
+    if scn.MCUseDisp:
+        fp.write("# displacement %s_disp.tif %d %.3f\n" % (name, scn.MCTextureLayer, scn.MCDispStrength))
     return
     
 
@@ -1439,7 +1440,9 @@ def getSeams(ob, scn):
             edgeList.append(e)
     return (vertList, pairList, edgeList)            
         
-def isOnEdge(v, faceTable, uvtex):            
+def isOnEdge(v, faceTable, uvtex):  
+    if v.index >= NBodyVerts:
+        return False
     uvloc = None
     for f in faceTable[v.index]:
         uvface = uvtex.data[f.index]
@@ -2002,10 +2005,7 @@ def setZDepthItems():
     return            
 
 def setZDepth(scn):    
-    global ZDepthItems
-    (name1, name2, name3) = ZDepthItems[scn["MCZDepthName"]]
-    #print(name1)
-    scn.MCZDepth = ZDepth[name1]
+    scn.MCZDepth = ZDepth[scn.MCZDepthName]
     return
     
  
@@ -2234,9 +2234,19 @@ def initInterface():
         description="Use normal map",
         default=False)
 
+    bpy.types.Scene.MCUseDisp = BoolProperty(
+        name="Displace", 
+        description="Use displacement map",
+        default=False)
+
     bpy.types.Scene.MCUseMask = BoolProperty(
         name="Mask", 
         description="Use mask map",
+        default=True)
+
+    bpy.types.Scene.MCUseTexture = BoolProperty(
+        name="Texture", 
+        description="Use texture",
         default=True)
 
     bpy.types.Scene.MCMaskLayer = IntProperty(
@@ -2248,6 +2258,24 @@ def initInterface():
         name="Texture UV layer", 
         description="UV layer for textures, starting with 0",
         default=0)
+
+    bpy.types.Scene.MCBumpStrength = FloatProperty(
+        name="Bump strength", 
+        description="Bump strength",
+        default=1.0,
+        min=0.0, max=1.0)
+
+    bpy.types.Scene.MCNormalStrength = FloatProperty(
+        name="Normal strength", 
+        description="Normal strength",
+        default=1.0,
+        min=0.0, max=1.0)
+
+    bpy.types.Scene.MCDispStrength = FloatProperty(
+        name="Disp strength", 
+        description="Displacement strength",
+        default=0.2,
+        min=0.0, max=1.0)
 
     bpy.types.Scene.MCAllUVLayers = BoolProperty(
         name="All UV layers", 
@@ -2287,6 +2315,11 @@ def initInterface():
     scn['MCForbidFailures'] = True
     """
     
+    bpy.types.Scene.MCUseInternal = BoolProperty(
+        name="Use Internal", 
+        description="Access internal settings",
+        default=False)
+
     bpy.types.Scene.MCLogging = BoolProperty(
         name="Log", 
         description="Write a log file for debugging",

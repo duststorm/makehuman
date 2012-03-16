@@ -88,8 +88,11 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.operator("mhclo.init_interface", text="ReInitialize")
         layout.operator("mhclo.factory_settings")
         layout.operator("mhclo.save_settings")
+        layout.separator()
+        layout.prop(scn, "MCDirectory")
 
-        layout.label("Utilities")
+        layout.separator()
+        layout.label("Vertex groups")
         layout.operator("mhclo.print_vnums")
         layout.operator("mhclo.copy_vert_locs")
         layout.separator()
@@ -102,26 +105,34 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.prop(scn, "MCKeepVertsUntil", expand=True)
         layout.operator("mhclo.delete_helpers")        
         
-        layout.label("Settings")
-        layout.prop(scn, "MCDirectory")
+        layout.separator()
+        layout.label("Materials")
         layout.prop(scn, "MCMaterials")
         layout.prop(scn, "MCBlenderMaterials")
         layout.prop(scn, "MCHairMaterial")
+        
+        layout.separator()
+        layout.label("Textures")
+        row = layout.row()
+        col = row.column()
+        col.prop(scn, "MCUseTexture")   
+        col.prop(scn, "MCUseMask")           
+        col.prop(scn, "MCUseBump")   
+        col.prop(scn, "MCUseNormal")   
+        col.prop(scn, "MCUseDisp")   
+        col = row.column()
+        col.prop(scn, "MCTextureLayer", text = "")   
+        col.prop(scn, "MCMaskLayer", text="")   
+        col.prop(scn, "MCBumpStrength", text="")   
+        col.prop(scn, "MCNormalStrength", text="")   
+        col.prop(scn, "MCDispStrength", text="")   
+        layout.prop(scn, "MCAllUVLayers")   
+
+        layout.separator()
         layout.label("Set mesh type")
         row = layout.row()
         row.operator("mhclo.make_human", text="Human").isHuman = True
         row.operator("mhclo.make_human", text="Clothing").isHuman = False
-        
-        layout.label("UV layers")
-        row = layout.row()
-        row.prop(scn, "MCUseBump")   
-        row.prop(scn, "MCUseNormal")   
-        row = layout.row()
-        row.prop(scn, "MCUseMask")   
-        row.prop(scn, "MCAllUVLayers")   
-        row = layout.row()
-        row.prop(scn, "MCMaskLayer", text="Mask")   
-        row.prop(scn, "MCTextureLayer", text = "Texture")   
 
         layout.separator()
         layout.label("Make clothes")
@@ -130,20 +141,24 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.operator("mhclo.export_obj_file")
         layout.operator("mhclo.export_blender_material")
         
+        layout.separator()
         layout.label("UV projection")
         layout.operator("mhclo.recover_seams")
         layout.operator("mhclo.project_uvs")
         layout.operator("mhclo.reexport_mhclo")        
         
+        layout.separator()
         layout.label("Shapekeys")
         for skey in main.ShapeKeys:
             layout.prop(scn, "MC%s" % skey)   
         
+        layout.separator()
         layout.label("Z depth")
         layout.prop(scn, "MCZDepthName")   
         layout.operator("mhclo.set_zdepth")
         layout.prop(scn, "MCZDepth")   
 
+        layout.separator()
         layout.label("Boundary")
         layout.prop(scn, "MCBodyPart")   
         layout.prop(scn, "MCExamineBoundary")           
@@ -164,11 +179,10 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.prop(scn, "MCLicense")
         layout.prop(scn, "MCHomePage")
             
-        if not main.UseInternal:
+        if not scn.MCUseInternal:
             return
         layout.separator()
         layout.label("For internal use")
-        layout.prop(scn, "MCListLength")
         layout.prop(scn, "MCLogging")
         layout.prop(scn, "MCSelfClothed")
         layout.prop(scn, "MCMakeHumanDirectory")

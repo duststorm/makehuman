@@ -686,12 +686,15 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
     tex = None
     bump = None
     normal = None
+    displacement = None
     if proxy.texture:
         (tex,texname) = writeProxyTexture(fp, proxy.texture, mat)
     if proxy.bump:
         (bump,bumpname) = writeProxyTexture(fp, proxy.bump, mat)
     if proxy.normal:
         (normal,normalname) = writeProxyTexture(fp, proxy.normal, mat)
+    if proxy.displacement:
+        (displacement,dispname) = writeProxyTexture(fp, proxy.displacement, mat)
            
     prxList = sortedMasks(proxyData)
     nMasks = countMasks(proxy, prxList)
@@ -707,6 +710,7 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
 "  MTex %d %s UV COLOR\n" % (slot, texname) +
 "    texture Refer Texture %s ;\n" % texname +
 "    use_map_alpha True ;\n" +
+"    diffuse_color_factor 1.0 ;\n" +
 "    uv_layer '%s' ;\n" % uvlayer)
         writeProxyMaterialSettings(fp, mat.mtexSettings)             
         fp.write("  end MTex\n")
@@ -718,6 +722,7 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
 "    texture Refer Texture %s ;\n" % bumpname +
 "    use_map_normal True ;\n" +
 "    use_map_color_diffuse False ;\n" +
+"    normal_factor %.3f ;\n" % proxy.bumpStrength + 
 "    use_rgb_to_intensity True ;\n" +
 "    uv_layer '%s' ;\n" % uvlayer +
 "  end MTex\n")
@@ -730,7 +735,20 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
 "    use_map_normal True ;\n" +
 "    use_map_color_diffuse False ;\n" +
 "    use_normal_map True ;\n" +
+"    normal_factor %.3f ;\n" % proxy.normalStrength + 
 "    normal_map_space 'TANGENT' ;\n" +
+"    uv_layer '%s' ;\n" % uvlayer +
+"  end MTex\n")
+        slot += 1
+        
+    if displacement:
+        fp.write(
+"  MTex %d %s UV DISPLACEMENT\n" % (slot, dispname) +
+"    texture Refer Texture %s ;\n" % dispname +
+"    use_map_displacement True ;\n" +
+"    use_map_color_diffuse False ;\n" +
+"    displacement_factor %.3f ;\n" % proxy.dispStrength + 
+"    use_rgb_to_intensity True ;\n" +
 "    uv_layer '%s' ;\n" % uvlayer +
 "  end MTex\n")
         slot += 1

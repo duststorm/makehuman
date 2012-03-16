@@ -52,6 +52,10 @@ class CProxy:
         self.texture = None
         self.bump = None
         self.normal = None
+        self.displacement = None
+        self.bumpStrength = 1.0
+        self.normalStrength = 1.0
+        self.dispStrength = 0.2
         self.obj_file = None
         self.material_file = None
         self.maskLayer = 0
@@ -246,8 +250,16 @@ def readProxyFile(obj, file, evalOnLoad):
                     proxy.maskLayer = int(words[3])
             elif key == 'bump':
                 proxy.bump = getFileName(folder, words[2], ".tif")
+                if len(words) > 4:
+                    proxy.bumpStrength = float(words[4])
             elif key == 'normal':
                 proxy.normal = getFileName(folder, words[2], ".tif")
+                if len(words) > 4:
+                    proxy.normalStrength = float(words[4])
+            elif key == 'displacement':
+                proxy.displacement = getFileName(folder, words[2], ".tif")
+                if len(words) > 4:
+                    proxy.dispStrength = float(words[4])
             elif key == 'texture':
                 proxy.texture = getFileName(folder, words[2], ".tif")
                 if len(words) > 3:
@@ -429,8 +441,8 @@ def readMaterial(line, mat, proxy):
     else:
         raise NameError("Material %s?" % key)
     if key == 'alpha':
-    	mat.alpha = float(words[1])
-    	mat.use_transparency = True
+        mat.alpha = float(words[1])
+        mat.use_transparency = True
 
 #
 #    getLoc(joint, obj):
