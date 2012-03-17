@@ -247,7 +247,7 @@ def autoWeightBody(context):
         dupliob.data.vertices[vn].select = True
     bpy.ops.object.mode_set(mode='EDIT')
     bpy.ops.mesh.select_linked(limit=False)
-    bpy.ops.mesh.select_inverse()
+    bpy.ops.mesh.select_all(action='INVERT')
     bpy.ops.mesh.delete(type='VERT')
     bpy.ops.object.mode_set(mode='OBJECT')
     rig.select = True
