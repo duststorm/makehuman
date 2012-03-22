@@ -36,9 +36,14 @@ class HairTaskView(gui3d.TaskView):
     
     def __init__(self, category):
         
-        gui3d.TaskView.__init__(self, category, 'Hair')
-        self.filechooser = self.addView(gui3d.FileChooser('data/hairstyles', 'obj', 'png', 'notfound.png'))
-        
+        gui3d.TaskView.__init__(self, category, 'Hair')        
+        # TL: look in user directory as well.
+        # self.filechooser = self.addView(gui3d.FileChooser('data/hairstyles', 'obj', 'png', 'notfound.png'))
+        hairDir = os.path.join(mh.getPath(''), 'data', 'hairstyles')
+        if not os.path.exists(hairDir):
+            os.makedirs(hairDir)
+        self.filechooser = self.addView(gui3d.FileChooser([hairDir , 'data/hairstyles'], 'obj', 'png', 'notfound.png'))
+      
         self.hairButton = gui3d.app.categories['Modelling'].addView(gui3d.Button(style=HairButtonStyle._replace(left=800-216, top=600-36, zIndex=9.2, normal='data/hairstyles/clear.png')))
         
         self.oHeadCentroid = [0.0, 7.436, 0.03 + 0.577]
@@ -58,6 +63,7 @@ class HairTaskView(gui3d.TaskView):
 
     def setHair(self, human, filename):
 
+        print("setHair", filename)
         #obj = os.path.join('data/hairstyles', filename)
         #TL: path now included in filename?
         obj = filename
@@ -79,9 +85,9 @@ class HairTaskView(gui3d.TaskView):
             human.hairObj.mesh.originalHairVerts = [v.co[:] for v in human.hairObj.mesh.verts]
                 
             hairName = human.hairObj.mesh.name.split('.')[0]
-            file = "data/hairstyles/%s.mhclo" % hairName
-            print("Loading clothes hair %s" % file)
-            human.hairProxy = mh2proxy.readProxyFile(human.meshData, file, False)
+            mhclo = obj.replace('.obj', '.mhclo')
+            print("Loading clothes hair", mhclo)
+            human.hairProxy = mh2proxy.readProxyFile(human.meshData, mhclo, False)
 
             self.adaptHairToHuman(human)
             human.hairObj.setSubdivided(human.isSubdivided())
