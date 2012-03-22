@@ -33,18 +33,18 @@ def safePrint( string, filename ):
         print("%s %s" % (string, filename))
         return
     except:
-        success = False
-    if not success:
-        ascii = ""
-        space = ord(' ')
-        z = ord('z')
-        for c in filename:
-            d = ord(c)
-            if d < space or d > z:
-                ascii += "\\x%x " % d
-            else:
-                ascii += chr(d)
-        print("%s %s" % (string, ascii))
+        pass
+    return
+    ascii = ""
+    space = ord(' ')
+    z = ord('z')
+    for c in filename:
+        d = ord(c)
+        if d < space or d > z:
+            ascii += "\\x%x " % d
+        else:
+            ascii += chr(d)
+    print("%s %s" % (string, ascii))
 
 #
 #
@@ -136,11 +136,17 @@ class CProxyFile:
 #   exportConfig(human, useHair, options=None):
 #
 
-def findExistingProxyFile(folder, subfolder, fname):
+def findExistingProxyFile(ptype, subfolder, fname):
+    folder = os.path.join(mh.getPath(''), 'data', ptype)
     path = findExistingProxyFile1(folder, subfolder, fname, 4)
-    if not path:
-        print("Did not find %s" % fname)                
-    return path
+    if path:
+        return path
+    folder = os.path.join('./data', ptype)
+    path = findExistingProxyFile1(folder, subfolder, fname, 4)
+    if path:
+        return path
+    safePrint("Did not find", fname)                
+    return None
 
 def findExistingProxyFile1(folder, subfolder, fname, depth):
     if depth < 0:
@@ -150,7 +156,7 @@ def findExistingProxyFile1(folder, subfolder, fname, depth):
     else:
         path = os.path.realpath("%s/%s" % (folder, fname))
     if os.path.isfile(path):
-        print("Found %s" % path)
+        safePrint("Found", path)
         return path
     files = os.listdir(folder)        
     for file in files:
@@ -193,7 +199,7 @@ def exportConfig(human, useHair, options=None):
         pfile = CProxyFile()
         pfile.set('Clothes', 2, useMhx, useObj, useDae)
         name = goodName(words[0])
-        pfile.file = findExistingProxyFile("./data/hairstyles", None, "%s.mhclo" % name)
+        pfile.file = findExistingProxyFile("hairstyles", None, "%s.mhclo" % name)
         cfg.proxyList.append(pfile)
 
     for (name,clo) in human.clothesObjs.items():
@@ -201,14 +207,14 @@ def exportConfig(human, useHair, options=None):
             name = goodName(name)
             pfile = CProxyFile()
             pfile.set('Clothes', 3, useMhx, useObj, useDae)            
-            pfile.file = findExistingProxyFile("./data/clothes", name, "%s.mhclo" % name)
+            pfile.file = findExistingProxyFile("clothes", name, "%s.mhclo" % name)
             cfg.proxyList.append(pfile)
             
     if human.proxy:
         name = goodName(human.proxy.name)
         pfile = CProxyFile()
         pfile.set('Proxy', 4, useMhx, useObj, useDae)
-        pfile.file = findExistingProxyFile("./data/proxymeshes", name, "%s.proxy" % name)
+        pfile.file = findExistingProxyFile("proxymeshes", name, "%s.proxy" % name)
         cfg.proxyList.append(pfile)    
 
     if cfg.cage:

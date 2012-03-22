@@ -133,12 +133,12 @@ def getFileName(folder, file, suffix):
 def readProxyFile(obj, file, evalOnLoad):
     if not file:
         return CProxy('Proxy', 2)
-    elif type(file) == str:
+    elif type(file) == str or type(file) == unicode:
         pfile = export_config.CProxyFile()
         pfile.file = file
     else:
         pfile = file
-    print(pfile)
+    export_config.safePrint("Loading", pfile)
     folder = os.path.dirname(pfile.file)
     objfile = None
     
