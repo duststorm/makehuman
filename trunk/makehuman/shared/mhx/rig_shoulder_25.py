@@ -39,6 +39,11 @@ ShoulderJoints = [
     ('r-lat',               'v', 4430),
     ('l-lat',               'v', 9997),
     
+    ('r-deltoid-head',      'vl', ((0.5, 3729), (0.5, 2601))),
+    ('l-deltoid-head',      'vl', ((0.5, 10104), (0.5, 11009))),
+    ('r-deltoid-tail',      'vl', ((0.5, 3444), (0.5, 3449))),
+    ('l-deltoid-tail',      'vl', ((0.5, 10319), (0.5, 10324))),
+        
     ('r-clav-head',         'l', ((0.7, 'r-scapula'), (0.3, 'l-scapula'))),
     ('l-clav-head',         'l', ((0.3, 'r-scapula'), (0.7, 'l-scapula'))),
 
@@ -105,6 +110,9 @@ ShoulderHeadsTails = [
 
     ('DfmLat_L',             'r-lat', 'r-armtrg'),
     ('DfmLat_R',             'l-lat', 'l-armtrg'),
+    
+    ('DfmDeltoid_L',         'r-deltoid-head', 'r-deltoid-tail'),
+    ('DfmDeltoid_R',         'l-deltoid-head', 'l-deltoid-tail'),
     
     # Elbow lock
 
@@ -175,6 +183,9 @@ ShoulderArmature = [
 
     ('DfmLat_L',           0, 'DfmSpine1', F_DEF, L_MSCL, NoBB ),
     ('DfmLat_R',           0, 'DfmSpine1', F_DEF, L_MSCL, NoBB ),
+
+    ('DfmDeltoid_L',       0, 'DfmClavicle_L', F_DEF, L_MSCL, NoBB ),
+    ('DfmDeltoid_R',       0, 'DfmClavicle_R', F_DEF, L_MSCL, NoBB ),
     
     # Elbow lock        
     ('Elbow_L',            0, Master, F_WIR, L_LEXTRA, NoBB),
@@ -278,6 +289,13 @@ def ShoulderControlPoses(fp):
         [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_R', 1, 1])])
 
 
+    addPoseBone(fp, 'DfmDeltoid_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
+        [('DampedTrack', 0, 0.5, ['DampedTrack', 'UpArm_L', 'TRACK_Y', 1])])
+
+    addPoseBone(fp, 'DfmDeltoid_R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
+        [('DampedTrack', 0, 0.5, ['DampedTrack', 'UpArm_R', 'TRACK_Y', 1])])
+
+
     # Scapula
     
     addPoseBone(fp, 'ShoulderPivot_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
@@ -341,4 +359,7 @@ def ShoulderControlPoses(fp):
 #    (Bone, constraint, driver, rotdiff, keypoints)
 #
 
-ShoulderDeformDrivers = []
+ShoulderDeformDrivers = [
+    ("DfmDeltoid_L", "DampedTrack", "2*cos(x)", [("x", "DfmUpArm1_L", "BendArmUp_L")], []),
+    ("DfmDeltoid_R", "DampedTrack", "2*cos(x)", [("x", "DfmUpArm1_R", "BendArmUp_R")], []),
+]

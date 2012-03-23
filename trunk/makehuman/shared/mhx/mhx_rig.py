@@ -933,6 +933,7 @@ def addDampedTrackConstraint(fp, flags, inf, data):
     name = data[0]
     subtar = data[1]
     track = data[2]
+    headtail = data[3]
     (ownsp, targsp, active, expanded) = constraintFlags(flags)
 
     fp.write(
@@ -944,6 +945,7 @@ def addDampedTrackConstraint(fp, flags, inf, data):
 "      owner_space '%s' ;\n" % ownsp+
 "      is_proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
+"      head_tail %d ;\n" % headtail +
 "      target_space '%s' ;\n" % targsp+
 "      track_axis '%s' ;\n" % track + 
 "    end Constraint\n")
@@ -1352,7 +1354,6 @@ def writeMuscleDrivers(fp, drivers, rig):
             drvVars.append( (var, 'ROTATION_DIFF', [('OBJECT', rig, targ1, C_LOC), ('OBJECT', rig, targ2, C_LOC)]) )
         writeDriver(fp, True, drvdata, "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, keypoints, drvVars)
     return
-
 
 #
 #    writeRotDiffDrivers(fp, drivers, proxy):

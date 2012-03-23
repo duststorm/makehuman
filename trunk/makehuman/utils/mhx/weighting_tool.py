@@ -202,6 +202,48 @@ class VIEW3D_OT_CopyVertexGroupsButton(bpy.types.Operator):
         copyVertexGroups(scn, src, trg)
         print("Vertex groups copied")
         return{'FINISHED'}    
+        
+#
+#
+#
+
+def mergeVertexGroups(scn, ob):
+    vgroups = []
+    for n in range(5):
+        vg = scn["MhxVG%d" % n]
+        if vg:
+            vgroups.append(vg)
+        else:
+            break
+    if not vgroups:
+        return
+    print("Merging", vgroups)
+    tgrp = ob.vertex_groups[vgroups[0]]
+    groups = []
+    for vg in vgroups:
+        groups.append( ob.vertex_groups[vg].index )
+    for v in ob.data.vertices:
+        w = 0
+        for g in v.groups:
+            if g.group in groups:
+                w += g.weight
+        if w > 1e-4:
+            tgrp.add([v.index], w, 'REPLACE')
+    for vgname in vgroups[1:]:
+        vg = ob.vertex_groups[vgname]
+        print("Remove", vg)
+        ob.vertex_groups.remove(vg)
+    return        
+   
+class VIEW3D_OT_MergeVertexGroupsButton(bpy.types.Operator):
+    bl_idname = "mhw.merge_vertex_groups"
+    bl_label = "Merge vertex groups"
+
+    def execute(self, context):
+        mergeVertexGroups(context.scene, context.object)
+        print("Vertex groups merged")
+        return{'FINISHED'}    
+   
 
 #
 #    unVertexDiamonds(context):
@@ -1295,6 +1337,7 @@ def initInterface(context):
 
 
     scn = context.scene
+    print("init", scn)
     if scn:
         scn['MhxWeight'] = 1.0
         scn['MhxBone1'] = 'Bone1'
@@ -1303,6 +1346,12 @@ def initInterface(context):
         scn['MhxExportSelectedOnly'] = False
         scn['MhxVertexOffset'] = 0
         scn['MhxVertexGroupFile'] = '/home/vgroups.txt'
+        
+        scn['MhxVG0'] = ""
+        scn['MhxVG1'] = ""
+        scn['MhxVG2'] = ""
+        scn['MhxVG3'] = ""
+        scn['MhxVG4'] = ""
 
     return
 
@@ -1331,6 +1380,7 @@ class MhxWeightToolsPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
+        scn = context.scene
         layout.operator("mhw.init_interface")
         layout.separator()
         layout.operator("mhw.print_vnums")
@@ -1346,7 +1396,7 @@ class MhxWeightToolsPanel(bpy.types.Panel):
         layout.operator("mhw.recover_diamonds")
 
         layout.separator()
-        layout.prop(context.scene, 'MhxVertNum')
+        layout.prop(scn, 'MhxVertNum')
         layout.operator("mhw.select_vnum")
 
         layout.separator()
@@ -1364,7 +1414,27 @@ class MhxWeightToolsPanel(bpy.types.Panel):
         layout.prop(context.scene, 'MhxVertexOffset')
         layout.operator("mhw.export_vertex_groups")    
         layout.operator("mhw.export_sum_groups")    
-        
+
+class MhxWeightExtraPanel(bpy.types.Panel):
+    bl_label = "Weight tools extra"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    
+    @classmethod
+    def poll(cls, context):
+        return context.object and context.object.type == 'MESH'
+
+       
+    def draw(self, context):
+        layout = self.layout
+        scn = context.scene
+        layout.prop(scn, '["MhxVG0"]')
+        layout.prop(scn, '["MhxVG1"]')
+        layout.prop(scn, '["MhxVG2"]')
+        layout.prop(scn, '["MhxVG3"]')
+        layout.prop(scn, '["MhxVG4"]')
+        layout.operator("mhw.merge_vertex_groups")
+
         layout.operator("mhw.list_vert_pairs")            
 
         layout.separator()

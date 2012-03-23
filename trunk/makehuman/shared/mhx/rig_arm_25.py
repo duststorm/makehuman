@@ -270,8 +270,8 @@ BicepsArmature = [
 #
 #
 
-limUpArm_L = (-90*D,90*D, -100*D,45*D, -90*D,90*D)
-limUpArm_R = (-90*D,90*D, -45*D,100*D, -90*D,90*D)
+limUpArm_L = (-90*D,90*D, -120*D,90*D, -90*D,90*D)
+limUpArm_R = (-90*D,90*D, -90*D,120*D, -90*D,90*D)
 
 limLoArm_L = (-0*D,0*D, -178*D,150*D, -175*D,10*D)
 limLoArm_R = (-0*D,0*D, -150*D,178*D, -10*D,175*D)
