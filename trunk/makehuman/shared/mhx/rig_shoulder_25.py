@@ -131,8 +131,8 @@ ShoulderHeadsTails = [
     # Rotation diffs
     ('BendArmDown_L',        'r-uparm0', ('r-uparm0', (0,-1,0))),
     ('BendArmDown_R',        'l-uparm0', ('l-uparm0', (0,-1,0))),
-    ('BendArmUp_L',          'r-uparm0', ('r-uparm0', (0,1,0))),
-    ('BendArmUp_R',          'l-uparm0', ('l-uparm0', (0,1,0))),
+    ('ShoulderTweak_L',      'r-uparm0', ('r-uparm0', (0,1,0))),
+    ('ShoulderTweak_R',      'l-uparm0', ('l-uparm0', (0,1,0))),
     ('BendArmForward_L',     'r-uparm0', ('r-uparm0', (0,0,1))),
     ('BendArmForward_R',     'l-uparm0', ('l-uparm0', (0,0,1))),
     ('BendArmBack_L',        'r-uparm0', ('r-uparm0', (0,0,-1))),
@@ -202,8 +202,8 @@ ShoulderArmature = [
 
     # Rotation diffs
 
-    ('BendArmUp_L',        -90*D, 'Clavicle_L', 0, L_HELP, NoBB),
-    ('BendArmUp_R',        90*D, 'Clavicle_R', 0, L_HELP, NoBB),
+    ('ShoulderTweak_L',        -90*D, 'Clavicle_L', F_WIR, L_TWEAK, NoBB),
+    ('ShoulderTweak_R',        90*D, 'Clavicle_R', F_WIR, L_TWEAK, NoBB),
 ]
 """
     ('BendArmDown_L',      90*D, 'Clavicle_L', 0, L_HELP, NoBB),
@@ -254,6 +254,10 @@ def ShoulderControlPoses(fp):
     addPoseBone(fp, 'Shoulder_R', 'MHBall025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
         [('CopyRot', 0, 1, ['Shoulder', 'ShoulderEnd_R', (1,1,1), (0,0,0), False]),
          ('CopyRot', 0, 0, ['Root', 'BendRoot', (1,1,1), (0,0,0), False])])
+         
+    addPoseBone(fp, 'ShoulderTweak_L', 'MHShoulder', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])         
+
+    addPoseBone(fp, 'ShoulderTweak_R', 'MHShoulder', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])         
 
     # Muscles
     addPoseBone(fp, 'DfmPect1_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
@@ -360,6 +364,6 @@ def ShoulderControlPoses(fp):
 #
 
 ShoulderDeformDrivers = [
-    ("DfmDeltoid_L", "DampedTrack", "2*cos(x)", [("x", "DfmUpArm1_L", "BendArmUp_L")], []),
-    ("DfmDeltoid_R", "DampedTrack", "2*cos(x)", [("x", "DfmUpArm1_R", "BendArmUp_R")], []),
+    ("DfmDeltoid_L", "DampedTrack", "2*cos(x)", [("x", "DfmUpArm1_L", "ShoulderTweak_L")], []),
+    ("DfmDeltoid_R", "DampedTrack", "2*cos(x)", [("x", "DfmUpArm1_R", "ShoulderTweak_R")], []),
 ]

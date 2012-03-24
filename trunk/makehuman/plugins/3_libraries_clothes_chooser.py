@@ -33,6 +33,8 @@ class ClothesTaskView(gui3d.TaskView):
         self.userClothes = os.path.join(mh.getPath(''), 'data', 'clothes')
         
         gui3d.TaskView.__init__(self, category, 'Clothes')
+        if not os.path.exists(self.userClothes):
+            os.makedirs(self.userClothes)
         self.filechooser = self.addView(gui3d.FileChooser([self.systemClothes, self.userClothes], 'mhclo', 'png', 'notfound.png'))
         self.update = self.filechooser.sortBox.addView(gui3d.Button('Check for updates'))
         self.mediaSync = None
