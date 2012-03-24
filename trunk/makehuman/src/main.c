@@ -769,6 +769,7 @@ int main(int argc, char *argv[])
     PyEval_InitThreads();
 
     PySys_SetArgv(argc, argv);
+	Py_SetPythonHome("pythonmodules");
 
     initGlobals(); /* initialize all our globals */
     module = Py_InitModule("mh", EmbMethods);
