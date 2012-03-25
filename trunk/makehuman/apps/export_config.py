@@ -93,6 +93,7 @@ class CExportConfig:
         self.biceps = False
         self.malerig = False
         self.skirtrig = "inh"
+        self.clothesrig = True
         self.clothesvisibilitydrivers = False
         self.customrigs = []
         self.customshapes = []
@@ -186,6 +187,7 @@ def exportConfig(human, useHair, options=None):
         cfg.bodyshapes = options['bodyshapes']
         cfg.separatefolder = options['separatefolder']
         cfg.cage = options['cage']
+        cfg.clothesrig = options['clothesrig']
         cfg.breastrig = options['breastrig']
         cfg.malerig = options['malerig']
         if options['skirtrig']:
@@ -243,7 +245,7 @@ def exportConfig(human, useHair, options=None):
             elif key in [
                 'separatefolder',
                 'expressions', 'faceshapes', 'bodyshapes', 
-                'breastrig', 'biceps', 'malerig',
+                'breastrig', 'biceps', 'malerig', 'clothesrig',
                 'clothesvisibilitydrivers'
                 ]:
                 try:
