@@ -91,9 +91,9 @@ def exportMhx_25(human, fp):
 "#endif\n")
 
     obj = human.meshData
-    mhx_rig.setupRig(obj)
     proxyData = {}
     scanProxies(obj, proxyData)
+    mhx_rig.setupRig(obj, proxyData)
     
     if not the.Config.cage:
         fp.write(

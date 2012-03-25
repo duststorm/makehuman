@@ -1,8 +1,9 @@
 # author Unknown
 # license GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 # homepage http://www.makehuman.org/
-# name long2
+# name HairLong2
 # subsurf 1 1
+# rig long2.rig
 # texture long2_texture.tif
 # material long2
 diffuse_intensity 0.8

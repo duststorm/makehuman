@@ -650,6 +650,10 @@ def initInterface():
         maxlen=1024,
         default="/home/svn/makehuman")        
     
+    bpy.types.Scene.MRVertNum = IntProperty(
+        name="Vertex", 
+        default = -1)
+    
     bpy.types.Scene.MRAuthor = StringProperty(
         name="Author", 
         default="Unknown",

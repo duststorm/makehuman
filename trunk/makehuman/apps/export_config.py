@@ -158,7 +158,10 @@ def findExistingProxyFile1(folder, subfolder, fname, depth):
     if os.path.isfile(path):
         safePrint("Found", path)
         return path
-    files = os.listdir(folder)        
+    try:
+        files = os.listdir(folder)        
+    except WindowsError:
+        return None
     for file in files:
         newfolder = os.path.join(folder, file)
         if os.path.isdir(newfolder):

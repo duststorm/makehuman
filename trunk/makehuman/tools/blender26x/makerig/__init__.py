@@ -88,14 +88,19 @@ class MakeRigPanel(bpy.types.Panel):
         layout.operator("mhrig.save_settings")
 
         layout.separator()
-        layout.label("Weighting")      
+        layout.label("Weighting, MH mesh specific")      
         layout.prop(scn, "MRMakeHumanDir")
         layout.operator("mhrig.auto_weight_body")
         layout.operator("mhrig.auto_weight_helpers")
+
+        layout.separator()
+        layout.label("Weighting utilites")  
+        layout.operator("mhrig.print_vnums")
+        layout.prop(scn, "MRVertNum")
+        layout.operator("mhrig.select_vnum")
         layout.operator("mhrig.unvertex_diamonds")
         layout.operator("mhrig.unvertex_selected")
         layout.operator("mhrig.unvertex_all")
-
         layout.operator("mhrig.symmetrize_weights", text="Symm weights L=>R").left2right = True
         layout.operator("mhrig.symmetrize_weights", text="Symm weights R=>L").left2right = False
 
@@ -165,6 +170,39 @@ class OBJECT_OT_AutoWeightHelpersButton(bpy.types.Operator):
     def execute(self, context):
         main.autoWeightHelpers(context)
         return{'FINISHED'}    
+ 
+class VIEW3D_OT_PrintVnumsButton(bpy.types.Operator):
+    bl_idname = "mhrig.print_vnums"
+    bl_label = "Print vertex numbers"
+
+    def execute(self, context):
+        ob = context.object
+        bpy.ops.object.mode_set(mode='OBJECT')
+        print("Verts in ", ob)
+        first = True
+        for v in ob.data.vertices:
+            if v.select:
+                print("  ", v.index)
+                if first:
+                    context.scene.MRVertNum = v.index
+                    first = False
+        return{'FINISHED'}    
+
+class VIEW3D_OT_SelectVnumButton(bpy.types.Operator):
+    bl_idname = "mhrig.select_vnum"
+    bl_label = "Select vertex number"
+
+    def execute(self, context):
+        n = context.scene.MRVertNum
+        ob = context.object
+        bpy.ops.object.mode_set(mode='OBJECT')
+        for v in ob.data.vertices:
+            v.select = False
+        v = ob.data.vertices[n]
+        v.select = True
+        bpy.ops.object.mode_set(mode='EDIT')
+        return{'FINISHED'}    
+
 
 class VIEW3D_OT_UnvertexDiamondsButton(bpy.types.Operator):
     bl_idname = "mhrig.unvertex_diamonds"

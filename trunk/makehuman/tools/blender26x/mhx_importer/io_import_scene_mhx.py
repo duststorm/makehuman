@@ -97,7 +97,7 @@ todo = []
 
 T_EnforceVersion = 0x01
 T_Clothes = 0x02
-T_Stretch = 0x04
+T_CloRig = 0x04
 
 T_Diamond = 0x10
 T_Replace = 0x20
@@ -2818,7 +2818,7 @@ MhxBoolProps = [
     #("replace", "Replace scene", "Replace scene", T_Replace),
     ("cage", "Cage", "Load mesh deform cage", T_Cage),
     ("clothes", "Clothes", "Include clothes", T_Clothes),
-    #("stretch", "Stretchy limbs", "Stretchy limbs", T_Stretch),
+    ("clorig", "Clothes rig", "Include clothes rig", T_CloRig),
     ("face", "Face shapes", "Include facial shapekeys", T_Face),
     ("shape", "Body shapes", "Include body shapekeys", T_Shape),
     #("symm", "Symmetric shapes", "Keep shapekeys symmetric", T_Symm),
@@ -3533,7 +3533,7 @@ class MhxExpressionsPanel(bpy.types.Panel):
 #########################################
 #
 #   FK-IK snapping panel. 
-#   The bulk of this code is shamelessly stolen from Rigify.
+#   The bulk of this code was shamelessly stolen from Rigify.
 #
 #########################################
 
@@ -3660,7 +3660,7 @@ def matchPoleTarget(ik_first, ik_last, pole, match_bone, length):
     # Get the rotation difference between ik_first and match_bone
     q1 = ik_first.matrix.to_quaternion()
     q2 = match_bone.matrix.to_quaternion()
-    angle = acos(min(1,max(-1,q1.dot(q2)))) * 2
+    angle = math.acos(min(1,max(-1,q1.dot(q2)))) * 2
 
     # Compensate for the rotation difference
     if angle > 0.0001:
@@ -3671,7 +3671,7 @@ def matchPoleTarget(ik_first, ik_last, pole, match_bone, length):
         # compensated in the right direction
         q1 = ik_first.matrix.to_quaternion()
         q2 = match_bone.matrix.to_quaternion()
-        angle2 = acos(min(1,max(-1,q1.dot(q2)))) * 2
+        angle2 = math.acos(min(1,max(-1,q1.dot(q2)))) * 2
         if angle2 > 0.0001:
             # Compensate in the other direction
             pv = Matrix.Rotation((angle*(-2)), 4, ikv).to_quaternion() * pv
@@ -3778,63 +3778,135 @@ def getSnapBones(rig, key, suffix):
 
 class VIEW3D_OT_MhxSnapFk2IkButton(bpy.types.Operator):
     bl_idname = "mhx.snap_fk_ik"
-    bl_label = "Set FK"
-    bone = StringProperty()    
+    bl_label = "Snap FK"
+    data = StringProperty()    
 
     def execute(self, context):
         bpy.ops.object.mode_set(mode='POSE')
-        if self.bone[:3] == "Arm":
-            fk2ikArm(context, self.bone[-2:])
-        elif self.bone[:3] == "Leg":
-            fk2ikLeg(context, self.bone[-2:])
+        rig = context.object
+        (prop, old) = setSnapProp(rig, self.data, 1.0)
+        if prop[:4] == "&Arm":
+            fk2ikArm(context, prop[-2:])
+        elif prop[:4] == "&Leg":
+            fk2ikLeg(context, prop[-2:])
+        updatePose(context.scene)
+        restoreSnapProp(rig, prop, old)
         return{'FINISHED'}    
 
 class VIEW3D_OT_MhxSnapIk2FkButton(bpy.types.Operator):
     bl_idname = "mhx.snap_ik_fk"
-    bl_label = "Set IK"
-    bone = StringProperty()    
+    bl_label = "Snap IK"
+    data = StringProperty()    
 
     def execute(self, context):
         bpy.ops.object.mode_set(mode='POSE')
-        if self.bone[:3] == "Arm":
-            ik2fkArm(context, self.bone[-2:])
-        elif self.bone[:3] == "Leg":
-            ik2fkLeg(context, self.bone[-2:])
+        rig = context.object
+        (prop, old) = setSnapProp(rig, self.data, 0.0)
+        if prop[:4] == "&Arm":
+            ik2fkArm(context, prop[-2:])
+        elif prop[:4] == "&Leg":
+            ik2fkLeg(context, prop[-2:])
+        updatePose(context.scene)
+        restoreSnapProp(rig, prop, old)
         return{'FINISHED'}    
 
-class MhxSnappingPanel(bpy.types.Panel):
-    bl_label = "MHX Snapping"
+def setSnapProp(rig, data, value):
+    words = data.split()
+    prop = words[0]
+    oldValue = rig[prop]
+    rig[prop] = value
+    ik = int(words[1])
+    fk = int(words[2])
+    oldIk = rig.data.layers[ik]
+    oldFk = rig.data.layers[fk]
+    rig.data.layers[ik] = True
+    rig.data.layers[fk] = True
+    return (prop, (oldValue, ik, fk, oldIk, oldFk))
+    
+def restoreSnapProp(rig, prop, old):
+    (oldValue, ik, fk, oldIk, oldFk) = old
+    rig[prop] = oldValue
+    rig.data.layers[ik] = oldIk
+    rig.data.layers[fk] = oldFk
+    return
+
+class VIEW3D_OT_MhxToggleFkIkButton(bpy.types.Operator):
+    bl_idname = "mhx.toggle_fk_ik"
+    bl_label = "FK - IK"
+    toggle = StringProperty()    
+
+    def execute(self, context):
+        scn = context.scene
+        words = self.toggle.split()
+        rig = context.object
+        prop = words[0]
+        value = float(words[1]) 
+        onLayer = int(words[2])
+        offLayer = int(words[3])
+        rig.data.layers[onLayer] = True
+        rig.data.layers[offLayer] = False
+        rig[prop] = value
+        # Don't do autokey - confusing.
+        #if context.tool_settings.use_keyframe_insert_auto:
+        #    rig.keyframe_insert('["%s"]' % prop, frame=scn.frame_current)        
+        updatePose(scn)
+        return{'FINISHED'}    
+
+class MhxFKIKPanel(bpy.types.Panel):
+    bl_label = "MHX FK/IK switch"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_options = {'DEFAULT_CLOSED'}
+    #bl_options = {'DEFAULT_CLOSED'}
     
     @classmethod
     def poll(cls, context):
         return pollMhxRig(context.object)
 
     def draw(self, context):
-        ob = context.object
-        layout = self.layout
+        rig = context.object
+        layout = self.layout        
 
         row = layout.row()
-        row.label("Left arm")
-        row.operator("mhx.snap_fk_ik").bone = "Arm_L"
-        row.operator("mhx.snap_ik_fk").bone = "Arm_L"
+        row.label("")
+        row.label("Left")
+        row.label("Right")
 
+        layout.label("FK/IK switch")
         row = layout.row()
-        row.label("Right arm")
-        row.operator("mhx.snap_fk_ik").bone = "Arm_R"
-        row.operator("mhx.snap_ik_fk").bone = "Arm_R"
+        row.label("Arm")
+        self.toggleButton(row, rig, "&ArmIk_L", " 3", " 2")
+        self.toggleButton(row, rig, "&ArmIk_R", " 19", " 18")
+        row = layout.row()
+        row.label("Leg")
+        self.toggleButton(row, rig, "&LegIk_L", " 5", " 4")
+        self.toggleButton(row, rig, "&LegIk_R", " 21", " 20")
+        
+        layout.label("Snap FK bones")
+        row = layout.row()
+        row.label("Arm")
+        row.operator("mhx.snap_fk_ik").data = "&ArmIk_L 2 3"
+        row.operator("mhx.snap_fk_ik").data = "&ArmIk_R 18 19"
+        row = layout.row()
+        row.label("Leg")
+        row.operator("mhx.snap_fk_ik").data = "&LegIk_L 4 5"
+        row.operator("mhx.snap_fk_ik").data = "&LegIk_R 20 21"
+                
+        layout.label("Snap IK bones")
+        row = layout.row()
+        row.label("Arm")
+        row.operator("mhx.snap_ik_fk").data = "&ArmIk_L 2 3"
+        row.operator("mhx.snap_ik_fk").data = "&ArmIk_R 18 19"
+        row = layout.row()
+        row.label("Leg")
+        row.operator("mhx.snap_ik_fk").data = "&LegIk_L 4 5"
+        row.operator("mhx.snap_ik_fk").data = "&LegIk_R 20 21"
 
-        row = layout.row()
-        row.label("Left leg")
-        row.operator("mhx.snap_fk_ik").bone = "Leg_L"
-        row.operator("mhx.snap_ik_fk").bone = "Leg_L"
-
-        row = layout.row()
-        row.label("Right arm")
-        row.operator("mhx.snap_fk_ik").bone = "Leg_R"
-        row.operator("mhx.snap_ik_fk").bone = "Leg_R"
+    def toggleButton(self, row, rig, prop, fk, ik):
+        if rig[prop] > 0.5:
+            row.operator("mhx.toggle_fk_ik", text="IK").toggle = prop + " 0" + fk + ik
+        else:
+            row.operator("mhx.toggle_fk_ik", text="FK").toggle = prop + " 1" + ik + fk
+            
 
 ###################################################################################    
 #

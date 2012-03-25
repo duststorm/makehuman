@@ -5,7 +5,6 @@
 # obj_file gloves.obj
 # z_depth 45
 # subsurf 1 2
-# shrinkwrap 0.030
 # shapekey Breathe
 # texture gloves_texture.tif
 # mask gloves_mask.png

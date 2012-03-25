@@ -32,6 +32,7 @@ import read_expression
 import sys
 import mhx_custom
 import read_rig
+import mh2proxy
         
 def rotationMode(flags):
     modes = ['QUATERNION', 'XYZ', 'XZY', 'YXZ', 'YZX', 'ZXY', 'ZYX']
@@ -1619,7 +1620,7 @@ def setupCircles(fp):
     return
 
 #
-#    setupRig(obj):
+#    setupRig(obj, proxyData):
 #    writeAllArmatures(fp)    
 #    writeAllPoses(fp)    
 #    writeAllActions(fp)    
@@ -1633,7 +1634,7 @@ import rig_skirt_25
 #import blenrig_rig        
 import rigify_rig
 
-def setupRig(obj):
+def setupRig(obj, proxyData):
     the.RigHead = {}
     the.RigTail = {}
     the.VertexWeights = []
@@ -1753,7 +1754,6 @@ def setupRig(obj):
 
     else:
         rigfile = "data/rigs/%s.rig" % the.Config.mhxrig
-        print("Rigfile", rigfile)
         (locations, armature, the.VertexWeights) = read_rig.readRigFile(rigfile, obj)        
         joints = (
             rig_joints_25.DeformJoints +
@@ -1765,31 +1765,7 @@ def setupRig(obj):
 
         headsTails = []
         the.Armature = []
-        for data in armature:
-            (bone, head, tail, roll, parent, options) = data
-            if parent == "-":
-                parent = None
-            flags = F_DEF|F_CON
-            for (key, value) in options.items():
-                if key == "-nc":
-                    flags &= ~F_CON
-                elif key == "-nc":
-                    flags &= ~F_DEF
-                elif key == "-circ":
-                    name = "Circ"+value[0]
-                    the.CustomShapes[name] = (key, int(value[0]))
-                    addPoseInfo(bone, ("CS", name))
-                    flags |= F_WIR
-                elif key == "-box":
-                    name = "Box" + value[0]
-                    the.CustomShapes[name] = (key, int(value[0]))
-                    addPoseInfo(bone, ("CS", name))
-                    flags |= F_WIR
-                elif key == "-ik":
-                    addPoseInfo(bone, ("IK", value))
-            the.Armature.append((bone, roll, parent, flags, L_MAIN, NoBB))
-            the.RigHead[bone] = aljabr.vsub(head, the.Origin)
-            the.RigTail[bone] = aljabr.vsub(tail, the.Origin)
+        appendRigBones(armature, obj, "", L_MAIN, [])
         the.BoneGroups = []
         the.RecalcRoll = []              
         the.VertexGroupFiles = []
@@ -1820,13 +1796,67 @@ def setupRig(obj):
     
     newSetupJoints(obj, joints)
     moveOriginToFloor()    
+
     if the.Config.mhxrig == 'mhx':
         rig_body_25.BodyDynamicLocations()
     for (bone, head, tail) in headsTails:
         the.RigHead[bone] = findLocation(head)
         the.RigTail[bone] = findLocation(tail)
+
+    body = the.RigHead.keys()
+    for proxy in proxyData.values():
+        if proxy.rig:
+            verts = []
+            for bary in proxy.realVerts:
+                verts.append(mh2proxy.proxyCoord(bary))
+            (locations, armature, weights) = read_rig.readRigFile(proxy.rig, obj, verts=verts) 
+            proxy.weights = prefixWeights(weights, proxy.name, body)
+            appendRigBones(armature, obj, proxy.name, L_CLO, body)
     return
-    
+
+def prefixWeights(weights, prefix, body):
+    pweights = {}
+    for name in weights.keys():
+        if name in body:
+            pweights[name] = weights[name]
+        else:
+            pweights[prefix+name] = weights[name]
+    return pweights
+
+def appendRigBones(armature, obj, prefix, layer, body):        
+        for data in armature:
+            (bone0, head, tail, roll, parent0, options) = data
+            if bone0 in body:
+                continue
+            bone = prefix + bone0
+            if parent0 == "-":
+                parent = None
+            elif parent0 in body:
+                parent = parent0
+            else:
+                parent = prefix + parent0
+            flags = F_DEF|F_CON
+            for (key, value) in options.items():
+                if key == "-nc":
+                    flags &= ~F_CON
+                elif key == "-nc":
+                    flags &= ~F_DEF
+                elif key == "-circ":
+                    name = "Circ"+value[0]
+                    the.CustomShapes[name] = (key, int(value[0]))
+                    addPoseInfo(bone, ("CS", name))
+                    flags |= F_WIR
+                elif key == "-box":
+                    name = "Box" + value[0]
+                    the.CustomShapes[name] = (key, int(value[0]))
+                    addPoseInfo(bone, ("CS", name))
+                    flags |= F_WIR
+                elif key == "-ik":
+                    addPoseInfo(bone, ("IK", value))
+            the.Armature.append((bone, roll, parent, flags, layer, NoBB))
+            the.RigHead[bone] = aljabr.vsub(head, the.Origin)
+            the.RigTail[bone] = aljabr.vsub(tail, the.Origin)
+            
 def addPoseInfo(bone, info):
     try:
         the.PoseInfo[bone]

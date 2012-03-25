@@ -5,7 +5,6 @@
 # obj_file bikini.obj
 # z_depth 20
 # subsurf 1 2
-# shrinkwrap 0.030
 # shapekey Breathe
 # texture bikini_texture.tif
 # mask bikini_mask.png

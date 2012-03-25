@@ -48,6 +48,7 @@ class CProxy:
         self.texVertsLayers = {}
         self.useBaseMaterials = False
         self.faceNumbers = []
+        self.rig = None
         self.mask = None
         self.texture = None
         self.bump = None
@@ -68,7 +69,6 @@ class CProxy:
         self.cage = False
         self.modifiers = []
         self.shapekeys = []
-        self.bones = []
         self.weights = None
         self.refVerts = []
         return
@@ -244,6 +244,8 @@ def readProxyFile(obj, file, evalOnLoad):
                 useProjection = int(words[2])
             elif key == 'ignoreOffset':
                 ignoreOffset = int(words[2])
+            elif key == 'rig':
+                proxy.rig = getFileName(folder, words[2], ".rig")
             elif key == 'mask':
                 proxy.mask = getFileName(folder, words[2], ".png")
                 if len(words) > 3:
