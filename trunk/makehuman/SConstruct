@@ -75,3 +75,46 @@ if platform.system() == "Windows":
     moduleEnv["SHLIBSUFFIX"] = ".pyd"
 moduleEnv.LoadableModule("mh", ["module_build/core.c", "module_build/glmodule.c", "module_build/arraybuffer.c", "module_build/main.c"])
 
+# Generate a dist directory with all of the material necessary to ship
+# use the dist target
+if platform.system() == "Windows" and 'dist' in COMMAND_LINE_TARGETS:
+    Execute([Delete("dist")])
+    Execute([Delete("output.exe")])
+    Execute([
+        Mkdir("dist"),
+        #Microsoft Visual C++ 2k10 Runtime
+        Copy("dist", r"C:\Windows\System32\msvcr100.dll"),   
+        #Python
+        Copy("dist", r"C:\Windows\System32\Python27.dll"),
+        Copy("dist/lib",r"C:\Python27\lib"),
+        Copy("dist/DLLs",r"C:\Python27\DLLs"),
+        #GLEW
+        Copy("dist",r"C:\Glew\bin\glew32.dll"),
+        #SDL
+	Copy("dist",r"C:\SDL\lib\libjpeg-8.dll"),
+	Copy("dist",r"C:\SDL\lib\libpng15-15.dll"),
+	Copy("dist",r"C:\SDL\lib\libtiff-5.dll"),
+	Copy("dist",r"C:\SDL\lib\libwebp-2.dll"),
+	Copy("dist",r"C:\SDL\lib\SDL.dll"),
+	Copy("dist",r"C:\SDL\lib\SDL_image.dll"),
+	Copy("dist",r"C:\SDL\lib\zlib1.dll"),
+        #MakeHuman
+        Copy("dist","makehuman.exe"),
+        Copy("dist","main.py"),
+        Copy("dist/apps","apps"),
+        Copy("dist/core","core"),
+#        Copy("dist/docs","docs"),
+        Copy("dist/toods","tools"),
+        Copy("dist/utils","utils"),
+        Copy("dist/shared","shared"),
+        Copy("dist/importers","importers"),
+        Copy("dist/plugins","plugins"),
+        Copy("dist/data","data"),
+	Copy("dist","setup.nsi"),
+	Copy("dist","license.txt"),
+        Copy("dist/lib","pythonmodules/_socket.pyd"),
+        Copy("dist/lib","pythonmodules/linalg_module.pyd"),
+    ])
+    Execute(['makensis dist/setup.nsi'])
+
+

@@ -1,5 +1,5 @@
 Name Makehuman
-OutFile setup.exe
+OutFile ../makehuman-nightly-win32.exe
 LicenseData license.txt
 
 InstallDir $PROGRAMFILES\Makehuman
@@ -17,7 +17,6 @@ Section "Copy files"
   File *.dll
   File main.py
   File license.txt
-  File proxy.cfg
 
   # Copy data files
   SetOutPath $INSTDIR\data
@@ -28,14 +27,16 @@ Section "Copy files"
   File /r /x .svn /x .pyc importers\*.*
   
   # Copy docs
-  SetOutPath $INSTDIR\docs
-  File /r /x .svn docs\*.pdf
+#  SetOutPath $INSTDIR\docs
+#  File /r /x .svn docs\*.pdf
 
   # Copy python files
   SetOutPath $INSTDIR\core
   File /r /x .svn /x .pyc core\*.py
-  SetOutPath $INSTDIR\pythonmodules
-  File /r /x .svn pythonmodules\*.pyc
+  SetOutPath $INSTDIR\lib
+  File /r /x .svn lib\*.*
+  SetOutPath $INSTDIR\DLLs
+  File /r /x .svn DLLs\*.*
   SetOutPath $INSTDIR\plugins
   File /r /x .svn /x .pyc plugins\*.py
   SetOutPath $INSTDIR\shared
