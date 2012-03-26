@@ -2,6 +2,11 @@ Name Makehuman
 OutFile ../makehuman-nightly-win32.exe
 LicenseData license.txt
 
+SetCompress Auto
+SetCompressor /SOLID lzma
+SetCompressorDictSize 32
+SetDatablockOptimize On
+
 InstallDir $PROGRAMFILES\Makehuman
 
 Page license
