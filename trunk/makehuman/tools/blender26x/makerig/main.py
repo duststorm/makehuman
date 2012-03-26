@@ -393,6 +393,17 @@ def unVertexDiamonds(context):
     bpy.ops.object.mode_set(mode='OBJECT')
     return
     
+def unVertexBelowThreshold(context):    
+    ob = context.object
+    threshold = context.scene.MRThreshold
+    for vgrp in ob.vertex_groups:
+        gn = vgrp.index
+        for v in ob.data.vertices:
+            for g in v.groups:
+                if g.group == gn and g.weight < threshold:
+                    vgrp.remove([v.index])
+    return
+    
 #
 #   goodName(name):    
 #   getFileName(pob, context, ext):            
@@ -653,6 +664,11 @@ def initInterface():
     bpy.types.Scene.MRVertNum = IntProperty(
         name="Vertex", 
         default = -1)
+
+    bpy.types.Scene.MRThreshold = FloatProperty(
+        name="Threshold", 
+        default = 0.001,
+        min=0.0, max=1.0)    
     
     bpy.types.Scene.MRAuthor = StringProperty(
         name="Author", 

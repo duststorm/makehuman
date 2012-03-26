@@ -101,6 +101,8 @@ class MakeRigPanel(bpy.types.Panel):
         layout.operator("mhrig.unvertex_diamonds")
         layout.operator("mhrig.unvertex_selected")
         layout.operator("mhrig.unvertex_all")
+        layout.prop(scn, "MRThreshold")
+        layout.operator("mhrig.unvertex_below")
         layout.operator("mhrig.symmetrize_weights", text="Symm weights L=>R").left2right = True
         layout.operator("mhrig.symmetrize_weights", text="Symm weights R=>L").left2right = False
 
@@ -211,6 +213,15 @@ class VIEW3D_OT_UnvertexDiamondsButton(bpy.types.Operator):
     def execute(self, context):
         main.unVertexDiamonds(context)
         print("Diamonds unvertexed")
+        return{'FINISHED'}    
+
+class VIEW3D_OT_UnvertexBelowButton(bpy.types.Operator):
+    bl_idname = "mhrig.unvertex_below"
+    bl_label = "Unvertex below threshold"
+
+    def execute(self, context):
+        main.unVertexBelowThreshold(context)
+        print("Threshold imposed")
         return{'FINISHED'}    
 
 class VIEW3D_OT_UnvertexSelectedButton(bpy.types.Operator):
