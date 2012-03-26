@@ -62,7 +62,7 @@ def isInited(scn):
 
 
 class MakeRigPanel(bpy.types.Panel):
-    bl_label = "Make rig"
+    bl_label = "Make Rig"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     
@@ -88,12 +88,6 @@ class MakeRigPanel(bpy.types.Panel):
         layout.operator("mhrig.save_settings")
 
         layout.separator()
-        layout.label("Weighting, MH mesh specific")      
-        layout.prop(scn, "MRMakeHumanDir")
-        layout.operator("mhrig.auto_weight_body")
-        layout.operator("mhrig.auto_weight_helpers")
-
-        layout.separator()
         layout.label("Weighting utilites")  
         layout.operator("mhrig.print_vnums")
         layout.prop(scn, "MRVertNum")
@@ -105,6 +99,12 @@ class MakeRigPanel(bpy.types.Panel):
         layout.operator("mhrig.unvertex_below")
         layout.operator("mhrig.symmetrize_weights", text="Symm weights L=>R").left2right = True
         layout.operator("mhrig.symmetrize_weights", text="Symm weights R=>L").left2right = False
+
+        layout.separator()
+        layout.label("Weighting, MH mesh specific")      
+        layout.prop(scn, "MRMakeHumanDir")
+        layout.operator("mhrig.auto_weight_body")
+        layout.operator("mhrig.auto_weight_helpers")
 
         layout.separator()
         layout.label("Export rig")      
