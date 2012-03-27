@@ -115,6 +115,18 @@ end Armature
 
   Property &Breathe 0.0 Breathe ;
   PropKeys &Breathe "min":-0.5,"max":2.0, ;
+  
+  Property &TweakDeltoidInfluence_L 0.0 Tweak_left_deltoid_influence ;
+  PropKeys &TweakDeltoidInfluence_L "min":0.0,"max":1.0, ;
+  
+  Property &TweakDeltoidOn_L False Use_property_to_tweak_left_deltoid_influence ;
+  PropKeys &TweakDeltoidOn_L "type":'BOOLEAN',"min":0,"max":1, ;
+
+  Property &TweakDeltoidInfluence_R 0.0 Tweak_right_deltoid_influence ;
+  PropKeys &TweakDeltoidInfluence_R "min":0.0,"max":1.0, ;
+  
+  Property &TweakDeltoidOn_R False Use_property_to_tweak_right_deltoid_influence ;
+  PropKeys &TweakDeltoidOn_R "type":'BOOLEAN',"min":0,"max":1, ;
 
   *** properties Object
 end Object

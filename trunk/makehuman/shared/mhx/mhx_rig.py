@@ -1351,8 +1351,11 @@ def writeMuscleDrivers(fp, drivers, rig):
             drvdata = ('SCRIPTED', expr)
         else:
             drvdata = 'MIN'
-        for (var, targ1, targ2) in targs:
-            drvVars.append( (var, 'ROTATION_DIFF', [('OBJECT', rig, targ1, C_LOC), ('OBJECT', rig, targ2, C_LOC)]) )
+        for (var, typ, targ1, targ2) in targs:
+            if typ == 'ROTATION_DIFF':
+                drvVars.append( (var, typ, [('OBJECT', rig, targ1, C_LOC), ('OBJECT', rig, targ2, C_LOC)]) )
+            elif typ == 'SINGLE_PROP':
+                drvVars.append( (var, typ, [('OBJECT', the.Human, '["%s"]' % (targ1))]) )
         writeDriver(fp, True, drvdata, "","pose.bones[\"%s\"].constraints[\"%s\"].influence" % (bone, cnsName), -1, keypoints, drvVars)
     return
 
@@ -1438,8 +1441,9 @@ def writeDriver(fp, cond, drvdata, extra, channel, index, coeffs, variables):
 "            transform_space 'WORLD_SPACE' ; \n" +
 "          end Target\n")
 
-        elif typ == 'SINGLE_PROP':
-            useMod = True
+        elif typ == 'SINGLE_PROP': 
+            if coeffs:
+                useMod = True
             for (idtype, targ, datapath) in targets:
                 fp.write(
 "          Target %s %s\n" % (targ, idtype) +

@@ -202,8 +202,8 @@ ShoulderArmature = [
 
     # Rotation diffs
 
-    ('DirShldrUp_L',        -90*D, 'Clavicle_L', F_WIR, L_TWEAK, NoBB),
-    ('DirShldrUp_R',        90*D, 'Clavicle_R', F_WIR, L_TWEAK, NoBB),
+    ('DirShldrUp_L',        -90*D, 'Clavicle_L', 0, L_HELP, NoBB),
+    ('DirShldrUp_R',        90*D, 'Clavicle_R', 0, L_HELP, NoBB),
     ('DirShldrFwd_L',       0*D, 'Clavicle_L', 0, L_HELP, NoBB),
     ('DirShldrFwd_R',       0*D, 'Clavicle_R', 0, L_HELP, NoBB),
     ('DirShldrBack_L',      0*D, 'Clavicle_L', 0, L_HELP, NoBB),
@@ -255,10 +255,6 @@ def ShoulderControlPoses(fp):
         [('CopyRot', 0, 1, ['Shoulder', 'ShoulderEnd_R', (1,1,1), (0,0,0), False]),
          ('CopyRot', 0, 0, ['Root', 'BendRoot', (1,1,1), (0,0,0), False])])
          
-    addPoseBone(fp, 'DirShldrUp_L', 'MHShoulder', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])         
-
-    addPoseBone(fp, 'DirShldrUp_R', 'MHShoulder', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])         
-
     # Muscles
     addPoseBone(fp, 'DfmPect1_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_L', 1, 1])])
@@ -364,14 +360,18 @@ def ShoulderControlPoses(fp):
 #
 
 ShoulderDeformDrivers = [
-    ("DfmDeltoid_L", "DampedTrack", "max(2*cos(u),max(0.5*cos(f),1.5*cos(b)))", 
-        [("u", "DfmUpArm1_L", "DirShldrUp_L"),
-         ("f", "DfmUpArm1_L", "DirShldrFwd_L"),
-         ("b", "DfmUpArm1_L", "DirShldrBack_L"),
+    ("DfmDeltoid_L", "DampedTrack", "o*i+(1-o)*max(2*cos(u),max(0.5*cos(f),1.5*cos(b)))", 
+        [("u", 'ROTATION_DIFF', "DfmUpArm1_L", "DirShldrUp_L"),
+         ("f", 'ROTATION_DIFF', "DfmUpArm1_L", "DirShldrFwd_L"),
+         ("b", 'ROTATION_DIFF', "DfmUpArm1_L", "DirShldrBack_L"),
+         ("i", 'SINGLE_PROP', "&TweakDeltoidInfluence_L", ""),
+         ("o", 'SINGLE_PROP', "&TweakDeltoidOn_L", ""),
         ], []),
-    ("DfmDeltoid_R", "DampedTrack", "max(2*cos(u),max(0.5*cos(f),1.5*cos(b)))", 
-        [("u", "DfmUpArm1_R", "DirShldrUp_R"),
-         ("f", "DfmUpArm1_R", "DirShldrFwd_R"),
-         ("b", "DfmUpArm1_R", "DirShldrBack_R"),
+    ("DfmDeltoid_R", "DampedTrack", "o*i+(1-o)*max(2*cos(u),max(0.5*cos(f),1.5*cos(b)))", 
+        [("u", 'ROTATION_DIFF', "DfmUpArm1_R", "DirShldrUp_R"),
+         ("f", 'ROTATION_DIFF', "DfmUpArm1_R", "DirShldrFwd_R"),
+         ("b", 'ROTATION_DIFF', "DfmUpArm1_R", "DirShldrBack_R"),
+         ("i", 'SINGLE_PROP', "&TweakDeltoidInfluence_R", ""),
+         ("o", 'SINGLE_PROP', "&TweakDeltoidOn_R", ""),
         ], []),
 ]

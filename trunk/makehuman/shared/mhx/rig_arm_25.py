@@ -560,8 +560,8 @@ ArmDeformDrivers = []
 
 ArmShapeDrivers = {}
 '''
-    'BicepFlex_L' : ( 'LoArm1_L', 'BendLoArmForward_L',  [(0,1), (90*D,0)] ),
-    'BicepFlex_R' : ( 'LoArm1_R', 'BendLoArmForward_R',  [(0,1), (90*D,0)] ),
+    'BicepFlex_L' : ( 'LoArm1_L', 'ROTATION_DIFF', 'BendLoArmForward_L',  [(0,1), (90*D,0)] ),
+    'BicepFlex_R' : ( 'LoArm1_R', 'ROTATION_DIFF', 'BendLoArmForward_R',  [(0,1), (90*D,0)] ),
 }
 '''
 
