@@ -23,7 +23,7 @@ MakeHuman to MHX (MakeHuman eXchange format) exporter. MHX files can be loaded i
 """
 
 MAJOR_VERSION = 1
-MINOR_VERSION = 10
+MINOR_VERSION = 11
 BODY_LANGUAGE = True
 
 import module3d

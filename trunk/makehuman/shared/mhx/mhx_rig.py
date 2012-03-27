@@ -41,7 +41,6 @@ def rotationMode(flags):
 # Fix for ChildOf bug
 
 the.Master = 'MasterFloor'
-the.RootChildOfConstraints = []
 
 #        ('ChildOf', C_CHILDOF, 1, ['Floor', 'MasterFloor', (1,1,1), (1,1,1), (1,1,1)]),
 #        ('ChildOf', C_CHILDOF, 0, ['Hips', 'MasterHips', (1,1,1), (1,1,1), (1,1,1)]),
@@ -179,7 +178,19 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
     fp.write("    head  %.6g %.6g %.6g  ;\n" % (x,-z,y))
     (x, y, z) = the.RigTail[bone]
     fp.write("    tail %.6g %.6g %.6g  ;\n" % (x,-z,y))
-    if parent:
+    if type(parent) == tuple:
+        (soft, hard) = parent
+        if hard:
+            fp.write(
+"#if toggle&T_HardParents\n" +
+"    parent Refer Bone %s ;\n" % hard +
+"#endif\n")
+        if soft:
+            fp.write(
+"#if toggle&T_HardParents==0\n" +
+"    parent Refer Bone %s ;\n" % soft +
+"#endif\n")
+    elif parent:
         fp.write("    parent Refer Bone %s ; \n" % (parent))
     fp.write(
 "    roll %.6g ; \n" % (roll)+
@@ -1097,6 +1108,7 @@ def addChildOfConstraint(fp, flags, inf, data):
 
     if the.Mhx25:
         fp.write(
+"#if toggle&T_HardParents==0\n" +        
 "    Constraint %s CHILD_OF True\n" % name +
 "      target Refer Object %s ;\n" % (the.Human) +
 "      active %s ;\n" % active +
@@ -1115,8 +1127,8 @@ def addChildOfConstraint(fp, flags, inf, data):
 "      use_scale_x %s ;\n" % scalex +
 "      use_scale_y %s ;\n" % scaley +
 "      use_scale_z %s ;\n" % scalez +
-"    end Constraint\n")
-#"    bpyops constraint.childof_set_inverse(constraint='%s',owner='BONE') ;\n" % name)
+"    end Constraint\n" +
+"#endif\n")
     return
 
 #
@@ -1937,11 +1949,22 @@ def writeAllDrivers(fp):
         writePropDrivers(fp, rig_arm_25.ArmPropDrivers, "", "&")
         writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_L", "&")
         writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_R", "&")
+        fp.write("#if toggle&T_HardParents==0\n")
+        writePropDrivers(fp, rig_arm_25.SoftArmPropLRDrivers, "_L", "&")
+        writePropDrivers(fp, rig_arm_25.SoftArmPropLRDrivers, "_R", "&")
+        fp.write("#endif\n")
         writePropDrivers(fp, rig_leg_25.LegPropDrivers, "", "&")
         writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_L", "&")
         writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_R", "&")
+        fp.write("#if toggle&T_HardParents==0\n")
+        writePropDrivers(fp, rig_leg_25.SoftLegPropLRDrivers, "_L", "&")
+        writePropDrivers(fp, rig_leg_25.SoftLegPropLRDrivers, "_R", "&")
+        fp.write("#endif\n")
         writePropDrivers(fp, rig_body_25.BodyPropDrivers, "", "&")
         writePropDrivers(fp, rig_face_25.FacePropDrivers, "", "&")
+        fp.write("#if toggle&T_HardParents==0\n")
+        writePropDrivers(fp, rig_face_25.SoftFacePropDrivers, "", "&")
+        fp.write("#endif\n")
         fingDrivers = rig_finger_25.getFingerPropDrivers()
         writePropDrivers(fp, fingDrivers, "_L", "&")            
         writePropDrivers(fp, fingDrivers, "_R", "&")            

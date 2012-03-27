@@ -318,8 +318,7 @@ def ShoulderControlPoses(fp):
     # Elbow lock
     
     addPoseBone(fp, 'Elbow_L', 'MHBall025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
-        the.RootChildOfConstraints + [
-        ('LimitDist', 0, 0, ['DistSternum', 'Sternum', 'LIMITDIST_INSIDE']),
+        [('LimitDist', 0, 0, ['DistSternum', 'Sternum', 'LIMITDIST_INSIDE']),
         ])
         
     addPoseBone(fp, 'ELClavicle_L', None, None, (1,1,1), (0,0,0), (1,1,1), 
@@ -336,8 +335,7 @@ def ShoulderControlPoses(fp):
         
 
     addPoseBone(fp, 'Elbow_R', 'MHBall025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-        the.RootChildOfConstraints + [
-        ('LimitDist', 0, 0, ['DistSternum', 'Sternum', 'LIMITDIST_INSIDE']),
+        [('LimitDist', 0, 0, ['DistSternum', 'Sternum', 'LIMITDIST_INSIDE']),
         ])
         
     addPoseBone(fp, 'ELClavicle_R', None, None, (1,1,1), (0,0,0), (1,1,1), 

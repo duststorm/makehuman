@@ -61,7 +61,7 @@ FaceArmature = [
     ('TongueBase',        0.0, 'Jaw', F_DEF+F_WIR, L_HEAD, NoBB),
     ('TongueMid',        0.0, 'TongueBase', F_DEF+F_WIR, L_HEAD, NoBB),
     ('TongueTip',        0.0, 'TongueMid', F_DEF+F_WIR, L_HEAD, NoBB),
-    ('Gaze',            pi, None, F_WIR, L_HEAD, NoBB),
+    ('Gaze',            pi, (None, 'Head'), F_WIR, L_HEAD, NoBB),
     ('Gaze_R',            pi, 'Gaze', F_WIR, L_HEAD, NoBB),
     ('Gaze_L',            pi, 'Gaze', F_WIR, L_HEAD, NoBB),
     ('Eye_R',            0.0, 'Head', F_DEF, L_DEF, NoBB),
@@ -135,7 +135,9 @@ def FaceDeformDrivers(fp):
 #   (Bone, Name, Props, Expr)
 #
 
-FacePropDrivers = [
+FacePropDrivers = []
+
+SoftFacePropDrivers = [
     ('Gaze', 'Head', ['GazeFollowsHead'], 'x1'),
     ('Gaze', 'World', ['GazeFollowsHead'], '1-x1'),
 ]

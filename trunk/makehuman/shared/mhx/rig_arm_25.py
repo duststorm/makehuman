@@ -197,8 +197,8 @@ ArmArmature = [
     ('Wrist_R',            handRoll, Master, F_WIR, L_RARMIK, NoBB),
     
     # Pole target
-    ('ElbowPT_L',         0, None, F_WIR, L_LARMIK, NoBB),
-    ('ElbowPT_R',         0, None, F_WIR, L_RARMIK, NoBB),
+    ('ElbowPT_L',         0, (None, 'Shoulder_L'), F_WIR, L_LARMIK, NoBB),
+    ('ElbowPT_R',         0, (None, 'Shoulder_R'), F_WIR, L_RARMIK, NoBB),
     ('ElbowLinkPT_L',     0, 'UpArm_L', F_RES, L_LARMIK, NoBB),
     ('ElbowLinkPT_R',     0, 'UpArm_R', F_RES, L_RARMIK, NoBB),
 
@@ -341,8 +341,7 @@ def ArmControlPoses(fp):
         ])
 
     addPoseBone(fp, 'Wrist_L', 'MHHandCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), CmodHand, 
-        the.RootChildOfConstraints + [
-        ('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Clavicle_L', (1,1,1), (1,1,1), (1,1,1)]),
+        [('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Clavicle_L', (1,1,1), (1,1,1), (1,1,1)]),
          ('LimitDist', 0, 0, ['DistShoulder', 'Shoulder_L', 'LIMITDIST_INSIDE']),
          ('LimitDist', 0, 0, ['DistElbow', 'Elbow_L', 'LIMITDIST_ONSURFACE']),
         ])
@@ -356,8 +355,7 @@ def ArmControlPoses(fp):
         ])
 
     addPoseBone(fp, 'Wrist_R', 'MHHandCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), CmodHand, 
-        the.RootChildOfConstraints + [
-        ('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Clavicle_R', (1,1,1), (1,1,1), (1,1,1)]),
+        [('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Clavicle_R', (1,1,1), (1,1,1), (1,1,1)]),
         ('LimitDist', 0, 0, ['DistShoulder', 'Shoulder_R', 'LIMITDIST_INSIDE']),
         ('LimitDist', 0, 0, ['DistElbow', 'Elbow_R', 'LIMITDIST_ONSURFACE']),
         ])
@@ -531,6 +529,9 @@ ArmPropLRDrivers = [
     ('Hand', 'FreeIK', ['ArmIk', 'ElbowPlant'], '(1-x1)*(1-x2)'),
     ('Hand', 'WristLoc', ['ArmIk'], 'x1'),
     ('Hand', 'WristRot', ['ArmIk', 'HandFollowsWrist'], 'x1*x2'),
+]
+
+SoftArmPropLRDrivers = [
     ('Shoulder', 'Shoulder', ['ArmHinge'], '1-x1'),
     ('Shoulder', 'Root', ['ArmHinge'], 'x1'),
     ('ElbowPT', 'Hand', ['ElbowFollowsWrist'], 'x1'),
