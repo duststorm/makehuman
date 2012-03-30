@@ -1191,6 +1191,7 @@ static void mhFlipSurface(SDL_Surface *surface)
  */
 GLuint mhLoadTexture(const Image *img, GLuint texture, int *width, int *height)
 {
+	int mipmaps = !(GLEW_VERSION_2_0 || GLEW_ARB_texture_non_power_of_two);
 #ifdef __APPLE__
     return textureCacheLoadTexture(img->imageFileName, texture, width, height);
 #else /* !__APPLE__ */
@@ -1239,11 +1240,15 @@ GLuint mhLoadTexture(const Image *img, GLuint texture, int *width, int *height)
         glBindTexture(GL_TEXTURE_1D, texture);
         glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE_EXT);
         glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE_EXT);
-        //glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		if (mipmaps)
+			glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		else
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        //gluBuild1DMipmaps(GL_TEXTURE_1D, internalFormat, flippedSurface->w, format, GL_UNSIGNED_BYTE, flippedSurface->pixels);
-		glTexImage1D(GL_TEXTURE_1D, 0, internalFormat, flippedSurface->w, 0, format, GL_UNSIGNED_BYTE, flippedSurface->pixels);
+        if (mipmaps)
+			gluBuild1DMipmaps(GL_TEXTURE_1D, internalFormat, flippedSurface->w, format, GL_UNSIGNED_BYTE, flippedSurface->pixels);
+		else
+			glTexImage1D(GL_TEXTURE_1D, 0, internalFormat, flippedSurface->w, 0, format, GL_UNSIGNED_BYTE, flippedSurface->pixels);
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
     else
@@ -1252,12 +1257,16 @@ GLuint mhLoadTexture(const Image *img, GLuint texture, int *width, int *height)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE_EXT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE_EXT);
 
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        if (mipmaps)
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		else
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        //gluBuild2DMipmaps(GL_TEXTURE_2D, internalFormat, flippedSurface->w, surface->h, format, GL_UNSIGNED_BYTE, flippedSurface->pixels);
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, flippedSurface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, flippedSurface->pixels);
+        if (mipmaps)
+			gluBuild2DMipmaps(GL_TEXTURE_2D, internalFormat, flippedSurface->w, surface->h, format, GL_UNSIGNED_BYTE, flippedSurface->pixels);
+        else
+			glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, flippedSurface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, flippedSurface->pixels);
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
 
