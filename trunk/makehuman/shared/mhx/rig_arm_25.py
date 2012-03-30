@@ -334,6 +334,7 @@ def ArmControlPoses(fp):
     addPoseBone(fp, 'LoArmIK_L', None, 'IK_L', (1,1,1), (0,0,0), (1,1,1), 
                 ((0,1,1), (0,0,0), 0.05, limLoArm_L), CmodLoArm, 
         [('IK', 0, 1, ['ArmIK', 'Wrist_L', 2, (pi-deltaElbow, 'ElbowPT_L'), (True, False,True)]),
+         ('CopyRot', C_LOCAL, 1, ['WristRot', 'Wrist_L', (0,1,0), (0,0,0), False])
         ])
 
     addPoseBone(fp, 'Wrist_L', 'MHHandCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), CmodHand, 
@@ -348,6 +349,7 @@ def ArmControlPoses(fp):
     addPoseBone(fp, 'LoArmIK_R', None, 'IK_R', (1,1,1), (0,0,0), (1,1,1), 
             ((0,1,1), (0,0,0), 0.05, limLoArm_R), CmodLoArm, 
         [('IK', 0, 1, ['ArmIK', 'Wrist_R', 2, (deltaElbow, 'ElbowPT_R'), (True, False,True)]),
+         ('CopyRot', C_LOCAL, 1, ['WristRot', 'Wrist_R', (0,1,0), (0,0,0), False])
         ])
 
     addPoseBone(fp, 'Wrist_R', 'MHHandCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), CmodHand, 
@@ -525,6 +527,7 @@ ArmPropLRDrivers = [
     ('Hand', 'FreeIK', ['ArmIk', 'ElbowPlant'], '(1-x1)*(1-x2)'),
     ('Hand', 'WristLoc', ['ArmIk'], 'x1'),
     ('Hand', 'WristRot', ['ArmIk', 'HandFollowsWrist'], 'x1*x2'),
+    ('LoArmIK', 'WristRot', ['ArmIk', 'HandFollowsWrist'], 'x1*x2'),
 ]
 
 SoftArmPropLRDrivers = [
