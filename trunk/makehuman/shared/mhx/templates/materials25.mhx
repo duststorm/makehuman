@@ -11,11 +11,6 @@ Image texture_ref.tif
   use_premultiply True ;
 end Image
 
-#Image ambient.tif
-#  *** Filename female_young.tif /data/textures/ ;
-#  use_premultiply True ;
-#end Image
-
 Texture diffuse IMAGE
   Image texture.tif ;
 end Texture
@@ -24,9 +19,46 @@ Texture specularity IMAGE
   Image texture_ref.tif ;
 end Texture
 
-#Texture ambient IMAGE
-#  Image ambient.tif ;
-#end Texture
+
+#if False
+
+Image brows_mid_height.tif
+  *** Filename brows_mid_height.tif data/textures/faceshapes ;
+  use_premultiply True ;
+end Image
+
+Image brows_outer_height_left.tif
+  *** Filename brows_outer_height_left.tif data/textures/faceshapes ;
+  use_premultiply True ;
+end Image
+
+Image brows_outer_height_right.tif
+  *** Filename brows_outer_height_right.tif data/textures/faceshapes ;
+  use_premultiply True ;
+end Image
+
+Image brows_squeeze.tif
+  *** Filename brows_squeeze.tif data/textures/faceshapes ;
+  use_premultiply True ;
+end Image
+
+Texture browsMidHeight IMAGE
+  Image brows_mid_height.tif ;
+end Texture
+
+Texture browsOuterHeight_L IMAGE
+  Image brows_outer_height_left.tif ;
+end Texture
+
+Texture browsOuterHeight_R IMAGE
+  Image brows_outer_height_right.tif ;
+end Texture
+
+Texture browsSqueeze IMAGE
+  Image brows_squeeze.tif ;
+end Texture
+
+#endif
 
 Texture solid IMAGE
 end Texture
@@ -122,48 +154,43 @@ end Texture
   end MTex
 
 #if False
-  *** MTex 2 ambient UV AMBIENT_COLOR
-    texture Refer Texture ambient ;
-    use_map_color_diffuse False ;
-    use_map_ambient True ;
-    ambient_factor 1 ;
-  end MTex
 
-  *** MTex 3 browsMidDown UV NORMAL
-    texture Refer Texture browsMidDown ;
+  *** MTex 2 browsMidHeight UV NORMAL
+    texture Refer Texture browsMidHeight ;
     use_map_color_diffuse False ;
     use_map_normal True ;
-    normal_factor -1.0 ;
+    normal_factor 0.0 ;
     use_rgb_to_intensity True ;
     use_stencil False ;
   end MTex
 
-  *** MTex 4 browsSqueeze UV NORMAL
-    texture Refer Texture browsSqueeze ;
+  *** MTex 3 browsOuterHeight_L UV NORMAL
+    texture Refer Texture browsOuterHeight_L ;
     use_map_color_diffuse False ;
     use_map_normal True ;
-    normal_factor -1.0 ;
+    normal_factor 0.0 ;
     use_rgb_to_intensity True ;
     use_stencil False ;
   end MTex
 
-  *** MTex 5 squint_L UV NORMAL
-    texture Refer Texture squint_L ;
+  *** MTex 4 browsOuterHeight_R UV NORMAL
+    texture Refer Texture browsOuterHeight_R ;
     use_map_color_diffuse False ;
     use_map_normal True ;
-    normal_factor -1.0 ;
+    normal_factor 0.0 ;
     use_rgb_to_intensity True ;
     use_stencil False ;
   end MTex
   
-  *** MTex 6 squint_R UV NORMAL
-    texture Refer Texture squint_R ;
+  *** MTex 5 browsSqueeze UV NORMAL
+    texture Refer Texture browsSqueeze ;
     use_map_color_diffuse False ;
     use_map_normal True ;
-    normal_factor -1.0 ;
+    normal_factor 0.0 ;
     use_rgb_to_intensity True ;
     use_stencil False ;
   end MTex
+  
 #endif
 
   diffuse_color Array 1.0 1.0 1.0  ;
@@ -440,6 +467,46 @@ end Material
     color Array 1.0 0.0 1.0  ;
     default_value 0.15 ;
   end MTex
+
+#if False
+
+  *** MTex 2 browsMidHeight UV NORMAL
+    texture Refer Texture browsMidHeight ;
+    use_map_color_diffuse False ;
+    use_map_normal True ;
+    normal_factor 0.0 ;
+    use_rgb_to_intensity True ;
+    use_stencil False ;
+  end MTex
+
+  *** MTex 3 browsOuterHeight_L UV NORMAL
+    texture Refer Texture browsOuterHeight_L ;
+    use_map_color_diffuse False ;
+    use_map_normal True ;
+    normal_factor 0.0 ;
+    use_rgb_to_intensity True ;
+    use_stencil False ;
+  end MTex
+
+  *** MTex 4 browsOuterHeight_R UV NORMAL
+    texture Refer Texture browsOuterHeight_R ;
+    use_map_color_diffuse False ;
+    use_map_normal True ;
+    normal_factor 0.0 ;
+    use_rgb_to_intensity True ;
+    use_stencil False ;
+  end MTex
+  
+  *** MTex 5 browsSqueeze UV NORMAL
+    texture Refer Texture browsSqueeze ;
+    use_map_color_diffuse False ;
+    use_map_normal True ;
+    normal_factor 0.0 ;
+    use_rgb_to_intensity True ;
+    use_stencil False ;
+  end MTex
+  
+#endif
 
   diffuse_color Array 1.0 1.0 1.0  ;
   diffuse_shader 'LAMBERT' ;

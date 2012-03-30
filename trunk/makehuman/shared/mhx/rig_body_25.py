@@ -140,7 +140,7 @@ L_DNSPN = L_DNSPNFK+L_DNSPNIK
 BodyArmature = [
     ('MasterFloor',        0, None, F_WIR, L_MAIN, NoBB),
 
-    ('Root',               0, Master, F_WIR, L_UPSPN+L_DNSPNIK, NoBB),
+    ('Root',               0, Master, F_WIR, L_MAIN+L_UPSPN+L_DNSPNIK, NoBB),
     ('Shoulders',          0, Master, F_WIR, L_UPSPNIK+L_DNSPN, NoBB),
     ('BendRoot',           0, 'Root', 0, L_HELP, NoBB),
 
@@ -150,7 +150,7 @@ BodyArmature = [
     ('Spine1',             0, 'Pelvis', F_WIR, L_UPSPNFK, NoBB),
     ('Spine2',             0, 'Spine1', F_WIR, L_UPSPNFK, NoBB),
     ('Spine3',             0, 'Spine2', F_WIR, L_UPSPNFK, NoBB),
-    ('Neck',               0, 'Spine3', F_WIR, L_UPSPN, NoBB),
+    ('Neck',               0, 'Spine3', F_WIR, L_UPSPN+L_HEAD, NoBB),
 
     ('SpinePT'   ,         0, 'Shoulders', F_WIR, L_UPSPNIK, NoBB),
     ('SpineLinkPT',        0, 'Spine2', F_RES, L_UPSPNIK, NoBB),
