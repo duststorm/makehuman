@@ -46,8 +46,10 @@ Section "Copy files"
   File /r /x .svn /x .pyc plugins\*.py
   SetOutPath $INSTDIR\shared
   File /r /x .svn /x .pyc shared\*.*
-   SetOutPath $INSTDIR\apps
+  SetOutPath $INSTDIR\apps
   File /r /x .svn /x .pyc apps\*.py
+  SetOutPath $INSTDIR\utils
+  File /r /x .svn /x .pyc utils\*.*
   
   CreateDirectory $INSTDIR\models
   CreateDirectory $INSTDIR\exports
@@ -76,6 +78,7 @@ Section "Uninstall"
 
   # Remove Makehuman files
   Delete $INSTDIR\makehuman.exe
+  Delete $INSTDIR\makehuman.exe.manifest
   Delete $INSTDIR\mh.pyd
   Delete $INSTDIR\*.dll
   Delete $INSTDIR\main.py
@@ -83,6 +86,7 @@ Section "Uninstall"
   
   # Remove Makehuman data folders
   RMDir /r $INSTDIR\apps
+  RMDir /r $INSTDIR\utils
   RMDir /r $INSTDIR\data
   RMDir /r $INSTDIR\docs
   RMDir /r $INSTDIR\core
