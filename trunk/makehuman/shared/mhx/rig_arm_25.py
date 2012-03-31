@@ -177,11 +177,11 @@ ArmArmature = [
     # Arm
     ('UpArm_L',            upArmRoll, 'Shoulder_L', F_WIR, L_LARMFK, NoBB),
     ('LoArm_L',            loArmRoll, 'UpArm_L', F_WIR+F_SCALE, L_LARMFK, NoBB),
-    ('Hand_L',             handRoll, 'LoArm_L', F_CON+F_WIR, L_LARMFK+L_LARMIK, NoBB),
+    ('Hand_L',             handRoll, 'LoArm_L', F_CON+F_WIR, L_LARMFK, NoBB),
     
     ('UpArm_R',            -upArmRoll, 'Shoulder_R', F_WIR, L_RARMFK, NoBB),
     ('LoArm_R',            -loArmRoll, 'UpArm_R', F_WIR+F_SCALE, L_RARMFK, NoBB),
-    ('Hand_R',             -handRoll, 'LoArm_R', F_CON+F_WIR, L_RARMFK+L_RARMIK, NoBB),
+    ('Hand_R',             -handRoll, 'LoArm_R', F_CON+F_WIR, L_RARMFK, NoBB),
     
     # IK arm
     ('UpArmIK_L',          upArmRoll, 'Shoulder_L', 0, L_LARMIK, NoBB),
@@ -257,8 +257,8 @@ BicepsArmature = [
 limUpArm_L = (-135*D,135*D, -120*D,90*D, -135*D,135*D)
 limUpArm_R = (-135*D,135*D, -90*D,120*D, -135*D,135*D)
 
-limLoArm_L = (-0*D,0*D, -178*D,150*D, -175*D,10*D)
-limLoArm_R = (-0*D,0*D, -150*D,178*D, -10*D,175*D)
+limLoArm_L = (-10*D,10*D, -178*D,150*D, -175*D,10*D)
+limLoArm_R = (-10*D,10*D, -150*D,178*D, -10*D,175*D)
 
 limHand_L = (-90*D,70*D, 0,0, -20*D,20*D)
 limHand_R = (-90*D,70*D, 0,0, -20*D,20*D)
@@ -286,6 +286,7 @@ def ArmControlPoses(fp):
     # Arm
     
     deltaElbow = 0.6*D
+    deltaWrist = 0.0*D
 
     addPoseBone(fp, 'UpArm_L', 'GZM_Circle025', 'FK_L', (1,1,1), (0,0,0), (1,0,1), (1,1,1), CmodUpArm, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpArm_L, (True, True, True)]),
@@ -332,9 +333,9 @@ def ArmControlPoses(fp):
             ((1,1,1), (0,0,0), 0.05, limUpArm_L), CmodUpArm, [])
 
     addPoseBone(fp, 'LoArmIK_L', None, 'IK_L', (1,1,1), (0,0,0), (1,1,1), 
-                ((0,1,1), (0,0,0), 0.05, limLoArm_L), CmodLoArm, 
-        [('IK', 0, 1, ['ArmIK', 'Wrist_L', 2, (pi-deltaElbow, 'ElbowPT_L'), (True, False,True)]),
-         ('CopyRot', C_LOCAL, 1, ['WristRot', 'Wrist_L', (0,1,0), (0,0,0), False])
+                ((1,1,1), (0,0,0), 0.05, limLoArm_L), CmodLoArm, 
+        [('CopyRot', C_LOCAL, 1, ['WristRot', 'Wrist_L', (0,1,0), (0,0,0), False]),
+         ('IK', 0, 1, ['ArmIK', 'Wrist_L', 2, (pi-deltaElbow, 'ElbowPT_L'), (True, False,True)]),
         ])
 
     addPoseBone(fp, 'Wrist_L', 'MHHandCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), CmodHand, 
@@ -347,9 +348,9 @@ def ArmControlPoses(fp):
             ((1,1,1), (0,0,0), 0.05, limUpArm_R), CmodUpArm, [])
 
     addPoseBone(fp, 'LoArmIK_R', None, 'IK_R', (1,1,1), (0,0,0), (1,1,1), 
-            ((0,1,1), (0,0,0), 0.05, limLoArm_R), CmodLoArm, 
-        [('IK', 0, 1, ['ArmIK', 'Wrist_R', 2, (deltaElbow, 'ElbowPT_R'), (True, False,True)]),
-         ('CopyRot', C_LOCAL, 1, ['WristRot', 'Wrist_R', (0,1,0), (0,0,0), False])
+            ((1,1,1), (0,0,0), 0.05, limLoArm_R), CmodLoArm, 
+        [('CopyRot', C_LOCAL, 1, ['WristRot', 'Wrist_R', (0,1,0), (0,0,0), False]),
+         ('IK', 0, 1, ['ArmIK', 'Wrist_R', 2, (deltaElbow, 'ElbowPT_R'), (True, False,True)]),
         ])
 
     addPoseBone(fp, 'Wrist_R', 'MHHandCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), CmodHand, 
@@ -423,7 +424,7 @@ def ArmControlPoses(fp):
          ('CopyLoc', 0, 0.5, ['LoArm3', 'LoArm3PT_L', (1,1,1), (0,0,0), 0, False])])
 
     addPoseBone(fp, 'LoArmRot_L', 'MHCircle05', 'FK_L', (1,1,1), (1,0,1), (1,1,1), (1,1,1), DmodLoArm,
-    	[('IK', 0, 1, ['IK', 'Hand_L', 1, None, (True, False,True)])])         
+        [('IK', 0, 1, ['IK', 'Hand_L', 1, None, (True, False,True)])])         
 
     copyDeformPartial(fp, 'DfmLoArm1_L', 'LoArm_L', (1,0,1), DmodLoArm, U_LOC, None,
         [('CopyScale', C_LOCAL, 1, ['Scale', 'LoArm_L', (0,1,0), False]),
@@ -440,7 +441,7 @@ def ArmControlPoses(fp):
         [('CopyLoc', 0, 0.5, ['LoArm3', 'LoArm3PT_R', (1,1,1), (0,0,0), 0, False])])
 
     addPoseBone(fp, 'LoArmRot_R', 'MHCircle05', 'FK_R', (1,1,1), (1,0,1), (1,1,1), (1,1,1), DmodLoArm,
-    	[('IK', 0, 1, ['IK', 'Hand_R', 1, None, (True, False,True)])])
+        [('IK', 0, 1, ['IK', 'Hand_R', 1, None, (True, False,True)])])
 
     copyDeformPartial(fp, 'DfmLoArm1_R', 'LoArm_R', (1,0,1), DmodLoArm, U_LOC, None, 
         [('CopyScale', C_LOCAL, 1, ['Scale', 'LoArm_R', (0,1,0), False]),

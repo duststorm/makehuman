@@ -217,15 +217,15 @@ LegArmature = [
     
     # IK Leg
     
-    ('UpLegIK_L',       upLegRoll, 'Hip_L', 0, L_LLEGIK, NoBB),
-    ('LoLegIK_L',       loLegRoll, 'UpLegIK_L', 0, L_LLEGIK, NoBB),
+    ('UpLegIK_L',       upLegRoll, 'Hip_L', 0, L_HELP, NoBB),
+    ('LoLegIK_L',       loLegRoll, 'UpLegIK_L', 0, L_HELP, NoBB),
     ('LegIK_L',         -footCtrlRoll, Master, F_WIR, L_LLEGIK, NoBB),
     ('ToeRev_L',        0, 'LegIK_L', F_WIR, L_LLEGIK, NoBB),
     ('FootRev_L',       0, 'ToeRev_L', F_WIR, L_LLEGIK, NoBB),
     ('Ankle_L',         0, (None, 'FootRev_L'), F_WIR, L_LEXTRA, NoBB),
 
-    ('UpLegIK_R',       -upLegRoll, 'Hip_R', 0, L_RLEGIK, NoBB),
-    ('LoLegIK_R',       -loLegRoll, 'UpLegIK_R', 0, L_RLEGIK, NoBB),
+    ('UpLegIK_R',       -upLegRoll, 'Hip_R', 0, L_HELP, NoBB),
+    ('LoLegIK_R',       -loLegRoll, 'UpLegIK_R', 0, L_HELP, NoBB),
     ('LegIK_R',         -footCtrlRoll, Master, F_WIR, L_RLEGIK, NoBB),
     ('ToeRev_R',        0, 'LegIK_R', F_WIR, L_RLEGIK, NoBB),
     ('FootRev_R',       0, 'ToeRev_R', F_WIR, L_RLEGIK, NoBB),
@@ -254,16 +254,16 @@ LegArmature = [
     ('LegTrg_L',        0.0, 'Hip_L', 0, L_HELP, NoBB),
     ('UpLeg2PT_L',      0.0, 'DfmUpLeg1_L', 0, L_HELP, NoBB),
     ('UpLeg3PT_L',      0.0, 'UpLeg_L', 0, L_HELP, NoBB),
-    ('KneePT_L',        0.0, (None, 'FootRev_L'), F_WIR, L_LLEGIK, NoBB),
-    ('KneeLinkPT_L',    0.0, 'UpLeg_L', F_RES, L_LLEGIK, NoBB),
+    ('KneePT_L',        0.0, (None, 'FootRev_L'), F_WIR, L_LLEGIK+L_LEXTRA, NoBB),
+    ('KneeLinkPT_L',    0.0, 'UpLeg_L', F_RES, L_LLEGIK+L_LEXTRA, NoBB),
     ('FootPT_L',        0.0, 'FootRev_L', 0, L_HELP, NoBB),
     ('ToePT_L',         0.0, 'ToeRev_L', 0, L_HELP, NoBB),
 
     ('LegTrg_R',        0.0, 'Hip_R', 0, L_HELP, NoBB),
     ('UpLeg2PT_R',      0.0, 'DfmUpLeg1_R', 0, L_HELP, NoBB),
     ('UpLeg3PT_R',      0.0, 'UpLeg_R', 0, L_HELP, NoBB),
-    ('KneePT_R',        0.0, (None, 'FootRev_R'), F_WIR, L_RLEGIK, NoBB),
-    ('KneeLinkPT_R',    0.0, 'UpLeg_R', F_RES, L_RLEGIK, NoBB),
+    ('KneePT_R',        0.0, (None, 'FootRev_R'), F_WIR, L_RLEGIK+L_REXTRA, NoBB),
+    ('KneeLinkPT_R',    0.0, 'UpLeg_R', F_RES, L_RLEGIK+L_REXTRA, NoBB),
     ('FootPT_R',        0.0, 'FootRev_R', 0, L_HELP, NoBB),
     ('ToePT_R',         0.0, 'ToeRev_R', 0, L_HELP, NoBB),
 
@@ -424,10 +424,12 @@ def LegControlPoses(fp):
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limRevToe_R, (1,1,1)])])
     
     addPoseBone(fp, 'Ankle_L', 'MHBall025', 'IK_L', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('ChildOf', C_CHILDOF, 1, ['Foot', 'FootRev_L', (1,1,1), (1,1,1), (1,1,1)]) ])
+        [('ChildOf', C_CHILDOF, 1, ['Foot', 'FootRev_L', (1,1,1), (1,1,1), (1,1,1)]),
+         ('ChildOf', C_CHILDOF, 0, ['Master', 'MasterFloor', (1,1,1), (1,1,1), (1,1,1)]) ])
 
     addPoseBone(fp, 'Ankle_R', 'MHBall025', 'IK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('ChildOf', C_CHILDOF, 1, ['Foot', 'FootRev_R', (1,1,1), (1,1,1), (1,1,1)]) ])
+        [('ChildOf', C_CHILDOF, 1, ['Foot', 'FootRev_R', (1,1,1), (1,1,1), (1,1,1)]),
+         ('ChildOf', C_CHILDOF, 0, ['Master', 'MasterFloor', (1,1,1), (1,1,1), (1,1,1)]) ])
 
 
     # Pole target
@@ -571,6 +573,7 @@ SoftLegPropLRDrivers = [
     ('KneePT', 'Foot', ['KneeFollowsFoot'], 'x1'),
     ('KneePT', 'Hip', ['KneeFollowsFoot'], '1-x1'),  
     ('Ankle', 'Foot', ['LegIkToAnkle'], '1-x1'),
+    ('Ankle', 'Master', ['LegIkToAnkle'], 'x1'),
 ]
 
 LegPropDrivers = [
