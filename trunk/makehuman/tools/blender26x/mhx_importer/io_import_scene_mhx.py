@@ -39,8 +39,8 @@ Alternatively, run the script in the script editor (Alt-P), and access from the 
 bl_info = {
     'name': 'Import: MakeHuman (.mhx)',
     'author': 'Thomas Larsson',
-    'version': (1, 11, 0),
-    "blender": (2, 6, 2),
+    'version': (1, 11, 1),
+    "blender": (2, 6, 3),
     'location': "File > Import > MakeHuman (.mhx)",
     'description': 'Import files in the MakeHuman eXchange format (.mhx)',
     'warning': '',
@@ -51,8 +51,8 @@ bl_info = {
 
 MAJOR_VERSION = 1
 MINOR_VERSION = 11
-SUB_VERSION = 0
-BLENDER_VERSION = (2, 62, 0)
+SUB_VERSION = 1
+BLENDER_VERSION = (2, 6, 2)
 
 #
 #
@@ -62,6 +62,7 @@ import bpy
 import os
 import time
 import math
+import mathutils
 from mathutils import Vector, Matrix
 from bpy.props import *
 
@@ -97,7 +98,8 @@ todo = []
 
 T_EnforceVersion = 0x01
 T_Clothes = 0x02
-T_HardParents = 0x04
+T_HardParents = 0x0
+T_CrashSafe = 0x04
 
 T_Diamond = 0x10
 T_Replace = 0x20
@@ -179,7 +181,7 @@ Plural = {
     'Bone' : 'bones',
     'BoneGroup' : 'bone_groups',
     'Pose' : 'poses',
-    'PoseBone' : 'pbs',
+    'PoseBone' : 'pose_bones',
     'Material' : 'materials',
     'Texture' : 'textures',
     'Image' : 'images',
@@ -189,38 +191,19 @@ Plural = {
 }
 
 #
-#    checkBlenderVersion()
-#
-
-def checkBlenderVersion():
-    print("Found Blender", bpy.app.version)
-    (A, B, C) = bpy.app.version
-    (a, b, c) = BLENDER_VERSION
-    if a <= A: return
-    if b <= B: return
-    if c <= C: return
-    msg = (
-"This version of the MHX importer only works with \n" +
-"Blender (%d, %d, %d) or later.\n" % (a, b, c) +
-"Download a more recent Blender from \n" +
-"www.blender.org or www.graphicall.org.\n"
-    )
-    MyError(msg)
-    return
-
-#
 #    readMhxFile(filePath):
 #
 
 def readMhxFile(filePath):
-    global todo, nErrors, theScale, defaultScale, One, toggle, warnedVersion
+    global todo, nErrors, theScale, defaultScale, One, toggle, warnedVersion, BMeshAware, theMessage
 
-    #checkBlenderVersion()    
-    
+    print("Blender r%s" % bpy.app.build_revision)
+    BMeshAware = (int(bpy.app.build_revision) > 44136)    
     defaultScale = theScale
     One = 1.0/theScale
     warnedVersion = False
     initLoadedData()
+    theMessage = ""
 
     fileName = os.path.expanduser(filePath)
     (shortName, ext) = os.path.splitext(fileName)
@@ -746,7 +729,7 @@ def parseFModifier(fcu, args, tokens):
 
 """
         var = driver.variables.new()
-        var.name = tarPb
+        var.name = target_bone
         var.targets[0].id_type = 'OBJECT'
         var.targets[0].id = obj
         var.targets[0].rna_path = driver_path
@@ -1053,15 +1036,10 @@ def parseObject(args, tokens):
         else:
             defaultKey(key, val, sub, "ob", ['type', 'data'], globals(), locals())
             
-    # Needed for updating layers
     if bpy.context.object == ob:
-        pass
-        '''
-        if ob.data in ['MESH', 'ARMATURE']:
-            print(ob, ob.data)
-            bpy.ops.object.mode_set(mode='EDIT')
-            bpy.ops.object.mode_set(mode='OBJECT')
-        '''
+        if ob.type == 'MESH':
+            print("Smooth shade", ob)
+            bpy.ops.object.shade_smooth()
     else:
         print("Context", ob, bpy.context.object, bpy.context.scene.objects.active)
     return
@@ -1245,12 +1223,16 @@ def parseMesh (args, tokens):
     linkObject(ob, me)
         
     mats = []
+    nuvlayers = 0
     for (key, val, sub) in tokens:
         if key == 'Verts' or key == 'Edges' or key == 'Faces':
             pass
         elif key == 'MeshTextureFaceLayer':
-            parseUvTexture(val, sub, me)
-        elif key == 'MeshColorLayer':
+            if BMeshAware:
+                parseUvTextureBMesh(val, sub, me)
+            else:
+                parseUvTextureNoBMesh(val, sub, me)
+        elif key == 'MeshColorLayer':            
             parseVertColorLayer(val, sub, me)
         elif key == 'VertexGroup':
             parseVertexGroup(ob, me, val, sub)
@@ -1268,7 +1250,10 @@ def parseMesh (args, tokens):
 
     for (key, val, sub) in tokens:
         if key == 'Faces':
-            parseFaces2(sub, me)
+            if BMeshAware:
+                parseFaces2BMesh(sub, me)
+            else:
+                parseFaces2NoBMesh(sub, me)
     print(me)
     return me
 
@@ -1304,7 +1289,37 @@ def parseFaces(tokens):
             faces.append(face)
     return faces
 
-def parseFaces2(tokens, me):    
+def parseFaces2BMesh(tokens, me):    
+    n = 0
+    for (key, val, sub) in tokens:
+        if key == 'ft':
+            f = me.polygons[n]
+            f.material_index = int(val[0])
+            f.use_smooth = int(val[1])
+            n += 1
+        elif key == 'ftn':
+            mn = int(val[1])
+            us = int(val[2])
+            npts = int(val[0])
+            for i in range(npts):
+                f = me.polygons[n]
+                f.material_index = mn
+                f.use_smooth = us
+                n += 1
+        elif key == 'mn':
+            fn = int(val[0])
+            mn = int(val[1])
+            f = me.polygons[fn]
+            f.material_index = mn
+        elif key == 'ftall':
+            mat = int(val[0])
+            smooth = int(val[1])
+            for f in me.polygons:
+                f.material_index = mat
+                f.use_smooth = smooth
+    return
+
+def parseFaces2NoBMesh(tokens, me):    
     n = 0
     for (key, val, sub) in tokens:
         if key == 'ft':
@@ -1336,22 +1351,51 @@ def parseFaces2(tokens, me):
 
 
 #
-#    parseUvTexture(args, tokens, me):
+#    parseUvTexture(args, tokens, me,):
 #    parseUvTexData(args, tokens, uvdata):
 #
 
-def parseUvTexture(args, tokens, me):
+def parseUvTextureBMesh(args, tokens, me):
+    name = args[0]
+    bpy.ops.mesh.uv_texture_add()
+    uvtex = me.uv_textures[-1]
+    uvtex.name = name
+    uvloop = me.uv_loop_layers[-1]
+    loadedData['MeshTextureFaceLayer'][name] = uvloop    
+    for (key, val, sub) in tokens:
+        if key == 'Data':
+            parseUvTexDataBMesh(val, sub, uvloop.data)
+        else:
+            defaultKey(key, val,  sub, "uvtex", [], globals(), locals())
+    return
+
+def parseUvTexDataBMesh(args, tokens, data):
+    n = 0
+    for (key, val, sub) in tokens:
+        if key == 'vt':
+            data[n].uv = (float(val[0]), float(val[1]))
+            n += 1
+            data[n].uv = (float(val[2]), float(val[3]))
+            n += 1
+            data[n].uv = (float(val[4]), float(val[5]))
+            n += 1
+            if len(val) > 6:
+                data[n].uv = (float(val[6]), float(val[7]))
+                n += 1
+    return
+
+def parseUvTextureNoBMesh(args, tokens, me):
     name = args[0]
     uvtex = me.uv_textures.new(name = name)
     loadedData['MeshTextureFaceLayer'][name] = uvtex
     for (key, val, sub) in tokens:
         if key == 'Data':
-            parseUvTexData(val, sub, uvtex.data)
+            parseUvTexDataNoBMesh(val, sub, uvtex.data)
         else:
             defaultKey(key, val,  sub, "uvtex", [], globals(), locals())
     return
 
-def parseUvTexData(args, tokens, data):
+def parseUvTexDataNoBMesh(args, tokens, data):
     n = 0
     for (key, val, sub) in tokens:
         if key == 'vt':
@@ -1361,10 +1405,6 @@ def parseUvTexData(args, tokens, data):
             if len(val) > 6:
                 data[n].uv4 = (float(val[6]), float(val[7]))
             n += 1    
-        else:
-            pass
-            #for i in range(n):
-            #    defaultKey(key, val,  sub, "data[i]", [], globals(), locals())
     return
 
 #
@@ -2032,14 +2072,26 @@ def deleteDiamonds(ob):
             break
     if invisioNum < 0:
         print("WARNING: Nu Invisio material found. Cannot delete helper geometry")
+    elif BMeshAware:        
+        for f in me.polygons:    
+            if f.material_index >= invisioNum:
+                for vn in f.vertices:
+                    me.vertices[vn].select = True
     else:        
         for f in me.faces:    
             if f.material_index >= invisioNum:
                 for vn in f.vertices:
                     me.vertices[vn].select = True
-    bpy.ops.object.mode_set(mode='EDIT')
-    bpy.ops.mesh.delete(type='VERT')
-    bpy.ops.object.mode_set(mode='OBJECT')
+    if BMeshAware and toggle&T_CrashSafe:     
+        theMessage = "\n  *** WARNING ***\nHelper deletion turned off due to Blender crash.\nHelpers can be deleted by deleting all selected vertices in Edit mode\n     **********\n"
+        print(theMessage)
+    else:
+        bpy.ops.object.mode_set(mode='EDIT')
+        print("Do delete")
+        bpy.ops.mesh.delete(type='VERT')
+        print("Verts deleted")
+        bpy.ops.object.mode_set(mode='OBJECT')
+        print("Back to object mode")
     return
   
 #
@@ -2331,7 +2383,8 @@ def hideLayers(args):
         sceneLayers = int(args[2], 16)
         sceneHideLayers = int(args[3], 16)
         boneLayers = int(args[4], 16)
-        boneHideLayers = int(args[5], 16)
+        # boneHideLayers = int(args[5], 16)
+        boneHideLayers = 0
     else:
         sceneLayers = 0x00ff
         sceneHideLayers = 0
@@ -2451,9 +2504,9 @@ def rigifyMhx(context, name):
         'head' : 'DEF-head',
         'ribs' : 'DEF-ribs',
         'upper_arm.L' : 'DEF-upper_arm.L.02',
-        'uplegFk.L' : 'DEF-uplegFk.L.02',
+        'thigh.L' : 'DEF-thigh.L.02',
         'upper_arm.R' : 'DEF-upper_arm.R.02',
-        'uplegFk.R' : 'DEF-uplegFk.R.02',
+        'thigh.R' : 'DEF-thigh.R.02',
     }
 
     for eb in mhx.data.edit_bones:
@@ -2528,9 +2581,9 @@ def rigifyMhx(context, name):
         #lineateChain(upbone, first, last, middles, 0.01, meta, heads, tails)
 
     ikPlanes = [
-        ('UP-leg.L', 'uplegFk.L', 'lolegFk.L'),
+        ('UP-leg.L', 'thigh.L', 'shin.L'),
         ('UP-arm.L', 'upper_arm.L', 'forearm.L'),
-        ('UP-leg.R', 'uplegFk.R', 'lolegFk.R'),
+        ('UP-leg.R', 'thigh.R', 'shin.R'),
         ('UP-arm.R', 'upper_arm.R', 'forearm.R'),
     ]
 
@@ -2683,10 +2736,10 @@ def copyConstraint(cns1, pb1, pb2, mhx, rigify):
         'MasterFloor' : 'root',
         'upper_arm.L' : 'DEF-upper_arm.L.01',
         'upper_arm.R' : 'DEF-upper_arm.R.01',
-        'uplegFk.L' : 'DEF-uplegFk.L.01',
-        'uplegFk.R' : 'DEF-uplegFk.R.01',
-        'lolegFk.L' : 'DEF-lolegFk.L.01',
-        'lolegFk.R' : 'DEF-lolegFk.R.01'
+        'thigh.L' : 'DEF-thigh.L.01',
+        'thigh.R' : 'DEF-thigh.R.01',
+        'shin.L' : 'DEF-shin.L.01',
+        'shin.R' : 'DEF-shin.R.01'
     }
 
     cns2 = pb2.constraints.new(cns1.type)
@@ -2784,7 +2837,13 @@ def MyError(message):
     theErrorLines = message.split('\n')
     theErrorStatus = True
     bpy.ops.mhx.error('INVOKE_DEFAULT')
-    raise NameError(theMessage)
+    raise MhxError(theMessage)
+
+class MhxError(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
 
 class SuccessOperator(bpy.types.Operator):
     bl_idname = "mhx.success"
@@ -2799,7 +2858,7 @@ class SuccessOperator(bpy.types.Operator):
         return wm.invoke_props_dialog(self)
 
     def draw(self, context):
-        self.layout.label(self.message)
+        self.layout.label(self.message + theMessage)
 
 ###################################################################################
 #
@@ -2809,16 +2868,15 @@ class SuccessOperator(bpy.types.Operator):
 
 from bpy_extras.io_utils import ImportHelper
 
-
 MhxBoolProps = [
     ("enforce", "Enforce version", "Only accept MHX files of correct version", T_EnforceVersion),
+    ("crash_safe", "Crash-safe", "Disable features that have caused Blender crashes", T_CrashSafe),
     ("mesh", "Mesh", "Use main mesh", T_Mesh),
     ("proxy", "Proxies", "Use proxies", T_Proxy),
     ("armature", "Armature", "Use armature", T_Armature),
     #("replace", "Replace scene", "Replace scene", T_Replace),
     ("cage", "Cage", "Load mesh deform cage", T_Cage),
     ("clothes", "Clothes", "Include clothes", T_Clothes),
-    ("hardpar", "Hard parents", "Actual parenting rather than Childof constraints", T_HardParents),
     ("face", "Face shapes", "Include facial shapekeys", T_Face),
     ("shape", "Body shapes", "Include body shapekeys", T_Shape),
     #("symm", "Symmetric shapes", "Keep shapekeys symmetric", T_Symm),
@@ -2856,7 +2914,7 @@ class ImportMhx(bpy.types.Operator, ImportHelper):
         try:
             readMhxFile(self.filepath)
             bpy.ops.mhx.success('INVOKE_DEFAULT', message = self.filepath)
-        except NameError:
+        except MhxError:
             print("Error when loading MHX file:\n" + theMessage)
 
         writeDefaults()
@@ -3225,7 +3283,7 @@ def getVisemeSet(context, rig):
     elif visset == 'BodyLanguage':
         return bodyLanguageVisemes
     else:
-        raise NameError("Unknown viseme set %s" % visset)
+        raise MhxError("Unknown viseme set %s" % visset)
 
 def setViseme(context, vis, setKey, frame):
     rig = getMhxRig(context.object)
@@ -3897,7 +3955,7 @@ def getChildofConstraint(pb):
         if cns.type == 'CHILD_OF':
             print("Found Childof constraint", cns.name)  
             return cns
-    raise NameError("Something is wrong. Cannot find Child-of constraint for bone %s" % pb.name)
+    raise MhxError("Something is wrong. Cannot find Child-of constraint for bone %s" % pb.name)
 
 class VIEW3D_OT_MhxSetInverseButton(bpy.types.Operator):
     bl_idname = "mhx.set_inverse"
@@ -4040,54 +4098,6 @@ class MhxDriversPanel(bpy.types.Panel):
 
 ###################################################################################    
 #
-#    Posing panel
-#
-################################################################################### 
-#
-#    class MhxDriversPanel(bpy.types.Panel):
-#
-
-class MhxDriversPanel(bpy.types.Panel):
-    bl_label = "MHX Drivers"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_options = {'DEFAULT_CLOSED'}
-    
-    @classmethod
-    def poll(cls, context):
-        return pollMhxRig(context.object)
-
-    def draw(self, context):
-        ob = context.object
-        layout = self.layout
-        lProps = []
-        rProps = []
-        props = []
-        plist = list(context.object.keys())
-        plist.sort()
-        for prop in plist:
-            if prop[0] == '&':
-                prop1 = prop[1:]
-            else:
-                continue
-            if prop[-2:] == '_L':
-                lProps.append((prop, prop1[:-2]))
-            elif prop[-2:] == '_R':
-                rProps.append((prop, prop1[:-2]))
-            else:
-                props.append((prop, prop1))
-        for (prop, pname) in props:
-            layout.prop(ob, '["%s"]' % prop, text=pname)
-        layout.label("Left")
-        for (prop, pname) in lProps:
-            layout.prop(ob, '["%s"]' % prop, text=pname)
-        layout.label("Right")
-        for (prop, pname) in rProps:
-            layout.prop(ob, '["%s"]' % prop, text=pname)
-        return
-
-###################################################################################    
-#
 #    Visibility panel
 #
 ###################################################################################          
@@ -4115,6 +4125,9 @@ class MhxVisibilityPanel(bpy.types.Panel):
                 layout.prop(ob, '["%s"]' % prop)
         layout.separator()
         layout.operator("mhx.update_textures")
+        layout.separator()
+        layout.operator("mhx.add_hiders")
+        layout.operator("mhx.remove_hiders")
         return
 
 class VIEW3D_OT_MhxUpdateTexturesButton(bpy.types.Operator):
@@ -4135,7 +4148,47 @@ class VIEW3D_OT_MhxUpdateTexturesButton(bpy.types.Operator):
                     #print("Update %s[%d] = %s" % (driver.data_path, driver.array_index, value))
                     prop[driver.array_index] = value
         return{'FINISHED'}    
+        
+class VIEW3D_OT_MhxAddHidersButton(bpy.types.Operator):
+    bl_idname = "mhx.add_hiders"
+    bl_label = "Add Hide Property"
 
+    def execute(self, context):
+        rig = context.object
+        for ob in context.scene.objects:
+            if ob.select and ob != rig:
+                prop = "Hide%s" % ob.name        
+                rig[prop] = False        
+                addHider(ob, "hide", rig, prop)
+                addHider(ob, "hide_render", rig, prop)
+        return{'FINISHED'}    
+                
+def addHider(ob, attr, rig, prop):
+    fcu = ob.driver_add(attr)
+    drv = fcu.driver
+    drv.type = 'SCRIPTED'
+    drv.expression = "x"
+    drv.show_debug_info = True
+    var = drv.variables.new()
+    var.name = "x"
+    targ = var.targets[0]
+    targ.id = rig
+    targ.data_path = '["%s"]' % prop
+    return
+
+class VIEW3D_OT_MhxRemoveHidersButton(bpy.types.Operator):
+    bl_idname = "mhx.remove_hiders"
+    bl_label = "Remove Hide Property"
+
+    def execute(self, context):
+        rig = context.object
+        for ob in context.scene.objects:
+            if ob.select and ob != rig:
+                ob.driver_remove("hide")
+                ob.driver_remove("hide_render")
+                del rig["Hide%s" % ob.name]
+        return{'FINISHED'}    
+        
 ###################################################################################    
 #
 #    Layers panel
@@ -4178,7 +4231,7 @@ class MhxLayersPanel(bpy.types.Panel):
     bl_label = "MHX Layers"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_options = {'DEFAULT_CLOSED'}
+    #bl_options = {'DEFAULT_CLOSED'}
     
     @classmethod
     def poll(cls, context):
