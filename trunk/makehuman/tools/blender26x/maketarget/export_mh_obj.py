@@ -32,6 +32,7 @@ Custom obj exporter for MakeHuman Maketarget
 import bpy, os, mathutils
 import math
 from mathutils import *
+from . import maketarget
 
 #
 #   GroupZOrderSuffix
@@ -82,22 +83,29 @@ def exportObjFile(path, groupsAsMaterials, context):
     me = ob.data
     if (not me) or (len(me.materials) < 2):
         raise NameError("Mesh must have materials")
+        
+    maketarget.checkBMeshAware()
+    if maketarget.BMeshAware:
+        faces = me.polygons
+    else:
+        faces = me.faces        
+    orderedFaces = zOrderFaces(me, faces)
+    
     (name,ext) = os.path.splitext(path)
     if ext.lower() != ".obj":
         path = path + ".obj"
     fp = open(path, "w")
     scn = context.scene
+
     for v in me.vertices:
         fp.write("v %.4f %.4f %.4f\n" % (v.co[0], v.co[2], -v.co[1]))
         
     for v in me.vertices:
         fp.write("vn %.4f %.4f %.4f\n" % (v.normal[0], v.normal[2], -v.normal[1]))
         
-    orderedFaces = zOrderFaces(me)
-    
     info =  (-1, None)
     if me.uv_textures:
-        (uvFaceVerts, texVerts, nTexVerts) = setupTexVerts(me)
+        (uvFaceVerts, texVerts, nTexVerts) = setupTexVerts(me, faces)
         for vtn in range(nTexVerts):
             vt = texVerts[vtn]
             fp.write("vt %.4f %.4f\n" % (vt[0], vt[1]))
@@ -168,15 +176,15 @@ def writeNewGroup(fp, f, info, me, ob, groupsAsMaterials):
     return info       
 
 #
-#   zOrderFaces(me):
+#   zOrderFaces(me, faces):
 #
 
-def zOrderFaces(me):
+def zOrderFaces(me, faces):
     zGroupFaces = {}
     zGroupFaces[0] = []
     for n in GroupZOrderSuffix.keys():
         zGroupFaces[n] = []        
-    for f in me.faces:
+    for f in faces:
         group = me.materials[f.material_index].name
         suffix = group.split("-")[-1]
         zgroup = zGroupFaces[0]
@@ -187,25 +195,26 @@ def zOrderFaces(me):
         zgroup.append(f)
     zlist = list(zGroupFaces.items())
     zlist.sort()
-    faces = []
-    for (key, flist) in zlist:
-        faces += flist
-    return faces
+    zfaces = []
+    for (key, zflist) in zlist:
+        zfaces += zflist
+    return zfaces
 
 #
-#   setupTexVerts(me):
+#   setupTexVerts(me, faces):
 #
 
-def setupTexVerts(me):
+def setupTexVerts(me, faces):
     vertEdges = {}
     vertFaces = {}
+    
     for v in me.vertices:
         vertEdges[v.index] = []
         vertFaces[v.index] = []
     for e in me.edges:
         for vn in e.vertices:
             vertEdges[vn].append(e)
-    for f in me.faces:
+    for f in faces:
         for vn in f.vertices:
             vertFaces[vn].append(f)
     
@@ -213,9 +222,9 @@ def setupTexVerts(me):
     for e in me.edges:
         edgeFaces[e.index] = []
     faceEdges = {}
-    for f in me.faces:
+    for f in faces:
         faceEdges[f.index] = []
-    for f in me.faces:
+    for f in faces:
         for vn in f.vertices:
             for e in vertEdges[vn]:
                 v0 = e.vertices[0]
@@ -228,25 +237,33 @@ def setupTexVerts(me):
         
     faceNeighbors = {}
     uvFaceVerts = {}
-    for f in me.faces:
+    for f in faces:
         faceNeighbors[f.index] = []
         uvFaceVerts[f.index] = []
-    for f in me.faces:
+    for f in faces:
         for e in faceEdges[f.index]:
             for f1 in edgeFaces[e.index]:
                 if f1 != f:
                     faceNeighbors[f.index].append((e,f1))
 
-    uvtex = me.uv_textures[0]
     vtn = 0
     texVerts = {}    
-    for f in me.faces:
-        uvf = uvtex.data[f.index]
-        vtn = findTexVert(uvf.uv1, vtn, f, faceNeighbors, uvFaceVerts, texVerts)
-        vtn = findTexVert(uvf.uv2, vtn, f, faceNeighbors, uvFaceVerts, texVerts)
-        vtn = findTexVert(uvf.uv3, vtn, f, faceNeighbors, uvFaceVerts, texVerts)
-        if len(f.vertices) > 3:
-            vtn = findTexVert(uvf.uv4, vtn, f, faceNeighbors, uvFaceVerts, texVerts)
+    if maketarget.BMeshAware:
+        uvloop = me.uv_loop_layers[0]
+        n = 0
+        for f in faces:
+            for vn in f.vertices:
+                vtn = findTexVert(uvloop.data[n].uv, vtn, f, faceNeighbors, uvFaceVerts, texVerts)                
+                n += 1
+    else:
+        uvtex = me.uv_textures[0]
+        for f in faces:
+            uvf = uvtex.data[f.index]
+            vtn = findTexVert(uvf.uv1, vtn, f, faceNeighbors, uvFaceVerts, texVerts)
+            vtn = findTexVert(uvf.uv2, vtn, f, faceNeighbors, uvFaceVerts, texVerts)
+            vtn = findTexVert(uvf.uv3, vtn, f, faceNeighbors, uvFaceVerts, texVerts)
+            if len(f.vertices) > 3:
+                vtn = findTexVert(uvf.uv4, vtn, f, faceNeighbors, uvFaceVerts, texVerts)
     return (uvFaceVerts, texVerts, vtn)     
 
 #
