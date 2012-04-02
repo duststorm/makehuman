@@ -60,6 +60,8 @@ Epsilon = 1e-3
 NBodyVerts = 15340
 
 theProxy = None
+
+BMeshAware = False
         
 #----------------------------------------------------------
 # 
@@ -184,6 +186,7 @@ def getScale(info, verts, index):
 #----------------------------------------------------------
 
 def importObj(filepath, context):
+    checkBMeshAware()
     scn = context.scene
     obname = nameFromPath(filepath)
     fp = open(filepath, "rU")  
@@ -240,16 +243,10 @@ def importObj(filepath, context):
     ob = bpy.data.objects.new(obname, me)
 
     if texverts:
-        uvtex = me.uv_textures.new()
-        uvtex.name = obname
-        data = uvtex.data
-        for n in range(len(texfaces)):
-            tf = texfaces[n]
-            data[n].uv1 = texverts[tf[0]]
-            data[n].uv2 = texverts[tf[1]]
-            data[n].uv3 = texverts[tf[2]]
-            if len(tf) == 4:
-                data[n].uv4 = texverts[tf[3]]
+        if BMeshAware:
+            addUvLayerBMesh(obname, me, texverts, texfaces)
+        else:
+            addUvLayerNoBMesh(obname, me, texverts, texfaces)
                 
     if scn.MhLoadMaterial == 'Groups':
         addMaterials(groups, me, "Group")
@@ -259,10 +256,16 @@ def importObj(filepath, context):
             vgrp = ob.vertex_groups.new(name=name)
             if vgrp.name != name:
                 print("WARNING: Group name %s => %s" % (name, vgrp.name))
-            for nf in group:
-                f = me.faces[nf]
-                for v in f.vertices:
-                    vgrp.add([v], 1.0, 'REPLACE')
+            if BMeshAware:
+                for nf in group:
+                    f = me.polygons[nf]
+                    for v in f.vertices:
+                        vgrp.add([v], 1.0, 'REPLACE')
+            else:
+                for nf in group:
+                    f = me.faces[nf]
+                    for v in f.vertices:
+                        vgrp.add([v], 1.0, 'REPLACE')
                     
     scn.objects.link(ob)
     ob.select = True
@@ -283,6 +286,34 @@ def parseFace(words):
             pass
     return (face, texface)
 
+def addUvLayerBMesh(obname, me, texverts, texfaces):            
+    uvtex = me.uv_textures.new(name=obname)
+    uvloop = me.uv_loop_layers[-1]
+    data = uvloop.data
+    n = 0
+    for tf in texfaces:
+        data[n].uv = texverts[tf[0]]
+        n += 1
+        data[n].uv = texverts[tf[1]]
+        n += 1
+        data[n].uv = texverts[tf[2]]
+        n += 1
+        if len(tf) == 4:
+            data[n].uv = texverts[tf[3]]
+            n += 1
+    return
+
+def addUvLayerNoBMesh(obname, me, texverts, texfaces):            
+        uvtex = me.uv_textures.new(name=obname)
+        data = uvtex.data
+        for n in range(len(texfaces)):
+            tf = texfaces[n]
+            data[n].uv1 = texverts[tf[0]]
+            data[n].uv2 = texverts[tf[1]]
+            data[n].uv3 = texverts[tf[2]]
+            if len(tf) == 4:
+                data[n].uv4 = texverts[tf[3]]
+
 def addMaterials(groups, me, string):        
     mn = 0
     for (name,group) in groups.items():
@@ -294,9 +325,14 @@ def addMaterials(groups, me, string):
             print("WARNING: %s name %s => %s" % (string, name, mat.name))
         mat.diffuse_color = (random.random(), random.random(), random.random())
         me.materials.append(mat)
-        for nf in group:
-            f = me.faces[nf]
-            f.material_index = mn
+        if BMeshAware:
+            for nf in group:
+                f = me.polygons[nf]
+                f.material_index = mn
+        else:
+            for nf in group:
+                f = me.faces[nf]
+                f.material_index = mn
         mn += 1
     return        
 
@@ -1058,11 +1094,17 @@ def isInited(scn):
     except:
         return False    
         
+def checkBMeshAware():
+    global BMeshAware
+    print("Blender r%s" % bpy.app.build_revision)
+    BMeshAware = (int(bpy.app.build_revision) > 44136)    
+
 class VIEW3D_OT_InitButton(bpy.types.Operator):
     bl_idname = "mh.init"
     bl_label = "Initialize"
 
     def execute(self, context):
+        checkBMeshAware()
         initScene(context.scene)
         return{'FINISHED'}                
 
