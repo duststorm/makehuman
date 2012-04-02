@@ -51,7 +51,7 @@ if not env.GetOption('clean'):
         
     # Add additional libs and set flags
     if platform.system() == "Windows":
-        env.Append(LIBS = ['opengl32','glu32','shell32','kernel32','user32'])
+        env.Append(LIBS = ['opengl32','glu32','shell32','kernel32','user32','shlwapi'])
         if 'msvc' in env['TOOLS']:
             env.Append(CFLAGS='/O2 /GL /D "_UNICODE" /D "UNICODE" /FD /EHsc /MD')
             env.Append(LINKFLAGS='/OPT:REF /OPT:ICF /LTCG /MACHINE:X86 /NODEFAULTLIB:libcmt.lib /SUBSYSTEM:CONSOLE')

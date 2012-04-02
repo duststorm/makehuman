@@ -49,6 +49,8 @@
     #include "OSXTools.h"
 #elif defined(__WIN32__)
     #include <shlobj.h>
+    #include <shlwapi.h>
+    #include <windows.h>
 
 OSVERSIONINFO winVersion(void)
 {
@@ -748,6 +750,19 @@ int main(int argc, char *argv[])
     int err;
     PyObject *module;
 
+#ifdef __WIN32__
+    //Let's make sure we're in the directory where the executable
+    //is since this is required for Makehuman to function on Windows
+    //Makehuman will fail to start if you're not in the same directory
+    //as the executable
+    TCHAR exepath[MAX_PATH];
+    if (0 == GetModuleFileName(0, exepath, MAX_PATH)) {
+      printf("coulnd't get executable path");
+    } else {
+      PathRemoveFileSpec(exepath);
+      SetCurrentDirectory(exepath);
+    }
+#endif
     if (argc >= 2)
     {
         snprintf(str, sizeof(str), "execfile(\"%s\")", argv[1]);
