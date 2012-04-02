@@ -30,26 +30,26 @@ from mathutils import *
 
 
 #
-#   invert(mat):
+#   printMat3(string, mat)
 #
 
-def invert(mat):
-    inv = mat.copy()
-    inv.invert()
-    return inv
-    
-#
-#   printMat(mat)
-#
-
-def printMat(mat):
-    mc = " ["
+def printMat3(string, mat, pad=""):
+    print("%s " % string)
+    mc = "%s  [" % pad
     for m in range(3):
         s = mc
         for n in range(3):
             s += " %6.3f" % mat[m][n]
         print(s+"]")
-    print(" ]")
+ 
+def printMat4(string, mat, pad=""):
+    print("%s%s " % (pad, string))
+    mc = "%s  [" % pad
+    for m in range(4):
+        s = mc
+        for n in range(4):
+            s += " %6.3f" % mat[m][n]
+        print(s+"]")
  
 #
 #  quadDict():

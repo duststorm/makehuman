@@ -41,7 +41,7 @@ from . import utils
 def listAllActions(context):
     scn = context.scene
     try:
-        doFilter = scn['McpFilterActions']
+        doFilter = scn.McpFilterActions
         filter = context.object.name
         if len(filter) > 4:
             filter = filter[0:4]
@@ -107,7 +107,7 @@ def selectedAction(n):
 def deleteAction(context):
     listAllActions(context)
     scn = context.scene
-    act = selectedAction(scn['McpActions'])
+    act = selectedAction(scn.McpActions)
     if not act:
         return
     print('Delete action', act)    
@@ -176,40 +176,4 @@ class VIEW3D_OT_McpSetCurrentActionButton(bpy.types.Operator):
     def execute(self, context):
         setCurrentAction(context, self.prop)
         return{'FINISHED'}    
-
-########################################################################
-#
-#   class ActionPanel(bpy.types.Panel):
-#
-
-class ActionPanel(bpy.types.Panel):
-    bl_label = "Mocap: Manage action"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_options = {'DEFAULT_CLOSED'}    
-    
-    @classmethod
-    def poll(cls, context):
-        if context.object and context.object.type == 'ARMATURE':
-            return True
-
-    def draw(self, context):
-        scn = context.scene
-        layout = self.layout
-        layout.prop_menu_enum(context.scene, "McpActions")
-        layout.prop(scn, 'McpFilterActions')
-        layout.operator("mcp.update_action_list")
-        layout.operator("mcp.set_current_action").prop = 'McpActions'
-        layout.prop(scn, "McpReallyDelete")
-        layout.operator("mcp.delete")
-        layout.operator("mcp.delete_hash")
-
-def register():
-    bpy.utils.register_module(__name__)
-
-def unregister():
-    bpy.utils.unregister_module(__name__)
-
-if __name__ == "__main__":
-    register()
 

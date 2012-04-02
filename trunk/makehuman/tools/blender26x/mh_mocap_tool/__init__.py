@@ -116,7 +116,7 @@ else:
     from bpy.props import *
 
     from . import utils
-    from . import globvar
+    from . import globvar as the
     from . import props
     from . import load
     from . import old_retarget
@@ -133,6 +133,304 @@ else:
     from . import accad, daz, eyes, hdm, max, mb, mega
     from . import rig_mhx, rig_rorkimaru, rig_game
 
+#        
+#    class MhxSourceBonesPanel(bpy.types.Panel):
+#
+
+class MhxSourceBonesPanel(bpy.types.Panel):
+    bl_label = "MH Mocap: Source armature"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_options = {'DEFAULT_CLOSED'}
+    
+    @classmethod
+    def poll(cls, context):
+        return (context.object and context.object.type == 'ARMATURE')
+
+    def draw(self, context):
+        layout = self.layout
+        scn = context.scene
+        rig = context.object
+        if the.sourceProps:
+            layout.operator("mcp.scan_rig", text="Rescan source rig")    
+        else:
+            layout.operator("mcp.scan_rig", text="Scan source rig")    
+        layout.operator("mcp.load_save_source_bones", text='Load source bones').loadSave = 'load'        
+        layout.operator("mcp.load_save_source_bones", text='Save source bones').loadSave = 'save'        
+        if not the.sourceProps:
+            return
+        layout.separator()
+        layout.prop(scn, 'McpGuessSrcRig')
+        layout.label("Arms")
+        row = layout.row()
+        row.prop(scn, '["McpSrcArmBentDown"]', text='Down')
+        row.prop(scn, '["McpSrcArmRoll"]', text='Roll')
+        layout.label("Legs")
+        row = layout.row()
+        row.prop(scn, '["McpSrcLegBentOut"]', text='Out')
+        row.prop(scn, '["McpSrcLegRoll"]', text='Roll')
+        for prop in the.sourceProps:
+            layout.prop_menu_enum(scn, prop)
+
+########################################################################
+#        
+#    class MhxTargetBonesPanel(bpy.types.Panel):
+#
+
+class MhxTargetBonesPanel(bpy.types.Panel):
+    bl_label = "MH Mocap: Target armature"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_options = {'DEFAULT_CLOSED'}
+    
+    @classmethod
+    def poll(cls, context):
+        return (context.object and context.object.type == 'ARMATURE')
+
+    def draw(self, context):
+        layout = self.layout
+        rig = context.object
+        try:
+            inited = rig["McpTargetRig"]
+        except:
+            inited = False
+
+        if not inited:
+            layout.operator("mcp.init_target_character", text='Initialize target character')
+            return
+
+        layout.operator("mcp.init_target_character", text='Reinitialize target character')        
+        layout.operator("mcp.uninit_target_character")        
+        layout.operator("mcp.load_save_target_bones", text='Load target bones').loadSave = 'load'        
+        layout.operator("mcp.load_save_target_bones", text='Save target bones').loadSave = 'save'        
+        layout.operator("mcp.make_assoc")        
+        layout.operator("mcp.unroll_all")        
+        #layout.prop(rig, McpArmBentDown, text='Arm bent down')
+        #layout.prop(rig, McpLegBentOut, text='Leg bent out')
+
+        layout.label("FK bones")
+        for bn in target.TargetBoneNames:
+            if bn:
+                (mhx, text) = bn
+                layout.prop(rig, '["%s"]' % mhx, text=text)
+            else:
+                layout.separator()
+        layout.label("IK bones")
+        for (mhx, text, fakePar, copyRot) in target.TargetIkBoneNames:
+            layout.prop(rig, '["%s"]' % mhx, text=text)
+        return
+
+########################################################################
+#
+#   class LoadPanel(bpy.types.Panel):
+#
+
+class LoadPanel(bpy.types.Panel):
+    bl_label = "MH Mocap: Load BVH"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_options = {'DEFAULT_CLOSED'}
+    
+    @classmethod
+    def poll(cls, context):
+        if context.object and context.object.type == 'ARMATURE':
+            return True
+
+    def draw(self, context):
+        layout = self.layout
+        scn = context.scene
+        ob = context.object
+
+        layout.label("Load BVH skeleton")
+        row = layout.row()
+        row.prop(scn, "McpAutoScale")
+        row.prop(scn, "McpBvhScale")
+        row = layout.row()
+        row.prop(scn, "McpStartFrame")
+        row.prop(scn, "McpEndFrame")
+        layout.prop(scn, "McpRot90Anim")
+        layout.operator("mcp.load_bvh")
+        layout.operator("mcp.rename_bvh")
+        layout.operator("mcp.load_and_rename_bvh")
+
+        layout.separator()
+        layout.label("Retarget")
+        layout.prop(scn, 'McpGuessSrcRig')
+        row = layout.row()
+        row.prop(scn, "McpDoSimplify")
+        row.prop(scn, "McpDefaultSS")
+        layout.prop(scn, "McpNewRetarget")
+        if scn.McpNewRetarget:
+            layout.operator("mcp.new_retarget_mhx")
+            layout.operator("mcp.new_load_retarget_simplify")
+        else:
+            row = layout.row()
+            row.prop(scn, "McpApplyFixes")
+            row.prop(scn, "McpNewIkRetarget")
+            layout.operator("mcp.old_retarget_mhx")
+            layout.operator("mcp.old_load_retarget_simplify")
+
+        if not scn.McpDefaultSS:
+            layout.separator()
+            layout.label("SubSample")
+            row = layout.row()
+            row.prop(scn, "McpSubsample")
+            row.prop(scn, "McpSSFactor")
+            row = layout.row()
+            row.prop(scn, "McpRescale")
+            row.prop(scn, "McpRescaleFactor")
+            layout.operator("mcp.rescale_fcurves")
+
+        layout.separator()
+        layout.label("Simplification")
+        row = layout.row()
+        row.prop(scn, "McpErrorLoc")
+        row.prop(scn, "McpErrorRot")
+        row = layout.row()
+        row.prop(scn, "McpSimplifyVisible")
+        row.prop(scn, "McpSimplifyMarkers")
+        layout.operator("mcp.simplify_fcurves")
+
+        layout.separator()
+        layout.label("Plant keys")
+        row = layout.row()
+        row.prop(scn, "McpPlantLoc")
+        row.prop(scn, "McpPlantRot")
+        layout.prop(scn, "McpPlantCurrent")
+        layout.operator("mcp.plant")
+        
+        layout.separator()
+        layout.label("Toggle constraints")
+        row = layout.row()
+        row.operator("mcp.toggle_pole_targets")
+        row.prop(ob, "McpTogglePoleTargets")
+        row = layout.row()
+        row.operator("mcp.toggle_ik_limits")
+        row.prop(ob, "McpToggleIkLimits")
+        row = layout.row()
+        row.operator("mcp.toggle_limit_constraints")
+        row.prop(ob, "McpToggleLimitConstraints")
+
+
+########################################################################
+#
+#   class EditPanel(bpy.types.Panel):
+#
+
+class EditPanel(bpy.types.Panel):
+    bl_label = "MH Mocap: Edit Actions"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_options = {'DEFAULT_CLOSED'}
+    
+    @classmethod
+    def poll(cls, context):
+        if context.object and context.object.type == 'ARMATURE':
+            return True
+
+    def draw(self, context):
+        layout = self.layout
+        scn = context.scene
+        ob = context.object
+        layout.label("Global Edit")
+        layout.operator("mcp.shift_bone")
+
+        layout.separator()
+        layout.label("Displace Animation")
+        layout.operator("mcp.start_edit")
+        layout.operator("mcp.undo_edit")
+        row = layout.row()
+        row.operator("mcp.insert_loc")
+        row.operator("mcp.insert_rot")
+        row.operator("mcp.insert_locrot")
+        layout.operator("mcp.confirm_edit")
+
+        layout.separator()
+        layout.label("Signal Processing")        
+        layout.operator("mcp.calc_filters")
+        try:
+            fd = the.filterData[ob.name]
+        except:
+            fd = None
+        if fd:
+            for k in range(fd.fb-1):
+                layout.prop(ob, s_%d % k)
+            layout.operator("mcp.reconstruct_action")
+
+        layout.separator()
+        layout.label("Loop Animation")
+        layout.prop(scn, "McpLoopBlendRange")
+        row = layout.row()
+        row.prop(scn, "McpLoopLoc")
+        row.prop(scn, "McpLoopRot")
+        layout.prop(scn, "McpLoopInPlace")
+        if scn.McpLoopInPlace:
+            layout.prop(scn, "McpLoopZInPlace")
+        layout.operator("mcp.loop_fcurves")
+
+        layout.separator()
+        layout.label("Repeat Animation")
+        layout.prop(scn, "McpRepeatNumber")
+        layout.operator("mcp.repeat_fcurves")
+
+        layout.separator()
+        layout.label("Stitch Animations")        
+        layout.operator("mcp.update_action_list")
+        layout.prop(scn, "McpFirstAction")
+        row = layout.row()
+        row.prop(scn, "McpFirstEndFrame")
+        row.operator("mcp.set_current_action").prop = "McpFirstAction"
+        layout.prop(scn, "McpSecondAction")
+        row = layout.row()
+        row.prop(scn, "McpSecondStartFrame")
+        row.operator("mcp.set_current_action").prop = "McpSecondAction"        
+        layout.prop(scn, "McpActionTarget")
+        layout.prop(scn, "McpOutputActionName")        
+        layout.operator("mcp.stitch_actions")
+
+########################################################################
+#
+#   class UlitityPanel(bpy.types.Panel):
+#
+
+class UlitityPanel(bpy.types.Panel):
+    bl_label = "MH Mocap: Utilities"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_options = {'DEFAULT_CLOSED'}    
+    
+    @classmethod
+    def poll(cls, context):
+        if context.object and context.object.type == 'ARMATURE':
+            return True
+
+    def draw(self, context):
+        layout = self.layout
+        scn = context.scene
+        ob = context.object
+        layout.label("Initialization")
+        layout.operator("mcp.init_interface")
+        layout.operator("mcp.save_defaults")
+        layout.operator("mcp.load_defaults")
+
+        layout.separator()
+        layout.label("Manage Actions")
+        layout.prop_menu_enum(context.scene, "McpActions")
+        layout.prop(scn, 'McpFilterActions')
+        layout.operator("mcp.update_action_list")
+        layout.operator("mcp.set_current_action").prop = 'McpActions'
+        layout.prop(scn, "McpReallyDelete")
+        layout.operator("mcp.delete")
+        layout.operator("mcp.delete_hash")
+
+        return
+        layout.operator("mcp.copy_angles_fk_ik")
+
+        layout.separator()
+        layout.label("Batch conversion")
+        layout.prop(scn, "McpDirectory")
+        layout.prop(scn, "McpPrefix")
+        layout.operator("mcp.batch")
 
 #
 #    Debugging

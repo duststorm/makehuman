@@ -594,13 +594,13 @@ def retargetMhxRig(context, srcRig, trgRig):
     insertAnimation(context, srcRig, srcAnimations, rig_mhx.FkBoneList)
     onoff = toggle.toggleLimitConstraints(trgRig)
     toggle.setLimitConstraints(trgRig, 0.0)
-    if scn['McpApplyFixes']:
-        srcFixes = the.fixesList[srcRig['McpArmature']]
+    if scn.McpApplyFixes:
+        srcFixes = the.fixesList[srcRig["McpArmature"]]
     else:
         srcFixes = None
     #debugOpen()
     nFrames = poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, srcFixes)
-    if scn['McpNewIkRetarget']:
+    if scn.McpNewIkRetarget:
         new_retarget.poseTrgIkBones(context, trgRig, nFrames)
     else:
         poseTrgIkBones(context, trgRig, trgAnimations)
@@ -693,38 +693,3 @@ class VIEW3D_OT_OldLoadRetargetSimplifyButton(bpy.types.Operator, ImportHelper):
     def invoke(self, context, event):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}    
-
-#
-#   class OldRetargetPanel(bpy.types.Panel):
-#
-
-class OldRetargetPanel(bpy.types.Panel):
-    bl_label = "Mocap: Retarget"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    
-    @classmethod
-    def poll(cls, context):
-        if context.object and context.object.type == 'ARMATURE':
-            return True
-
-    def draw(self, context):
-        layout = self.layout
-        scn = context.scene
-        ob = context.object
-        layout.prop(scn, "McpDoSimplify")
-        layout.prop(scn, "McpApplyFixes")
-        layout.prop(scn, "McpNewIkRetarget")
-        layout.operator("mcp.old_retarget_mhx")
-        layout.operator("mcp.old_load_retarget_simplify")
-
-def register():
-    bpy.utils.register_module(__name__)
-
-def unregister():
-    bpy.utils.unregister_module(__name__)
-
-if __name__ == "__main__":
-    register()
-
-

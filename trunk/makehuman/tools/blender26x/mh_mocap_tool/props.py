@@ -41,7 +41,7 @@ def initInterface(context):
         default=0.65)
 
     bpy.types.Scene.McpAutoScale = BoolProperty(
-        name="Auto scale",
+        name="Auto Scale",
         description="Rescale skeleton to match target",
         default=True)
 
@@ -66,13 +66,18 @@ def initInterface(context):
         default=True)
         
     bpy.types.Scene.McpApplyFixes = BoolProperty(
-        name="Apply found fixes", 
-        description="Apply found fixes",
+        name="Apply Found Fixes", 
+        description="Apply found fixes (old retarget only)",
         default=True)
 
     bpy.types.Scene.McpNewIkRetarget = BoolProperty(
-        name="New IK retarget", 
+        name="New IK Retarget", 
         description="Use new retarget for IK bones",
+        default=False)
+
+    bpy.types.Scene.McpNewRetarget = BoolProperty(
+        name="New Retarget", 
+        description="Use new retarget",
         default=False)
 
 
@@ -230,65 +235,72 @@ def initInterface(context):
     bpy.types.Scene.McpSecondAction = EnumProperty(
         items = [],
         name = "Second action")
+        
+   # Source
+   
+    bpy.types.Scene.McpGuessSrcRig = BoolProperty(
+        name = "Guess source rig")
+        
+
 
     scn = context.scene
-    if scn:        
+    if False and scn:        
         # Load and retarget
         
-        scn["McpBvhScale"] = 0.65
-        scn["McpAutoScale"] = True
-        scn["McpStartFrame"] = 1
-        scn["McpEndFrame"] = 32000
-        scn["McpRot90Anim"] = True
-        scn["McpDoSimplify"] = False
-        scn["McpNewIkRetarget"] = False
+        scn.McpBvhScale = 0.65
+        scn.McpAutoScale = True
+        scn.McpStartFrame = 1
+        scn.McpEndFrame = 32000
+        scn.McpRot90Anim = True
+        scn.McpDoSimplify = False
+        scn.McpNewIkRetarget = False
 
         # Subsample and rescale
         
-        scn["McpSubsample"] = True
-        scn["McpSSFactor"] = 1
-        scn["McpDefaultSS"] = True
-        scn["McpRescaleFactor"] = 1
-        scn["McpRescale"] = False
+        scn.McpSubsample = True
+        scn.McpSSFactor = 1
+        scn.McpDefaultSS = True
+        scn.McpRescaleFactor = 1
+        scn.McpRescale = False
         
         # Simplify
         
-        scn["McpSimplifyVisible"] = False
-        scn["McpSimplifyMarkers"] = False
-        scn["McpApplyFixes"] = True
-        scn["McpErrorLoc"] = 0.01
-        scn["McpErrorRot"] = 0.1
+        scn.McpSimplifyVisible = False
+        scn.McpSimplifyMarkers = False
+        scn.McpApplyFixes = True
+        scn.McpErrorLoc = 0.01
+        scn.McpErrorRot = 0.1
         
         # Loop
     
-        scn["McpLoopBlendRange"] = 5
-        scn["McpLoopLoc"] = True
-        scn["McpLoopRot"] = True
-        scn["McpLoopInPlace"] = False
-        scn["McpLoopZInPlace"] = False
-        scn["McpRepeatNumber"] = 1
-        scn["McpFirstEndFrame"] = 1
-        scn["McpSecondStartFrame"] = 1
-        scn["McpFirstAction"] = 0
-        scn["McpSecondAction"] = 0
-        scn["McpUseNewOutputAction"] = False
-        scn["McpOutputActionName"] = ""
+        scn.McpLoopBlendRange = 5
+        scn.McpLoopLoc = True
+        scn.McpLoopRot = True
+        scn.McpLoopInPlace = False
+        scn.McpLoopZInPlace = False
+        scn.McpRepeatNumber = 1
+        scn.McpFirstEndFrame = 1
+        scn.McpSecondStartFrame = 1
+        scn.McpFirstAction = 0
+        scn.McpSecondAction = 0
+        scn.McpUseNewOutputAction = False
+        scn.McpOutputActionName = ""
     
         # Plant
         
-        scn["McpPlantCurrent"] = True
-        scn["McpPlantLoc"] = True
-        scn["McpPlantRot"] = False
+        scn.McpPlantCurrent = True
+        scn.McpPlantLoc = True
+        scn.McpPlantRot = False
 
         # Props
         
-        scn["McpPrefix"] = "Female1_A"
-        scn["McpDirectory"] = "~/makehuman/bvh/Female1_bvh"
+        scn.McpPrefix = "Female1_A"
+        scn.McpDirectory = "~/makehuman/bvh/Female1_bvh"
         
         # Manage actions            
         
-        scn["McpFilterActions"] = False
-        scn["McpReallyDelete"] = False
+        scn.McpFilterActions = False
+        scn.McpReallyDelete = False
         action.listAllActions(context)
         print("Default scene properties set")
     else:
@@ -307,7 +319,7 @@ def initInterface(context):
 
 def ensureInited(context):
     try:
-        context.scene["McpBvhScale"]
+        context.scene.McpBvhScale
         inited = True
     except:
         inited = False
@@ -436,52 +448,11 @@ class VIEW3D_OT_McpBatchButton(bpy.types.Operator):
     bl_label = "Batch run"
 
     def execute(self, context):
-        paths = readDirectory(context.scene["McpDirectory"], context.scene["McpPrefix"])
+        paths = readDirectory(context.scene.McpDirectory, context.scene.McpPrefix)
         trgRig = context.object
         for filepath in paths:
             context.scene.objects.active = trgRig
             loadRetargetSimplify(context, filepath)
         return{"FINISHED"}    
-
-#
-#    class PropsPanel(bpy.types.Panel):
-#
-
-class PropsPanel(bpy.types.Panel):
-    bl_label = "Mocap: Init"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    
-    @classmethod
-    def poll(cls, context):
-        if context.object and context.object.type == "ARMATURE":
-            return True
-
-    def draw(self, context):
-        layout = self.layout
-        scn = context.scene
-        ob = context.object
-        layout.operator("mcp.init_interface")
-        layout.operator("mcp.save_defaults")
-        layout.operator("mcp.load_defaults")
-        return
-        layout.operator("mcp.copy_angles_fk_ik")
-
-        layout.separator()
-        layout.label("Batch conversion")
-        layout.prop(scn, "McpDirectory")
-        layout.prop(scn, "McpPrefix")
-        layout.operator("mcp.batch")
-        return
-
-def register():
-    bpy.utils.register_module(__name__)
-
-def unregister():
-    bpy.utils.unregister_module(__name__)
-
-if __name__ == "__main__":
-    register()
-
 
 

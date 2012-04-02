@@ -44,8 +44,9 @@ class CBoneData:
         self.rig = rig
         self.posebone = pb
         self.parent = None
-        self.rest_mat = None
-        self.rest_inv = None
+        self.restMat = None
+        self.bakeMat = None
+        self.bakeInv = None
         self.offset = None
         self.roll = None
         return
@@ -65,11 +66,12 @@ def getLitBoneOrNone(name, rig):
 #
 
 def retargetBone(srcData, trgData, frame):
+    testing = False
     srcBone = srcData.posebone
     trgBone = trgData.posebone
     trgParent = trgData.parent
     if srcBone:
-        srcRot = srcBone.matrix  # * srcData.rig.matrix_world
+        srcRot = srcBone.matrix  #* srcData.rig.matrix_world
         bakeMat = srcBone.matrix
     else:
         srcRot = Matrix.Rotation(0, 4, 'X')
@@ -77,29 +79,45 @@ def retargetBone(srcData, trgData, frame):
         #print(srcRot)
 
     if trgParent:
-        parMatInv = utils.invert(srcData.parent.posebone.matrix)
-        bakeMat = parMatInv * bakeMat
-    trgBone.matrix_basis = trgData.rest_inv * bakeMat
+        srcParent = srcData.parent.posebone
+        bakeMat = srcParent.matrix.inverted() * bakeMat
+    trgMat = trgData.bakeInv * bakeMat
+    if testing:
+        print(trgBone.name)
+        utils.printMat4(" SrcRot", srcRot, "  ")
+        utils.printMat4(" Bake", bakeMat, "  ")
+        utils.printMat4(" BakeInv", trgData.bakeInv, "  ")
+        utils.printMat4(" SrcMat", srcBone.matrix, "  ")
+        utils.printMat4(" TrgMat", trgBone.matrix, "  ")
+    trgBone.matrix_basis = trgMat
+    if testing:
+        utils.printMat4(" MatBas", trgBone.matrix_basis, "  ")
+        utils.printMat4(" Matrix", trgBone.matrix, "  ")
+    if testing and trgBone.name == "Clavicle_L":
+        halt
     
-    if trgParent:    
-        trgBone.location = trgData.offset
-
     utils.insertRotationKeyFrame(trgBone, frame)
     if not trgParent:
         trgBone.keyframe_insert("location", group=trgBone.name)
     return        
-    
+   
 #
 #    retargetMhxRig(context, srcRig, trgRig):
 #
     
 def retargetMhxRig(context, srcRig, trgRig):
+    bpy.ops.pose.rot_clear()
+    bpy.ops.pose.loc_clear()
+
     scn = context.scene
+    if scn.McpGuessSrcRig:
+        source.scanSourceRig(scn, srcRig)
     source.setArmature(srcRig)
-    fixes = the.fixesList[srcRig['McpArmature']]
+    fixes = the.fixesList[srcRig["McpArmature"]]
     print("Retarget %s --> %s" % (srcRig, trgRig))
     if trgRig.animation_data:
         trgRig.animation_data.action = None
+    oldProps = mhxPropertiesReset(trgRig)
 
     frames = utils.activeFrames(srcRig)
     (boneAssoc, ikBoneAssoc, parAssoc, rolls, mats, ikBones, ikParents) = target.makeTargetAssoc(trgRig, scn)
@@ -107,21 +125,24 @@ def retargetMhxRig(context, srcRig, trgRig):
     fkAssoc = []
     trgDatas = {}
     srcDatas = {}
-    for (trgName, name) in boneAssoc:
+    for (trgName, srcName) in boneAssoc:
         try:
             trgBone = trgRig.pose.bones[trgName]
-            srcBone = srcRig.pose.bones[name]
+            srcBone = srcRig.pose.bones[srcName]
         except:
-            print("  -", trgName, name)
+            print("  -", trgName, srcName)
             continue
         trgData = CBoneData(trgBone, trgRig)
         srcData = CBoneData(srcBone, srcRig)
         trgDatas[trgName] = trgData
-        srcDatas[name] = srcData
+        srcDatas[srcName] = srcData
         
-        trgData.rest_mat = trgBone.bone.matrix_local
+        if 0 and (trgBone.name in ["Root", "Pelvis", "Hips"]):
+            trgData.restMat = srcBone.bone.matrix_local
+        else:
+            trgData.restMat = trgBone.bone.matrix_local
         try:
-            (mat, srcRoll) = fixes[name]
+            (mat, srcRoll) = fixes[srcName]
         except:
             srcRoll = 0
         trgRoll = rolls[trgName]
@@ -145,14 +166,17 @@ def retargetMhxRig(context, srcRig, trgRig):
             if trgParent:
                 trgData.parent = trgDatas[trgParent.name]
                 trgData.offset = trgBone.bone.head_local - trgParent.bone.tail_local
-                parRestInv = utils.invert(trgParent.bone.matrix_local)
-                parRollInv = utils.invert(trgData.parent.roll)
-                trgData.rest_mat = parRestInv * trgData.rest_mat
+                parRestInv = trgData.parent.restMat.inverted()
+                #parRestInv = trgParent.bone.matrix_local.inverted()
+                parRollInv = trgData.parent.roll.inverted()
+                trgData.bakeMat = parRestInv * trgData.restMat
+            else:
+                trgData.bakeMat = trgData.restMat
 
-        trgData.rest_inv = utils.invert(trgData.rest_mat)            
+        trgData.bakeInv = trgData.bakeMat.inverted()            
         print("BP", trgName, parName)        
-        print("rest", trgData.rest_mat)
-        print("roll", trgData.roll)
+        #print("rest", trgData.restMat)
+        #print("roll", trgData.roll)
         fkAssoc.append( (srcData, trgData) )
 
     ikAssoc = []
@@ -187,7 +211,10 @@ def retargetMhxRig(context, srcRig, trgRig):
     
     scn.objects.active = trgRig
     scn.update()
-    bpy.ops.object.mode_set(mode='POSE')        
+    bpy.ops.object.mode_set(mode='POSE')  
+    bpy.ops.pose.select_all(action='DESELECT')
+    for name in ["Root", "Hips", "Pelvis"]:
+        trgRig.data.bones[name].select = True
     
     constraints = []
     for (srcData, trgData) in fkAssoc:
@@ -197,30 +224,35 @@ def retargetMhxRig(context, srcRig, trgRig):
                constraints.append((cns, cns.influence))
                cns.influence = 0.0
 
-    for frame in frames:            
-        scn.frame_set(frame)
-        if frame % 10 == 0:
-            print("Frame", frame)
-        for (srcData, trgData) in fkAssoc:
-            #print("  ", srcBone.name, trgBone.name, srcParent, trgParent)
-            retargetBone(srcData, trgData, frame)
-        for (srcData, trgData) in ikAssoc:            
-            pass
-            #print(" *", fkBone, trgBone, fkParent, trgParent)
-            #retargetBone(srcData, trgData, frame)
-            #trgBone.keyframe_insert("location", group=trgBone.name)
-            """
-            print(trgBone.name)
-            print("  FK", fkBone.head)
-            print("  rs", trgBone.bone.matrix_local.to_translation())
-            print("  L1", trgBone.location)
-            #trgBone.location = fkBone.head - trgBone.bone.matrix_local.to_translation()
-            trgBone.keyframe_insert("location", group=trgBone.name)
-            print("  L2", trgBone.location)
-            print("  hd", trgBone.head)
-            print("")
-            """
-        #x = foo            
+    oldLayers = list(trgRig.data.layers)
+    try:
+        trgRig.data.layers = 32*[True]
+        for frame in frames:            
+            scn.frame_set(frame)
+            if frame % 10 == 0:
+                print("Frame", frame)
+            for (srcData, trgData) in fkAssoc:
+                #print("  ", srcBone.name, trgBone.name, srcParent, trgParent)
+                retargetBone(srcData, trgData, frame)
+                bpy.ops.pose.rot_clear()    
+            for (srcData, trgData) in ikAssoc:            
+                pass
+                #print(" *", fkBone, trgBone, fkParent, trgParent)
+                #retargetBone(srcData, trgData, frame)
+                #trgBone.keyframe_insert("location", group=trgBone.name)
+                """
+                print(trgBone.name)
+                print("  FK", fkBone.head)
+                print("  rs", trgBone.bone.matrix_local.to_translation())
+                print("  L1", trgBone.location)
+                #trgBone.location = fkBone.head - trgBone.bone.matrix_local.to_translation()
+                trgBone.keyframe_insert("location", group=trgBone.name)
+                print("  L2", trgBone.location)
+                print("  hd", trgBone.head)
+                print("")
+                """
+    finally:                
+        trgRig.data.layers = oldLayers
             
     for (cns, inf) in constraints:
         #print(cns.type)
@@ -232,6 +264,31 @@ def retargetMhxRig(context, srcRig, trgRig):
     act.use_fake_user = True
     print("Retargeted %s --> %s" % (srcRig, trgRig))
     return
+
+#
+#   mhxPropertiesReset(rig):
+#
+
+def mhxPropertiesReset(rig):
+    mhxProps = [
+        ("&RotationLimits", 0.0),
+        ("&ArmIk_L", 0.0),
+        ("&ArmIk_R", 0.0),
+        ("&LegIk_L", 0.0),
+        ("&LegIk_R", 0.0),
+        ("&SpineIk", 0.0),
+        ("&SpineInvert", 0.0),
+        ("&ElbowPlant_L", 0.0),
+        ("&ElbowPlant_R", 0.0),
+        ]
+    oldProps = []
+    for (key, value) in mhxProps:
+        try:
+            oldProps.append((key, rig[key]))
+            rig[key] = value
+        except KeyError:
+            pass
+    return oldProps        
 
 #
 #   poseTrgIkBones(context, trgRig, nFrames):
@@ -416,7 +473,7 @@ def loadRetargetSimplify(context, filepath):
 #
 #   class VIEW3D_OT_NewRetargetMhxButton(bpy.types.Operator):
 #
-"""
+
 class VIEW3D_OT_NewRetargetMhxButton(bpy.types.Operator):
     bl_idname = "mcp.new_retarget_mhx"
     bl_label = "Retarget selected to active"
@@ -449,28 +506,6 @@ class VIEW3D_OT_NewLoadRetargetSimplifyButton(bpy.types.Operator, ImportHelper):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}    
 
-#
-#   class NewRetargetPanel(bpy.types.Panel):
-#
-
-class NewRetargetPanel(bpy.types.Panel):
-    bl_label = "Mocap: New retarget"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    
-    @classmethod
-    def poll(cls, context):
-        if context.object and context.object.type == 'ARMATURE':
-            return True
-
-    def draw(self, context):
-        layout = self.layout
-        scn = context.scene
-        ob = context.object
-        layout.prop(scn, "McpDoSimplify")
-        layout.prop(scn, "McpApplyFixes")
-        layout.operator("mcp.new_retarget_mhx")
-        layout.operator("mcp.new_load_retarget_simplify")
 
 def register():
     bpy.utils.register_module(__name__)
@@ -482,4 +517,3 @@ if __name__ == "__main__":
     register()
 
 
-"""

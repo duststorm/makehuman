@@ -70,23 +70,23 @@ def loopFCurves(context):
     hasLocation = {}
     for fcu in fcurves:
         (name, mode) = utils.fCurveIdentity(fcu)
-        if utils.isRotation(mode) and scn['McpLoopRot']:
+        if utils.isRotation(mode) and scn.McpLoopRot:
             loopFCurve(fcu, minTime, maxTime, scn)
 
-    if scn['McpLoopLoc']:
-        if scn['McpLoopInPlace']:
+    if scn.McpLoopLoc:
+        if scn.McpLoopInPlace:
             for pb in utils.ikBoneList(rig):
                 scn.frame_set(minTime)
                 head0 = pb.head.copy()
                 scn.frame_set(maxTime)
                 head1 = pb.head.copy()
                 offs = (head1-head0)/(maxTime-minTime)
-                if not scn['McpLoopZInPlace']:
+                if not scn.McpLoopZInPlace:
                     offs[2] = 0
                 print("Loc", pb.name, offs)
 
                 restMat = pb.bone.matrix_local.to_3x3()
-                restInv = utils.invert(restMat)
+                restInv = restMat.inverted()
                 #if pb.parent:
                 #    parRest = pb.parent.bone.matrix_local.to_3x3()
                 #    restInv = restInv * parRest
@@ -97,10 +97,10 @@ def loopFCurves(context):
                     diff = head - pb.bone.head_local
                     #if pb.parent:
                     #    parMat = pb.parent.matrix.to_3x3()                        
-                    #    diff = utils.invert(parMat) * diff                        
+                    #    diff = parMat.inverted() * diff                        
                     pb.location = restInv * diff                    
                     pb.keyframe_insert("location", group=pb.name)  
-                # pb.matrix_basis = utils.invert(pb.bone.matrix_local) * par.bone.matrix_local * utils.invert(par.matrix) * pb.matrix
+                # pb.matrix_basis = pb.bone.matrix_local.inverted() * par.bone.matrix_local * par.matrix.inverted() * pb.matrix
 
         for fcu in fcurves:
             (name, mode) = utils.fCurveIdentity(fcu)
@@ -112,7 +112,7 @@ def loopFCurves(context):
     
     
 def loopFCurve(fcu, t0, tn, scn):
-    delta = scn['McpLoopBlendRange']
+    delta = scn.McpLoopBlendRange
     
     v0 = fcu.evaluate(t0)
     vn = fcu.evaluate(tn)
@@ -197,7 +197,7 @@ class VIEW3D_OT_McpRepeatFCurvesButton(bpy.types.Operator):
     bl_label = "Repeat F-curves"
 
     def execute(self, context):
-        repeatFCurves(context, context.scene["McpRepeatNumber"])
+        repeatFCurves(context, context.scene.McpRepeatNumber)
         return{'FINISHED'}    
     
 
@@ -209,20 +209,20 @@ def stitchActions(context):
     action.listAllActions(context)
     scn = context.scene
     rig = context.object
-    act1 = action.selectedAction(scn['McpFirstAction'])
+    act1 = action.selectedAction(scn.McpFirstAction)
     if not act1: return
-    act2 = action.selectedAction(context.scene['McpSecondAction'])
+    act2 = action.selectedAction(scn.McpSecondAction)
     if not act2: return
-    frame1 = scn['McpFirstEndFrame']
-    frame2 = scn['McpSecondStartFrame'] 
-    delta = scn['McpLoopBlendRange']
+    frame1 = scn.McpFirstEndFrame
+    frame2 = scn.McpSecondStartFrame
+    delta = scn.McpLoopBlendRange
 
     if not rig.animation_data:
         pb = context.active_posebone
         pb.keyframe_insert("location", group=pb.name)
         rig.animation_data.action = None
         
-    actionTarget = scn["McpActionTarget"]
+    actionTarget = scn.McpActionTarget
     print("Acttar", actionTarget)
     if actionTarget == 0:   # Second to new
         act = None
@@ -239,12 +239,12 @@ def stitchActions(context):
     rig.animation_data.action = act1
     scn.frame_set(frame1)
     for pb in context.selected_pose_bones:
-        matrix1[pb.name] = utils.invert(pb.bone.matrix_local) * pb.matrix
+        matrix1[pb.name] = pb.bone.matrix_local.inverted() * pb.matrix
     rig.animation_data.action = act2
     scn.frame_set(frame2)
     for pb in context.selected_pose_bones:
-        matrix2[pb.name] = utils.invert(pb.bone.matrix_local) * pb.matrix
-        matrix[pb.name] = matrix1[pb.name] * utils.invert(matrix2[pb.name])
+        matrix2[pb.name] = pb.bone.matrix_local.inverted() * pb.matrix
+        matrix[pb.name] = matrix1[pb.name] * matrix2[pb.name].inverted()
         #print(pb.name, scn.frame_current)        
         #print(pb.matrix)
         #print(matrix1[pb.name])
@@ -267,7 +267,7 @@ def stitchActions(context):
         
     if act:
         name = act2.name
-        act2.name = scn["McpOutputActionName"]
+        act2.name = scn.McpOutputActionName
         act.name = name
         act = None
 
@@ -385,63 +385,3 @@ class VIEW3D_OT_McpShiftBoneFCurvesButton(bpy.types.Operator):
         print("Bones shifted")
         return{'FINISHED'}    
         
-########################################################################
-#
-#   class LoopStitchPanel(bpy.types.Panel):
-#
-
-class LoopStitchPanel(bpy.types.Panel):
-    bl_label = "Mocap: Loop and stitch"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_options = {'DEFAULT_CLOSED'}
-    
-    @classmethod
-    def poll(cls, context):
-        if context.object and context.object.type == 'ARMATURE':
-            return True
-
-    def draw(self, context):
-        layout = self.layout
-        scn = context.scene
-        ob = context.object
-        layout.label("Loop animation")
-        layout.prop(scn, "McpLoopBlendRange")
-        row = layout.row()
-        row.prop(scn, "McpLoopLoc")
-        row.prop(scn, "McpLoopRot")
-        layout.prop(scn, "McpLoopInPlace")
-        if scn['McpLoopInPlace']:
-            layout.prop(scn, "McpLoopZInPlace")
-        layout.operator("mcp.loop_fcurves")
-
-        layout.label("Repeat animation")
-        layout.prop(scn, "McpRepeatNumber")
-        layout.operator("mcp.repeat_fcurves")
-
-        layout.label("Stitch")        
-        layout.operator("mcp.update_action_list")
-        layout.prop(scn, "McpFirstAction")
-        row = layout.row()
-        row.prop(scn, "McpFirstEndFrame")
-        row.operator("mcp.set_current_action").prop = "McpFirstAction"
-
-        layout.prop(scn, "McpSecondAction")
-        row = layout.row()
-        row.prop(scn, "McpSecondStartFrame")
-        row.operator("mcp.set_current_action").prop = "McpSecondAction"
-        
-        layout.prop(scn, "McpActionTarget")
-        layout.prop(scn, "McpOutputActionName")
-        
-        layout.operator("mcp.stitch_actions")
-
-def register():
-    bpy.utils.register_module(__name__)
-
-def unregister():
-    bpy.utils.unregister_module(__name__)
-
-if __name__ == "__main__":
-    register()
-

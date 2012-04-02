@@ -37,7 +37,7 @@ from . import globvar as the
 
 def getUndoAction(rig):
     try:
-        name = rig['McpUndoAction']
+        name = rig["McpUndoAction"]
         return bpy.data.actions[name]
     except:
         return None
@@ -54,8 +54,8 @@ def startEdit(context):
     act.name = '#'+aname
     nact = bpy.data.actions.new(aname)
     rig.animation_data.action = nact
-    rig['McpUndoAction'] = act.name
-    rig['McpActionName'] = aname
+    rig["McpUndoAction"] = act.name
+    rig["McpActionName"] = aname
 
     the.editLoc = utils.quadDict()
     the.editRot = utils.quadDict()
@@ -90,13 +90,13 @@ def undoEdit(context):
     if not oact:
         print("No action to undo")
         return
-    rig['McpUndoAction'] = ""
+    rig["McpUndoAction"] = ""
     the.editLoc = None
     the.editRot = None
-    rig['McpActionName'] = ""
+    rig["McpActionName"] = ""
     act = rig.animation_data.action
     act.name = "#Delete"
-    oact.name = rig['McpActionName'] 
+    oact.name = rig["McpActionName"] 
     rig.animation_data.action = oact
     utils.deleteAction(act)
     print("Action changes undone")
@@ -162,8 +162,8 @@ def confirmEdit(context):
                 continue
             displaceFCurve(fcu, ofcu, edit)
 
-    rig['McpUndoAction'] = ""
-    rig['McpActionName'] = ""
+    rig["McpUndoAction"] = ""
+    rig["McpActionName"] = ""
     the.editLoc = None
     the.editRot = None
     utils.deleteAction(oact)
@@ -345,46 +345,4 @@ def evalCRInterval(t, t0, t1, tfac, params):
     x1 = 1-x
     f = x*x*(a*x + b*x1) + x1*x1*(c*x+d*x1)
     return f
-
-
-########################################################################
-#
-#   class EditPanel(bpy.types.Panel):
-#
-
-class EditPanel(bpy.types.Panel):
-    bl_label = "Mocap: Edit"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_options = {'DEFAULT_CLOSED'}
-    
-    @classmethod
-    def poll(cls, context):
-        if context.object and context.object.type == 'ARMATURE':
-            return True
-
-    def draw(self, context):
-        layout = self.layout
-        scn = context.scene
-        ob = context.object
-        layout.label("Shift")
-        layout.operator("mcp.shift_bone")
-
-        layout.label("Displace animation")
-        layout.operator("mcp.start_edit")
-        layout.operator("mcp.undo_edit")
-        row = layout.row()
-        row.operator("mcp.insert_loc")
-        row.operator("mcp.insert_rot")
-        row.operator("mcp.insert_locrot")
-        layout.operator("mcp.confirm_edit")
-                
-def register():
-    bpy.utils.register_module(__name__)
-
-def unregister():
-    bpy.utils.unregister_module(__name__)
-
-if __name__ == "__main__":
-    register()
 

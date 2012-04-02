@@ -67,10 +67,10 @@ def plantKeys(context):
         if fcu.data_path == rotPath:
             rots.append(fcu)
 
-    useCrnt = scn['McpPlantCurrent']
-    if scn['McpPlantLoc']:
+    useCrnt = scn.McpPlantCurrent
+    if scn.McpPlantLoc:
         plantFCurves(locs, first, last, useCrnt, pb.location)
-    if scn['McpPlantRot']:
+    if scn.McpPlantRot:
         plantFCurves(rots, first, last, useCrnt, pbRot)
     return
 
@@ -116,37 +116,4 @@ class VIEW3D_OT_McpPlantButton(bpy.types.Operator):
         plantKeys(context)
         print("Keys planted")
         return{'FINISHED'}    
-
-#
-#    class PlantPanel(bpy.types.Panel):
-#
-
-class PlantPanel(bpy.types.Panel):
-    bl_label = "Mocap: Plant keys"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_options = {'DEFAULT_CLOSED'}
-    
-    @classmethod
-    def poll(cls, context):
-        if context.object and context.object.type == 'ARMATURE':
-            return True
-
-    def draw(self, context):
-        layout = self.layout
-        scn = context.scene
-        row = layout.row()
-        row.prop(scn, "McpPlantLoc")
-        row.prop(scn, "McpPlantRot")
-        layout.prop(scn, "McpPlantCurrent")
-        layout.operator("mcp.plant")
-
-def register():
-    bpy.utils.register_module(__name__)
-
-def unregister():
-    bpy.utils.unregister_module(__name__)
-
-if __name__ == "__main__":
-    register()
 

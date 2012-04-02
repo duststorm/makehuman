@@ -118,15 +118,15 @@ Epsilon = 1e-5
 
 def readBvhFile(context, filepath, scn, scan):
     props.ensureInited(context)
-    scale = scn['McpBvhScale']
-    startFrame = scn['McpStartFrame']
-    endFrame = scn['McpEndFrame']
-    rot90 = scn['McpRot90Anim']
-    if (scn['McpSubsample']):
-        ssFactor = scn['McpSSFactor']
+    scale = scn.McpBvhScale
+    startFrame = scn.McpStartFrame
+    endFrame = scn.McpEndFrame
+    rot90 = scn.McpRot90Anim
+    if (scn.McpSubsample):
+        ssFactor = scn.McpSSFactor
     else:
         ssFactor = 1
-    defaultSS = scn['McpDefaultSS']
+    defaultSS = scn.McpDefaultSS
 
     fileName = os.path.realpath(os.path.expanduser(filepath))
     (shortName, ext) = os.path.splitext(fileName)
@@ -502,14 +502,14 @@ def copyAnglesIK(context):
 #
 
 def rescaleRig(scn, trgRig, srcRig):
-    if not scn['McpAutoScale']:
+    if not scn.McpAutoScale:
         return
     upleg = target.getTrgBone('UpLeg_L')
     trgScale = trgRig.data.bones[upleg].length
     srcScale = srcRig.data.bones['UpLeg_L'].length
     scale = trgScale/srcScale
     print("Rescale %s with factor %f" % (scn.objects.active, scale))
-    scn['McpBvhScale'] = scale
+    scn.McpBvhScale = scale
     
     bpy.ops.object.mode_set(mode='EDIT')
     ebones = srcRig.data.edit_bones
@@ -533,7 +533,7 @@ def rescaleRig(scn, trgRig, srcRig):
 
 def renameAndRescaleBvh(context, srcRig, trgRig):
     try:
-        if srcRig['McpRenamed']:
+        if srcRig["McpRenamed"]:
             print("%s already renamed and rescaled." % srcRig.name)
             return
     except:
@@ -548,7 +548,7 @@ def renameAndRescaleBvh(context, srcRig, trgRig):
     renameBones(srcRig, scn)
     utils.setInterpolation(srcRig)
     rescaleRig(context.scene, trgRig, srcRig)
-    srcRig['McpRenamed'] = True
+    srcRig["McpRenamed"] = True
     return 
 
 ########################################################################
@@ -592,7 +592,7 @@ class VIEW3D_OT_RenameBvhButton(bpy.types.Operator):
             print("No target rig selected")
             return
         renameAndRescaleBvh(context, srcRig, trgRig)
-        if scn['McpRescale']:
+        if scn.McpRescale:
             simplify.rescaleFCurves(context, srcRig, scn.McpRescaleFactor)
         print("%s renamed" % srcRig.name)
         return{'FINISHED'}    
@@ -612,7 +612,7 @@ class VIEW3D_OT_LoadAndRenameBvhButton(bpy.types.Operator, ImportHelper):
     def execute(self, context):
         (srcRig, trgRig) = readBvhFile(context, self.properties.filepath, context.scene, False)        
         renameAndRescaleBvh(context, srcRig, trgRig)
-        if context.scene['McpRescale']:
+        if context.scene.McpRescale:
             simplify.rescaleFCurves(context, srcRig, scn.McpRescaleFactor)
         print("%s loaded and renamed" % srcRig.name)
         return{'FINISHED'}    
@@ -620,40 +620,3 @@ class VIEW3D_OT_LoadAndRenameBvhButton(bpy.types.Operator, ImportHelper):
     def invoke(self, context, event):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}    
-
-
-#
-#   class LoadPanel(bpy.types.Panel):
-#
-
-class LoadPanel(bpy.types.Panel):
-    bl_label = "Mocap: Load"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_options = {'DEFAULT_CLOSED'}
-    
-    @classmethod
-    def poll(cls, context):
-        if context.object and context.object.type == 'ARMATURE':
-            return True
-
-    def draw(self, context):
-        layout = self.layout
-        scn = context.scene
-        layout.prop(scn, "McpBvhScale")
-        layout.prop(scn, "McpAutoScale")
-        layout.prop(scn, "McpStartFrame")
-        layout.prop(scn, "McpEndFrame")
-        layout.prop(scn, "McpRot90Anim")
-        layout.operator("mcp.load_bvh")
-        layout.operator("mcp.rename_bvh")
-        layout.operator("mcp.load_and_rename_bvh")
-
-def register():
-    bpy.utils.register_module(__name__)
-
-def unregister():
-    bpy.utils.unregister_module(__name__)
-
-if __name__ == "__main__":
-    register()
