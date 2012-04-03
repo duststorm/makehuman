@@ -267,6 +267,7 @@ class OBJECT_OT_ProjectUVsButton(bpy.types.Operator):
         (human, clothing) = main.getObjectPair(context)
         main.unwrapObject(clothing, context)
         main.projectUVs(human, clothing, context)
+        print("UVs projected")
         return{'FINISHED'}    
         
 #

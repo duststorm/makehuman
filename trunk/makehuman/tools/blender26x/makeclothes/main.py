@@ -275,7 +275,8 @@ def findClothes(context, bob, pob, log):
     vfaces = {}
     for v in base.vertices:
         vfaces[v.index] = []            
-    for f in base.faces:
+    baseFaces = getFaces(base)
+    for f in baseFaces:
         v0 = f.vertices[0]
         v1 = f.vertices[1]
         v2 = f.vertices[2]
@@ -572,8 +573,9 @@ def printClothes(context, bob, pob, data):
     
 def printMhcloUvLayers(fp, pob, scn):
     me = pob.data
-    if me.uv_textures:
-        for layer,uvtex in enumerate(me.uv_textures):
+    uvTexs = getUvTextures(me)
+    if uvTexs:
+        for layer,uvtex in enumerate(uvTexs):
             if layer == scn.MCTextureLayer:
                 continue
             if scn.MCAllUVLayers:
@@ -591,7 +593,8 @@ def printMhcloUvLayers(fp, pob, scn):
                 vt = texVerts[vtn]
                 fp.write("%.4f %.4f\n" % (vt[0], vt[1]))
             fp.write("# texFaces %d\n" % printLayer)
-            for f in me.faces:
+            meFaces = getFaces(me)
+            for f in meFaces:
                 uvVerts = uvFaceVerts[f.index]
                 for n,v in enumerate(f.vertices):
                     (vt, uv) = uvVerts[n]
@@ -600,6 +603,7 @@ def printMhcloUvLayers(fp, pob, scn):
     return
     
 def reexportMhclo(context):
+    checkBMeshAware()
     pob = getClothing(context)
     scn = context.scene
     scn.objects.active = pob    
@@ -736,6 +740,7 @@ def writeTextures(fp, name, scn):
 #
 
 def exportObjFile(context):
+    checkBMeshAware()
     ob = getClothing(context)
     (objpath, objfile) = getFileName(ob, context, "obj")
     print("Open", objfile)
@@ -755,7 +760,8 @@ def exportObjFile(context):
         layer = scn.MCTextureLayer
         writeObjTextureData(fp, me, texVertsList[layer], uvFaceVertsList[layer])
     else:
-        for f in me.faces:
+        meFaces = getFaces(me)
+        for f in meFaces:
             fp.write("f ")
             for v in f.vertices:
                 fp.write("%d " % (v+1))
@@ -770,7 +776,8 @@ def writeObjTextureData(fp, me, texVerts, uvFaceVerts):
     for vtn in range(nTexVerts):
         vt = texVerts[vtn]
         fp.write("vt %.4f %.4f\n" % (vt[0], vt[1]))
-    for f in me.faces:
+    meFaces = getFaces(me)
+    for f in meFaces:
         uvVerts = uvFaceVerts[f.index]
         fp.write("f ")
         for n,v in enumerate(f.vertices):
@@ -797,25 +804,27 @@ def printScale(fp, bob, scn, name, index, prop1, prop2):
 #
 
 def setupTexVerts(ob):
+    me = ob.data
     vertEdges = {}
     vertFaces = {}
-    for v in ob.data.vertices:
+    for v in me.vertices:
         vertEdges[v.index] = []
         vertFaces[v.index] = []
-    for e in ob.data.edges:
+    for e in me.edges:
         for vn in e.vertices:
             vertEdges[vn].append(e)
-    for f in ob.data.faces:
+    meFaces = getFaces(me)
+    for f in meFaces:
         for vn in f.vertices:
             vertFaces[vn].append(f)
     
     edgeFaces = {}
-    for e in ob.data.edges:
+    for e in me.edges:
         edgeFaces[e.index] = []
     faceEdges = {}
-    for f in ob.data.faces:
+    for f in meFaces:
         faceEdges[f.index] = []
-    for f in ob.data.faces:
+    for f in meFaces:
         for vn in f.vertices:
             for e in vertEdges[vn]:
                 v0 = e.vertices[0]
@@ -827,9 +836,9 @@ def setupTexVerts(ob):
                         faceEdges[f.index].append(e)
             
     faceNeighbors = {}
-    for f in ob.data.faces:
+    for f in meFaces:
         faceNeighbors[f.index] = []
-    for f in ob.data.faces:
+    for f in meFaces:
         for e in faceEdges[f.index]:
             for f1 in edgeFaces[e.index]:
                 if f1 != f:
@@ -837,22 +846,30 @@ def setupTexVerts(ob):
 
     uvFaceVertsList = []
     texVertsList = []
-    for uvtex in ob.data.uv_textures:
+    for index,uvtex in enumerate(me.uv_textures):
         uvFaceVerts = {}
         uvFaceVertsList.append(uvFaceVerts)
-        for f in ob.data.faces:
+        for f in meFaces:
             uvFaceVerts[f.index] = []
         vtn = 0
         texVerts = {}    
         texVertsList.append(texVerts)
-        for f in ob.data.faces:
-            uvf = uvtex.data[f.index]
-            vtn = findTexVert(uvf.uv1, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
-            vtn = findTexVert(uvf.uv2, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
-            vtn = findTexVert(uvf.uv3, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
-            if len(f.vertices) > 3:
-                vtn = findTexVert(uvf.uv4, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
-                
+        if BMeshAware:
+            uvloop = me.uv_loop_layers[index]
+            n = 0
+            for f in me.polygons:
+                for vn in f.vertices:
+                    uvv = uvloop.data[n]
+                    n += 1
+                    vtn = findTexVert(uvv.uv, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
+        else:
+            for f in me.faces:
+                uvf = uvtex.data[f.index]
+                vtn = findTexVert(uvf.uv1, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
+                vtn = findTexVert(uvf.uv2, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
+                vtn = findTexVert(uvf.uv3, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
+                if len(f.vertices) > 3:
+                    vtn = findTexVert(uvf.uv4, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob)
     return (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVertsList, texVertsList)     
 
 def findTexVert(uv, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob):
@@ -871,6 +888,7 @@ def findTexVert(uv, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob):
 #
 
 def exportBaseUvsPy(context):
+    checkBMeshAware()
     ob = context.object
     bpy.ops.object.mode_set(mode='OBJECT')
     scn = context.scene
@@ -894,7 +912,8 @@ def exportBaseUvsPy(context):
     fp.write("]\n")
     """
     fp.write("texFaces = [\n")
-    for f in ob.data.faces:
+    meFaces = getFaces(ob.data)
+    for f in meFaces:
         uvVerts = uvFaceVerts[f.index]
         fp.write("  ( ")
         for n,v in enumerate(f.vertices):
@@ -981,7 +1000,7 @@ def unwrapObject(ob, context):
     scn = context.scene
     old = scn.objects.active
     scn.objects.active = ob
-    uvtexs = ob.data.uv_textures
+    uvtexs = getUvTextures(ob.data)
     
     n = len(uvtexs)-1
     if n < scn.MCMaskLayer:
@@ -1002,25 +1021,33 @@ def unwrapObject(ob, context):
 #
 #   projectUVs(bob, pob, context):
 #   setUvLoc(pv, puv, table):
-#   getUvLoc(v, f, uvface):
+#   getUvLoc(v, f, uvface, uvtex, uvIndices):
 #
 
+def printItems(struct):
+    for (key,value) in struct.items():
+        print(key, value)
+    
+
 def projectUVs(bob, pob, context):
-    (bob1, data) = restoreData(context)
+    checkBMeshAware()
     print("Projecting %s => %s" % (bob.name, pob.name))
+    (bob1, data) = restoreData(context)
 
     (bVertEdges, bVertFaces, bEdgeFaces, bFaceEdges, bFaceNeighbors, bUvFaceVertsList, bTexVertsList) = setupTexVerts(bob)
     bUvFaceVerts = bUvFaceVertsList[0]
     bTexVerts = bTexVertsList[0]
     bNTexVerts = len(bTexVerts)
     table = {}
-    bUvTex = getModifiedUvTex(bob)
+    bModUvTex = getModifiedUvTex(bob)
+    bUvtex = getUvTextures(bob.data)[0]
+    bUvIndices = getUvIndices(bob)
     for (pv, exact, verts, wts, diff) in data:
         if exact:
             print("Exact", pv.index)
             vn0 = verts[0]
             for f0 in bVertFaces[vn0]:
-                uv0 = getUvLoc(v0, f0.vertices, bUvTex[f.index])
+                uv0 = getUvLoc(v0, f0, bModUvTex[f.index], bUvtex, bUvIndices)
                 table[pv.index] = (1, uv0, 1)
                 print(pv.index, table[pv.index])
                 break
@@ -1031,7 +1058,7 @@ def projectUVs(bob, pob, context):
             if (vn1 == 0) and (vn2 == 1) and (abs(wts[0]-1) < Epsilon):
                 uvVerts = []
                 for f0 in bVertFaces[vn0]:
-                    uv0 = getUvLoc(vn0, f0.vertices, bUvTex[f0.index])
+                    uv0 = getUvLoc(vn0, f0, bModUvTex[f0.index], bUvtex, bUvIndices)
                     uvVerts.append(uv0)
                 table[pv.index] = (2, uvVerts, wts)
                 continue
@@ -1040,9 +1067,9 @@ def projectUVs(bob, pob, context):
                     if (f1 == f0):
                         for f2 in bVertFaces[vn2]:
                             if (f2 == f0):
-                                uv0 = getUvLoc(vn0, f0.vertices, bUvTex[f0.index])
-                                uv1 = getUvLoc(vn1, f0.vertices, bUvTex[f0.index])
-                                uv2 = getUvLoc(vn2, f0.vertices, bUvTex[f0.index])
+                                uv0 = getUvLoc(vn0, f0, bModUvTex[f0.index], bUvtex, bUvIndices)
+                                uv1 = getUvLoc(vn1, f0, bModUvTex[f0.index], bUvtex, bUvIndices)
+                                uv2 = getUvLoc(vn2, f0, bModUvTex[f0.index], bUvtex, bUvIndices)
                                 table[pv.index] = (0, [uv0,uv1,uv2], wts)
         
     (pVertEdges, pVertFaces, pEdgeFaces, pFaceEdges, pFaceNeighbors, pUvFaceVertsList, pTexVertsList) = setupTexVerts(pob)
@@ -1055,13 +1082,15 @@ def projectUVs(bob, pob, context):
     for vtn in range(pNTexVerts):
         pTexVertUv[vtn] = None
         
-    pUvtex = pob.data.uv_textures[maskLayer]
+    pUvtex = getUvTextures(pob.data)[maskLayer]
     pverts = pob.data.vertices
     bverts = bob.data.vertices
     bedges = bob.data.edges
     remains = {}
     zero = (0,0)
-    for pf in pob.data.faces:
+    uvIndex = 0
+    pMeFaces = getFaces(pob.data)
+    for pf in pMeFaces:
         fn = pf.index
         rmd = {}
         rmd[0] = None
@@ -1070,36 +1099,44 @@ def projectUVs(bob, pob, context):
         rmd[3] = None
         remains[fn] = rmd
         
-        pvn0 = pf.vertices[0]
-        pvn1 = pf.vertices[1]
-        pvn2 = pf.vertices[2]    
-        uv0 = getSingleUvLoc(pvn0, table)
-        uv1 = getSingleUvLoc(pvn1, table)
-        uv2 = getSingleUvLoc(pvn2, table)
-        if len(pf.vertices) > 3:
-            pvn3 = pf.vertices[3]
-            uv3 = getSingleUvLoc(pvn3, table)
-        else:
-            uv3 = zero
-            
-        uvf = pUvtex.data[fn]
+        if BMeshAware:
+            for pvn in pf.vertices:
+                uv0 = getSingleUvLoc(pvn, table)
+                uv = trySetUv(pvn, fn, None, rmd, 0, uv0, pVertTexVerts, pTexVertUv, pSeamVertEdges)
+                if not uv: 
+                    uv = uv0
+                pUvtex.data[uvIndex].uv = uv 
+                uvIndex += 1
+        else:                
+            pvn0 = pf.vertices[0]
+            pvn1 = pf.vertices[1]
+            pvn2 = pf.vertices[2]    
+            uv0 = getSingleUvLoc(pvn0, table)
+            uv1 = getSingleUvLoc(pvn1, table)
+            uv2 = getSingleUvLoc(pvn2, table)
+            if len(pf.vertices) > 3:
+                pvn3 = pf.vertices[3]
+                uv3 = getSingleUvLoc(pvn3, table)
+            else:
+                uv3 = zero
 
-        uv0 = trySetUv(pvn0, fn, uvf, rmd, 0, uv0, pVertTexVerts, pTexVertUv, pSeamVertEdges)
-        if uv0: 
-            uvf.uv1 = uv0
-            
-        uv1 = trySetUv(pvn1, fn, uvf, rmd, 1, uv1, pVertTexVerts, pTexVertUv, pSeamVertEdges)
-        if uv1: 
-            uvf.uv2 = uv1
+            uvf = pUvtex.data[fn]
+            uv0 = trySetUv(pvn0, fn, uvf, rmd, 0, uv0, pVertTexVerts, pTexVertUv, pSeamVertEdges)
+            if uv0: 
+                uvf.uv1 = uv0            
+            uv1 = trySetUv(pvn1, fn, uvf, rmd, 1, uv1, pVertTexVerts, pTexVertUv, pSeamVertEdges)
+            if uv1: 
+                uvf.uv2 = uv1
+            uv2 = trySetUv(pvn2, fn, uvf, rmd, 2, uv2, pVertTexVerts, pTexVertUv, pSeamVertEdges)
+            if uv2:
+                uvf.uv3 = uv2
+            if len(pf.vertices) > 3:
+                uv3 = trySetUv(pvn3, fn, uvf, rmd, 3, uv3, pVertTexVerts, pTexVertUv, pSeamVertEdges)
+                if uv3:
+                    uvf.uv4 = uv3                        
 
-        uv2 = trySetUv(pvn2, fn, uvf, rmd, 2, uv2, pVertTexVerts, pTexVertUv, pSeamVertEdges)
-        if uv2:
-            uvf.uv3 = uv2
-
-        if len(pf.vertices) > 3:
-            uv3 = trySetUv(pvn3, fn, uvf, rmd, 3, uv3, pVertTexVerts, pTexVertUv, pSeamVertEdges)
-            if uv3:
-                uvf.uv4 = uv3
+    if BMeshAware:
+        return
 
     #(bSeamEdgeFaces, bSeamVertEdges, bBoundaryVertEdges) = getSeamData(bob.data, bUvFaceVerts, bEdgeFaces)
     (bVertList, bPairList, bEdgeList) = getSeams(bob, context.scene)  
@@ -1117,7 +1154,7 @@ def projectUVs(bob, pob, context):
                             if pTexVertUv[vt]:
                                 uv = pTexVertUv[vt]
                             else:
-                                uv = getSeamVertFaceUv(pv, pe, pf, pVertTexVerts, pTexVertUv, be, bEdgeFaces, bUvTex, pverts, bverts)
+                                uv = getSeamVertFaceUv(pv, pe, pf, pVertTexVerts, pTexVertUv, be, bEdgeFaces, bModUvTex, pverts, bverts)
                                 pTexVertUv[vt] = uv
                             setUvVert(uvf, n, uv)
                             remains[fn][n] = None
@@ -1134,9 +1171,7 @@ def projectUVs(bob, pob, context):
                 else:
                     pTexVertUv[vt] = uv
                 setUvVert(uvf, n, uv)
-    
-    print("Projection %s => %s done" % (bob.name, pob.name))
-    return
+    return                
 
 #
 #   getModifiedUvTex(bob):
@@ -1155,18 +1190,18 @@ class CUvTex:
             (self.uv1[0], self.uv1[1], self.uv2[0], self.uv2[1], self.uv3[0], self.uv3[1], self.uv4[0], self.uv4[1]))
         
 def getModifiedUvTex(bob):
-    bUvTex0 = bob.data.uv_textures[0].data    
-    bUvTex = {}
+    bUvTex0 = getUvTextures(bob.data)[0].data    
+    bModUvTex = {}
     for fn in range(NBodyFaces):
-        bUvTex[fn] = bUvTex0[fn]
-    faces = bob.data.faces
-    nFaces = len(faces)
+        bModUvTex[fn] = bUvTex0[fn]
+    meFaces = getFaces(bob.data)
+    nFaces = len(meFaces)
     nModFaces = len(base_uv.texFaces)
     for n in range(nModFaces):
-        bUvTex[n+NBodyFaces] = CUvTex(base_uv.texFaces[n])
+        bModUvTex[n+NBodyFaces] = CUvTex(base_uv.texFaces[n])
     for fn in range(NBodyFaces+nModFaces, nFaces):        
-        bUvTex[fn] = bUvTex0[fn]
-    return bUvTex
+        bModUvTex[fn] = bUvTex0[fn]
+    return bModUvTex
      
 #
 #   trySetUv(pv, fn, uvf, rmd, n, uv, vertTexVerts, texVertUv, seamVertEdges):        
@@ -1200,10 +1235,10 @@ def findClosestEdge(pv, edgeList, verts, edges):
         
 
 #
-#   getSeamVertFaceUv(pv, pe, pf, pVertTexVerts, pTexVertUv, be, bEdgeFaces, bUvTex, pverts, bverts):       
+#   getSeamVertFaceUv(pv, pe, pf, pVertTexVerts, pTexVertUv, be, bEdgeFaces, bModUvTex, pverts, bverts):       
 #
 
-def getSeamVertFaceUv(pv, pe, pf, pVertTexVerts, pTexVertUv, be, bEdgeFaces, bUvTex, pverts, bverts):
+def getSeamVertFaceUv(pv, pe, pf, pVertTexVerts, pTexVertUv, be, bEdgeFaces, bModUvTex, pverts, bverts):
     dist = {}
     for bf in bEdgeFaces[be.index]:
         dist[bf.index] = 0
@@ -1213,7 +1248,7 @@ def getSeamVertFaceUv(pv, pe, pf, pVertTexVerts, pTexVertUv, be, bEdgeFaces, bUv
         if puv:
             for bf in bEdgeFaces[be.index]:
                 for n,bvn in enumerate(bf.vertices):
-                    buvf = bUvTex[bf.index]
+                    buvf = bModUvTex[bf.index]
                     buv = getUvVert(buvf, n)
                     duv = buv - puv
                     dist[bf.index] += duv.length
@@ -1228,7 +1263,7 @@ def getSeamVertFaceUv(pv, pe, pf, pVertTexVerts, pTexVertUv, be, bEdgeFaces, bUv
     bv1 = bverts[be.vertices[1]]
     m0 = getFaceIndex(bv0.index, best)
     m1 = getFaceIndex(bv1.index, best)
-    buvf = bUvTex[best.index]
+    buvf = bModUvTex[best.index]
     buv0 = getUvVert(buvf, m0)
     buv1 = getUvVert(buvf, m1)
     vec0 = pv.co - bv0.co
@@ -1305,7 +1340,8 @@ def getSeamData(me, uvFaceVerts, edgeFaces):
         vertTexVerts[vn] = {}
         v.select = False
 
-    for f in me.faces:
+    meFaces = getFaces(me)
+    for f in meFaces:
         fn = f.index
         for vn in f.vertices:
             n = getFaceIndex(vn, f)
@@ -1378,23 +1414,40 @@ def getSingleUvLoc(vn, table):
             print(buvs[0], wts[0])
             halt
         
-def getUvLoc(vn, f, uvface):
-    if vn == f[0]:
-        return uvface.uv1
-    elif vn == f[1]:
-        return uvface.uv2
-    elif vn == f[2]:
-        return uvface.uv3
-    elif vn == f[3]:
-        return uvface.uv4
+def getUvLoc(vn, f, uvface, uvtex, uvIndices):
+    verts = f.vertices
+    if BMeshAware:
+        uvIndex = uvIndices[f.index]
+        for n,vn in enumerate(verts):
+            if vn == verts[n]:
+                return uvtex.data[uvIndex+n].uv        
+    else:
+        if vn == verts[0]:
+            return uvface.uv1
+        elif vn == verts[1]:
+            return uvface.uv2
+        elif vn == verts[2]:
+            return uvface.uv3
+        elif vn == verts[3]:
+            return uvface.uv4
     raise NameError("Vertex %d not in face %d??" % (vn,f))
 
+def getUvIndices(ob):
+    if not BMeshAware:
+        return {}
+    uvIndices = {}
+    uvIndex = 0
+    for f in ob.data.polygons:
+        uvIndices[f.index] = uvIndex
+        uvIndex += len(f.vertices)
+    return uvIndices        
 
 #
 #   recoverSeams(context):
 #
 
 def recoverSeams(context):
+    checkBMeshAware()
     ob = getHuman(context)
     scn = context.scene
     (vertList, pairList, edgeList) = getSeams(ob, scn)
@@ -1416,8 +1469,9 @@ def coordList(vertList, verts):
     
 def getSeams(ob, scn):
     verts = ob.data.vertices
-    uvtex = ob.data.uv_textures[0]
-    faceTable = createFaceTable(ob.data.vertices, ob.data.faces)
+    uvtex = getUvTextures(ob.data)[0]
+    meFaces = getFaces(ob.data)
+    faceTable = createFaceTable(ob.data.vertices, meFaces)
     onEdges = {}
     for v in verts:
         onEdges[v.index] = False
@@ -1444,24 +1498,38 @@ def isOnEdge(v, faceTable, uvtex):
     if v.index >= NBodyVerts:
         return False
     uvloc = None
-    for f in faceTable[v.index]:
-        uvface = uvtex.data[f.index]
-        for n,vn in enumerate(f.vertices):
-            if vn == v.index:
-                if n == 0:
-                    uvnloc = uvface.uv1
-                elif n == 1:
-                    uvnloc = uvface.uv2
-                elif n == 2:
-                    uvnloc = uvface.uv3
-                elif n == 3:
-                    uvnloc = uvface.uv4
-                if uvloc:
-                    dist = uvnloc - uvloc
-                    if dist.length > 0.01:
-                        return True
-                else:
-                    uvloc = uvnloc
+    if BMeshAware:
+        uvIndex = -1
+        for f in faceTable[v.index]:
+            for vn in f.vertices:
+                uvIndex += 1
+                if vn == v.index:
+                    uvnloc = uvtex.data[uvIndex].uv
+                    if uvloc:
+                        dist = uvnloc - uvloc
+                        if dist.length > 0.01:
+                            return True
+                    else:
+                        uvloc = uvnloc
+    else:
+        for f in faceTable[v.index]:
+            uvface = uvtex.data[f.index]
+            for n,vn in enumerate(f.vertices):
+                if vn == v.index:
+                    if n == 0:
+                        uvnloc = uvface.uv1
+                    elif n == 1:
+                        uvnloc = uvface.uv2
+                    elif n == 2:
+                        uvnloc = uvface.uv3
+                    elif n == 3:
+                        uvnloc = uvface.uv4
+                    if uvloc:
+                        dist = uvnloc - uvloc
+                        if dist.length > 0.01:
+                            return True
+                    else:
+                        uvloc = uvnloc
     return False                            
 
 #
@@ -1469,6 +1537,7 @@ def isOnEdge(v, faceTable, uvtex):
 #
 
 def makeClothes(context):
+    checkBMeshAware()
     (bob, pob) = getObjectPair(context)
     scn = context.scene
     checkObjectOK(bob, context)
@@ -1552,6 +1621,7 @@ def checkSingleVGroups(pob):
 #
 
 def offsetCloth(context):
+    checkBMeshAware()
     (bob, pob) = getObjectPair(context)
     bverts = bob.data.vertices
     pverts = pob.data.vertices    
@@ -1620,7 +1690,8 @@ def offsetCloth(context):
 
 def writeFaces(pob, fp):
     fp.write("# faces\n")
-    for f in pob.data.faces:
+    meFaces = getFaces(pob.data)
+    for f in meFaces:
         for v in f.vertices:
             fp.write(" %d" % (v+1))
         fp.write("\n")
@@ -2031,6 +2102,7 @@ def printVertNums(context):
 #
 
 def deleteHelpers(context):
+    checkBMeshAware()
     ob = context.object
     scn = context.scene
     #if not isHuman(ob):
@@ -2053,6 +2125,7 @@ def deleteHelpers(context):
 #
 
 def removeVertexGroups(context, removeType):
+    checkBMeshAware()
     ob = context.object
     bpy.ops.object.mode_set(mode='OBJECT')
     if removeType == 'All':
@@ -2071,6 +2144,7 @@ def removeVertexGroups(context, removeType):
 #
 
 def autoVertexGroups(context):
+    checkBMeshAware()
     ob = context.object
     scn = context.scene
     ishuman = isHuman(ob)
@@ -2121,7 +2195,8 @@ def addHelperVerts(me, verts):
     return
     
 def addBodyVerts(me, verts):
-    for f in me.faces:
+    meFaces = getFaces(me)
+    for f in meFaces:
         if len(f.vertices) < 4:
             continue
         for vn in f.vertices:
@@ -2134,6 +2209,7 @@ def addBodyVerts(me, verts):
 #
 
 def checkAndVertexDiamonds(ob):
+    checkBMeshAware()
     print("Unvertex diamonds in %s" % ob)
     bpy.ops.object.mode_set(mode='EDIT')
     bpy.ops.mesh.select_all(action='DESELECT')
@@ -2200,6 +2276,27 @@ def saveDefaultSettings(context):
     fp.close()
     return
     
+#
+#   BMesh
+#
+
+def checkBMeshAware():
+    global BMeshAware
+    print("Blender r%s" % bpy.app.build_revision)
+    BMeshAware = (int(bpy.app.build_revision) > 44136)    
+    
+def getFaces(me):
+    if BMeshAware:
+        return me.polygons
+    else:
+        return me.faces
+        
+def getUvTextures(me):
+    if BMeshAware:
+        return me.uv_loop_layers
+    else:
+        return me.uv_textures
+
 #
 #   initInterface():
 #
