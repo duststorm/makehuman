@@ -247,6 +247,15 @@ def initTargetCharacter(rig):
     rig['McpLegBentOut'] = 0.0
     return
     
+def ensureTargetCharacterInited(rig):
+    try:
+        rig['McpTargetRig']
+        return
+    except:
+        None
+    initTargetCharacter(rig)    
+    return
+    
 class VIEW3D_OT_McpInitTargetCharacterButton(bpy.types.Operator):
     bl_idname = "mcp.init_target_character"
     bl_label = "Initialize target character"
@@ -272,6 +281,7 @@ class VIEW3D_OT_McpUnInitTargetCharacterButton(bpy.types.Operator):
 #
 
 def assocTargetBones(rig, names, xtraAssoc):
+    ensureTargetCharacterInited(rig)
     boneAssoc = []
     print("N", names)
     print(rig)

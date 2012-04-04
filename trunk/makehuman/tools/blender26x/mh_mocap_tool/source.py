@@ -218,11 +218,10 @@ def buildSrcArmature(context, rig):
     return (amt, "MySource", fixes)
 
 #
-#    ensureSourceInited(context):
+#    ensureSourceInited(scn):
 #
 
-def ensureSourceInited(context):
-    scn = context.scene
+def ensureSourceInited(scn):
     try:
         scn.McpGuessSrcRig
         return
@@ -237,19 +236,22 @@ def ensureSourceInited(context):
 #    class VIEW3D_OT_McpScanRigButton(bpy.types.Operator):
 #
 
+def scanSourceRig(scn, ob):        
+    (the.sourceProps, the.sourceEnums) = makeSourceBoneList(scn,  ob)
+    scn['McpSrcArmBentDown'] = 0.0
+    scn['McpSrcArmRoll'] = 0.0
+    scn['McpSrcLegBentOut'] = 0.0
+    scn['McpSrcLegRoll'] = 0.0
+    ensureSourceInited(scn)
+    return
+
 class VIEW3D_OT_McpScanRigButton(bpy.types.Operator):
     bl_idname = "mcp.scan_rig"
     bl_label = "Scan source rig"
     bl_options = {'REGISTER'}
 
     def execute(self, context):
-        scn = context.scene
-        (the.sourceProps, the.sourceEnums) = makeSourceBoneList(scn,  context.object)
-        scn['McpSrcArmBentDown'] = 0.0
-        scn['McpSrcArmRoll'] = 0.0
-        scn['McpSrcLegBentOut'] = 0.0
-        scn['McpSrcLegRoll'] = 0.0
-        ensureSourceInited(context)
+        scanSourceRig(context,scene, context.object)
         return{'FINISHED'}    
 
 #
@@ -308,7 +310,7 @@ class VIEW3D_OT_McpLoadSaveSourceBonesButton(bpy.types.Operator, ImportHelper):
     filepath = StringProperty(name="File Path", maxlen=1024, default="")
 
     def execute(self, context):
-        ensureSourceInited(context)
+        ensureSourceInited(context.scene)
         if self.loadSave == 'save':
             saveSourceBones(context, self.properties.filepath)
         else:

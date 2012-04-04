@@ -590,7 +590,7 @@ class VIEW3D_OT_RenameBvhButton(bpy.types.Operator):
                 break
         if not trgRig:
             print("No target rig selected")
-            return
+            return{'FINISHED'}    
         renameAndRescaleBvh(context, srcRig, trgRig)
         if scn.McpRescale:
             simplify.rescaleFCurves(context, srcRig, scn.McpRescaleFactor)
