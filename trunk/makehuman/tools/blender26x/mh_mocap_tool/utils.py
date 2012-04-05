@@ -34,6 +34,9 @@ from mathutils import *
 #
 
 def printMat3(string, mat, pad=""):
+    if not mat:
+        print("%s None" % string)
+        return
     print("%s " % string)
     mc = "%s  [" % pad
     for m in range(3):
@@ -43,6 +46,9 @@ def printMat3(string, mat, pad=""):
         print(s+"]")
  
 def printMat4(string, mat, pad=""):
+    if not mat:
+        print("%s None" % string)
+        return
     print("%s%s " % (pad, string))
     mc = "%s  [" % pad
     for m in range(4):
