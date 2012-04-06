@@ -261,7 +261,12 @@ class LoadPanel(bpy.types.Panel):
         row.prop(scn, "McpDefaultSS")
         layout.prop(scn, "McpNewRetarget")
         if scn.McpNewRetarget:
+            row = layout.row()
+            row.prop(scn, "McpUseSpineOffset")
+            row.prop(scn, "McpUseClavOffset")
+            layout.prop(scn, "McpRetargetIK")
             layout.operator("mcp.new_retarget_mhx")
+            #layout.operator("mcp.retarget_ik")
             layout.operator("mcp.new_load_retarget_simplify")
             layout.operator("mcp.fix_ankles")
         else:

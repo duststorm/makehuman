@@ -79,26 +79,11 @@ class CAnimation:
 #
 #
 
-KeepRotationOffset = [
-    "Root", "Pelvis", "Hips",
-    "Spine1",
-    "Spine2", "Spine3",
-    "Neck", "Head",
-    "Clavicle_L", "Clavicle_R",
-    "Foot_L", "Foot_R", "Toe_L", "Toe_R"
-]
-
-SpineBone = [
-    "Spine1",
-    "Spine2", "Spine3",
-    "Neck", "Head",
-    "Foot_L", "Foot_R", 
-    "Toe_L", "Toe_R"
-]
-
-IgnoreBones = [
-    "Toe_L", "Toe_R"
-]
+KeepRotationOffset = ["Root", "Pelvis", "Hips"]
+ClavBones = ["Clavicle_L", "Clavicle_R"]
+SpineBones = ["Spine1", "Spine2", "Spine3", "Neck", "Head"]
+FootBones = ["Foot_L", "Foot_R", "Toe_L", "Toe_R"]
+IgnoreBones = ["Toe_L", "Toe_R"]
 
 #
 #
@@ -222,21 +207,24 @@ def collectSrcMats(anim, frames, scn):
     return                
 
 #
-#   retargetMatrices(anim, frames, scn):
+#   retargetMatrices(anim, frames, first, doFK, doIK, scn):
 #
 
-def retargetMatrices(anim, frames, scn):
+def retargetMatrices(anim, frames, first, doFK, doIK, scn):
     for frame in frames:
         if frame % 100 == 0:
             print("Retarget", int(frame))
-        for boneData in anim.boneDataList:
-            retargetFkBone(boneData, frame)
-        retargetIkBones(anim.trgRig, frame)        
+        if doFK:
+            for boneData in anim.boneDataList:
+                retargetFkBone(boneData, frame)
+        if doIK:
+            retargetIkBones(anim.trgRig, frame, first) 
+            first = False
     return               
  
   
 #
-#   setupFkBones(srcRig, trgRig, boneAssoc, parAssoc, anim):
+#   setupFkBones(srcRig, trgRig, boneAssoc, parAssoc, anim, scn):
 #
     
 def getParent(parName, parAssoc, trgRig, anim):
@@ -254,7 +242,16 @@ def getParent(parName, parAssoc, trgRig, anim):
     return getParent(parAssoc[trgParent.name], parAssoc, trgRig, anim)
     
     
-def setupFkBones(srcRig, trgRig, boneAssoc, parAssoc, anim):
+def setupFkBones(srcRig, trgRig, boneAssoc, parAssoc, anim, scn):
+    keepOffsets = KeepRotationOffset + FootBones
+    keepOffsInverts = []
+    if scn.McpUseSpineOffset:
+        keepOffsets += SpineBones
+        keepOffsInverts += SpineBones
+    if scn.McpUseClavOffset:
+        keepOffsets += ClavBones
+        keepOffsInverts += ClavBones
+        
     for (trgName, srcName) in boneAssoc:
         try:
             trgBone = trgRig.pose.bones[trgName]
@@ -288,10 +285,10 @@ def setupFkBones(srcRig, trgRig, boneAssoc, parAssoc, anim):
                 boneData.trgOffset = parRestInv * Matrix.Translation(offs) * parRest
                 boneData.trgBakeMat = parRestInv * boneData.trgRestMat
 
-        if trgName in KeepRotationOffset:        
+        if trgName in keepOffsets:        
             offs = trgBone.bone.matrix_local*srcBone.bone.matrix_local.inverted()
             boneData.rotOffset = boneData.trgRestInv * offs * boneData.trgRestMat
-            if trgParent and (trgName in SpineBone):                
+            if trgName in keepOffsInverts:
                 boneData.rotOffsInv = boneData.rotOffset.inverted()
                         
         boneData.trgBakeInv = boneData.trgBakeMat.inverted()   
@@ -299,15 +296,14 @@ def setupFkBones(srcRig, trgRig, boneAssoc, parAssoc, anim):
 
 
 #
-#    retargetMhxRig(context, srcRig, trgRig):
+#    retargetMhxRig(context, srcRig, trgRig, doFK, doIK):
 #
 
-def retargetMhxRig(context, srcRig, trgRig):
+def setupMhxAnimation(scn, srcRig, trgRig):
     bpy.ops.object.mode_set(mode='POSE')
     bpy.ops.pose.rot_clear()
     bpy.ops.pose.loc_clear()
 
-    scn = context.scene
     if scn.McpGuessSrcRig:
         source.scanSourceRig(scn, srcRig)
     source.setArmature(srcRig)
@@ -315,11 +311,19 @@ def retargetMhxRig(context, srcRig, trgRig):
     if trgRig.animation_data:
         trgRig.animation_data.action = None
 
-    frames = utils.activeFrames(srcRig)
     anim = CAnimation(srcRig, trgRig)
     (boneAssoc, ikBoneAssoc, parAssoc, rolls, mats, ikBones, ikParents) = target.makeTargetAssoc(trgRig, scn)
- 
-    setupFkBones(srcRig, trgRig, boneAssoc, parAssoc, anim)
+    setupFkBones(srcRig, trgRig, boneAssoc, parAssoc, anim, scn)
+    return anim
+    
+
+def retargetMhxRig(context, srcRig, trgRig, doFK, doIK):
+    scn = context.scene
+    if doFK:
+        anim = setupMhxAnimation(scn, srcRig, trgRig)
+    else:
+        anim = CAnimation(srcRig, trgRig)
+    frames = utils.activeFrames(srcRig)
 
     scn.objects.active = trgRig
     scn.update()
@@ -336,11 +340,13 @@ def retargetMhxRig(context, srcRig, trgRig):
     oldData = changeTargetData(trgRig)
     frameBlock = frames[0:100]
     index = 0
+    first = True
     try:
         while frameBlock:
             collectSrcMats(anim, frameBlock, scn)
-            retargetMatrices(anim, frameBlock, scn)
+            retargetMatrices(anim, frameBlock, first, doFK, doIK, scn)
             index += 100
+            first = False
             frameBlock = frames[index:index+100]
             
         scn.frame_current = frames[0]
@@ -350,10 +356,13 @@ def retargetMhxRig(context, srcRig, trgRig):
         restoreTargetData(trgRig, oldData)
             
     utils.setInterpolation(trgRig)
-    act = trgRig.animation_data.action
-    act.name = trgRig.name[:4] + srcRig.name[2:]
-    act.use_fake_user = True
-    print("Retargeted %s --> %s" % (srcRig, trgRig))
+    if doFK:
+        act = trgRig.animation_data.action
+        act.name = trgRig.name[:4] + srcRig.name[2:]
+        act.use_fake_user = True
+        print("Retargeted %s --> %s" % (srcRig, trgRig))
+    else:
+        print("IK retargeted %s" % trgRig)
     return
 
 #
@@ -522,20 +531,17 @@ def ik2fkLeg(rig, ikBones, fkBones, legIkToAnkle, suffix, frame):
     (uplegIk, lolegIk, kneePt, ankleIk, legIk, legFk, footIk, toeIk) = ikBones
     (uplegFk, lolegFk, kneePtFk, footFk, toeFk) = fkBones
 
-    if legIkToAnkle:
-        matchPoseTranslation(ankleIk, footFk, frame)
-    else:
-        ankleIk.location = (0,0,0)
-        ankleIk.rotation_quaternion = (1,0,0,0)
     matchPoseTranslation(legIk, legFk, frame)
     matchPoseRotation(legIk, legFk, frame)  
     matchPoseReverse(toeIk, toeFk, False, frame)
     matchPoseReverse(footIk, footFk, True, frame)
     matchPoseTranslation(kneePt, kneePtFk, frame)
+    if legIkToAnkle:
+        matchPoseTranslation(ankleIk, footFk, frame)
     return
    
    
-def retargetIkBones(rig, frame):
+def retargetIkBones(rig, frame, first):
     lArmIkBones = getSnapBones(rig, "ArmIK", "_L")
     lArmFkBones = getSnapBones(rig, "ArmFK", "_L")
     rArmIkBones = getSnapBones(rig, "ArmIK", "_R")
@@ -549,8 +555,8 @@ def retargetIkBones(rig, frame):
     bpy.ops.object.mode_set(mode='POSE')
     ik2fkArm(rig, lArmIkBones, lArmFkBones, "_L", frame)
     ik2fkArm(rig, rArmIkBones, rArmFkBones, "_R", frame)
-    ik2fkLeg(rig, lLegIkBones, lLegFkBones, rig["&LegIkToAnkle_L"], "_L", frame)
-    ik2fkLeg(rig, rLegIkBones, rLegFkBones, rig["&LegIkToAnkle_R"], "_R", frame)
+    ik2fkLeg(rig, lLegIkBones, lLegFkBones, (first or rig["&LegIkToAnkle_L"]), "_L", frame)
+    ik2fkLeg(rig, rLegIkBones, rLegFkBones, (first or rig["&LegIkToAnkle_R"]), "_R", frame)
     return        
         
 #
@@ -581,8 +587,8 @@ def fixAnkles(rig, scn):
     layers = list(rig.data.layers)
     try:
         rig.data.layers = 32*[True]
-        clearInverse(rig, rig.pose.bones["Ankle_L"])
-        clearInverse(rig, rig.pose.bones["Ankle_R"])
+        setInverse(rig, rig.pose.bones["Ankle_L"])
+        setInverse(rig, rig.pose.bones["Ankle_R"])
         scn.frame_current = scn.frame_current
     finally:
         rig.data.layers = layers
@@ -626,7 +632,7 @@ def loadRetargetSimplify(context, filepath):
     scn = context.scene
     (srcRig, trgRig) = load.readBvhFile(context, filepath, scn, False)
     load.renameAndRescaleBvh(context, srcRig, trgRig)
-    retargetMhxRig(context, srcRig, trgRig)
+    retargetMhxRig(context, srcRig, trgRig, True, scn.McpRetargetIK)
     scn = context.scene
     if scn.McpDoSimplify:
         simplify.simplifyFCurves(context, trgRig, False, False)
@@ -652,7 +658,17 @@ class VIEW3D_OT_NewRetargetMhxButton(bpy.types.Operator):
         target.guessTargetArmature(trgRig, context.scene)
         for srcRig in context.selected_objects:
             if srcRig != trgRig:
-                retargetMhxRig(context, srcRig, trgRig)
+                retargetMhxRig(context, srcRig, trgRig, True, scn.McpRetargetIK)
+        return{'FINISHED'}    
+
+
+class VIEW3D_OT_RetargetIKButton(bpy.types.Operator):
+    bl_idname = "mcp.retarget_ik"
+    bl_label = "Retarget IK bones"
+
+    def execute(self, context):
+        rig = context.object
+        retargetMhxRig(context, rig, rig, False, True)
         return{'FINISHED'}    
 
 

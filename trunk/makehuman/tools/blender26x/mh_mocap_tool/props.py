@@ -64,7 +64,22 @@ def initInterface(context):
         name="Simplify FCurves", 
         description="Simplify FCurves",
         default=True)
+
+    bpy.types.Scene.McpUseSpineOffset = BoolProperty(
+        name="Spine Offsets", 
+        description="Use offset for spine bones",
+        default=True)        
         
+    bpy.types.Scene.McpUseClavOffset = BoolProperty(
+        name="Clavicle Offsets", 
+        description="Use offset for clavicles",
+        default=True)        
+        
+    bpy.types.Scene.McpRetargetIK = BoolProperty(
+        name="Retarget IK", 
+        description="Include IK bones in retargeting",
+        default=True)        
+                
     bpy.types.Scene.McpApplyFixes = BoolProperty(
         name="Apply Found Fixes", 
         description="Apply found fixes (old retarget only)",
