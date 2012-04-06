@@ -211,7 +211,7 @@ def collectSrcMats(anim, frames, scn):
         for frame in frames:
             scn.frame_set(frame)
             if frame % 100 == 0:
-                print("Collect Src", frame)
+                print("Collect", int(frame))
             for boneData in anim.boneDataList:
                 mat = CMatrixGroup(boneData.srcPoseBone.matrix, frame)
                 boneData.matrices[frame] = mat
@@ -220,17 +220,17 @@ def collectSrcMats(anim, frames, scn):
     return                
 
 #
-#   retargetMats(anim, frames):
+#   retargetMatrices(anim, frames, scn):
 #
 
-def retargetMats(anim, frames):
+def retargetMatrices(anim, frames, scn):
     for frame in frames:
         if frame % 100 == 0:
-            print("Retarget FK", frame)
+            print("Retarget", int(frame))
         for boneData in anim.boneDataList:
             retargetFkBone(boneData, frame)
         retargetIkBones(anim.trgRig, frame)        
-    return                
+    return               
  
   
 #
@@ -311,7 +311,6 @@ def retargetMhxRig(context, srcRig, trgRig):
     print("Retarget %s --> %s" % (srcRig, trgRig))
     if trgRig.animation_data:
         trgRig.animation_data.action = None
-    oldProps = mhxPropertiesReset(trgRig)
 
     frames = utils.activeFrames(srcRig)
     anim = CAnimation(srcRig, trgRig)
@@ -325,16 +324,25 @@ def retargetMhxRig(context, srcRig, trgRig):
     bpy.ops.pose.select_all(action='DESELECT')
     for name in ["Root", "Hips", "Pelvis"]:
         trgRig.data.bones[name].select = True
-    
+
+    try:
+        scn.frame_current = frames[0]
+    except:
+        print("No frames found. Quitting.")
+        return
     oldData = changeTargetData(trgRig)
     frameBlock = frames[0:100]
     index = 0
     try:
         while frameBlock:
             collectSrcMats(anim, frameBlock, scn)
-            retargetMats(anim, frameBlock)
+            retargetMatrices(anim, frameBlock, scn)
             index += 100
             frameBlock = frames[index:index+100]
+            
+        scn.frame_current = frames[0]
+        setInverse(trgRig, trgRig.pose.bones["Ankle_L"])
+        setInverse(trgRig, trgRig.pose.bones["Ankle_R"])
     finally:                
         restoreTargetData(trgRig, oldData)
             
@@ -345,7 +353,43 @@ def retargetMhxRig(context, srcRig, trgRig):
     print("Retargeted %s --> %s" % (srcRig, trgRig))
     return
 
+#
+#   changeTargetData(rig):    
+#   restoreTargetData(rig, data):
+#
+    
 def changeTargetData(rig):    
+    tempProps = [
+        ("&RotationLimits", 0.0),
+        ("&ArmIk_L", 0.0),
+        ("&ArmIk_R", 0.0),
+        ("&LegIk_L", 0.0),
+        ("&LegIk_R", 0.0),
+        ("&SpineIk", 0),
+        ("&SpineInvert", 0),
+        ("&ElbowPlant_L", 0),
+        ("&ElbowPlant_R", 0),
+        ]
+
+    props = []
+    for (key, value) in tempProps:
+        try:
+            props.append((key, rig[key]))
+            rig[key] = value
+        except KeyError:
+            pass
+
+    permProps = [
+        ("&HandFollowsShoulder", 0),
+        ("&HandFollowsWrist", 0),
+        ("&FootFollowsHip", 0),
+        ("&FootFollowsFoot", 0),
+        ]
+
+    for (key, value) in permProps:
+        rig[key+"_L"] = value
+        rig[key+"_R"] = value
+ 
     layers = list(rig.data.layers)
     rig.data.layers = 32*[True]
     locks = []
@@ -364,11 +408,15 @@ def changeTargetData(rig):
         pb.lock_location = [False, False, False]
         pb.lock_rotation = [False, False, False]
         pb.lock_scale = [False, False, False]
-    return (layers, locks)
+    return (props, layers, locks)
     
 def restoreTargetData(rig, data):
-    (rig.data.layers, locks) = data
+    (props, rig.data.layers, locks) = data
+    
+    for (key,value) in props:
+        rig[key] = value
     return
+    
     for lock in locks:
         (pb, lockLoc, lockRot, lockScale, mode, constraints) = lock
         pb.lock_location = lockLoc
@@ -452,125 +500,47 @@ def setPoseScale(pb, mat, frame):
 def matchPoseTranslation(pb, tarPb, frame):
     mat = getPoseMatrixInOtherSpace(tarPb.matrix, pb)
     setPoseTranslation(pb, mat, frame)
-    bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.mode_set(mode='POSE')
+    #bpy.ops.object.mode_set(mode='OBJECT')
+    #bpy.ops.object.mode_set(mode='POSE')
 
 def matchPoseRotation(pb, tarPb, frame):
     mat = getPoseMatrixInOtherSpace(tarPb.matrix, pb)
     setPoseRotation(pb, mat, frame)
-    bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.mode_set(mode='POSE')
+    #bpy.ops.object.mode_set(mode='OBJECT')
+    #bpy.ops.object.mode_set(mode='POSE')
 
 def matchPoseScale(pb, tarPb, frame):
     mat = getPoseMatrixInOtherSpace(tarPb.matrix, pb)
     setPoseScale(pb, mat, frame)
-    bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.mode_set(mode='POSE')
-
-def matchPoleTarget(ik_first, ik_last, pole, match_bone, length, frame):
-    """ Places an IK chain's pole target to match ik_first's
-        transforms to match_bone.  All bones should be given as pose bones.
-        You need to be in pose mode on the relevant armature object.
-        ik_first: first bone in the IK chain
-        ik_last:  last bone in the IK chain
-        pole:  pole target bone for the IK chain
-        match_bone:  bone to match ik_first to (probably first bone in a matching FK chain)
-        length:  distance pole target should be placed from the chain center
-    """
-    a = ik_first.matrix.to_translation()
-    b = ik_last.matrix.to_translation() + ik_last.vector
-
-    # Vector from the head of ik_first to the
-    # tip of ik_last
-    ikv = b - a
-
-    # Create a vector that is not aligned with ikv.
-    # It doesn't matter what vector.  Just any vector
-    # that's guaranteed to not be pointing in the same
-    # direction.  In this case, we create a unit vector
-    # on the axis of the smallest component of ikv.
-    if abs(ikv[0]) < abs(ikv[1]) and abs(ikv[0]) < abs(ikv[2]):
-        v = Vector((1,0,0))
-    elif abs(ikv[1]) < abs(ikv[2]):
-        v = Vector((0,1,0))
-    else:
-        v = Vector((0,0,1))
-
-    # Get a vector perpendicular to ikv
-    pv = v.cross(ikv).normalized() * length
-
-    def set_pole(pvi, frame):
-        """ Set pole target's position based on a vector
-            from the arm center line.
-        """
-        # Translate pvi into armature space
-        ploc = a + (ikv/2) + pvi
-
-        # Set pole target to location
-        mat = getPoseMatrixInOtherSpace(Matrix.Translation(ploc), pole)
-        setPoseTranslation(pole, mat, frame)
-
-        bpy.ops.object.mode_set(mode='OBJECT')
-        bpy.ops.object.mode_set(mode='POSE')
-
-    set_pole(pv, frame)
-
-    # Get the rotation difference between ik_first and match_bone
-    q1 = ik_first.matrix.to_quaternion()
-    q2 = match_bone.matrix.to_quaternion()
-    angle = math.acos(min(1,max(-1,q1.dot(q2)))) * 2
-
-    # Compensate for the rotation difference
-    if angle > 0.0001:
-        pv = Matrix.Rotation(angle, 4, ikv).to_quaternion() * pv
-        set_pole(pv, frame)
-
-        # Get rotation difference again, to see if we
-        # compensated in the right direction
-        q1 = ik_first.matrix.to_quaternion()
-        q2 = match_bone.matrix.to_quaternion()
-        angle2 = math.acos(min(1,max(-1,q1.dot(q2)))) * 2
-        if angle2 > 0.0001:
-            # Compensate in the other direction
-            pv = Matrix.Rotation((angle*(-2)), 4, ikv).to_quaternion() * pv
-            set_pole(pv, frame)
-
+    #bpy.ops.object.mode_set(mode='OBJECT')
+    #bpy.ops.object.mode_set(mode='POSE')
 
 def ik2fkArm(rig, ikBones, fkBones, suffix, frame):
-    (uparmIk, loarmIk, elbowPt, wrist) = ikBones
-    (uparmFk, loarmFk, handFk) = fkBones
+    (uparmIk, loarmIk, elbow, elbowPt, wrist) = ikBones
+    (uparmFk, loarmFk, elbowPtFk, handFk) = fkBones
     matchPoseTranslation(wrist, handFk, frame)
     matchPoseRotation(wrist, handFk, frame)  
-    matchPoseScale(wrist, handFk, frame)
-    matchPoleTarget(uparmIk, loarmIk, elbowPt, uparmFk, (uparmIk.length + loarmIk.length), frame)
+    matchPoseTranslation(elbow, elbowPtFk, frame)
+    matchPoseTranslation(elbowPt, elbowPtFk, frame)
     return
 
-def ik2fkLeg(rig, ikBones, fkBones, suffix, frame):
+def ik2fkLeg(rig, ikBones, fkBones, legIkToAnkle, suffix, frame):
     (uplegIk, lolegIk, kneePt, ankleIk, legIk, legFk) = ikBones
-    (uplegFk, lolegFk, footFk) = fkBones
+    (uplegFk, lolegFk, kneePtFk, footFk) = fkBones
 
-    legIkToAnkle = "&LegIkToAnkle" + suffix
-    try:
-        oldLegIkToAnkle = rig[legIkToAnkle]
-        isHard = False
-    except:
-        oldLegIkToAnkle = 1.0
-        isHard = True
-    oldActive = rig.data.bones.active
-    rig.data.bones.active = ankleIk.bone
-    rig[legIkToAnkle] = 1.0
-    matchPoseTranslation(ankleIk, footFk, frame)
-    if isHard or oldLegIkToAnkle < 0.5:
-        matchPoseTranslation(legIk, legFk, frame)
-        matchPoseRotation(legIk, legFk, frame)  
-        matchPoseScale(legIk, legFk, frame)
-    matchPoleTarget(uplegIk, lolegIk, kneePt, uplegFk, (uplegIk.length + lolegIk.length), frame)        
-    rig.data.bones.active = ankleIk.bone
-    if not isHard:
-        rig[legIkToAnkle] = oldLegIkToAnkle
-
+    if legIkToAnkle:
+        matchPoseTranslation(ankleIk, footFk, frame)
+    else:
+        ankleIk.location = (0,0,0)
+        ankleIk.rotation_quaternion = (1,0,0,0)
+        #ankleIk.keyframe_insert("location", frame=frame, group=ankleIk.name)
+        #ankleIk.keyframe_insert("rotation_quaternion", frame=frame, group=ankleIk.name)
+        #setInverse(rig, ankleIk)
+    matchPoseTranslation(legIk, legFk, frame)
+    matchPoseRotation(legIk, legFk, frame)  
+    matchPoseTranslation(kneePt, kneePtFk, frame)
     return
-    
+   
 def retargetIkBones(rig, frame):
     lArmIkBones = getSnapBones(rig, "ArmIK", "_L")
     lArmFkBones = getSnapBones(rig, "ArmFK", "_L")
@@ -581,21 +551,63 @@ def retargetIkBones(rig, frame):
     rLegIkBones = getSnapBones(rig, "LegIK", "_R")
     rLegFkBones = getSnapBones(rig, "LegFK", "_R")
         
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.mode_set(mode='POSE')
     ik2fkArm(rig, lArmIkBones, lArmFkBones, "_L", frame)
     ik2fkArm(rig, rArmIkBones, rArmFkBones, "_R", frame)
-    ik2fkLeg(rig, lLegIkBones, lLegFkBones, "_L", frame)
-    ik2fkLeg(rig, rLegIkBones, rLegFkBones, "_R", frame)
+    ik2fkLeg(rig, lLegIkBones, lLegFkBones, rig["&LegIkToAnkle_L"], "_L", frame)
+    ik2fkLeg(rig, rLegIkBones, rLegFkBones, rig["&LegIkToAnkle_R"], "_R", frame)
     return        
         
+#
+#   setInverse(rig, pb):
+#
 
+def setInverse(rig, pb):
+    rig.data.bones.active = pb.bone
+    pb.bone.select = True
+    for cns in pb.constraints:
+        if cns.type == 'CHILD_OF':
+            bpy.ops.constraint.childof_set_inverse(constraint=cns.name, owner='BONE')
+    return
+
+def clearInverse(rig, pb):
+    rig.data.bones.active = pb.bone
+    pb.bone.select = True
+    bpy.ops.pose.loc_clear()
+    bpy.ops.pose.rot_clear()
+    for cns in pb.constraints:
+        if cns.type == 'CHILD_OF':
+            bpy.ops.constraint.childof_clear_inverse(constraint=cns.name, owner='BONE')
+    return
+
+def fixAnkles(rig, scn):
+    layers = list(rig.data.layers)
+    try:
+        rig.data.layers = 32*[True]
+        clearInverse(rig, rig.pose.bones["Ankle_L"])
+        clearInverse(rig, rig.pose.bones["Ankle_R"])
+        scn.frame_current = scn.frame_current
+    finally:
+        rig.data.layers = layers
+    return
+
+class VIEW3D_OT_FixAnklesButton(bpy.types.Operator):
+    bl_idname = "mcp.fix_ankles"
+    bl_label = "Fix ankles"
+    bl_description = "Set inverse for ankle Child-of constraints"
+
+    def execute(self, context):
+        fixAnkles(context.object, context.scene)
+        return{'FINISHED'}    
 #
 #
 #
 
 SnapBones = {
-    "ArmFK" : ["UpArm", "LoArm", "Hand"],
-    "ArmIK" : ["UpArmIK", "LoArmIK", "ElbowPT", "Wrist"],
-    "LegFK" : ["UpLeg", "LoLeg", "Foot"],
+    "ArmFK" : ["UpArm", "LoArm", "ElbowPTFK", "Hand"],
+    "ArmIK" : ["UpArmIK", "LoArmIK", "Elbow", "ElbowPT", "Wrist"],
+    "LegFK" : ["UpLeg", "LoLeg", "KneePTFK", "Foot"],
     "LegIK" : ["UpLegIK", "LoLegIK", "KneePT", "Ankle", "LegIK", "LegFK"],
 }
 
@@ -606,224 +618,6 @@ def getSnapBones(rig, key, suffix):
         pb = rig.pose.bones[name+suffix]
         pbones.append(pb)
     return tuple(pbones)
-
-def setSnapProp(rig, data, value, context, isIk):
-    words = data.split()
-    prop = words[0]
-    oldValue = rig[prop]
-    rig[prop] = value
-    ik = int(words[1])
-    fk = int(words[2])
-    extra = int(words[3])
-    oldIk = rig.data.layers[ik]
-    oldFk = rig.data.layers[fk]
-    oldExtra = rig.data.layers[extra]
-    rig.data.layers[ik] = True
-    rig.data.layers[fk] = True
-    rig.data.layers[extra] = True
-    updatePose(context)
-    if isIk:
-        oldValue = 1.0
-        oldIk = True
-        oldFk = False
-    else:
-        oldValue = 0.0
-        oldIk = False
-        oldFk = True
-        oldExtra = False
-    return (prop, (oldValue, ik, fk, extra, oldIk, oldFk, oldExtra))
-    
-def restoreSnapProp(rig, prop, old, context):
-    updatePose(context)
-    (oldValue, ik, fk, extra, oldIk, oldFk, oldExtra) = old
-    rig[prop] = oldValue
-    rig.data.layers[ik] = oldIk
-    rig.data.layers[fk] = oldFk
-    rig.data.layers[extra] = oldExtra
-    return
-    
-
-#
-#   mhxPropertiesReset(rig):
-#
-
-def mhxPropertiesReset(rig):
-    mhxProps = [
-        ("&RotationLimits", 0.0),
-        ("&ArmIk_L", 0.0),
-        ("&ArmIk_R", 0.0),
-        ("&LegIk_L", 0.0),
-        ("&LegIk_R", 0.0),
-        ("&SpineIk", 0.0),
-        ("&SpineInvert", 0.0),
-        ("&ElbowPlant_L", 0.0),
-        ("&ElbowPlant_R", 0.0),
-        ]
-    oldProps = []
-    for (key, value) in mhxProps:
-        try:
-            oldProps.append((key, rig[key]))
-            rig[key] = value
-        except KeyError:
-            pass
-    return oldProps        
-
-#
-#   poseTrgIkBones(context, trgRig, nFrames):
-#   copyMatrix(info):
-#   revertMatrix(pb):
-#
-
-class CIkInfo:
-    def __init__(self, rig, ikname):
-        self.ik = rig.pose.bones[ikname]
-        self.fk = None
-        self.parent = None
-        self.fakepar = None
-        self.empty = None
-        self.reverse = False
-        self.hasLoc = True
-        self.restInv = None
-        self.rotmode = None
-
-def setupIkInfo(rig):
-    infos = []
-    for (ikname, fkname) in [
-        ("Wrist_L", "Hand_L"), 
-        ("Wrist_R", "Hand_R"),
-        ("LegIK_L", "LegFK_L"), 
-        ("LegIK_R", "LegFK_R")
-        ]:
-        info = CIkInfo(rig, ikname)
-        info.fk = rig.pose.bones[fkname]
-        info.parent = info.ik.parent
-        infos.append(info)
-        
-    for (ikname, parname, fakepar) in [
-        ("ElbowPT_L", "Clavicle_L", "UpArm_L"), 
-        ("ElbowPT_R", "Clavicle_R", "UpArm_R"),
-        ("KneePT_L", "LegIK_L", "UpLeg_L"), 
-        ("KneePT_R", "LegIK_R", "UpLeg_R")
-        ]:
-        info = CIkInfo(rig, ikname)
-        info.parent = rig.pose.bones[parname]
-        info.fakepar = rig.pose.bones[fakepar]
-        infos.append(info)
-
-    for (ikname, parname, fkname) in [
-        ("ToeRev_L", "LegIK_L", "Toe_L"), 
-        ("ToeRev_L", "LegIK_L", "Toe_L"),
-        ("FootRev_L", "ToeRev_L", "Foot_L"), 
-        ("FootRev_L", "ToeRev_L", "Foot_L")
-        ]:
-        info = CIkInfo(rig, ikname)
-        info.fk = rig.pose.bones[fkname]
-        info.parent = rig.pose.bones[parname]
-        info.reverse = True
-        info.hasLoc = False
-        infos.append(info)
-
-    for info in infos:
-        if info.ik.rotation_mode == 'QUATERNION':
-            info.rotmode = "rotation_quaternion"
-        else:
-            info.rotmode = "rotation_euler"
-        info.restInv = info.ik.bone.matrix_local.inverted()
-        if info.parent:
-            info.restInv = info.restInv * info.parent.bone.matrix_local
-    
-    return infos
-
-def turnOffDrivers(rig):    
-    fkBones = [
-        "UpArm_L", "UpArm_R", 
-        "LoArm_L", "LoArm_R", 
-        "Hand_L", "Hand_R",
-        "UpLeg_L", "UpLeg_R",
-        "LoLeg_L", "LoLeg_R",
-        "Foot_L", "Foot_R",
-        "Toe_L", "Toe_R"
-        ]
-    drivers = []
-    for fcu in rig.animation_data.drivers:
-        words = fcu.data_path.split('"')
-        if words[1] in fkBones:
-            drv = fcu.driver
-            drivers.append((fcu, drv.type, drv.expression))
-            drv.type = 'SCRIPTED'
-            drv.expression = "0.0"
-    return drivers    
-
-def turnOnDrivers(drivers):    
-    for (fcu, type, expression) in drivers:
-        fcu.driver.type = type
-        fcu.driver.expression = expression
-    return
-    
-def poseTrgIkBones(context, rig, nFrames):
-    bpy.ops.object.mode_set(mode='POSE')
-
-    drivers = turnOffDrivers(rig)    
-    infos = setupIkInfo(rig)    
-    rig.data.pose_position = 'REST'
-    for info in infos:
-        if info.fakepar:
-            empty = bpy.data.objects.new("_"+info.ik.name, None)
-            context.scene.objects.link(empty)
-            empty.parent = rig
-            empty.parent_type = 'BONE'
-            empty.parent_bone = info.fakepar.name
-            offs = info.ik.bone.head_local - info.fakepar.bone.tail_local
-            mat = info.fakepar.bone.matrix_local.to_3x3().inverted()
-            empty.location = mat*offs
-            info.empty = empty
-    rig.data.pose_position = 'POSE'  
-
-    print("Copy animation to IK bones")
-    for frame in range(nFrames):
-        context.scene.frame_set(frame)
-        for info in infos:
-            copyMatrix(info, frame)
-        if frame % 10 == 0:
-            print(frame)
-
-    turnOnDrivers(drivers)
-          
-    for info in infos:
-        if info.empty:
-            info.empty.parent = None
-            info.empty.name = "#"+info.empty.name
-            context.scene.objects.unlink(info.empty)
-            info.empty = None
-    return            
-
-def copyMatrix(info, frame):
-    #print(info.ik.name, info.fk, info.empty, info.parent)
-
-    if info.empty:
-        #fkMat = Matrix.Translation(info.empty.location)
-        fkMat = info.empty.matrix_world
-    elif info.reverse:
-        fkMat = revertMatrix(info.fk)
-    else:
-        fkMat = info.fk.matrix
-    if info.parent:
-        parInv = info.parent.matrix.inverted()        
-        info.ik.matrix_basis = info.restInv * parInv * fkMat
-    else:
-        info.ik.matrix_basis = info.restInv * fkMat
-    if info.hasLoc:
-        info.ik.keyframe_insert("location", frame=frame, group=info.ik.name)
-    info.ik.keyframe_insert(info.rotmode, frame=frame, group=info.ik.name)    
-    return
-    
-def revertMatrix(pb):
-    mat = pb.matrix.copy()
-    for i in range(3):
-        mat[3][i] = pb.tail[i]
-        for j in range(0,2):
-            mat[j][i] *= -1
-    return mat            
 
 #
 #    loadRetargetSimplify(context, filepath):
@@ -883,15 +677,4 @@ class VIEW3D_OT_NewLoadRetargetSimplifyButton(bpy.types.Operator, ImportHelper):
     def invoke(self, context, event):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}    
-
-
-def register():
-    bpy.utils.register_module(__name__)
-
-def unregister():
-    bpy.utils.unregister_module(__name__)
-
-if __name__ == "__main__":
-    register()
-
 

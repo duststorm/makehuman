@@ -156,6 +156,8 @@ ArmHeadsTails = [
 
     ('ElbowPT_L',         'r-elbow-pt', ('r-elbow-pt', the.yunit)),
     ('ElbowPT_R',         'l-elbow-pt', ('l-elbow-pt', the.yunit)),
+    ('ElbowPTFK_L',       'r-elbow-pt', ('r-elbow-pt', the.yunit)),
+    ('ElbowPTFK_R',       'l-elbow-pt', ('l-elbow-pt', the.yunit)),
     ('ElbowLinkPT_L',     'r-elbow', 'r-elbow-pt'),
     ('ElbowLinkPT_R',     'l-elbow', 'l-elbow-pt'),
     
@@ -199,6 +201,8 @@ ArmArmature = [
     # Pole target
     ('ElbowPT_L',         0, (None, 'Shoulder_L'), F_WIR, L_LARMIK, NoBB),
     ('ElbowPT_R',         0, (None, 'Shoulder_R'), F_WIR, L_RARMIK, NoBB),
+    ('ElbowPTFK_L',       0, 'UpArm_L', 0, L_HELP, NoBB),
+    ('ElbowPTFK_R',       0, 'UpArm_R', 0, L_HELP, NoBB),
     ('ElbowLinkPT_L',     0, 'UpArm_L', F_RES, L_LARMIK, NoBB),
     ('ElbowLinkPT_R',     0, 'UpArm_R', F_RES, L_RARMIK, NoBB),
 
@@ -547,7 +551,7 @@ SoftArmPropLRDrivers = [
     ('Shoulder', 'Shoulder', ['ArmHinge'], '1-x1'),
     ('Shoulder', 'Root', ['ArmHinge'], 'x1'),
     ('ElbowPT', 'Hand', ['ElbowFollowsWrist'], 'x1'),
-    ('ElbowPT', 'Shoulder', ['ElbowFollowsWrist'], '1-x1'),
+    ('ElbowPT', 'Shoulder', ['ElbowFollowsShoulder', 'ElbowFollowsWrist'], 'x1*(1-x2)'),
 ]
 
 ArmPropDrivers = [

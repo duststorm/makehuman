@@ -32,27 +32,33 @@ end Armature
   Property &ArmIk_L 0.0 Left_arm_FK/IK ;
   PropKeys &ArmIk_L "min":0.0,"max":1.0, ;
 
-  Property &ArmHinge_L 0.0 Left_arm_hinge ;
-  PropKeys &ArmHinge_L "min":0.0,"max":1.0, ;
+  Property &ArmHinge_L False Left_arm_hinge ;
+  PropKeys &ArmHinge_L "type":'BOOLEAN',"min":0,"max":1, ;
 
-  Property &ElbowPlant_L 0.0 Left_elbow_plant ;
-  PropKeys &ElbowPlant_L "min":0.0,"max":1.0, ;
+  Property &ElbowPlant_L False Left_elbow_plant ;
+  PropKeys &ElbowPlant_L "type":'BOOLEAN',"min":0,"max":1, ;
 
-  Property &HandFollowsWrist_L 1.0 Left_hand_follows_wrist ;
-  PropKeys &HandFollowsWrist_L "min":0.0,"max":1.0, ;
+  Property &HandFollowsWrist_L True Left_hand_follows_wrist ;
+  PropKeys &HandFollowsWrist_L "type":'BOOLEAN',"min":0,"max":1, ;
 
   Property &LegIk_L 0.0 Left_leg_FK/IK ;
   PropKeys &LegIk_L "min":0.0,"max":1.0, ;
   
 #if toggle&T_HardParents==0
-  Property &LegIkToAnkle_L 0.0 Left_leg_IK_to_ankle ;
-  PropKeys &LegIkToAnkle_L "min":0.0,"max":1.0, ;
+  Property &LegIkToAnkle_L False Left_leg_IK_to_ankle ;
+  PropKeys &LegIkToAnkle_L "type":'BOOLEAN',"min":0,"max":1, ;
 
-  Property &KneeFollowsFoot_L 1.0 Left_knee_follows_foot ;
-  PropKeys &KneeFollowsFoot_L "min":0.0,"max":1.0, ;
+  Property &KneeFollowsFoot_L False Left_knee_follows_foot ;
+  PropKeys &KneeFollowsFoot_L "type":'BOOLEAN',"min":0,"max":1, ;
 
-  Property &ElbowFollowsWrist_L 0.0 Left_elbow_follows_wrist ;
-  PropKeys &ElbowFollowsWrist_L "min":0.0,"max":1.0, ;
+  Property &KneeFollowsHip_L True Left_knee_follows_hip ;
+  PropKeys &KneeFollowsHip_L "type":'BOOLEAN',"min":0,"max":1, ;
+
+  Property &ElbowFollowsWrist_L False Left_elbow_follows_wrist ;
+  PropKeys &ElbowFollowsWrist_L "type":'BOOLEAN',"min":0,"max":1, ;
+
+  Property &ElbowFollowsShoulder_L True Left_elbow_follows_shoulder ;
+  PropKeys &ElbowFollowsShoulder_L "type":'BOOLEAN',"min":0,"max":1, ;
 #endif
 
   Property &FingerControl_L True Left_fingers_controlled ;
@@ -61,30 +67,36 @@ end Armature
   Property &ArmIk_R 0.0 Right_arm_FK/IK ;
   PropKeys &ArmIk_R "min":0.0,"max":1.0, ;
 
-  Property &ArmHinge_R 0.0 Right_arm_hinge ;
-  PropKeys &ArmHinge_R "min":0.0,"max":1.0, ;
+  Property &ArmHinge_R False Right_arm_hinge ;
+  PropKeys &ArmHinge_R "type":'BOOLEAN',"min":0,"max":1, ;
 
-  Property &ElbowPlant_R 0.0 Right_elbow_plant ;
-  PropKeys &ElbowPlant_R "min":0.0,"max":1.0, ;
+  Property &ElbowPlant_R False Right_elbow_plant ;
+  PropKeys &ElbowPlant_R "type":'BOOLEAN',"min":0,"max":1, ;
 
   Property &LegIk_R 0.0 Right_leg_FK/IK ;
   PropKeys &LegIk_R "min":0.0,"max":1.0, ;
 
-  Property &HandFollowsWrist_R 1.0 Right_hand_follows_wrist ;
-  PropKeys &HandFollowsWrist_R "min":0.0,"max":1.0, ;
+  Property &HandFollowsWrist_R True Right_hand_follows_wrist ;
+  PropKeys &HandFollowsWrist_R "type":'BOOLEAN',"min":0,"max":1, ;
 
 #if toggle&T_HardParents==0
-  Property &LegIkToAnkle_R 0.0 Right_leg_IK_to_ankle ;
-  PropKeys &LegIkToAnkle_R "min":0.0,"max":1.0, ;
+  Property &LegIkToAnkle_R False Right_leg_IK_to_ankle ;
+  PropKeys &LegIkToAnkle_R "type":'BOOLEAN',"min":0,"max":1, ;
 
-  Property &KneeFollowsFoot_R 1.0 Right_knee_follows_foot ;
-  PropKeys &KneeFollowsFoot_R "min":0.0,"max":1.0, ;
+  Property &KneeFollowsFoot_R False Right_knee_follows_foot ;
+  PropKeys &KneeFollowsFoot_R "type":'BOOLEAN',"min":0,"max":1, ;
 
-  Property &ElbowFollowsWrist_R 0.0 Right_elbow_follows_wrist ;
-  PropKeys &ElbowFollowsWrist_R "min":0.0,"max":1.0, ;
+  Property &KneeFollowsHip_R True Right_knee_follows_hip ;
+  PropKeys &KneeFollowsHip_R "type":'BOOLEAN',"min":0,"max":1, ;
+
+  Property &ElbowFollowsWrist_R False Right_elbow_follows_wrist ;
+  PropKeys &ElbowFollowsWrist_R "type":'BOOLEAN',"min":0,"max":1, ;
+
+  Property &ElbowFollowsShoulder_R True Right_elbow_follows_shoulder ;
+  PropKeys &ElbowFollowsShoulder_R "type":'BOOLEAN',"min":0,"max":1, ;
 
   Property &GazeFollowsHead 1.0 Gaze_follows_world_or_head ;
-  PropKeys &GazeFollowsHead "min":0.0,"max":1.0, ;
+  PropKeys &GazeFollowsHead "type":'BOOLEAN',"min":0.0,"max":1.0, ;
 #endif
 
   Property &FingerControl_R True Right_fingers_controlled ;
@@ -93,8 +105,8 @@ end Armature
   Property &SpineInvert False Spine_from_shoulders_to_pelvis ;
   PropKeys &SpineInvert "type":'BOOLEAN',"min":0,"max":1, ;
   
-  Property &SpineIk 0.0 Spine_FK/IK ;
-  PropKeys &SpineIk "min":0.0,"max":1.0, ;
+  Property &SpineIk False Spine_FK/IK ;
+  PropKeys &SpineIk "type":'BOOLEAN',"min":0,"max":1, ;
   
   Property &SpineStretch 0.2 Spine_stretch_amount ;
   PropKeys &SpineStretch "min":0.0,"max":1.0, ;

@@ -175,6 +175,7 @@ LegHeadsTails = [
     ('UpLeg2PT_L',      ('r-upleg1', (0,0,-1)), ('r-upleg1', (0,0,-2))),
     ('UpLeg3PT_L',      ('r-upleg2', (0,0,-1)), ('r-upleg2', (0,0,-2))),
     ('KneePT_L',        'r-knee-pt', ('r-knee-pt', offs)),
+    ('KneePTFK_L',      'r-knee-pt', ('r-knee-pt', offs)),
     ('KneeLinkPT_L',    'r-knee', 'r-knee-pt'),
     ('FootPT_L',        ('r-midfoot', (0,1,0.2)), ('r-midfoot', (0,1.3,0.2))),
     ('ToePT_L',         ('r-midtoe', (0,1,0)), ('r-midtoe', (0,1.3,0))),
@@ -183,6 +184,7 @@ LegHeadsTails = [
     ('UpLeg2PT_R',      ('l-upleg1', (0,0,-1)), ('l-upleg1', (0,0,-2))),
     ('UpLeg3PT_R',      ('l-upleg2', (0,0,-1)), ('l-upleg2', (0,0,-2))),
     ('KneePT_R',        'l-knee-pt', ('l-knee-pt', offs)),
+    ('KneePTFK_R',      'l-knee-pt', ('l-knee-pt', offs)),
     ('KneeLinkPT_R',    'l-knee', 'l-knee-pt'),
     ('FootPT_R',        ('l-midfoot', (0,1,0.2)), ('l-midfoot', (0,1.3,0.2))),
     ('ToePT_R',         ('l-midtoe', (0,1,0)), ('l-midtoe', (0,1.3,0))),
@@ -255,6 +257,7 @@ LegArmature = [
     ('UpLeg2PT_L',      0.0, 'DfmUpLeg1_L', 0, L_HELP, NoBB),
     ('UpLeg3PT_L',      0.0, 'UpLeg_L', 0, L_HELP, NoBB),
     ('KneePT_L',        0.0, (None, 'FootRev_L'), F_WIR, L_LLEGIK+L_LEXTRA, NoBB),
+    ('KneePTFK_L',      0.0, 'UpLeg_L', 0, L_HELP, NoBB),
     ('KneeLinkPT_L',    0.0, 'UpLeg_L', F_RES, L_LLEGIK+L_LEXTRA, NoBB),
     ('FootPT_L',        0.0, 'FootRev_L', 0, L_HELP, NoBB),
     ('ToePT_L',         0.0, 'ToeRev_L', 0, L_HELP, NoBB),
@@ -263,6 +266,7 @@ LegArmature = [
     ('UpLeg2PT_R',      0.0, 'DfmUpLeg1_R', 0, L_HELP, NoBB),
     ('UpLeg3PT_R',      0.0, 'UpLeg_R', 0, L_HELP, NoBB),
     ('KneePT_R',        0.0, (None, 'FootRev_R'), F_WIR, L_RLEGIK+L_REXTRA, NoBB),
+    ('KneePTFK_R',      0.0, 'UpLeg_R', 0, L_HELP, NoBB),
     ('KneeLinkPT_R',    0.0, 'UpLeg_R', F_RES, L_RLEGIK+L_REXTRA, NoBB),
     ('FootPT_R',        0.0, 'FootRev_R', 0, L_HELP, NoBB),
     ('ToePT_R',         0.0, 'ToeRev_R', 0, L_HELP, NoBB),
@@ -571,7 +575,7 @@ LegPropLRDrivers = [
 
 SoftLegPropLRDrivers = [
     ('KneePT', 'Foot', ['KneeFollowsFoot'], 'x1'),
-    ('KneePT', 'Hip', ['KneeFollowsFoot'], '1-x1'),  
+    ('KneePT', 'Hip', ['KneeFollowsHip', 'KneeFollowsFoot'], 'x1*(1-x2)'),  
     ('Ankle', 'Foot', ['LegIkToAnkle'], '1-x1'),
     ('Ankle', 'Master', ['LegIkToAnkle'], 'x1'),
 ]
