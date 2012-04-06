@@ -31,7 +31,7 @@ from mathutils import *
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty, FloatProperty, IntProperty, BoolProperty, EnumProperty
 
-from . import utils, props, source, target, rig_mhx, toggle, load, simplify, new_retarget
+from . import utils, props, source, target, rig_mhx, toggle, load, simplify
 from . import globvar as the
 
 ###################################################################################
@@ -446,11 +446,180 @@ def rollRot(rot, roll):
     return
 
 
+# ------------------------------------------------------------------------------------
 #
-#    poseTrgIkBones(context, trgRig, trgAnimations)
+#   "New" IK Retarget
+#
+# ------------------------------------------------------------------------------------
+
+#
+#   newPoseTrgIkBones(context, trgRig, nFrames):
+#   copyMatrix(info):
+#   revertMatrix(pb):
 #
 
-def poseTrgIkBones(context, trgRig, trgAnimations):
+class CIkInfo:
+    def __init__(self, rig, ikname):
+        self.ik = rig.pose.bones[ikname]
+        self.fk = None
+        self.parent = None
+        self.fakepar = None
+        self.empty = None
+        self.reverse = False
+        self.hasLoc = True
+        self.restInv = None
+        self.rotmode = None
+
+def setupIkInfo(rig):
+    infos = []
+    for (ikname, fkname) in [
+        ("Wrist_L", "Hand_L"), 
+        ("Wrist_R", "Hand_R"),
+        ("LegIK_L", "LegFK_L"), 
+        ("LegIK_R", "LegFK_R")
+        ]:
+        info = CIkInfo(rig, ikname)
+        info.fk = rig.pose.bones[fkname]
+        info.parent = info.ik.parent
+        infos.append(info)
+        
+    for (ikname, parname, fakepar) in [
+        ("ElbowPT_L", "Clavicle_L", "UpArm_L"), 
+        ("ElbowPT_R", "Clavicle_R", "UpArm_R"),
+        ("KneePT_L", "LegIK_L", "UpLeg_L"), 
+        ("KneePT_R", "LegIK_R", "UpLeg_R")
+        ]:
+        info = CIkInfo(rig, ikname)
+        info.parent = rig.pose.bones[parname]
+        info.fakepar = rig.pose.bones[fakepar]
+        infos.append(info)
+
+    for (ikname, parname, fkname) in [
+        ("ToeRev_L", "LegIK_L", "Toe_L"), 
+        ("ToeRev_L", "LegIK_L", "Toe_L"),
+        ("FootRev_L", "ToeRev_L", "Foot_L"), 
+        ("FootRev_L", "ToeRev_L", "Foot_L")
+        ]:
+        info = CIkInfo(rig, ikname)
+        info.fk = rig.pose.bones[fkname]
+        info.parent = rig.pose.bones[parname]
+        info.reverse = True
+        info.hasLoc = False
+        infos.append(info)
+
+    for info in infos:
+        if info.ik.rotation_mode == 'QUATERNION':
+            info.rotmode = "rotation_quaternion"
+        else:
+            info.rotmode = "rotation_euler"
+        info.restInv = info.ik.bone.matrix_local.inverted()
+        if info.parent:
+            info.restInv = info.restInv * info.parent.bone.matrix_local
+    
+    return infos
+
+def turnOffDrivers(rig):    
+    fkBones = [
+        "UpArm_L", "UpArm_R", 
+        "LoArm_L", "LoArm_R", 
+        "Hand_L", "Hand_R",
+        "UpLeg_L", "UpLeg_R",
+        "LoLeg_L", "LoLeg_R",
+        "Foot_L", "Foot_R",
+        "Toe_L", "Toe_R"
+        ]
+    drivers = []
+    for fcu in rig.animation_data.drivers:
+        words = fcu.data_path.split('"')
+        if words[1] in fkBones:
+            drv = fcu.driver
+            drivers.append((fcu, drv.type, drv.expression))
+            drv.type = 'SCRIPTED'
+            drv.expression = "0.0"
+    return drivers    
+
+def turnOnDrivers(drivers):    
+    for (fcu, type, expression) in drivers:
+        fcu.driver.type = type
+        fcu.driver.expression = expression
+    return
+    
+def newPoseTrgIkBones(context, rig, nFrames):
+    bpy.ops.object.mode_set(mode='POSE')
+
+    drivers = turnOffDrivers(rig)    
+    infos = setupIkInfo(rig)    
+    rig.data.pose_position = 'REST'
+    for info in infos:
+        if info.fakepar:
+            empty = bpy.data.objects.new("_"+info.ik.name, None)
+            context.scene.objects.link(empty)
+            empty.parent = rig
+            empty.parent_type = 'BONE'
+            empty.parent_bone = info.fakepar.name
+            offs = info.ik.bone.head_local - info.fakepar.bone.tail_local
+            mat = info.fakepar.bone.matrix_local.to_3x3().inverted()
+            empty.location = mat*offs
+            info.empty = empty
+    rig.data.pose_position = 'POSE'  
+
+    print("Copy animation to IK bones")
+    for frame in range(nFrames):
+        context.scene.frame_set(frame)
+        for info in infos:
+            copyMatrix(info, frame)
+        if frame % 10 == 0:
+            print(frame)
+
+    turnOnDrivers(drivers)
+          
+    for info in infos:
+        if info.empty:
+            info.empty.parent = None
+            info.empty.name = "#"+info.empty.name
+            context.scene.objects.unlink(info.empty)
+            info.empty = None
+    return            
+
+def copyMatrix(info, frame):
+    #print(info.ik.name, info.fk, info.empty, info.parent)
+
+    if info.empty:
+        #fkMat = Matrix.Translation(info.empty.location)
+        fkMat = info.empty.matrix_world
+    elif info.reverse:
+        fkMat = revertMatrix(info.fk)
+    else:
+        fkMat = info.fk.matrix
+    if info.parent:
+        parInv = info.parent.matrix.inverted()        
+        info.ik.matrix_basis = info.restInv * parInv * fkMat
+    else:
+        info.ik.matrix_basis = info.restInv * fkMat
+    if info.hasLoc:
+        info.ik.keyframe_insert("location", frame=frame, group=info.ik.name)
+    info.ik.keyframe_insert(info.rotmode, frame=frame, group=info.ik.name)    
+    return
+    
+def revertMatrix(pb):
+    mat = pb.matrix.copy()
+    for i in range(3):
+        mat[3][i] = pb.tail[i]
+        for j in range(0,2):
+            mat[j][i] *= -1
+    return mat            
+
+# ------------------------------------------------------------------------------------
+#
+#   Old IK Retarget
+#
+# ------------------------------------------------------------------------------------
+
+#
+#    oldPoseTrgIkBones(context, trgRig, trgAnimations)
+#
+
+def oldPoseTrgIkBones(context, trgRig, trgAnimations):
     bpy.ops.object.mode_set(mode='POSE')
     pbones = trgRig.pose.bones
 
@@ -601,9 +770,9 @@ def retargetMhxRig(context, srcRig, trgRig):
     #debugOpen()
     nFrames = poseTrgFkBones(context, trgRig, srcAnimations, trgAnimations, srcFixes)
     if scn.McpNewIkRetarget:
-        new_retarget.poseTrgIkBones(context, trgRig, nFrames)
+        newPoseTrgIkBones(context, trgRig, nFrames)
     else:
-        poseTrgIkBones(context, trgRig, trgAnimations)
+        oldPoseTrgIkBones(context, trgRig, trgAnimations)
     #debugClose()
     utils.setInterpolation(trgRig)
     if onoff == 'OFF':
