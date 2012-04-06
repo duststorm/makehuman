@@ -78,7 +78,7 @@ def initInterface(context):
     bpy.types.Scene.McpNewRetarget = BoolProperty(
         name="New Retarget", 
         description="Use new retarget",
-        default=False)
+        default=True)
 
 
     # Subsample and rescale
@@ -239,9 +239,8 @@ def initInterface(context):
    # Source
    
     bpy.types.Scene.McpGuessSrcRig = BoolProperty(
-        name = "Guess source rig")
-        
-
+        name = "Guess source rig",
+        default=True)
 
     scn = context.scene
     if False and scn:        
