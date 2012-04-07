@@ -54,6 +54,12 @@ Section "Copy files"
   CreateDirectory $INSTDIR\models
   CreateDirectory $INSTDIR\exports
   CreateDirectory $INSTDIR\backgrounds
+
+
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Makehuman" \
+ 		   "DisplayName" "Makehuman"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Makehuman" \
+ 		   "UninstallString" "$\"$INSTDIR\Uninst.exe$\""
   
 SectionEnd
 
@@ -109,4 +115,28 @@ Section "Uninstall"
   Delete $SMPROGRAMS\Makehuman\Uninstall.lnk
   RMDir $SMPROGRAMS\Makehuman
   
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Makehuman"
 SectionEnd
+
+
+Function .onInit
+  ReadRegStr $R0 HKLM \
+  "Software\Microsoft\Windows\CurrentVersion\Uninstall\Makehuman" \
+  "UninstallString"
+  StrCmp $R0 "" done
+  
+  MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
+  "Makehuman is already installed. $\n$\nClick 'OK' to remove the \
+  previous version or 'Cancel' to cancel this upgrade." \
+  IDOK uninst
+  Abort
+
+  uninst:
+    ClearErrors
+    ExecWait '$R0 _?=$INSTDIR'
+    
+    IfErrors no_remove_uninstaller done
+    no_remove_uninstaller:
+  done:
+FunctionEnd
+  
