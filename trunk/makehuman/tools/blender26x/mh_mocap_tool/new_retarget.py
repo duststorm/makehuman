@@ -31,7 +31,8 @@ from mathutils import *
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import *
 
-from . import utils, props, source, target, rig_mhx, toggle, load, simplify
+from . import utils, props, source, target, toggle, load, simplify
+from .target_rigs import rig_mhx
 from . import globvar as the
 
     
@@ -266,13 +267,6 @@ def setupFkBones(srcRig, trgRig, boneAssoc, parAssoc, anim, scn):
         anim.boneDataList.append(boneData)
         boneData.trgRestMat = trgBone.bone.matrix_local
 
-        trgRoll = utils.getRoll(trgBone.bone)
-        srcRoll = utils.getRoll(srcBone.bone)
-        diff = srcRoll-trgRoll
-        if abs(diff) > 0.1:            
-            boneData.rollMat = Matrix.Rotation(diff, 4, 'Y') 
-            boneData.rollInv = boneData.rollMat.inverted()
-
         boneData.trgRestInv = trgBone.bone.matrix_local.inverted()
         boneData.trgBakeMat = boneData.trgRestMat  
 
@@ -288,10 +282,17 @@ def setupFkBones(srcRig, trgRig, boneAssoc, parAssoc, anim, scn):
                 boneData.trgBakeMat = parRestInv * boneData.trgRestMat
                 #print(trgName, trgParent.name)
 
+        trgRoll = utils.getRoll(trgBone.bone)
+        srcRoll = utils.getRoll(srcBone.bone)
+        diff = srcRoll-trgRoll
         if srcName in keepOffsets:        
             offs = trgBone.bone.matrix_local*srcBone.bone.matrix_local.inverted()
             boneData.rotOffset = boneData.trgRestInv * offs * boneData.trgRestMat
             if trgName in keepOffsInverts:
+                boneData.rotOffsInv = boneData.rotOffset.inverted()
+        else:                
+            if abs(diff) > 0.1:            
+                boneData.rotOffset = Matrix.Rotation(diff, 4, 'Y') 
                 boneData.rotOffsInv = boneData.rotOffset.inverted()
                         
         boneData.trgBakeInv = boneData.trgBakeMat.inverted()   

@@ -26,7 +26,8 @@
 import bpy
 from math import pi, sqrt
 from mathutils import *
-from . import utils, load, simplify, props, rig_mhx, action
+from . import utils, load, simplify, props, action
+from .target_rigs import rig_mhx
 from . import globvar as the
 
 #

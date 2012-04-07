@@ -84,6 +84,8 @@ Batch run:
 if "bpy" in locals():
     print("Reloading Mocap tool")
     import imp
+    imp.reload(source_rigs)
+    imp.reload(target_rigs)
     imp.reload(utils)
     imp.reload(globvar)
     imp.reload(props)
@@ -98,24 +100,15 @@ if "bpy" in locals():
     imp.reload(loop)
     imp.reload(edit)
     imp.reload(plant)
-    imp.reload(accad)
     imp.reload(sigproc)
-    imp.reload(daz)
-    imp.reload(eyes)
-    imp.reload(hdm)
-    imp.reload(max)
-    imp.reload(mb)
-    imp.reload(mega)
-    imp.reload(rig_mhx)
-    imp.reload(rig_simple)
-    imp.reload(rig_game)
-    imp.reload(rig_second_life)
 else:
     print("Loading Mocap tool")
     import bpy, os
     from bpy_extras.io_utils import ImportHelper
     from bpy.props import *
 
+    from . import source_rigs
+    from . import target_rigs
     from . import utils
     from . import globvar as the
     from . import props
@@ -131,8 +124,7 @@ else:
     from . import edit
     from . import plant
     from . import sigproc
-    from . import accad, daz, eyes, hdm, max, mb, mega
-    from . import rig_mhx, rig_simple, rig_game, rig_second_life
+
 
 #        
 #    class MhxSourceBonesPanel(bpy.types.Panel):

@@ -51,7 +51,11 @@ Bones = [
     ('mFootRight',       'Toe_R'),
 ]
 
-Names = {}
+Names = {
+    #'mCollarLeft' : 'mChest',
+    #'mCollarRight': 'mChest',
+}
+
 IkBones = []
 
 

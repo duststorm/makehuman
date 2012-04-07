@@ -33,7 +33,7 @@ from bpy_extras.io_utils import ImportHelper
 
 from . import target
 from . import globvar as the
-       
+              
 #
 #    guessSrcArmature(rig):
 #

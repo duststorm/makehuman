@@ -159,7 +159,7 @@ def copyAction(act1, name):
 def activeFrames(ob):
     active = {}
     if ob.animation_data is None:
-    	return []
+        return []
     action = ob.animation_data.action
     if action is None:
         return []
@@ -253,4 +253,37 @@ def insertRotationKeyFrame(pb, frame):
         pb.keyframe_insert("rotation_axis_angle", frame=frame, group=grp)
     else:
         pb.keyframe_insert("rotation_euler", frame=frame, group=grp)
-        
+   
+#
+#
+#
+
+import os
+import imp
+import sys
+
+def initModules():
+    basePath = os.path.realpath(".")
+    print("Path", basePath) 
+    the.targetRigs = initModulesPath(basePath, "target_rigs")
+    the.sourceRigs = initModulesPath(basePath, "source_rigs")
+    return
+
+def initModulesPath(basePath, subPath):
+    path = os.path.join(basePath, subPath)
+    rignames = []
+    for relpath in os.listdir:
+        (modname, ext) = os.path.splitext(relpath)
+        if ext == ".py":
+            file = os.path.join(path, relpath)
+            print("Import %s" % modname)
+            fp, pathname, description = imp.find_module(modname)
+            try:
+                imp.load_module(modname, fp, pathname, description)
+            finally:
+                if fp:
+                    fp.close()
+        rignames.append(modname)
+    return rignames        
+
+   

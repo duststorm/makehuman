@@ -31,7 +31,8 @@ from mathutils import *
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 
-from . import utils, rig_mhx, rig_simple, rig_game, rig_second_life
+from . import utils
+from .target_rigs import rig_mhx, rig_simple, rig_game, rig_second_life
 from . import globvar as the
 
 Deg2Rad = math.pi/180
