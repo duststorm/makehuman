@@ -31,22 +31,17 @@ from mathutils import *
 from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 
-from . import utils, rig_mhx, rig_game, rig_rorkimaru
+from . import utils, rig_mhx, rig_simple, rig_game, rig_second_life
 from . import globvar as the
 
 Deg2Rad = math.pi/180
-
-T_MHX = 1
-T_Rorkimaru = 2
-T_Game = 3
-T_Custom = 4
 
 #
 #   getTrgBone(b):
 #
 
 def getTrgBone(b):
-    if the.target == T_MHX:
+    if the.target == the.T_MHX:
         return b
     else:
         try:
@@ -59,7 +54,7 @@ def getTrgBone(b):
 #
 
 def getSrcBone(b):
-    if the.target == T_MHX:
+    if the.target == the.T_MHX:
         return b
     else:
         try:
@@ -74,19 +69,24 @@ def getSrcBone(b):
 def getParentName(b):
     if b == None:
         return None
-    elif the.target == T_MHX:
+    elif the.target == the.T_MHX:
         if b == 'MasterFloor':
             return None
         else:
             return b
-    elif the.target == T_Rorkimaru:
-        try:
-            return rig_rorkimaru.Names[b]
-        except:
-            return b
-    elif the.target == T_Game:
+    elif the.target == the.T_Game:
         try:
             return rig_game.Names[b]
+        except:
+            return b
+    elif the.target == the.T_Simple:
+        try:
+            return rig_simple.Names[b]
+        except:
+            return b
+    elif the.target == the.T_SecondLife:
+        try:
+            return rig_simple.Names[b]
         except:
             return b
     else:
@@ -102,18 +102,22 @@ def guessTargetArmature(trgRig, scn):
         custom = trgRig['McpTargetRig']
     except:
         custom = False
+    custom = False        
     if custom:
-        the.target = T_Custom
+        the.target = the.T_Custom
         name = "Custom %s" % trgRig.name
     elif 'KneePT_L' in bones:
-        the.target = T_MHX
+        the.target = the.T_MHX
         name = "MHX"
-    elif testTargetRig(bones, rig_game.Bones):
-        the.target = T_Game
+    elif testTargetRig("Simple", bones, rig_simple.Bones):
+        the.target = the.T_Simple
+        name = "Simple"
+    elif testTargetRig("Game", bones, rig_game.Bones):
+        the.target = the.T_Game
         name = "Game"
-    elif testTargetRig(bones, rig_rorkimaru.Bones):
-        the.target = T_Rorkimaru
-        name = "Rorkimaru"
+    elif testTargetRig("Second Life", bones, rig_second_life.Bones):
+        the.target = the.T_SecondLife
+        name = "Second Life"
     else:
         print("Bones", bones)
         raise NameError("Did not recognize target armature %s" % trgRig)
@@ -123,55 +127,74 @@ def guessTargetArmature(trgRig, scn):
     the.targetRolls = {}
     the.targetMats = {}
 
-    if the.target == T_MHX:
+    if the.target == the.T_MHX:
         the.fkBoneList = rig_mhx.FkBoneList
         the.IkBoneList = rig_mhx.IkBoneList
         the.GlobalBoneList = rig_mhx.GlobalBoneList
         the.IkParents = rig_mhx.IkParents
         for bone in trgRig.data.bones:
-            """
-            try:
-                roll = bone['Roll']
-            except:
-                roll = 0
-            """
             roll = utils.getRoll(bone)
             if abs(roll) > 0.1:
                 the.targetRolls[bone.name] = roll
+        return assocTargetBones(trgRig, TargetBoneNames, [])
     else:
         the.fkBoneList = []
         the.GlobalBoneList = []
 
         the.trgBone = {}
         the.srcBone = {}
-        if the.target == T_Custom:
-            (bones, ikBones, the.parents, the.targetRolls, the.targetMats, the.IkBoneList, the.IkParents) = makeTargetAssoc(trgRig, scn)
-        elif the.target == T_Rorkimaru:
-            bones = rig_rorkimaru.Bones
-            the.IkBoneList = rig_game.IkBoneList
-            the.IkParents = rig_game.IkParents
-        elif the.target == T_Game:
-            bones = rig_game.Bones
-            the.IkBoneList = rig_game.IkBoneList
-            the.IkParents = rig_game.IkParents
+        if the.target == the.T_Custom:
+            (boneAssoc, ikBones, the.parents, the.targetRolls, the.targetMats, the.IkBoneList, the.IkParents) = makeTargetAssoc(trgRig, scn)
+        elif the.target == the.T_Game:
+            boneAssoc = rig_game.Bones
+            names = rig_game.Names
+            the.IkBones = rig_game.IkBones
+        elif the.target == the.T_Simple:
+            boneAssoc = rig_simple.Bones
+            names = rig_simple.Names
+            the.IkBones = rig_simple.IkBones
+        elif the.target == the.T_SecondLife:
+            boneAssoc = rig_second_life.Bones
+            names = rig_second_life.Names
+            the.IkBones = rig_second_life.IkBones
         else:
             raise NameError("Unknown target %s" % the.target)
-        for (trg,src) in bones:
-            the.fkBoneList.append(trg)
-            the.srcBone[trg] = src
-            the.trgBone[src] = trg
-            if src in rig_mhx.GlobalBoneList:
-                the.GlobalBoneList.append(trg)
-    return
+        parAssoc = assocParents(trgRig, boneAssoc, names)                        
+        return (boneAssoc, parAssoc, None)
 
 
-def testTargetRig(bones, rigBones):
+def assocParents(rig, boneAssoc, names):          
+    parAssoc = {}
+    taken = { None : True }
+    for (name, mhx) in boneAssoc:
+        name = getName(name, names)
+        the.trgBone[mhx] = name
+        pb = rig.pose.bones[name]
+        taken[name] = True
+        parAssoc[name] = None
+        while pb.parent:
+            pname = getName(pb.parent.name, names)
+            if taken[pname]:
+                parAssoc[name] = pname
+                break
+    return parAssoc                 
+
+
+def getName(name, names):        
+    try:
+        return names[name]
+    except:
+        return name
+
+
+def testTargetRig(name, bones, rigBones):
+    #print("Testing %s" % name)
     for (b, mb) in rigBones:
         if b not in bones:
-            print("Fail", b, mb)
+            #print("Failed to find", b, mb)
             return False
     return True
-
+    
 ###############################################################################
 #
 #    Target armatures
@@ -283,11 +306,7 @@ class VIEW3D_OT_McpUnInitTargetCharacterButton(bpy.types.Operator):
 def assocTargetBones(rig, names, xtraAssoc):
     ensureTargetCharacterInited(rig)
     boneAssoc = []
-    print("N", names)
-    print(rig)
-    print("R", rig.keys())
     for bn in names:
-        print("  ", bn)
         if not bn:
             continue
         try:
@@ -322,36 +341,12 @@ def assocTargetBones(rig, names, xtraAssoc):
     for (bname, mhx) in boneAssoc:
         rolls[bname] = utils.getRoll(rig.data.bones[bname])
 
-    """
-    try:
-        bpy.ops.object.mode_set(mode='EDIT')    
-        (bname, mhx) = boneAssoc[0]
-        rig.data.edit_bones[bname]
-        edit = True
-    except:
-        edit = False
-    if edit:
-        for (bname, mhx) in boneAssoc:
-            eb = rig.data.edit_bones[bname]
-            rolls[bname] = eb.roll
-        bpy.ops.object.mode_set(mode='POSE')    
-        for (bname, mhx) in boneAssoc:
-            bone = rig.data.bones[bname]
-            bone['Roll'] = rolls[bname]
-    else:
-        for (bname, mhx) in boneAssoc:
-            bone = rig.data.bones[bname]
-            try:
-                rolls[bname] = bone['Roll']
-            except:
-                raise NameError("Associations must be made in rig source file")
-    """
-
     pb = rig.pose.bones[rig['Root']]
     pb.lock_location = (False,False,False)
 
     return (boneAssoc, parAssoc, rolls)
-
+    
+    
 #
 #    findFakeParent(mhx, boneAssoc):
 #
@@ -384,7 +379,10 @@ def makeTargetAssoc(rig, scn):
         parAssoc[bone] = par
 
     fixMats = createCustomFixes(rig['McpLegBentOut'], 0, rig['McpArmBentDown'], 0)
-
+    printAssociations(boneAssoc, ikBoneAssoc, rolls)
+    return (boneAssoc, ikBoneAssoc, parAssoc, rolls, fixMats, ikBones, ikParents)
+    
+def printAssociations(boneAssoc, ikBoneAssoc, rolls):
     print("Associations:")    
     print("            Bone :       Mhx bone         Parent  Roll")
     for (bname, mhx) in boneAssoc:
@@ -395,7 +393,6 @@ def makeTargetAssoc(rig, scn):
     for (bname, mhx) in ikBoneAssoc:
         (par, fakePar, copyRot, reverse) = ikParents[bname]
         print("  %14s : %14s %14s %14s %14s" % (bname, mhx, par, fakePar, copyRot))
-    return (boneAssoc, ikBoneAssoc, parAssoc, rolls, fixMats, ikBones, ikParents)
 
 
 #

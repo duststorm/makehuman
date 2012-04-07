@@ -41,7 +41,7 @@ from . import globvar as the
 
 class CBoneData:
     def __init__(self, srcBone, trgBone):
-        self.name = trgBone.name
+        self.name = srcBone.name
         self.parent = None        
         self.srcMatrices = {}        
         self.srcPoseBone = srcBone        
@@ -217,6 +217,8 @@ def retargetMatrices(anim, frames, first, doFK, doIK, scn):
         if doFK:
             for boneData in anim.boneDataList:
                 retargetFkBone(boneData, frame)
+        else:
+            scn.frame_set(frame)
         if doIK:
             retargetIkBones(anim.trgRig, frame, first) 
             first = False
@@ -284,8 +286,9 @@ def setupFkBones(srcRig, trgRig, boneAssoc, parAssoc, anim, scn):
                 offs = trgBone.bone.head_local - trgParent.bone.head_local
                 boneData.trgOffset = parRestInv * Matrix.Translation(offs) * parRest
                 boneData.trgBakeMat = parRestInv * boneData.trgRestMat
+                #print(trgName, trgParent.name)
 
-        if trgName in keepOffsets:        
+        if srcName in keepOffsets:        
             offs = trgBone.bone.matrix_local*srcBone.bone.matrix_local.inverted()
             boneData.rotOffset = boneData.trgRestInv * offs * boneData.trgRestMat
             if trgName in keepOffsInverts:
@@ -312,7 +315,8 @@ def setupMhxAnimation(scn, srcRig, trgRig):
         trgRig.animation_data.action = None
 
     anim = CAnimation(srcRig, trgRig)
-    (boneAssoc, ikBoneAssoc, parAssoc, rolls, mats, ikBones, ikParents) = target.makeTargetAssoc(trgRig, scn)
+    (boneAssoc, parAssoc, rolls) = target.guessTargetArmature(trgRig, scn)
+    #(boneAssoc, ikBoneAssoc, parAssoc, rolls, mats, ikBones, ikParents) = target.makeTargetAssoc(trgRig, scn)
     setupFkBones(srcRig, trgRig, boneAssoc, parAssoc, anim, scn)
     return anim
     
@@ -328,16 +332,13 @@ def retargetMhxRig(context, srcRig, trgRig, doFK, doIK):
     scn.objects.active = trgRig
     scn.update()
     bpy.ops.object.mode_set(mode='POSE')  
-    bpy.ops.pose.select_all(action='DESELECT')
-    for name in ["Root", "Hips", "Pelvis"]:
-        trgRig.data.bones[name].select = True
 
     try:
         scn.frame_current = frames[0]
     except:
         print("No frames found. Quitting.")
         return
-    oldData = changeTargetData(trgRig)
+    oldData = changeTargetData(trgRig, anim)
     frameBlock = frames[0:100]
     index = 0
     first = True
@@ -350,8 +351,9 @@ def retargetMhxRig(context, srcRig, trgRig, doFK, doIK):
             frameBlock = frames[index:index+100]
             
         scn.frame_current = frames[0]
-        setInverse(trgRig, trgRig.pose.bones["Ankle_L"])
-        setInverse(trgRig, trgRig.pose.bones["Ankle_R"])
+        if the.target == the.T_MHX:
+            setInverse(trgRig, trgRig.pose.bones["Ankle_L"])
+            setInverse(trgRig, trgRig.pose.bones["Ankle_R"])
     finally:                
         restoreTargetData(trgRig, oldData)
             
@@ -366,11 +368,11 @@ def retargetMhxRig(context, srcRig, trgRig, doFK, doIK):
     return
 
 #
-#   changeTargetData(rig):    
+#   changeTargetData(rig, anim):    
 #   restoreTargetData(rig, data):
 #
     
-def changeTargetData(rig):    
+def changeTargetData(rig, anim):    
     tempProps = [
         ("&RotationLimits", 0.0),
         ("&ArmIk_L", 0.0),
@@ -416,11 +418,18 @@ def changeTargetData(rig):
         pb.lock_rotation = [False, False, False]
         pb.lock_scale = [False, False, False]
         
-    norotBones = []        
-    for name in ["UpLegRot_L", "UpLegRot_R"]:
-        b = rig.data.bones[name]
-        norotBones.append(b)
-        b.use_inherit_rotation = False        
+    norotBones = []      
+    if the.target == the.T_MHX:
+        for (name, parent) in [("UpLegRot_L", "Hip_L"), ("UpLegRot_R", "Hip_R")]:
+            try:
+                anim.boneDatas[parent]
+                isPermanent = True
+            except:
+                isPermanent = False
+            b = rig.data.bones[name]
+            if not isPermanent:
+                norotBones.append(b)
+            b.use_inherit_rotation = False
     return (props, layers, locks, norotBones)
 
     
@@ -542,21 +551,29 @@ def ik2fkLeg(rig, ikBones, fkBones, legIkToAnkle, suffix, frame):
    
    
 def retargetIkBones(rig, frame, first):
-    lArmIkBones = getSnapBones(rig, "ArmIK", "_L")
-    lArmFkBones = getSnapBones(rig, "ArmFK", "_L")
-    rArmIkBones = getSnapBones(rig, "ArmIK", "_R")
-    rArmFkBones = getSnapBones(rig, "ArmFK", "_R")
-    lLegIkBones = getSnapBones(rig, "LegIK", "_L")
-    lLegFkBones = getSnapBones(rig, "LegFK", "_L")
-    rLegIkBones = getSnapBones(rig, "LegIK", "_R")
-    rLegFkBones = getSnapBones(rig, "LegFK", "_R")
-        
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.mode_set(mode='POSE')
-    ik2fkArm(rig, lArmIkBones, lArmFkBones, "_L", frame)
-    ik2fkArm(rig, rArmIkBones, rArmFkBones, "_R", frame)
-    ik2fkLeg(rig, lLegIkBones, lLegFkBones, (first or rig["&LegIkToAnkle_L"]), "_L", frame)
-    ik2fkLeg(rig, rLegIkBones, rLegFkBones, (first or rig["&LegIkToAnkle_R"]), "_R", frame)
+
+    if the.target == the.T_MHX:
+        lArmIkBones = getSnapBones(rig, "ArmIK", "_L")
+        lArmFkBones = getSnapBones(rig, "ArmFK", "_L")
+        rArmIkBones = getSnapBones(rig, "ArmIK", "_R")
+        rArmFkBones = getSnapBones(rig, "ArmFK", "_R")
+        lLegIkBones = getSnapBones(rig, "LegIK", "_L")
+        lLegFkBones = getSnapBones(rig, "LegFK", "_L")
+        rLegIkBones = getSnapBones(rig, "LegIK", "_R")
+        rLegFkBones = getSnapBones(rig, "LegFK", "_R")
+        
+        ik2fkArm(rig, lArmIkBones, lArmFkBones, "_L", frame)
+        ik2fkArm(rig, rArmIkBones, rArmFkBones, "_R", frame)
+        ik2fkLeg(rig, lLegIkBones, lLegFkBones, (first or rig["&LegIkToAnkle_L"]), "_L", frame)
+        ik2fkLeg(rig, rLegIkBones, rLegFkBones, (first or rig["&LegIkToAnkle_R"]), "_R", frame)
+    else:
+        for (ik,fk) in the.IkBones:
+            ikPb = rig.pose.bones[ik]
+            fkPb = rig.pose.bones[fk]
+            matchPoseTranslation(ikPb, fkPb, frame)  
+            matchPoseRotation(ikPb, fkPb, frame)          
     return        
         
 #
@@ -655,7 +672,8 @@ class VIEW3D_OT_NewRetargetMhxButton(bpy.types.Operator):
 
     def execute(self, context):
         trgRig = context.object
-        target.guessTargetArmature(trgRig, context.scene)
+        scn = context.scene
+        target.guessTargetArmature(trgRig, scn)
         for srcRig in context.selected_objects:
             if srcRig != trgRig:
                 retargetMhxRig(context, srcRig, trgRig, True, scn.McpRetargetIK)
@@ -668,6 +686,8 @@ class VIEW3D_OT_RetargetIKButton(bpy.types.Operator):
 
     def execute(self, context):
         rig = context.object
+        scn = context.scene
+        target.guessTargetArmature(rig, scn)
         retargetMhxRig(context, rig, rig, False, True)
         return{'FINISHED'}    
 

@@ -158,10 +158,12 @@ def copyAction(act1, name):
 
 def activeFrames(ob):
     active = {}
-    act = ob.animation_data.action
-    if not act:
+    if ob.animation_data is None:
+    	return []
+    action = ob.animation_data.action
+    if action is None:
         return []
-    for fcu in act.fcurves:
+    for fcu in action.fcurves:
         for kp in fcu.keyframe_points:
             active[kp.co[0]] = True
     frames = list(active.keys())
@@ -213,16 +215,14 @@ def setRotation(pb, rot, frame, group):
         except:
             quat = rot
         pb.rotation_quaternion = quat
-        for n in range(4):
-            pb.keyframe_insert('rotation_quaternion', index=n, frame=frame, group=group)
+        pb.keyframe_insert('rotation_quaternion', frame=frame, group=group)
     else:
         try:
             euler = rot.to_euler(pb.rotation_mode)
         except:
             euler = rot
         pb.rotation_euler = euler
-        for n in range(3):
-            pb.keyframe_insert('rotation_euler', index=n, frame=frame, group=group)
+        pb.keyframe_insert('rotation_euler', frame=frame, group=group)
 
 #
 #    setInterpolation(rig):

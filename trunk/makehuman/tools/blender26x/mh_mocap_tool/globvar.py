@@ -39,6 +39,13 @@ actions = []
 F_Rev = 1
 F_LR = 2
 
+
+T_MHX = 1
+T_Game = 2
+T_Simple = 3
+T_SecondLife = 4
+T_Custom = 5
+
 ###################################################################################
 #
 #    Supported source armatures

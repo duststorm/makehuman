@@ -88,7 +88,7 @@ if "bpy" in locals():
     imp.reload(globvar)
     imp.reload(props)
     imp.reload(load)
-    imp.reload(old_retarget)
+    #imp.reload(old_retarget)
     imp.reload(new_retarget)
     imp.reload(source)
     imp.reload(target)
@@ -107,8 +107,9 @@ if "bpy" in locals():
     imp.reload(mb)
     imp.reload(mega)
     imp.reload(rig_mhx)
-    imp.reload(rig_rorkimaru)
+    imp.reload(rig_simple)
     imp.reload(rig_game)
+    imp.reload(rig_second_life)
 else:
     print("Loading Mocap tool")
     import bpy, os
@@ -119,7 +120,7 @@ else:
     from . import globvar as the
     from . import props
     from . import load
-    from . import old_retarget
+    #from . import old_retarget
     from . import new_retarget
     from . import source
     from . import target
@@ -131,7 +132,7 @@ else:
     from . import plant
     from . import sigproc
     from . import accad, daz, eyes, hdm, max, mb, mega
-    from . import rig_mhx, rig_rorkimaru, rig_game
+    from . import rig_mhx, rig_simple, rig_game, rig_second_life
 
 #        
 #    class MhxSourceBonesPanel(bpy.types.Panel):
@@ -259,15 +260,17 @@ class LoadPanel(bpy.types.Panel):
         row = layout.row()
         row.prop(scn, "McpDoSimplify")
         row.prop(scn, "McpDefaultSS")
-        layout.prop(scn, "McpNewRetarget")
+        #layout.prop(scn, "McpNewRetarget")
         if scn.McpNewRetarget:
             row = layout.row()
             row.prop(scn, "McpUseSpineOffset")
             row.prop(scn, "McpUseClavOffset")
             layout.prop(scn, "McpRetargetIK")
-            layout.operator("mcp.new_retarget_mhx")
-            #layout.operator("mcp.retarget_ik")
+            layout.separator()
             layout.operator("mcp.new_load_retarget_simplify")
+            layout.separator()
+            layout.operator("mcp.new_retarget_mhx")
+            layout.operator("mcp.retarget_ik")
             layout.operator("mcp.fix_ankles")
         else:
             row = layout.row()

@@ -23,32 +23,35 @@
 # Script copyright (C) MakeHuman Team 2001-2011
 # Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
 
+
+
 Bones = [
     ('Root',        'Root'),
-    ('Spine1',      'Spine1'),
-    ('Spine2',      'Spine3'),
+    ('Spine1',        'Spine1'),
+    ('Spine2',        'Spine2'),
+    ('Spine3',        'Spine3'),
     ('Neck',        'Neck'),
     ('Head',        'Head'),
 
-    ('Clavicle_L',  'Clavicle_L'),
-    ('UpArm_L',     'UpArm_L'),
-    ('LoArm_L',     'LoArm_L'),
-    ('Hand_L',      'Hand_L'),
+    ('Clavicle_L',    'Clavicle_L'),
+    ('UpArm_L',        'UpArm_L'),
+    ('LoArm_L',        'LoArm_L'),
+    ('Hand_L',        'Hand_L'),
 
-    ('Clavicle_R',  'Clavicle_R'),
-    ('UpArm_R',     'UpArm_R'),
-    ('LoArm_R',     'LoArm_R'),
-    ('Hand_R',      'Hand_R'),
+    ('Clavicle_R',    'Clavicle_R'),
+    ('UpArm_R',        'UpArm_R'),
+    ('LoArm_R',        'LoArm_R'),
+    ('Hand_R',        'Hand_R'),
 
-    ('UpLeg_L',     'UpLeg_L'),
-    ('LoLeg_L',     'LoLeg_L'),
-    ('Foot_L',      'Foot_L'),
-    ('Toe_L',       'Toe_L'),
+    ('UpLeg_L',        'UpLeg_L'),
+    ('LoLeg_L',        'LoLeg_L'),
+    ('Foot_L',        'Foot_L'),
+    ('Toe_L',        'Toe_L'),
 
-    ('UpLeg_R',     'UpLeg_R'),
-    ('LoLeg_R',     'LoLeg_R'),
-    ('Foot_R',      'Foot_R'),
-    ('Toe_R',       'Toe_R'),
+    ('UpLeg_R',        'UpLeg_R'),
+    ('LoLeg_R',        'LoLeg_R'),
+    ('Foot_R',        'Foot_R'),
+    ('Toe_R',        'Toe_R'),
 ]
 
 IkBones = [ 
@@ -59,12 +62,13 @@ IkBones = [
 ]
 
 Names = {
-    'MasterFloor' :     None,
-    'MasterFloorInv' :  None,
+    'MasterFloor' :    None,
+    'MasterFloorInv' :    None,
     'RootInv' :        'Root',
     'HipsInv' :        'Root',
-    'Hips' :           'Root',
-    'Spine2Inv' :      'Spine2',
-    'Spine3' :         'Spine2',
+    'Hips' :        'Root',
+    'Spine3Inv' :    'Spine3',
 }
+
+
 

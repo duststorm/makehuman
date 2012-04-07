@@ -293,7 +293,7 @@ def loadSourceBones(context, path):
             the.sourceProps.append(prop)
             mhx = words[1]
             setSourceProp(scn, prop, mhx, the.sourceEnums)
-            print(prop, scn[prop], mhx)
+            #print(prop, scn[prop], mhx)
     fp.close()
     
     for prop in the.sourceProps:

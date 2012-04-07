@@ -97,7 +97,7 @@ def createAnimData(name, animations, bones, isTarget):
     except:
         anim.roll = 0
 
-    if isTarget and the.target == target.T_Custom:
+    if isTarget and the.target == the.T_Custom:
         anim.parent = the.parents[name]
     elif b.parent:
         if isTarget:

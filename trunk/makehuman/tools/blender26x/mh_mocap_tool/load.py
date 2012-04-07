@@ -121,6 +121,7 @@ def readBvhFile(context, filepath, scn, scan):
     scale = scn.McpBvhScale
     startFrame = scn.McpStartFrame
     endFrame = scn.McpEndFrame
+    frameno = 1
     rot90 = scn.McpRot90Anim
     if (scn.McpSubsample):
         ssFactor = scn.McpSSFactor
@@ -241,6 +242,8 @@ def readBvhFile(context, filepath, scn, scan):
     utils.setInterpolation(rig)
     time2 = time.clock()
     print("Bvh file %s loaded in %.3f s" % (filepath, time2-time1))
+    if frameno == 1:
+        print("Warning: No frames in range %d -- %d." % (startFrame, endFrame))
     renameBvhRig(rig, filepath)
     return (rig, trgRig)
 
@@ -266,8 +269,7 @@ def addFrame(words, frame, nodes, pbones, scale):
                         m += 1
                     if first:
                         pb.location = node.inverse * (scale * vec - node.head)
-                        for n in range(3):
-                            pb.keyframe_insert('location', index=n, frame=frame, group=name)
+                        pb.keyframe_insert('location', frame=frame, group=name)
                     first = False
                 elif mode == Rotation:
                     mats = []
@@ -360,13 +362,17 @@ def renameBones(srcRig, scn):
     scn.update()
     bpy.ops.object.mode_set(mode='EDIT')
     bpy.ops.object.mode_set(mode='EDIT')
-    print("Ren", bpy.context.object, srcRig.mode)
+    #print("Ren", bpy.context.object, srcRig.mode)
     ebones = srcRig.data.edit_bones
     for bone in ebones:
         srcBones.append( CEditBone(bone) )
     
     setbones = []
-    action = srcRig.animation_data.action
+    adata = srcRig.animation_data
+    if adata is None:
+        action = None
+    else:
+        action = adata.action
     for srcBone in srcBones:
         srcName = srcBone.name
         lname = srcName.lower()
@@ -378,9 +384,9 @@ def renameBones(srcRig, scn):
         if trgName:
             eb.name = trgName
             trgBones[trgName] = CEditBone(eb)
-            grp = action.groups[srcName]
-            grp.name = trgName
-
+            if action:
+                grp = action.groups[srcName]
+                grp.name = trgName
             setbones.append((eb, trgName))
         else:
             eb.name = '_' + srcName
@@ -451,8 +457,9 @@ def renameBvhRig(srcRig, filepath):
     print("Name", name)
 
     srcRig.name = name
-    action = srcRig.animation_data.action
-    action.name = name
+    adata = srcRig.animation_data
+    if adata:
+        adata.action.name = name
     return 
     
 #
@@ -518,8 +525,10 @@ def rescaleRig(scn, trgRig, srcRig):
         eb.head *= scale
         eb.tail *= scale
     bpy.ops.object.mode_set(mode='POSE')
-    action = srcRig.animation_data.action
-    for fcu in action.fcurves:
+    adata = srcRig.animation_data
+    if adata is None:
+        return
+    for fcu in adata.action.fcurves:
         words = fcu.data_path.split('.')
         if words[-1] == 'location':
             for kp in fcu.keyframe_points:
