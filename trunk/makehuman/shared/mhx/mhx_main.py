@@ -23,7 +23,7 @@ MakeHuman to MHX (MakeHuman eXchange format) exporter. MHX files can be loaded i
 """
 
 MAJOR_VERSION = 1
-MINOR_VERSION = 11
+MINOR_VERSION = 12
 BODY_LANGUAGE = True
 
 import module3d
@@ -205,7 +205,9 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
 "  Property MhxOffsetY %.4f ;\n" % the.Origin[1] +
 "  Property MhxOffsetZ %.4f ;\n" % the.Origin[2])
                 elif words[2] == 'ControlRig':
-                    fp.write("Object %s ARMATURE %s\n"  % (the.Human, the.Human))
+                    fp.write(
+                    "Object %s ARMATURE %s\n"  % (the.Human, the.Human) +
+                    "  Property MhxVersion %d ;\n" % MINOR_VERSION)
             elif key == 'rig-poses':
                 fp.write("Pose %s\n" % the.Human)
                 mhx_rig.writeControlPoses(fp)
