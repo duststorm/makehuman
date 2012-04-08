@@ -27,7 +27,7 @@ from mathutils import *
 
 DazArmature = {
     'hip' : 'Root', 
-    'abdomen' : 'Spine1',
+    'abdomen' : 'Spine2',
 
     'chest' : 'Spine3',
     'neck' : 'Neck',

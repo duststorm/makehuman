@@ -71,7 +71,14 @@ MBArmature = {
 
 
 MBRolls = {
-    'UpLeg_L' : 22.5,
-    'UpLeg_R' : -22.5,
+    'UpLeg_L' : -20,
+    'LoLeg_L' : -20,
+    'Foot_L'  : -20,
+    'Toe_L'   : -20,
+
+    'UpLeg_R' : 20,
+    'LoLeg_R' : 20,
+    'Foot_R'  : 20,
+    'Toe_R'   : 20,
 }
 
