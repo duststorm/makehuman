@@ -76,18 +76,18 @@ DazArmature = {
     'rpinky2' : None, 
     'rpinky3' : None, 
 
-    'lbuttock' : 'Hip_L',
+    'lbuttock' : None,
     'lthigh' : 'UpLeg_L',
     'lshin' : 'LoLeg_L', 
     'lfoot' : 'Foot_L', 
     'ltoe' : 'Toe_L',
 
-    'rbuttock' : 'Hip_R',
+    'rbuttock' : None,
     'rthigh' : 'UpLeg_R',
     'rshin' : 'LoLeg_R', 
     'rfoot' : 'Foot_R', 
     'rtoe' : 'Toe_R',
 }
 
-DazFixes = {}
+DazRolls = {}
 

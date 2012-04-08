@@ -322,9 +322,8 @@ def initInterface(context):
 
     bpy.types.Object.McpArmature = StringProperty()
     
-    bpy.types.Object.McpTogglePoleTargets = BoolProperty(default=True)
-    bpy.types.Object.McpToggleIkLimits = BoolProperty(default=False)
-    bpy.types.Object.McpToggleLimitConstraints = BoolProperty(default=True)
+    bpy.types.Object.McpLimitsOn = BoolProperty(default=True)
+    bpy.types.Object.McpChildOfsOn = BoolProperty(default=False)
 
 
 #

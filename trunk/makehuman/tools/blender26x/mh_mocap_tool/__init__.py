@@ -38,9 +38,9 @@ Alternatively, run the script in the script editor (Alt-P), and access from UI p
 bl_info = {
     "name": "MHX Mocap",
     "author": "Thomas Larsson",
-    "version": "0.8",
-    "blender": (2, 5, 8),
-    "api": 35774,
+    "version": "0.9",
+    "blender": (2, 6, 3),
+    "api": 44000,
     "location": "View3D > Properties > MHX Mocap",
     "description": "Mocap tool for MHX rig",
     "warning": "",
@@ -138,6 +138,7 @@ class MhxSourceBonesPanel(bpy.types.Panel):
     
     @classmethod
     def poll(cls, context):
+        return False
         return (context.object and context.object.type == 'ARMATURE')
 
     def draw(self, context):
@@ -178,6 +179,7 @@ class MhxTargetBonesPanel(bpy.types.Panel):
     
     @classmethod
     def poll(cls, context):
+        return False
         return (context.object and context.object.type == 'ARMATURE')
 
     def draw(self, context):
@@ -303,14 +305,17 @@ class LoadPanel(bpy.types.Panel):
         layout.separator()
         layout.label("Toggle constraints")
         row = layout.row()
-        row.operator("mcp.toggle_pole_targets")
-        row.prop(ob, "McpTogglePoleTargets")
+        row.label("Limit constraints")
+        if ob.McpLimitsOn:
+            row.operator("mcp.toggle_limits", text="ON").mute=True
+        else:
+            row.operator("mcp.toggle_limits", text="OFF").mute=False
         row = layout.row()
-        row.operator("mcp.toggle_ik_limits")
-        row.prop(ob, "McpToggleIkLimits")
-        row = layout.row()
-        row.operator("mcp.toggle_limit_constraints")
-        row.prop(ob, "McpToggleLimitConstraints")
+        row.label("Child-of constraints")
+        if ob.McpChildOfsOn:
+            row.operator("mcp.toggle_childofs", text="ON").mute=True
+        else:
+            row.operator("mcp.toggle_childofs", text="OFF").mute=False
 
 
 ########################################################################

@@ -28,13 +28,13 @@ from mathutils import *
 MaxArmature = {
     'hips' : 'Root',
 
-    'lhipjoint' : 'Hip_L',
+    'lhipjoint' : None,
     'lefthip' : 'UpLeg_L',
     'leftknee' : 'LoLeg_L',
     'leftankle' : 'Foot_L',
     'lefttoe' : 'Toe_L',
 
-    'rhipjoint' : 'Hip_R',
+    'rhipjoint' : None,
     'righthip' : 'UpLeg_R',
     'rightknee' : 'LoLeg_R',
     'rightankle' : 'Foot_R',
@@ -64,19 +64,15 @@ MaxArmature = {
     'rthumb' : None,
 }
 
-MaxFixes = {
-    'UpLeg_L' : ( Matrix.Rotation(0.4, 3, 'Y') * Matrix.Rotation(-0.45, 3, 'Z'), 0),
-    'UpLeg_R' : ( Matrix.Rotation(-0.4, 3, 'Y') * Matrix.Rotation(0.45, 3, 'Z'), 0),
-    'LoLeg_L' : ( Matrix.Rotation(-0.3, 3, 'Y'), 0),
-    'LoLeg_R' : ( Matrix.Rotation(0.3, 3, 'Y'), 0),
-    #'Foot_L'  : ( Matrix.Rotation(-0.3, 3, 'Z'), 0),
-    #'Foot_R'  : ( Matrix.Rotation(0.3, 3, 'Z'), 0),
+MaxRolls = {
+    'UpLeg_L' : 22.5,
+    'UpLeg_R' : -22.5,
 
-    'UpArm_L' :  (Matrix.Rotation(1.57, 3, 'Z'), 1.57),
-    'LoArm_L' :  (None, 1.57),
-    'Hand_L'  :  (None, 1.57),
-    'UpArm_R' :  (Matrix.Rotation(-1.57, 3, 'Z'), -1.57),
-    'LoArm_R' :  (None, -1.57),
-    'Hand_R'  :  (None, -1.57),
+    'UpArm_L' :  90,
+    'LoArm_L' :  90,
+    'Hand_L'  :  90,
+    'UpArm_R' :  -90,
+    'LoArm_R' :  -90,
+    'Hand_R'  :  -90,
 }
 

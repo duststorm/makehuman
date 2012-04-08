@@ -61,14 +61,14 @@ the.armatures = {
 
 the.armatureList = [ 'Accad', 'MB', 'Mega', 'HDM', 'Eyes', 'Daz', '3dsMax' ]
 
-the.fixesList = {
-    'MB'  : mb.MBFixes,
-    'Accad' : accad.AccadFixes,
-    'Mega' : mega.MegaFixes,
-    'HDM' : hdm.HDMFixes,
-    '3dsMax': max.MaxFixes,
-    'Eyes': eyes.EyesFixes,
-    'Daz' : daz.DazFixes,
+the.rollFixes = {
+    'MB'  : mb.MBRolls,
+    'Accad' : accad.AccadRolls,
+    'Mega' : mega.MegaRolls,
+    'HDM' : hdm.HDMRolls,
+    '3dsMax': max.MaxRolls,
+    'Eyes': eyes.EyesRolls,
+    'Daz' : daz.DazRolls,
 }
 
  

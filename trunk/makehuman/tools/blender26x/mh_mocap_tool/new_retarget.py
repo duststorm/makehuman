@@ -35,6 +35,7 @@ from . import utils, props, source, target, toggle, load, simplify
 from .target_rigs import rig_mhx
 from . import globvar as the
 
+Deg2Rad = math.pi/180
     
 #
 #   class CBoneData:
@@ -282,16 +283,22 @@ def setupFkBones(srcRig, trgRig, boneAssoc, parAssoc, anim, scn):
                 boneData.trgBakeMat = parRestInv * boneData.trgRestMat
                 #print(trgName, trgParent.name)
 
+
         trgRoll = utils.getRoll(trgBone.bone)
-        srcRoll = utils.getRoll(srcBone.bone)
-        diff = srcRoll-trgRoll
+        try:
+            srcRoll = the.srcRolls[srcName]*Deg2Rad
+        except KeyError:
+            srcRoll = 0
+        srcRoll = 0
+        diff = srcRoll - trgRoll
+        
         if srcName in keepOffsets:        
             offs = trgBone.bone.matrix_local*srcBone.bone.matrix_local.inverted()
             boneData.rotOffset = boneData.trgRestInv * offs * boneData.trgRestMat
             if trgName in keepOffsInverts:
                 boneData.rotOffsInv = boneData.rotOffset.inverted()
         else:                
-            if abs(diff) > 0.1:            
+            if abs(diff) > 0.02:            
                 boneData.rotOffset = Matrix.Rotation(diff, 4, 'Y') 
                 boneData.rotOffsInv = boneData.rotOffset.inverted()
                         

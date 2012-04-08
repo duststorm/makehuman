@@ -24,7 +24,9 @@
 # Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
 
 import bpy
+from bpy.props import *
 
+"""
 #
 #    togglePoleTargets(trgRig):
 #
@@ -181,17 +183,42 @@ class VIEW3D_OT_McpToggleLimitConstraintsButton(bpy.types.Operator):
         res = toggleLimitConstraints(context.object)
         print("Limit constraints toggled", res)
         return{'FINISHED'}    
+"""
 
 #
-#   class VIEW3D_OT_McpSilenceConstraintsButton(bpy.types.Operator):
+#   class VIEW3D_OT_McpToggleLimitButton(bpy.types.Operator):
 #
 
-class VIEW3D_OT_McpSilenceConstraintsButton(bpy.types.Operator):
-    bl_idname = "mcp.silence_constraints"
-    bl_label = "Silence constraints"
+def toggleConstraints(rig, types, mute):
+    for pb in rig.pose.bones:
+        for cns in pb.constraints:
+            if cns.type in types:
+                cns.mute = mute
+    bpy.ops.object.mode_set(mode='OBJECT')                
+    bpy.ops.object.mode_set(mode='POSE')                
+    return                
+
+
+class VIEW3D_OT_McpToggleLimitButton(bpy.types.Operator):
+    bl_idname = "mcp.toggle_limits"
+    bl_label = "Limit"
+    mute = BoolProperty()
 
     def execute(self, context):
-        silenceConstraints(context.object)
-        print("Constraints silenced")
+        ob = context.object
+        toggleConstraints(ob, 
+            ['LIMIT_LOCATION', 'LIMIT_ROTATION', 'LIMIT_DISTANCE', 'LIMIT_SCALE'],
+            self.mute)
+        ob.McpLimitsOn = not self.mute
         return{'FINISHED'}    
 
+class VIEW3D_OT_McpToggleChildofButton(bpy.types.Operator):
+    bl_idname = "mcp.toggle_childofs"
+    bl_label = "Childofs"
+    mute = BoolProperty()
+
+    def execute(self, context):
+        ob = context.object
+        toggleConstraints(ob, ['CHILD_OF'], self.mute)
+        ob.McpChildOfsOn = not self.mute
+        return{'FINISHED'}    

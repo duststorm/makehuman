@@ -59,5 +59,5 @@ AccadArmature = {
     'righttoebase' : 'Toe_R',
 }
 
-AccadFixes = {}
+AccadRolls = {}
 

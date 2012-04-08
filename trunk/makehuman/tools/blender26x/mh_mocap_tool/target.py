@@ -42,126 +42,65 @@ Deg2Rad = math.pi/180
 #
 
 def getTrgBone(b):
-    if the.target == the.T_MHX:
-        return b
-    else:
-        try:
-            return the.trgBone[b]
-        except:
-            return None
-
-#
-#   getSrcBone(b):
-#
-
-def getSrcBone(b):
-    if the.target == the.T_MHX:
-        return b
-    else:
-        try:
-            return the.srcBone[b]
-        except:
-            return None            
-            
-#
-#   getParentName(b):
-#
-
-def getParentName(b):
-    if b == None:
+    try:
+        return the.trgBone[b]
+    except:
         return None
-    elif the.target == the.T_MHX:
-        if b == 'MasterFloor':
-            return None
-        else:
-            return b
-    elif the.target == the.T_Game:
-        try:
-            return rig_game.Names[b]
-        except:
-            return b
-    elif the.target == the.T_Simple:
-        try:
-            return rig_simple.Names[b]
-        except:
-            return b
-    elif the.target == the.T_SecondLife:
-        try:
-            return rig_simple.Names[b]
-        except:
-            return b
-    else:
+        
+        
+def renameBone(b):
+    try:
+        return the.Renames[b]
+    except:
         return b
 
 #
-#   guessTargetArmature(trgRig, scn):
+#   guessTar getArmature(trgRig, scn):
 #
 
 def guessTargetArmature(trgRig, scn):
+    the.Renames = { None : None }
+    the.trgBone = {}
     bones = trgRig.data.bones.keys()
     try:
         custom = trgRig['McpTargetRig']
     except:
         custom = False
-    custom = False        
+    custom = False      
     if custom:
         the.target = the.T_Custom
         name = "Custom %s" % trgRig.name
     elif 'KneePT_L' in bones:
         the.target = the.T_MHX
         name = "MHX"
+        boneAssoc = rig_mhx.Bones
+        the.Renames = rig_mhx.Renames
+        the.IkBones = rig_mhx.IkBones        
     elif testTargetRig("Simple", bones, rig_simple.Bones):
         the.target = the.T_Simple
         name = "Simple"
+        boneAssoc = rig_simple.Bones
+        the.Renames = rig_simple.Renames
+        the.IkBones = rig_simple.IkBones
     elif testTargetRig("Game", bones, rig_game.Bones):
         the.target = the.T_Game
         name = "Game"
+        boneAssoc = rig_game.Bones
+        the.Renames = rig_game.Renames
+        the.IkBones = rig_game.IkBones
     elif testTargetRig("Second Life", bones, rig_second_life.Bones):
         the.target = the.T_SecondLife
         name = "Second Life"
+        boneAssoc = rig_second_life.Bones
+        the.Renames = rig_second_life.Renames
+        the.IkBones = rig_second_life.IkBones
     else:
         print("Bones", bones)
         raise NameError("Did not recognize target armature %s" % trgRig)
 
     print("Target armature %s" % name)
-    the.parents = {}
-    the.targetRolls = {}
-    the.targetMats = {}
-
-    if the.target == the.T_MHX:
-        the.fkBoneList = rig_mhx.FkBoneList
-        the.IkBoneList = rig_mhx.IkBoneList
-        the.GlobalBoneList = rig_mhx.GlobalBoneList
-        the.IkParents = rig_mhx.IkParents
-        for bone in trgRig.data.bones:
-            roll = utils.getRoll(bone)
-            if abs(roll) > 0.1:
-                the.targetRolls[bone.name] = roll
-        return assocTargetBones(trgRig, TargetBoneNames, [])
-    else:
-        the.fkBoneList = []
-        the.GlobalBoneList = []
-
-        the.trgBone = {}
-        the.srcBone = {}
-        if the.target == the.T_Custom:
-            (boneAssoc, ikBones, the.parents, the.targetRolls, the.targetMats, the.IkBoneList, the.IkParents) = makeTargetAssoc(trgRig, scn)
-        elif the.target == the.T_Game:
-            boneAssoc = rig_game.Bones
-            names = rig_game.Names
-            the.IkBones = rig_game.IkBones
-        elif the.target == the.T_Simple:
-            boneAssoc = rig_simple.Bones
-            names = rig_simple.Names
-            the.IkBones = rig_simple.IkBones
-        elif the.target == the.T_SecondLife:
-            boneAssoc = rig_second_life.Bones
-            names = rig_second_life.Names
-            the.IkBones = rig_second_life.IkBones
-        else:
-            raise NameError("Unknown target %s" % the.target)
-        parAssoc = assocParents(trgRig, boneAssoc, names)                        
-        return (boneAssoc, parAssoc, None)
+    parAssoc = assocParents(trgRig, boneAssoc, the.Renames)                        
+    return (boneAssoc, parAssoc, None)
 
 
 def assocParents(rig, boneAssoc, names):          
@@ -239,6 +178,7 @@ TargetBoneNames = [
 
 #    (mhx bone, text, fakeparent, copyRot)
 
+"""
 TargetIkBoneNames = [ 
     ('Wrist_L',     'L wrist', 'LoArm_L', 'Hand_L'),
     ('ElbowPT_L',     'L elbow', 'UpArm_L', None),
@@ -556,4 +496,4 @@ class VIEW3D_OT_McpLoadSaveTargetBonesButton(bpy.types.Operator, ImportHelper):
     def invoke(self, context, event):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}    
-
+"""

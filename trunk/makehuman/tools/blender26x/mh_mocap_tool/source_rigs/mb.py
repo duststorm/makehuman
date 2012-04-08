@@ -56,13 +56,13 @@ MBArmature = {
     'rfingers' : None,
     'rthumb' : None, 
 
-    'lhipjoint' : 'Hip_L', 
+    'lhipjoint' : None, 
     'leftupleg' : 'UpLeg_L',
     'leftleg' : 'LoLeg_L', 
     'leftfoot' : 'Foot_L', 
     'lefttoebase' : 'Toe_L',
 
-    'rhipjoint' : 'Hip_R', 
+    'rhipjoint' : None, 
     'rightupleg' : 'UpLeg_R',
     'rightleg' : 'LoLeg_R', 
     'rightfoot' : 'Foot_R', 
@@ -70,14 +70,8 @@ MBArmature = {
 }
 
 
-MBFixes = {
-    'UpLeg_L' : ( Matrix.Rotation(0.4, 3, 'Y') * Matrix.Rotation(-0.45, 3, 'Z'), 0),
-    'UpLeg_R' : ( Matrix.Rotation(-0.4, 3, 'Y') * Matrix.Rotation(0.45, 3, 'Z'), 0),
-    'LoLeg_L' : ( Matrix.Rotation(-0.2, 3, 'Y'), 0),
-    'LoLeg_R' : ( Matrix.Rotation(0.2, 3, 'Y'), 0),
-    'Foot_L'  : ( Matrix.Rotation(-0.3, 3, 'Z'), 0),
-    'Foot_R'  : ( Matrix.Rotation(0.3, 3, 'Z'), 0),
-    #'UpArm_L' : ( Matrix.Rotation(0.1, 3, 'X'), 0),
-    #'UpArm_R' : ( Matrix.Rotation(0.1, 3, 'X'), 0),
+MBRolls = {
+    'UpLeg_L' : 22.5,
+    'UpLeg_R' : -22.5,
 }
 

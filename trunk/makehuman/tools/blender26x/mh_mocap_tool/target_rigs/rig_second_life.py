@@ -51,7 +51,7 @@ Bones = [
     ('mFootRight',       'Toe_R'),
 ]
 
-Names = {
+Renames = {
     #'mCollarLeft' : 'mChest',
     #'mCollarRight': 'mChest',
 }

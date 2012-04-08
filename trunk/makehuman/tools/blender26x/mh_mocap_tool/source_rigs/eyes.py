@@ -49,14 +49,13 @@ EyesArmature = {
     'head' : 'Head',
 }
 
-EyesFixes = {
-    'Head2' : (Matrix.Rotation(0.2, 3, 'X'), 0),
-    'Spine2' : (Matrix.Rotation(0.3, 3, 'X'), 0),
-    'UpArm_L' :  (Matrix.Rotation(pi/2, 3, 'Z')*Matrix.Rotation(-0.1, 3, 'X'), pi/2),
-    'LoArm_L' :  (None, pi/2),
-    'Hand_L' :  (None, pi/2),
-    'UpArm_R' :  (Matrix.Rotation(-pi/2, 3, 'Z')*Matrix.Rotation(-0.1, 3, 'X'), -pi/2),
-    'LoArm_R' :  (None, -pi/2),
-    'Hand_R' :  (None, -pi/2),
+
+EyesRolls = {
+    'UpArm_L' :  90,
+    'LoArm_L' :  90,
+    'Hand_L' :  90,
+    'UpArm_R' :  -90,
+    'LoArm_R' :  -90,
+    'Hand_R' :  -90,
 }
 

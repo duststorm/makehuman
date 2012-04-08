@@ -58,7 +58,7 @@ IkBones = [
     ('Ankle_R', 'Foot_R')
 ]
 
-Names = {
+Renames = {
     'MasterFloor' :     None,
     'MasterFloorInv' :  None,
     'RootInv' :        'Root',

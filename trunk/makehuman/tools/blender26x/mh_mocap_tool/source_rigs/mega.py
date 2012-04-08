@@ -89,5 +89,5 @@ MegaArmature = {
     'right toe' : 'Toe_R',
 }
 
-MegaFixes = {}
+MegaRolls = {}
 

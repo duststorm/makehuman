@@ -334,7 +334,7 @@ class CEditBone():
         self.tail = bone.tail.copy()
         self.roll = bone.roll
         if bone.parent:
-            self.parent = target.getParentName(bone.parent.name)
+            self.parent = target.renameBone(bone.parent.name)
         else:
             self.parent = None
         if self.parent:
@@ -378,8 +378,9 @@ def renameBones(srcRig, scn):
         lname = srcName.lower()
         try:
             trgName = the.armature[lname]
-        except:
-            trgName = the.armature[lname.replace(' ','_')]
+        except KeyError:
+            lname = lname.replace(' ','_')
+            trgName = the.armature[lname]
         eb = ebones[srcName]
         if trgName:
             eb.name = trgName
@@ -400,7 +401,7 @@ def renameBones(srcRig, scn):
 #
 #    createExtraBones(ebones, trgBones):
 #
-
+"""
 def createExtraBones(ebones, trgBones):
     for suffix in ['_L', '_R']:
         try:
@@ -434,7 +435,7 @@ def createExtraBones(ebones, trgBones):
         eb.parent = ebones['LoLeg'+suffix]
         trgBones[nameSrc] = CEditBone(eb)
     return
-
+"""
 #
 #    renameBvhRig(srcRig, filepath):
 #
@@ -484,26 +485,7 @@ def deleteSourceRig(context, rig, prefix):
                     del act
     return
     
-
-#
-#    copyAnglesIK():
-#
-"""
-def copyAnglesIK(context):
-    trgRig = context.object
-    target.guessTargetArmature(trgRig. context.scene)
-    trgAnimations = createTargetAnimation(context, trgRig)
-    insertAnimation(context, trgRig, trgAnimations, the.fkBoneList)
-    onoff = toggleLimitConstraints(trgRig)
-    setLimitConstraints(trgRig, 0.0)
-    poseTrgIkBones(context, trgRig, trgAnimations)
-    utils.setInterpolation(trgRig)
-    if onoff == 'OFF':
-        setLimitConstraints(trgRig, 1.0)
-    else:
-        setLimitConstraints(trgRig, 0.0)
-    return
-"""    
+  
 #
 #    rescaleRig(scn, trgRig, srcRig):
 #

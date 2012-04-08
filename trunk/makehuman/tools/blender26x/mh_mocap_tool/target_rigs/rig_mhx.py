@@ -28,6 +28,56 @@
 #    Mhx rig
 #
 
+Bones = [
+    ('Root',        'Root'),
+    ('Pelvis',      'Pelvis'),
+    ('Spine1',      'Spine1'),
+    ('Spine2',      'Spine2'),
+    ('Spine3',      'Spine3'),
+    ('Neck',        'Neck'),
+    ('Head',        'Head'),
+    ('Hips',        'Hips'),
+
+    ('Clavicle_L',  'Clavicle_L'),
+    ('UpArm_L',     'UpArm_L'),
+    ('LoArm_L',     'LoArm_L'),
+    ('Hand_L',      'Hand_L'),
+
+    ('Clavicle_R',  'Clavicle_R'),
+    ('UpArm_R',     'UpArm_R'),
+    ('LoArm_R',     'LoArm_R'),
+    ('Hand_R',      'Hand_R'),
+
+    ('Hip_L',       'Hip_L'),
+    ('UpLeg_L',     'UpLeg_L'),
+    ('LoLeg_L',     'LoLeg_L'),
+    ('Foot_L',      'Foot_L'),
+    ('Toe_L',       'Toe_L'),
+
+    ('Hip_R',       'Hip_R'),
+    ('UpLeg_R',     'UpLeg_R'),
+    ('LoLeg_R',     'LoLeg_R'),
+    ('Foot_R',      'Foot_R'),
+    ('Toe_R',       'Toe_R'),
+]
+
+IkBones = [ 
+    ('Wrist_L', 'Hand_L'),
+    ('Wrist_R', 'Hand_R'),
+    ('Ankle_L', 'Foot_L'),
+    ('Ankle_R', 'Foot_R')
+]
+
+Renames = {
+    'MasterFloor' : None,
+    'DfmNeck' :     'Neck',
+    'DfmHips' :     'Hips',
+    'Sternum' :     'Spine3',
+    'Shoulder_L' :  'Clavicle_L',
+    'Shoulder_R' :  'Clavicle_R',
+}
+
+"""
 FkBoneList = [
     'Root', 'Hips', 'Pelvis', 'Spine1', 'Spine2', 'Spine3', #'Shoulders', 
     'LowerNeck', 'Neck', 'Head', 'Sternum',
@@ -74,4 +124,4 @@ GlobalBoneList = [
     'Root', 
 ]
 
-
+"""

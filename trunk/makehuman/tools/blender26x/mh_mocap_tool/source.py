@@ -74,6 +74,7 @@ def findSrcArmature(context, rig):
         the.fixesList[name] = fixes
     else:
         (the.armature, name) = guessSrcArmature(rig)
+    the.srcRolls = the.rollFixes[name]    
     rig['McpArmature'] = name
     print("Using matching armature %s." % name)
     return
@@ -89,6 +90,7 @@ def setArmature(rig):
         print("***", rig)
         raise NameError("No armature set")
     the.armature = the.armatures[name]
+    the.srcRolls = the.rollFixes[name]  
     print("Set armature %s" % name)
     return
     

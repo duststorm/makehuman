@@ -27,12 +27,12 @@ from mathutils import *
 
 HDMArmature = {
     'hip' : 'Root',
-    'lhipjoint' : 'Hip_L',
+    'lhipjoint' : None,
     'lfemur' : 'UpLeg_L',
     'ltibia' : 'LoLeg_L',
     'lfoot' : 'Foot_L',
     'ltoes' : 'Toe_L',
-    'rhipjoint' : 'Hip_R',
+    'rhipjoint' : None,
     'rfemur' : 'UpLeg_R',
     'rtibia' : 'LoLeg_R',
     'rfoot' : 'Foot_R',
@@ -59,12 +59,8 @@ HDMArmature = {
     'rthumb' : 'Finger1_R',
 }
 
-HDMFixes = {
-    'UpLeg_L' : ( Matrix.Rotation(0.4, 3, 'Y') * Matrix.Rotation(-0.45, 3, 'Z'), 0),
-    'UpLeg_R' : ( Matrix.Rotation(-0.4, 3, 'Y') * Matrix.Rotation(0.45, 3, 'Z'), 0),
-    'LoLeg_L' : ( Matrix.Rotation(-0.4, 3, 'Y'), 0),
-    'LoLeg_R' : ( Matrix.Rotation(0.4, 3, 'Y'), 0),
-    'UpArm_L' : ( Matrix.Rotation(0.1, 3, 'X'), 0),
-    'UpArm_R' : ( Matrix.Rotation(0.1, 3, 'X'), 0),
+HDMRolls = {
+    'UpLeg_L' : 22.5,
+    'UpLeg_R' : -22.5,
 }
 
