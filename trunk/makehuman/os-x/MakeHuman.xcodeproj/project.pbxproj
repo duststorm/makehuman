@@ -548,7 +548,6 @@
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "MakeHuman" */;
 			compatibilityVersion = "Xcode 3.1";
-			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -1162,6 +1161,416 @@
 			};
 			name = NightlyBuild;
 		};
+		6882BCD615324B6000C5AAA6 /* NightlyBuild_10.5Universal */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				EXTRA_FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS = (
+					/Library/Frameworks,
+					"$(EXTRA_FRAMEWORK_SEARCH_PATHS)",
+				);
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREFIX_HEADER = include/MakeHuman_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					NIGHT_BUILD,
+					X_CHECK_PYTHON_VERSION,
+				);
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../include/,
+					./include/,
+					./include/pythonwrapper/,
+					./include/sdlwrapper/,
+				);
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = "";
+				PREBINDING = NO;
+				SDKROOT = macosx10.5;
+				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
+				VALID_ARCHS = "i386 ppc";
+			};
+			name = NightlyBuild_10.5Universal;
+		};
+		6882BCD715324B6000C5AAA6 /* NightlyBuild_10.5Universal */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				INFOPLIST_FILE = resources/Info_NB.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = MakeHuman;
+				WARNING_CFLAGS = "-Wall";
+				WRAPPER_EXTENSION = app;
+			};
+			name = NightlyBuild_10.5Universal;
+		};
+		6882BCD815324B6000C5AAA6 /* NightlyBuild_10.5Universal */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/frameworks\"";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PREPROCESSOR_DEFINITIONS = MAKEHUMAN_AS_MODULE;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = MakeHumanDLib;
+			};
+			name = NightlyBuild_10.5Universal;
+		};
+		6882BCD915324B6000C5AAA6 /* NightlyBuild_10.5Universal */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_VERSION = A;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				GCC_PREPROCESSOR_DEFINITIONS = MAKEHUMAN_AS_MODULE;
+				INFOPLIST_FILE = "MakeHumanFramework-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = MakeHuman;
+			};
+			name = NightlyBuild_10.5Universal;
+		};
+		6882BCDA15324B6000C5AAA6 /* NightlyBuild_10.5Universal */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				EXECUTABLE_EXTENSION = so;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PREFIX_HEADER = "";
+				GCC_PREPROCESSOR_DEFINITIONS = NIGHT_BUILD;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = linalg_module;
+			};
+			name = NightlyBuild_10.5Universal;
+		};
+		6882BCDC15324D0600C5AAA6 /* Debug_10.5Universal */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				EXTRA_FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS = (
+					/Library/Frameworks,
+					"$(EXTRA_FRAMEWORK_SEARCH_PATHS)",
+				);
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREFIX_HEADER = include/MakeHuman_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					XCHECK_PYTHON_VERSION,
+					DEBUG,
+				);
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../include/,
+					./include/,
+					./include/pythonwrapper/,
+					./include/sdlwrapper/,
+				);
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "";
+				PREBINDING = NO;
+				SDKROOT = macosx10.5;
+				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
+				VALID_ARCHS = "i386 ppc";
+			};
+			name = Debug_10.5Universal;
+		};
+		6882BCDD15324D0600C5AAA6 /* Debug_10.5Universal */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				INFOPLIST_FILE = resources/Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = MakeHuman;
+				WARNING_CFLAGS = "-Wall";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug_10.5Universal;
+		};
+		6882BCDE15324D0600C5AAA6 /* Debug_10.5Universal */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/frameworks\"";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PREPROCESSOR_DEFINITIONS = MAKEHUMAN_AS_MODULE;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = MakeHumanDLib;
+			};
+			name = Debug_10.5Universal;
+		};
+		6882BCDF15324D0600C5AAA6 /* Debug_10.5Universal */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_VERSION = A;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				GCC_PREPROCESSOR_DEFINITIONS = MAKEHUMAN_AS_MODULE;
+				INFOPLIST_FILE = "MakeHumanFramework-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = MakeHuman;
+			};
+			name = Debug_10.5Universal;
+		};
+		6882BCE015324D0600C5AAA6 /* Debug_10.5Universal */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				EXECUTABLE_EXTENSION = so;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREFIX_HEADER = "";
+				INSTALL_PATH = /usr/local/lib;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				PRODUCT_NAME = linalg_module;
+			};
+			name = Debug_10.5Universal;
+		};
+		6882BCE115324D1900C5AAA6 /* Release_10.5Universal */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				EXTRA_FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS = "$(EXTRA_FRAMEWORK_SEARCH_PATHS)";
+				GCC_PREFIX_HEADER = include/MakeHuman_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					CHECK_PYTHON_VERSION,
+					NDEBUG,
+				);
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../include/,
+					./include/,
+					./include/pythonwrapper/,
+					./include/sdlwrapper/,
+				);
+				OTHER_LDFLAGS = "";
+				PREBINDING = NO;
+				PRESERVE_DEAD_CODE_INITS_AND_TERMS = YES;
+				SDKROOT = macosx10.5;
+				STRINGS_FILE_OUTPUT_ENCODING = "UTF-8";
+				VALID_ARCHS = "i386 ppc";
+			};
+			name = Release_10.5Universal;
+		};
+		6882BCE215324D1900C5AAA6 /* Release_10.5Universal */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_ENABLE_CPP_EXCEPTIONS = NO;
+				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				INFOPLIST_FILE = resources/Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				PREBINDING = YES;
+				PRODUCT_NAME = MakeHuman;
+				STRIP_INSTALLED_PRODUCT = YES;
+				WARNING_CFLAGS = "-Wall";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release_10.5Universal;
+		};
+		6882BCE315324D1900C5AAA6 /* Release_10.5Universal */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/frameworks\"";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PREPROCESSOR_DEFINITIONS = MAKEHUMAN_AS_MODULE;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = MakeHumanDLib;
+				ZERO_LINK = NO;
+			};
+			name = Release_10.5Universal;
+		};
+		6882BCE415324D1900C5AAA6 /* Release_10.5Universal */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3 = "\"$(SRCROOT)/frameworks\"";
+				FRAMEWORK_VERSION = A;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				GCC_PREPROCESSOR_DEFINITIONS = MAKEHUMAN_AS_MODULE;
+				INFOPLIST_FILE = "MakeHumanFramework-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = MakeHuman;
+				ZERO_LINK = NO;
+			};
+			name = Release_10.5Universal;
+		};
+		6882BCE515324D1900C5AAA6 /* Release_10.5Universal */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				EXECUTABLE_EXTENSION = so;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PREFIX_HEADER = "";
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = linalg_module;
+				ZERO_LINK = NO;
+			};
+			name = Release_10.5Universal;
+		};
 		C01FCF4B08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1285,9 +1694,12 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6850794213AE1C06004C0164 /* Debug */,
+				6882BCE015324D0600C5AAA6 /* Debug_10.5Universal */,
 				6818892414DD6E1600CCF240 /* DebugXCode4 */,
 				6850794313AE1C06004C0164 /* NightlyBuild */,
+				6882BCDA15324B6000C5AAA6 /* NightlyBuild_10.5Universal */,
 				6850794413AE1C06004C0164 /* Release */,
+				6882BCE515324D1900C5AAA6 /* Release_10.5Universal */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1296,9 +1708,12 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				685701AD1001D78000F9C649 /* Debug */,
+				6882BCDE15324D0600C5AAA6 /* Debug_10.5Universal */,
 				6818892214DD6E1600CCF240 /* DebugXCode4 */,
 				686C9AE3116601BE0050C414 /* NightlyBuild */,
+				6882BCD815324B6000C5AAA6 /* NightlyBuild_10.5Universal */,
 				685701AE1001D78000F9C649 /* Release */,
+				6882BCE315324D1900C5AAA6 /* Release_10.5Universal */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1307,9 +1722,12 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6857022910031DA200F9C649 /* Debug */,
+				6882BCDF15324D0600C5AAA6 /* Debug_10.5Universal */,
 				6818892314DD6E1600CCF240 /* DebugXCode4 */,
 				686C9AE4116601BE0050C414 /* NightlyBuild */,
+				6882BCD915324B6000C5AAA6 /* NightlyBuild_10.5Universal */,
 				6857022A10031DA200F9C649 /* Release */,
+				6882BCE415324D1900C5AAA6 /* Release_10.5Universal */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1318,9 +1736,12 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01FCF4B08A954540054247B /* Debug */,
+				6882BCDD15324D0600C5AAA6 /* Debug_10.5Universal */,
 				6818892114DD6E1600CCF240 /* DebugXCode4 */,
 				686C9AE2116601BE0050C414 /* NightlyBuild */,
+				6882BCD715324B6000C5AAA6 /* NightlyBuild_10.5Universal */,
 				C01FCF4C08A954540054247B /* Release */,
+				6882BCE215324D1900C5AAA6 /* Release_10.5Universal */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1329,9 +1750,12 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C01FCF4F08A954540054247B /* Debug */,
+				6882BCDC15324D0600C5AAA6 /* Debug_10.5Universal */,
 				6818892014DD6E1600CCF240 /* DebugXCode4 */,
 				686C9AE1116601BE0050C414 /* NightlyBuild */,
+				6882BCD615324B6000C5AAA6 /* NightlyBuild_10.5Universal */,
 				C01FCF5008A954540054247B /* Release */,
+				6882BCE115324D1900C5AAA6 /* Release_10.5Universal */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

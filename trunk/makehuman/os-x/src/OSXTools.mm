@@ -408,7 +408,7 @@ void challengePythonUpdate()
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:s]];
 }
 
--(IBAction)helpFileMHUsersGuide:(id)inSender        {[SDLMain openURL:@"http://www.makehuman.org/download/MakeHuman.pdf"];}
+-(IBAction)helpFileMHUsersGuide:(id)inSender        {[SDLMain openURL:@"FileMHUsersGuide"];}
 
 -(IBAction)helpFileMHDevelMHProto:(id)inSender      {[SDLMain openURL:@"http://www.makehuman.org/download/doc"];}
 
