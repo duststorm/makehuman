@@ -108,6 +108,7 @@ LegHeadsTails = [
     ('UpLegIK_L',       'r-upper-leg', 'r-knee'),
     ('LoLegIK_L',       'r-knee', 'r-ankle'),
     ('Ankle_L',         'r-ankle', 'r-ankle-tip'),
+    ('AnkleIK_L',       'r-ankle', 'r-ankle-tip'),
     ('LegIK_L',         'r-heel', 'r-foot-2'),
     ('ToeRev_L',        'r-foot-2', 'r-foot-1'),
     ('FootRev_L',       'r-foot-1', 'r-ankle'),
@@ -115,6 +116,7 @@ LegHeadsTails = [
     ('UpLegIK_R',       'l-upper-leg', 'l-knee'),
     ('LoLegIK_R',       'l-knee', 'l-ankle'),
     ('Ankle_R',         'l-ankle', 'l-ankle-tip'),
+    ('AnkleIK_R',       'l-ankle', 'l-ankle-tip'),
     ('LegIK_R',         'l-heel', 'l-foot-2'),
     ('ToeRev_R',        'l-foot-2', 'l-foot-1'),
     ('FootRev_R',       'l-foot-1', 'l-ankle'),
@@ -224,14 +226,16 @@ LegArmature = [
     ('LegIK_L',         -footCtrlRoll, Master, F_WIR, L_LLEGIK, NoBB),
     ('ToeRev_L',        0, 'LegIK_L', F_WIR, L_LLEGIK, NoBB),
     ('FootRev_L',       0, 'ToeRev_L', F_WIR, L_LLEGIK, NoBB),
-    ('Ankle_L',         0, (None, 'FootRev_L'), F_WIR, L_LEXTRA, NoBB),
+    ('Ankle_L',         0, Master, F_WIR, L_LEXTRA, NoBB),
+    ('AnkleIK_L',       0, 'FootRev_L', 0, L_HELP, NoBB),
 
     ('UpLegIK_R',       -upLegRoll, 'Hip_R', 0, L_HELP, NoBB),
     ('LoLegIK_R',       -loLegRoll, 'UpLegIK_R', 0, L_HELP, NoBB),
     ('LegIK_R',         -footCtrlRoll, Master, F_WIR, L_RLEGIK, NoBB),
     ('ToeRev_R',        0, 'LegIK_R', F_WIR, L_RLEGIK, NoBB),
     ('FootRev_R',       0, 'ToeRev_R', F_WIR, L_RLEGIK, NoBB),
-    ('Ankle_R',         0, (None, 'FootRev_R'), F_WIR, L_REXTRA, NoBB),
+    ('Ankle_R',         0, Master, F_WIR, L_REXTRA, NoBB),
+    ('AnkleIK_R',       0, 'FootRev_L', 0, L_HELP, NoBB),
 
     # Deform
     ('UpLegRot_L',      upLegRoll, 'Hip_L', F_WIR, L_TWEAK, NoBB),
@@ -399,12 +403,12 @@ def LegControlPoses(fp):
 
     addPoseBone(fp, 'LoLegIK_L', None, 'IK_L', (1,1,1), (0,0,1), (1,0,1), 
                 ((1,1,0), (0,0,0), 0.05, limLoLeg_L), CmodLoLeg, 
-        [('IK', 0, 1, ['LegIK', 'Ankle_L', 2, (-90*D+deltaKnee, 'KneePT_L'), (1,0,1)]),
+        [('IK', 0, 1, ['LegIK', 'AnkleIK_L', 2, (-90*D+deltaKnee, 'KneePT_L'), (1,0,1)]),
         ])
 
     addPoseBone(fp, 'LoLegIK_R', None, 'IK_R', (1,1,1), (0,0,1), (1,0,1), 
                 ((1,1,0), (0,0,0), 0.05, limLoLeg_R), CmodLoLeg, 
-        [('IK', 0, 1, ['LegIK', 'Ankle_R', 2, (-90*D-deltaKnee, 'KneePT_R'), (1,0,1)])
+        [('IK', 0, 1, ['LegIK', 'AnkleIK_R', 2, (-90*D-deltaKnee, 'KneePT_R'), (1,0,1)])
         ])
 
     addPoseBone(fp, 'LegIK_L', 'MHFootCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
@@ -427,13 +431,17 @@ def LegControlPoses(fp):
     addPoseBone(fp, 'ToeRev_R', 'MHRevToe', 'IK_R', (1,1,1), (0,1,1), (1,1,1), (1,1,1), CmodToe, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limRevToe_R, (1,1,1)])])
     
-    addPoseBone(fp, 'Ankle_L', 'MHBall025', 'IK_L', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('ChildOf', C_CHILDOF, 1, ['Foot', 'FootRev_L', (1,1,1), (1,1,1), (1,1,1)]),
-         ('ChildOf', C_CHILDOF, 0, ['Master', 'MasterFloor', (1,1,1), (1,1,1), (1,1,1)]) ])
+    addPoseBone(fp, 'Ankle_L', 'MHBall025', 'IK_L', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-    addPoseBone(fp, 'Ankle_R', 'MHBall025', 'IK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('ChildOf', C_CHILDOF, 1, ['Foot', 'FootRev_R', (1,1,1), (1,1,1), (1,1,1)]),
-         ('ChildOf', C_CHILDOF, 0, ['Master', 'MasterFloor', (1,1,1), (1,1,1), (1,1,1)]) ])
+    addPoseBone(fp, 'Ankle_R', 'MHBall025', 'IK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+
+    addPoseBone(fp, 'AnkleIK_L', None, None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('CopyLoc', 0, 1, ['Foot', 'FootRev_L', (1,1,1), (0,0,0), 1, False]),
+         ('CopyLoc', 0, 0, ['Ankle', 'Ankle_L', (1,1,1), (0,0,0), 0, False]) ])
+
+    addPoseBone(fp, 'AnkleIK_R', None, None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('CopyLoc', 0, 1, ['Foot', 'FootRev_R', (1,1,1), (0,0,0), 1, False]),
+         ('CopyLoc', 0, 0, ['Ankle', 'Ankle_R', (1,1,1), (0,0,0), 0, False]) ])
 
 
     # Pole target
@@ -576,8 +584,8 @@ LegPropLRDrivers = [
 SoftLegPropLRDrivers = [
     ('KneePT', 'Foot', ['KneeFollowsFoot'], 'x1'),
     ('KneePT', 'Hip', ['KneeFollowsHip', 'KneeFollowsFoot'], 'x1*(1-x2)'),  
-    ('Ankle', 'Foot', ['LegIkToAnkle'], '1-x1'),
-    ('Ankle', 'Master', ['LegIkToAnkle'], 'x1'),
+    ('AnkleIK', 'Foot', ['LegIkToAnkle'], '1-x1'),
+    ('AnkleIK', 'Ankle', ['LegIkToAnkle'], 'x1'),
 ]
 
 LegPropDrivers = [

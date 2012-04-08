@@ -250,7 +250,13 @@ class LoadPanel(bpy.types.Panel):
 
         layout.separator()
         layout.label("Retarget")
-        layout.prop(scn, 'McpGuessSrcRig')
+        row = layout.row()
+        row.prop(scn, "McpAutoScale")
+        row.prop(scn, "McpBvhScale")
+        row = layout.row()
+        row.prop(scn, "McpStartFrame")
+        row.prop(scn, "McpEndFrame")
+        #layout.prop(scn, 'McpGuessSrcRig')
         row = layout.row()
         row.prop(scn, "McpDoSimplify")
         row.prop(scn, "McpDefaultSS")
@@ -265,7 +271,7 @@ class LoadPanel(bpy.types.Panel):
             layout.separator()
             layout.operator("mcp.new_retarget_mhx")
             layout.operator("mcp.retarget_ik")
-            layout.operator("mcp.fix_ankles")
+            #layout.operator("mcp.fix_ankles")
         else:
             row = layout.row()
             row.prop(scn, "McpApplyFixes")
@@ -293,6 +299,7 @@ class LoadPanel(bpy.types.Panel):
         row.prop(scn, "McpSimplifyVisible")
         row.prop(scn, "McpSimplifyMarkers")
         layout.operator("mcp.simplify_fcurves")
+        return
 
         layout.separator()
         layout.label("Plant keys")

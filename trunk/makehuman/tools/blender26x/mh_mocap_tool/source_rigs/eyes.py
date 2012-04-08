@@ -52,10 +52,10 @@ EyesArmature = {
 
 EyesRolls = {
     'UpArm_L' :  90,
-    'LoArm_L' :  90,
-    'Hand_L' :  90,
+    #'LoArm_L' :  90,
+    #'Hand_L' :  90,
     'UpArm_R' :  -90,
-    'LoArm_R' :  -90,
-    'Hand_R' :  -90,
+    #'LoArm_R' :  -90,
+    #'Hand_R' :  -90,
 }
 

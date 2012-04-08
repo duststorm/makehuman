@@ -49,3 +49,9 @@ the.T_Simple = 3
 the.T_SecondLife = 4
 the.T_Custom = 5
 
+TargetInfo = {
+    "MHX" : (the.T_MHX, rig_mhx.Bones, rig_mhx.Renames, rig_mhx.IkBones),
+    "Simple": (the.T_Simple, rig_simple.Bones, rig_simple.Renames, rig_simple.IkBones),
+    "Game": (the.T_Game, rig_game.Bones, rig_game.Renames, rig_game.IkBones),
+    "Second Life": (the.T_SecondLife, rig_second_life.Bones, rig_second_life.Renames, rig_second_life.IkBones),
+}

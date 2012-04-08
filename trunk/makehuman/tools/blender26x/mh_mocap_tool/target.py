@@ -32,7 +32,8 @@ from bpy_extras.io_utils import ImportHelper
 from bpy.props import StringProperty
 
 from . import utils
-from .target_rigs import rig_mhx, rig_simple, rig_game, rig_second_life
+from . import target_rigs
+#from .target_rigs import rig_mhx, rig_simple, rig_game, rig_second_life
 from . import globvar as the
 
 Deg2Rad = math.pi/180
@@ -55,7 +56,7 @@ def renameBone(b):
         return b
 
 #
-#   guessTar getArmature(trgRig, scn):
+#   guessTargetArmature(trgRig, scn):
 #
 
 def guessTargetArmature(trgRig, scn):
@@ -70,34 +71,23 @@ def guessTargetArmature(trgRig, scn):
     if custom:
         the.target = the.T_Custom
         name = "Custom %s" % trgRig.name
-    elif 'KneePT_L' in bones:
-        the.target = the.T_MHX
-        name = "MHX"
-        boneAssoc = rig_mhx.Bones
-        the.Renames = rig_mhx.Renames
-        the.IkBones = rig_mhx.IkBones        
-    elif testTargetRig("Simple", bones, rig_simple.Bones):
-        the.target = the.T_Simple
-        name = "Simple"
-        boneAssoc = rig_simple.Bones
-        the.Renames = rig_simple.Renames
-        the.IkBones = rig_simple.IkBones
-    elif testTargetRig("Game", bones, rig_game.Bones):
-        the.target = the.T_Game
-        name = "Game"
-        boneAssoc = rig_game.Bones
-        the.Renames = rig_game.Renames
-        the.IkBones = rig_game.IkBones
-    elif testTargetRig("Second Life", bones, rig_second_life.Bones):
-        the.target = the.T_SecondLife
-        name = "Second Life"
-        boneAssoc = rig_second_life.Bones
-        the.Renames = rig_second_life.Renames
-        the.IkBones = rig_second_life.IkBones
     else:
-        print("Bones", bones)
-        raise NameError("Did not recognize target armature %s" % trgRig)
-
+        if 'KneePT_L' in bones:
+            name = "MHX"
+            (the.target, boneAssoc, the.Renames, the.IkBones) = target_rigs.TargetInfo[name]
+        else:
+            found = False
+            for (name, info) in target_rigs.TargetInfo.items():
+                (the.target, boneAssoc, the.Renames, the.IkBones) = info
+                if name == "MHX":
+                        found = True
+                        break
+                elif testTargetRig(name, bones, boneAssoc):           
+                    found = True
+                    break
+            if not found:                
+                print("Bones", bones)
+                raise NameError("Did not recognize target armature %s" % trgRig)        
     print("Target armature %s" % name)
     parAssoc = assocParents(trgRig, boneAssoc, the.Renames)                        
     return (boneAssoc, parAssoc, None)
