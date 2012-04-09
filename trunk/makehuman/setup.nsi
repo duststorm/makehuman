@@ -18,6 +18,7 @@ Section "Copy files"
   # Copy root files
   SetOutPath $INSTDIR
   File makehuman.exe
+  File makehuman.exe.manifest
   # File mh.pyd
   File *.dll
   File main.py
