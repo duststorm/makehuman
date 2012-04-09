@@ -548,6 +548,7 @@
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "MakeHuman" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -634,7 +635,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "# This Function copies the files of a given subpath (relative to makehuman) to the\n# Apps resource folder.\ncopyResourceFiles()\n{\n    # Copy the directory 'data' into the Application Folder (Resources/$1)\n    if [ ! -e \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/$1\" ]\n    then\n        mkdir -p \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/$1\"\n        cp -rf \"${PROJECT_DIR}/../$1\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\n        cd \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/$1\"\n        find . -name \"Makefile*\" -delete\n        find . -name \"*.zip\" -delete\n        find . -name \"empty.txt\" -delete\n        find . -name \".svn\" -type d | xargs rm -rf\n        find . -name \"CVS\" -type d | xargs rm -rf\n        find . -name \"*.pyc\" -delete\n    fi\n}\n\ncopyPythonExtension()\n{\n\tcp \"${CONFIGURATION_BUILD_DIR}/$1\" \"${CONFIGURATION_BUILD_DIR}/${PROJECT_NAME}.app/Contents/Resources/$1\"\n}\n\npatchFonts()\n{\n\t${PROJECT_DIR}/tools/FontTransFixer/bin/fontTransFixer ${PROJECT_DIR}/../data/fonts ${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/data/fonts\n}\n\n# copy python extensions....\ncopyPythonExtension linalg_module.so\n\ncopyResourceFiles data\ncopyResourceFiles plugins\ncopyResourceFiles core\ncopyResourceFiles importers\ncopyResourceFiles utils\ncopyResourceFiles shared\n\ncp -f \"${PROJECT_DIR}/../main.py\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\ncp -f \"${PROJECT_DIR}/../mh_export.config\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\n\n# Patch the fonts\npatchFonts\n\n# do stuff which is relevant for a nightly build only.\nif [ ${BUILD_STYLE} == \"NightlyBuild\" ]; then \n\tcp -f \"${PROJECT_DIR}/resources/splash_nb.png\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/data/themes/default/images/splash.png\"\n\tcp -f \"${PROJECT_DIR}/resources/Info_nb.plist\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/Info.plist\"\nfi\n\n# do stuff which is relevant for a release build only.\nif [ ${BUILD_STYLE} == \"Release\" ]; then \n\t# clean up all \"pyc\" files\n\tcd \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources\"\n\tfind . -name \"*.pyc\" -delete\n\tfind . -name \".svn\" -type d | xargs rm -rf\n     find . -name \"CVS\" -type d | xargs rm -rf\nfi\n";
+			shellScript = "# This Function copies the files of a given subpath (relative to makehuman) to the\n# Apps resource folder.\ncopyResourceFiles()\n{\n    # Copy the directory 'data' into the Application Folder (Resources/$1)\n    if [ ! -e \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/$1\" ]\n    then\n        mkdir -p \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/$1\"\n        cp -rf \"${PROJECT_DIR}/../$1\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\n        cd \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/$1\"\n        find . -name \"Makefile*\" -delete\n        find . -name \"*.zip\" -delete\n        find . -name \"empty.txt\" -delete\n        find . -name \".svn\" -type d | xargs rm -rf\n        find . -name \"CVS\" -type d | xargs rm -rf\n        find . -name \"*.pyc\" -delete\n    fi\n}\n\ncopyPythonExtension()\n{\n\tcp \"${CONFIGURATION_BUILD_DIR}/$1\" \"${CONFIGURATION_BUILD_DIR}/${PROJECT_NAME}.app/Contents/Resources/$1\"\n}\n\npatchFonts()\n{\n\t${PROJECT_DIR}/tools/FontTransFixer/bin/fontTransFixer ${PROJECT_DIR}/../data/fonts ${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/data/fonts\n}\n\n# copy python extensions....\ncopyPythonExtension linalg_module.so\n\ncopyResourceFiles data\ncopyResourceFiles plugins\ncopyResourceFiles core\ncopyResourceFiles importers\ncopyResourceFiles utils\ncopyResourceFiles shared\n\ncp -f \"${PROJECT_DIR}/../main.py\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\ncp -f \"${PROJECT_DIR}/../mh_export.config\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/\"\n\n# Patch the fonts\npatchFonts\n\n# do stuff which is relevant for a nightly build only.\nif [ ${BUILD_STYLE} == \"NightlyBuild\" ]; then \n\tcp -f \"${PROJECT_DIR}/resources/splash_nb.png\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/data/themes/default/images/splash.png\"\n\tcp -f \"${PROJECT_DIR}/resources/Info_nb.plist\" \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources/Info.plist\"\nfi\n\n# do stuff which is relevant for a release build only.\nif [ ${BUILD_STYLE} == Release${BUILD_STYLE##Release} ]; then \n\t# clean up all \"pyc\" files\n\tcd \"${CONFIGURATION_BUILD_DIR}/${PRODUCT_NAME}.app/Contents/Resources\"\n\tfind . -name \"*.pyc\" -delete\n\tfind . -name \".svn\" -type d | xargs rm -rf\n     find . -name \"CVS\" -type d | xargs rm -rf\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -1164,7 +1165,7 @@
 		6882BCD615324B6000C5AAA6 /* NightlyBuild_10.5Universal */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
 				EXTRA_FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/frameworks\"";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1177,7 +1178,7 @@
 					NIGHT_BUILD,
 					X_CHECK_PYTHON_VERSION,
 				);
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = 4.2;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
@@ -1207,7 +1208,6 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
 				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
@@ -1299,7 +1299,7 @@
 		6882BCDC15324D0600C5AAA6 /* Debug_10.5Universal */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
 				EXTRA_FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/frameworks\"";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1313,7 +1313,7 @@
 					XCHECK_PYTHON_VERSION,
 					DEBUG,
 				);
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = 4.2;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
@@ -1343,7 +1343,6 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
 				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
@@ -1438,7 +1437,7 @@
 		6882BCE115324D1900C5AAA6 /* Release_10.5Universal */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				EXTRA_FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/frameworks\"";
@@ -1448,7 +1447,7 @@
 					CHECK_PYTHON_VERSION,
 					NDEBUG,
 				);
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = 4.2;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
@@ -1476,7 +1475,6 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PFE_FILE_C_DIALECTS = "objective-c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
@@ -1559,7 +1557,6 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				EXECUTABLE_EXTENSION = so;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;

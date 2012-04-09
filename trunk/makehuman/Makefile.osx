@@ -6,30 +6,96 @@
 #######################################################################
 
 DEPS=src/core.d src/main.d src/glmodule.d
-PYTHON_VER=2.5
+PYTHON_VER=2.7
 RM=rm -rf
+
+
+# Adapt this according your XCode 3.x installation. If you have no Xcode 3.x installed
+# then just leave it. This makefile is smart enough to detect this ;)
+EXPECTED_XCODE3_DIR=/Developer3
+
+# ========================================================================================
+# An Universal build of MakeHuman requires an Xcode version *prior* of 4.x !
+# That is because apple dropped PPC Support in Xcode 4.x.
+# The recommended version of Xcode for an Universal Build is 3.2.5.
+#
+# However it is possible to build MakeHuman even on Macs which runs on newer Version
+# as Mc OS X 10.5.x. In this case you have to install Xcode 3.2.5. It makes no harm
+# if you have installed Xcode 4.x already! Both version can be installed on the same machine.
+#
+# If you want to have a *parallel* installation of Xcode 4 and Xcode 3 you have to follow
+# this rule: Change the install path of Xcode 3.2.5 from /Developer to /Developer3
+#
+# -------------------------------------------------------------------------
+# This makefile is smart enough to detect this:
+#  1) If the Build host is Mac OS 10.5 then the Xcode toolchain (among the SDKs) are
+#     searched at the default location (which is part of $(PATH) already).
+#
+#  2) If the build host is *not* 10.5 - which means that you have installed Snow Leo,
+#     Lion or newer then the Makefile will look if you have installed Xcode 3.2.x either.
+#     If this is the case then this compiler will be used and a Universal Build will be
+#     done.
+#     Otherwise Xcode 4.x will be used and a nativ build will be triggered
+# ========================================================================================
+
+DEVELOPER3_EXISTS = $(strip $(wildcard $(EXPECTED_XCODE3_DIR)))
+HOST_OS_MAJOR_NUM=$(firstword $(subst ., ,$(shell uname -r)))
+OS_RELEASE_NR_FOR_10_5=9
+
+ifneq ($(HOST_OS_MAJOR_NUM),$(OS_RELEASE_NR_FOR_10_5)) # 9 because relevant for Build hosts running on Mac OS 10.5 only!
+	ifneq ($(DEVELOPER3_EXISTS),)
+		PERFORM_UNIVERSAL_BUILD=1
+	endif
+else
+	PERFORM_UNIVERSAL_BUILD=1
+endif
+
+# Select the toolchain and the build targets according if we perform an universal Build or not...
+ifeq ($(PERFORM_UNIVERSAL_BUILD),1)
+	XCODE_BUILD=$(EXPECTED_XCODE3_DIR)/usr/bin/xcodebuild
+
+	DEBUG_CONFIG="Debug_10.5Universal"
+	RELEASE_CONFIG="Release_10.5Universal"
+	NIGHTLY_CONFIG="NightlyBuild_10.5Universal"
+else
+	XCODE_BUILD=xcodebuild
+
+	DEBUG_CONFIG="Debug"
+	RELEASE_CONFIG="Release"
+	NIGHTLY_CONFIG="NightlyBuild"
+endif
+
+XCODE_COMMON_BUILD_OPTS=-project os-x/MakeHuman.xcodeproj -target MakeHuman
+
 cleanbuild: clean build
 
 build: debug
 
-release: 
-	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration Release build
+release:
+	@$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -configuration $(RELEASE_CONFIG) build
+
+	# Create an installer package...
 	hdiutil create -srcfolder os-x/build/Release/ -ov -volname MakeHuman MakeHuman.dmg
 
-debug: 
-	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration Debug build
+debug:
+	@$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -configuration $(DEBUG_CONFIG) build
 
-nightlybuild: 
-	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration NightlyBuild build
+# A nightly build performs a clean of the (probably) last nightly build artifacts first!
+# -> Make a clean build.
+nightlybuild:
+	$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -target MakeHuman -configuration $(NIGHTLY_CONFIG)  clean
+	@$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -configuration $(NIGHTLY_CONFIG) build
 
-nightlybuild_10.5: 
-	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration NightlyBuild_10.5Universal build
+nightlybuild_10.5: nightlybuild
+
+queryopts:
+	@$(XCODE_BUILD) -project os-x/MakeHuman.xcodeproj -list
 
 module: mh.so mhproto_doc
 
 mhproto_doc:
 	cd docs; doxygen ./configs/doxygen_html_config_osx.txt
-    
+
 
 mh.so:
 	@echo "building mh.so ..."
@@ -55,22 +121,23 @@ mh.so:
 
 fixmesh:
 	@make -C utils/fixmesh/ -f Makefile.osx
-    
+
 # ---------------------------------------------------------------------
 # Create the API documentation
 # ---------------------------------------------------------------------
 doc:
 	cd docs; doxygen configs/doxygen_html_config.txt
-    
+
 # ---------------------------------------------------------------------
 # Cleanup unused stuff
 # ---------------------------------------------------------------------
 clean:
 	$(RM) $(OBJS) $(DEPS) *.obj *~ *.bak *%% *~ src/*.o src/*.d mh.so docs/mhproto_cdoc/*
-	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration Debug  clean
-	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration Release  clean
+	$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -target MakeHuman -configuration $(DEBUG_CONFIG)  clean
+	$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -target MakeHuman -configuration $(RELEASE_CONFIG)  clean
+	$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -target MakeHuman -configuration $(NIGHTLY_CONFIG)  clean
 	make -C utils/fixmesh/ -f Makefile.osx clean
-	
+
 
 up:
 	@echo "Updating von SVN ..."
