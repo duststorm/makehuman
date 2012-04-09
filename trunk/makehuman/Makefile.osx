@@ -22,6 +22,9 @@ debug:
 nightlybuild: 
 	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration NightlyBuild build
 
+nightlybuild_10.5: 
+	xcodebuild -project os-x/MakeHuman.xcodeproj -target MakeHuman -configuration NightlyBuild_10.5Universal build
+
 module: mh.so mhproto_doc
 
 mhproto_doc:
