@@ -51,6 +51,8 @@ Section "Copy files"
   File /r /x .svn /x .pyc apps\*.py
   SetOutPath $INSTDIR\utils
   File /r /x .svn /x .pyc utils\*.*
+  SetOutPath $INSTDIR\tools
+  File /r /x .svn /x .pyc tools\*.*
   
   CreateDirectory $INSTDIR\models
   CreateDirectory $INSTDIR\exports
@@ -93,6 +95,7 @@ Section "Uninstall"
   
   # Remove Makehuman data folders
   RMDir /r $INSTDIR\apps
+  RMDir /r $INSTDIR\tools
   RMDir /r $INSTDIR\utils
   RMDir /r $INSTDIR\data
   RMDir /r $INSTDIR\docs

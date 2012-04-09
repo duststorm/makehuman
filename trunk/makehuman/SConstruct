@@ -105,7 +105,7 @@ if platform.system() == "Windows" and 'dist' in COMMAND_LINE_TARGETS:
         Copy("dist/apps","apps"),
         Copy("dist/core","core"),
 #        Copy("dist/docs","docs"),
-        Copy("dist/toods","tools"),
+        Copy("dist/tools","tools"),
         Copy("dist/utils","utils"),
         Copy("dist/shared","shared"),
         Copy("dist/importers","importers"),
