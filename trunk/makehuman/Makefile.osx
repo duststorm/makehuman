@@ -44,22 +44,22 @@ OS_RELEASE_NR_FOR_10_5=9
 
 ifneq ($(HOST_OS_MAJOR_NUM),$(OS_RELEASE_NR_FOR_10_5)) # 9 because relevant for Build hosts running on Mac OS 10.5 only!
 	ifneq ($(DEVELOPER3_EXISTS),)
-		PERFORM_UNIVERSAL_BUILD=1
+        PERFORM_UNIVERSAL_BUILD=1
+    	XCODE_BUILD=$(EXPECTED_XCODE3_DIR)/usr/bin/xcodebuild
+    else
+    	XCODE_BUILD=xcodebuild
 	endif
 else
-	PERFORM_UNIVERSAL_BUILD=1
+    PERFORM_UNIVERSAL_BUILD=1
+	XCODE_BUILD=xcodebuild
 endif
 
 # Select the toolchain and the build targets according if we perform an universal Build or not...
 ifeq ($(PERFORM_UNIVERSAL_BUILD),1)
-	XCODE_BUILD=$(EXPECTED_XCODE3_DIR)/usr/bin/xcodebuild
-
 	DEBUG_CONFIG="Debug_10.5Universal"
 	RELEASE_CONFIG="Release_10.5Universal"
 	NIGHTLY_CONFIG="NightlyBuild_10.5Universal"
 else
-	XCODE_BUILD=xcodebuild
-
 	DEBUG_CONFIG="Debug"
 	RELEASE_CONFIG="Release"
 	NIGHTLY_CONFIG="NightlyBuild"
@@ -71,7 +71,7 @@ cleanbuild: clean build
 
 build: debug
 
-release:
+release: clean_release
 	@$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -configuration $(RELEASE_CONFIG) build
 
 	# Create an installer package...
@@ -82,8 +82,7 @@ debug:
 
 # A nightly build performs a clean of the (probably) last nightly build artifacts first!
 # -> Make a clean build.
-nightlybuild:
-	$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -target MakeHuman -configuration $(NIGHTLY_CONFIG)  clean
+nightlybuild: clean_nightly
 	@$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -configuration $(NIGHTLY_CONFIG) build
 
 nightlybuild_10.5: nightlybuild
@@ -131,13 +130,19 @@ doc:
 # ---------------------------------------------------------------------
 # Cleanup unused stuff
 # ---------------------------------------------------------------------
-clean:
+clean: clean_release clean_nightly clean_debug
+	@$(RM) $(OBJS) $(DEPS) *.obj *~ *.bak *%% *~ src/*.o src/*.d mh.so docs/mhproto_cdoc/*
+	@make -C utils/fixmesh/ -f Makefile.osx clean
+
+clean_release:
+	$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -target MakeHuman -configuration $(RELEASE_CONFIG)  clean
+
+clean_nightly:
+	$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -target MakeHuman -configuration $(NIGHTLY_CONFIG)  clean
+
+clean_debug:
 	$(RM) $(OBJS) $(DEPS) *.obj *~ *.bak *%% *~ src/*.o src/*.d mh.so docs/mhproto_cdoc/*
 	$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -target MakeHuman -configuration $(DEBUG_CONFIG)  clean
-	$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -target MakeHuman -configuration $(RELEASE_CONFIG)  clean
-	$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -target MakeHuman -configuration $(NIGHTLY_CONFIG)  clean
-	make -C utils/fixmesh/ -f Makefile.osx clean
-
 
 up:
 	@echo "Updating von SVN ..."
