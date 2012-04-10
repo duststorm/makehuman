@@ -52,7 +52,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'MakeHuman'
-copyright = u'2011, MHteam'
+copyright = u'2012, MHteam'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -197,7 +197,7 @@ htmlhelp_basename = 'MakeHumandoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'MakeHuman.tex', u'MakeHuman Documentation',
+  ('index', 'MakeHuman.tex', u'MakeHuman python API',
    u'MHteam', 'manual'),
 ]
 
@@ -233,7 +233,7 @@ latex_elements = {'preamble' : "\usepackage{latexsym}\n\usepackage{amssymb}\n\us
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'makehuman', u'MakeHuman Documentation',
+    ('index', 'makehuman', u'MakeHuman python API',
      [u'MHteam'], 1)
 ]
 
