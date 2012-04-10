@@ -224,7 +224,7 @@ class LoadPanel(bpy.types.Panel):
     bl_label = "MH Mocap: Load BVH"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_options = {'DEFAULT_CLOSED'}
+    #bl_options = {'DEFAULT_CLOSED'}
     
     @classmethod
     def poll(cls, context):
@@ -236,20 +236,6 @@ class LoadPanel(bpy.types.Panel):
         scn = context.scene
         ob = context.object
 
-        layout.label("Load BVH skeleton")
-        row = layout.row()
-        row.prop(scn, "McpAutoScale")
-        row.prop(scn, "McpBvhScale")
-        row = layout.row()
-        row.prop(scn, "McpStartFrame")
-        row.prop(scn, "McpEndFrame")
-        layout.prop(scn, "McpRot90Anim")
-        layout.operator("mcp.load_bvh")
-        layout.operator("mcp.rename_bvh")
-        layout.operator("mcp.load_and_rename_bvh")
-
-        layout.separator()
-        layout.label("Retarget")
         row = layout.row()
         row.prop(scn, "McpAutoScale")
         row.prop(scn, "McpBvhScale")
@@ -257,27 +243,29 @@ class LoadPanel(bpy.types.Panel):
         row.prop(scn, "McpStartFrame")
         row.prop(scn, "McpEndFrame")
         #layout.prop(scn, 'McpGuessSrcRig')
+        layout.prop(scn, "McpRetargetIK")
+        layout.prop(scn, "McpDoSimplify")
+        layout.prop(scn, "McpDefaultSS")
         row = layout.row()
-        row.prop(scn, "McpDoSimplify")
-        row.prop(scn, "McpDefaultSS")
-        #layout.prop(scn, "McpNewRetarget")
-        if scn.McpNewRetarget:
-            row = layout.row()
-            row.prop(scn, "McpUseSpineOffset")
-            row.prop(scn, "McpUseClavOffset")
-            layout.prop(scn, "McpRetargetIK")
-            layout.separator()
-            layout.operator("mcp.new_load_retarget_simplify")
-            layout.separator()
-            layout.operator("mcp.new_retarget_mhx")
-            layout.operator("mcp.retarget_ik")
-            #layout.operator("mcp.fix_ankles")
-        else:
-            row = layout.row()
-            row.prop(scn, "McpApplyFixes")
-            row.prop(scn, "McpNewIkRetarget")
-            layout.operator("mcp.old_retarget_mhx")
-            layout.operator("mcp.old_load_retarget_simplify")
+        row.prop(scn, "McpUseSpineOffset")
+        row.prop(scn, "McpUseClavOffset")
+        layout.separator()
+        layout.operator("mcp.load_and_retarget")
+
+        layout.separator()
+        layout.label("Load BVH skeleton")
+        layout.prop(scn, "McpRot90Anim")
+        layout.operator("mcp.load_bvh")
+        layout.operator("mcp.rename_bvh")
+        layout.operator("mcp.load_and_rename_bvh")
+
+        layout.separator()
+        layout.operator("mcp.new_retarget_mhx")
+
+        layout.separator()
+        layout.label("IK retargeting")
+        layout.operator("mcp.retarget_ik")
+
 
         if not scn.McpDefaultSS:
             layout.separator()
@@ -334,7 +322,7 @@ class EditPanel(bpy.types.Panel):
     bl_label = "MH Mocap: Edit Actions"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_options = {'DEFAULT_CLOSED'}
+    #bl_options = {'DEFAULT_CLOSED'}
     
     @classmethod
     def poll(cls, context):

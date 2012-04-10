@@ -53,7 +53,7 @@ def initInterface(context):
     bpy.types.Scene.McpEndFrame = IntProperty(
         name="Last Frame", 
         description="Last frame for the animation",
-        default=32000)
+        default=250)
 
     bpy.types.Scene.McpRot90Anim = BoolProperty(
         name="Rotate 90 deg", 
@@ -78,17 +78,7 @@ def initInterface(context):
     bpy.types.Scene.McpRetargetIK = BoolProperty(
         name="Retarget IK", 
         description="Include IK bones in retargeting",
-        default=True)        
-                
-    bpy.types.Scene.McpApplyFixes = BoolProperty(
-        name="Apply Found Fixes", 
-        description="Apply found fixes (old retarget only)",
-        default=True)
-
-    bpy.types.Scene.McpNewIkRetarget = BoolProperty(
-        name="New IK Retarget", 
-        description="Use new retarget for IK bones",
-        default=False)
+        default=False)        
 
     bpy.types.Scene.McpNewRetarget = BoolProperty(
         name="New Retarget", 
@@ -103,7 +93,7 @@ def initInterface(context):
         default=False)
 
     bpy.types.Scene.McpSSFactor = IntProperty(
-        name="Subsample factor", 
+        name="Subsample Factor", 
         description="Sample only every n:th frame",
         min=1, default=1)
 
@@ -113,7 +103,7 @@ def initInterface(context):
         default=False)
 
     bpy.types.Scene.McpRescaleFactor = IntProperty(
-        name="Rescale factor", 
+        name="Rescale Factor", 
         description="Factor for rescaling time",
         min=1, default=1)
 
@@ -124,23 +114,23 @@ def initInterface(context):
     # Simplify
 
     bpy.types.Scene.McpSimplifyVisible = BoolProperty(
-        name="Only visible", 
+        name="Only Visible", 
         description="Simplify only visible F-curves",
         default=False)
 
     bpy.types.Scene.McpSimplifyMarkers = BoolProperty(
-        name="Only between markers", 
+        name="Only Between Markers", 
         description="Simplify only between markers",
         default=False)
 
     bpy.types.Scene.McpErrorLoc = FloatProperty(
-        name="Max loc error", 
+        name="Max Loc Error", 
         description="Max error for location FCurves when doing simplification",
         min=0.001,
         default=0.01)
 
     bpy.types.Scene.McpErrorRot = FloatProperty(
-        name="Max rot error", 
+        name="Max Rot Error", 
         description="Max error for rotation (degrees) FCurves when doing simplification",
         min=0.001,
         default=0.1)
@@ -148,50 +138,50 @@ def initInterface(context):
     # Loop
     
     bpy.types.Scene.McpLoopBlendRange = IntProperty(
-        name="Blend range", 
+        name="Blend Range", 
         min=1,
         default=5)
     
     bpy.types.Scene.McpLoopLoc = BoolProperty(
         name="Loc", 
-        description="Looping affects location",
+        description="Looping Affects Location",
         default=True)
 
     bpy.types.Scene.McpLoopRot = BoolProperty(
         name="Rot", 
-        description="Looping affects rotation",
+        description="Looping Affects Rotation",
         default=True)
 
     bpy.types.Scene.McpLoopInPlace = BoolProperty(
         name="Loop in place", 
-        description="Remove location F-curves",
+        description="Remove Location F-curves",
         default=False)
 
     bpy.types.Scene.McpLoopZInPlace = BoolProperty(
-        name="In place affects Z", 
+        name="In Place Affects Z", 
         default=False)
 
     bpy.types.Scene.McpRepeatNumber = IntProperty(
-        name="Repeat number", 
+        name="Repeat Number", 
         min=1,
         default=1)
         
     bpy.types.Scene.McpFirstEndFrame = IntProperty(
-        name="First end frame",
+        name="First End Frame",
         default=1)
         
     bpy.types.Scene.McpSecondStartFrame = IntProperty(
-        name="Second start frame",
+        name="Second Start Frame",
         default=1)
         
     bpy.types.Scene.McpActionTarget = EnumProperty(
         items = [('Second to new','Second to new','Second to new'),
                  ('Extend second', 'Extend second', 'Extend second'),
                  ('Stitch new', 'Stitch new', 'Stitch new')],
-        name = "Action target")
+        name = "Action Target")
 
     bpy.types.Scene.McpOutputActionName = StringProperty(
-        name="Output action name", 
+        name="Output Action Name", 
         maxlen=24,
         default="")
        
@@ -199,7 +189,7 @@ def initInterface(context):
     # Plant
     
     bpy.types.Scene.McpPlantCurrent = BoolProperty(
-        name="Use current", 
+        name="Use Current", 
         description="Plant at current",
         default=True)
 
@@ -235,7 +225,7 @@ def initInterface(context):
         default=False)
 
     bpy.types.Scene.McpReallyDelete = BoolProperty(
-        name="Really delete", 
+        name="Really Delete", 
         description="Delete button deletes action permanently",
         default=False)
 
@@ -245,16 +235,16 @@ def initInterface(context):
 
     bpy.types.Scene.McpFirstAction = EnumProperty(
         items = [],
-        name = "First action")
+        name = "First Action")
 
     bpy.types.Scene.McpSecondAction = EnumProperty(
         items = [],
-        name = "Second action")
+        name = "Second Action")
         
    # Source
    
     bpy.types.Scene.McpGuessSrcRig = BoolProperty(
-        name = "Guess source rig",
+        name = "Guess Source Rig",
         default=True)
 
     scn = context.scene
@@ -264,7 +254,7 @@ def initInterface(context):
         scn.McpBvhScale = 0.65
         scn.McpAutoScale = True
         scn.McpStartFrame = 1
-        scn.McpEndFrame = 32000
+        scn.McpEndFrame = 250
         scn.McpRot90Anim = True
         scn.McpDoSimplify = False
         scn.McpNewIkRetarget = False

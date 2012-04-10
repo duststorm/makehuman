@@ -78,7 +78,7 @@ def findAction(name):
 
 class VIEW3D_OT_McpUpdateActionListButton(bpy.types.Operator):
     bl_idname = "mcp.update_action_list"
-    bl_label = "Update action list"
+    bl_label = "Update Action List"
 
     @classmethod
     def poll(cls, context):
@@ -125,7 +125,7 @@ def deleteAction(context):
 
 class VIEW3D_OT_McpDeleteButton(bpy.types.Operator):
     bl_idname = "mcp.delete"
-    bl_label = "Delete action"
+    bl_label = "Delete Action"
 
     @classmethod
     def poll(cls, context):
@@ -148,7 +148,7 @@ def deleteHash():
     
 class VIEW3D_OT_McpDeleteHashButton(bpy.types.Operator):
     bl_idname = "mcp.delete_hash"
-    bl_label = "Delete hash actions"
+    bl_label = "Delete Hash Actions"
 
     def execute(self, context):
         deleteHash()
@@ -170,7 +170,7 @@ def setCurrentAction(context, prop):
     
 class VIEW3D_OT_McpSetCurrentActionButton(bpy.types.Operator):
     bl_idname = "mcp.set_current_action"
-    bl_label = "Set current action"
+    bl_label = "Set Current Action"
     prop = StringProperty()
 
     def execute(self, context):

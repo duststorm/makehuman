@@ -99,6 +99,11 @@ def setTranslation(mat, loc):
         mat[m][3] = loc[m][3]
 
 
+def setTranslationVec(mat, loc):
+    for m in range(3):
+        mat[m][3] = loc[m]
+
+
 def setRotation(mat, rot):
     for m in range(3):
         for n in range(3):
@@ -158,8 +163,12 @@ def retargetFkBone(boneData, frame):
     trgMat = boneData.trgRestInv * bakeMat
 
     if boneData.rollMat:
+        #print(name)
+        #utils.printMat4(" Trg1", trgMat, "  ")
         trgRot = trgMat * boneData.rollMat
         setRotation(trgMat, trgRot)
+        #utils.printMat4(" Trg2", trgMat, "  ")
+        #halt
 
     trgBone.matrix_basis = trgMat
     if 0 and trgBone.name == "Hip_L":
@@ -228,8 +237,7 @@ def retargetMatrices(anim, frames, first, doFK, doIK, scn):
         if doIK:
             retargetIkBones(anim.trgRig, frame, first) 
             first = False
-    return               
- 
+    return                
   
 #
 #   setupFkBones(srcRig, trgRig, boneAssoc, parAssoc, anim, scn):
@@ -355,7 +363,8 @@ def retargetMhxRig(context, srcRig, trgRig, doFK, doIK):
     first = True
     try:
         while frameBlock:
-            collectSrcMats(anim, frameBlock, scn)
+            if doFK:
+                collectSrcMats(anim, frameBlock, scn)
             retargetMatrices(anim, frameBlock, first, doFK, doIK, scn)
             index += 100
             first = False
@@ -467,6 +476,11 @@ def restoreTargetData(rig, data):
 #
 #########################################
 
+def updateScene():
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.mode_set(mode='POSE')
+
+
 def getPoseMatrix(mat, pb):
     restInv = pb.bone.matrix_local.inverted()
     if pb.parent:
@@ -512,20 +526,56 @@ def insertRotation(pb, mat, frame):
         pb.keyframe_insert("rotation_euler", frame=frame, group=pb.name)
 
 
-def matchPoseReverse(pb, fkPb, doSetHead, frame):
-    bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.mode_set(mode='POSE')
-    gmat = fkPb.matrix * Matrix.Rotation(math.pi, 4, 'Z')
-    offs = pb.bone.length * fkPb.matrix.col[1]    
-    gmat[0][3] += offs[0]
-    gmat[1][3] += offs[1]
-    gmat[2][3] += offs[2]    
+def matchPoseLocRot(pb, fkPb, frame):
+    mat = getPoseMatrix(fkPb.matrix, pb)
+    insertLocation(pb, mat, frame)
+    insertRotation(pb, mat, frame)
+
+
+def makePlanar(pb, rig, frame):
+    master = rig.pose.bones["MasterFloor"]
+    mmat = master.matrix
+    gmat = pb.matrix
+    pmat = pb.parent.matrix
+
+    zvec = mmat.to_3x3().col[2].normalized()
+    yvec = gmat.to_3x3().col[1].normalized()
+    xvec = yvec.cross(zvec)
+    pyvec = pmat.to_3x3().col[1].normalized()
+    c = zvec.dot(yvec)
+    pc = zvec.dot(pyvec)
+    if 0 and c > pc:
+    	print("fix", c, frame)
+    	c += pc
+    angle = math.acos(c)   
+    angle = math.pi/2 - angle
+    rotX = Matrix.Rotation(angle, 4, 'X')
     mat = getPoseMatrix(gmat, pb)
+    setRotation(mat, rotX*mat)
+    insertRotation(pb, mat, frame)
+    
+    updateScene()
+    gmat = pb.matrix.copy()
+    pmat = pb.parent.matrix
+    head = gmat.col[3]
+    tail = head + gmat.col[1]*pb.bone.length
+    phead = pmat.col[3]
+    ptail = phead + pmat.col[1]*pb.parent.bone.length
+    head = ptail - gmat.col[1]*pb.bone.length
+    setTranslationVec(gmat, head)
+    mat = getPoseMatrix(gmat, pb)    
+    insertLocation(pb, mat, frame)    
+    
+
+def matchPoseReverse(pb, fkPb, frame):
+    updateScene()
+    mat = getPoseMatrix(fkPb.matrix, pb)
+    mat = mat * Matrix.Rotation(math.pi, 4, 'Z')
+    mat[1][3] -= pb.bone.length
     pb.matrix_basis = mat
     insertLocation(pb, mat, frame)
     insertRotation(pb, mat, frame)
     
-
 
 def matchPoseScale(pb, fkPb, frame):
     mat = getPoseMatrix(fkPb.matrix, pb)
@@ -536,8 +586,7 @@ def matchPoseScale(pb, fkPb, frame):
 def ik2fkArm(rig, ikBones, fkBones, suffix, frame):
     (uparmIk, loarmIk, elbow, elbowPt, wrist) = ikBones
     (uparmFk, loarmFk, elbowPtFk, handFk) = fkBones
-    matchPoseTranslation(wrist, handFk, frame)
-    matchPoseRotation(wrist, handFk, frame)  
+    matchPoseLocRot(wrist, handFk, frame)
     matchPoseTranslation(elbow, elbowPtFk, frame)
     matchPoseTranslation(elbowPt, elbowPtFk, frame)
     return
@@ -547,20 +596,20 @@ def ik2fkLeg(rig, ikBones, fkBones, legIkToAnkle, suffix, frame, first):
     (uplegIk, lolegIk, kneePt, ankleIk, legIk, legFk, footIk, toeIk) = ikBones
     (uplegFk, lolegFk, kneePtFk, footFk, toeFk) = fkBones
 
-    matchPoseTranslation(legIk, legFk, frame)
-    matchPoseRotation(legIk, legFk, frame)  
-    matchPoseReverse(toeIk, toeFk, False, frame)
-    matchPoseReverse(footIk, footFk, True, frame)
+    makePlanar(legFk, rig, frame)
+    updateScene()
+    #halt
+    matchPoseLocRot(legIk, legFk, frame)
+    matchPoseReverse(toeIk, toeFk, frame)
+    matchPoseReverse(footIk, footFk, frame)
     matchPoseTranslation(kneePt, kneePtFk, frame)
-    if legIkToAnkle or first:
+    if True or legIkToAnkle or first:
         matchPoseTranslation(ankleIk, footFk, frame)
+    #halt
     return
    
    
 def retargetIkBones(rig, frame, first):
-    bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.mode_set(mode='POSE')
-
     if the.target == the.T_MHX:
         lArmIkBones = getSnapBones(rig, "ArmIK", "_L")
         lArmFkBones = getSnapBones(rig, "ArmFK", "_L")
@@ -570,7 +619,7 @@ def retargetIkBones(rig, frame, first):
         lLegFkBones = getSnapBones(rig, "LegFK", "_L")
         rLegIkBones = getSnapBones(rig, "LegIK", "_R")
         rLegFkBones = getSnapBones(rig, "LegFK", "_R")
-        
+
         ik2fkArm(rig, lArmIkBones, lArmFkBones, "_L", frame)
         ik2fkArm(rig, rArmIkBones, rArmFkBones, "_R", frame)
         ik2fkLeg(rig, lLegIkBones, lLegFkBones, rig["&LegIkToAnkle_L"], "_L", frame, first)
@@ -583,55 +632,6 @@ def retargetIkBones(rig, frame, first):
             matchPoseRotation(ikPb, fkPb, frame)          
     return        
         
-#
-#   setInverse(rig, pb):
-#
-"""
-def setInverse(rig, pb):
-    rig.data.bones.active = pb.bone
-    pb.bone.select = True
-    bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.mode_set(mode='POSE')
-    for cns in pb.constraints:
-        if cns.type == 'CHILD_OF':
-            bpy.ops.constraint.childof_set_inverse(constraint=cns.name, owner='BONE')
-    return
-
-
-def clearInverse(rig, pb):
-    rig.data.bones.active = pb.bone
-    pb.bone.select = True
-    bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.mode_set(mode='POSE')
-    bpy.ops.pose.loc_clear()
-    bpy.ops.pose.rot_clear()
-    for cns in pb.constraints:
-        if cns.type == 'CHILD_OF':
-            bpy.ops.constraint.childof_clear_inverse(constraint=cns.name, owner='BONE')
-    return
-
-
-def fixAnkles(rig, scn):
-    layers = list(rig.data.layers)
-    try:
-        rig.data.layers = 32*[True]
-        setInverse(rig, rig.pose.bones["Ankle_L"])
-        setInverse(rig, rig.pose.bones["Ankle_R"])
-        scn.frame_current = scn.frame_current
-    finally:
-        rig.data.layers = layers
-    return
-
-
-class VIEW3D_OT_FixAnklesButton(bpy.types.Operator):
-    bl_idname = "mcp.fix_ankles"
-    bl_label = "Fix ankles"
-    bl_description = "Set inverse for ankle Child-of constraints"
-
-    def execute(self, context):
-        fixAnkles(context.object, context.scene)
-        return{'FINISHED'}    
-"""        
 #
 #
 #
@@ -680,7 +680,7 @@ def loadRetargetSimplify(context, filepath):
 
 class VIEW3D_OT_NewRetargetMhxButton(bpy.types.Operator):
     bl_idname = "mcp.new_retarget_mhx"
-    bl_label = "Retarget selected to active"
+    bl_label = "Retarget Selected To Active"
 
     def execute(self, context):
         trgRig = context.object
@@ -694,7 +694,7 @@ class VIEW3D_OT_NewRetargetMhxButton(bpy.types.Operator):
 
 class VIEW3D_OT_RetargetIKButton(bpy.types.Operator):
     bl_idname = "mcp.retarget_ik"
-    bl_label = "Retarget IK bones"
+    bl_label = "Retarget IK Bones"
 
     def execute(self, context):
         rig = context.object
@@ -704,9 +704,9 @@ class VIEW3D_OT_RetargetIKButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 
-class VIEW3D_OT_NewLoadRetargetSimplifyButton(bpy.types.Operator, ImportHelper):
-    bl_idname = "mcp.new_load_retarget_simplify"
-    bl_label = "Load, retarget, simplify"
+class VIEW3D_OT_LoadAndRetargetButton(bpy.types.Operator, ImportHelper):
+    bl_idname = "mcp.load_and_retarget"
+    bl_label = "Load And Retarget"
 
     filename_ext = ".bvh"
     filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})

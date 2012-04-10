@@ -549,7 +549,7 @@ def renameAndRescaleBvh(context, srcRig, trgRig):
 
 class VIEW3D_OT_LoadBvhButton(bpy.types.Operator, ImportHelper):
     bl_idname = "mcp.load_bvh"
-    bl_label = "Load BVH file (.bvh)"
+    bl_label = "Load BVH File (.bvh)"
 
     filename_ext = ".bvh"
     filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})
@@ -569,7 +569,7 @@ class VIEW3D_OT_LoadBvhButton(bpy.types.Operator, ImportHelper):
 
 class VIEW3D_OT_RenameBvhButton(bpy.types.Operator):
     bl_idname = "mcp.rename_bvh"
-    bl_label = "Rename and rescale BVH rig"
+    bl_label = "Rename And Rescale BVH Rig"
 
     def execute(self, context):
         scn = context.scene
@@ -594,7 +594,7 @@ class VIEW3D_OT_RenameBvhButton(bpy.types.Operator):
 
 class VIEW3D_OT_LoadAndRenameBvhButton(bpy.types.Operator, ImportHelper):
     bl_idname = "mcp.load_and_rename_bvh"
-    bl_label = "Load and rename BVH file (.bvh)"
+    bl_label = "Load And Rename BVH File (.bvh)"
 
     filename_ext = ".bvh"
     filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})

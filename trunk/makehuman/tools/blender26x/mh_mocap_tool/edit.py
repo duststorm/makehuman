@@ -74,7 +74,7 @@ def startEdit(context):
 
 class VIEW3D_OT_McpStartEditButton(bpy.types.Operator):
     bl_idname = "mcp.start_edit"
-    bl_label = "Start edit"
+    bl_label = "Start Edit"
 
     def execute(self, context):
         startEdit(context)
@@ -105,7 +105,7 @@ def undoEdit(context):
 
 class VIEW3D_OT_McpUndoEditButton(bpy.types.Operator):
     bl_idname = "mcp.undo_edit"
-    bl_label = "Undo edit"
+    bl_label = "Undo Edit"
 
     def execute(self, context):
         undoEdit(context)
@@ -173,7 +173,7 @@ def confirmEdit(context):
             
 class VIEW3D_OT_McpConfirmEditButton(bpy.types.Operator):
     bl_idname = "mcp.confirm_edit"
-    bl_label = "Confirm edit"
+    bl_label = "Confirm Edit"
 
     def execute(self, context):
         confirmEdit(context)

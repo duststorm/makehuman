@@ -315,7 +315,7 @@ def translateFCurves(fcurves, dt):
     
 class VIEW3D_OT_McpStitchActionsButton(bpy.types.Operator):
     bl_idname = "mcp.stitch_actions"
-    bl_label = "Stitch actions"
+    bl_label = "Stitch Actions"
 
     def execute(self, context):
         stitchActions(context)
@@ -379,7 +379,7 @@ def touchBones(rig, frame, touchedLoc, touchedRot):
 
 class VIEW3D_OT_McpShiftBoneFCurvesButton(bpy.types.Operator):
     bl_idname = "mcp.shift_bone"
-    bl_label = "Shift bone F-curves"
+    bl_label = "Shift Bone F-curves"
 
     def execute(self, context):
         shiftBoneFCurves(context)
