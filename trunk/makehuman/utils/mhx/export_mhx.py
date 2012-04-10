@@ -1128,25 +1128,25 @@ def exportMesh(ob, fp):
         #writeDir(v, ['co', 'index', 'normal'], "      ", fp)
         fp.write("  end Verts\n")
 
-    if me.faces:
+    if me.polygons:
         fp.write("  Faces\n")
-        for f in me.faces:
+        for f in me.polygons:
             fp.write("    f ")
             for v in f.vertices:
                 fp.write("%d " % v)
             fp.write(";\n")
         if len(me.materials) <= 1:
-            f = me.faces[0]
+            f = me.polygons[0]
             fp.write("    ftall %d %d ;\n" % (f.material_index, f.use_smooth))
         else:
             """
-            for f in me.faces:
+            for f in me.polygons:
                 fp.write("    ft %d %d ;\n" % (f.material_index, f.use_smooth))
             """
             mi = -1
             us = -1
             n = 0
-            for f in me.faces:
+            for f in me.polygons:
                 if (f.material_index == mi) and (f.use_smooth == us):
                     n += 1
                 else:
