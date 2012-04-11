@@ -321,10 +321,15 @@ def setupFkBones(srcRig, trgRig, boneAssoc, parAssoc, anim, scn):
 #    retargetMhxRig(context, srcRig, trgRig, doFK, doIK):
 #
 
-def setupMhxAnimation(scn, srcRig, trgRig):
+def clearPose():    
     bpy.ops.object.mode_set(mode='POSE')
+    bpy.ops.pose.select_all(action='SELECT')
     bpy.ops.pose.rot_clear()
     bpy.ops.pose.loc_clear()
+
+
+def setupMhxAnimation(scn, srcRig, trgRig):
+    clearPose()
 
     if scn.McpGuessSrcRig:
         source.scanSourceRig(scn, srcRig)
@@ -350,7 +355,6 @@ def retargetMhxRig(context, srcRig, trgRig, doFK, doIK):
 
     scn.objects.active = trgRig
     scn.update()
-    bpy.ops.object.mode_set(mode='POSE')  
 
     try:
         scn.frame_current = frames[0]
@@ -358,6 +362,7 @@ def retargetMhxRig(context, srcRig, trgRig, doFK, doIK):
         print("No frames found. Quitting.")
         return
     oldData = changeTargetData(trgRig, anim)
+    clearPose()
     frameBlock = frames[0:100]
     index = 0
     first = True
@@ -427,8 +432,10 @@ def changeTargetData(rig, anim):
     for pb in rig.pose.bones:
         constraints = []
         for cns in pb.constraints:
-            if cns.type in ['LIMIT_ROTATION', 'LIMIT_SCALE', 'LIMIT_DISTANCE']:
+            if cns.type in ['LIMIT_ROTATION', 'LIMIT_SCALE']:
                 constraints.append( (cns, cns.mute) )
+                cns.mute = True
+            elif cns.type == 'LIMIT_DISTANCE':
                 cns.mute = True
         locks.append( (pb, list(pb.lock_location), list(pb.lock_rotation), list(pb.lock_scale), constraints) )
         pb.lock_location = [False, False, False]
@@ -534,37 +541,37 @@ def matchPoseLocRot(pb, fkPb, frame):
 
 def makePlanar(pb, rig, frame):
     master = rig.pose.bones["MasterFloor"]
-    mmat = master.matrix
-    gmat = pb.matrix
-    pmat = pb.parent.matrix
-
-    zvec = mmat.to_3x3().col[2].normalized()
-    yvec = gmat.to_3x3().col[1].normalized()
-    xvec = yvec.cross(zvec)
-    pyvec = pmat.to_3x3().col[1].normalized()
-    c = zvec.dot(yvec)
-    pc = zvec.dot(pyvec)
-    if 0 and c > pc:
-    	print("fix", c, frame)
-    	c += pc
-    angle = math.acos(c)   
-    angle = math.pi/2 - angle
-    rotX = Matrix.Rotation(angle, 4, 'X')
-    mat = getPoseMatrix(gmat, pb)
-    setRotation(mat, rotX*mat)
-    insertRotation(pb, mat, frame)
-    
-    updateScene()
-    gmat = pb.matrix.copy()
-    pmat = pb.parent.matrix
-    head = gmat.col[3]
-    tail = head + gmat.col[1]*pb.bone.length
-    phead = pmat.col[3]
+    mmat = master.matrix.to_3x3()
+    pmat = pb.parent.matrix.to_3x3()
+    phead = pb.parent.matrix.to_translation()
     ptail = phead + pmat.col[1]*pb.parent.bone.length
-    head = ptail - gmat.col[1]*pb.bone.length
-    setTranslationVec(gmat, head)
-    mat = getPoseMatrix(gmat, pb)    
-    insertLocation(pb, mat, frame)    
+    
+    zmaster = mmat.col[2]
+    yvec = pmat.col[1].copy()
+    proj = zmaster.dot(yvec)
+    ymax = 0
+    ymin = -0.5
+    if proj > ymax:
+        proj = ymax
+    elif proj < 2*ymin:
+        proj = 0
+    elif proj < ymin:
+        proj = 2*ymin-proj
+    yvec -= proj*zmaster    
+    yvec.normalize()
+    xvec = pmat.col[0].normalized()
+    zvec = xvec.cross(yvec)
+    head = ptail - yvec*pb.bone.length
+    
+    nmat = Matrix()
+    for i in range(3):
+        nmat[i][0] = xvec[i]
+        nmat[i][1] = yvec[i]
+        nmat[i][2] = zvec[i]
+        nmat[i][3] = head[i]
+    mat = getPoseMatrix(nmat, pb)
+    insertRotation(pb, mat, frame)
+    insertLocation(pb, mat, frame)  
     
 
 def matchPoseReverse(pb, fkPb, frame):

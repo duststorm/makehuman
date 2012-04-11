@@ -287,16 +287,9 @@ class LoadPanel(bpy.types.Panel):
         row.prop(scn, "McpSimplifyVisible")
         row.prop(scn, "McpSimplifyMarkers")
         layout.operator("mcp.simplify_fcurves")
+        
         return
 
-        layout.separator()
-        layout.label("Plant keys")
-        row = layout.row()
-        row.prop(scn, "McpPlantLoc")
-        row.prop(scn, "McpPlantRot")
-        layout.prop(scn, "McpPlantCurrent")
-        layout.operator("mcp.plant")
-        
         layout.separator()
         layout.label("Toggle constraints")
         row = layout.row()
@@ -333,6 +326,22 @@ class EditPanel(bpy.types.Panel):
         layout = self.layout
         scn = context.scene
         ob = context.object
+
+        layout.label("Plant keys")
+        row = layout.row()
+        row.label("Source")
+        row.prop(scn, "McpPlantFrom", expand=True)
+        row = layout.row()
+        row.prop(scn, "McpPlantLocX")
+        row.prop(scn, "McpPlantLocY")
+        row.prop(scn, "McpPlantLocZ")
+        row = layout.row()
+        row.prop(scn, "McpPlantRotX")
+        row.prop(scn, "McpPlantRotY")
+        row.prop(scn, "McpPlantRotZ")
+        layout.operator("mcp.plant")
+        
+        layout.separator()
         layout.label("Global Edit")
         layout.operator("mcp.shift_bone")
 

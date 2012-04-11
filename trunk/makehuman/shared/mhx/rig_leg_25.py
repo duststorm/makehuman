@@ -45,12 +45,14 @@ LegJoints = [
     ('l-midtoe',            'l', ((0.5, 'l-foot-1'), (0.5, 'l-foot-2'))),
 
     ('r-heel0',             'v', 5721),
-    ('r-heel',              'p', ['r-foot-2', 'r-foot-1', 'r-heel0']),
+    #('r-heel',              'p', ['r-foot-2', 'r-foot-1', 'r-heel0']),
+    ('r-heel',              'l', ((-2.5,'r-foot-2'), (3.5,'r-foot-1'))),
     ('r-ankle-tip',         'o', ('r-ankle', [0.0, 0.0, -1.0])),
     ('r-loleg-fan',         'l', ((0.75, 'r-knee'), (0.25, 'r-ankle'))),
 
     ('l-heel0',             'v', 13338),
-    ('l-heel',              'p', ['l-foot-2', 'l-foot-1', 'l-heel0']),
+    #('l-heel',              'p', ['l-foot-2', 'l-foot-1', 'l-heel0']),
+    ('l-heel',              'l', ((-2.5,'l-foot-2'), (3.5,'l-foot-1'))),
     ('l-ankle-tip',         'o', ('l-ankle', [0.0, 0.0, -1.0])),
     ('l-loleg-fan',         'l', ((0.75, 'l-knee'), (0.25, 'l-ankle'))),
 
@@ -201,7 +203,7 @@ loLegRoll = 0
 footRoll = 0
 #toeRoll = -63.5*D
 toeRoll = 135*D
-footCtrlRoll = 0.0
+footCtrlRoll = 0
 
 LegArmature = [
     # Leg

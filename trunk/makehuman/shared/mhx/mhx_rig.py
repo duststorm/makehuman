@@ -98,6 +98,11 @@ def newSetupJoints (obj, joints):
             y = the.Locations[data[1]]
             z = the.Locations[data[2]]
             the.Locations[key] = [x[0],y[1],z[2]]
+        elif typ == 'vz':
+            v = int(data[0])
+            z = obj.verts[v].co[2]
+            loc = the.Locations[data[1]]
+            the.Locations[key] = [loc[0],loc[1],z]
         elif typ == 'X':
             r = the.Locations[data[0]]
             (x,y,z) = data[1]
