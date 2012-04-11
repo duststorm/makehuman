@@ -575,6 +575,9 @@ class ExportTaskView(gui3d.TaskView):
         
     def addRigs(self, options, rigs, suffix, check, y):
         path = "data/rigs"
+        if not os.path.exists(path):
+            print("Did not find directory %s" % path)
+            return (y, [])
         buttons = []
         for fname in os.listdir(path):
             (name, ext) = os.path.splitext(fname)
