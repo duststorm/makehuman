@@ -109,8 +109,8 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.operator("mh.new_target", text="New secondary target")
             layout.operator("mh.load_target", text="Load secondary target")            
             layout.operator("mh.fit_target")
-            layout.operator("mh.symmetrize_target", text="Symm Left->Right").left2right = True
-            layout.operator("mh.symmetrize_target", text="Symm Right->Left").left2right = False
+            layout.operator("mh.symmetrize_target", text="Symm Left->Right").left2right = False
+            layout.operator("mh.symmetrize_target", text="Symm Right->Left").left2right = True
             #layout.separator()
             #layout.prop(scn, '["Relax"]')
             #layout.operator("mh.relax_target")
