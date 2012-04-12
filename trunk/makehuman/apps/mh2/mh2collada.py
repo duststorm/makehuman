@@ -438,7 +438,7 @@ def exportDae(human, name, fp):
     rigfile = "data/rigs/%s.rig" % the.Options["daerig"]
     print("Using rig file %s" % rigfile)
     amt = getArmatureFromRigFile(rigfile, obj)
-    #rawTargets = loadShapeKeys("data/templates/shapekeys-facial25.mhx")
+    #rawTargets = loadShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx")
     rawTargets = []
     (the.Stuff, stuffs) = setupStuff(name, obj, amt, rawTargets, cfg)
 

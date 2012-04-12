@@ -223,7 +223,7 @@ def exportConfig(human, useHair, options=None):
         cfg.proxyList.append(pfile)    
 
     if cfg.cage:
-        pfile = getCageFile("./data/templates/cage/cage.mhclo", 4, useMhx, useObj, useDae)
+        pfile = getCageFile("./data/cages/cage/cage.mhclo", 4, useMhx, useObj, useDae)
         cfg.proxyList.append(pfile)    
         
     if not fp: 
@@ -314,7 +314,7 @@ def exportConfig(human, useHair, options=None):
             if len(words) > 0:
                 name = words[0]
             else:
-                name = "./data/templates/cage/cage.mhclo"
+                name = "./data/cages/cage/cage.mhclo"
             pfile = getCageFile(name, layer, useMhx, useObj, useDae)
             cfg.cage = True
             cfg.proxyList.append(pfile)
