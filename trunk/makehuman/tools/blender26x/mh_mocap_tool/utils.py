@@ -253,7 +253,7 @@ def insertRotationKeyFrame(pb, frame):
         pb.keyframe_insert("rotation_axis_angle", frame=frame, group=grp)
     else:
         pb.keyframe_insert("rotation_euler", frame=frame, group=grp)
-   
+  
 #
 #
 #

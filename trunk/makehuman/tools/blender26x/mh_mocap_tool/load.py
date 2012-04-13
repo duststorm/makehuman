@@ -224,7 +224,7 @@ def readBvhFile(context, filepath, scn, scan):
                 pbones = rig.pose.bones
                 for pb in pbones:
                     #try:
-                    #    trgName = the.armature[pb.name.lower()]
+                    #    trgName = the.srcArmature[pb.name.lower()]
                     #    pb.rotation_mode = trgPbones[trgName].rotation_mode
                     #except:
                     pb.rotation_mode = 'QUATERNION'
@@ -377,10 +377,10 @@ def renameBones(srcRig, scn):
         srcName = srcBone.name
         lname = srcName.lower()
         try:
-            trgName = the.armature[lname]
+            (trgName, twist) = the.srcArmature[lname]
         except KeyError:
             lname = lname.replace(' ','_')
-            trgName = the.armature[lname]
+            (trgName, twist) = the.srcArmature[lname]
         eb = ebones[srcName]
         if trgName:
             eb.name = trgName

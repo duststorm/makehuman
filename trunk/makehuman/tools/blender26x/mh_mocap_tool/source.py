@@ -42,8 +42,8 @@ def guessSrcArmature(rig):
     bestMisses = 1000
     misses = {}
     bones = rig.data.bones
-    for name in the.armatureList:
-        amt = the.armatures[name]
+    for name in the.sourceArmatures.keys():
+        amt = the.sourceArmatures[name]
         nMisses = 0
         for bone in bones:
             try:
@@ -68,257 +68,91 @@ def guessSrcArmature(rig):
 #
 
 def findSrcArmature(context, rig):
-    if useCustomSrcRig(context):
-        (the.armature, name, fixes) = buildSrcArmature(context, rig)
-        the.armatures[name] = the.armature
-        the.fixesList[name] = fixes
+    scn = context.scene
+    if scn.McpGuessSrcRig:
+        (the.srcArmature, name) = guessSrcArmature(rig)
     else:
-        (the.armature, name) = guessSrcArmature(rig)
-    the.srcRolls = the.rollFixes[name]    
-    rig['McpArmature'] = name
+        name = scn.McpSourceRig
+        the.srcArmature = the.sourceArmatures[name]
+    rig.McpArmature = name
     print("Using matching armature %s." % name)
     return
 
 #
-#    setArmature(rig)
+#    setArmature(rig, scn)
 #
 
-def setArmature(rig):
+def setArmature(rig, scn):
     try:
-        name = rig['McpArmature']
-    except:
-        print("***", rig)
+        name = rig.McpArmature
+    except:    
+        name = scn.McpSourceRig
+    if name:
+        print("Setting armature to %s" % name)
+        rig.McpArmature = name
+        scn.McpSourceRig = name
+    else:
         raise NameError("No armature set")
-    the.armature = the.armatures[name]
-    the.srcRolls = the.rollFixes[name]  
+    the.srcArmature = the.sourceArmatures[name]
     print("Set armature %s" % name)
     return
     
-###############################################################################
 #
-#    Source armatures
-#
-###############################################################################
-
-the.sourceProps = []
-
-#
-#    defaultEnums():
-#    setSourceProp(scn, prop, mhx, enums):
-#    makeSourceBoneList(scn, rig):
+#   findSourceKey(mhx, struct):
 #
 
-def defaultEnums():
-    enums = [('None','None','None')]
-    for bn in target.TargetBoneNames:
-        if not bn:
-            continue
-        (mhx, text) = bn
-        enum = (mhx, text, mhx)
-        enums.append(enum)
-    return enums
-
-def setSourceProp(scn, prop, mhx, enums):
-    scn[prop] = 0
-    n = 0
-    for (mhx1, text1, mhx2) in enums:
-        if mhx == mhx1: 
-            scn[prop] = n
-            return
-        n += 1
-    return
-
-def makeSourceBoneList(scn, rig):
-    root = None
-    for bone in rig.data.bones:
-        if bone.parent == None:
-            root = bone
-            break
-    if root:
-        print("Root bone %s", root)
-    else:        
-        print("Did not find root bone")
-        return
+def findSourceKey(mhx, struct):
+    for bone in struct.keys():
+        (mhx1, twist) = struct[bone]
+        if mhx == mhx1:
+            return (bone, twist)
+    return (None, 0)
+    
+def getSourceRoll(mhx):
+    (bone, roll) = findSourceKey(mhx, the.srcArmature)
+    return roll
             
-    enums = defaultEnums()
-    props = []
-    makeSourceBones(scn, root, enums, props)
-    for prop in props:
-        name = prop[2:].lower()
-        mhx = guessSourceBone(name)
-        setSourceProp(scn, prop, mhx, enums)
-    return (props, enums)
-
+    
+###############################################################################
 #
-#    makeSourceBones(scn, bone, enums, props):
-#    defineSourceProp(name, enums):
+#    Source initialization
 #
+###############################################################################
 
-def makeSourceBones(scn, bone, enums, props):
-    prop = defineSourceProp(bone.name, enums)
-    props.append(prop)
-    for child in bone.children:
-        makeSourceBones(scn, child, enums, props)
-    return
 
-def defineSourceProp(name, enums):
-    qname = name.replace(' ','_')
-    expr = 'bpy.types.Scene.S_%s = EnumProperty(items = enums, name = "%s")' % (qname, name)
-    exec(expr)
-    return 'S_'+qname
+def isSourceInited(scn):
+    try:
+        scn.McpSourceRig
+        return True
+    except:
+        return False
 
-#
-#    guessSourceBone(name):
-#
 
-def guessSourceBone(name):
-    for amtname in the.armatureList:
-        amt = the.armatures[amtname]
-        try:
-            mhx = amt[name]
-            return mhx
-        except:
-            pass
-    return ''
-
-#
-#    useCustomSrcRig(context):
-#
-
-def useCustomSrcRig(context):
-    if the.sourceProps:
-        try:
-            guess = context.scene.McpGuessSrcRig
-        except:
-            guess = True
-        return not guess
-    return False
-
-#
-#    buildSrcArmature(context, rig):
-#
-
-def buildSrcArmature(context, rig):
-    amt = {}
-    used = {}
-    scn = context.scene
-    for prop in the.sourceProps:
-        name = prop[2:].lower()
-        (mhx1, text, mhx2) = the.sourceEnums[scn[prop]]
-        if mhx1 == 'None':
-            amt[name] = None
-            continue
-        amt[name] = mhx1
-        try:
-            user = used[mhx1]
-        except:
-            user = None
-        if user:
-            raise NameError("Source bones %s and %s both assigned to %s" % (user, name, mhx1))
-        used[mhx1] = name
-    fixes = target.createCustomFixes(scn['McpSrcLegBentOut'], scn['McpSrcLegRoll'], scn['McpSrcArmBentDown'], scn['McpSrcArmRoll'])
-    return (amt, "MySource", fixes)
-
-#
-#    ensureSourceInited(scn):
-#
+def initSources(scn):        
+    the.srcArmatureEnums = []
+    keys = list(the.sourceArmatures.keys())
+    keys.sort()
+    for key in keys:
+        the.srcArmatureEnums.append((key,key,key))
+        
+    bpy.types.Scene.McpSourceRig = EnumProperty(
+        items = the.srcArmatureEnums,
+        name = "Source rig",
+        default = 'MB')
+    scn.McpSourceRig = 'MB'
+    print("Defined McpSourceRig")
+    return    
+       
 
 def ensureSourceInited(scn):
-    try:
-        scn.McpGuessSrcRig
-        return
-    except:
-        pass
-    expr = 'bpy.types.Scene.McpGuessSrcRig = BoolProperty(name = "Guess source rig")'
-    exec(expr)    
-    scn.McpGuessSrcRig = False
-    return
+    if not isSourceInited(scn):
+        initSources(scn)
+        
 
-#
-#    class VIEW3D_OT_McpScanRigButton(bpy.types.Operator):
-#
-
-def scanSourceRig(scn, ob):        
-    (the.sourceProps, the.sourceEnums) = makeSourceBoneList(scn,  ob)
-    scn['McpSrcArmBentDown'] = 0.0
-    scn['McpSrcArmRoll'] = 0.0
-    scn['McpSrcLegBentOut'] = 0.0
-    scn['McpSrcLegRoll'] = 0.0
-    ensureSourceInited(scn)
-    return
-
-class VIEW3D_OT_McpScanRigButton(bpy.types.Operator):
-    bl_idname = "mcp.scan_rig"
-    bl_label = "Scan source rig"
-    bl_options = {'REGISTER'}
+class VIEW3D_OT_McpInitSourcesButton(bpy.types.Operator):
+    bl_idname = "mcp.init_sources"
+    bl_label = "Init Source Panel"
 
     def execute(self, context):
-        scanSourceRig(context,scene, context.object)
+        initSources(context.scene)
         return{'FINISHED'}    
-
-#
-#    saveSourceBones(context, path):
-#    loadSourceBones(context, path):
-#    class VIEW3D_OT_McpLoadSaveSourceBonesButton(bpy.types.Operator, ImportHelper):
-#
-
-def saveSourceBones(context, path):
-    scn = context.scene
-    fp = open(path, "w")
-    fp.write("Settings\n")
-    for prop in ['McpSrcArmBentDown','McpSrcArmRoll','McpSrcLegBentOut','McpSrcLegRoll']:
-        fp.write("%s %s\n" % (prop, scn[prop]))
-    fp.write("Bones\n")
-    for prop in the.sourceProps:
-        (mhx1, text, mhx2) = the.sourceEnums[scn[prop]]
-        fp.write("%s %s\n" % (prop, mhx1))
-    fp.close()
-    return
-        
-def loadSourceBones(context, path):
-    scn = context.scene
-    the.sourceEnums = defaultEnums()
-    the.sourceProps = []
-    fp = open(path, "rU")
-    status = 0
-    for line in fp:
-        words = line.split()
-        if len(words) == 1:
-
-            status = words[0]
-        elif status == 'Settings':
-            prop = words[0]
-            value = float(words[1])
-            scn[prop] = value
-        elif status == 'Bones':
-            prop = words[0]
-            the.sourceProps.append(prop)
-            mhx = words[1]
-            setSourceProp(scn, prop, mhx, the.sourceEnums)
-            #print(prop, scn[prop], mhx)
-    fp.close()
-    
-    for prop in the.sourceProps:
-        defineSourceProp(prop[2:], the.sourceEnums)
-    return
-        
-class VIEW3D_OT_McpLoadSaveSourceBonesButton(bpy.types.Operator, ImportHelper):
-    bl_idname = "mcp.load_save_source_bones"
-    bl_label = "Load/save source bones"
-
-    loadSave = bpy.props.StringProperty()
-    filename_ext = ".txt"
-    #filter_glob = StringProperty(default="*.txt", options={'HIDDEN'})
-    filepath = StringProperty(name="File Path", maxlen=1024, default="")
-
-    def execute(self, context):
-        ensureSourceInited(context.scene)
-        if self.loadSave == 'save':
-            saveSourceBones(context, self.properties.filepath)
-        else:
-            loadSourceBones(context, self.properties.filepath)
-        return{'FINISHED'}    
-
-    def invoke(self, context, event):
-        context.window_manager.fileselect_add(self)
-        return {'RUNNING_MODAL'}    

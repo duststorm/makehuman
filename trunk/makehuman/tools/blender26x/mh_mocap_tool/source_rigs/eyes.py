@@ -26,37 +26,29 @@
 from mathutils import *
 from math import pi
 
-EyesArmature = {
-    'hips' : 'Root',
-    'lefthip' : 'UpLeg_L',
-    'leftknee' : 'LoLeg_L',
-    'leftankle' : 'Foot_L',
-    'righthip' : 'UpLeg_R',
-    'rightknee' : 'LoLeg_R',
-    'rightankle' : 'Foot_R',
-    'chest' : 'Spine1',
-    'chest2' : 'Spine2',
-    'cs_bvh' : 'Spine3',
-    'leftcollar' : 'Clavicle_L',
-    'leftshoulder' : 'UpArm_L',
-    'leftelbow' : 'LoArm_L',
-    'leftwrist' : 'Hand_L',
-    'rightcollar' : 'Clavicle_R',
-    'rightshoulder' : 'UpArm_R',
-    'rightelbow' : 'LoArm_R',
-    'rightwrist' : 'Hand_R',
-    'neck' : 'Neck',
-    'head' : 'Head',
+# Eyes Japan bone : ( MHX bone, twist)
+
+Armature = {
+    'hips' : ('Root', 0),
+    'lefthip' : ('UpLeg_L', 0),
+    'leftknee' : ('LoLeg_L', 0),
+    'leftankle' : ('Foot_L', 0),
+    'righthip' : ('UpLeg_R', 0),
+    'rightknee' : ('LoLeg_R', 0),
+    'rightankle' : ('Foot_R', 0),
+    'chest' : ('Spine1', 0),
+    'chest2' : ('Spine2', 0),
+    'cs_bvh' : ('Spine3', 0),
+    'leftcollar' : ('Clavicle_L', 0),
+    'leftshoulder' : ('UpArm_L', 90),
+    'leftelbow' : ('LoArm_L', 90),
+    'leftwrist' : ('Hand_L', 90),
+    'rightcollar' : ('Clavicle_R', 0),
+    'rightshoulder' : ('UpArm_R', -90),
+    'rightelbow' : ('LoArm_R', -90),
+    'rightwrist' : ('Hand_R', -90),
+    'neck' : ('Neck', 0),
+    'head' : ('Head', 0),
 }
 
-
-EyesRolls = {
-    'UpArm_L' :  90,
-    'LoArm_L' :  90,
-    'Hand_L' :  90,
-
-    'UpArm_R' :  -90,
-    'LoArm_R' :  -90,
-    'Hand_R' :  -90,
-}
 

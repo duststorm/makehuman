@@ -25,49 +25,43 @@
 
 from mathutils import *
 
-HDMArmature = {
-    'hip' : 'Root',
-    'lhipjoint' : None,
-    'lfemur' : 'UpLeg_L',
-    'ltibia' : 'LoLeg_L',
-    'lfoot' : 'Foot_L',
-    'ltoes' : 'Toe_L',
-    'rhipjoint' : None,
-    'rfemur' : 'UpLeg_R',
-    'rtibia' : 'LoLeg_R',
-    'rfoot' : 'Foot_R',
-    'rtoes' : 'Toe_R',
-    'lowerback' : 'Spine1',
-    'upperback' : 'Spine2',
-    'thorax' : 'Spine3',
-    'lowerneck' : 'LowerNeck',
-    'upperneck' : 'Neck',
-    'head' : 'Head',
-    'lclavicle' : 'Clavicle_L',
-    'lhumerus' : 'UpArm_L',
-    'lradius' : 'LoArm_L',
-    'lwrist' : 'Hand0_L',
-    'lhand' : 'Hand_L',
-    'lfingers' : None,
-    'lthumb' : 'Finger1_L',
-    'rclavicle' : 'Clavicle_R',
-    'rhumerus' : 'UpArm_R',
-    'rradius' : 'LoArm_R',
-    'rwrist' : 'Hand0_R',
-    'rhand' : 'Hand_R',
-    'rfingers' : None,
-    'rthumb' : 'Finger1_R',
-}
+# HDM bone : ( MHX bone, twist)
 
-HDMRolls = {
-    'UpLeg_L' : -20,
-    'LoLeg_L' : -20,
-    'Foot_L'  : -20,
-    'Toe_L'   : -20,
-
-    'UpLeg_R' : 20,
-    'LoLeg_R' : 20,
-    'Foot_R'  : 20,
-    'Toe_R'   : 20,
+Armature = {
+    'hip' : ('Root', 0),
+    'lhipjoint' : (None, 0),
+    'lfemur' : ('UpLeg_L', -20),
+    'ltibia' : ('LoLeg_L', -20),
+    'lfoot' : ('Foot_L', -20),
+    'ltoes' : ('Toe_L', -20),
+    
+    'rhipjoint' : (None, 0),
+    'rfemur' : ('UpLeg_R', 20),
+    'rtibia' : ('LoLeg_R', 20),
+    'rfoot' : ('Foot_R', 20),
+    'rtoes' : ('Toe_R', 20),
+    
+    'lowerback' : ('Spine1', 0),
+    'upperback' : ('Spine2', 0),
+    'thorax' : ('Spine3', 0),
+    'lowerneck' : ('LowerNeck', 0),
+    'upperneck' : ('Neck', 0),
+    'head' : ('Head', 0),
+    
+    'lclavicle' : ('Clavicle_L', 0),
+    'lhumerus' : ('UpArm_L', 0),
+    'lradius' : ('LoArm_L', 0),
+    'lwrist' : ('Hand0_L', 0),
+    'lhand' : ('Hand_L', 0),
+    'lfingers' : (None, 0),
+    'lthumb' : ('Finger1_L', 0),
+    
+    'rclavicle' : ('Clavicle_R', 0),
+    'rhumerus' : ('UpArm_R', 0),
+    'rradius' : ('LoArm_R', 0),
+    'rwrist' : ('Hand0_R', 0),
+    'rhand' : ('Hand_R', 0),
+    'rfingers' : (None, 0),
+    'rthumb' : ('Finger1_R', 0),
 }
 

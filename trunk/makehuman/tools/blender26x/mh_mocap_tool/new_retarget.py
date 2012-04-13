@@ -268,7 +268,6 @@ def setupFkBones(srcRig, trgRig, boneAssoc, parAssoc, anim, scn):
         keepOffsets += ClavBones
         keepOffsInverts += ClavBones
         
-    print(the.srcRolls.items())        
     for (trgName, srcName) in boneAssoc:
         try:
             trgBone = trgRig.pose.bones[trgName]
@@ -298,10 +297,7 @@ def setupFkBones(srcRig, trgRig, boneAssoc, parAssoc, anim, scn):
 
 
         trgRoll = utils.getRoll(trgBone.bone)
-        try:
-            srcRoll = the.srcRolls[srcName]*Deg2Rad
-        except KeyError:
-            srcRoll = 0
+        srcRoll = source.getSourceRoll(srcName) * Deg2Rad
         diff = srcRoll - trgRoll
 
         if srcName in keepOffsets:        
@@ -331,9 +327,10 @@ def clearPose():
 def setupMhxAnimation(scn, srcRig, trgRig):
     clearPose()
 
-    if scn.McpGuessSrcRig:
-        source.scanSourceRig(scn, srcRig)
-    source.setArmature(srcRig)
+    source.ensureSourceInited(scn)
+    #if scn.McpGuessSrcRig:
+    #    source.scanSourceRig(scn, srcRig)
+    source.setArmature(srcRig, scn)
     print("Retarget %s --> %s" % (srcRig, trgRig))
     if trgRig.animation_data:
         trgRig.animation_data.action = None

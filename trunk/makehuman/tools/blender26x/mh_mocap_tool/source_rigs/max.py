@@ -25,62 +25,43 @@
 
 from mathutils import *
 
-MaxArmature = {
-    'hips' : 'Root',
+# 3DSMax bone : ( MHX bone, twist)
 
-    'lhipjoint' : None,
-    'lefthip' : 'UpLeg_L',
-    'leftknee' : 'LoLeg_L',
-    'leftankle' : 'Foot_L',
-    'lefttoe' : 'Toe_L',
+Armature = {
+    'hips' : ('Root', 0),
 
-    'rhipjoint' : None,
-    'righthip' : 'UpLeg_R',
-    'rightknee' : 'LoLeg_R',
-    'rightankle' : 'Foot_R',
-    'righttoe' : 'Toe_R',
+    'lhipjoint' : (None, 0),
+    'lefthip' : ('UpLeg_L', -20),
+    'leftknee' : ('LoLeg_L', -20),
+    'leftankle' : ('Foot_L', -20),
+    'lefttoe' : ('Toe_L', -20),
 
-    'lowerback' : 'Spine1',
-    'chest' : 'Spine2',
-    'chest2' : 'Spine3',
-    'lowerneck' : 'LowerNeck',
-    'neck' : 'Neck',
-    'head' : 'Head',
+    'rhipjoint' : (None, 0),
+    'righthip' : ('UpLeg_R', 20),
+    'rightknee' : ('LoLeg_R', 20),
+    'rightankle' : ('Foot_R', 20),
+    'righttoe' : ('Toe_R', 20),
 
-    'leftcollar' : 'Clavicle_L',
-    'leftshoulder' : 'UpArm_L',
-    'leftelbow' : 'LoArm_L',
-    'leftwrist' : 'Hand_L',
-    'lhand' : None,
-    'lfingers' : None,
-    'lthumb' : None,
+    'lowerback' : ('Spine1', 0),
+    'chest' : ('Spine2', 0),
+    'chest2' : ('Spine3', 0),
+    'lowerneck' : ('LowerNeck', 0),
+    'neck' : ('Neck', 0),
+    'head' : ('Head', 0),
 
-    'rightcollar' : 'Clavicle_R',
-    'rightshoulder' : 'UpArm_R',
-    'rightelbow' : 'LoArm_R',
-    'rightwrist' : 'Hand_R',
-    'rhand' : None,
-    'rfingers' : None,
-    'rthumb' : None,
+    'leftcollar' : ('Clavicle_L', 0),
+    'leftshoulder' : ('UpArm_L', 90),
+    'leftelbow' : ('LoArm_L', 90),
+    'leftwrist' : ('Hand_L', 90),
+    'lhand' : (None, 0),
+    'lfingers' : (None, 0),
+    'lthumb' : (None, 0),
+
+    'rightcollar' : ('Clavicle_R', 0),
+    'rightshoulder' : ('UpArm_R', -90),
+    'rightelbow' : ('LoArm_R', -90),
+    'rightwrist' : ('Hand_R', -90),
+    'rhand' : (None, 0),
+    'rfingers' : (None, 0),
+    'rthumb' : (None, 0),
 }
-
-MaxRolls = {
-    'UpLeg_L' : -20,
-    'LoLeg_L' : -20,
-    'Foot_L'  : -20,
-    'Toe_L'   : -20,
-
-    'UpLeg_R' : 20,
-    'LoLeg_R' : 20,
-    'Foot_R'  : 20,
-    'Toe_R'   : 20,
-
-    'UpArm_L' :  90,
-    'LoArm_L' :  90,
-    'Hand_L'  :  90,
-
-    'UpArm_R' :  -90,
-    'LoArm_R' :  -90,
-    'Hand_R'  :  -90,
-}
-

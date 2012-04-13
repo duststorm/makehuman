@@ -25,60 +25,45 @@
 
 from mathutils import *
 
-#
-#    MBArmature
-#
+# MB bone : ( MHX bone, twist)
 
-MBArmature = {
-    'hips' : 'Root', 
-    'lowerback' : 'Spine1',
-    'spine' : 'Spine2', 
-    'spine1' : 'Spine3',
-    'neck' : 'Neck',
-    'neck1' : 'Head', 
-    'head' : None,
+Armature = {
+    'hips' : ('Root', 0), 
+    'lowerback' : ('Spine1', 0),
+    'spine' : ('Spine2', 0), 
+    'spine1' : ('Spine3', 0),
+    'neck' : ('Neck', 0),
+    'neck1' : ('Head', 0), 
+    'head' : (None, 0),
 
-    'leftshoulder' : 'Clavicle_L',
-    'leftarm' : 'UpArm_L', 
-    'leftforearm' : 'LoArm_L',
-    'lefthand' : 'Hand_L',
-    'lefthandindex1' : None,
-    'leftfingerbase' : None,
-    'lfingers' : None,
-    'lthumb' : None, 
+    'leftshoulder' : ('Clavicle_L', 0),
+    'leftarm' : ('UpArm_L', 0), 
+    'leftforearm' : ('LoArm_L', 0),
+    'lefthand' : ('Hand_L', 0),
+    'lefthandindex1' : (None, 0),
+    'leftfingerbase' : (None, 0),
+    'lfingers' : (None, 0),
+    'lthumb' : (None, 0), 
 
-    'rightshoulder' : 'Clavicle_R', 
-    'rightarm' : 'UpArm_R', 
-    'rightforearm' : 'LoArm_R',
-    'righthand' : 'Hand_R',
-    'righthandindex1' : None,
-    'rightfingerbase' : None,
-    'rfingers' : None,
-    'rthumb' : None, 
+    'rightshoulder' : ('Clavicle_R', 0), 
+    'rightarm' : ('UpArm_R', 0), 
+    'rightforearm' : ('LoArm_R', 0),
+    'righthand' : ('Hand_R', 0),
+    'righthandindex1' : (None, 0),
+    'rightfingerbase' : (None, 0),
+    'rfingers' : (None, 0),
+    'rthumb' : (None, 0), 
 
-    'lhipjoint' : None, 
-    'leftupleg' : 'UpLeg_L',
-    'leftleg' : 'LoLeg_L', 
-    'leftfoot' : 'Foot_L', 
-    'lefttoebase' : 'Toe_L',
+    'lhipjoint' : (None, 0), 
+    'leftupleg' : ('UpLeg_L', -20),
+    'leftleg' : ('LoLeg_L', -20), 
+    'leftfoot' : ('Foot_L', -20), 
+    'lefttoebase' : ('Toe_L', -20),
 
-    'rhipjoint' : None, 
-    'rightupleg' : 'UpLeg_R',
-    'rightleg' : 'LoLeg_R', 
-    'rightfoot' : 'Foot_R', 
-    'righttoebase' : 'Toe_R',
-}
-
-
-MBRolls = {
-    'UpLeg_L' : -20,
-    'LoLeg_L' : -20,
-    'Foot_L'  : -20,
-    'Toe_L'   : -20,
-
-    'UpLeg_R' : 20,
-    'LoLeg_R' : 20,
-    'Foot_R'  : 20,
-    'Toe_R'   : 20,
+    'rhipjoint' : (None, 0), 
+    'rightupleg' : ('UpLeg_R', 20),
+    'rightleg' : ('LoLeg_R', 20), 
+    'rightfoot' : ('Foot_R', 20), 
+    'righttoebase' : ('Toe_R', 20),
 }
 

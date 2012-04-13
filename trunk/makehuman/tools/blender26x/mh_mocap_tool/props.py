@@ -232,6 +232,13 @@ def initInterface(context):
         maxlen=24,
         default="")
 
+    # Source
+    
+    bpy.types.Scene.McpGuessSrcRig = BoolProperty(
+        name = "Guess source rig",
+        default = True)
+        
+
     # Manage actions
     
     bpy.types.Scene.McpFilterActions = BoolProperty(
@@ -256,12 +263,7 @@ def initInterface(context):
         items = [],
         name = "Second Action")
         
-   # Source
-   
-    bpy.types.Scene.McpGuessSrcRig = BoolProperty(
-        name = "Guess Source Rig",
-        default=True)
-
+ 
     scn = context.scene
     if False and scn:        
         # Load and retarget

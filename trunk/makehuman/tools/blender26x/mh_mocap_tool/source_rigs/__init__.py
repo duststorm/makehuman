@@ -45,30 +45,16 @@ else:
     from . import eyes
     from . import hdm
     from . import max
-    from . import mb
+    from . import mb 
     from . import mega
 
  
-the.armatures = {
-    'MB' : mb.MBArmature, 
-    'Accad' : accad.AccadArmature,
-    'Mega' : mega.MegaArmature,
-    'HDM' : hdm.HDMArmature,
-    '3dsMax' : max.MaxArmature,
-    'Eyes' : eyes.EyesArmature,
-    'Daz' : daz.DazArmature,
+the.sourceArmatures = {
+    'MB' : mb.Armature, 
+    'Accad' : accad.Armature,
+    'Mega' : mega.Armature,
+    'HDM' : hdm.Armature,
+    '3dsMax' : max.Armature,
+    'Eyes' : eyes.Armature,
+    'Daz' : daz.Armature,
 }
-
-the.armatureList = [ 'Accad', 'MB', 'Mega', 'HDM', 'Eyes', 'Daz', '3dsMax' ]
-
-the.rollFixes = {
-    'MB'  : mb.MBRolls,
-    'Accad' : accad.AccadRolls,
-    'Mega' : mega.MegaRolls,
-    'HDM' : hdm.HDMRolls,
-    '3dsMax': max.MaxRolls,
-    'Eyes': eyes.EyesRolls,
-    'Daz' : daz.DazRolls,
-}
-
- 

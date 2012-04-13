@@ -60,6 +60,7 @@ def renameBone(b):
 #
 
 def guessTargetArmature(trgRig, scn):
+    print("Guessing")
     the.Renames = { None : None }
     the.trgBone = {}
     bones = trgRig.data.bones.keys()
@@ -97,6 +98,7 @@ def assocParents(rig, boneAssoc, names):
     parAssoc = {}
     taken = { None : True }
     for (name, mhx) in boneAssoc:
+        print(name, mhx)
         name = getName(name, names)
         the.trgBone[mhx] = name
         pb = rig.pose.bones[name]

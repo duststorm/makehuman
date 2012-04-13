@@ -138,34 +138,36 @@ class MhxSourceBonesPanel(bpy.types.Panel):
     
     @classmethod
     def poll(cls, context):
-        return False
         return (context.object and context.object.type == 'ARMATURE')
 
     def draw(self, context):
         layout = self.layout
         scn = context.scene
         rig = context.object
-        if the.sourceProps:
-            layout.operator("mcp.scan_rig", text="Rescan source rig")    
-        else:
-            layout.operator("mcp.scan_rig", text="Scan source rig")    
-        layout.operator("mcp.load_save_source_bones", text='Load source bones').loadSave = 'load'        
-        layout.operator("mcp.load_save_source_bones", text='Save source bones').loadSave = 'save'        
-        if not the.sourceProps:
-            return
-        layout.separator()
-        layout.prop(scn, 'McpGuessSrcRig')
-        layout.label("Arms")
-        row = layout.row()
-        row.prop(scn, '["McpSrcArmBentDown"]', text='Down')
-        row.prop(scn, '["McpSrcArmRoll"]', text='Roll')
-        layout.label("Legs")
-        row = layout.row()
-        row.prop(scn, '["McpSrcLegBentOut"]', text='Out')
-        row.prop(scn, '["McpSrcLegRoll"]', text='Roll')
-        for prop in the.sourceProps:
-            layout.prop_menu_enum(scn, prop)
 
+        if not source.isSourceInited(scn):
+            layout.operator("mcp.init_sources", text="Init Source Panel")
+            return
+        layout.operator("mcp.init_sources", text="Reinit Source Panel")
+        layout.prop(scn, 'McpGuessSrcRig')
+        layout.prop(scn, "McpSourceRig")
+        
+        if scn.McpSourceRig:
+            bones = the.sourceArmatures[scn.McpSourceRig]
+            
+            for boneText in target.TargetBoneNames:
+                if not boneText:
+                    layout.separator()
+                    continue
+                (mhx, text) = boneText
+                (bone, twist) = source.findSourceKey(mhx, bones)
+                if bone:
+                    row = layout.row()
+                    row.label(text)
+                    row.label(bone)
+                    row.label(str(twist))
+        
+    
 ########################################################################
 #        
 #    class MhxTargetBonesPanel(bpy.types.Panel):
@@ -242,7 +244,7 @@ class LoadPanel(bpy.types.Panel):
         row = layout.row()
         row.prop(scn, "McpStartFrame")
         row.prop(scn, "McpEndFrame")
-        #layout.prop(scn, 'McpGuessSrcRig')
+        layout.prop(scn, 'McpGuessSrcRig')
         layout.prop(scn, "McpRetargetIK")
         layout.prop(scn, "McpDoSimplify")
         layout.prop(scn, "McpDefaultSS")
@@ -400,10 +402,10 @@ class EditPanel(bpy.types.Panel):
 
 ########################################################################
 #
-#   class UlitityPanel(bpy.types.Panel):
+#   class UtilityPanel(bpy.types.Panel):
 #
 
-class UlitityPanel(bpy.types.Panel):
+class UtilityPanel(bpy.types.Panel):
     bl_label = "MH Mocap: Utilities"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"

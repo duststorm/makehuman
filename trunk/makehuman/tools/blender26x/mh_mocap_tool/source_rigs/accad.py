@@ -26,38 +26,35 @@
 from mathutils import *
 
 #
-#    AccadArmature
 #    www.accad.Accad.edu/research/mocap/mocap_data.htm
 #
+# ACCAD bone : ( MHX bone, twist)
 
-AccadArmature = {
-    'hips' : 'Root',
-    'tospine' : 'Spine1',
-    'spine' : 'Spine2',
-    'spine1' : 'Spine3', 
-    'neck' : 'Neck', 
-    'head' : 'Head', 
+Armature = {
+    'hips' : ('Root', 0),
+    'tospine' : ('Spine1', 0),
+    'spine' : ('Spine2', 0),
+    'spine1' : ('Spine3', 0), 
+    'neck' : ('Neck', 0), 
+    'head' : ('Head', 0), 
 
-    'leftshoulder' : 'Clavicle_L',
-    'leftarm' : 'UpArm_L', 
-    'leftforearm' : 'LoArm_L',
-    'lefthand' : 'Hand_L', 
+    'leftshoulder' : ('Clavicle_L', 0),
+    'leftarm' : ('UpArm_L', 0), 
+    'leftforearm' : ('LoArm_L', 0),
+    'lefthand' : ('Hand_L', 0), 
 
-    'rightshoulder' : 'Clavicle_R',
-    'rightarm' : 'UpArm_R', 
-    'rightforearm' : 'LoArm_R',
-    'righthand' : 'Hand_R',
+    'rightshoulder' : ('Clavicle_R', 0),
+    'rightarm' : ('UpArm_R', 0), 
+    'rightforearm' : ('LoArm_R', 0),
+    'righthand' : ('Hand_R', 0),
 
-    'leftupleg' : 'UpLeg_L', 
-    'leftleg' : 'LoLeg_L', 
-    'leftfoot' : 'Foot_L', 
-    'lefttoebase' : 'Toe_L',
+    'leftupleg' : ('UpLeg_L', 0), 
+    'leftleg' : ('LoLeg_L', 0), 
+    'leftfoot' : ('Foot_L', 0), 
+    'lefttoebase' : ('Toe_L', 0),
 
-    'rightupleg' : 'UpLeg_R',
-    'rightleg' : 'LoLeg_R', 
-    'rightfoot' : 'Foot_R', 
-    'righttoebase' : 'Toe_R',
+    'rightupleg' : ('UpLeg_R', 0),
+    'rightleg' : ('LoLeg_R', 0), 
+    'rightfoot' : ('Foot_R', 0), 
+    'righttoebase' : ('Toe_R', 0),
 }
-
-AccadRolls = {}
-
