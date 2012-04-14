@@ -232,11 +232,17 @@ def initInterface(context):
         maxlen=24,
         default="")
 
-    # Source
+    # Source and Target
     
-    bpy.types.Scene.McpGuessSrcRig = BoolProperty(
+    bpy.types.Scene.McpGuessSourceRig = BoolProperty(
         name = "Guess source rig",
         default = True)
+
+
+    bpy.types.Scene.McpGuessTargetRig = BoolProperty(
+        name = "Guess target rig",
+        default = True)
+        
         
 
     # Manage actions
@@ -411,6 +417,7 @@ def saveDefaults(context):
 class VIEW3D_OT_McpInitInterfaceButton(bpy.types.Operator):
     bl_idname = "mcp.init_interface"
     bl_label = "Initialize"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         initInterface(context)
@@ -420,6 +427,7 @@ class VIEW3D_OT_McpInitInterfaceButton(bpy.types.Operator):
 class VIEW3D_OT_McpSaveDefaultsButton(bpy.types.Operator):
     bl_idname = "mcp.save_defaults"
     bl_label = "Save defaults"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         saveDefaults(context)
@@ -428,6 +436,7 @@ class VIEW3D_OT_McpSaveDefaultsButton(bpy.types.Operator):
 class VIEW3D_OT_McpLoadDefaultsButton(bpy.types.Operator):
     bl_idname = "mcp.load_defaults"
     bl_label = "Load defaults"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         loadDefaults(context)
@@ -440,6 +449,7 @@ class VIEW3D_OT_McpLoadDefaultsButton(bpy.types.Operator):
 class VIEW3D_OT_McpCopyAnglesIKButton(bpy.types.Operator):
     bl_idname = "mcp.copy_angles_fk_ik"
     bl_label = "Angles  --> IK"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         copyAnglesIK(context)
@@ -466,6 +476,7 @@ def readDirectory(directory, prefix):
 class VIEW3D_OT_McpBatchButton(bpy.types.Operator):
     bl_idname = "mcp.batch"
     bl_label = "Batch run"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         paths = readDirectory(context.scene.McpDirectory, context.scene.McpPrefix)

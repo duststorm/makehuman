@@ -160,6 +160,7 @@ def loopFCurve(fcu, t0, tn, scn):
 class VIEW3D_OT_McpLoopFCurvesButton(bpy.types.Operator):
     bl_idname = "mcp.loop_fcurves"
     bl_label = "Loop F-curves"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         loopFCurves(context)
@@ -196,6 +197,7 @@ def repeatFCurves(context, nRepeats):
 class VIEW3D_OT_McpRepeatFCurvesButton(bpy.types.Operator):
     bl_idname = "mcp.repeat_fcurves"
     bl_label = "Repeat F-curves"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         repeatFCurves(context, context.scene.McpRepeatNumber)
@@ -316,6 +318,7 @@ def translateFCurves(fcurves, dt):
 class VIEW3D_OT_McpStitchActionsButton(bpy.types.Operator):
     bl_idname = "mcp.stitch_actions"
     bl_label = "Stitch Actions"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         stitchActions(context)
@@ -380,6 +383,7 @@ def touchBones(rig, frame, touchedLoc, touchedRot):
 class VIEW3D_OT_McpShiftBoneFCurvesButton(bpy.types.Operator):
     bl_idname = "mcp.shift_bone"
     bl_label = "Shift Bone F-curves"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         shiftBoneFCurves(context)

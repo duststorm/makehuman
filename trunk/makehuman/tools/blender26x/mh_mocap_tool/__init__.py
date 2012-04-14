@@ -113,7 +113,6 @@ else:
     from . import globvar as the
     from . import props
     from . import load
-    #from . import old_retarget
     from . import new_retarget
     from . import source
     from . import target
@@ -149,23 +148,26 @@ class MhxSourceBonesPanel(bpy.types.Panel):
             layout.operator("mcp.init_sources", text="Init Source Panel")
             return
         layout.operator("mcp.init_sources", text="Reinit Source Panel")
-        layout.prop(scn, 'McpGuessSrcRig')
+        layout.prop(scn, 'McpGuessSourceRig')
         layout.prop(scn, "McpSourceRig")
         
         if scn.McpSourceRig:
             bones = the.sourceArmatures[scn.McpSourceRig]
-            
+            box = layout.box()
             for boneText in target.TargetBoneNames:
                 if not boneText:
-                    layout.separator()
+                    box.separator()
                     continue
                 (mhx, text) = boneText
                 (bone, twist) = source.findSourceKey(mhx, bones)
                 if bone:
-                    row = layout.row()
-                    row.label(text)
-                    row.label(bone)
-                    row.label(str(twist))
+                    row = box.row()
+                    split = row.split(percentage=0.4)
+                    split.label(text)
+                    split = split.split(percentage=0.7)
+                    split.label(bone)
+                    #split.alignment = 'RIGHT'
+                    split.label(str(twist))
         
     
 ########################################################################
@@ -181,40 +183,43 @@ class MhxTargetBonesPanel(bpy.types.Panel):
     
     @classmethod
     def poll(cls, context):
-        return False
         return (context.object and context.object.type == 'ARMATURE')
 
     def draw(self, context):
         layout = self.layout
         rig = context.object
-        try:
-            inited = rig["McpTargetRig"]
-        except:
-            inited = False
+        scn = context.scene
 
-        if not inited:
-            layout.operator("mcp.init_target_character", text='Initialize target character')
+        if not target.isTargetInited(scn):
+            layout.operator("mcp.init_targets", text="Init Target Panel")
             return
+        layout.operator("mcp.init_targets", text="Reinit Target Panel")
+        layout.prop(scn, 'McpGuessTargetRig')
+        layout.prop(scn, "McpTargetRig")
 
-        layout.operator("mcp.init_target_character", text='Reinitialize target character')        
-        layout.operator("mcp.uninit_target_character")        
-        layout.operator("mcp.load_save_target_bones", text='Load target bones').loadSave = 'load'        
-        layout.operator("mcp.load_save_target_bones", text='Save target bones').loadSave = 'save'        
-        layout.operator("mcp.make_assoc")        
-        layout.operator("mcp.unroll_all")        
-        #layout.prop(rig, McpArmBentDown, text='Arm bent down')
-        #layout.prop(rig, McpLegBentOut, text='Leg bent out')
+        if scn.McpTargetRig:
+            (bones, renames, ikBones) = target_rigs.TargetInfo[scn.McpTargetRig]
 
-        layout.label("FK bones")
-        for bn in target.TargetBoneNames:
-            if bn:
-                (mhx, text) = bn
-                layout.prop(rig, '["%s"]' % mhx, text=text)
-            else:
-                layout.separator()
-        layout.label("IK bones")
-        for (mhx, text, fakePar, copyRot) in target.TargetIkBoneNames:
-            layout.prop(rig, '["%s"]' % mhx, text=text)
+            layout.label("FK bones")
+            box = layout.box()
+            for boneText in target.TargetBoneNames:
+                if not boneText:
+                    box.separator()
+                    continue
+                (mhx, text) = boneText
+                bone = target.findTargetKey(mhx, bones)
+                if bone:
+                    row = box.row()
+                    row.label(text)
+                    row.label(bone)
+            row = layout.row()
+            row.label("IK bone")
+            row.label("FK bone")
+            box = layout.box()
+            for (ikBone, fkBone) in ikBones:
+                row = box.row()
+                row.label(ikBone)
+                row.label(fkBone)
         return
 
 ########################################################################
@@ -223,7 +228,7 @@ class MhxTargetBonesPanel(bpy.types.Panel):
 #
 
 class LoadPanel(bpy.types.Panel):
-    bl_label = "MH Mocap: Load BVH"
+    bl_label = "MH Mocap: Load And Retarget BVH"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     #bl_options = {'DEFAULT_CLOSED'}
@@ -238,13 +243,16 @@ class LoadPanel(bpy.types.Panel):
         scn = context.scene
         ob = context.object
 
+        layout.label("Load And Retarget BVH File")
         row = layout.row()
         row.prop(scn, "McpAutoScale")
         row.prop(scn, "McpBvhScale")
         row = layout.row()
         row.prop(scn, "McpStartFrame")
         row.prop(scn, "McpEndFrame")
-        layout.prop(scn, 'McpGuessSrcRig')
+        row = layout.row()
+        row.prop(scn, 'McpGuessSourceRig')
+        row.prop(scn, 'McpGuessTargetRig')
         layout.prop(scn, "McpRetargetIK")
         layout.prop(scn, "McpDoSimplify")
         layout.prop(scn, "McpDefaultSS")
@@ -255,7 +263,7 @@ class LoadPanel(bpy.types.Panel):
         layout.operator("mcp.load_and_retarget")
 
         layout.separator()
-        layout.label("Load BVH skeleton")
+        layout.label("Load BVH File")
         layout.prop(scn, "McpRot90Anim")
         layout.operator("mcp.load_bvh")
         layout.operator("mcp.rename_bvh")

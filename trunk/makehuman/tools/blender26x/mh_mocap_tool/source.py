@@ -69,7 +69,7 @@ def guessSrcArmature(rig):
 
 def findSrcArmature(context, rig):
     scn = context.scene
-    if scn.McpGuessSrcRig:
+    if scn.McpGuessSourceRig:
         (the.srcArmature, name) = guessSrcArmature(rig)
     else:
         name = scn.McpSourceRig
@@ -152,6 +152,7 @@ def ensureSourceInited(scn):
 class VIEW3D_OT_McpInitSourcesButton(bpy.types.Operator):
     bl_idname = "mcp.init_sources"
     bl_label = "Init Source Panel"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         initSources(context.scene)

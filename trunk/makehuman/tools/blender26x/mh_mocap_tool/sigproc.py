@@ -185,6 +185,7 @@ def reconstructAction(context):
 class VIEW3D_OT_CalcFiltersButton(bpy.types.Operator):
     bl_idname = "mcp.calc_filters"
     bl_label = "Calculate Filters"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         calcFilters(context)
@@ -198,6 +199,7 @@ class VIEW3D_OT_CalcFiltersButton(bpy.types.Operator):
 class VIEW3D_OT_ReconstructActionButton(bpy.types.Operator):
     bl_idname = "mcp.reconstruct_action"
     bl_label = "Reconstruct Action"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         reconstructAction(context)

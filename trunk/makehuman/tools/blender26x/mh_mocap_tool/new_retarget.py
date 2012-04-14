@@ -328,15 +328,14 @@ def setupMhxAnimation(scn, srcRig, trgRig):
     clearPose()
 
     source.ensureSourceInited(scn)
-    #if scn.McpGuessSrcRig:
-    #    source.scanSourceRig(scn, srcRig)
     source.setArmature(srcRig, scn)
+    target.ensureTargetInited(scn)
     print("Retarget %s --> %s" % (srcRig, trgRig))
     if trgRig.animation_data:
         trgRig.animation_data.action = None
 
     anim = CAnimation(srcRig, trgRig)
-    (boneAssoc, parAssoc, rolls) = target.guessTargetArmature(trgRig, scn)
+    (boneAssoc, parAssoc, rolls) = target.getTargetArmature(trgRig, scn)
     #(boneAssoc, ikBoneAssoc, parAssoc, rolls, mats, ikBones, ikParents) = target.makeTargetAssoc(trgRig, scn)
     setupFkBones(srcRig, trgRig, boneAssoc, parAssoc, anim, scn)
     return anim
@@ -440,7 +439,7 @@ def changeTargetData(rig, anim):
         pb.lock_scale = [False, False, False]
         
     norotBones = []      
-    if the.target == the.T_MHX:
+    if the.target == 'MHX':
         for (name, parent) in [("UpLegRot_L", "Hip_L"), ("UpLegRot_R", "Hip_R")]:
             try:
                 anim.boneDatas[parent]
@@ -614,7 +613,7 @@ def ik2fkLeg(rig, ikBones, fkBones, legIkToAnkle, suffix, frame, first):
    
    
 def retargetIkBones(rig, frame, first):
-    if the.target == the.T_MHX:
+    if the.target == 'MHX':
         lArmIkBones = getSnapBones(rig, "ArmIK", "_L")
         lArmFkBones = getSnapBones(rig, "ArmFK", "_L")
         rArmIkBones = getSnapBones(rig, "ArmIK", "_R")
@@ -685,11 +684,12 @@ def loadRetargetSimplify(context, filepath):
 class VIEW3D_OT_NewRetargetMhxButton(bpy.types.Operator):
     bl_idname = "mcp.new_retarget_mhx"
     bl_label = "Retarget Selected To Active"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         trgRig = context.object
         scn = context.scene
-        target.guessTargetArmature(trgRig, scn)
+        target.getTargetArmature(trgRig, scn)
         for srcRig in context.selected_objects:
             if srcRig != trgRig:
                 retargetMhxRig(context, srcRig, trgRig, True, scn.McpRetargetIK)
@@ -699,11 +699,12 @@ class VIEW3D_OT_NewRetargetMhxButton(bpy.types.Operator):
 class VIEW3D_OT_RetargetIKButton(bpy.types.Operator):
     bl_idname = "mcp.retarget_ik"
     bl_label = "Retarget IK Bones"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         rig = context.object
         scn = context.scene
-        target.guessTargetArmature(rig, scn)
+        target.getTargetArmature(rig, scn)
         retargetMhxRig(context, rig, rig, False, True)
         return{'FINISHED'}    
 
@@ -711,6 +712,7 @@ class VIEW3D_OT_RetargetIKButton(bpy.types.Operator):
 class VIEW3D_OT_LoadAndRetargetButton(bpy.types.Operator, ImportHelper):
     bl_idname = "mcp.load_and_retarget"
     bl_label = "Load And Retarget"
+    bl_options = {'UNDO'}
 
     filename_ext = ".bvh"
     filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})

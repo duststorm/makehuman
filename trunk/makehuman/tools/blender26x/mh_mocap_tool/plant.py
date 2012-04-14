@@ -111,6 +111,7 @@ def plantFCurves(fcurves, first, last, useCrnt, values):
 class VIEW3D_OT_McpPlantButton(bpy.types.Operator):
     bl_idname = "mcp.plant"
     bl_label = "Plant"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         plantKeys(context)

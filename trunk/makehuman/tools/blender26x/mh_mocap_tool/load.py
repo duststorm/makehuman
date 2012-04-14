@@ -534,7 +534,7 @@ def renameAndRescaleBvh(context, srcRig, trgRig):
     scn.objects.active = srcRig
     scn.update()
     #(srcRig, srcBones, action) =  renameBvhRig(rig, filepath)
-    target.guessTargetArmature(trgRig, scn)
+    target.getTargetArmature(trgRig, scn)
     source.findSrcArmature(context, srcRig)
     renameBones(srcRig, scn)
     utils.setInterpolation(srcRig)
@@ -550,6 +550,7 @@ def renameAndRescaleBvh(context, srcRig, trgRig):
 class VIEW3D_OT_LoadBvhButton(bpy.types.Operator, ImportHelper):
     bl_idname = "mcp.load_bvh"
     bl_label = "Load BVH File (.bvh)"
+    bl_options = {'UNDO'}
 
     filename_ext = ".bvh"
     filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})
@@ -570,6 +571,7 @@ class VIEW3D_OT_LoadBvhButton(bpy.types.Operator, ImportHelper):
 class VIEW3D_OT_RenameBvhButton(bpy.types.Operator):
     bl_idname = "mcp.rename_bvh"
     bl_label = "Rename And Rescale BVH Rig"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         scn = context.scene
@@ -595,6 +597,7 @@ class VIEW3D_OT_RenameBvhButton(bpy.types.Operator):
 class VIEW3D_OT_LoadAndRenameBvhButton(bpy.types.Operator, ImportHelper):
     bl_idname = "mcp.load_and_rename_bvh"
     bl_label = "Load And Rename BVH File (.bvh)"
+    bl_options = {'UNDO'}
 
     filename_ext = ".bvh"
     filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})

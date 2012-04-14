@@ -280,6 +280,7 @@ def addFCurveInserts(fcu, inserts, limitData):
 class VIEW3D_OT_McpSimplifyFCurvesButton(bpy.types.Operator):
     bl_idname = "mcp.simplify_fcurves"
     bl_label = "Simplify FCurves"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         scn = context.scene
@@ -289,6 +290,7 @@ class VIEW3D_OT_McpSimplifyFCurvesButton(bpy.types.Operator):
 class VIEW3D_OT_McpRescaleFCurvesButton(bpy.types.Operator):
     bl_idname = "mcp.rescale_fcurves"
     bl_label = "Rescale FCurves"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         scn = context.scene

@@ -75,6 +75,7 @@ def startEdit(context):
 class VIEW3D_OT_McpStartEditButton(bpy.types.Operator):
     bl_idname = "mcp.start_edit"
     bl_label = "Start Edit"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         startEdit(context)
@@ -106,6 +107,7 @@ def undoEdit(context):
 class VIEW3D_OT_McpUndoEditButton(bpy.types.Operator):
     bl_idname = "mcp.undo_edit"
     bl_label = "Undo Edit"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         undoEdit(context)
@@ -174,6 +176,7 @@ def confirmEdit(context):
 class VIEW3D_OT_McpConfirmEditButton(bpy.types.Operator):
     bl_idname = "mcp.confirm_edit"
     bl_label = "Confirm Edit"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         confirmEdit(context)
@@ -231,6 +234,7 @@ def insertKey(context, useLoc, useRot):
 class VIEW3D_OT_McpInsertLocButton(bpy.types.Operator):
     bl_idname = "mcp.insert_loc"
     bl_label = "Loc"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         insertKey(context, True, False)
@@ -239,6 +243,7 @@ class VIEW3D_OT_McpInsertLocButton(bpy.types.Operator):
 class VIEW3D_OT_McpInsertRotButton(bpy.types.Operator):
     bl_idname = "mcp.insert_rot"
     bl_label = "Rot"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         insertKey(context, False, True)
@@ -247,6 +252,7 @@ class VIEW3D_OT_McpInsertRotButton(bpy.types.Operator):
 class VIEW3D_OT_McpInsertLocRotButton(bpy.types.Operator):
     bl_idname = "mcp.insert_locrot"
     bl_label = "LocRot"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         insertKey(context, True, True)
