@@ -35,7 +35,7 @@ from .utils import MocapError
 #   Delete button really deletes action. Handle with care.
 #
 #   listAllActions(context):
-#   findAction(name):
+#   findActionNumber(name):
 #   class VIEW3D_OT_McpUpdateActionListButton(bpy.types.Operator):
 #
 
@@ -69,9 +69,9 @@ def listAllActions(context):
     print("Actions declared")
     return
 
-def findAction(name):
-    for n,action in enumerate(the.actions):
-        (name1, name2, name3) = action        
+def findActionNumber(name):
+    for n,enum in enumerate(the.actions):
+        (name1, name2, name3) = enum        
         if name == name1:
             return n
     raise MocapError("Unrecognized action %s" % name)
@@ -95,28 +95,19 @@ class VIEW3D_OT_McpUpdateActionListButton(bpy.types.Operator):
 #   class VIEW3D_OT_McpDeleteButton(bpy.types.Operator):
 #
 
-def selectedAction(n):
-    try:
-        (name1, name2, name3) = the.actions[n]
-    except:
-        return None
-    try:
-        return bpy.data.actions[name1]
-    except:
-        print("Did not find action %s" % name1)
-        return None
-
 def deleteAction(context):
     listAllActions(context)
     scn = context.scene
-    act = selectedAction(scn.McpActions)
-    if not act:
+    try:
+        act = bpy.data.actions[scn.McpActions]
+    except KeyError:
+        print("Did not find action %s" % scn.McpActions)
         return
     print('Delete action', act)    
     act.use_fake_user = False
     if act.users == 0:
         print("Deleting", act)
-        n = findAction(act.name)
+        n = findActionNumber(act.name)
         the.actions.pop(n)
         bpy.data.actions.remove(act)
         print('Action', act, 'deleted')
@@ -171,8 +162,11 @@ class VIEW3D_OT_McpDeleteHashButton(bpy.types.Operator):
 
 def setCurrentAction(context, prop):
     listAllActions(context)
-    act = selectedAction(context.scene[prop])
-    if not act:
+    scn = context.scene
+    try:
+        act = bpy.data.actions[scn.McpActions]
+    except KeyError:
+        print("Did not find action %s" % scn.McpActions)
         return
     context.object.animation_data.action = act
     print("Action set to %s" % act)
