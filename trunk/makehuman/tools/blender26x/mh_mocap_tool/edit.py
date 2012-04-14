@@ -29,6 +29,7 @@ from mathutils import *
 from . import utils, load, simplify, props, action
 from .target_rigs import rig_mhx
 from . import globvar as the
+from .utils import MocapError
 
 ########################################################################
 #
@@ -78,7 +79,10 @@ class VIEW3D_OT_McpStartEditButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        startEdit(context)
+        try:
+            startEdit(context)
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
 
 #
@@ -110,7 +114,10 @@ class VIEW3D_OT_McpUndoEditButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        undoEdit(context)
+        try:
+            undoEdit(context)
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'} 
         
 #
@@ -179,7 +186,10 @@ class VIEW3D_OT_McpConfirmEditButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        confirmEdit(context)
+        try:
+            confirmEdit(context)
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'} 
 
 #

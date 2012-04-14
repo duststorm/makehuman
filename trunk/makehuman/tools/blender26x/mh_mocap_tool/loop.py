@@ -29,6 +29,7 @@ from mathutils import *
 from . import utils, load, simplify, props, action
 from .target_rigs import rig_mhx
 from . import globvar as the
+from .utils import MocapError
 
 #
 #   normalizeRotCurves(scn, rig, fcurves, frames)
@@ -163,7 +164,10 @@ class VIEW3D_OT_McpLoopFCurvesButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        loopFCurves(context)
+        try:
+            loopFCurves(context)
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
     
 #    
@@ -200,7 +204,10 @@ class VIEW3D_OT_McpRepeatFCurvesButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        repeatFCurves(context, context.scene.McpRepeatNumber)
+        try:
+            repeatFCurves(context, context.scene.McpRepeatNumber)
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
     
 
@@ -321,7 +328,10 @@ class VIEW3D_OT_McpStitchActionsButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        stitchActions(context)
+        try:
+            stitchActions(context)
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
     
     
@@ -386,7 +396,10 @@ class VIEW3D_OT_McpShiftBoneFCurvesButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        shiftBoneFCurves(context)
-        print("Bones shifted")
+        try:
+            shiftBoneFCurves(context)
+            print("Bones shifted")
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
         

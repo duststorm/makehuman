@@ -33,6 +33,7 @@ from bpy_extras.io_utils import ImportHelper
 
 from . import target
 from . import globvar as the
+from .utils import MocapError
               
 #
 #    guessSrcArmature(rig):
@@ -60,7 +61,7 @@ def guessSrcArmature(rig):
             print("'%s'" % bone.name)
         for (name, n) in misses.items():
             print(name, n)
-        raise NameError('Did not find matching armature. nMisses = %d' % bestMisses)
+        raise MocapError('Did not find matching armature. nMisses = %d' % bestMisses)
     return (best, bestName)
 
 #
@@ -92,7 +93,7 @@ def setArmature(rig, scn):
         rig.McpArmature = name
         scn.McpSourceRig = name
     else:
-        raise NameError("No armature set")
+        raise MocapError("No armature set")
     the.srcArmature = the.sourceArmatures[name]
     print("Set armature %s" % name)
     return

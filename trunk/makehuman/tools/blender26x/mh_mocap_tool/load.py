@@ -33,6 +33,7 @@ from bpy.props import *
 
 from . import utils, props, target, source
 from . import globvar as the
+from .utils import MocapError
 
 ###################################################################################
 #    BVH importer. 
@@ -132,7 +133,7 @@ def readBvhFile(context, filepath, scn, scan):
     fileName = os.path.realpath(os.path.expanduser(filepath))
     (shortName, ext) = os.path.splitext(fileName)
     if ext.lower() != ".bvh":
-        raise NameError("Not a bvh file: " + fileName)
+        raise MocapError("Not a bvh file: " + fileName)
     print( "Loading BVH file "+ fileName )
 
     trgRig = context.object
@@ -157,7 +158,7 @@ def readBvhFile(context, filepath, scn, scan):
             status = Hierarchy
         elif key == 'MOTION':
             if level != 0:
-                raise NameError("Tokenizer out of kilter %d" % level)    
+                raise MocapError("Tokenizer out of kilter %d" % level)    
             if scan:
                 return root
             amt = bpy.data.armatures.new("BvhAmt")
@@ -206,7 +207,7 @@ def readBvhFile(context, filepath, scn, scan):
                 level -= 1
                 node = node.parent
             else:
-                raise NameError("Did not expect %s" % words[0])
+                raise MocapError("Did not expect %s" % words[0])
         elif status == Motion:
             if key == 'FRAMES:':
                 nFrames = int(words[1])
@@ -375,12 +376,7 @@ def renameBones(srcRig, scn):
         action = adata.action
     for srcBone in srcBones:
         srcName = srcBone.name
-        lname = srcName.lower()
-        try:
-            (trgName, twist) = the.srcArmature[lname]
-        except KeyError:
-            lname = lname.replace(' ','_')
-            (trgName, twist) = the.srcArmature[lname]
+        (trgName, twist) = getTargetFromSource(srcName)
         eb = ebones[srcName]
         if trgName:
             eb.name = trgName
@@ -397,6 +393,20 @@ def renameBones(srcRig, scn):
     #createExtraBones(ebones, trgBones)
     bpy.ops.object.mode_set(mode='POSE')
     return
+
+
+def getTargetFromSource(srcName):    
+    lname = srcName.lower()
+    try:
+        return the.srcArmature[lname]     
+    except KeyError:
+        pass
+    lname = lname.replace(' ','_')        
+    try:
+        return the.srcArmature[lname]     
+    except KeyError:
+        pass
+    raise MocapError("No target bone corresponding to source bone %s" % srcName)
 
 #
 #    createExtraBones(ebones, trgBones):
@@ -557,7 +567,10 @@ class VIEW3D_OT_LoadBvhButton(bpy.types.Operator, ImportHelper):
     filepath = StringProperty(name="File Path", description="Filepath used for importing the BVH file", maxlen=1024, default="")
 
     def execute(self, context):
-        readBvhFile(context, self.properties.filepath, context.scene, False)        
+        try:
+            readBvhFile(context, self.properties.filepath, context.scene, False)        
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
 
     def invoke(self, context, event):
@@ -584,10 +597,13 @@ class VIEW3D_OT_RenameBvhButton(bpy.types.Operator):
         if not trgRig:
             print("No target rig selected")
             return{'FINISHED'}    
-        renameAndRescaleBvh(context, srcRig, trgRig)
-        if scn.McpRescale:
-            simplify.rescaleFCurves(context, srcRig, scn.McpRescaleFactor)
-        print("%s renamed" % srcRig.name)
+        try:
+            renameAndRescaleBvh(context, srcRig, trgRig)
+            if scn.McpRescale:
+                simplify.rescaleFCurves(context, srcRig, scn.McpRescaleFactor)
+            print("%s renamed" % srcRig.name)
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
 
 #
@@ -604,11 +620,14 @@ class VIEW3D_OT_LoadAndRenameBvhButton(bpy.types.Operator, ImportHelper):
     filepath = StringProperty(name="File Path", description="Filepath used for importing the BVH file", maxlen=1024, default="")
 
     def execute(self, context):
-        (srcRig, trgRig) = readBvhFile(context, self.properties.filepath, context.scene, False)        
-        renameAndRescaleBvh(context, srcRig, trgRig)
-        if context.scene.McpRescale:
-            simplify.rescaleFCurves(context, srcRig, scn.McpRescaleFactor)
-        print("%s loaded and renamed" % srcRig.name)
+        try:
+            (srcRig, trgRig) = readBvhFile(context, self.properties.filepath, context.scene, False)        
+            renameAndRescaleBvh(context, srcRig, trgRig)
+            if context.scene.McpRescale:
+                simplify.rescaleFCurves(context, srcRig, scn.McpRescaleFactor)
+            print("%s loaded and renamed" % srcRig.name)
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
 
     def invoke(self, context, event):

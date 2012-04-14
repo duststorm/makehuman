@@ -27,11 +27,13 @@
 
 import bpy
 from bpy.props import *
+import math
 
 from . import utils
 from . import target_rigs
 #from .target_rigs import rig_mhx, rig_simple, rig_game, rig_second_life
 from . import globvar as the
+from .utils import MocapError
 
 Deg2Rad = math.pi/180
 
@@ -61,12 +63,15 @@ def getTargetArmature(rig, scn):
     if scn.McpGuessTargetRig:
         name = guessArmature(rig, bones, scn)
     else:
-        name = scn.McpTargetRig
+        try:
+            name = scn.McpTargetRig
+        except:
+            raise MocapError("Initialize Target Panel first")
     the.target = name        
     (boneAssoc, the.Renames, the.IkBones) = target_rigs.TargetInfo[name]
     if not testTargetRig(name, bones, boneAssoc):
         print("Bones", bones)
-        raise NameError("Target armature %s does not match armature %s" % (rig.name, name))
+        raise MocapError("Target armature %s does not match armature %s" % (rig.name, name))
     print("Target armature %s" % name)
     parAssoc = assocParents(rig, boneAssoc, the.Renames)                        
     return (boneAssoc, parAssoc, None)
@@ -82,24 +87,27 @@ def guessArmature(rig, bones, scn):
             if testTargetRig(name, bones, boneAssoc):           
                 return name
     print("Bones", bones)
-    raise NameError("Did not recognize target armature %s" % rig.name)        
+    raise MocapError("Did not recognize target armature %s" % rig.name)        
 
 
 def assocParents(rig, boneAssoc, names):          
     parAssoc = {}
     the.trgBone = {}
-    taken = { None : True }
+    taken = [ None ]
     for (name, mhx) in boneAssoc:
         name = getName(name, names)
         the.trgBone[mhx] = name
         pb = rig.pose.bones[name]
-        taken[name] = True
+        taken.append(name)
         parAssoc[name] = None
-        while pb.parent:
-            pname = getName(pb.parent.name, names)
-            if taken[pname]:
+        parent = pb.parent
+        while parent:
+            pname = getName(parent.name, names)
+            if pname in taken:
                 parAssoc[name] = pname
                 break
+            else:
+                parent = rig.pose.bones[pname].parent
     return parAssoc                 
 
 

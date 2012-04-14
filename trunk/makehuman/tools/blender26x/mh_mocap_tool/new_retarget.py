@@ -34,6 +34,7 @@ from bpy.props import *
 from . import utils, props, source, target, toggle, load, simplify
 from .target_rigs import rig_mhx
 from . import globvar as the
+from .utils import MocapError
 
 Deg2Rad = math.pi/180
     
@@ -687,12 +688,15 @@ class VIEW3D_OT_NewRetargetMhxButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        trgRig = context.object
-        scn = context.scene
-        target.getTargetArmature(trgRig, scn)
-        for srcRig in context.selected_objects:
-            if srcRig != trgRig:
-                retargetMhxRig(context, srcRig, trgRig, True, scn.McpRetargetIK)
+        try:
+            trgRig = context.object
+            scn = context.scene
+            target.getTargetArmature(trgRig, scn)
+            for srcRig in context.selected_objects:
+                if srcRig != trgRig:
+                    retargetMhxRig(context, srcRig, trgRig, True, scn.McpRetargetIK)
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
 
 
@@ -702,10 +706,13 @@ class VIEW3D_OT_RetargetIKButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        rig = context.object
-        scn = context.scene
-        target.getTargetArmature(rig, scn)
-        retargetMhxRig(context, rig, rig, False, True)
+        try:
+            rig = context.object
+            scn = context.scene
+            target.getTargetArmature(rig, scn)
+            retargetMhxRig(context, rig, rig, False, True)
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
 
 
@@ -719,7 +726,10 @@ class VIEW3D_OT_LoadAndRetargetButton(bpy.types.Operator, ImportHelper):
     filepath = StringProperty(name="File Path", description="Filepath used for importing the BVH file", maxlen=1024, default="")
 
     def execute(self, context):
-        loadRetargetSimplify(context, self.properties.filepath)
+        try:
+            loadRetargetSimplify(context, self.properties.filepath)
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
 
     def invoke(self, context, event):

@@ -28,19 +28,12 @@ Abstract
 Target rigs 
 """
 
-if "bpy" in locals():
-    print("Reloading target rigs")
-    import imp
-    imp.reload(rig_mhx)
-    imp.reload(rig_simple)
-    imp.reload(rig_game)
-    imp.reload(rig_second_life)
-else:
-    from .. import globvar as the
-    from . import rig_mhx
-    from . import rig_simple
-    from . import rig_game
-    from . import rig_second_life
+from .. import globvar as the
+from . import rig_mhx
+from . import rig_simple
+from . import rig_game
+from . import rig_second_life
+from . import rig_sintel_light
 
 
 TargetInfo = {
@@ -48,4 +41,5 @@ TargetInfo = {
     "Simple": (rig_simple.Bones, rig_simple.Renames, rig_simple.IkBones),
     "Game": (rig_game.Bones, rig_game.Renames, rig_game.IkBones),
     "Second Life": (rig_second_life.Bones, rig_second_life.Renames, rig_second_life.IkBones),
+    "Sintel Light": (rig_sintel_light.Bones, rig_sintel_light.Renames, rig_sintel_light.IkBones),
 }

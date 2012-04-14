@@ -26,6 +26,7 @@
 import bpy
 from math import pi
 from . import utils
+from .utils import MocapError
 
 #
 #    simplifyFCurves(context, rig, useVisible, useMarkers):
@@ -107,7 +108,7 @@ def simplifyFCurve(fcu, act, maxErrLoc, maxErrRot, minTime, maxTime):
     elif words[-1] == 'rotation_euler':
         maxErr = maxErrRot * pi/180
     else:
-        raise NameError("Unknown FCurve type %s" % words[-1])
+        raise MocapError("Unknown FCurve type %s" % words[-1])
 
     (points, before, after) = splitFCurvePoints(fcu, minTime, maxTime)
 
@@ -283,8 +284,11 @@ class VIEW3D_OT_McpSimplifyFCurvesButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        scn = context.scene
-        simplifyFCurves(context, context.object, scn.McpSimplifyVisible, scn.McpSimplifyMarkers)
+        try:
+            scn = context.scene
+            simplifyFCurves(context, context.object, scn.McpSimplifyVisible, scn.McpSimplifyMarkers)
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
 
 class VIEW3D_OT_McpRescaleFCurvesButton(bpy.types.Operator):
@@ -293,7 +297,10 @@ class VIEW3D_OT_McpRescaleFCurvesButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        scn = context.scene
-        rescaleFCurves(context, context.object, scn.McpRescaleFactor)
+        try:
+            scn = context.scene
+            rescaleFCurves(context, context.object, scn.McpRescaleFactor)
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
 

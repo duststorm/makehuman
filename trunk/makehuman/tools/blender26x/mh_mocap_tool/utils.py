@@ -25,9 +25,11 @@
 
 
 import bpy
+from bpy.props import *
 from math import sin, cos, atan, pi
 from mathutils import *
 
+from . import globvar as the
 
 #
 #   printMat3(string, mat)
@@ -253,7 +255,33 @@ def insertRotationKeyFrame(pb, frame):
         pb.keyframe_insert("rotation_axis_angle", frame=frame, group=grp)
     else:
         pb.keyframe_insert("rotation_euler", frame=frame, group=grp)
+
+#
+#
+#
+
+class MocapError(Exception):
+    def __init__(self, value):
+        self.value = value
+        print("*** Mocap error ***\n%s" % value)
+        the.errorLines = value.split("\n")
+    def __str__(self):
+        return repr(self.value)
   
+class ErrorOperator(bpy.types.Operator):
+    bl_idname = "mcp.error"
+    bl_label = "Mocap error"
+
+    def execute(self, context):
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        return wm.invoke_props_dialog(self)
+
+    def draw(self, context):
+        for line in the.errorLines:
+            self.layout.label(line)
 #
 #
 #

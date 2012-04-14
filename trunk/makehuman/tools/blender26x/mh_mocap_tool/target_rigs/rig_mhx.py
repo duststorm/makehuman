@@ -62,10 +62,6 @@ Bones = [
 ]
 
 IkBones = [ 
-    ('Wrist_L', 'Hand_L'),
-    ('Wrist_R', 'Hand_R'),
-    ('Ankle_L', 'Foot_L'),
-    ('Ankle_R', 'Foot_R')
 ]
 
 Renames = {

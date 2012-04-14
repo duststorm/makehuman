@@ -26,6 +26,7 @@ import bpy
 from bpy.props import StringProperty, FloatProperty, IntProperty, BoolProperty, EnumProperty
 from . import utils, simplify
 from . import globvar as the
+from .utils import MocapError
 
 
 #
@@ -188,8 +189,11 @@ class VIEW3D_OT_CalcFiltersButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        calcFilters(context)
-        print("Filters calculated")
+        try:
+            calcFilters(context)
+            print("Filters calculated")
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
 
 #
@@ -202,7 +206,10 @@ class VIEW3D_OT_ReconstructActionButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        reconstructAction(context)
-        print("F-curves reconstructed")
+        try:
+            reconstructAction(context)
+            print("F-curves reconstructed")
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
 

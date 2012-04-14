@@ -28,6 +28,7 @@ from bpy.props import EnumProperty, StringProperty
 
 from . import globvar as the
 from . import utils
+from .utils import MocapError
 
 #
 #   Select or delete action
@@ -73,7 +74,7 @@ def findAction(name):
         (name1, name2, name3) = action        
         if name == name1:
             return n
-    raise NameError("Unrecognized action %s" % name)
+    raise MocapError("Unrecognized action %s" % name)
 
 
 class VIEW3D_OT_McpUpdateActionListButton(bpy.types.Operator):
@@ -134,7 +135,10 @@ class VIEW3D_OT_McpDeleteButton(bpy.types.Operator):
         return context.scene.McpReallyDelete
 
     def execute(self, context):
-        deleteAction(context)
+        try:
+            deleteAction(context)
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
 
 #
@@ -154,7 +158,10 @@ class VIEW3D_OT_McpDeleteHashButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        deleteHash()
+        try:
+            deleteHash()
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
 
 #
@@ -178,6 +185,9 @@ class VIEW3D_OT_McpSetCurrentActionButton(bpy.types.Operator):
     prop = StringProperty()
 
     def execute(self, context):
-        setCurrentAction(context, self.prop)
+        try:
+            setCurrentAction(context, self.prop)
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
 
