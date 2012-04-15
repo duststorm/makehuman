@@ -28,7 +28,6 @@ from . import simplify
 
 #
 #    plantKeys(context)
-#    plantFCurves(fcurves, first, last):
 #
 
 def plantKeys(context):
@@ -46,60 +45,59 @@ def plantKeys(context):
         print("Cannot plant: no active bone")
         return
 
-    (first, last) = simplify.getMarkedTime(scn)
-    if first == None:
-        print("Cannot plant: need two selected time markers")
-        return
-
+    fromIndex = int(scn.McpPlantFrom)
     pb = rig.pose.bones[bone.name]
     locPath = 'pose.bones["%s"].location' % bone.name
+    locPlants = [scn.McpPlantLocX, scn.McpPlantLocY, scn.McpPlantLocZ]
     if pb.rotation_mode == 'QUATERNION':
         rotPath = 'pose.bones["%s"].rotation_quaternion' % bone.name
+        rotPlants = [False, scn.McpPlantRotX, scn.McpPlantRotY, scn.McpPlantRotZ]
         pbRot = pb.rotation_quaternion
     else:
         rotPath = 'pose.bones["%s"].rotation_euler' % bone.name
+        rotPlants = [scn.McpPlantRotX, scn.McpPlantRotY, scn.McpPlantRotZ]
         pbRot = pb.rotation_euler
-    rots = []
-    locs = []
+        
+    targets = []
     for fcu in act.fcurves:
-        if fcu.data_path == locPath:
-            locs.append(fcu)
+        if fcu.data_path == locPath:   
+            if locPlants[fcu.array_index]:        
+                targets.append(fcu)
+            if fcu.array_index == fromIndex:
+                fromFcu = fcu
         if fcu.data_path == rotPath:
-            rots.append(fcu)
+            if rotPlants[fcu.array_index]:
+                targets.append(fcu)
 
-    useCrnt = scn.McpPlantCurrent
-    if scn.McpPlantLoc:
-        plantFCurves(locs, first, last, useCrnt, pb.location)
-    if scn.McpPlantRot:
-        plantFCurves(rots, first, last, useCrnt, pbRot)
-    return
+    plantTimes = []
+    for kp in fromFcu.keyframe_points:
+        if kp.select_control_point:
+            plantTimes.append(int(kp.co[0]))
+            
+    for fcu in targets:
+        block = []            
+        t0 = -1000
+        for kp in fcu.keyframe_points:
+            t = int(kp.co[0])
+            if t in plantTimes:
+                if t == t0+1:
+                    block.append(kp)
+                else:
+                    plantBlock(block)
+                    block = [kp]
+                t0 = t
+            plantBlock(block)
+            
 
-def plantFCurves(fcurves, first, last, useCrnt, values):
-    for fcu in fcurves:
-        print("Plant", fcu.data_path, fcu.array_index)
-        kpts = fcu.keyframe_points
-        sum = 0.0
-        dellist = []
-        firstx = first - 1e-4
-        lastx = last + 1e-4
-        print("Btw", firstx, lastx)
-        for kp in kpts:
-            (x,y) = kp.co
-            if x > firstx and x < lastx:
-                dellist.append(kp)
-                sum += y
-        nterms = len(dellist)
-        if nterms == 0:
-            return
-        if useCrnt:
-            ave = values[fcu.array_index]
-            print("Current", ave)
-        else:
-            ave = sum/nterms
-        for kp in dellist:
-            kp.co[1] = ave
-        kpts.insert(first, ave, options={'FAST'})
-        kpts.insert(last, ave)
+def plantBlock(block):            
+    if block == []:
+        return
+    sum = 0
+    for kp in block:
+        sum += kp.co[1]
+    ave = sum/len(block)
+    for kp in block:
+        kp.co[1] = ave
     return
         
 
