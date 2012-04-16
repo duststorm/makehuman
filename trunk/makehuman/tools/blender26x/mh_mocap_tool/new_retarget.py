@@ -144,6 +144,9 @@ def retargetFkBone(boneData, frame):
         if parent.rollMat:
             bakeRot = parent.rollInv * bakeMat
             setRotation(bakeMat, bakeRot)
+        elif parent.rotOffsInv:
+            bakeRot = parent.rotOffsInv * bakeMat
+            setRotation(bakeMat, bakeRot)
 
         parRest = parent.trgRestMat
         bakeMat = parRest * bakeMat
