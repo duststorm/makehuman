@@ -26,7 +26,7 @@
 """
 Abstract
 Source rigs 
-"""
+""" 
 
 if "bpy" in locals():
     print("Reloading source rigs")
@@ -38,6 +38,7 @@ if "bpy" in locals():
     imp.reload(max)
     imp.reload(mb)
     imp.reload(mega)    
+    imp.reload(perfume)    
 else:
     from .. import globvar as the
     from . import accad
@@ -47,6 +48,7 @@ else:
     from . import max
     from . import mb 
     from . import mega
+    from . import perfume
 
  
 the.sourceArmatures = {
@@ -57,4 +59,5 @@ the.sourceArmatures = {
     '3dsMax' : max.Armature,
     'Eyes' : eyes.Armature,
     'Daz' : daz.Armature,
+    'Perfume' : perfume.Armature,
 }
