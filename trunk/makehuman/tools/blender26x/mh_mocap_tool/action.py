@@ -120,16 +120,25 @@ class VIEW3D_OT_McpDeleteButton(bpy.types.Operator):
     bl_idname = "mcp.delete"
     bl_label = "Delete Action"
     bl_options = {'UNDO'}
+    answer = StringProperty(default="")
 
-    @classmethod
-    def poll(cls, context):
-        return context.scene.McpReallyDelete
+    #@classmethod
+    #def poll(cls, context):
+    #    return context.scene.McpReallyDelete
 
     def execute(self, context):
-        try:
-            deleteAction(context)
-        except MocapError:
-            bpy.ops.mcp.error('INVOKE_DEFAULT')
+        the.UtilityString = "?"
+        if self.answer == "":
+            the.UtilityString = "Really delete action?"
+            the.UtilityConfirm = self.bl_idname
+        elif self.answer == "yes":
+            the.UtilityConfirm = ""
+            try:
+                deleteAction(context)
+            except MocapError:
+                bpy.ops.mcp.error('INVOKE_DEFAULT')
+        else:
+            the.UtilityConfirm = ""
         return{'FINISHED'}    
 
 #

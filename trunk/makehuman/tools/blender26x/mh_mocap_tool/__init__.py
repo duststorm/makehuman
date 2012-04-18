@@ -337,6 +337,10 @@ class EditPanel(bpy.types.Panel):
         scn = context.scene
         ob = context.object
 
+        if the.EditConfirm:
+            confirmPanel(layout, the.EditConfirm, the.EditString)
+            return
+            
         layout.label("Plant keys")
         row = layout.row()
         row.label("Source")
@@ -358,7 +362,7 @@ class EditPanel(bpy.types.Panel):
         layout.separator()
         layout.label("Displace Animation")
         layout.operator("mcp.start_edit")
-        layout.operator("mcp.undo_edit")
+        layout.operator("mcp.undo_edit").answer=""
         row = layout.row()
         row.operator("mcp.insert_loc")
         row.operator("mcp.insert_rot")
@@ -428,6 +432,11 @@ class UtilityPanel(bpy.types.Panel):
         layout = self.layout
         scn = context.scene
         ob = context.object
+        
+        if the.UtilityConfirm:
+            confirmPanel(layout, the.UtilityConfirm, the.UtilityString)
+            return
+            
         layout.label("Initialization")
         layout.operator("mcp.init_interface")
         layout.operator("mcp.save_defaults")
@@ -439,8 +448,8 @@ class UtilityPanel(bpy.types.Panel):
         layout.prop(scn, 'McpFilterActions')
         layout.operator("mcp.update_action_list")
         layout.operator("mcp.set_current_action").prop = 'McpActions'
-        layout.prop(scn, "McpReallyDelete")
-        layout.operator("mcp.delete")
+        #layout.prop(scn, "McpReallyDelete")
+        layout.operator("mcp.delete").answer=""
         layout.operator("mcp.delete_hash")
 
         return
@@ -453,30 +462,20 @@ class UtilityPanel(bpy.types.Panel):
         layout.operator("mcp.batch")
 
 #
-#    Debugging
+#    Confirm
 #
-"""
-def debugOpen():
-    global theDbgFp
-    theDbgFp = open("/home/thomas/myblends/debug.txt", "w")
 
-def debugClose():
-    global theDbgFp
-    theDbgFp.close()
+the.EditConfirm = None
+the.EditString = "?"
+the.UtilityConfirm = None
+the.UtilityString = "?"
 
-def debugPrint(string):
-    global theDbgFp
-    theDbgFp.write("%s\n" % string)
+def confirmPanel(layout, confirm, string):            
+    layout.label(string)
+    layout.operator(confirm, text="yes").answer="yes"
+    layout.operator(confirm, text="no").answer="no"
+    return
 
-def debugPrintVec(vec):
-    global theDbgFp
-    theDbgFp.write("(%.3f %.3f %.3f)\n" % (vec[0], vec[1], vec[2]))
-
-def debugPrintVecVec(vec1, vec2):
-    global theDbgFp
-    theDbgFp.write("(%.3f %.3f %.3f) (%.3f %.3f %.3f)\n" %
-        (vec1[0], vec1[1], vec1[2], vec2[0], vec2[1], vec2[2]))
-"""
 
 #
 #    init 

@@ -24,6 +24,7 @@
 # Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
 
 import bpy
+from bpy.props import *
 from math import pi, sqrt
 from mathutils import *
 from . import utils, load, simplify, props, action
@@ -112,12 +113,21 @@ class VIEW3D_OT_McpUndoEditButton(bpy.types.Operator):
     bl_idname = "mcp.undo_edit"
     bl_label = "Undo Edit"
     bl_options = {'UNDO'}
+    answer = StringProperty(default="")
 
     def execute(self, context):
-        try:
-            undoEdit(context)
-        except MocapError:
-            bpy.ops.mcp.error('INVOKE_DEFAULT')
+        the.EditString = "?"
+        if self.answer == "":
+            the.EditString = "Really undo editing?"
+            the.EditConfirm = self.bl_idname
+        elif self.answer == "yes":
+            the.EditConfirm = ""
+            try:
+                undoEdit(context)
+            except MocapError:
+                bpy.ops.mcp.error('INVOKE_DEFAULT')
+        else:
+            the.EditConfirm = ""
         return{'FINISHED'} 
         
 #
