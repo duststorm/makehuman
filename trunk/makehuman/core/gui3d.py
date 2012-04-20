@@ -356,6 +356,10 @@ class Object(events3d.EventHandler):
                 self.mesh.update()
             self.mesh.setVisibility(1)
             
+    def updateSubdivisionMesh(self):
+    
+        self.getSubdivisionMesh(True)
+            
     def getBBox(self):
         return self.mesh.calcBBox()
         

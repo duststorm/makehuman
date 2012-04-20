@@ -382,15 +382,17 @@ class Human(gui3d.Object):
                 progressCallback(progressVal)
 
         # Update all verts
+        self.getSeedMesh().update()
         self.updateProxyMesh()
         if self.isSubdivided():
-            self.getSubdivisionMesh()
+            self.updateSubdivisionMesh()
             if progressCallback:
                 progressCallback(0.7)
             self.mesh.calcNormals()
             if progressCallback:
                 progressCallback(0.8)
-            self.mesh.update()
+            if update:
+                self.mesh.update()
         else:
             self.meshData.calcNormals(1, 1)
             if progressCallback:
