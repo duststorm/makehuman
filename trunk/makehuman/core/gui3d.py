@@ -1473,7 +1473,7 @@ class Slider(View):
 
     def __init__(self, value=0.0, min=0.0, max=1.0, label=None,
         style=SliderStyle, thumbStyle=SliderThumbStyle):
-        print style
+
         View.__init__(self, style)
         
         self.thumbStyle = thumbStyle
