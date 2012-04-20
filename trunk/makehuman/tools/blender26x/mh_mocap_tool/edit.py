@@ -82,10 +82,23 @@ class VIEW3D_OT_McpStartEditButton(bpy.types.Operator):
     def execute(self, context):
         try:
             startEdit(context)
+            setKeyMap(context, "mcp.insert_locrot", True)
         except MocapError:
             bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
 
+def setKeyMap(context, idname, doAdd):
+    km = context.window_manager.keyconfigs.active.keymaps['3D View']
+    if doAdd:
+        km.keymap_items.new(idname, 'SPACE', 'PRESS')
+    else:
+        try:
+            item = km.keymap_items[idname]        
+        except KeyError:
+            return
+        km.keymap_items.remove(item)
+    return        
+ 
 #
 #   undoEdit(context):
 #   class VIEW3D_OT_McpUndoEditButton(bpy.types.Operator):
@@ -95,8 +108,7 @@ def undoEdit(context):
     rig = context.object
     oact = getUndoAction(rig)
     if not oact:
-        print("No action to undo")
-        return
+        raise MocapError("No action to undo")
     rig["McpUndoAction"] = ""
     the.editLoc = None
     the.editRot = None
@@ -122,6 +134,7 @@ class VIEW3D_OT_McpUndoEditButton(bpy.types.Operator):
             the.EditConfirm = self.bl_idname
         elif self.answer == "yes":
             the.EditConfirm = ""
+            setKeyMap(context, "mcp.insert_locrot", False)
             try:
                 undoEdit(context)
             except MocapError:
@@ -138,7 +151,7 @@ def getActionPair(context):
     rig = context.object
     oact = getUndoAction(rig)
     if not oact:
-        print("No stored action")
+        raise MocapError("No action is currently being edited")
         return None
     try:
         the.editLoc
@@ -196,6 +209,7 @@ class VIEW3D_OT_McpConfirmEditButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
+        setKeyMap(context, "mcp.insert_locrot", False)
         try:
             confirmEdit(context)
         except MocapError:
@@ -224,7 +238,7 @@ def insertKey(context, useLoc, useRot):
     rig = context.object
     pair = getActionPair(context)
     if not pair:
-        return
+        raise MocapError("No action is currently being edited")
     (act, oact) = pair
     
     pb = bpy.context.active_pose_bone
@@ -257,7 +271,10 @@ class VIEW3D_OT_McpInsertLocButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        insertKey(context, True, False)
+        try:
+            insertKey(context, True, False)
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'} 
         
 class VIEW3D_OT_McpInsertRotButton(bpy.types.Operator):
@@ -266,7 +283,10 @@ class VIEW3D_OT_McpInsertRotButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        insertKey(context, False, True)
+        try:
+            insertKey(context, False, True)
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'} 
         
 class VIEW3D_OT_McpInsertLocRotButton(bpy.types.Operator):
@@ -275,7 +295,10 @@ class VIEW3D_OT_McpInsertLocRotButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        insertKey(context, True, True)
+        try:
+            insertKey(context, True, True)
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'} 
         
 #
