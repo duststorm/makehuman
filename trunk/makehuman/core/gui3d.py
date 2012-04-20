@@ -54,6 +54,7 @@ class Style(object):
             if self.__parent:
                 return getattr(self.__parent, name)
             else:
+                print "%s not in %s" % (name, self.__params)
                 raise RuntimeError(name)
                 return None
             
@@ -70,6 +71,10 @@ class Style(object):
         style.update(kwds)
         style['parent'] = self.__parent
         return Style(**style)
+        
+    def __str__(self):
+        
+        return str(self.__params)
 
 # Wrapper around Object3D
 class Object(events3d.EventHandler):
@@ -399,6 +404,9 @@ class Object(events3d.EventHandler):
 AlignLeft = 0
 AlignCenter = 1
 AlignRight = 2
+
+OrientationHorizontal = 0
+OrientationVertical = 1
 
 class TextObject(Object):
 
@@ -1421,7 +1429,8 @@ SliderStyle = Style(**{
     'width':112,
     'height':32,
     'normal':'slider_generic.png',
-    'margin':[2,2,2,2]
+    'margin':[2,2,2,2],
+    'orientation':OrientationHorizontal
     })
     
 SliderThumbStyle = Style(**{
@@ -1430,6 +1439,14 @@ SliderThumbStyle = Style(**{
     'height':16,
     'normal':'slider.png',
     'focused':'slider_focused.png',
+    })
+    
+VerticalSliderStyle = Style(**{
+    'parent':SliderStyle,
+    'width':32,
+    'height':112,
+    'normal':'slider_generic_vertical.png',
+    'orientation':OrientationVertical
     })
 
 class Slider(View):
@@ -1456,7 +1473,7 @@ class Slider(View):
 
     def __init__(self, value=0.0, min=0.0, max=1.0, label=None,
         style=SliderStyle, thumbStyle=SliderThumbStyle):
-        
+        print style
         View.__init__(self, style)
         
         self.thumbStyle = thumbStyle
@@ -1468,7 +1485,10 @@ class Slider(View):
         self.background = self.addObject(Object([style.left, style.top, style.zIndex], mesh))
         
         mesh = RectangleMesh(thumbStyle.width, thumbStyle.height, self.thumbTexture)
-        self.thumb = self.addObject(Object([style.left, style.top + style.height / 2, style.zIndex + 0.01], mesh))
+        if style.orientation == OrientationHorizontal:
+            self.thumb = self.addObject(Object([style.left, style.top + style.height / 2, style.zIndex + 0.01], mesh))
+        else:
+            self.thumb = self.addObject(Object([style.left + style.width / 2, style.top, style.zIndex + 0.01], mesh))
             
         if isinstance(label, str) or isinstance(label, unicode):
             font = app.getFont(style.fontFamily)
@@ -1512,8 +1532,13 @@ class Slider(View):
             self.label = None
             self.labelFormat = None
             
-        self.thumbMinX = style.left
-        self.thumbMaxX = style.left + style.width - thumbStyle.width
+        if style.orientation == OrientationHorizontal:
+            self.thumbMinX = style.left
+            self.thumbMaxX = style.left + style.width - thumbStyle.width
+        else:
+            self.thumbMinY = style.top
+            self.thumbMaxY = style.top + style.height - thumbStyle.height
+            
         self.min = min
         self.max = max
         self.setValue(value)
@@ -1543,9 +1568,14 @@ class Slider(View):
         thumbPos = self.thumb.getPosition()
         screenPos = mh.cameras[1].convertToScreen(*thumbPos)
         worldPos = mh.cameras[1].convertToWorld3D(x, y, screenPos[2])
-        thumbPos[0] = min(self.thumbMaxX, max(self.thumbMinX, worldPos[0] - self.thumbStyle.width / 2))
-        self.thumb.setPosition(thumbPos)
-        value = (thumbPos[0] - self.thumbMinX) / float(self.thumbMaxX - self.thumbMinX)
+        if self.style.orientation == OrientationHorizontal:
+            thumbPos[0] = min(self.thumbMaxX, max(self.thumbMinX, worldPos[0] - self.thumbStyle.width / 2))
+            self.thumb.setPosition(thumbPos)
+            value = (thumbPos[0] - self.thumbMinX) / float(self.thumbMaxX - self.thumbMinX)
+        else:
+            thumbPos[1] = min(self.thumbMaxY, max(self.thumbMinY, worldPos[1] - self.thumbStyle.height / 2))
+            self.thumb.setPosition(thumbPos)
+            value = (thumbPos[1] - self.thumbMinY) / float(self.thumbMaxY - self.thumbMinY)
         self.__setValue(value * (self.max - self.min) + self.min)
         
     def __updateThumb(self):
@@ -1556,7 +1586,10 @@ class Slider(View):
             value = (self.__value - self.min) / float(self.max - self.min)
         else:
             value = 0
-        thumbPos[0] = value * (self.thumbMaxX - self.thumbMinX) + self.thumbMinX
+        if self.style.orientation == OrientationHorizontal:
+            thumbPos[0] = value * (self.thumbMaxX - self.thumbMinX) + self.thumbMinX
+        else:
+            thumbPos[1] = value * (self.thumbMaxY - self.thumbMinY) + self.thumbMinY
         self.thumb.setPosition(thumbPos)
     
     def getPosition(self):
@@ -1564,9 +1597,14 @@ class Slider(View):
         
     def setPosition(self, position):
         self.background.setPosition(position)
-        self.thumb.setPosition([position[0], position[1] + self.style.height / 2, position[2] + 0.01])
-        self.thumbMinX = position[0]
-        self.thumbMaxX = position[0] + self.style.width - self.thumbStyle.width
+        if self.style.orientation == OrientationHorizontal:
+            self.thumb.setPosition([position[0], position[1] + self.style.height / 2, position[2] + 0.01])
+            self.thumbMinX = position[0]
+            self.thumbMaxX = position[0] + self.style.width - self.thumbStyle.width
+        else:
+            self.thumb.setPosition([position[0] + self.style.width / 2, position[1], position[2] + 0.01])
+            self.thumbMinY = position[1]
+            self.thumbMaxY = position[1] + self.style.height - self.thumbStyle.height
         self.setValue(self.getValue())
         if self.label:
             self.label.setPosition([position[0],position[1]-2,position[2]+0.2])
@@ -2441,7 +2479,7 @@ class FileChooser(View):
         self.paths = path if isinstance(path, list) else [path]
         self.extension = extension
         self.previewExtension = previewExtension
-        self.slider = self.addView(Slider(0, 0, 0, style=SliderStyle._replace(left=10, top=600-35, zIndex=9.1)))
+        self.slider = self.addView(Slider(0, 0, 0, style=VerticalSliderStyle._replace(left=800-32, top=100, zIndex=9.1)))
         font = app.getFont(TextViewStyle.fontFamily)
         self.location = self.slider.addView(TextView(os.path.abspath(self.path), style=TextViewStyle._replace(left=10 + 112 + 10, top=600-2-font.lineHeight, zIndex=9.1)))
         self.sortBox = self.slider.addView(GroupBox([10, 80, 9.0], 'Sort'))
@@ -2462,7 +2500,7 @@ class FileChooser(View):
             self.refresh()
             
         @self.slider.event
-        def onChange(value):
+        def onChanging(value):
             self.scrollTo(value)
         
     def getPosition(self):
@@ -2612,7 +2650,7 @@ class FileChooser(View):
 
         self.style.width, self.style.height = event.width, event.height
         self.__updateScrollBar()
-        self.slider.setPosition([10, event.height-35, 9.1])
+        self.slider.setPosition([event.width-32, 100, 9.1])
         font = app.getFont(TextViewStyle.fontFamily)
         self.location.setPosition([10 + 112 + 10, event.height-2-font.lineHeight, 9.1])
              
