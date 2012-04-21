@@ -14,18 +14,24 @@ MakeHuman
     <xsl:for-each select="node[count(. | key('sectiontitles', Section)[1]) = 1]">
       <xsl:sort data-type="number" select="sectionweight"/>
     
-      <xsl:text>------------------------------------------------------------------------------------
-</xsl:text><xsl:value-of select="Section" /><xsl:text>
-------------------------------------------------------------------------------------
+      <xsl:variable name="sectnum" select="position()" />
+\<xsl:copy-of select="$sectnum" /><xsl:text>. </xsl:text><xsl:value-of select="Section" /><xsl:text>
+____________________________________________________________________________________________
 
 </xsl:text>
+   
     <xsl:for-each select="key('sectiontitles', Section)">
-      <xsl:sort select="title"/>      
+      <xsl:sort data-type="number" select="weight" />      
+    <xsl:text>
+
+</xsl:text>
+<xsl:value-of select="sectionbody" />
     <xsl:text>
 
 </xsl:text>
 
-    <xsl:value-of select="title" />
+\<xsl:copy-of select="$sectnum" /><xsl:text>.</xsl:text><xsl:number level="multiple" value="position()" />
+    <xsl:text> </xsl:text><xsl:value-of select="title" />
     <xsl:text> (NID: </xsl:text>
     <xsl:value-of select="Nid" />
 <xsl:text>)

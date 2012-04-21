@@ -17,6 +17,8 @@ while($inlin = <FIL>)
   $inlin =~ s/ +\</</g;
   $inlin =~ s/^ +//g;
   $inlin =~ s/\/sites\/mhnew.jwp.se\/files\///g;
+  $inlin =~ s/\"\/images\//"_images\//g;
+
 
   print UT $inlin;
 }
@@ -29,5 +31,4 @@ system 'xsltproc stylesheet.xsl unescaped.xml > rst/documentation.rst';
 chdir "rst";
 
 system "rst2pdf documentation.rst";
-unlink "unescaped.xml";
 
