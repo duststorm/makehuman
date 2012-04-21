@@ -137,6 +137,7 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.separator()
         layout.label("Make clothes")
         layout.operator("mhclo.make_clothes")
+        layout.operator("mhclo.print_clothes")
         layout.separator()
         layout.operator("mhclo.export_obj_file")
         layout.operator("mhclo.export_blender_material")
@@ -252,7 +253,15 @@ class OBJECT_OT_MakeClothesButton(bpy.types.Operator):
     bl_label = "Make clothes"
 
     def execute(self, context):     
-        main.makeClothes(context)
+        main.makeClothes(context, True)
+        return{'FINISHED'}    
+        
+class OBJECT_OT_PrintClothesButton(bpy.types.Operator):
+    bl_idname = "mhclo.print_clothes"
+    bl_label = "Print mhclo file"
+
+    def execute(self, context):     
+        main.makeClothes(context, False)
         return{'FINISHED'}    
         
 #

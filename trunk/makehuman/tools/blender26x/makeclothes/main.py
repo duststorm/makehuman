@@ -557,6 +557,7 @@ def printClothes(context, bob, pob, data):
     if not isSelfClothed(context):
         printStuff(fp, pob, context)
 
+    printFaceNumbers(fp, pob)
     fp.write("# verts %d\n" % (firstVert))
     for (pv, exact, verts, wts, diff) in data:
         if exact:
@@ -570,6 +571,33 @@ def printClothes(context, bob, pob, data):
     fp.close()
     print("%s done" % outfile)    
     return
+    
+
+def printFaceNumbers(fp, ob):
+    if len(ob.data.materials) <= 1:
+        return
+    fp.write("# faceNumbers\n")
+    meFaces = getFaces(ob.data)
+    mi = -1
+    us = -1
+    n = 0
+    for f in meFaces:
+        if (f.material_index == mi) and (f.use_smooth == us):
+            n += 1
+        else:
+            if n > 1:
+                fp.write("    ftn %d %d %d ;\n" % (n, mi, us))
+            elif n > 0:
+                fp.write("    ft %d %d ;\n" % (mi, us))
+            mi = f.material_index
+            us = f.use_smooth
+            n = 1
+    if n > 1:
+        fp.write("    ftn %d %d %d ;\n" % (n, mi, us))
+    elif n > 0:
+        fp.write("    ft %d %d ;\n" % (mi, us))
+    return
+
     
 def printMhcloUvLayers(fp, pob, scn):
     me = pob.data
@@ -1533,10 +1561,10 @@ def isOnEdge(v, faceTable, uvtex):
     return False                            
 
 #
-#    makeClothes(context):
+#    makeClothes(context, doFindClothes):
 #
 
-def makeClothes(context):
+def makeClothes(context, doFindClothes):
     checkBMeshAware()
     (bob, pob) = getObjectPair(context)
     scn = context.scene
@@ -1549,8 +1577,11 @@ def makeClothes(context):
         log = open(logfile, "w")
     else:
         log = None
-    data = findClothes(context, bob, pob, log)
-    storeData(pob, bob, data)
+    if doFindClothes:
+        data = findClothes(context, bob, pob, log)
+        storeData(pob, bob, data)
+    else:
+        (bob, data) = restoreData(context)
     printClothes(context, bob, pob, data)
     if log:
         log.close()
