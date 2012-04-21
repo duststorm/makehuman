@@ -339,6 +339,7 @@ def addMaterials(groups, me, string):
 class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
     bl_idname = "mh.import_base_mhclo"
     bl_label = "Mhclo"
+    bl_options = {'UNDO'}
     delete = BoolProperty()
 
     filename_ext = ".mhclo"
@@ -372,6 +373,7 @@ class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
 class VIEW3D_OT_ImportBaseObjButton(bpy.types.Operator):
     bl_idname = "mh.import_base_obj"
     bl_label = "Obj"
+    bl_options = {'UNDO'}
     delete = BoolProperty()
 
     filename_ext = ".obj"
@@ -518,6 +520,7 @@ def shapeKeyLen(ob):
 class VIEW3D_OT_LoadTargetButton(bpy.types.Operator):
     bl_idname = "mh.load_target"
     bl_label = "Load target file"
+    bl_options = {'UNDO'}
 
     filename_ext = ".target"
     filter_glob = StringProperty(default="*.target", options={'HIDDEN'})
@@ -578,6 +581,7 @@ def loadTargetFromMesh(context):
 class VIEW3D_OT_LoadTargetFromMeshButton(bpy.types.Operator):
     bl_idname = "mh.load_target_from_mesh"
     bl_label = "Load target from mesh"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         loadTargetFromMesh(context)
@@ -606,6 +610,7 @@ def newTarget(context):
 class VIEW3D_OT_NewTargetButton(bpy.types.Operator):
     bl_idname = "mh.new_target"
     bl_label = "New target"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         newTarget(context)
@@ -659,6 +664,7 @@ def evalVertLocations(ob):
 class VIEW3D_OT_SaveTargetButton(bpy.types.Operator):
     bl_idname = "mh.save_target"
     bl_label = "Save target"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         global Confirm, ConfirmString, ConfirmString2
@@ -677,6 +683,7 @@ class VIEW3D_OT_SaveTargetButton(bpy.types.Operator):
 class VIEW3D_OT_SaveasTargetButton(bpy.types.Operator, ExportHelper):
     bl_idname = "mh.saveas_target"
     bl_label = "Save target as"
+    bl_options = {'UNDO'}
 
     filename_ext = ".target"
     filter_glob = StringProperty(default="*.target", options={'HIDDEN'})
@@ -717,6 +724,7 @@ def applyTargets(context):
 class VIEW3D_OT_ApplyTargetsButton(bpy.types.Operator):
     bl_idname = "mh.apply_targets"
     bl_label = "Apply targets"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         global Confirm, ConfirmString, ConfirmString2
@@ -754,6 +762,7 @@ def batchFixTargets(context, folder):
 class VIEW3D_OT_BatchFixButton(bpy.types.Operator):
     bl_idname = "mh.batch_fix"
     bl_label = "Batch fix targets"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         global TargetSubPaths, Confirm, ConfirmString, ConfirmString2
@@ -796,6 +805,7 @@ def batchRenderTargets(context, folder, opengl, outdir):
 class VIEW3D_OT_BatchRenderButton(bpy.types.Operator):
     bl_idname = "mh.batch_render"
     bl_label = "Batch render"
+    bl_options = {'UNDO'}
     opengl = BoolProperty()
 
     def execute(self, context):
@@ -854,6 +864,7 @@ def relaxMesh(verts, edges, first, k):
 class VIEW3D_OT_RelaxTargetButton(bpy.types.Operator):
     bl_idname = "mh.relax_target"
     bl_label = "Relax target"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         relaxTarget(context)
@@ -890,6 +901,7 @@ def fitTarget(context):
 class VIEW3D_OT_FitTargetButton(bpy.types.Operator):
     bl_idname = "mh.fit_target"
     bl_label = "Fit target"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         fitTarget(context)
@@ -921,6 +933,7 @@ def checkValid(ob):
 class VIEW3D_OT_DiscardTargetButton(bpy.types.Operator):
     bl_idname = "mh.discard_target"
     bl_label = "Discard target"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         global Confirm, ConfirmString, ConfirmString2
@@ -969,6 +982,7 @@ def symmetrizeTarget(context, left2right):
 class VIEW3D_OT_SymmetrizeTargetButton(bpy.types.Operator):
     bl_idname = "mh.symmetrize_target"
     bl_label = "Symmetrize"
+    bl_options = {'UNDO'}
     left2right = BoolProperty()
 
     def execute(self, context):
@@ -991,6 +1005,7 @@ def fixInconsistency(context):
 class VIEW3D_OT_FixInconsistencyButton(bpy.types.Operator):
     bl_idname = "mh.fix_inconsistency"
     bl_label = "Fix it!"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         fixInconsistency(context)
@@ -999,6 +1014,7 @@ class VIEW3D_OT_FixInconsistencyButton(bpy.types.Operator):
 class VIEW3D_OT_SkipButton(bpy.types.Operator):
     bl_idname = "mh.skip"
     bl_label = "No"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         global Confirm, ConfirmString, ConfirmString2
@@ -1102,6 +1118,7 @@ def checkBMeshAware():
 class VIEW3D_OT_InitButton(bpy.types.Operator):
     bl_idname = "mh.init"
     bl_label = "Initialize"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         checkBMeshAware()
