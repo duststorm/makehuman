@@ -27,6 +27,7 @@ close(UT);
 close(FIL);
 
 system 'xsltproc stylesheet.xsl unescaped.xml > rst/documentation.rst';
+system "sed -i -e 's/^[ ]\\*/\\*/g' rst/documentation.rst";
 
 chdir "rst";
 

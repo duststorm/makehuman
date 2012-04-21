@@ -19,7 +19,7 @@
   <xsl:include href="ul.xsl" />
   <xsl:include href="ol.xsl" />
   <xsl:include href="li.xsl" />
-  <!-- xsl:include href="bolds.xsl" / -->
+  <xsl:include href="bolds.xsl" />
 
   <xsl:output method="text" />
 

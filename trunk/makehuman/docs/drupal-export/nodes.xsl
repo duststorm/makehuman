@@ -15,14 +15,14 @@ MakeHuman
       <xsl:sort data-type="number" select="sectionweight"/>
     
       <xsl:variable name="sectnum" select="position()" />
-\<xsl:copy-of select="$sectnum" /><xsl:text>. </xsl:text><xsl:value-of select="Section" /><xsl:text>
-____________________________________________________________________________________________
+      <xsl:text>
 
-</xsl:text>
-   
-    <xsl:for-each select="key('sectiontitles', Section)">
-      <xsl:sort data-type="number" select="weight" />      
-    <xsl:text>
+.. raw:: pdf
+
+   PageBreak
+
+</xsl:text>\<xsl:copy-of select="$sectnum" /><xsl:text>. </xsl:text><xsl:value-of select="Section" /><xsl:text>
+____________________________________________________________________________________________
 
 </xsl:text>
 <xsl:value-of select="sectionbody" />
@@ -30,6 +30,12 @@ ________________________________________________________________________________
 
 </xsl:text>
 
+   
+    <xsl:for-each select="key('sectiontitles', Section)">
+      <xsl:sort data-type="number" select="weight" />      
+    <xsl:text>
+
+</xsl:text>
 \<xsl:copy-of select="$sectnum" /><xsl:text>.</xsl:text><xsl:number level="multiple" value="position()" />
     <xsl:text> </xsl:text><xsl:value-of select="title" />
     <xsl:text> (NID: </xsl:text>
@@ -43,6 +49,9 @@ ________________________________________________________________________________
 
     </xsl:for-each>
     </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template match="sectionbody">
   </xsl:template>
 
 </xsl:stylesheet>
