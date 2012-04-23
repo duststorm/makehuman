@@ -1794,7 +1794,7 @@ class Button(View):
         else:
             mesh = RectangleMesh(width, height, t)
         self.button = self.addObject(Object([self.style.left, self.style.top, self.style.zIndex], mesh))
-        if isinstance(label, str):
+        if isinstance(label, str) or isinstance(label, unicode):
             textAlign = self.style.textAlign
             wrapWidth = width - self.style.padding[0] - self.style.padding[2]
             self.label = self.addObject(TextObject([self.style.left + self.style.padding[0], 

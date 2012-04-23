@@ -44,16 +44,19 @@ class CustomTargetsTaskView(gui3d.TaskView):
         
         self.msg = self.addView(gui3d.TextView(label='No custom targets found.\nTo add a custom target, place the file in ' + self.targetsPath, \
                                             style=gui3d.TextViewStyle._replace(left=10, top=80, width=320)))
-        self.targetsBox = self.addView(gui3d.GroupBox(label = 'Targets',position = [10, 80, 9.0]))
         
-        self.optionsBox = self.addView(gui3d.GroupBox(label = 'Options', position=[650, 80, 9.0], style=gui3d.GroupBoxStyle._replace(margin=[10,0,0,10])))
-        rescanButton = self.optionsBox.addView(gui3d.Button(label="Rescan targets' folder"))
+        y = 80
+        self.optionsBox = self.addView(gui3d.GroupBox(label = 'Options', position=[650, 80, 9.0], style=gui3d.GroupBoxStyle._replace(margin=[10,0,0,10])));y += 25
+        rescanButton = self.optionsBox.addView(gui3d.Button(label="Rescan targets' folder"));y += 20
+        y+=16
+        self.folderBox = self.addView(gui3d.GroupBox(label = 'Folders', position=[650, y, 9.0], style=gui3d.GroupBoxStyle._replace(margin=[10,0,0,10])))
+        
         @rescanButton.event
         def onClicked(event):
             #TODO: undo any applied change here
             self.searchTargets()
-            
-        #baseMeshToogle = gui3d.ToggleButton(optionsBox, label='Apply to base mesh')
+           
+        self.folders = [] 
             
         self.searchTargets()
         
@@ -61,26 +64,45 @@ class CustomTargetsTaskView(gui3d.TaskView):
     
         self.sliders = []
         self.modifiers = {}
-        targets = os.listdir(self.targetsPath)
         
-        if len(targets) == 0:
-            self.msg.show()
-            self.targetsBox.hide()
-        else:
-            self.msg.hide()
+        for folder in self.folders:
+            self.removeView(folder)
+        for child in self.folderBox.children:
+            self.folderBox.removeView(child)
             
-            children = self.targetsBox.children
-            for child in children:
-                self.targetsBox.removeView(child)
+        self.folders = []
+        group = []
+        
+        for root, dirs, files in os.walk(self.targetsPath):
+
+            box = self.addView(gui3d.GroupBox(label = 'Targets', position = [10, 80, 9.0]))
+            button = self.folderBox.addView(gui3d.RadioButton(group, os.path.basename(root), self.folderBox.children == 0, style=gui3d.ButtonStyle))
+            self.folders.append(box)
+            
+            @button.event
+            def onClicked(event):
+                gui3d.RadioButton.onClicked(button, event)
+                for folder in self.folders:
+                    folder.hide()
+                box.show()
+
+            for f in files:
+
+                if f.endswith(".target"):
                 
-            for target in targets:
-                self.createTargetControls(self.targetsBox, self.targetsPath, target)
-                
-            for child in self.targetsBox.children:
+                    self.createTargetControls(box, root, f)
+                    
+            box.hide()
+        
+        for folder in self.folders:
+            for child in folder.children:
                 child.update()
             
-            self.targetsBox.show()
-            self.targetsBox.layout.rebuild()
+        if self.folders:
+            self.folderBox.children[0].setSelected(True)
+            self.folders[0].show()
+            if self.folders[0].children:
+                self.folders[0].children[0].setFocus()
         
     def createTargetControls(self, box, targetPath, targetFile):
         # When the slider is dragged and released, an onChange event is fired
@@ -105,8 +127,9 @@ class CustomTargetsTaskView(gui3d.TaskView):
     def onShow(self, event):
 
         gui3d.TaskView.onShow(self, event)
-        if len(self.targetsBox.children):
-            self.targetsBox.children[0].setFocus()
+        if self.folders:
+            if self.folders[0].children:
+                self.folders[0].children[0].setFocus()
         self.syncSliders()
         
     def loadHandler(self, human, values):
