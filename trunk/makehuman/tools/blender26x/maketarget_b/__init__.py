@@ -107,6 +107,15 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.separator()
             layout.operator("mh.update_sum")
             layout.operator("mh.update_active")
+            row = layout.row()
+            row.label("Edit mode")
+            row.label("Mode")
+            row = layout.row()
+            row.operator("mh.editmode_toggle")
+            box = row.box()
+            box.label(ob.mode)
+            if ob.mode == 'EDIT':
+                return
             layout.separator()
             layout.operator("mh.new_target", text="New secondary target")
             layout.operator("mh.load_target", text="Load secondary target")            
@@ -185,12 +194,12 @@ def menu_func(self, context):
     self.layout.operator(ExportObj.bl_idname, text="MakeHuman OBJ (.obj)...")
  
 def register():
+    bpy.utils.register_module(__name__)
+    bpy.types.INFO_MT_file_export.append(menu_func)
     try:
         maketarget.initScene(bpy.context)
     except:
         pass
-    bpy.utils.register_module(__name__)
-    bpy.types.INFO_MT_file_export.append(menu_func)
   
 def unregister():
     bpy.utils.unregister_module(__name__)

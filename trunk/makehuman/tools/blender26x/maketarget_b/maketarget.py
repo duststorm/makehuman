@@ -638,6 +638,7 @@ def updateSum(ob):
         v.co = offsets[n] - totvalue*bverts[n].co           
     ob.active_shape_key_index = 1
     sumkey.value = 1.0
+    print("Sum shapekey updated")
     return
 
 
@@ -647,7 +648,15 @@ class VIEW3D_OT_UpdateSumButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        updateSum(context.object)
+        global Confirm, ConfirmString, ConfirmString2
+        ob = context.object
+        if ob.mode == 'OBJECT' or Confirm:
+            Confirm = None
+            updateSum(ob)
+        else:
+            Confirm = "mh.update_sum"
+            ConfirmString = "Really update sum shapekey in edit mode?"
+            ConfirmString2 = ""
         return {'FINISHED'}
     
 #----------------------------------------------------------
@@ -681,6 +690,7 @@ def updateActive(ob):
     for n,v in enumerate(skey.data):
         v.co = offsets[n]/value
     ob.active_shape_key_index = 1
+    print("Active shapekey updated")
     return
     
 
@@ -690,7 +700,15 @@ class VIEW3D_OT_UpdateActiveButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        updateActive(context.object)
+        global Confirm, ConfirmString, ConfirmString2
+        ob = context.object
+        if ob.mode == 'EDIT' or Confirm:
+            Confirm = None
+            updateActive(ob)
+        else:
+            Confirm = "mh.update_active"
+            ConfirmString = "Really update active shapekey in object mode?"
+            ConfirmString2 = ""
         return {'FINISHED'}
     
     
@@ -1204,7 +1222,8 @@ def initScene(context):
     
 class MH_OT_editmode_toggle(bpy.types.Operator):
     bl_idname = "mh.editmode_toggle"
-    bl_label = "Toggle Edit Mode"
+    bl_label = "Toggle"
+    bl_description = "Toggles between edit and object mode, and updates the sum/active keys"
     bl_options = {'UNDO'}
 
     def execute(self, context):
