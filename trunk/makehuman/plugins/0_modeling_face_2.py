@@ -241,40 +241,28 @@ class FaceTaskView(gui3d.TaskView):
 
         for slider in self.sliders:
             slider.update()
-    '''
+
     def loadHandler(self, human, values):
 
         if values[0] == 'face':
-            modifier = self.modifiers.get(values[1], None)
+            modifier = self.modifiers.get(values[1].replace("-", " "), None)
             if modifier:
                 modifier.setValue(human, float(values[2]))
-        elif values[0] == 'headAge':
-            self.headAgeModifier.setValue(human, float(values[1]))
-        elif values[0] == 'faceAngle':
-            self.faceAngleModifier.setValue(human, float(values[1]))
 
     def saveHandler(self, human, file):
 
         for name, modifier in self.modifiers.iteritems():
             value = modifier.getValue(human)
             if value:
-                file.write('face %s %f\n' % (name, value))
-
-        file.write('headAge %f\n' % self.headAgeModifier.getValue(human))
-        file.write('faceAngle %f\n' % self.faceAngleModifier.getValue(human))
-    '''
+                file.write('face %s %f\n' % (name.replace(" ", "-"), value))
 
 def load(app):
     category = app.getCategory('Modelling')
     taskview = category.addView(FaceTaskView(category))
 
-    '''
     app.addLoadHandler('face', taskview.loadHandler)
-    app.addLoadHandler('headAge', taskview.loadHandler)
-    app.addLoadHandler('faceAngle', taskview.loadHandler)
-
     app.addSaveHandler(taskview.saveHandler)
-    '''
+
     print 'Face loaded'
 
 def unload(app):
