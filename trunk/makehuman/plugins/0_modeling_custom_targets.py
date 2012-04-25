@@ -33,6 +33,17 @@ import algos3d
 import os
 import humanmodifier
 
+class FolderButton(gui3d.RadioButton):
+
+    def __init__(self, group, label, groupBox, selected=False):
+        gui3d.RadioButton.__init__(self, group, label, selected, style=gui3d.ButtonStyle)
+        self.groupBox = groupBox
+        
+    def onClicked(self, event):
+        gui3d.RadioButton.onClicked(self, event)
+        self.parent.parent.hideAllBoxes()
+        self.groupBox.show()
+
 class CustomTargetsTaskView(gui3d.TaskView):
 
     def __init__(self, category, app):
@@ -67,7 +78,7 @@ class CustomTargetsTaskView(gui3d.TaskView):
         
         for folder in self.folders:
             self.removeView(folder)
-        for child in self.folderBox.children:
+        for child in self.folderBox.children[:]:
             self.folderBox.removeView(child)
             
         self.folders = []
@@ -75,34 +86,28 @@ class CustomTargetsTaskView(gui3d.TaskView):
         
         for root, dirs, files in os.walk(self.targetsPath):
 
-            box = self.addView(gui3d.GroupBox(label = 'Targets', position = [10, 80, 9.0]))
-            button = self.folderBox.addView(gui3d.RadioButton(group, os.path.basename(root), self.folderBox.children == 0, style=gui3d.ButtonStyle))
-            self.folders.append(box)
-            
-            @button.event
-            def onClicked(event):
-                gui3d.RadioButton.onClicked(button, event)
-                for folder in self.folders:
-                    folder.hide()
-                box.show()
+            groupBox = self.addView(gui3d.GroupBox(label = 'Targets', position = [10, 80, 9.0]))
+            button = self.folderBox.addView(FolderButton(group, os.path.basename(root), groupBox, self.folderBox.children == 0))
+            self.folders.append(groupBox)
 
             for f in files:
-
                 if f.endswith(".target"):
-                
-                    self.createTargetControls(box, root, f)
+                    self.createTargetControls(groupBox, root, f)
                     
-            box.hide()
+            groupBox.hide()
         
         for folder in self.folders:
             for child in folder.children:
                 child.update()
             
         if self.folders:
+            self.msg.hide()
             self.folderBox.children[0].setSelected(True)
             self.folders[0].show()
             if self.folders[0].children:
                 self.folders[0].children[0].setFocus()
+        else:
+            self.msg.show()
         
     def createTargetControls(self, box, targetPath, targetFile):
         # When the slider is dragged and released, an onChange event is fired
@@ -119,6 +124,11 @@ class CustomTargetsTaskView(gui3d.TaskView):
         
         for slider in self.sliders:
             slider.update()
+            
+    def hideAllBoxes(self):
+    
+        for folder in self.folders:
+            folder.hide()
         
     def onResized(self, event):
         
