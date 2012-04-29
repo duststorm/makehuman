@@ -66,6 +66,18 @@ def setupRigJoint (words, obj, verts, locations):
         except:
             loc = verts[v]         
         locations[key] = vadd(loc, [x,y,z])
+    elif typ == 'front':
+        raw = locations[words[2]]
+        head = locations[words[3]]
+        tail = locations[words[4]]
+        offs = eval(words[5])
+        vec = aljabr.vsub(tail, head)
+        vec2 = aljabr.vdot(vec, vec)
+        vraw = aljabr.vsub(raw, head)
+        x = aljabr.vdot(vec, vraw) / vec2
+        rvec = aljabr.vmul(vec, x)
+        nloc = aljabr.vadd(head, rvec, offs)
+        locations[key] = nloc
     else:
         raise NameError("Unknown %s" % typ)
 
@@ -120,6 +132,12 @@ def readRigFile(filename, obj, verts=None):
             parent = words[4]
             options = {}
             for word in words[5:]:
+                try:
+                    float(word)
+                    values.append(word)
+                    continue
+                except:
+                    pass
                 if word[0] == '-':
                     values = []
                     options[word] = values

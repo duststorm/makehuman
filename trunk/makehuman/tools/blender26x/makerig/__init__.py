@@ -99,11 +99,16 @@ class MakeRigPanel(bpy.types.Panel):
         layout.operator("mhrig.unvertex_below")
         layout.operator("mhrig.symmetrize_weights", text="Symm weights L=>R").left2right = True
         layout.operator("mhrig.symmetrize_weights", text="Symm weights R=>L").left2right = False
+        
+        layout.separator()
+        layout.label("Rigging utilities")
+        layout.operator("mhrig.zero_rolls")
 
         layout.separator()
         layout.label("Weighting, MH mesh specific")      
         layout.prop(scn, "MRMakeHumanDir")
         layout.operator("mhrig.auto_weight_body")
+        layout.operator("mhrig.copy_weights")
         layout.operator("mhrig.auto_weight_helpers")
 
         layout.separator()
@@ -133,6 +138,7 @@ class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
         print("Interface initialized")
         return{'FINISHED'}    
 
+
 class OBJECT_OT_FactorySettingsButton(bpy.types.Operator):
     bl_idname = "mhrig.factory_settings"
     bl_label = "Restore factory settings"
@@ -140,6 +146,7 @@ class OBJECT_OT_FactorySettingsButton(bpy.types.Operator):
     def execute(self, context):
         main.initInterface()
         return{'FINISHED'}    
+
 
 class OBJECT_OT_SaveSettingsButton(bpy.types.Operator):
     bl_idname = "mhrig.save_settings"
@@ -149,6 +156,7 @@ class OBJECT_OT_SaveSettingsButton(bpy.types.Operator):
         main.saveDefaultSettings(context)
         return{'FINISHED'}    
 
+
 class OBJECT_OT_ExportRigFileButton(bpy.types.Operator):
     bl_idname = "mhrig.export_rig_file"
     bl_label = "Export Rig file"
@@ -156,6 +164,16 @@ class OBJECT_OT_ExportRigFileButton(bpy.types.Operator):
     def execute(self, context):
         main.exportRigFile(context)
         return{'FINISHED'}    
+
+
+class OBJECT_OT_ZeroRollsButton(bpy.types.Operator):
+    bl_idname = "mhrig.zero_rolls"
+    bl_label = "Zero roll angles"
+
+    def execute(self, context):
+        main.zeroRolls(context)
+        return{'FINISHED'}    
+
 
 class OBJECT_OT_AutoWeightBodyButton(bpy.types.Operator):
     bl_idname = "mhrig.auto_weight_body"
@@ -165,6 +183,17 @@ class OBJECT_OT_AutoWeightBodyButton(bpy.types.Operator):
         main.autoWeightBody(context)
         return{'FINISHED'}    
 
+
+class OBJECT_OT_CopyWeightsButton(bpy.types.Operator):
+    bl_idname = "mhrig.copy_weights"
+    bl_label = "Copy weights"
+    bl_description = "Copy weights between meshes"
+
+    def execute(self, context):
+        main.copyWeights(context)
+        return{'FINISHED'}    
+
+
 class OBJECT_OT_AutoWeightHelpersButton(bpy.types.Operator):
     bl_idname = "mhrig.auto_weight_helpers"
     bl_label = "Auto weight MH helpers"
@@ -172,6 +201,7 @@ class OBJECT_OT_AutoWeightHelpersButton(bpy.types.Operator):
     def execute(self, context):
         main.autoWeightHelpers(context)
         return{'FINISHED'}    
+ 
  
 class VIEW3D_OT_PrintVnumsButton(bpy.types.Operator):
     bl_idname = "mhrig.print_vnums"
@@ -189,6 +219,7 @@ class VIEW3D_OT_PrintVnumsButton(bpy.types.Operator):
                     context.scene.MRVertNum = v.index
                     first = False
         return{'FINISHED'}    
+
 
 class VIEW3D_OT_SelectVnumButton(bpy.types.Operator):
     bl_idname = "mhrig.select_vnum"
@@ -215,6 +246,7 @@ class VIEW3D_OT_UnvertexDiamondsButton(bpy.types.Operator):
         print("Diamonds unvertexed")
         return{'FINISHED'}    
 
+
 class VIEW3D_OT_UnvertexBelowButton(bpy.types.Operator):
     bl_idname = "mhrig.unvertex_below"
     bl_label = "Unvertex below threshold"
@@ -223,6 +255,7 @@ class VIEW3D_OT_UnvertexBelowButton(bpy.types.Operator):
         main.unVertexBelowThreshold(context)
         print("Threshold imposed")
         return{'FINISHED'}    
+
 
 class VIEW3D_OT_UnvertexSelectedButton(bpy.types.Operator):
     bl_idname = "mhrig.unvertex_selected"

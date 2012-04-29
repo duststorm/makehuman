@@ -1875,7 +1875,15 @@ def appendRigBones(armature, obj, prefix, layer, body):
                     addPoseInfo(bone, ("CS", name))
                     flags |= F_WIR
                 elif key == "-ik":
+                    try:
+                        pt = options["-pt"]
+                    except KeyError:
+                        pt = None
+                    print(value, pt)
+                    value.append(pt)
                     addPoseInfo(bone, ("IK", value))
+                elif key == "-ik":
+                    pass
             the.Armature.append((bone, roll, parent, flags, layer, NoBB))
             the.RigHead[bone] = aljabr.vsub(head, the.Origin)
             the.RigTail[bone] = aljabr.vsub(tail, the.Origin)
@@ -1934,7 +1942,13 @@ def writeControlPoses(fp):
                 goal = value[0]
                 n = int(value[1])
                 inf = float(value[2])
-                constraints =  [('IK', 0, inf, ['IK', goal, n, None, (True,False,True)])]
+                pt = value[3]
+                if pt:
+                    print(goal, n, inf, pt)
+                    subtar = pt[0]
+                    poleAngle = float(pt[1])
+                    pt = (poleAngle, subtar)
+                constraints =  [('IK', 0, inf, ['IK', goal, n, pt, (True,False,True)])]
         addPoseBone(fp, bone, cs, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, constraints)       
         
     for (path, modname) in the.Config.customrigs:

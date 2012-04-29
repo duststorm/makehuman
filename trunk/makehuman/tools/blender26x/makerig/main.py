@@ -133,6 +133,16 @@ def writeBones(fp, rig, me):
             fp.write("-nd ")
         if not eb.use_connect:
             fp.write("-nc ")
+
+        pb = rig.pose.bones[eb.name]
+        print(pb)
+        for cns in pb.constraints:
+            print("  ", cns)
+            if cns.type == 'IK':
+                fp.write("-ik %s %d %.3f " % (cns.subtarget, cns.chain_count, cns.influence))
+                if cns.pole_target:
+                    fp.write("-pt %s %.3f " % (cns.pole_subtarget, cns.pole_angle))
+                break
         fp.write("\n")
 
 #
@@ -278,6 +288,39 @@ def autoWeightBody(context):
     mod.use_bone_envelopes = False
     scn.objects.unlink(dupliob)    
     return
+    
+#
+#   copyWeights(context):
+#
+
+def copyWeights(context):
+    src = context.object
+    trg = None
+    scn = context.scene
+    for ob in scn.objects:
+        if ob.select and ob.type == 'MESH' and ob != src:
+            trg = ob
+            break
+    if not trg:
+        raise NameError("Two meshes must be selected")
+    if len(trg.data.vertices) < len(src.data.vertices):
+        ob = src
+        src = trg
+        trg = ob
+        
+    scn.objects.active = trg
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.vertex_group_remove(all=True)
+        
+    groupMap = {}
+    for sgrp in src.vertex_groups:
+        groupMap[sgrp.index] = trg.vertex_groups.new(sgrp.name)
+    for n,vs in enumerate(src.data.vertices):
+        vt = trg.data.vertices[n]
+        for g in vs.groups:
+            tgrp = groupMap[g.group]
+            tgrp.add([vt.index], g.weight, 'REPLACE')
+        
      
 #
 #    class CProxy
@@ -550,6 +593,20 @@ def cleanGroups(me, groups):
             grp.remove([v.index])
     return
     
+#
+#   zeroRolls(context):
+#
+    
+def zeroRolls(context):
+    ob = context.object
+    if not (ob and ob.type == 'ARMATURE'):
+        raise NameError("An armature must be selected")
+    bpy.ops.object.mode_set(mode='EDIT')
+    for eb in ob.data.edit_bones:
+        eb.roll = 0
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+        
 #----------------------------------------------------------
 #   setupVertexPairs(ob):
 #----------------------------------------------------------
