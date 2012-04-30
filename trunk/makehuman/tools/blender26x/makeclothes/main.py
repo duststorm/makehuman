@@ -631,8 +631,8 @@ def printMhcloUvLayers(fp, pob, scn):
     return
     
 def reexportMhclo(context):
-    checkBMeshAware()
     pob = getClothing(context)
+    checkBMeshAware(pob)
     scn = context.scene
     scn.objects.active = pob    
     bpy.ops.object.mode_set(mode='OBJECT')
@@ -768,8 +768,8 @@ def writeTextures(fp, name, scn):
 #
 
 def exportObjFile(context):
-    checkBMeshAware()
     ob = getClothing(context)
+    checkBMeshAware(ob)
     (objpath, objfile) = getFileName(ob, context, "obj")
     print("Open", objfile)
     fp = open(objfile, "w")
@@ -883,7 +883,7 @@ def setupTexVerts(ob):
         texVerts = {}    
         texVertsList.append(texVerts)
         if BMeshAware:
-            uvloop = me.uv_loop_layers[index]
+            uvloop = me.uv_layers[index]
             n = 0
             for f in me.polygons:
                 for vn in f.vertices:
@@ -916,8 +916,8 @@ def findTexVert(uv, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob):
 #
 
 def exportBaseUvsPy(context):
-    checkBMeshAware()
     ob = context.object
+    checkBMeshAware(ob)
     bpy.ops.object.mode_set(mode='OBJECT')
     scn = context.scene
     (vertEdges, vertFaces, edgeFaces, faceEdges, faceNeighbors, uvFaceVertsList, texVertsList) = setupTexVerts(ob)
@@ -1058,7 +1058,7 @@ def printItems(struct):
     
 
 def projectUVs(bob, pob, context):
-    checkBMeshAware()
+    checkBMeshAware(bob)
     print("Projecting %s => %s" % (bob.name, pob.name))
     (bob1, data) = restoreData(context)
 
@@ -1073,9 +1073,9 @@ def projectUVs(bob, pob, context):
     for (pv, exact, verts, wts, diff) in data:
         if exact:
             print("Exact", pv.index)
-            vn0 = verts[0]
-            for f0 in bVertFaces[vn0]:
-                uv0 = getUvLoc(v0, f0, bModUvTex[f.index], bUvtex, bUvIndices)
+            (v0, x) = verts[0]            
+            for f0 in bVertFaces[v0.index]:
+                uv0 = getUvLoc(v0, f0, bModUvTex[f0.index], bUvtex, bUvIndices)
                 table[pv.index] = (1, uv0, 1)
                 print(pv.index, table[pv.index])
                 break
@@ -1475,8 +1475,8 @@ def getUvIndices(ob):
 #
 
 def recoverSeams(context):
-    checkBMeshAware()
     ob = getHuman(context)
+    checkBMeshAware(ob)
     scn = context.scene
     (vertList, pairList, edgeList) = getSeams(ob, scn)
     vcoList = coordList(vertList, ob.data.vertices)
@@ -1565,8 +1565,8 @@ def isOnEdge(v, faceTable, uvtex):
 #
 
 def makeClothes(context, doFindClothes):
-    checkBMeshAware()
     (bob, pob) = getObjectPair(context)
+    checkBMeshAware(bob)
     scn = context.scene
     checkObjectOK(bob, context)
     checkAndVertexDiamonds(bob)
@@ -1652,8 +1652,8 @@ def checkSingleVGroups(pob):
 #
 
 def offsetCloth(context):
-    checkBMeshAware()
     (bob, pob) = getObjectPair(context)
+    checkBMeshAware(bob)
     bverts = bob.data.vertices
     pverts = pob.data.vertices    
     print("Offset %s to %s" % (bob.name, pob.name))
@@ -2133,8 +2133,8 @@ def printVertNums(context):
 #
 
 def deleteHelpers(context):
-    checkBMeshAware()
     ob = context.object
+    checkBMeshAware(ob)
     scn = context.scene
     #if not isHuman(ob):
     #    return
@@ -2156,8 +2156,8 @@ def deleteHelpers(context):
 #
 
 def removeVertexGroups(context, removeType):
-    checkBMeshAware()
     ob = context.object
+    checkBMeshAware(ob)
     bpy.ops.object.mode_set(mode='OBJECT')
     if removeType == 'All':
         bpy.ops.object.vertex_group_remove(all=True)
@@ -2175,8 +2175,8 @@ def removeVertexGroups(context, removeType):
 #
 
 def autoVertexGroups(context):
-    checkBMeshAware()
     ob = context.object
+    checkBMeshAware(ob)
     scn = context.scene
     ishuman = isHuman(ob)
     mid = ob.vertex_groups.new("Mid")
@@ -2240,7 +2240,7 @@ def addBodyVerts(me, verts):
 #
 
 def checkAndVertexDiamonds(ob):
-    checkBMeshAware()
+    checkBMeshAware(ob)
     print("Unvertex diamonds in %s" % ob)
     bpy.ops.object.mode_set(mode='EDIT')
     bpy.ops.mesh.select_all(action='DESELECT')
@@ -2311,10 +2311,15 @@ def saveDefaultSettings(context):
 #   BMesh
 #
 
-def checkBMeshAware():
+def checkBMeshAware(ob):
     global BMeshAware
-    print("Blender r%s" % bpy.app.build_revision)
-    BMeshAware = (int(bpy.app.build_revision) > 44136)    
+    try:
+        ob.data.faces
+        BMeshAware = False
+        print("Not using BMesh")
+    except:
+        BMeshAware = True
+        print("Using BMesh")
     
 def getFaces(me):
     if BMeshAware:
@@ -2324,7 +2329,7 @@ def getFaces(me):
         
 def getUvTextures(me):
     if BMeshAware:
-        return me.uv_loop_layers
+        return me.uv_layers
     else:
         return me.uv_textures
 

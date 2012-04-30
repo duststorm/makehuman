@@ -114,6 +114,10 @@ class MakeRigPanel(bpy.types.Panel):
         layout.separator()
         layout.label("Export rig")      
         layout.prop(scn, "MRDirectory")
+        layout.prop(scn, "MRLegIK")
+        if scn.MRLegIK:
+            layout.prop(scn, "MRThigh_L")
+            layout.prop(scn, "MRThigh_R")
         layout.operator("mhrig.export_rig_file")
 
         layout.separator()

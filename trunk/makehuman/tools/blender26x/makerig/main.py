@@ -28,7 +28,7 @@ SkirtVert = 16000
 TightsVert = 18000
 
 #
-#   writeBones(character, scale, fp):
+#   getRigAndMesh(context):
 #
 
 def getRigAndMesh(context):
@@ -77,7 +77,7 @@ def writeJoint(fp, jName, loc, joints, me):
         joints[jName] = (jName, loc)
         v = closestVert(loc, me)
         offs = loc - v.co
-        fp.write("  %s voffset %d %.4g %.4g %.4g\n" % (jName, v.index, offs[0], offs[1], offs[2]))
+        fp.write("  %s voffset %d %.4g %.4g %.4g\n" % (jName, v.index, offs[0], offs[2], -offs[1]))
     return
     
 def closestVert(loc, me):
@@ -89,23 +89,57 @@ def closestVert(loc, me):
             mindist = offs.length
     return best
 
+
+def addKnee(fp, thigh, shin, ebones, joints):        
+    hfound = findJoint(thigh+"_head", None, joints)
+    tfound = findJoint(shin+"_tail", None, joints)
+    mfound = findJoint(thigh+"_tailRaw", None, joints)
+    (hname,hx) = hfound
+    (tname,tx) = tfound
+    (mname,mx) = mfound
+    ttail = thigh+"_tail"
+    fp.write("  %s front %s %s %s [0,0,0.1]\n" % (ttail, mname, hname, tname))
+    joints[ttail] = (ttail, None)
+    joints[shin+"_head"] = joints[ttail]
+    
+
 #
-#   writeBones(fp, rig, me):
+#   writeBones(fp, rig, me, scn):
 #
 
-def writeBones(fp, rig, me):
+def writeBones(fp, rig, me, scn):
     bpy.context.scene.objects.active = rig
     bpy.ops.object.mode_set(mode='EDIT')
     
     # List symbolic joint locations
     joints = {}
     fp.write("\n# locations\n")
-    for eb in rig.data.edit_bones:
-        ebName = eb.name.replace(" ","_")
-        writeJoint(fp, ebName+"_head", eb.head, joints, me)
-        writeJoint(fp, ebName+"_tail", eb.tail, joints, me)
+    ebones = rig.data.edit_bones
+    if scn.MRLegIK:
+        for eb in ebones:
+            ebName = eb.name.replace(" ","_")
+            if eb.parent and eb.parent.name == scn.MRThigh_L:
+                writeJoint(fp, ebName+"_headRaw", eb.head, joints, me)
+                shin_L = ebName
+            elif eb.parent and eb.parent.name == scn.MRThigh_R:
+                writeJoint(fp, ebName+"_headRaw", eb.head, joints, me)
+                shin_R = ebName
+            else:
+                writeJoint(fp, ebName+"_head", eb.head, joints, me)
+            if ebName in [scn.MRThigh_L, scn.MRThigh_R]:
+                writeJoint(fp, ebName+"_tailRaw", eb.tail, joints, me)
+            else:
+                writeJoint(fp, ebName+"_tail", eb.tail, joints, me)
+        fp.write("\n")
+        addKnee(fp, scn.MRThigh_L, shin_L, ebones, joints)
+        addKnee(fp, scn.MRThigh_R, shin_R, ebones, joints)
+    else:
+        for eb in ebones:
+            ebName = eb.name.replace(" ","_")
+            writeJoint(fp, ebName+"_head", eb.head, joints, me)
+            writeJoint(fp, ebName+"_tail", eb.tail, joints, me)
     fp.write("\n")
-    
+        
     # List symbolic names for heads and tails
     fp.write("# bones\n")
     for eb in rig.data.edit_bones:
@@ -135,9 +169,7 @@ def writeBones(fp, rig, me):
             fp.write("-nc ")
 
         pb = rig.pose.bones[eb.name]
-        print(pb)
         for cns in pb.constraints:
-            print("  ", cns)
             if cns.type == 'IK':
                 fp.write("-ik %s %d %.3f " % (cns.subtarget, cns.chain_count, cns.influence))
                 if cns.pole_target:
@@ -225,9 +257,10 @@ def exportRigFile(context):
         "# author %s\n" % scn.MRAuthor +
         "# license %s\n" % scn.MRLicense +
         "# homepage %s\n" % scn.MRHomePage)
-    writeBones(fp, rig, ob.data)
+    writeBones(fp, rig, ob.data, scn)
     writeVertexGroups(fp, ob)
     fp.close()
+    print("Rig file %s created" % rigfile)
     return
     
 #
@@ -722,7 +755,7 @@ def initInterface():
         default="~")
         
     bpy.types.Scene.MRMakeHumanDir = StringProperty(
-        name="MakeHuman directory", 
+        name="MakeHuman Directory", 
         description="The directory where MakeHuman is installed", 
         maxlen=1024,
         default="/home/svn/makehuman")        
@@ -750,6 +783,18 @@ def initInterface():
         name="HomePage", 
         default="http://www.makehuman.org/",
         maxlen=256)
+        
+    bpy.types.Scene.MRLegIK = BoolProperty(
+        name="Leg IK",
+        default=False)
+
+    bpy.types.Scene.MRThigh_L = StringProperty(
+        name="Left Thigh Bone",
+        default="UpLeg_L")
+    
+    bpy.types.Scene.MRThigh_R = StringProperty(
+        name="Right Thigh Bone",
+        default="UpLeg_R")
     
 
     return

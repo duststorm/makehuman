@@ -186,7 +186,7 @@ def getScale(info, verts, index):
 #----------------------------------------------------------
 
 def importObj(filepath, context):
-    checkBMeshAware()
+    global BMeshAware
     scn = context.scene
     obname = nameFromPath(filepath)
     fp = open(filepath, "rU")  
@@ -241,6 +241,14 @@ def importObj(filepath, context):
     me.from_pydata(verts, [], faces)
     me.update()
     ob = bpy.data.objects.new(obname, me)
+    
+    try:
+    	me.polygons
+    	BMeshAware = True
+    	print("Using BMesh")
+    except:
+    	BMeshAware = False
+    	print("Not using BMesh")
 
     if texverts:
         if BMeshAware:
@@ -288,7 +296,7 @@ def parseFace(words):
 
 def addUvLayerBMesh(obname, me, texverts, texfaces):            
     uvtex = me.uv_textures.new(name=obname)
-    uvloop = me.uv_loop_layers[-1]
+    uvloop = me.uv_layers[-1]
     data = uvloop.data
     n = 0
     for tf in texfaces:
@@ -1110,10 +1118,6 @@ def isInited(scn):
     except:
         return False    
         
-def checkBMeshAware():
-    global BMeshAware
-    print("Blender r%s" % bpy.app.build_revision)
-    BMeshAware = (int(bpy.app.build_revision) > 44136)    
 
 class VIEW3D_OT_InitButton(bpy.types.Operator):
     bl_idname = "mh.init"
@@ -1121,7 +1125,6 @@ class VIEW3D_OT_InitButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        checkBMeshAware()
         initScene(context.scene)
         return{'FINISHED'}                
 

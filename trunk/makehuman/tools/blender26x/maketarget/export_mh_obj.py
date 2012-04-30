@@ -79,16 +79,21 @@ Epsilon = 1e-4
 #
 
 def exportObjFile(path, groupsAsMaterials, context):
+    global BMeshAware
     ob = context.object
     me = ob.data
     if (not me) or (len(me.materials) < 2):
         raise NameError("Mesh must have materials")
-        
-    maketarget.checkBMeshAware()
-    if maketarget.BMeshAware:
+
+    try:        
         faces = me.polygons
-    else:
+        BMeshAware = True
+        print("Using BMesh")
+    except:
         faces = me.faces        
+        BMeshAware = False
+        print("Not using BMesh")
+        
     orderedFaces = zOrderFaces(me, faces)
     
     (name,ext) = os.path.splitext(path)
@@ -205,6 +210,7 @@ def zOrderFaces(me, faces):
 #
 
 def setupTexVerts(me, faces):
+    global BMeshAware
     vertEdges = {}
     vertFaces = {}
     
@@ -248,8 +254,8 @@ def setupTexVerts(me, faces):
 
     vtn = 0
     texVerts = {}    
-    if maketarget.BMeshAware:
-        uvloop = me.uv_loop_layers[0]
+    if BMeshAware:
+        uvloop = me.uv_layers[0]
         n = 0
         for f in faces:
             for vn in f.vertices:
