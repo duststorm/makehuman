@@ -44,7 +44,7 @@ bl_info = {
     "location": "View3D > Properties > MHX Mocap",
     "description": "Mocap tool for MHX rig",
     "warning": "",
-    'wiki_url': 'http://sites.google.com/site/makehumandocs/blender-export-and-mhx/mocap-tool',
+    'wiki_url': "http://www.makehuman.org/node/285",
     "category": "MakeHuman"}
 
 """

@@ -31,7 +31,7 @@ bl_info = {
     "location": "View3D > Properties > Make Target",
     "description": "Make MakeHuman Target",
     "warning": "",
-    'wiki_url': '',
+    'wiki_url': "http://www.makehuman.org/node/223",
     "category": "MakeHuman"}
 
 if "bpy" in locals():

@@ -28,7 +28,7 @@ bl_info = {
     "location": "View3D > Properties > Make MH clothes",
     "description": "Make clothes for MakeHuman characters",
     "warning": "",
-    'wiki_url': '',
+    'wiki_url': "http://www.makehuman.org/node/228",
     "category": "MakeHuman"}
 
 

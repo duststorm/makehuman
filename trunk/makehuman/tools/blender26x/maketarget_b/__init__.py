@@ -25,13 +25,13 @@
 
 bl_info = {
     "name": "Make Target B",
-    "author": "Manuel Bastioni, Thomas Larsson",
+    "author": "Thomas Larsson",
     "version": "0.4",
     "blender": (2, 6, 2),
-    "location": "View3D > Properties > Make Target",
+    "location": "View3D > Properties > Make Target B",
     "description": "Alternative Make Target.",
     "warning": "",
-    'wiki_url': '',
+    'wiki_url': "http://www.makehuman.org/node/362",
     "category": "MakeHuman"}
 
 if "bpy" in locals():
@@ -53,7 +53,7 @@ else:
 #----------------------------------------------------------
 
 class MakeTargetPanel(bpy.types.Panel):
-    bl_label = "Make Target"
+    bl_label = "Make Target B"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     
