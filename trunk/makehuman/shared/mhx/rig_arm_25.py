@@ -437,7 +437,8 @@ def ArmControlPoses(fp):
         [('IK', 0, 1, ['IK', 'Hand_L', 1, (90*D, 'LoArm2PT_L'), (True, False,True)])])
         
     copyDeformPartial(fp, 'DfmLoArm3_L', 'LoArm_L', (0,1,0), 0, 0, None,
-        [('StretchTo', 0, 1, ['Stretch', 'Hand_L', 0, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'Hand_L', 0, 1]),
+         ('IK', 0, 1, ['IK', 'Hand_L', 1, (90*D, 'LoArm3PT_L'), (True, False,True)])])
 
 
     addPoseBone(fp, 'LoArm2PT_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
@@ -454,7 +455,8 @@ def ArmControlPoses(fp):
         [('IK', 0, 1, ['IK', 'Hand_R', 1, (90*D, 'LoArm2PT_R'), (True, False,True)])])
         
     copyDeformPartial(fp, 'DfmLoArm3_R', 'LoArm_R', (0,1,0), 0, 0, None,
-        [('StretchTo', 0, 1, ['Stretch', 'Hand_R', 0, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'Hand_R', 0, 1]),
+         ('IK', 0, 1, ['IK', 'Hand_R', 1, (90*D, 'LoArm2PT_R'), (True, False,True)])])
         
     # Hand deform
     
