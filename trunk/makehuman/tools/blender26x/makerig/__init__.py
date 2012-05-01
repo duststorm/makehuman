@@ -110,6 +110,7 @@ class MakeRigPanel(bpy.types.Panel):
         layout.operator("mhrig.auto_weight_body")
         layout.operator("mhrig.copy_weights")
         layout.operator("mhrig.auto_weight_helpers")
+        layout.operator("mhrig.auto_weight_skirt")
 
         layout.separator()
         layout.label("Export rig")      
@@ -204,6 +205,15 @@ class OBJECT_OT_AutoWeightHelpersButton(bpy.types.Operator):
 
     def execute(self, context):
         main.autoWeightHelpers(context)
+        return{'FINISHED'}    
+ 
+
+class OBJECT_OT_AutoWeightSkirtButton(bpy.types.Operator):
+    bl_idname = "mhrig.auto_weight_skirt"
+    bl_label = "Auto weight skirt"
+
+    def execute(self, context):
+        main.autoWeightSkirt(context)
         return{'FINISHED'}    
  
  

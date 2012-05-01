@@ -353,7 +353,54 @@ def copyWeights(context):
         for g in vs.groups:
             tgrp = groupMap[g.group]
             tgrp.add([vt.index], g.weight, 'REPLACE')
-        
+
+
+#
+#   autoWeightSkirt(context):
+#
+
+def autoWeightSkirt(context):
+    ob = context.object
+    xmin = 1000
+    xmax = -1000
+    verts = {}
+    for v in ob.data.vertices:
+        if v.select:
+            if v.co[0] > xmax:
+                xmax = v.co[0]
+            if v.co[0] < xmin:
+                xmin = v.co[0]
+            verts[v.index] = []
+    if xmin >= xmax:
+        raise NameError("Selection does not contain vertices at different x")
+    print("xmin = %.3f xmax = %.3f" % (xmin, xmax))
+                        
+    (pairs, symm, symmIndex) = symmetricGroups(ob)    
+    for (left, leftIndex, right, rightIndex) in pairs:
+        print(leftIndex.items())
+        for v in ob.data.vertices:
+            if v.select:
+                for g in v.groups:
+                    try:
+                        gname = leftIndex[g.group]
+                    except:
+                        gname = None
+                    if not gname:
+                        try:
+                            gname = rightIndex[g.group]
+                        except:
+                            gname = None
+                    if gname and g.weight > Epsilon:
+                        verts[v.index].append( (left[gname], right[gname], v.co[0], g.weight) )
+                        
+    for (vn, value) in verts.items():
+        for (lgrp, rgrp, x, w) in value:
+            wl = w*(x-xmin)/(xmax-xmin)
+            wr = w-wl
+            lgrp.add([vn], wl, 'REPLACE')
+            rgrp.add([vn], wr, 'REPLACE')
+
+    return
      
 #
 #    class CProxy
@@ -437,6 +484,7 @@ class CProxy:
                     self.refVerts.append( (v0,v1,v2,w0,w1,w2,d0,d1,d2) )
         return
         
+        
 def autoWeightHelpers(context):
     ob = context.object
     proxy = CProxy()
@@ -514,24 +562,24 @@ def getFileName(ob, context, ext):
 #
 
 Epsilon = 1e-3
-
-def symmetrizeWeights(context, left2right):
-    ob = context.object
-    bpy.ops.object.mode_set(mode='OBJECT')
-    scn = context.scene
-
+    
+def symmetricGroups(ob):
     left = {}
     left01 = {}
     left02 = {}
+    left03 = {}
     leftIndex = {}
     left01Index = {}
     left02Index = {}
+    left03Index = {}
     right = {}
     right01 = {}
     right02 = {}
+    right03 = {}
     rightIndex = {}
     right01Index = {}
-    right02Index = {}
+    right02Index = {}    
+    right03Index = {}
     symm = {}
     symmIndex = {}
     for vgrp in ob.vertex_groups:
@@ -559,6 +607,14 @@ def symmetrizeWeights(context, left2right):
             nameStripped = vgrp.name[:-5]
             right02[nameStripped] = vgrp
             right02Index[vgrp.index] = nameStripped
+        elif vgrp.name[-4:] in ['Left', 'left']:
+            nameStripped = vgrp.name[:-4]
+            left03[nameStripped] = vgrp
+            left03Index[vgrp.index] = nameStripped
+        elif vgrp.name[-5:] in ['Right', 'right']:
+            nameStripped = vgrp.name[:-5]
+            right03[nameStripped] = vgrp
+            right03Index[vgrp.index] = nameStripped
         else:
             symm[vgrp.name] = vgrp
             symmIndex[vgrp.index] = vgrp.name
@@ -569,21 +625,40 @@ def symmetrizeWeights(context, left2right):
     printGroups('Right01', right01, right01Index, ob.vertex_groups)
     printGroups('Left02', left02, left02Index, ob.vertex_groups)
     printGroups('Right02', right02, right02Index, ob.vertex_groups)
+    printGroups('left03', left03, left03Index, ob.vertex_groups)
+    printGroups('right03', right03, right03Index, ob.vertex_groups)
     printGroups('Symm', symm, symmIndex, ob.vertex_groups)
+    
+    pairs = [(left, leftIndex, right, rightIndex), 
+             (left01, left01Index, right01, right01Index), 
+             (left02, left02Index, right02, right02Index),
+             (left03, left03Index, right03, right03Index)] 
+    return (pairs, symm, symmIndex)
 
+
+def symmetrizeWeights(context, left2right):
+    ob = context.object
+    bpy.ops.object.mode_set(mode='OBJECT')
+    scn = context.scene
+    
+    (pairs, symm, symmIndex) = symmetricGroups(ob)    
+    (left, leftIndex, right, rightIndex) = pairs[0]
     (lverts, rverts, mverts) = setupVertexPairs(context)
+    groups = []
     if left2right:
         factor = 1
         fleft = left
         fright = right
-        groups = list(right.values()) + list(right01.values()) + list(right02.values())
+        for (left0, left0Index, right0, right0Index) in pairs:
+            groups += list(right0.values())
         cleanGroups(ob.data, groups)
     else:
         factor = -1
         fleft = right
         fright = left
         rverts = lverts
-        groups = list(left.values()) + list(left01.values()) + list(left02.values())
+        for (left0, left0Index, right0, right0Index) in pairs:
+            groups += list(left0.values())
         cleanGroups(ob.data, groups)
 
     for (vn, rvn) in rverts.items():
@@ -593,13 +668,12 @@ def symmetrizeWeights(context, left2right):
         for rgrp in rv.groups:
             rgrp.weight = 0
         for grp in v.groups:
+            pairList = [(symm, symmIndex)]
+            for (left, leftIndex, right, rightIndex) in pairs:
+                pairList.append((right, leftIndex))
+                pairList.append((left, rightIndex))
             rgrp = None
-            for (indices, groups) in [
-                (leftIndex, right), (rightIndex, left),
-                (left01Index, right01), (right01Index, left01),
-                (left02Index, right02), (right02Index, left02),
-                (symmIndex, symm)
-                ]:
+            for (groups, indices) in pairList:              
                 try:
                     name = indices[grp.group]
                     rgrp = groups[name]
@@ -610,14 +684,16 @@ def symmetrizeWeights(context, left2right):
                 rgrp.add([rv.index], grp.weight, 'REPLACE')
             else:                
                 gn = grp.group
-                print("*** No rgrp for %s %s %s" % (grp, gn, ob.vertex_groups[gn]))
+                raise NameError("*** No rgrp for %s %s %s" % (grp, gn, ob.vertex_groups[gn]))
     return len(rverts)
+
 
 def printGroups(name, groups, indices, vgroups):
     print(name)
     for (nameStripped, grp) in groups.items():
         print("  ", nameStripped, grp.name, indices[grp.index])
     return
+
 
 def cleanGroups(me, groups):
     for grp in groups:
