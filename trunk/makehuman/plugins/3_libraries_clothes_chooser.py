@@ -135,7 +135,11 @@ class ClothesTaskView(gui3d.TaskView):
 
     def loadHandler(self, human, values):
         
-        self.setClothes(human, os.path.join('data/clothes', values[1].replace('.obj', ''), values[1].replace('.obj', '.mhclo')))
+        clothesRelPath = os.path.join(values[1].replace('.obj', ''), values[1].replace('.obj', '.mhclo'))
+        clothesPath = os.path.join(self.userClothes, clothesRelPath)
+        if not os.path.isfile(clothesPath):
+        	clothesPath = os.path.join(self.systemClothes, clothesRelPath)
+        self.setClothes(human, clothesPath)
         
     def saveHandler(self, human, file):
         
