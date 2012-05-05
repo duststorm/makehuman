@@ -84,19 +84,19 @@
   upperleg_R_tail front upperleg_R_tailRaw hip_R_tail lowerleg_R_tail [0,0,0.1]
 
 # bones
- master master_head master_tail 0 - -nc 
+ master master_head master_tail 1.05 - -nc 
  spine1 spine1_head spine1_tail 0 master -nc 
  hip_L spine1_head hip_L_tail 0 spine1 -nc 
- upperleg_L hip_L_tail upperleg_L_tail 0 hip_L 
- lowerleg_L upperleg_L_tail lowerleg_L_tail 0 upperleg_L -ik foot_L 2 1.000 
+ upperleg_L hip_L_tail upperleg_L_tail 3.14 hip_L 
+ lowerleg_L upperleg_L_tail lowerleg_L_tail 3.14 upperleg_L -ik foot_L 2 1.000 
  hip_R hip_R_head hip_R_tail 0 spine1 -nc 
- upperleg_R hip_R_tail upperleg_R_tail 0 hip_R 
- lowerleg_R upperleg_R_tail lowerleg_R_tail 0 upperleg_R -ik foot_R 2 1.000 
- spine2 spine1_tail spine2_tail 0 spine1 
- spine3 spine2_tail spine3_tail 0 spine2 
- spine4 spine3_tail spine4_tail 0 spine3 
- neck spine4_tail neck_tail 0 spine4 
- head neck_tail head_tail 0 neck -nc 
+ upperleg_R hip_R_tail upperleg_R_tail 3.14 hip_R 
+ lowerleg_R upperleg_R_tail lowerleg_R_tail 3.14 upperleg_R -ik foot_R 2 1.000 
+ spine2 spine1_tail spine2_tail 3.14 spine1 
+ spine3 spine2_tail spine3_tail 3.14 spine2 
+ spine4 spine3_tail spine4_tail 3.14 spine3 
+ neck spine4_tail neck_tail 3.14 spine4 
+ head neck_tail head_tail 3.14 neck -nc 
  shoulder_L spine4_tail shoulder_L_tail 0 spine4 
  upperarm_L shoulder_L_tail upperarm_L_tail 0 shoulder_L -nc 
  forearm_L upperarm_L_tail forearm_L_tail 0 upperarm_L 
@@ -136,12 +136,12 @@
  thumb_1_R thumb_1_R_head thumb_1_R_tail 0 hand_R -nc 
  thumb_2_R thumb_1_R_tail thumb_2_R_tail 0 thumb_1_R 
  thumb_3_R thumb_2_R_tail thumb_3_R_tail 0 thumb_2_R 
- leg_L lowerleg_L_tail leg_L_tail 0 master -nc 
- foot_L lowerleg_L_tail foot_L_tail 0 leg_L -nc 
- toe_L foot_L_tail toe_L_tail 0 leg_L -nc 
- leg_R lowerleg_R_tail leg_R_tail 0 master -nc 
- foot_R lowerleg_R_tail foot_R_tail 0 leg_R -nc 
- toe_R foot_R_tail toe_R_tail 0 leg_R -nc 
+ leg_L lowerleg_L_tail leg_L_tail 3.14 master -nc 
+ foot_L lowerleg_L_tail foot_L_tail 3.14 leg_L -nc 
+ toe_L foot_L_tail toe_L_tail 3.14 leg_L -nc 
+ leg_R lowerleg_R_tail leg_R_tail 3.14 master -nc 
+ foot_R lowerleg_R_tail foot_R_tail 3.14 leg_R -nc 
+ toe_R foot_R_tail toe_R_tail 3.14 leg_R -nc 
  knee_L knee_L_head knee_L_tail 0 master -nc -ik master 1 1.000 
  knee_R knee_R_head knee_R_tail 0 master -nc -ik master 1 1.000 
 

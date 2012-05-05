@@ -292,7 +292,7 @@ def addInvBones(hier, heads, tails):
 
 class CStuff:
     def __init__(self, name, proxy):
-        self.name = name
+        self.name = os.path.basename(name)
         self.type = None
         self.bones = None
         self.rawWeights = None

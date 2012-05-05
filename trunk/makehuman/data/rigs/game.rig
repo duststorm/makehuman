@@ -53,15 +53,14 @@
   Ankle_R_tail voffset 13312 0.06783 -0.3492 0.05965
 
 # bones
- MasterFloor MasterFloor_head MasterFloor_tail 0 - -nc 
- Root Root_head Root_tail 0 MasterFloor -nc 
+ Root Root_head Root_tail 0 - -nc 
  Hips Root_tail Root_head 3.142 Root 
  UpLeg_L UpLeg_L_head UpLeg_L_tail 0 Hips -nc 
- LoLeg_L UpLeg_L_tail LoLeg_L_tail 0 UpLeg_L -ik Ankle_L 2 0.000 
+ LoLeg_L UpLeg_L_tail LoLeg_L_tail 0 UpLeg_L 
  Foot_L LoLeg_L_tail Foot_L_tail 0 LoLeg_L 
  Toe_L Foot_L_tail Toe_L_tail 0 Foot_L 
  UpLeg_R UpLeg_R_head UpLeg_R_tail 0 Hips -nc 
- LoLeg_R UpLeg_R_tail LoLeg_R_tail 0 UpLeg_R -ik Ankle_R 2 0.000 
+ LoLeg_R UpLeg_R_tail LoLeg_R_tail 0 UpLeg_R 
  Foot_R LoLeg_R_tail Foot_R_tail 0 LoLeg_R 
  Toe_R Foot_R_tail Toe_R_tail 0 Foot_R 
  Spine1 Root_tail Spine1_tail 0 Root 
@@ -71,7 +70,7 @@
  Jaw Jaw_head Jaw_tail 0 Head -nc 
  Clavicle_L Clavicle_L_head Clavicle_L_tail 0 Spine2 -nc 
  UpArm_L Clavicle_L_tail UpArm_L_tail 0 Clavicle_L 
- LoArm_L UpArm_L_tail LoArm_L_tail 0 UpArm_L -ik Wrist_L 2 0.000 
+ LoArm_L UpArm_L_tail LoArm_L_tail 0 UpArm_L 
  Hand_L LoArm_L_tail Hand_L_tail 0 LoArm_L 
  Thumb-1_L Thumb-1_L_head Thumb-1_L_tail 1.571 Hand_L -nc 
  Thumb-2_L Thumb-1_L_tail Thumb-2_L_tail 1.571 Thumb-1_L 
@@ -79,16 +78,12 @@
  Mit_L Mit_L_head Mit_L_tail 0 Hand_L -nc 
  Clavicle_R Clavicle_R_head Clavicle_R_tail 0 Spine2 -nc 
  UpArm_R Clavicle_R_tail UpArm_R_tail 0 Clavicle_R 
- LoArm_R UpArm_R_tail LoArm_R_tail 0 UpArm_R -ik Wrist_R 2 0.000 
+ LoArm_R UpArm_R_tail LoArm_R_tail 0 UpArm_R 
  Hand_R LoArm_R_tail Hand_R_tail 0 LoArm_R 
  Thumb-1_R Thumb-1_R_head Thumb-1_R_tail 1.571 Hand_R -nc 
  Thumb-2_R Thumb-1_R_tail Thumb-2_R_tail 1.571 Thumb-1_R 
  Index_R Index_R_head Index_R_tail 0 Hand_R -nc 
  Mit_R Mit_R_head Mit_R_tail 0 Hand_R -nc 
- Wrist_L LoArm_L_tail Wrist_L_tail 0 MasterFloor -nc 
- Wrist_R LoArm_R_tail Wrist_R_tail 0 MasterFloor -nc 
- Ankle_L LoLeg_L_tail Ankle_L_tail 0 MasterFloor -nc 
- Ankle_R LoLeg_R_tail Ankle_R_tail 0 MasterFloor -nc 
 
 # weights LoLeg_R
   6727 0.0304
