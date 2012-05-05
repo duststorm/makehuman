@@ -23,8 +23,8 @@ TO DO
 import gui3d, mh, os
 import files3d
 from aljabr import in2pts, vadd, vsub, calcBBox
-# TL: import mh2proxy for treating polygon hair as clothes
 import mh2proxy
+import export_config
 
 HairButtonStyle = gui3d.Style(**{
     'parent':gui3d.ViewStyle,
@@ -52,8 +52,8 @@ class HairTaskView(gui3d.TaskView):
         @self.filechooser.event
         def onFileSelected(filename):
             
-            self.setHair(gui3d.app.selectedHuman, filename)
-            
+            mhclo = filename.replace('.obj', '.mhclo')
+            self.setHair(gui3d.app.selectedHuman, filename, mhclo)            
             gui3d.app.switchCategory('Modelling')
             
         @self.hairButton.event
@@ -61,12 +61,8 @@ class HairTaskView(gui3d.TaskView):
             gui3d.app.switchCategory('Library')
             gui3d.app.switchTask("Hair")
 
-    def setHair(self, human, filename):
+    def setHair(self, human, obj, mhclo):
 
-        print("setHair", filename)
-        #obj = os.path.join('data/hairstyles', filename)
-        #TL: path now included in filename?
-        obj = filename
         tif = obj.replace('.obj', '_texture.tif')
         
         if human.hairObj:
@@ -85,8 +81,6 @@ class HairTaskView(gui3d.TaskView):
             human.hairObj.mesh.originalHairVerts = [v.co[:] for v in human.hairObj.mesh.verts]
                 
             hairName = human.hairObj.mesh.name.split('.')[0]
-            mhclo = obj.replace('.obj', '.mhclo')
-            print("Loading clothes hair", mhclo)
             human.hairProxy = mh2proxy.readProxyFile(human.meshData, mhclo, False)
 
             self.adaptHairToHuman(human)
@@ -157,7 +151,10 @@ class HairTaskView(gui3d.TaskView):
 
     def loadHandler(self, human, values):
         
-        self.setHair(human, values[1])
+        (fname, ext) = os.path.splitext(values[1])
+        mhclo = export_config.findExistingProxyFile("hairstyles", None, "%s.mhclo" % fname)          
+        obj = mhclo.replace(".mhclo", ".obj")
+        self.setHair(human, obj, mhclo)
         
     def saveHandler(self, human, file):
         

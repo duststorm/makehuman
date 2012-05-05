@@ -62,7 +62,7 @@ def getTexture(path, cache=None):
         
         if os.stat(path).st_mtime != texture.modified:
             
-            print 'reloading ' + path
+            print ('reloading ', path)	# TL: unicode problems unbracketed
             
             try:
                 img = mh.Image(path=path)

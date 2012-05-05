@@ -138,7 +138,7 @@ def readProxyFile(obj, file, evalOnLoad):
         pfile.file = file
     else:
         pfile = file
-    print("Loading", pfile)
+    print "Loading", pfile
     folder = os.path.dirname(pfile.file)
     objfile = None
     
@@ -147,7 +147,7 @@ def readProxyFile(obj, file, evalOnLoad):
     except:
         tmpl = None
     if tmpl == None:
-        print("*** Cannot open", pfile.file)
+        print "*** Cannot open", pfile.file
         return None
         return CProxy(pfile.type, pfile.layer)
 
@@ -382,7 +382,7 @@ def copyObjFile(proxy):
     try:
         tmpl = open(objpath, "rU")
     except:
-        print("*** Cannot open %s" % objpath)
+        print "*** Cannot open %s" % objpath
         return False
 
     proxy.texVerts = []

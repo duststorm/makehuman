@@ -24,6 +24,7 @@ import gui3d, mh, os
 import download
 import files3d
 import mh2proxy
+import export_config
 
 class ClothesTaskView(gui3d.TaskView):
     
@@ -52,7 +53,6 @@ class ClothesTaskView(gui3d.TaskView):
         
     def setClothes(self, human, mhclo):
 
-        print("Clothes file", mhclo)
         proxy = mh2proxy.readProxyFile(human.meshData, mhclo, False)
         #folder = os.path.dirname(mhclo)
         (folder, name) = proxy.obj_file
@@ -135,10 +135,13 @@ class ClothesTaskView(gui3d.TaskView):
 
     def loadHandler(self, human, values):
         
-        clothesRelPath = os.path.join(values[1].replace('.obj', ''), values[1].replace('.obj', '.mhclo'))
-        clothesPath = os.path.join(self.userClothes, clothesRelPath)
-        if not os.path.isfile(clothesPath):
-        	clothesPath = os.path.join(self.systemClothes, clothesRelPath)
+        #clothesRelPath = os.path.join(values[1].replace('.obj', ''), values[1].replace('.obj', '.mhclo'))
+        #clothesPath = os.path.join(self.userClothes, clothesRelPath)
+        #if not os.path.isfile(clothesPath):
+        #	clothesPath = os.path.join(self.systemClothes, clothesRelPath)
+
+	(fname, ext) = os.path.splitext(values[1])
+        clothesPath = export_config.findExistingProxyFile("clothes", None, "%s.mhclo" % fname)        	
         self.setClothes(human, clothesPath)
         
     def saveHandler(self, human, file):

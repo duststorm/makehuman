@@ -23,6 +23,7 @@ TO DO
 import gui3d, mh, os
 import files3d
 import mh2proxy
+import export_config
 
 class ProxyTaskView(gui3d.TaskView):
     
@@ -67,7 +68,9 @@ class ProxyTaskView(gui3d.TaskView):
 
     def loadHandler(self, human, values):
         
-        self.setProxy(human, os.path.join("data", "proxymeshes", values[1], values[1] + ".proxy"))
+	(fname, ext) = os.path.splitext(values[1])
+        path = export_config.findExistingProxyFile("proxymeshes", None, "%s.proxy" % fname)        	
+        self.setProxy(human, path)
         
     def saveHandler(self, human, file):
         

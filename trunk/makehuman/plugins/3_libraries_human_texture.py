@@ -119,8 +119,10 @@ class HumanTextureTaskView(gui3d.TaskView):
     def loadHandler(self, human, values):
         
         if values[0] == 'skinTexture':
-            human.setTexture(os.path.join(os.path.join(mh.getPath(''), 'data', 'skins', values[1])))
-            self.syncTexture()
+            (fname, ext) = os.path.splitext(values[1])
+            if fname != "texture":
+                human.setTexture(os.path.join(os.path.join(mh.getPath(''), 'data', 'skins', values[1])))
+                self.syncTexture()
        
     def saveHandler(self, human, file):
         
