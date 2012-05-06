@@ -11,9 +11,11 @@
 
 **Authors:**           Pedro Alcaide, aka povmaniaco
 
-**Copyright(c):**      MakeHuman Team 2001-2012
+**Copyright(c):**      MakeHuman Team 2001-2011
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+
+**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
 
 Abstract
 --------
@@ -35,12 +37,11 @@ import mh
 from os.path import basename
 #
 import sys
-#sys.path.append('h:/Mitsuba3')
 
 
 def MitsubaExport(obj, app, settings):
   
-    print 'Mitsuba Export of object: ', obj.name
+    print 'Mitsuba Export object: ', obj.name
 
     # Read settings from an ini file. This reload enables the settings to be
     # changed dynamically without forcing the user to restart the MH
@@ -51,31 +52,41 @@ def MitsubaExport(obj, app, settings):
 
     reload(mh2mitsuba_ini)
     
-    path = os.path.join(mh.getPath('render'), mh2mitsuba_ini.outputpath)
+    out_path = os.path.join(mh.getPath('render'), mh2mitsuba_ini.outputpath)
     #
     source = mh2mitsuba_ini.source if settings['source'] == 'gui' else settings['source']
     action = mh2mitsuba_ini.action 
     #
-    outputDirectory = os.path.dirname(path)
+    outputDirectory = os.path.dirname(out_path)
+    #
+    if not os.path.exists(out_path):
+        os.mkdir(out_path)
+    #
+    # Copy the textures.png file into the output directory ?
+    # because to copy, if we can use it directly from source?
+    # 
+    pigmentMap = 'data/textures/texture.png'
+    # we can remove this code...
+    try:
+        shutil.copy(pigmentMap, outputDirectory)
+    except (IOError, os.error), why:
+        print "Can't copy %s" % str(why)
 
     # The ini action option defines whether or not to attempt to render the file once
     # it's been written.
     if action == 'render':
         
-        # exporting human mesh. Use mh2obj.py code and some variances.. atm! 
+        # exporting human mesh. Use mh2obj.py and some variances..! 
         fileobj = 'human.obj'
-        filename = path + fileobj
+        filename = out_path + fileobj
         previewMat = False
-        #
-        #from mitsuba.render import Scene, RenderQueue, RenderJob, SceneHandler
-        #scene = Scene()
+        
         #
         if not previewMat:
             exportObj(obj, filename)
-            print 'DEBUG: Human mesh exported sucessful'
         
         # create name for Mitsuba xml scene file
-        # this name is diferent to the name use for command line
+        # this name is different to the name use for command line?
         filexml = str(filename).replace('.obj','.xml')
         print filexml
          
@@ -148,33 +159,27 @@ def exportObj(obj, filename):
     f.write('usemtl basic\n')
     f.write('s off\n')
     
-    # mio
-    faces = [fa for fa in obj.faces if not 'joint-' in fa.group.name]
-    #groupFilter = False
-    #exportGroups = False
-    
-    for face in faces:
-        f.write('f')
-        for i, v in enumerate(face.verts):
-            if (obj.uvValues == None):
-                f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
-            else:
-                f.write(' %i/%i/%i ' % (v.idx + 1, face.uv[i] + 1, v.idx + 1))
-        f.write('\n')
-    '''  
+    #
+    groupFilter = None
+    exportGroups = False
+    #
     for fg in obj.faceGroups:
         if not groupFilter or groupFilter(fg):
             if exportGroups:
                 f.write('g %s\n' % fg.name)
-            for face in fg.faces:
-                f.write('f')
-                for i, v in enumerate(face.verts):
-                    if (obj.uvValues == None):
-                        f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
-                    else:
-                        f.write(' %i/%i/%i ' % (v.idx + 1, face.uv[i] + 1, v.idx + 1))
-                f.write('\n')
-    '''
+        # filter eyebrown, lash and joint objects
+        if not '-eyebrown' in fg.name:
+            if not '-lash' in fg.name:
+                if not 'joint-' in fg.name:
+                    for face in fg.faces:
+                        f.write('f')
+                        for i, v in enumerate(face.verts):
+                            if (obj.uvValues == None):
+                                f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
+                            else:
+                                f.write(' %i/%i/%i ' % (v.idx + 1, face.uv[i] + 1, v.idx + 1))
+                        f.write('\n')
+    
     f.close()
 
     # Write material file
@@ -201,7 +206,8 @@ def mitsubaXmlFile(filexml):
 def mitsubaIntegrator(filexml):
     #
     f = open(filexml, 'a')
-    f.write('    <integrator type="path">\n' +
+    f.write('\n' +
+            '    <integrator type="path">\n' +
             '        <integer name="maxDepth" value="8"/>\n' +
             '    </integrator>\n')
     f.close()
@@ -211,7 +217,6 @@ def mitsubaCamera(camera, resolution, filexml):
     fov = 37
     f = open(filexml, 'a')
     f.write('\n' +
-            '    <string name="sampler" value="ldsampler"/>\n' +
             '    <camera type="perspective" id="Camera01-lib">\n' +
             '        <float name="fov" value="%f"/>\n' % fov +
             '        <float name="nearClip" value="1"/>\n' +
@@ -221,7 +226,6 @@ def mitsubaCamera(camera, resolution, filexml):
             '            <scale x="-1"/>\n' +
             '            <lookAt origin="%f, %f, %f" target="%f, %f, %f" up="0, 1, 0"/>\n' % (camera.eyeX, camera.eyeY, camera.eyeZ, camera.focusX, camera.focusY, camera.focusZ) +
             '        </transform>\n' +
-            '        <sampler type="ldsampler"/>\n' +
             '        <film type="exrfilm" id="film">\n' +
             '            <integer name="width" value="%i"/>\n'  % resolution[0] +
             '            <integer name="height" value="%i"/>\n' % resolution[1] +
@@ -233,22 +237,43 @@ def mitsubaCamera(camera, resolution, filexml):
 #
 def mitsubaLights(filexml):
     #
+    env = False
+    sky = True
+    #
+    '''
     f = open(filexml, 'a')
-    f.write('\n' +
-            '    <luminaire type="envmap" id="Area_002-light">\n' +
-            '        <string name="filename" value="envmap.exr"/>\n' +
-            '        <transform name="toWorld">\n' +
-            '            <rotate z="1" angle="90"/>\n' +
-            '            <matrix value="-0.224951 -0.000001 -0.974370 0.000000 -0.974370 0.000000 0.224951 0.000000 0.000000 1.000000 -0.000001 8.870000 0.000000 0.000000 0.000000 1.000000 "/>\n' +
-            '        </transform>\n' +
-            '        <float name="intensityScale" value="3"/>\n' +
-            '    </luminaire>\n')
+    # test for image environment lighting
+    if env:
+        f.write('\n' +
+                '    <luminaire type="envmap" id="Area_002-light">\n' +
+                '        <string name="filename" value="envmap.exr"/>\n' +
+                '        <transform name="toWorld">\n' +
+                '            <rotate z="1" angle="90"/>\n' +
+                '            <matrix value="-0.224951 -0.000001 -0.974370 0.000000 -0.974370 0.000000 0.224951 0.000000 0.000000 1.000000 -0.000001 8.870000 0.000000 0.000000 0.000000 1.000000 "/>\n' +
+                '        </transform>\n' +
+                '        <float name="intensityScale" value="3"/>\n' +
+                '    </luminaire>\n' )
+    elif sky:
+        f.write('\n'+
+                '    <luminaire type="sky">\n' +
+                '    </luminaire>\n')
+    else:
+        f.write('\n' + # test for sphere light
+                '    <shape type="sphere">\n' +
+                '       <point name="center" x="-1" y="4" z="60"/>\n' +
+                '        <float name="radius" value="1"/>\n' +
+                '            <luminaire type="area">\n' +
+                '                <blackbody name="intensity" temperature="7000K"/>\n' +
+                '            </luminaire>\n' +
+                '    </shape>\n')
     f.close()
+    '''
 #
 def mitsubaTexture(filexml):
     #
     f = open(filexml, 'a')
-    f.write('    <texture type="bitmap" id="imageh">\n' +
+    f.write('\n' +
+            '    <texture type="bitmap" id="imageh">\n' +
             '        <string name="filename" value="texture.png"/>\n' +
             '    </texture>\n')
     f.close()
@@ -256,7 +281,8 @@ def mitsubaTexture(filexml):
 def mitsubaMaterials(filexml):
     #
     f = open(filexml, 'a')
-    f.write('    <bsdf type="diffuse" id="humanMat">\n' +
+    f.write('\n' +
+            '    <bsdf type="diffuse" id="humanMat">\n' + # create a 'instantiate' material definition (id)
             '        <texture type="bitmap" name="reflectance">\n' +
             '            <string name="filename" value="texture.png"/>\n' +
             '        </texture>\n' +
@@ -268,18 +294,31 @@ def mitsubaGeometry(filexml, previewMat, fileobj):
     pos = (0, 4, 0)
     size = 5
     f = open(filexml, 'a')
+    # write plane
+    '''
+    f.write('    <shape type="disk">\n' +
+            '        <bsdf type="diffuse">\n' +
+            '            <texture name="reflectance" type="checkerboard">\n' +
+            '                <float name="uvscale" value=".4"/>\n' +
+            '            </texture>\n' +
+            '        </bsdf>\n' +
+            '    </shape>\n')
+    
     if previewMat:
-        f.write('    <shape type="sphere">\n' +
+        f.write('\n' +
+                '    <shape type="sphere">\n' +
                 '        <point name="center" x="%f" y="%f" z="%f"/>\n' % pos +
                 '        <float name="radius" value="%i"/>\n' % size +
                 '        <bsdf type="diffuse"/>\n' +
                 '        <ref id="humanMat"/>\n' +
                 '    </shape>\n')
-    else:
-        f.write('    <shape type="obj">\n' +
-                '        <string name="filename" value="%s"/>\n' % fileobj +
-                '        <ref id="humanMat"/>\n' +
-                '    </shape>\n')
+    #else:
+    '''
+    f.write('\n' +
+            '    <shape type="obj">\n' +
+            '        <string name="filename" value="%s"/>\n' % fileobj +
+            '        <ref id="humanMat"/>\n' + # use 'instantiate' material declaration (id)
+            '    </shape>\n')
     f.close()
     
 def mitsubaFileClose(filexml):

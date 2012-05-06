@@ -12,9 +12,11 @@ Mitsuba Export parameters.
 
 **Authors:**           Pedro Alcaide, aka povmaniaco
 
-**Copyright(c):**      MakeHuman Team 2001-2012
+**Copyright(c):**      MakeHuman Team 2001-2011
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+
+**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
 
 Abstract
 --------
@@ -28,38 +30,42 @@ to reload the application.
 print 'Mitsuba Renderer Parameter File'
 
 import sys
-import os
-import ctypes
 
-#
+# config path to Mitsuba. Change for your own path
+# TO DO: create option menu into 'render settings' gui ?
 MITSUBA_PATH = ''
 
 if sys.platform == 'win32':
-    MITSUBA_PATH = "H:/Mitsuba31"   # change for your own installation path
+    if MITSUBA_PATH == '':
+        MITSUBA_PATH = "H:/Mitsuba31"
+       
+    # this part is only for test with Mitsuba Python API [ ---------------
     #dllArray = ['mitsuba','zlib1','boost_python-vc100-mt-1_44', 'boost_system-vc100-mt-1_44', 'boost_filesystem-vc100-mt-1_44']
-    
+    # ----------- ]
 elif sys.platform == 'darwin':
     MITSUBA_PATH= '/home/user/programs/mitsuba'  # need revision
+    
 else:
-    MITSUBA_PATH="/home/pedro/programas/mitsuba"  #change for your own installation path
+    MITSUBA_PATH="/home/user/programs/mitsuba"  #change for your own installation path
        
 #
 sys.path.append(MITSUBA_PATH)
 
+# this part is only for test with Mitsuba Python API [ -----------
 #for dll in dllArray:
 #    try:
 #        ctypes.cdll.LoadLibrary(os.path.join(MITSUBA_PATH, dll))
 #    except Exception as e:
 #        print("ERROR: Failed to load library " + dll + ", " + repr(e))
-
+#---------------- ]
        
 # The output path defines the standard output directory and the generated include file name.
-# The default directory is pov_output, within the MakeHuman installation directory.
+# The default directory is mitsuba_output, within the MakeHuman installation directory.
 # The default include file name is makehuman.inc.
 
-outputpath = 'pov_output/'
+outputpath = 'mitsuba_output/'
 
-# 'gui' for use QT4 Mitsuba interface, 'console' for Mitsuba render console or 'xml' for export to .xml file
+# use 'gui' for use QT4 Mitsuba interface, 'console' for Mitsuba render console or 'xml' for export to .xml file
 source = 'gui'
 
 # define action : render or export
