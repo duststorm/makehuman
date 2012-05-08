@@ -2,8 +2,12 @@
 <resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
 	<object class="wxFrame" name="MakeTarget">
 		<style>wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL</style>
-		<size>500,-1</size>
+		<size>500,520</size>
 		<title>MakeTarget GUI</title>
+	</object>
+	<object class="wxPanel" name="MakeTargetPanel">
+		<style>wxTAB_TRAVERSAL</style>
+		<size>500,520</size>
 		<object class="wxBoxSizer">
 			<orient>wxVERTICAL</orient>
 			<object class="sizeritem">
