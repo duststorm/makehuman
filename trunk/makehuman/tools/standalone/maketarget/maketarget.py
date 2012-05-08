@@ -349,7 +349,7 @@ def sanityCheckInput():
     if not inputObjDir and not outputPath:
         e = Exception("No output option specified (--out or --dir). Nothing will be written.")
         e.errCode = 2
-        raise e    # Or allow some dry-run mode or output to terminal? You can dry-run while still demanding proper params, just not actually write anything
+        raise e    # TODO Or allow some dry-run mode or output to terminal? You can dry-run while still demanding proper params, just not actually write anything
     if outputObj and (inputObj or inputObjDir) and not targetsToAdd and not targetsToSubtract:
         # Input obj, don't add any other targets and output the same obj again
         e = Exception("This command does nothing useful.")
@@ -363,6 +363,10 @@ def sanityCheckInput():
     if not inputObjDir and not inputObj and not inputTarget and not targetsToSubtract and not targetsToAdd:
         # No inputs at all
         e = Exception("Nothing to do.")
+        e.errCode = 2
+        raise e
+    if not outputObj and not inputObjDir and not inputObj and not inputTarget and len(targetsToAdd) == 1 and not targetsToSubtract:
+    	e = Exception("This command does nothing useful. It's the same as maketarget.py --i %s --out %s"% (targetsToAdd[0], outputPath))
         e.errCode = 2
         raise e
             
