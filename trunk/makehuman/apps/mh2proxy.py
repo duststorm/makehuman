@@ -114,6 +114,8 @@ class CMaterial:
         self.use_transparency = False
         self.alpha = 1
         
+        self.textures = []
+        
         return
                 
 
@@ -129,6 +131,16 @@ def getFileName(folder, file, suffix):
 #
 #    readProxyFile(obj, file, evalOnLoad):
 #
+
+doVerts = 1
+doFaces = 2
+doMaterial = 3
+doTexVerts = 4
+doObjData = 5
+doWeights = 6
+doRefVerts = 7
+doFaceNumbers = 8
+doTexFaces = 9
 
 def readProxyFile(obj, file, evalOnLoad):
     if not file:
@@ -164,15 +176,6 @@ def readProxyFile(obj, file, evalOnLoad):
     zScale = 1.0
     
     status = 0
-    doVerts = 1
-    doFaces = 2
-    doMaterial = 3
-    doTexVerts = 4
-    doObjData = 5
-    doWeights = 6
-    doRefVerts = 7
-    doFaceNumbers = 8
-    doTexFaces = 9
 
     vn = 0
     for line in tmpl:
@@ -440,11 +443,63 @@ def readMaterial(line, mat, proxy):
     elif key == 'texture':
         tex = os.path.realpath(os.path.expanduser(words[1]))
         proxy.texture = os.path.split(tex)
+        mat.textures.append(tex)
     else:
         raise NameError("Material %s?" % key)
     if key == 'alpha':
         mat.alpha = float(words[1])
         mat.use_transparency = True
+
+#
+#   readUvset(filename):
+#
+
+class CUvSet:
+    def __init__(self, name):
+        self.name = name
+        self.type = "UvSet"
+        self.materials = []
+        self.faceNumbers = []
+        self.texVerts = []
+        self.texFaces = []
+
+
+def readUvset(filename):
+    try:
+        fp = open(filename, "r")
+    except:
+        raise NameError("Cannot open %s" % filename)
+        
+    status = 0
+    for line in fp:
+        words = line.split()
+        if words == []:
+            continue
+        elif words[0] == '#':
+            if words[1] == "name":
+                uvset = CUvSet(words[2])
+            elif words[1] == "material":
+                mat = CMaterial()
+                mat.name = words[2]
+                uvset.materials.append(mat)
+                status = doMaterial
+            elif words[1] == "faceNumbers":
+                status = doFaceNumbers
+            elif words[1] == "texVerts":
+                status = doTexVerts
+            elif words[1] == "texFaces":
+                status = doTexFaces
+        elif status == doMaterial:
+            readMaterial(line, mat, uvset)
+        elif status == doFaceNumbers:
+            uvset.faceNumbers.append(line)
+        elif status == doTexVerts:
+            uvset.texVerts.append([float(words[0]), float(words[1])])
+        elif status == doTexFaces:
+            newTexFace(words, uvset)
+    fp.close()            
+    return uvset      
+            
 
 #
 #    getLoc(joint, obj):

@@ -59,6 +59,8 @@ class Human(gui3d.Object):
 
         self.enableUVInterpolation = 0
         self.targetUVBuffer = {}
+        
+        self.uvsetFile = None
 
         self.meshStored = []
         self.meshStoredNormals = []

@@ -126,7 +126,12 @@ def exportMhx_25(human, fp):
     
     fp.write("\nNoScale False ;\n\n")
 
-    copyFile25(human, "shared/mhx/templates/materials25.mhx", fp, None, proxyData)    
+    if human.uvsetFile:
+        uvset = mh2proxy.readUvset(human.uvsetFile)
+        proxyData["__uvset__"] = uvset
+        writeMultiMaterials(uvset, human, fp)
+    else:
+        copyFile25(human, "shared/mhx/templates/materials25.mhx", fp, None, proxyData)    
 
     if the.Config.cage:
         proxyCopy('Cage', human, proxyData, fp)
@@ -281,6 +286,15 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
                     for v in f:
                         fp.write(" %d" % v[0])
                     fp.write(" ;\n")
+                if human.uvsetFile:
+                    fp.write("#if False\n")
+            elif key == 'EndFaces':
+                if human.uvsetFile:
+                    fp.write("#else\n")
+                    uvset = proxyData["__uvset__"]
+                    for ftn in uvset.faceNumbers:
+                        fp.write(ftn)
+                    fp.write("#endif\n")
             elif key == 'FTTriangles':
                 for (fn,f) in enumerate(faces):
                     if len(f) < 4:
@@ -298,25 +312,34 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
                         fp.write("    vt")
                         for v in f:
                             uv = texverts[v]
-                            fp.write(" %.6g %.6g" % (uv[0], uv[1]))
+                            fp.write(" %.4g %.4g" % (uv[0], uv[1]))
                         fp.write(" ;\n")
                     fp.write(
 '    end Data\n' +
 '  end MeshTextureFaceLayer\n')
             elif key == 'TexVerts':
-                for f in faces:
-                    fp.write("    vt")
-                    for v in f:
-                        uv = obj.uvValues[v[1]]
-                        fp.write(" %.6g %.6g" %(uv[0], uv[1]))
-                    fp.write(" ;\n")
+                if human.uvsetFile:
+                    uvset = proxyData["__uvset__"]
+                    for ft in uvset.texFaces:
+                        fp.write("    vt")
+                        for vt in ft:
+                            uv = uvset.texVerts[vt]
+                            fp.write(" %.4g %.4g" %(uv[0], uv[1]))
+                        fp.write(" ;\n")
+                else:
+                    for f in faces:
+                        fp.write("    vt")
+                        for v in f:
+                            uv = obj.uvValues[v[1]]
+                            fp.write(" %.4g %.4g" %(uv[0], uv[1]))
+                        fp.write(" ;\n")
             elif key == 'Material':
                 fp.write("Material %s%s\n" % (the.Human, words[2]))
             elif key == 'Materials':
-                writeBaseMaterials(fp)
+                writeBaseMaterials(fp, human, proxyData)
             elif key == 'ProxyMaterials':
                 if proxy.useBaseMaterials:
-                    writeBaseMaterials(fp)
+                    writeBaseMaterials(fp, human, proxyData)
                 elif proxy.material:
                     fp.write("  Material %s%s ;\n" % (the.Human, proxy.material.name))
             elif key == 'VertexGroup':
@@ -373,11 +396,16 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
     return
 
 #
-#   writeBaseMaterials(fp):                    
+#   writeBaseMaterials(fp, human, proxyData):                    
 #
 
-def writeBaseMaterials(fp):                    
-    fp.write(
+def writeBaseMaterials(fp, human, proxyData):      
+    if human.uvsetFile:
+        uvset = proxyData["__uvset__"]
+        for mat in uvset.materials:
+            fp.write("  Material %s_%s ;\n" % (the.Human, mat.name))
+    else:
+        fp.write(
 "  Material %sSkin ;\n" % the.Human +
 "  Material %sMouth ;\n" % the.Human +
 "  Material %sEye ;\n" % the.Human +
@@ -1133,19 +1161,37 @@ def loadFacesIndices(obj):
     fileDescriptor.close()
     return vertsIdxs
 
-"""
 #
-#   Can not use the. face info in obj.faceGroups, because diamonds are not the.re
+#   writeMultiMaterials(uvset, human, fp):
 #
-def loadFacesIndices(obj):
-    faces = []
-    print(list(obj.faceGroups))
-    for fg in obj.faceGroups:
-        for f in fg.faces:
-            face = []
-            for i,v in enumerate(f.verts):   
-                face.append((v.idx, f.uv[i]))
-            faces.append(face)
-    return faces
-"""
+
+def writeMultiMaterials(uvset, human, fp):
+    folder = os.path.dirname(human.uvsetFile)
+    print("Folder", folder)
+    for mat in uvset.materials:
+        for tex in mat.textures:
+            name = os.path.basename(tex)
+            fp.write("Image %s\n" % name)
+            #file = export_config.getOutFileName(tex, "data/textures", True, human, the.Config)
+            file = os.path.join(folder, name)
+            fp.write(
+                "  Filename %s ;\n" % file +
+                "  use_premultiply True ;\n" +
+                "end Image\n" +
+                "Texture %s IMAGE\n" % name +
+                "  Image %s ;\n" % name +
+                "end Texture\n")
+            
+        fp.write("Material %s_%s\n" % (the.Human, mat.name))
+        n = 0
+        for tex in mat.textures:
+            fp.write(
+            "  MTex %d %s UV COLOR\n" % (n, name) +
+            "    texture Refer Texture %s ;\n" % name +
+            "    use_map_color_diffuse True ;\n" +
+            "    use_map_color_diffuse True ;\n" +
+            "  end MTex\n")
+        fp.write("end Material\n")
+    
+
 

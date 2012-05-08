@@ -18,8 +18,7 @@
 
 Abstract
 --------
-MakeHuman to Collada (MakeHuman eXchange format) exporter. Collada files can be loaded into
-Blender by collada_import.py.
+Read rig file
 
 TO DO
 

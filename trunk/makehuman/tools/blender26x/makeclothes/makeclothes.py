@@ -1,24 +1,31 @@
-""" 
-**Project Name:**      MakeHuman
+# ##### BEGIN GPL LICENSE BLOCK #####
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; either version 2
+#  of the License, or (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software Foundation,
+#  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# ##### END GPL LICENSE BLOCK #####
 
-**Product Home Page:** http://www.makehuman.org/
-
-**Code Home Page:**    http://code.google.com/p/makehuman/
-
-**Authors:**           Thomas Larsson
-
-**Copyright(c):**      MakeHuman Team 2001-2011
-
-**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
-
-**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
-
-Abstract
-Utility for making clothes to MH characters.
-
-For more info see: http://sites.google.com/site/makehumandocs/blender-export-and-mhx/making-clothes
-
-"""
+# Project Name:        MakeHuman
+# Product Home Page:   http://www.makehuman.org/
+# Code Home Page:      http://code.google.com/p/makehuman/
+# Authors:             Thomas Larsson
+# Script copyright (C) MakeHuman Team 2001-2011
+# Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
+#
+# Abstract
+# Utility for making clothes to MH characters.
+#
 
 import bpy
 import os
@@ -567,7 +574,7 @@ def printClothes(context, bob, pob, data):
             fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f %.5f %.5f\n" % (
                 verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], diff[0], diff[2], -diff[1]))
     fp.write('\n')
-    printMhcloUvLayers(fp, pob, scn)
+    printMhcloUvLayers(fp, pob, scn, True)
     fp.close()
     print("%s done" % outfile)    
     return
@@ -599,14 +606,15 @@ def printFaceNumbers(fp, ob):
     return
 
     
-def printMhcloUvLayers(fp, pob, scn):
+def printMhcloUvLayers(fp, pob, scn, hasObj):
     me = pob.data
     uvTexs = getUvTextures(me)
-    if uvTexs:
+    if uvTexs:      
         for layer,uvtex in enumerate(uvTexs):
-            if layer == scn.MCTextureLayer:
+            print(layer, uvtex)            
+            if hasObj and (layer == scn.MCTextureLayer):
                 continue
-            if scn.MCAllUVLayers:
+            if scn.MCAllUVLayers or not hasObj:
                 printLayer = layer
             else:
                 printLayer = 1
@@ -627,6 +635,7 @@ def printMhcloUvLayers(fp, pob, scn):
                 for n,v in enumerate(f.vertices):
                     (vt, uv) = uvVerts[n]
                     fp.write("%d " % vt)
+                    #fp.write("(%.3f %.3f) " % (uv[0], uv[1]))
                 fp.write("\n")
     return
     
@@ -666,7 +675,7 @@ def reexportMhclo(context):
                 fp.write(line)                
         elif not doingStuff:                
             fp.write(line)                
-    printMhcloUvLayers(fp, pob, scn)
+    printMhcloUvLayers(fp, pob, scn, True)
     fp.close()
     print("%s written" % outfile)    
     return
@@ -734,12 +743,10 @@ def printStuff(fp, pob, context):
         mat = me.materials[0]
         fp.write("# material %s\n" % mat.name)
         if useMats:
-            writeColor(fp, 'diffuse_color', mat.diffuse_color)
+            writeColor(fp, 'diffuse_color', mat.diffuse_color, mat.diffuse_intensity)
             fp.write('diffuse_shader %s\n' % mat.diffuse_shader)
-            fp.write('diffuse_intensity %.4f\n' % mat.diffuse_intensity)
-            writeColor(fp, 'specular_color', mat.specular_color)
+            writeColor(fp, 'specular_color', mat.specular_color, mat.specular_intensity)
             fp.write('specular_shader %s\n' % mat.specular_shader)
-            fp.write('specular_intensity %.4f\n' % mat.specular_intensity)
         if useBlender:
             (outpath, outfile) = getFileName(pob, context, "mhx")
             mhxfile = exportBlenderMaterial(me, outpath)
@@ -814,8 +821,8 @@ def writeObjTextureData(fp, me, texVerts, uvFaceVerts):
         fp.write("\n")
     return        
 
-def writeColor(fp, string, color):
-    fp.write("%s %.4f %.4f %.4f\n" % (string, color[0], color[1], color[2]))
+def writeColor(fp, string, color, intensity):
+    fp.write("%s %.4f %.4f %.4f\n" % (string, color[0]*intensity, color[1]*intensity, color[2]*intensity))
 
 def printScale(fp, bob, scn, name, index, prop1, prop2):
     verts = bob.data.vertices
@@ -904,7 +911,7 @@ def findTexVert(uv, vtn, f, faceNeighbors, uvFaceVerts, texVerts, ob):
     for (e,f1) in faceNeighbors[f.index]:
         for (vtn1,uv1) in uvFaceVerts[f1.index]:
             vec = uv - uv1
-            if vec.length < Epsilon:
+            if vec.length < 1e-8:
                 uvFaceVerts[f.index].append((vtn1,uv))                
                 return vtn
     uvFaceVerts[f.index].append((vtn,uv))
@@ -2312,6 +2319,7 @@ def saveDefaultSettings(context):
 #
 
 def checkBMeshAware(ob):
+    return
     global BMeshAware
     try:
         ob.data.faces
@@ -2322,15 +2330,23 @@ def checkBMeshAware(ob):
         print("Using BMesh")
     
 def getFaces(me):
-    if BMeshAware:
+    global BMeshAware
+    try:
+        BMeshAware = True
         return me.polygons
-    else:
+    except:
+        BMeshAware = False
         return me.faces
         
 def getUvTextures(me):
-    if BMeshAware:
+    global BMeshAware
+    try:
+        BMeshAware = True
+        me.polygons
         return me.uv_layers
-    else:
+    except:
+        BMeshAware = False
+        me.faces
         return me.uv_textures
 
 #

@@ -37,6 +37,7 @@
     ftn 714 7 1 ;
     ftn 2390 5 1 ;
 
+  *** EndFaces
   end Faces
   
   MeshTextureFaceLayer UVTex

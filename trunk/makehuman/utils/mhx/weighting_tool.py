@@ -22,6 +22,14 @@ import math
 from mathutils import *
 from bpy.props import *
 
+NBodyVertices = 15340
+
+def getFaces(me):
+    try:
+        return me.polygons
+    except:
+        return me.faces
+    
 #
 #    printVertNums(context):
 #    class VIEW3D_OT_PrintVnumsButton(bpy.types.Operator):
@@ -665,26 +673,70 @@ def recoverDiamonds(context):
         dob = ob
         ob = tmp
 
-    dverts = dob.data.vertices
-    verts = ob.data.vertices
-    Epsilon = 1e-4
-
-    context.scene.objects.active = dob
-    bpy.ops.object.vertex_group_remove(all=True)
+    vdiamond = {}
+    for v in dob.data.vertices:
+        vdiamond[v.index] = False
+    dfaces = getFaces(dob.data)
+    for f in dfaces:
+        if len(f.vertices) < 4:
+            for vn in f.vertices:
+                vdiamond[vn] = True
 
     vassoc = {}
-    dn = 0
-    for v in verts:
-        vec = dverts[dn].co - v.co
-        while vec.length > Epsilon:
-            dn += 1
-            vec = dverts[dn].co - v.co
-        vassoc[v.index] = dn
+    vedges = {}
+    vfaces = {}
+    vn = 0  
+    for dv in dob.data.vertices:
+        vedges[dv.index] = []
+        vfaces[dv.index] = []
+        if not vdiamond[dv.index]:
+            vassoc[vn] = dv.index
+            vn += 1
+
+    for de in dob.data.edges:
+        de.use_seam = False
+        de.select = False
+        dvn0 = de.vertices[0]
+        vedges[dvn0].append(de)
+        dvn1 = de.vertices[1]
+        vedges[dvn1].append(de)
+        
+    for df in dfaces:
+        for dvn in df.vertices:
+            vfaces[dvn].append(df)
+
+    for e in ob.data.edges:
+        dvn0 = vassoc[e.vertices[0]]
+        dvn1 = vassoc[e.vertices[1]]
+        for de in vedges[dvn0]:
+            if dvn1 in de.vertices:
+                de.select = e.use_seam
+                de.use_seam = e.use_seam
+                #if e.use_seam:
+                #    print(e.index, de.index)
+                break
+     
+    faces = getFaces(ob.data)
+    for f in faces:        
+        dverts = []
+        for vn in f.vertices:
+            dverts.append(vassoc[vn])            
+        for df in vfaces[dverts[0]]:
+            for dvn in dverts:
+                if dvn not in df.vertices:
+                    continue            
+            df.material_index = f.material_index   
+            print(f.index, df.index, df.material_index)
+            break
+        
+    context.scene.objects.active = dob
+    return
+    bpy.ops.object.vertex_group_remove(all=True)
 
     for grp in ob.vertex_groups:
         group = dob.vertex_groups.new(grp.name)
         index = group.index
-        for v in verts:    
+        for v in ob.data.vertices:    
             for vgrp in v.groups:
                 if vgrp.group == index:
                     dn = vassoc[v.index]
