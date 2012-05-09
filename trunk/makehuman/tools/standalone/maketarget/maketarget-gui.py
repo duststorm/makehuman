@@ -27,12 +27,21 @@ Abstract
 This is a GUI (Graphical User Interface) for the commandline maketarget tool.
 """
 
+## CONFIG ##
+
+DEBUG = False    # Debug mode (no masking of exceptions)
+
+############
+
+
+
 import maketarget
 import sys, os
 
 if __name__ == "__main__" and len(sys.argv) > 1:
     # Run commandline version
     try:
+        print "MakeTarget (v%s)"% str(maketarget.VERSION)
         maketarget.main(sys.argv[1:])
         print "All done"
         sys.exit()
@@ -53,9 +62,9 @@ if __name__ == "__main__" and len(sys.argv) > 1:
         print "Error: "+msg
         sys.exit(errorCode)
 else:
-	# Import GUI dependencies
-	import wx
-	from wx import xrc
+    # Import GUI dependencies
+    import wx
+    from wx import xrc
 
 
 class MakeTargetGUI(wx.App):
@@ -89,8 +98,13 @@ class MakeTargetGUI(wx.App):
         
         # Set title bar icon
         if os.path.isfile("resources/makehuman.ico"):
-        	loc = wx.IconLocation(r'resources/makehuman.ico', 0)
-	        self.frame.SetIcon(wx.IconFromLocation(loc))
+            loc = wx.IconLocation(r'resources/makehuman.ico', 0)
+            self.frame.SetIcon(wx.IconFromLocation(loc))
+            
+        if DEBUG:
+            self.frame.SetTitle("MakeTarget (v%s) (DEBUG mode)"% str(maketarget.VERSION))
+        else:
+            self.frame.SetTitle("MakeTarget (v%s)"% str(maketarget.VERSION))
         
         self.status = xrc.XRCCTRL(self.panel, 'status_label')
         
@@ -293,27 +307,36 @@ class MakeTargetGUI(wx.App):
         if self.outputObj:
             args.append("--obj")
         
-        try:
+        ## for DEBUGging
+        if DEBUG:
+            args.append("--verbose")
+            print "MakeTarget (v%s)"% str(maketarget.VERSION)
             maketarget.main(args)
-        except Exception as e:
-            # Error handling: retrieve error message
-            if hasattr(e, "errCode"):
-                errorCode = e.errCode
-            else:
-                errorCode = -1
+            wx.MessageBox("Operation completed", 'Success', wx.OK)
+        ###
+        else:
+            try:
+                maketarget.main(args)
+                wx.MessageBox("Operation completed", 'Success', wx.OK)
+            except Exception as e:
+                # Error handling: retrieve error message
+                if hasattr(e, "errCode"):
+                    errorCode = e.errCode
+                else:
+                    errorCode = -1
+                    
+                if hasattr(e, "ownMsg"):
+                    msg = e.ownMsg
+                elif hasattr(e, "msg"):
+                    msg = e.msg
+                else:
+                    msg = str(e)
                 
-            if hasattr(e, "ownMsg"):
-                msg = e.ownMsg
-            elif hasattr(e, "msg"):
-                msg = e.msg
-            else:
-                msg = str(e)
-            
-            if errorCode == 2:
-                # Show commandline context if error is argument error
-                msg = msg + "\n\nUsed command: \nmaketarget "+ " ".join(args)
+                if errorCode == 2:
+                    # Show commandline context if error is argument error
+                    msg = msg + "\n\nUsed command: \nmaketarget "+ " ".join(args)
 
-            wx.MessageBox(msg, 'Error', wx.OK | wx.ICON_ERROR)
+                wx.MessageBox(msg, 'Error', wx.OK | wx.ICON_ERROR)
             
 
 if __name__ == '__main__':

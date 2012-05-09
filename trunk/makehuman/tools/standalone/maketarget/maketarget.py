@@ -29,19 +29,19 @@ This is a commandline version implementing the basic MakeTarget functionality.
 For more info on the usage of this tool, see usage()
 """
 
-import getopt, sys, os, glob, shutil
-
-from maketargetlib import *
-
-
-
 ## CONFIG ##
 
-BASE_OBJ_PATH = "../../../data/3dobjs/base.obj"
+BASE_OBJ_SVN_PATH = "../../../data/3dobjs/base.obj"
 
 DEBUG = False    # Debug mode (no masking of exceptions)
 
 ############
+
+
+
+import getopt, sys, os, glob, shutil
+
+from maketargetlib import *
 
 
 def usage():
@@ -117,15 +117,31 @@ def backupIfExists(path):
     shutil.move(path, backupPath)
     return backupPath
     
+    
+BASE_OBJ = False  # Globally stored base.obj
+
 def getBaseObj():
     '''Load and return a copy of the base.obj file.'''
-    # TODO make this more efficient by using copy operator, instead of reading the file multiple times
-    try:
-        return Obj(BASE_OBJ_PATH)
-    except IOError:
-        e = Exception("Failed to load base OBJ from %s. Set the script's BASE_OBJ_PATH correctly."% BASE_OBJ_PATH)
-        e.errCode = -1
-        raise e
+    global BASE_OBJ
+    
+    if not BASE_OBJ:
+        # Only read base.obj once, then return a deep copy of the obj in memory
+        try:
+            # First try to get obj from path in svn, otherwise fall back on local base.obj in resources/
+            if os.path.isfile(BASE_OBJ_SVN_PATH):
+                verbosePrint("Using base.obj in svn at location %s"% BASE_OBJ_SVN_PATH)
+                BASE_OBJ = Obj(BASE_OBJ_SVN_PATH)
+            else:
+                verbosePrint("Using local base.obj at location %s"% os.path.join("resources", "base.obj"))
+                BASE_OBJ = Obj(os.path.join("resources", "base.obj"))
+        except IOError:
+            e = Exception("Failed to load base OBJ from %s."% os.path.join("resources", "base.obj"))
+            e.errCode = -1
+            raise e
+
+    # Uses a custom copy constructor as deep copying is very slow (slower than loading the file from disk)
+    return Obj(BASE_OBJ)
+    
    
 def isTargetFile(filePath):
     '''Determines whether file path points to file with .target extension.'''
@@ -160,7 +176,7 @@ def performAdditionalCalculations(obj):
 def processInputObj(obj, outputFile):
     '''Process input obj to output file. obj can either be an Obj instance
     or a str pointing to the obj file location.'''
-    if isinstance(obj, str):
+    if isinstance(obj, basestring):
         obj = Obj(obj)
         
     performAdditionalCalculations(obj)
@@ -180,7 +196,7 @@ def processInputObj(obj, outputFile):
         
 def processInputTarget(inputTarget, outputPath):
     '''Process input target.'''
-    if isinstance(inputTarget, str):
+    if isinstance(inputTarget, basestring):
         inputTarget = Target(inputTarget)
     
     # Apply input target on base
@@ -366,7 +382,7 @@ def sanityCheckInput():
         e.errCode = 2
         raise e
     if not outputObj and not inputObjDir and not inputObj and not inputTarget and len(targetsToAdd) == 1 and not targetsToSubtract:
-    	e = Exception("This command does nothing useful. It's the same as maketarget.py --i %s --out %s"% (targetsToAdd[0], outputPath))
+        e = Exception("This command does nothing useful. It's the same as maketarget.py --i %s --out %s"% (targetsToAdd[0], outputPath))
         e.errCode = 2
         raise e
             
@@ -407,7 +423,7 @@ def verboseDetailProcess():
 def main(args):
     '''Main method of the commandline program.'''
     global outputExtension, base
-      
+    
     parseArguments(args)
        
     sanityCheckInput()
@@ -444,6 +460,8 @@ def main(args):
         
         
 if __name__ == "__main__":
+    print "MakeTarget (v%s)"% str(VERSION)
+
     ## for DEBUGging
     if DEBUG:
         main(sys.argv[1:])

@@ -35,8 +35,11 @@ IF NOT EXIST "..\dist" mkdir "..\dist"
 copy maketarget\dist\maketarget.exe ..\dist
 copy ..\maketarget.xrc ..\dist
 
+:: Copy needed resource files from svn checkout to dist\ folder
 IF NOT EXIST "..\dist\resources" mkdir "..\dist\resources"
 copy ..\resources\*png ..\dist\resources
 copy %iconpath% ..\dist\resources
+copy ..\..\..\..\data\3dobjs\base.obj ..\dist\resources
+copy ..\..\..\..\license.txt ..\dist
 
 cd ..

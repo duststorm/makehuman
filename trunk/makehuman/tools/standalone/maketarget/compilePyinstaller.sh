@@ -33,12 +33,14 @@ fi
 cp maketarget/dist/maketarget ../dist
 cp ../maketarget.xrc ../dist
 
+# Copy needed resource files from svn checkout to dist/ folder
 if [[ ! -e ../dist/resources ]]; then
 	mkdir ../dist/resources
 fi
 
 cp ../resources/*png ../dist/resources
 cp ../resources/makehuman.ico ../dist/resources
-
+cp ../../../../data/3dobjs/base.obj ../dist/resources
+cp ../../../../license.txt ../dist
 
 popd

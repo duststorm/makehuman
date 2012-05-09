@@ -28,6 +28,9 @@ This library implements base functionality used by the standalone maketarget
 tool.
 """
 
+'''The global version for the entire tool.'''
+VERSION = "1.0"
+
 class Vector3(object):
     '''Simple 3D vector class.'''
     
@@ -37,11 +40,19 @@ class Vector3(object):
         self.y = 0
         self.z = 0
         
-    def __init__(self, x, y, z):
-        '''Construct vector (x,y,z).'''
-        self.x = x
-        self.y = y
-        self.z = z
+    def __init__(self, x, y=None, z=None):
+        '''Construct vector (x,y,z).
+        If the first argument is another Vector3 instance this acts as
+        copy constructor.'''
+        if isinstance(x, Vector3):
+            # Copy constructor
+            self.x = x.x
+            self.y = x.y
+            self.z = x.z
+        else:
+            self.x = x
+            self.y = y
+            self.z = z
     
     def __eq__(self, other):
         '''Equals operator'''
@@ -93,10 +104,18 @@ class Obj(object):
     are only used. Maintains a ref to the file it was loaded from.'''
     
     def __init__(self, path):
-        '''Create a wavefront obj by loading it from a file at specified path.'''
-        self.filepath = path
-        self.verts = list()
-        self._loadVerts(path)
+        '''Create a wavefront obj by loading it from a file at specified path.
+        If path is another Obj instance, this acts as copy constructor.'''
+        if isinstance(path, Obj):
+            # Copy constructor
+            self.filepath = path.filepath
+            self.verts = list()
+            for v in path.verts:
+                self.verts.append( Vector3(v) )
+        else:
+            self.filepath = path
+            self.verts = list()
+            self._loadVerts(path)
         
     def getNbVerts(self):
         '''The number of vertices in this obj.'''
