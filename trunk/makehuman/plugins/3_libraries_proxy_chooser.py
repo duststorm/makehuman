@@ -39,9 +39,14 @@ class ProxyTaskView(gui3d.TaskView):
 
             gui3d.app.switchCategory('Modelling')
         
-    def setProxy(self, human, proxy):
+    def setProxy(self, human, filename):
 
-        human.setProxy(mh2proxy.readProxyFile(human.getSeedMesh(), proxy, False))
+        if os.path.basename(filename) == "clear.proxy":
+            human.setProxy(None)
+            return
+
+        proxy = mh2proxy.readProxyFile(human.getSeedMesh(), filename, False)        
+        human.setProxy(proxy)
 
     def onShow(self, event):
         # When the task gets shown, set the focus to the file chooser
@@ -68,14 +73,12 @@ class ProxyTaskView(gui3d.TaskView):
 
     def loadHandler(self, human, values):
         
-	(fname, ext) = os.path.splitext(values[1])
-        path = export_config.findExistingProxyFile("proxymeshes", None, "%s.proxy" % fname)        	
-        self.setProxy(human, path)
+        self.setProxy(human, values[1])
         
     def saveHandler(self, human, file):
         
         if human.proxy:
-            file.write('proxy %s\n' % human.proxy.name.lower())
+            file.write('proxy %s\n' % human.proxy.file)
 
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements

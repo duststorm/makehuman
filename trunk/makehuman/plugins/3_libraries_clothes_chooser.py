@@ -81,8 +81,7 @@ class ClothesTaskView(gui3d.TaskView):
         clo.mesh.setSolid(human.mesh.solid)
         clo.mesh.setTransparentPrimitives(len(clo.mesh.faces))
         clo.mesh.originalClothesVerts = [v.co[:] for v in clo.mesh.verts]
-        human.clothesObjs[proxy.name] = clo
-        
+        human.clothesObjs[proxy.name] = clo        
         human.clothesProxies[proxy.name] = proxy
 
         self.adaptClothesToHuman(human)
@@ -138,17 +137,18 @@ class ClothesTaskView(gui3d.TaskView):
         #clothesRelPath = os.path.join(values[1].replace('.obj', ''), values[1].replace('.obj', '.mhclo'))
         #clothesPath = os.path.join(self.userClothes, clothesRelPath)
         #if not os.path.isfile(clothesPath):
-        #	clothesPath = os.path.join(self.systemClothes, clothesRelPath)
+        #   clothesPath = os.path.join(self.systemClothes, clothesRelPath)
 
-	(fname, ext) = os.path.splitext(values[1])
-        clothesPath = export_config.findExistingProxyFile("clothes", None, "%s.mhclo" % fname)        	
-        self.setClothes(human, clothesPath)
+        #(fname, ext) = os.path.splitext(values[1])
+        #clothesPath = export_config.findExistingProxyFile("clothes", None, "%s.mhclo" % fname)         
+        self.setClothes(human, values[1])
         
     def saveHandler(self, human, file):
         
-        for clo in human.clothesObjs.values():
+        for (name,clo) in human.clothesObjs.items():
             if clo:
-                file.write('clothes %s\n' % clo.mesh.name)
+                proxy = human.clothesProxies[name]
+                file.write('clothes %s\n' % proxy.file)
                 
     def syncMedia(self):
         

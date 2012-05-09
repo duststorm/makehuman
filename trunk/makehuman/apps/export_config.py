@@ -136,7 +136,7 @@ class CProxyFile:
 #
 #   exportConfig(human, useHair, options=None):
 #
-
+"""
 def findExistingProxyFile(ptype, subfolder, fname):
     folder = os.path.join(mh.getPath(''), 'data', ptype)
     path = findExistingProxyFile1(folder, subfolder, fname, 4)
@@ -170,6 +170,7 @@ def findExistingProxyFile1(folder, subfolder, fname, depth):
             if path:
                 return path
     return None                
+"""
 
 def exportConfig(human, useHair, options=None):
     cfg = CExportConfig()
@@ -199,27 +200,31 @@ def exportConfig(human, useHair, options=None):
     else:    
         fp = proxyFilePtr('mh_export.config')
 
-    if useHair and human.hairObj:
+    if useHair and human.hairProxy:
         words = human.hairObj.mesh.name.split('.')
         pfile = CProxyFile()
         pfile.set('Clothes', 2, useMhx, useObj, useDae)
         name = goodName(words[0])
-        pfile.file = findExistingProxyFile("hairstyles", None, "%s.mhclo" % name)
+        #pfile.file = findExistingProxyFile("hairstyles", None, "%s.mhclo" % name)
+        pfile.file = human.hairProxy.file
         cfg.proxyList.append(pfile)
 
-    for (name,clo) in human.clothesObjs.items():
+    for (key,clo) in human.clothesObjs.items():
         if clo:
-            name = goodName(name)
+            name = goodName(key)
             pfile = CProxyFile()
             pfile.set('Clothes', 3, useMhx, useObj, useDae)            
-            pfile.file = findExistingProxyFile("clothes", name, "%s.mhclo" % name)
+            #pfile.file = findExistingProxyFile("clothes", name, "%s.mhclo" % name)
+            proxy = human.clothesProxies[key]
+            pfile.file = proxy.file
             cfg.proxyList.append(pfile)
             
     if human.proxy:
         name = goodName(human.proxy.name)
         pfile = CProxyFile()
         pfile.set('Proxy', 4, useMhx, useObj, useDae)
-        pfile.file = findExistingProxyFile("proxymeshes", name, "%s.proxy" % name)
+        #pfile.file = findExistingProxyFile("proxymeshes", name, "%s.proxy" % name)
+        pfile.file = human.proxy.file
         cfg.proxyList.append(pfile)    
 
     if cfg.cage:

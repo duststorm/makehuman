@@ -63,15 +63,17 @@ class HairTaskView(gui3d.TaskView):
 
     def setHair(self, human, obj, mhclo):
 
-        tif = obj.replace('.obj', '_texture.tif')
-        
         if human.hairObj:
             gui3d.app.removeObject(human.hairObj)
             human.hairObj = None
             human.hairProxy = None
 
+        if os.path.basename(obj) == "clear.obj":
+            return
+            
         mesh = files3d.loadMesh(obj)
         if mesh:
+            tif = obj.replace('.obj', '_texture.tif')        
             mesh.setTexture(tif)        
             human.hairObj = gui3d.app.addObject(gui3d.Object(human.getPosition(), mesh))
             human.hairObj.setRotation(human.getRotation())
@@ -94,28 +96,6 @@ class HairTaskView(gui3d.TaskView):
             
             mesh = human.hairObj.getSeedMesh()
             human.hairProxy.update(mesh, human.meshData)
-            
-            """
-                headNames = [group.name for group in human.meshData.faceGroups if ("head" in group.name or "jaw" in group.name or "nose" in group.name or "mouth" in group.name or "ear" in group.name or "eye" in group.name)]
-                headVertices = human.meshData.getVerticesAndFacesForGroups(headNames)[0]
-                headBBox = calcBBox(headVertices)
-            
-                headCentroid = in2pts(headBBox[0], headBBox[1], 0.5)
-                delta = vsub(headCentroid, self.oHeadCentroid)
-            
-                sx = (headBBox[1][0]-headBBox[0][0])/float(self.oHeadBBox[1][0]-self.oHeadBBox[0][0])
-                sy = (headBBox[1][1]-headBBox[0][1])/float(self.oHeadBBox[1][1]-self.oHeadBBox[0][1])
-                sz = (headBBox[1][2]-headBBox[0][2])/float(self.oHeadBBox[1][2]-self.oHeadBBox[0][2])
-            
-                mesh = human.hairObj.getSeedMesh()
-                for i, v in enumerate(mesh.verts):
-                    co = vsub(mesh.originalHairVerts[i], headCentroid)
-                    co[0] *= sx
-                    co[1] *= sy
-                    co[2] *= sz
-                    v.co = vadd(vadd(co, headCentroid), delta)
-            """
-            
             mesh.update()
             if human.hairObj.isSubdivided():
                 human.hairObj.getSubdivisionMesh()
@@ -151,15 +131,14 @@ class HairTaskView(gui3d.TaskView):
 
     def loadHandler(self, human, values):
         
-        (fname, ext) = os.path.splitext(values[1])
-        mhclo = export_config.findExistingProxyFile("hairstyles", None, "%s.mhclo" % fname)          
+        mhclo = values[1]
         obj = mhclo.replace(".mhclo", ".obj")
         self.setHair(human, obj, mhclo)
         
     def saveHandler(self, human, file):
         
-        if human.hairObj:
-            file.write('hair %s\n' % human.hairObj.mesh.name)
+        if human.hairProxy:
+            file.write('hair %s\n' % human.hairProxy.file)
 
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements

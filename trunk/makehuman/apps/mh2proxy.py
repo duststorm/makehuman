@@ -33,9 +33,10 @@ import read_rig, mhx_rig, mhx_main
 #
 
 class CProxy:
-    def __init__(self, typ, layer):
+    def __init__(self, file, typ, layer):
         self.name = None
         self.type = typ
+        self.file = file
         self.z_depth = 50
         self.layer = layer
         self.material = CMaterial()
@@ -150,7 +151,7 @@ doTexFaces = 9
 
 def readProxyFile(obj, file, evalOnLoad):
     if not file:
-        return CProxy('Proxy', 2)
+        return CProxy(None, 'Proxy', 2)
     elif type(file) == str or type(file) == unicode:
         pfile = export_config.CProxyFile()
         pfile.file = file
@@ -167,12 +168,12 @@ def readProxyFile(obj, file, evalOnLoad):
     if tmpl == None:
         print("*** Cannot open", pfile.file)
         return None
-        return CProxy(pfile.type, pfile.layer)
+        return CProxy(None, pfile.type, pfile.layer)
 
     verts = obj.verts
     locations = {}
     tails = {}
-    proxy = CProxy(pfile.type, pfile.layer)
+    proxy = CProxy(pfile.file, pfile.type, pfile.layer)
     proxy.name = "MyProxy"
 
     useProjection = True
