@@ -27,11 +27,36 @@ Abstract
 This is a GUI (Graphical User Interface) for the commandline maketarget tool.
 """
 
-import wx
-from wx import xrc
-import os
-
 import maketarget
+import sys, os
+
+if __name__ == "__main__" and len(sys.argv) > 1:
+    # Run commandline version
+    try:
+        maketarget.main(sys.argv[1:])
+        print "All done"
+        sys.exit()
+    except Exception as e:
+        # Error handling: print message to terminal
+        if hasattr(e, "errCode"):
+            errorCode = e.errCode
+        else:
+            errorCode = -1
+            
+        if hasattr(e, "ownMsg"):
+            msg = e.ownMsg
+        elif hasattr(e, "msg"):
+            msg = e.msg
+        else:
+            msg = str(e)
+
+        print "Error: "+msg
+        sys.exit(errorCode)
+else:
+	# Import GUI dependencies
+	import wx
+	from wx import xrc
+
 
 class MakeTargetGUI(wx.App):
 
