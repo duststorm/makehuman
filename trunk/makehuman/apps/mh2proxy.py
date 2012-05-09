@@ -117,6 +117,12 @@ class CMaterial:
         self.textures = []
         
         return
+        
+        
+class CTexture:
+    def __init__(self, fname):
+        self.file = fname
+        self.types = []   
                 
 
 def getFileName(folder, file, suffix):
@@ -150,7 +156,7 @@ def readProxyFile(obj, file, evalOnLoad):
         pfile.file = file
     else:
         pfile = file
-    print "Loading", pfile
+    #print("Loading", pfile)
     folder = os.path.dirname(pfile.file)
     objfile = None
     
@@ -159,7 +165,7 @@ def readProxyFile(obj, file, evalOnLoad):
     except:
         tmpl = None
     if tmpl == None:
-        print "*** Cannot open", pfile.file
+        print("*** Cannot open", pfile.file)
         return None
         return CProxy(pfile.type, pfile.layer)
 
@@ -361,7 +367,7 @@ def readProxyFile(obj, file, evalOnLoad):
         elif status == doTexFaces:
             newTexFace(words, proxy)
         elif status == doMaterial:
-            readMaterial(line, proxy.material, proxy)
+            readMaterial(line, proxy.material, proxy, False)
         elif status == doWeights:
             v = int(words[0])
             w = float(words[1])
@@ -385,7 +391,7 @@ def copyObjFile(proxy):
     try:
         tmpl = open(objpath, "rU")
     except:
-        print "*** Cannot open %s" % objpath
+        print("*** Cannot open %s" % objpath)
         return False
 
     proxy.texVerts = []
@@ -419,10 +425,10 @@ def getScale(words, verts, index):
     return num/den
 
 #
-#    readMaterial(line, mat, proxy):
+#    readMaterial(line, mat, proxy, multiTex):
 #
 
-def readMaterial(line, mat, proxy):
+def readMaterial(line, mat, proxy, multiTex):
     words= line.split()
     key = words[0]
     if key in ['diffuse_color', 'specular_color', 'ambient', 'emit']:
@@ -441,9 +447,17 @@ def readMaterial(line, mat, proxy):
     elif key in ['use_alpha']:
         mat.textureSettings.append( (key, int(words[1])) )
     elif key == 'texture':
-        tex = os.path.realpath(os.path.expanduser(words[1]))
-        proxy.texture = os.path.split(tex)
-        mat.textures.append(tex)
+        fname = os.path.realpath(os.path.expanduser(words[1]))
+        if multiTex:
+            tex = CTexture(fname)
+            nmax = len(words)
+            n = 2
+            while n < nmax:
+                tex.types.append((words[n], words[n+1]))
+                n += 2
+            mat.textures.append(tex)
+        else:
+            proxy.texture = os.path.split(fname)
     else:
         raise NameError("Material %s?" % key)
     if key == 'alpha':
@@ -490,7 +504,7 @@ def readUvset(filename):
             elif words[1] == "texFaces":
                 status = doTexFaces
         elif status == doMaterial:
-            readMaterial(line, mat, uvset)
+            readMaterial(line, mat, uvset, True)
         elif status == doFaceNumbers:
             uvset.faceNumbers.append(line)
         elif status == doTexVerts:

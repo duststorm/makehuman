@@ -53,45 +53,33 @@ def exportUVs(context):
         fp.write("# material %s\n" % mat.name)
         makeclothes.writeColor(fp, '  diffuse_color', mat.diffuse_color, mat.diffuse_intensity)
         makeclothes.writeColor(fp, '  specular_color', mat.specular_color, mat.specular_intensity)
+        fp.write("  alpha %.3g\n" % mat.alpha)
         for mtex in mat.texture_slots:
             if mtex:
                 print(mat.name, mtex.name)
                 tex = mtex.texture
-                fp.write("  texture %s\n" % tex.image.name)
-                #fp.write("    image %s\n" % os.path.basename(tex.image.filepath))
+                fp.write("  texture %s" % tex.image.name)
+                if mtex.use_map_color_diffuse:
+                    fp.write(" diffuse %.3g" % mtex.diffuse_color_factor)
+                if mtex.use_map_specular:
+                    fp.write(" specular %.3g" % mtex.specular_factor)
+                if mtex.use_map_alpha:
+                    fp.write(" alpha %.3g" % mtex.alpha_factor)
+                if mtex.use_map_translucency:
+                    fp.write(" translucency %.3g" % mtex.translucency_factor)
+                if mtex.use_map_normal:
+                    fp.write(" bump %.3g" % mtex.normal_factor)
+                if mtex.use_map_displacement:
+                    fp.write(" displacement %.3g" % mtex.displacement_factor)
+                fp.write("\n")        
     
     makeclothes.printFaceNumbers(fp, ob)    
     makeclothes.printMhcloUvLayers(fp, ob, scn, False)
-    #printSimpleTexFaces(fp, ob)
     fp.close()
     print("File %s written" % outfile)
     return
+
     
-    
-def printSimpleTexFaces(fp, ob):
-    faces = makeclothes.getFaces(ob.data)
-    if makeclothes.BMeshAware:
-        pass
-    else:
-        uvtex = ob.data.uv_textures[0]
-        fp.write("# texVerts\n")
-        for f in faces:
-            uvf = uvtex.data[f.index]
-            writeTexVert(fp, uvf.uv1)
-            writeTexVert(fp, uvf.uv2)
-            writeTexVert(fp, uvf.uv3)
-            if len(f.vertices) == 4:
-                writeTexVert(fp, uvf.uv4)
-        n = 0
-        fp.write("# texFaces\n")
-        for f in faces:
-            if len(f.vertices) == 3:
-                fp.write("%d %d %d\n" % (n, n+1, n+2))
-                n += 3
-            else:
-                fp.write("%d %d %d %d\n" % (n, n+1, n+2, n+3))
-                n += 4
-    return
     
     
 def writeTexVert(fp, uv):

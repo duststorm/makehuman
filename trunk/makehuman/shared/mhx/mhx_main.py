@@ -1164,34 +1164,65 @@ def loadFacesIndices(obj):
 #
 #   writeMultiMaterials(uvset, human, fp):
 #
+        
+TexInfo = {
+    "diffuse" :     ("COLOR", "use_map_color_diffuse", "diffuse_color_factor", 1.0, False),
+    "specular" :    ("SPECULAR", "use_map_specular", "specular_factor", 1.0, True),
+    "alpha" :       ("ALPHA", "use_map_alpha", "alpha_factor", 1.0, True),
+    "translucency": ("TRANSLUCENCY", "use_map_translucency", "translucency_factor", 1.0, True),
+    "bump" :        ("NORMAL", "use_map_normal", "normal_factor", 0.1, True),
+    "displacement": ("DISPLACEMENT", "use_map_displacement", "displacement_factor", 0.1, True),
+}    
 
 def writeMultiMaterials(uvset, human, fp):
     folder = os.path.dirname(human.uvsetFile)
     print("Folder", folder)
     for mat in uvset.materials:
         for tex in mat.textures:
-            name = os.path.basename(tex)
+            name = os.path.basename(tex.file)
             fp.write("Image %s\n" % name)
             #file = export_config.getOutFileName(tex, "data/textures", True, human, the.Config)
             file = os.path.join(folder, name)
             fp.write(
                 "  Filename %s ;\n" % file +
                 "  use_premultiply True ;\n" +
-                "end Image\n" +
+                "end Image\n\n" +
                 "Texture %s IMAGE\n" % name +
                 "  Image %s ;\n" % name +
-                "end Texture\n")
+                "end Texture\n\n")
             
         fp.write("Material %s_%s\n" % (the.Human, mat.name))
+        for (key, value) in mat.settings:
+            if key == "alpha":
+                fp.write(
+                "  use_transparency True ;\n" +
+                "  alpha %s ;\n" % value)
         n = 0
         for tex in mat.textures:
+            name = os.path.basename(tex.file)
+            if len(tex.types) > 0:
+                (key, value) = tex.types[0]
+            else:
+                (key, value) = ("diffuse", "1")
+            (type, use, factor, multiplier, bw) = TexInfo[key]
+            diffuse = False
             fp.write(
-            "  MTex %d %s UV COLOR\n" % (n, name) +
-            "    texture Refer Texture %s ;\n" % name +
-            "    use_map_color_diffuse True ;\n" +
-            "    use_map_color_diffuse True ;\n" +
-            "  end MTex\n")
-        fp.write("end Material\n")
+                "  MTex %d %s UV %s\n" % (n, name, type) +
+                "    texture Refer Texture %s ;\n" % name)            
+            for (key, value) in tex.types:
+                (type, use, factor, multiplier, bw) = TexInfo[key]
+                fp.write(
+                "    %s True ;\n" % use +
+                "    %s %.3g ;\n" % (factor, eval(value)*multiplier))
+                fp.write("    use_rgb_to_intensity %s ;\n" % bw)
+                if key == "diffuse":
+                    diffuse = True
+            if not diffuse:
+                fp.write("    use_map_color_diffuse False ;\n")
+            fp.write("  end MTex\n")
+            n += 1
+        fp.write("end Material\n\n")
+    
     
 
 
