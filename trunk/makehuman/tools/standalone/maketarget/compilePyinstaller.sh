@@ -38,6 +38,7 @@ if [[ ! -e ../dist/resources ]]; then
 fi
 
 cp ../resources/*png ../dist/resources
+cp ../resources/makehuman.ico ../dist/resources
 
 
 popd

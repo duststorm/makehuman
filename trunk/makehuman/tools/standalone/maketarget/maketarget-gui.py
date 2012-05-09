@@ -87,6 +87,11 @@ class MakeTargetGUI(wx.App):
         self.frame.Layout()
         self.panel.Layout()
         
+        # Set title bar icon
+        if os.path.isfile("resources/makehuman.ico"):
+        	loc = wx.IconLocation(r'resources/makehuman.ico', 0)
+	        self.frame.SetIcon(wx.IconFromLocation(loc))
+        
         self.status = xrc.XRCCTRL(self.panel, 'status_label')
         
         self.inputTypeRadio = xrc.XRCCTRL(self.panel, 'input_type')

@@ -11,15 +11,23 @@
 :: NOTE: you will need at least UPX 1.92 beta due to incompatibilites
 :: with the Visual Studio compiler, with which newer versions of python are 
 :: compiled on windows.
+:: You also need the wxPython 2.8 package for windows.
 ::
-:: Remove the --windowed parameter for debugging.
+:: Remove the --windowed parameter for debugging or for enabling cmd version.
 
 cd pyinstaller
 
 c:\python27\python.exe Configure.py
 
-c:\python27\python.exe Makespec.py --onefile --windowed --upx --name=maketarget ..\maketarget-gui.py
-
+:: Adding an icon file that does not exist results in a corrupted .exe
+set iconpath=..\resources\makehuman.ico
+IF EXIST %iconpath% (
+	:: Remove the --windowed parameter if you need a version that works on cmdline
+	c:\python27\python.exe Makespec.py --onefile --windowed --upx --name=maketarget --icon=%iconpath% ..\maketarget-gui.py
+) ELSE (
+	:: Remove the --windowed parameter if you need a version that works on cmdline
+	c:\python27\python.exe Makespec.py --onefile --windowed --upx --name=maketarget ..\maketarget-gui.py
+)
 c:\python27\python.exe Build.py maketarget\maketarget.spec
 
 IF NOT EXIST "..\dist" mkdir "..\dist"
@@ -29,5 +37,6 @@ copy ..\maketarget.xrc ..\dist
 
 IF NOT EXIST "..\dist\resources" mkdir "..\dist\resources"
 copy ..\resources\*png ..\dist\resources
+copy %iconpath% ..\dist\resources
 
 cd ..
