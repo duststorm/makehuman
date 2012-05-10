@@ -743,9 +743,9 @@ def printStuff(fp, pob, context):
         mat = me.materials[0]
         fp.write("# material %s\n" % mat.name)
         if useMats:
-            writeColor(fp, 'diffuse_color', mat.diffuse_color, mat.diffuse_intensity)
+            writeColor(fp, 'diffuse_color', 'diffuse_intensity', mat.diffuse_color, mat.diffuse_intensity)
             fp.write('diffuse_shader %s\n' % mat.diffuse_shader)
-            writeColor(fp, 'specular_color', mat.specular_color, mat.specular_intensity)
+            writeColor(fp, 'specular_color', 'specular_intensity', mat.specular_color, mat.specular_intensity)
             fp.write('specular_shader %s\n' % mat.specular_shader)
         if useBlender:
             (outpath, outfile) = getFileName(pob, context, "mhx")
@@ -821,8 +821,10 @@ def writeObjTextureData(fp, me, texVerts, uvFaceVerts):
         fp.write("\n")
     return        
 
-def writeColor(fp, string, color, intensity):
-    fp.write("%s %.4f %.4f %.4f\n" % (string, color[0]*intensity, color[1]*intensity, color[2]*intensity))
+def writeColor(fp, string1, string2, color, intensity):
+    fp.write(
+    	"%s %.4f %.4f %.4f\n" % (string1, color[0], color[1], color[2]) +
+    	"%s %.4g\n" % (string2, intensity))
 
 def printScale(fp, bob, scn, name, index, prop1, prop2):
     verts = bob.data.vertices

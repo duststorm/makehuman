@@ -51,8 +51,8 @@ def exportUVs(context):
     
     for mat in ob.data.materials:
         fp.write("# material %s\n" % mat.name)
-        makeclothes.writeColor(fp, '  diffuse_color', mat.diffuse_color, mat.diffuse_intensity)
-        makeclothes.writeColor(fp, '  specular_color', mat.specular_color, mat.specular_intensity)
+        makeclothes.writeColor(fp, '  diffuse_color', '  diffuse_intensity', mat.diffuse_color, mat.diffuse_intensity)
+        makeclothes.writeColor(fp, '  specular_color', '  specular_intensity', mat.specular_color, mat.specular_intensity)
         fp.write("  alpha %.3g\n" % mat.alpha)
         for mtex in mat.texture_slots:
             if mtex:

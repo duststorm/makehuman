@@ -479,7 +479,7 @@ def writeMaskDrivers(fp, proxyData):
     fp.write("#if toggle&T_Clothes\n")
     n = 0
     for prx in proxyData.values():
-        if prx.mask:
+        if prx.type == 'Clothes' and prx.mask:
             (dir, file) = prx.mask
             mhx_rig.writePropDriver(fp, ["Hide%s" % prx.name], "1-x1", 'use_textures', n+1)
             n += 1            
@@ -823,7 +823,7 @@ def addProxyMaskMTexs(fp, mat, proxy, prxList, tex):
 def sortedMasks(proxyData):
     prxList = []
     for prx in proxyData.values():
-        if prx.mask:
+        if prx.type == 'Clothes' and prx.mask:
             prxList.append((prx.z_depth, prx))
     prxList.sort()
     return prxList
@@ -831,7 +831,7 @@ def sortedMasks(proxyData):
 def countMasks(proxy, prxList):
     n = 0
     for (zdepth, prx) in prxList:
-        if zdepth > proxy.z_depth:
+        if prx.type == 'Clothes' and zdepth > proxy.z_depth:
             n += 1
     return n            
 
@@ -1164,14 +1164,17 @@ def loadFacesIndices(obj):
 #
 #   writeMultiMaterials(uvset, human, fp):
 #
-        
+      
+TX_SCALE = 1
+TX_BW = 2
+
 TexInfo = {
-    "diffuse" :     ("COLOR", "use_map_color_diffuse", "diffuse_color_factor", 1.0, False),
-    "specular" :    ("SPECULAR", "use_map_specular", "specular_factor", 1.0, True),
-    "alpha" :       ("ALPHA", "use_map_alpha", "alpha_factor", 1.0, True),
-    "translucency": ("TRANSLUCENCY", "use_map_translucency", "translucency_factor", 1.0, True),
-    "bump" :        ("NORMAL", "use_map_normal", "normal_factor", 0.1, True),
-    "displacement": ("DISPLACEMENT", "use_map_displacement", "displacement_factor", 0.1, True),
+    "diffuse" :     ("COLOR", "use_map_color_diffuse", "diffuse_color_factor", 0),
+    "specular" :    ("SPECULAR", "use_map_specular", "specular_factor", TX_BW),
+    "alpha" :       ("ALPHA", "use_map_alpha", "alpha_factor", TX_BW),
+    "translucency": ("TRANSLUCENCY", "use_map_translucency", "translucency_factor", TX_BW),
+    "bump" :        ("NORMAL", "use_map_normal", "normal_factor", TX_SCALE|TX_BW),
+    "displacement": ("DISPLACEMENT", "use_map_displacement", "displacement_factor", TX_SCALE|TX_BW),
 }    
 
 def writeMultiMaterials(uvset, human, fp):
@@ -1182,7 +1185,7 @@ def writeMultiMaterials(uvset, human, fp):
             name = os.path.basename(tex.file)
             fp.write("Image %s\n" % name)
             #file = export_config.getOutFileName(tex, "data/textures", True, human, the.Config)
-            file = os.path.join(folder, name)
+            file = export_config.getOutFileName(name, folder, True, human, the.Config)
             fp.write(
                 "  Filename %s ;\n" % file +
                 "  use_premultiply True ;\n" +
@@ -1192,11 +1195,23 @@ def writeMultiMaterials(uvset, human, fp):
                 "end Texture\n\n")
             
         fp.write("Material %s_%s\n" % (the.Human, mat.name))
+        alpha = False
         for (key, value) in mat.settings:
             if key == "alpha":
+                alpha = True
                 fp.write(
                 "  use_transparency True ;\n" +
+                "  use_raytrace False ;\n" +
+                "  use_shadows False ;\n" +
+                "  use_transparent_shadows False ;\n" +
                 "  alpha %s ;\n" % value)
+            elif key in ["diffuse_color", "specular_color"]:
+                fp.write("  %s Array %s %s %s ;\n" % (key, value[0], value[1], value[2]))
+            elif key in ["diffuse_intensity", "specular_intensity"]:
+                fp.write("  %s %s ;\n" % (key, value))
+        if not alpha:
+            fp.write("  use_transparent_shadows True ;\n")
+                
         n = 0
         for tex in mat.textures:
             name = os.path.basename(tex.file)
@@ -1204,17 +1219,22 @@ def writeMultiMaterials(uvset, human, fp):
                 (key, value) = tex.types[0]
             else:
                 (key, value) = ("diffuse", "1")
-            (type, use, factor, multiplier, bw) = TexInfo[key]
+            (type, use, factor, flags) = TexInfo[key]
             diffuse = False
             fp.write(
                 "  MTex %d %s UV %s\n" % (n, name, type) +
                 "    texture Refer Texture %s ;\n" % name)            
             for (key, value) in tex.types:
-                (type, use, factor, multiplier, bw) = TexInfo[key]
+                (type, use, factor, flags) = TexInfo[key]
+                if flags & TX_SCALE:
+                    scale = "*theScale"
+                else:
+                    scale = ""
                 fp.write(
                 "    %s True ;\n" % use +
-                "    %s %.3g ;\n" % (factor, eval(value)*multiplier))
-                fp.write("    use_rgb_to_intensity %s ;\n" % bw)
+                "    %s %s%s ;\n" % (factor, value, scale))
+                if flags & TX_BW:
+                    fp.write("    use_rgb_to_intensity True ;\n")
                 if key == "diffuse":
                     diffuse = True
             if not diffuse:
