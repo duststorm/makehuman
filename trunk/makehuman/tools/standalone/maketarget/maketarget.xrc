@@ -17,7 +17,7 @@
 				<object class="wxBoxSizer">
 					<orient>wxHORIZONTAL</orient>
 					<object class="sizeritem">
-						<option>1</option>
+						<option>0</option>
 						<flag>wxALL</flag>
 						<border>5</border>
 						<object class="wxRadioBox" name="input_type">
@@ -30,6 +30,22 @@
 								<item>Directory</item>
 							</content>
 							<dimension>2</dimension>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<option>1</option>
+						<flag>wxALL</flag>
+						<border>5</border>
+						<object class="wxRadioBox" name="infolder_type">
+							<style>wxRA_SPECIFY_ROWS</style>
+							<tooltip>The type of files to load from Directory</tooltip>
+							<label>Input type</label>
+							<selection>0</selection>
+							<content>
+								<item>Target</item>
+								<item>OBJ</item>
+							</content>
+							<dimension>1</dimension>
 						</object>
 					</object>
 					<object class="sizeritem">

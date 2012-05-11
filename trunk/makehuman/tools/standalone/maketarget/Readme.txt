@@ -29,10 +29,12 @@ Here follows the explanation of how to use the commandline version.
 Options:
     -i --in     input obj or target
     -o --out    output obj or target
-    --obj       output obj file(s) instead of target
     -s --sub    target to subtract from obj
     -a --add    target to add to obj
-    -d --dir    input folder to load all objs from
+    -d --dir    input folder to load all objs or targets from
+    --intype    type of file to be input, obj (default) or target
+                only applicable if --dir is used
+    --outtype   type of file that will be output, obj or target (default)
     -h --help   this info
     -v --verbose    verbose mode, shows extra information
     
@@ -53,22 +55,22 @@ Usage scenarios:
     maketarget --dir=myfolder --sub=foo1.target
         Load all objs from myfolder, subtract foo1.target from each of them, and
         save the difference between base.obj and each of the resulting objs to 
-        a target files with the same name as the input obj.
+        atarget file with the same name as the input obj.
     maketarget --dir=myfolder --add=foo1.target
         Load all objs from myfolder, add foo1.target to each of them, and
         save the difference between base.obj and each of the resulting objs to 
-        a target files with the same name as the input obj.
-    maketarget --obj -i foo.target -o foo.obj
+        a target file with the same name as the input obj.
+    maketarget --outtype=obj -i foo.target -o foo.obj
         Load foo.target, apply it to base.obj and output the resulting obj as
         foo.obj.
-    maketarget --obj --dir=myfolder
+    maketarget --outtype=obj --dir=myfolder --intype=target
         Load all target files from myfolder, apply each of them to base.obj and
         save the result of each to obj with the same name as the target file.
-    maketarget --obj --dir myfolder --sub foo1.target
+    maketarget --outtype obj --dir myfolder --intype target --sub foo1.target
         Load all target files in myfolder, apply each of them to base.obj while
         also subtracting foo1.target from the result. Save each combination to
         an obj with the same name as the input target.
-    maketarget --obj --dir myfolder --add foo1.target
+    maketarget --outtype obj --dir myfolder --intype target --add foo1.target
         Load all target files in myfolder, apply each of them to base.obj while
         also adding foo1.target to the result. Save each combination to an obj 
         with the same name as the input target.
@@ -79,10 +81,10 @@ Some additional scenarios that are not documented are possible with the tool.
 The user is protected from issuing commands that make no sense (eg. do nothing)
 as the tool will warn you about this.
 
-Also note that files are never overwritten. Upon encountering an already existing
-file this file is backed up as original_filename.bak. Additional backups of the
-same file are named in order original_filename.bak.0 original_filename.bak.1
-etc.
+Also note that files are never overwritten. Upon encountering an already 
+existing file this file is backed up as original_filename.bak. Additional 
+backups of the same file are named in order original_filename.bak.0 
+original_filename.bak.1 etc.
 
 The GUI version of the tool does exactly the same thing. The exact same options
 (except help and verbose) are available in the GUI. The only difference between

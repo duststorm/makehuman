@@ -40,8 +40,15 @@ import sys, os
 
 if __name__ == "__main__" and len(sys.argv) > 1:
     # Run commandline version
+    print "MakeTarget (v%s)"% str(maketarget.VERSION)
+    
+    ## for DEBUGging
+    if DEBUG:
+        maketarget.main(sys.argv[1:])
+        sys.exit()
+    ###
+    
     try:
-        print "MakeTarget (v%s)"% str(maketarget.VERSION)
         maketarget.main(sys.argv[1:])
         print "All done"
         sys.exit()
@@ -111,6 +118,8 @@ class MakeTargetGUI(wx.App):
         self.inputTypeRadio = xrc.XRCCTRL(self.panel, 'input_type')
         self.frame.Bind(wx.EVT_RADIOBOX, self.inputTypeChanged, self.inputTypeRadio)
         
+        self.infolderTypeRadio = xrc.XRCCTRL(self.panel, 'infolder_type')
+        
         self.inputField = xrc.XRCCTRL(self.panel, 'input_ctrl')
         self.frame.Bind(wx.EVT_TEXT, self.validateInput, self.inputField)
         
@@ -161,17 +170,19 @@ class MakeTargetGUI(wx.App):
             self.outputField.Disable()
             self.outputField.SetValue("same folder as input")
             self.outputBrowseBtn.Disable()
+            self.infolderTypeRadio.Enable()
         else:
             self.outputField.SetValue("")
             self.outputField.Enable()
             self.outputBrowseBtn.Enable()
+            self.infolderTypeRadio.Disable()
         self.inputField.SetValue("")
         
     def browseInputFile(self, e):
         """Browse for input .target or .obj file"""
         self.dirname = ''
         if self.inputFromFolder:
-            dlg = wx.DirDialog(self.frame, "Choose an input folder to load all OBJs from", self.dirname, wx.DD_DIR_MUST_EXIST)
+            dlg = wx.DirDialog(self.frame, "Choose an input folder to load all %ss from"% self.infolderTypeRadio.GetStringSelection(), self.dirname, wx.DD_DIR_MUST_EXIST)
         else:
             dlg = wx.FileDialog(self.frame, "Choose a target or obj file", self.dirname, "", "Target (*.target)|*.target|Wavefront OBJ (*.obj)|*.obj", wx.OPEN)
         if dlg.ShowModal() == wx.ID_OK:
@@ -293,6 +304,10 @@ class MakeTargetGUI(wx.App):
         args = list()
         if self.inputFromFolder:
             args.append("--dir=%s"% self.inputField.GetValue())
+            if self.infolderTypeRadio.GetStringSelection() == "Target":
+            	args.append("--intype=target")
+            else:
+            	args.append("--intype=obj")
         elif self.inputField.GetValue():
             args.append("--in=%s"% self.inputField.GetValue())
             
@@ -305,7 +320,10 @@ class MakeTargetGUI(wx.App):
             args.append("--out=%s"% self.outputField.GetValue())
             
         if self.outputObj:
-            args.append("--obj")
+            args.append("--outtype")
+            args.append("obj")
+        else:
+        	args.append("target")
         
         ## for DEBUGging
         if DEBUG:

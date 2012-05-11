@@ -41,5 +41,6 @@ copy ..\resources\*png ..\dist\resources
 copy %iconpath% ..\dist\resources
 copy ..\..\..\..\data\3dobjs\base.obj ..\dist\resources
 copy ..\..\..\..\license.txt ..\dist
+copy ..\Readme.txt ..\dist
 
 cd ..

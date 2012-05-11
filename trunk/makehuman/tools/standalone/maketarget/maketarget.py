@@ -51,10 +51,12 @@ Maketarget stand-alone console application.
 Options:
     -i --in     input obj or target
     -o --out    output obj or target
-    --obj       output obj file(s) instead of target
     -s --sub    target to subtract from obj
     -a --add    target to add to obj
-    -d --dir    input folder to load all objs from
+    -d --dir    input folder to load all objs or targets from
+    --intype    type of file to be input, obj (default) or target
+                only applicable if --dir is used
+    --outtype   type of file that will be output, obj or target (default)
     -h --help   this info
     -v --verbose    verbose mode, shows extra information
     
@@ -75,22 +77,22 @@ Usage scenarios:
     maketarget --dir=myfolder --sub=foo1.target
         Load all objs from myfolder, subtract foo1.target from each of them, and
         save the difference between base.obj and each of the resulting objs to 
-        a target files with the same name as the input obj.
+        atarget file with the same name as the input obj.
     maketarget --dir=myfolder --add=foo1.target
         Load all objs from myfolder, add foo1.target to each of them, and
         save the difference between base.obj and each of the resulting objs to 
-        a target files with the same name as the input obj.
-    maketarget --obj -i foo.target -o foo.obj
+        a target file with the same name as the input obj.
+    maketarget --outtype=obj -i foo.target -o foo.obj
         Load foo.target, apply it to base.obj and output the resulting obj as
         foo.obj.
-    maketarget --obj --dir=myfolder
+    maketarget --outtype=obj --dir=myfolder --intype=target
         Load all target files from myfolder, apply each of them to base.obj and
         save the result of each to obj with the same name as the target file.
-    maketarget --obj --dir myfolder --sub foo1.target
+    maketarget --outtype obj --dir myfolder --intype target --sub foo1.target
         Load all target files in myfolder, apply each of them to base.obj while
         also subtracting foo1.target from the result. Save each combination to
         an obj with the same name as the input target.
-    maketarget --obj --dir myfolder --add foo1.target
+    maketarget --outtype obj --dir myfolder --intype target --add foo1.target
         Load all target files in myfolder, apply each of them to base.obj while
         also adding foo1.target to the result. Save each combination to an obj 
         with the same name as the input target.
@@ -186,12 +188,12 @@ def processInputObj(obj, outputFile):
     if backupLocation:
         verbosePrint("Output file %s already exists. Backed up to %s"% (outputFile, backupLocation))
     
-    if outputObj:
+    if outType == "obj":
         verbosePrint("Writing obj to %s"% outputFile)
         obj.write(outputFile)
     else:
         diff = obj.getDifferenceAsTarget(base)
-        verbosePrint("Writing target to %s"% outputFile)
+        verbosePrint("Writing target to %s (target has %d vertices)"% (outputFile, diff.getNbVerts()))
         diff.write(outputFile)
         
 def processInputTarget(inputTarget, outputPath):
@@ -207,10 +209,10 @@ def processInputTarget(inputTarget, outputPath):
   
 def parseArguments(args):
     '''Parse commandline options.'''
-    global verbose, outputPath, inputTarget, inputObj, inputObjDir, targetsToSubtract, targetsToAdd, outputObj
+    global verbose, outputPath, inputTarget, inputObj, inputDir, targetsToSubtract, targetsToAdd, inType, outType
     
     try:
-        opts, args = getopt.getopt(args, "i:o:s:a:d:hv", ["help", "out=", "in=", "dir=", "obj", "add=", "sub=", "verbose"])
+        opts, args = getopt.getopt(args, "i:o:s:a:d:hv", ["help", "out=", "in=", "dir=", "intype=", "outtype=", "add=", "sub=", "verbose"])
     except getopt.GetoptError, err:
         # print help information and exit:
         print str(err) # will print something like "option -g not recognized"
@@ -221,15 +223,16 @@ def parseArguments(args):
             
     outputPath = False
         
+    inType = False
+    outType = False
+
     inputTarget = False
     inputObj = False
-    inputObjDir = False
+    inputDir = False
         
     targetsToSubtract = list()
     targetsToAdd = list()
         
-    outputObj = False
-            
     for opt, val in opts:
         if opt in ("-h", "--help"):
             usage()
@@ -321,8 +324,32 @@ def parseArguments(args):
                 raise e
             else:
                 targetsToAdd.append(val)
-        elif opt == "--obj":
-            outputObj = True
+        elif opt == "--intype":
+            if inType:
+                e = Exception("Input type already specified. This option can only be set once.")
+                e.errCode = 2
+                raise e
+            if val == "obj":
+                inType = "obj"
+            elif val == "target":
+                inType = "target"
+            else:
+                e = Exception('Invalid input type specified. Choose either "obj" or "target".')
+                e.errCode = 2
+                raise e
+        elif opt == "--outtype":
+            if outType:
+                e = Exception("Output type already specified. This option can only be set once.")
+                e.errCode = 2
+                raise e
+            if val == "obj":
+                outType = "obj"
+            elif val == "target":
+                outType = "target"
+            else:
+                e = Exception('Invalid output type specified. Choose either "obj" or "target".')
+                e.errCode = 2
+                raise e
         elif opt in ("-d", "--dir"):
             if val == "ir" or val.startswith("ir="):
                 e = Exception("Use either -d or --dir. Not -dir.")
@@ -332,56 +359,68 @@ def parseArguments(args):
                 e = Exception("No value specified for input dir (--dir) option. Value is required.")
                 e.errCode = 2
                 raise e
-            if inputObjDir:
+            if inputDir:
                 e = Exception("Multiple input dir (--dir) options given, only one expected.")
                 e.errCode = 2
                 raise e
             else:
-                inputObjDir = val
+                inputDir = val
         else:
             assert False
-    
-    
+            
+    if inputDir and not inType:
+        # Set to default
+        inType = "obj"
+    if inputDir and not outType:
+        # Set to default
+        outType = "target"
+
+  
+#TODO it might be better to only require --outtype when using --dir, and determine the outtype from the extension of -o value (like with -i)  
 def sanityCheckInput():
     '''Perform sanity checks on commandline input.'''
     # NOTE: --add foo.target and -i foo.target are actually the same. The only difference is that -i is allowed only once.
         
-    if inputObjDir and (inputTarget or inputObj):
+    if inType and not inputDir:
+        e = Exception("Illegal option. Only set --intype together with --dir.")
+        e.errCode = 2
+        raise e
+    if inputDir and (inputTarget or inputObj):
         e = Exception("Illegal input option. Either choose --dir or individual --in file, not both.")
         e.errCode = 2
         raise e
-    if inputObjDir and outputPath:
+    if inputDir and outputPath:
         e = Exception("Illegal output option. Do not specify an output file (--out) together with input dir (--dir).")
         e.errCode = 2
         raise e
-    if outputPath and outputObj and not isObjFile(outputPath):
+    if outputPath and outType == "obj" and not isObjFile(outputPath):
         e = Exception("The specified output file should be a .obj file.")
         e.errCode = 2
         raise e
-    elif outputPath and not outputObj and not isTargetFile(outputPath):
+    elif outputPath and outType == "target" and not isTargetFile(outputPath):
         e = Exception("The specified output file should be a .target file.")
         e.errCode = 2
         raise e
-    if not inputObjDir and not outputPath:
+    if not inputDir and not outputPath:
         e = Exception("No output option specified (--out or --dir). Nothing will be written.")
         e.errCode = 2
         raise e    # TODO Or allow some dry-run mode or output to terminal? You can dry-run while still demanding proper params, just not actually write anything
-    if outputObj and (inputObj or inputObjDir) and not targetsToAdd and not targetsToSubtract:
+    if outType == "obj" and (inputObj or inType == "obj") and not targetsToAdd and not targetsToSubtract:
         # Input obj, don't add any other targets and output the same obj again
         e = Exception("This command does nothing useful.")
         e.errCode = 2
         raise e
-    if not outputObj and inputTarget and not targetsToAdd and not targetsToSubtract:
+    if outType == "target" and (inputTarget or inType == "target") and not targetsToAdd and not targetsToSubtract:
         # Input a target and calculate and output that exact same target
         e = Exception("This command does nothing useful.")
         e.errCode = 2
         raise e
-    if not inputObjDir and not inputObj and not inputTarget and not targetsToSubtract and not targetsToAdd:
+    if not inputDir and not inputObj and not inputTarget and not targetsToSubtract and not targetsToAdd:
         # No inputs at all
-        e = Exception("Nothing to do.")
+        e = Exception("No inputs given. Nothing to do.")
         e.errCode = 2
         raise e
-    if not outputObj and not inputObjDir and not inputObj and not inputTarget and len(targetsToAdd) == 1 and not targetsToSubtract:
+    if outType == "target" and not inputDir and not inputObj and not inputTarget and len(targetsToAdd) == 1 and not targetsToSubtract:
         e = Exception("This command does nothing useful. It's the same as maketarget.py --i %s --out %s"% (targetsToAdd[0], outputPath))
         e.errCode = 2
         raise e
@@ -390,8 +429,11 @@ def verboseDetailProcess():
     '''Give detailed overview of the process to be performed.'''
     print "\nInput:"
     print "------"
-    if inputObjDir:
-        print "  All OBJs from directory: %s"% inputObjDir
+    if inputDir:
+        if inType == "obj":
+            print "  All OBJs from directory: %s"% inputDir
+        else:
+            print "  All targets from directory: %s"% inputDir
     elif inputTarget:
         print "  Target: %s"% inputTarget
     elif inputObj:
@@ -409,12 +451,12 @@ def verboseDetailProcess():
 
     print "\nOutput:"
     print "--------"
-    if outputObj:
+    if outType == "obj":
         print "  Output type: OBJ"
     else:
         print "  Output type: target"
-    if inputObjDir:
-        print "  Output files: %s/*%s"% (inputObjDir, outputExtension)
+    if inputDir:
+        print "  Output files: %s/*%s"% (inputDir, outputExtension)
     elif outputPath:
         print "  Output to file: %s"% outputPath
     print "\n"
@@ -428,7 +470,7 @@ def main(args):
        
     sanityCheckInput()
             
-    if outputObj:
+    if outType == "obj":
         outputExtension = ".obj"
     else:
         outputExtension = ".target"
@@ -440,11 +482,17 @@ def main(args):
     # Load globally used (and unmodified) base obj
     base = getBaseObj()
             
-    if inputObjDir:
-        for iObj in glob.glob(os.path.join(inputObjDir, "*.obj")):
-            verbosePrint("Processing %s (output to %s)"% (iObj, getOutputName(iObj)))
-            processInputObj(iObj, getOutputName(iObj))
-            verbosePrint("\n")
+    if inputDir:
+        if inType == "obj":
+            for iObj in glob.glob(os.path.join(inputDir, "*.obj")):
+                verbosePrint("Processing %s (output to %s)"% (iObj, getOutputName(iObj)))
+                processInputObj(iObj, getOutputName(iObj))
+                verbosePrint("\n")
+        else:
+            for iTgt in glob.glob(os.path.join(inputDir, "*.target")):
+                verbosePrint("Processing %s (output to %s)"% (iTgt, getOutputName(iTgt)))
+                processInputTarget(iTgt, getOutputName(iTgt))
+                verbosePrint("\n")
     elif inputObj:
         verbosePrint("Processing %s (output to %s)"% (inputObj, outputPath))
         processInputObj(inputObj, outputPath)
@@ -460,15 +508,16 @@ def main(args):
         
         
 if __name__ == "__main__":
-    print "MakeTarget (v%s)"% str(VERSION)
 
     ## for DEBUGging
     if DEBUG:
+        print "MakeTarget (v%s) (DEBUG)"% str(VERSION)
         main(sys.argv[1:])
         sys.exit()
     ###
 
     try:
+        print "MakeTarget (v%s)"% str(VERSION)
         main(sys.argv[1:])
         print "All done"
         sys.exit()

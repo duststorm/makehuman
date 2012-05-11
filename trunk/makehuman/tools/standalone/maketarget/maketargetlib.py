@@ -29,7 +29,12 @@ tool.
 """
 
 '''The global version for the entire tool.'''
-VERSION = "1.0"
+VERSION = "1.1"
+
+'''The minimum distance a vert from original has to be moved before it is added
+in a target.'''
+EPSILON = 0.001
+EPSILON_SQUARED = EPSILON*EPSILON
 
 class Vector3(object):
     '''Simple 3D vector class.'''
@@ -94,6 +99,15 @@ class Vector3(object):
         self.y = self.y - other.y
         self.z = self.z - other.z
         
+    def squaredDistance(self, other):
+        '''Calculate squared distance (distance*distance) between this and other
+        vert. Distance is kept squared because the square root operator is
+        expensive. Squared distance suffices for distance comparisons.'''
+        dx = self.x-other.x
+        dy = self.y-other.y
+        dz = self.z-other.z
+        return dx*dx + dy*dy + dz*dz
+        
     def __str__(self):
         '''Informal textual representation. Used by str() and print'''
         return "x=%f y=%f z=%f"%(self.x, self.y, self.z)
@@ -130,9 +144,7 @@ class Obj(object):
             raise e
         result = Target()
         for i in range(self.getNbVerts()):
-            # Explicitly test for equality to avoid numerical instability problems!
-            # TODO to be completely safe I should test equality with a certain alpha margin
-            if self.verts[i] != obj.verts[i]: 
+            if self.verts[i].squaredDistance(obj.verts[i]) > EPSILON_SQUARED: 
                 result.addVertDiff(i, self.verts[i] - obj.verts[i])
         return result
         
@@ -151,7 +163,7 @@ class Obj(object):
             e = Exception("Target contains more vertices (%d) than this obj (%d)."% (target.getMaxVertIndex(), self.getNbVerts()))
             e.errCode = -1
             raise e
-        for index, vertDiff in target.verts:
+        for index, vertDiff in target.verts.items():
             self.verts[index].add(vertDiff)
         
     def _loadVerts(self, path):
@@ -167,14 +179,23 @@ class Obj(object):
         """
         fd = open(path)
         data = fd.readline()
-        while data:
-            dataList = data.split()
-            if dataList[0] == "v":
-                self.verts.append( Vector3( float(dataList[1]),\
-                                            float(dataList[2]),\
-                                            float(dataList[3])) )
-            data = fd.readline()
-        fd.close()
+        lineNb = 0
+        try:
+            while data:
+                lineNb = lineNb +1
+                dataList = data.split()
+                if dataList and dataList[0] == "v":
+                    self.verts.append( Vector3( float(dataList[1]),\
+                                                float(dataList[2]),\
+                                                float(dataList[3])) )
+                data = fd.readline()
+            fd.close()
+        except Exception as e:
+            e = Exception("Error while parsing OBJ file %s at line %d."% (path, lineNb))
+            e.errCode = -1
+            raise e
+        finally:
+            fd.close()
         return
         
     def write(self, outPath):
@@ -223,6 +244,10 @@ class Target(object):
             self.maxVertIndex = index
         self.verts[index] = vertexDiff
         
+    def getNbVerts(self):
+        '''The number of vertices in this target.'''
+        return len(self.verts)
+        
     def getMaxVertIndex(self):
         '''The maximum vertex index found in this target.'''
         return self.maxVertIndex
@@ -231,14 +256,24 @@ class Target(object):
         '''Load vertices in this target from the specified file.'''
         fd = open(path)
         data = fd.readline()
-        while data:
-            dataList = data.split()
-            index = int(dataList[0])
-            self.addVertDiff(index, Vector3(float(dataList[1]), \
-                                            float(dataList[2]), \
-                                            float(dataList[3]) ))
-            data = fd.readline()
-        fd.close()
+        lineNb = 0
+        try:
+            while data:
+            	lineNb = lineNb +1
+                dataList = data.split()
+                if dataList:
+                    index = int(dataList[0])
+                    self.addVertDiff(index, Vector3(float(dataList[1]), \
+                                                    float(dataList[2]), \
+                                                    float(dataList[3]) ))
+                    data = fd.readline()
+            fd.close()
+        except Exception as e:
+            e = Exception("Error while parsing target file %s at line %d."% (path, lineNb))
+            e.errCode = -1
+            raise e
+        finally:
+            fd.close()
         return
         
     def write(self, outPath):
