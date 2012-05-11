@@ -66,6 +66,7 @@ class CProxy:
         self.uvtexLayerName = {0 : "UVTex"}
         self.materials = []
         self.constraints = []
+        self.deletes = []
         self.wire = False
         self.cage = False
         self.modifiers = []
@@ -254,6 +255,8 @@ def readProxyFile(obj, file, evalOnLoad):
                 useProjection = int(words[2])
             elif key == 'ignoreOffset':
                 ignoreOffset = int(words[2])
+            elif key == 'delete':
+                proxy.deletes.append(words[2])
             elif key == 'rig':
                 proxy.rig = getFileName(folder, words[2], ".rig")
             elif key == 'mask':

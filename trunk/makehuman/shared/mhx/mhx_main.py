@@ -286,15 +286,9 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
                     for v in f:
                         fp.write(" %d" % v[0])
                     fp.write(" ;\n")
-                if human.uvsetFile:
-                    fp.write("#if False\n")
+                fp.write("#if False\n")
             elif key == 'EndFaces':
-                if human.uvsetFile:
-                    fp.write("#else\n")
-                    uvset = proxyData["__uvset__"]
-                    for ftn in uvset.faceNumbers:
-                        fp.write(ftn)
-                    fp.write("#endif\n")
+                writeFaceNumbers(fp, human, proxyData)
             elif key == 'FTTriangles':
                 for (fn,f) in enumerate(faces):
                     if len(f) < 4:
@@ -394,6 +388,74 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
     tmpl.close()
 
     return
+
+#
+#   writeFaceNumbers(fp, human, proxyData):
+#
+
+MaterialNumbers = {
+    "skin" : 0,
+    "nail" : 0,
+    "teeth" : 1,
+    "eye": 2,
+    "cornea" : 2,
+    "brows" : 3,
+    "joint" : 4,
+    "red" : 5,
+    "green" : 6,
+    "blue" : 7
+}
+    
+def deleteGroup(name, deletes):
+    for part in deletes:
+        if part in name:
+            return True
+    return False
+
+def writeFaceNumbers(fp, human, proxyData):
+    fp.write("#else\n")
+    if human.uvsetFile:
+        uvset = proxyData["__uvset__"]
+        for ftn in uvset.faceNumbers:
+            fp.write(ftn)
+    else:            
+        obj = human.meshData
+        fmats = {}
+        for f in obj.faces:
+            fmats[f.idx] = MaterialNumbers[f.mtl]
+        deletes = []
+        for proxy in proxyData.values():
+            deletes += proxy.deletes
+        for fg in obj.faceGroups: 
+            if deleteGroup(fg.name, deletes):
+                for f in fg.faces:
+                    fmats[f.idx] = 4
+            elif fg.name == "helper-tights":                    
+                for f in fg.faces:
+                    fmats[f.idx] = 5
+            elif fg.name == "helper-skirt":                    
+                for f in fg.faces:
+                    fmats[f.idx] = 7
+            elif ("tongue" in fg.name):
+                for f in fg.faces:
+                    fmats[f.idx] = 1
+            elif ("eyebrown" in fg.name) or ("lash" in fg.name):
+                for f in fg.faces:
+                    fmats[f.idx] = 3            
+                
+        mn = -1
+        fn = 0
+        f0 = 0
+        for f in obj.faces:
+            if fmats[fn] != mn:
+                if fn != f0:
+                    fp.write("  ftn %d %d 1 ;\n" % (fn-f0, mn))
+                mn = fmats[fn]
+                f0 = fn
+            fn += 1
+        if fn != f0:
+            fp.write("  ftn %d %d 1 ;\n" % (fn-f0, mn))
+    fp.write("#endif\n")
 
 #
 #   writeBaseMaterials(fp, human, proxyData):                    
@@ -693,7 +755,7 @@ def copyProxyMaterialFile(fp, pair, mat, proxy, proxyData):
 #   writeProxyMaterial(fp, mat, proxy, proxyData):
 #
 
-def writeProxyTexture(fp, texture, mat):        
+def writeProxyTexture(fp, texture, mat, extra):        
     (folder,name) = texture
     tex = os.path.join(folder,name)
     #print(the.Human)
@@ -709,6 +771,7 @@ def writeProxyTexture(fp, texture, mat):
 "Texture %s IMAGE\n" % texname +
 "  Image %s ;\n" % texname)
     writeProxyMaterialSettings(fp, mat.textureSettings)             
+    fp.write(extra)
     fp.write("end Texture\n\n")
     return (tex, texname)
     
@@ -718,13 +781,15 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
     normal = None
     displacement = None
     if proxy.texture:
-        (tex,texname) = writeProxyTexture(fp, proxy.texture, mat)
+        (tex,texname) = writeProxyTexture(fp, proxy.texture, mat, "")
     if proxy.bump:
-        (bump,bumpname) = writeProxyTexture(fp, proxy.bump, mat)
+        (bump,bumpname) = writeProxyTexture(fp, proxy.bump, mat, "")
     if proxy.normal:
-        (normal,normalname) = writeProxyTexture(fp, proxy.normal, mat)
+        (normal,normalname) = writeProxyTexture(fp, proxy.normal, mat, 
+            ("    use_normal_map True ;\n")
+            )
     if proxy.displacement:
-        (displacement,dispname) = writeProxyTexture(fp, proxy.displacement, mat)
+        (displacement,dispname) = writeProxyTexture(fp, proxy.displacement, mat, "")
            
     prxList = sortedMasks(proxyData)
     nMasks = countMasks(proxy, prxList)
@@ -764,7 +829,6 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
 "    texture Refer Texture %s ;\n" % normalname +
 "    use_map_normal True ;\n" +
 "    use_map_color_diffuse False ;\n" +
-"    use_normal_map True ;\n" +
 "    normal_factor %.3f ;\n" % proxy.normalStrength + 
 "    normal_map_space 'TANGENT' ;\n" +
 "    uv_layer '%s' ;\n" % uvlayer +
