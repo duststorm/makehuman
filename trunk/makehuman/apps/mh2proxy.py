@@ -66,7 +66,9 @@ class CProxy:
         self.uvtexLayerName = {0 : "UVTex"}
         self.materials = []
         self.constraints = []
-        self.deletes = []
+        self.neighbors = {}
+        self.deleteGroups = []
+        self.deleteVerts = {}
         self.wire = False
         self.cage = False
         self.modifiers = []
@@ -256,7 +258,9 @@ def readProxyFile(obj, file, evalOnLoad):
             elif key == 'ignoreOffset':
                 ignoreOffset = int(words[2])
             elif key == 'delete':
-                proxy.deletes.append(words[2])
+                proxy.deleteGroups.append(words[2])
+            elif key == 'delete_connected':
+                selectConnected(proxy, obj, int(words[2]))
             elif key == 'rig':
                 proxy.rig = getFileName(folder, words[2], ".rig")
             elif key == 'mask':
@@ -385,6 +389,49 @@ def readProxyFile(obj, file, evalOnLoad):
         proxy.name = pfile.name
     return proxy
 
+#
+#   selectConnected(proxy, obj, vn):
+#
+
+def selectConnected(proxy, obj, vn):
+    nVerts = len(obj.verts)
+    if not proxy.deleteVerts:
+        for n in range(nVerts):    
+            proxy.deleteVerts[n] = False
+            proxy.neighbors[n] = []
+        for f in obj.faces:
+            for v1 in f.verts:            
+                for v2 in f.verts:
+                    if v1 != v2:
+                        proxy.neighbors[v1.idx].append(v2.idx)
+    walkTree(proxy, vn)
+    return
+    
+    
+def walkTree(proxy, vn):    
+    proxy.deleteVerts[vn] = True                        
+    for vk in proxy.neighbors[vn]:
+        if not proxy.deleteVerts[vk]:
+            walkTree(proxy, vk)
+    return            
+
+
+def deleteGroup(name, groups):
+    for part in groups:
+        if part in name:
+            return True
+    return False
+       
+
+def multiplyDeleteVerts(proxy, deleteVerts):
+    if proxy.deleteVerts:
+        if not deleteVerts:
+            return proxy.deleteVerts
+        else:
+            for (key,value) in proxy.deleteVerts.items():
+                deleteVerts[key] &= value       
+    return deleteVerts
+    
 #
 #
 #

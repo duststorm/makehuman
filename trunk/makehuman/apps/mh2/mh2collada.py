@@ -340,17 +340,10 @@ class CStuff:
         return
 
 #
-#    filterMesh(mesh1, obj, deletes):
+#    filterMesh(mesh1, obj, groups, deleteVerts):
 #
 
-def deleteGroup(name, deletes):
-    for part in deletes:
-        if part in name:
-            return True
-    return False
-    
-    
-def filterMesh(mesh1, obj, deletes):
+def filterMesh(mesh1, obj, deleteGroups, deleteVerts):
     (verts1, vnormals1, uvValues1, faces1, weights1, targets1) = mesh1
     
     killVerts = {}
@@ -362,6 +355,9 @@ def filterMesh(mesh1, obj, deletes):
         killFaces[f.idx] = False        
         for vt in f.uv:
             killUvs[vt] = False
+            
+    for vn in deleteVerts:
+        killVerts[vn] = True
     
     for fg in obj.faceGroups:
         if (((not the.Options["helpers"]) and 
@@ -370,7 +366,7 @@ def filterMesh(mesh1, obj, deletes):
              (("eyebrown" in fg.name) or ("cornea" in fg.name))) or
             ((not the.Options["lashes"]) and 
              ("lash" in fg.name)) or
-             deleteGroup(fg.name, deletes)):
+             mh2proxy.deleteGroup(fg.name, deleteGroups)):
             print("  kill %s" % fg.name) 
             for f in fg.faces:            
                 killFaces[f.idx] = True
@@ -531,31 +527,37 @@ def setupStuff(name, obj, amt, rawTargets, cfg):
     if amt:
         stuff.setBones(amt)
     the.Stuff = stuff
-    deletes = []
-    foundProxy = setupProxies('Proxy', name, obj, stuffs, amt, rawTargets, cfg.proxyList, deletes)
-    setupProxies('Clothes', None, obj, stuffs, amt, rawTargets, cfg.proxyList, deletes)
+    deleteGroups = []
+    deleteVerts = []
+    foundProxy = setupProxies('Proxy', name, obj, stuffs, amt, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
+    setupProxies('Clothes', None, obj, stuffs, amt, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
     if not foundProxy:
         mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
-        if the.Options["helpers"] and the.Options["eyebrows"] and  the.Options["lashes"] and deletes == []:
+        if (the.Options["helpers"] and 
+            the.Options["eyebrows"] and  
+            the.Options["lashes"] and 
+            deleteGroups == [] and
+            deleteVerts == []):
             mesh2 = mesh1
         else:
-            mesh2 = filterMesh(mesh1, obj, deletes)
+            mesh2 = filterMesh(mesh1, obj, deleteGroups, deleteVerts)
         stuff.setMesh(mesh2)
         stuffs = [stuff] + stuffs
     return (stuff, stuffs)
 
 #
-#    setupProxies(typename, name, obj, stuffs, amt, rawTargets, proxyList, deletes):
+#    setupProxies(typename, name, obj, stuffs, amt, rawTargets, proxyList, deleteGroups, deleteVerts):
 #
 
-def setupProxies(typename, name, obj, stuffs, amt, rawTargets, proxyList, deletes):
+def setupProxies(typename, name, obj, stuffs, amt, rawTargets, proxyList, deleteGroups, deleteVerts):
     foundProxy = False    
     for pfile in proxyList:
         if pfile.useDae and pfile.type == typename and pfile.file:
             proxy = mh2proxy.readProxyFile(obj, pfile, True)
             if proxy and proxy.name and proxy.texVerts:
                 foundProxy = True
-                deletes += proxy.deletes
+                deleteGroups += proxy.deleteGroups
+                deleteVerts = mh2proxy.multiplyDeleteVerts(proxy, deleteVerts)
                 if name:
                     stuff = CStuff(name, proxy)
                 else:

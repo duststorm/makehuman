@@ -406,12 +406,6 @@ MaterialNumbers = {
     "blue" : 7
 }
     
-def deleteGroup(name, deletes):
-    for part in deletes:
-        if part in name:
-            return True
-    return False
-
 def writeFaceNumbers(fp, human, proxyData):
     fp.write("#else\n")
     if human.uvsetFile:
@@ -423,11 +417,17 @@ def writeFaceNumbers(fp, human, proxyData):
         fmats = {}
         for f in obj.faces:
             fmats[f.idx] = MaterialNumbers[f.mtl]
-        deletes = []
+        deleteGroups = []
+        deleteVerts = None
         for proxy in proxyData.values():
-            deletes += proxy.deletes
+            deleteGroups += proxy.deleteGroups
+            deleteVerts = mh2proxy.multiplyDeleteVerts(proxy, deleteVerts)
+                    
         for fg in obj.faceGroups: 
-            if deleteGroup(fg.name, deletes):
+            if mh2proxy.deleteGroup(fg.name, deleteGroups):
+                for f in fg.faces:
+                    fmats[f.idx] = 6
+            elif "joint" in fg.name:
                 for f in fg.faces:
                     fmats[f.idx] = 4
             elif fg.name == "helper-tights":                    
@@ -441,7 +441,13 @@ def writeFaceNumbers(fp, human, proxyData):
                     fmats[f.idx] = 1
             elif ("eyebrown" in fg.name) or ("lash" in fg.name):
                 for f in fg.faces:
-                    fmats[f.idx] = 3            
+                    fmats[f.idx] = 3   
+                    
+        if deleteVerts:
+            for f in obj.faces:
+                v = f.verts[0]
+                if deleteVerts[v.idx]:
+                    fmats[f.idx] = 6                        
                 
         mn = -1
         fn = 0
