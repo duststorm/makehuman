@@ -29,7 +29,7 @@ This is a GUI (Graphical User Interface) for the commandline maketarget tool.
 
 ## CONFIG ##
 
-DEBUG = True    # Debug mode (no masking of exceptions)
+DEBUG = False    # Debug mode (no masking of exceptions)
 
 ############
 
