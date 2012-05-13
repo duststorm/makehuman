@@ -460,8 +460,28 @@ def verboseDetailProcess():
     elif outputPath:
         print "  Output to file: %s"% outputPath
     print "\n"
-
     
+    
+procCallBacks = list()
+
+def addProcessCallback(processCallback):
+    '''Add a callback to be alerted on the progress when processing multiple
+    files in a directory. Can be used for a progress bar in a GUI or a cancel
+    operation button.
+    Callback objects need an updateProgress(filename, percent) method and
+    should return True to continue, False to cancel the process.'''
+    global procCallBacks
+    procCallBacks.append(processCallback)
+    
+def notifyCallbacks(filename, percent):
+    '''Notify all registered callback objects of progress.'''
+    result = True
+    for cb in procCallBacks:
+        if not cb.updateProgress(filename, percent):
+            result = False
+    return result
+
+
 def main(args):
     '''Main method of the commandline program.'''
     global outputExtension, base
@@ -483,13 +503,24 @@ def main(args):
     base = getBaseObj()
             
     if inputDir:
+        count = 0
         if inType == "obj":
-            for iObj in glob.glob(os.path.join(inputDir, "*.obj")):
+            objs = glob.glob(os.path.join(inputDir, "*.obj"))
+            for iObj in objs:
+                if not notifyCallbacks(getOutputName(iObj), (100*count)/len(objs)):
+                    verbosePrint("Process canceled.")
+                    return
+                count = count +1
                 verbosePrint("Processing %s (output to %s)"% (iObj, getOutputName(iObj)))
                 processInputObj(iObj, getOutputName(iObj))
                 verbosePrint("\n")
         else:
-            for iTgt in glob.glob(os.path.join(inputDir, "*.target")):
+            tgts = glob.glob(os.path.join(inputDir, "*.target"))
+            for iTgt in tgts:
+                if not notifyCallbacks(getOutputName(iTgt), (100*count)/len(tgts)):
+                    verbosePrint("Process canceled.")
+                    return
+                count = count +1
                 verbosePrint("Processing %s (output to %s)"% (iTgt, getOutputName(iTgt)))
                 processInputTarget(iTgt, getOutputName(iTgt))
                 verbosePrint("\n")

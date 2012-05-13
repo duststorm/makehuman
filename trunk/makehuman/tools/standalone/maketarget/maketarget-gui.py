@@ -79,6 +79,8 @@ class MakeTargetGUI(wx.App):
     def OnInit(self):
         self.res = xrc.XmlResource('maketarget.xrc')
         self.init_frame()
+        self.progressWindow = False
+        maketarget.addProcessCallback(self)
         return True
 
     def init_frame(self):
@@ -299,6 +301,24 @@ class MakeTargetGUI(wx.App):
         self.inputEvaluated = False
         return
         
+    def updateProgress(self, filename, percent):
+        '''Callback for updating the progress bar that is shown when processing
+        multiple files from a folder.'''
+        if not self.progressWindow:
+            self.progressWindow = wx.ProgressDialog("Processing directory",
+                               "Processing %s"% os.path.basename(filename),
+                               maximum = 100,
+                               parent=self.frame,
+                               style = wx.PD_CAN_ABORT
+                                | wx.PD_APP_MODAL
+                                | wx.PD_ELAPSED_TIME
+                                #| wx.PD_ESTIMATED_TIME
+                                | wx.PD_REMAINING_TIME
+                                )
+        (cont, skip) = self.progressWindow.Update(percent, "Processing %s"% os.path.basename(filename))
+        return cont
+
+        
     def makeTarget(self, e):
         '''Start maketarget application'''
         args = list()
@@ -330,11 +350,17 @@ class MakeTargetGUI(wx.App):
             args.append("--verbose")
             print "MakeTarget (v%s)"% str(maketarget.VERSION)
             maketarget.main(args)
+            if self.progressWindow:
+                self.progressWindow.Destroy()
+                self.progressWindow = False
             wx.MessageBox("Operation completed", 'Success', wx.OK)
         ###
         else:
             try:
                 maketarget.main(args)
+                if self.progressWindow:
+                    self.progressWindow.Destroy()
+                    self.progressWindow = False
                 wx.MessageBox("Operation completed", 'Success', wx.OK)
             except Exception as e:
                 # Error handling: retrieve error message
@@ -354,6 +380,9 @@ class MakeTargetGUI(wx.App):
                     # Show commandline context if error is argument error
                     msg = msg + "\n\nUsed command: \nmaketarget "+ " ".join(args)
 
+                if self.progressWindow:
+                    self.progressWindow.Destroy()
+                    self.progressWindow = False
                 wx.MessageBox(msg, 'Error', wx.OK | wx.ICON_ERROR)
             
 

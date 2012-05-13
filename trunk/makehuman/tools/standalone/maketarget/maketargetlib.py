@@ -29,7 +29,7 @@ tool.
 """
 
 '''The global version for the entire tool.'''
-VERSION = "1.1"
+VERSION = "1.2"
 
 '''The minimum distance a vert from original has to be moved before it is added
 in a target.'''
