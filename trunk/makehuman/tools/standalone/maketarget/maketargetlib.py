@@ -154,7 +154,7 @@ class Obj(object):
             e = Exception("Target contains more vertices (%d) than this obj (%d)."% (target.getMaxVertIndex(), self.getNbVerts()))
             e.errCode = -1
             raise e
-        for index, vertDiff in target.verts:
+        for index, vertDiff in target.verts.items():
             self.verts[index].sub(vertDiff)
             
     def addTarget(self, target):
