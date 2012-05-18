@@ -37,6 +37,8 @@ class UvTaskView(gui3d.TaskView):
         @self.filechooser.event
         def onFileSelected(filename):
             
+            if os.path.basename(filename) == "clear.mhuv":
+                filename = None            
             self.setUv(gui3d.app.selectedHuman, filename)
 
             gui3d.app.switchCategory('Modelling')
