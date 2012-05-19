@@ -4,8 +4,6 @@ NoScale False ;
 
   *** rig-bones
 
-  use_deform_envelopes False ;
-  use_deform_vertex_groups True ;
   show_axes False ;
   show_bone_custom_shapes True ;
   show_group_colors True ;

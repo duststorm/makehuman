@@ -207,7 +207,7 @@ ArmArmature = [
     ('ElbowLinkPT_R',     0, 'UpArm_R', F_RES, L_RARMIK, NoBB),
 
     # Arm deform
-    ('UpArmRot_L',        upArmRoll, 'Shoulder_L', F_WIR, L_TWEAK, NoBB),
+    ('UpArmRot_L',        upArmRoll, 'UpArm_L', F_WIR, L_TWEAK, NoBB),
     ('DfmUpArm1_L',       upArmRoll, 'UpArmRot_L', F_DEF, L_DMAIN, NoBB),
     ('DfmUpArm2_L',       upArmRoll, 'DfmUpArm1_L', F_DEF+F_SCALE, L_DMAIN,(0,0,5) ),
     ('DfmUpArm3_L',       upArmRoll, 'UpArm_L', F_DEF, L_DMAIN, NoBB),
@@ -218,7 +218,7 @@ ArmArmature = [
     ('DfmLoArmFan_L',     loArmRoll, 'UpArm_L', F_DEF, L_DMAIN, NoBB),
     ('DfmHand_L',         handRoll, 'LoArm_L', F_DEF, L_DMAIN, NoBB),
 
-    ('UpArmRot_R',        upArmRoll, 'Shoulder_R', F_WIR, L_TWEAK, NoBB),
+    ('UpArmRot_R',        upArmRoll, 'UpArm_R', F_WIR, L_TWEAK, NoBB),
     ('DfmUpArm1_R',       upArmRoll, 'UpArmRot_R', F_DEF, L_DMAIN, NoBB),
     ('DfmUpArm2_R',       upArmRoll, 'DfmUpArm1_R', F_DEF+F_SCALE, L_DMAIN,(0,0,5) ),
     ('DfmUpArm3_R',       upArmRoll, 'UpArm_R', F_DEF, L_DMAIN, NoBB),
