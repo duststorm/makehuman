@@ -85,14 +85,14 @@ def isClothing(ob):
     
 def getHuman(context):
     for ob in context.scene.objects:
-        if isHuman(ob):
+        if ob.select and isHuman(ob):
             return ob
     raise NameError("No human selected")
 
         
 def getClothing(context):        
     for ob in context.scene.objects:
-        if isClothing(ob):
+        if ob.select and isClothing(ob):
             return ob
     raise NameError("No clothing selected")
     
