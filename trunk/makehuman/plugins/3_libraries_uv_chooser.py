@@ -72,7 +72,11 @@ class UvTaskView(gui3d.TaskView):
 
     def loadHandler(self, human, values):
 
-        self.setUv(human, values[1])
+	mhuv = values[1]
+        if not os.path.exists(os.path.realpath(mhuv)):
+            print mhuv, "does not exist. Skipping."
+            return
+        self.setUv(human, mhuv)
         
     def saveHandler(self, human, file):
 

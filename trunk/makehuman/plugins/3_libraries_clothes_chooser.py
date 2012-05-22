@@ -133,15 +133,12 @@ class ClothesTaskView(gui3d.TaskView):
         self.adaptClothesToHuman(human)
 
     def loadHandler(self, human, values):
-        
-        #clothesRelPath = os.path.join(values[1].replace('.obj', ''), values[1].replace('.obj', '.mhclo'))
-        #clothesPath = os.path.join(self.userClothes, clothesRelPath)
-        #if not os.path.isfile(clothesPath):
-        #   clothesPath = os.path.join(self.systemClothes, clothesRelPath)
 
-        #(fname, ext) = os.path.splitext(values[1])
-        #clothesPath = export_config.findExistingProxyFile("clothes", None, "%s.mhclo" % fname)         
-        self.setClothes(human, values[1])
+	mhclo = values[1]        
+        if not os.path.exists(os.path.realpath(mhclo)):
+            print mhclo, "does not exist. Skipping."
+            return
+        self.setClothes(human, mhclo)
         
     def saveHandler(self, human, file):
         

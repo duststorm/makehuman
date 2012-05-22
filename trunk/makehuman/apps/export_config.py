@@ -301,11 +301,11 @@ def exportConfig(human, useHair, options=None):
         elif status:
             if status == 'customrigs':
                 path = os.path.realpath(os.path.expanduser(words[0]))
-                print(path)
+                print path
                 (dirname,fname) = os.path.split(path)
-                print(fname)
+                print fname
                 (modname,ext) = os.path.splitext(fname)
-                print(modname, ext)
+                print modname, ext
                 if ext != ".py":
                     raise NameError("@CustomRig must be a .py file, not %s" % words[0])
                 cfg.customrigs.append((dirname, modname))
@@ -357,14 +357,15 @@ def getOutFileFolder(filename, config):
 
 def getSubFolder(path, name):
     folder = os.path.join(path, name)
-    print(path, name)
-    print("Using folder", folder)
+    #print "Using folder", folder
     if not os.path.exists(folder):
-        print("Creating folder", folder)
+        print "Creating folder"
+        #print folder
         try:
             os.mkdir(folder)
         except:
-            print("Unable to create separate folder %s" % folder)
+            print "Unable to create separate folder:",
+            #print folder
             return None
     return folder        
     

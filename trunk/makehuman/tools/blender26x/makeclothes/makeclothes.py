@@ -42,11 +42,8 @@ theThreshold = -0.2
 theListLength = 3
 Epsilon = 1e-4
 
-LastVertices = {
-    "Body" : 15340,
-    "Skirt" : 16096,
-    "Tights" : 18528,
-}
+BaseMeshVersion = "alpha_7"
+
 LastClothing = "Tights"
 ClothingEnums = [
     ("Body", "Body", "Body"),
@@ -54,8 +51,14 @@ ClothingEnums = [
     ("Tights", "Tights", "Tights")
 ]
 
-NBodyVerts = LastVertices["Body"]
-NBodyFaces = 14812
+if BaseMeshVersion == "alpha_7":
+    LastVertices = {
+        "Body" : 15340,
+        "Skirt" : 16096,
+        "Tights" : 18528,
+    }
+    NBodyVerts = LastVertices["Body"]
+    NBodyFaces = 14812
 
 #
 #   isHuman(ob):
@@ -532,7 +535,8 @@ def printClothes(context, bob, pob, data):
     fp.write(
 "# author %s\n" % scn.MCAuthor +
 "# license %s\n" % scn.MCLicense +
-"# homepage %s\n" % scn.MCHomePage)
+"# homepage %s\n" % scn.MCHomePage +
+"# basemesh %s\n" % BaseMeshVersion)
 
     fp.write("# name %s\n" % pob.name.replace(" ","_"))
     fp.write("# obj_file %s.obj\n" % goodName(pob.name))
@@ -804,6 +808,8 @@ def writeColor(fp, string1, string2, color, intensity):
         "%s %.4g\n" % (string2, intensity))
 
 def printScale(fp, bob, scn, name, index, prop1, prop2):
+    if not scn.MCIsMHMesh:
+        return
     verts = bob.data.vertices
     n1 = eval("scn.%s" % prop1)
     n2 = eval("scn.%s" % prop2)
@@ -1035,6 +1041,7 @@ def printItems(struct):
 def projectUVs(bob, pob, context):
     print("Projecting %s => %s" % (bob.name, pob.name))
     (bob1, data) = restoreData(context)
+    scn = context.scene
 
     (bVertEdges, bVertFaces, bEdgeFaces, bFaceEdges, bFaceNeighbors, bUvFaceVertsList, bTexVertsList) = setupTexVerts(bob)
     bUvFaceVerts = bUvFaceVertsList[0]
@@ -1043,7 +1050,8 @@ def projectUVs(bob, pob, context):
     table = {}
     bFaces = getFaces(bob.data)
     bTexFaces = getTexFaces(bob.data, 0)
-    modifyTexFaces(bFaces, bTexFaces)
+    if scn.MCIsMHMesh:
+        modifyTexFaces(bFaces, bTexFaces)
     for (pv, exact, verts, wts, diff) in data:
         if exact:
             print("Exact", pv.index)
@@ -1148,6 +1156,8 @@ def projectUVs(bob, pob, context):
 def modifyTexFaces(meFaces, texFaces):
     nFaces = len(meFaces)
     nModFaces = len(base_uv.texFaces)
+    if nFaces < NBodyFaces + nModFaces:
+        nModFaces = nFaces - NBodyFaces
     for n in range(nModFaces):
         tf = base_uv.texFaces[n]
         texFaces[n+NBodyFaces].uvs = [Vector(tf[0]), Vector(tf[1]), Vector(tf[2]), Vector(tf[3])]
@@ -1341,6 +1351,7 @@ def getUvLoc(vn, f, uvface):
 def recoverSeams(context):
     ob = getHuman(context)
     scn = context.scene
+    getFaces(ob.data)
     texFaces = getTexFaces(ob.data, 0)
     (vertList, pairList, edgeList) = getSeams(ob, texFaces, scn)
     vcoList = coordList(vertList, ob.data.vertices)
@@ -1353,6 +1364,52 @@ def recoverSeams(context):
     print("Seams recovered for object %s\n" % ob.name)
     return    
 
+
+def setSeams(context):
+    scn = context.scene
+    clothing = None
+    seams = None
+    for ob in scn.objects:
+        if ob.select and not isHuman(ob):
+            faces = getFaces(ob.data)
+            if faces:
+                clothing = ob
+            else:
+                seams = ob
+    if not (clothing and seams):
+        raise NameError("A clothing and a seam object must be selected")
+    checkObjectOK(clothing, context)
+    checkObjectOK(seams, context)
+
+    for e in clothing.data.edges:
+        e.use_seam = False
+        
+    for se in seams.data.edges:
+        dist = 1e6
+        sv0 = seams.data.vertices[se.vertices[0]]
+        sv1 = seams.data.vertices[se.vertices[1]]
+        best = None
+        for e in clothing.data.edges:
+            v0 = clothing.data.vertices[e.vertices[0]]
+            v1 = clothing.data.vertices[e.vertices[1]]
+            d00 = v0.co - sv0.co
+            d01 = v0.co - sv1.co
+            d10 = v1.co - sv0.co
+            d11 = v1.co - sv1.co
+            d0 = d00.length + d11.length
+            d1 = d01.length + d10.length
+            if d1 < d0:
+                d0 = d1
+            if d0 < dist:
+                dist = d0
+                best = e
+        best.use_seam = True
+        best.select = True
+        if se.index % 100 == 0:
+            print(se.index)
+    print("Seams set for object %s\n" % clothing.name)
+    return        
+    
             
 def coordList(vertList, verts):
     coords = []
@@ -1414,7 +1471,7 @@ def makeClothes(context, doFindClothes):
     (bob, pob) = getObjectPair(context)
     scn = context.scene
     checkObjectOK(bob, context)
-    checkAndVertexDiamonds(bob)
+    checkAndVertexDiamonds(scn, bob)
     checkObjectOK(pob, context)
     checkSingleVGroups(pob)
     if scn.MCLogging:
@@ -2077,17 +2134,17 @@ def addBodyVerts(me, verts):
     return                
 
 #
-#   checkAndVertexDiamonds(ob):
+#   checkAndVertexDiamonds(scn, ob):
 #
 
-def checkAndVertexDiamonds(ob):
+def checkAndVertexDiamonds(scn, ob):
     print("Unvertex diamonds in %s" % ob)
     bpy.ops.object.mode_set(mode='EDIT')
     bpy.ops.mesh.select_all(action='DESELECT')
     bpy.ops.object.mode_set(mode='OBJECT')
     me = ob.data
     nverts = len(me.vertices)
-    if nverts not in LastVertices.values():
+    if scn.MCIsMHMesh and (nverts not in LastVertices.values()):
         raise NameError(
             "Base object %s has %d vertices. The number of verts in an MH human must be one of %s" % 
             (ob, nverts, LastVertices.values()))
@@ -2345,6 +2402,11 @@ def initInterface():
         name="Log", 
         description="Write a log file for debugging",
         default=False)
+
+    bpy.types.Scene.MCIsMHMesh = BoolProperty(
+        name="MakeHuman mesh", 
+        description="The human is the MakeHuman base mesh",
+        default=True)
 
     bpy.types.Scene.MCMakeHumanDirectory = StringProperty(
         name="MakeHuman Directory", 

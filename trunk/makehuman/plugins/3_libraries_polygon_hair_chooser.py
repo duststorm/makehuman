@@ -132,6 +132,9 @@ class HairTaskView(gui3d.TaskView):
     def loadHandler(self, human, values):
         
         mhclo = values[1]
+        if not os.path.exists(os.path.realpath(mhclo)):
+            print mhclo, "does not exist. Skipping."
+            return
         obj = mhclo.replace(".mhclo", ".obj")
         self.setHair(human, obj, mhclo)
         

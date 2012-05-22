@@ -37,6 +37,7 @@ class CProxy:
         self.name = None
         self.type = typ
         self.file = file
+        self.basemesh = "alpha_7"
         self.z_depth = 50
         self.layer = layer
         self.material = CMaterial()
@@ -160,7 +161,7 @@ def readProxyFile(obj, file, evalOnLoad):
         pfile.file = file
     else:
         pfile = file
-    #print("Loading", pfile)
+    #print "Loading", pfile
     folder = os.path.dirname(pfile.file)
     objfile = None
     
@@ -169,7 +170,7 @@ def readProxyFile(obj, file, evalOnLoad):
     except:
         tmpl = None
     if tmpl == None:
-        print("*** Cannot open", pfile.file)
+        print "*** Cannot open", pfile.file 
         return None
         return CProxy(None, pfile.type, pfile.layer)
 
@@ -303,9 +304,12 @@ def readProxyFile(obj, file, evalOnLoad):
                 proxy.modifiers.append( ['shrinkwrap', offset] )
             elif key == 'shapekey':
                 proxy.shapekeys.append( words[2] )
+            elif key == 'basemesh':
+                proxy.basemesh = words[2]
+                print "Base mesh %s" % proxy.basemesh
             else:
                 pass
-                #print("Ignored proxy keyword " + key)
+                #print "Ignored proxy keyword", key
         elif status == doObjData:
             if words[0] == 'vt':
                 newTexVert(1, words, proxy)
@@ -442,7 +446,7 @@ def copyObjFile(proxy):
     try:
         tmpl = open(objpath, "rU")
     except:
-        print("*** Cannot open %s" % objpath)
+        print "*** Cannot open %s" % objpath
         return False
 
     proxy.texVerts = []
