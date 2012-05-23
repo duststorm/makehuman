@@ -79,6 +79,7 @@ class CProxy:
         self.shapekeys = []
         self.weights = None
         self.refVerts = []
+        self.clothings = []
         return
         
     def update(self, mesh, parent):
@@ -307,6 +308,8 @@ def readProxyFile(obj, file, evalOnLoad):
                 proxy.material_file = getFileName(folder, words[2], ".mhx")
             elif key == 'obj_file':
                 proxy.obj_file = getFileName(folder, words[2], ".obj")
+            elif key == 'clothing':
+                proxy.clothings.append(words[2])
             elif key == 'subsurf':
                 levels = int(words[2])
                 if len(words) > 3:

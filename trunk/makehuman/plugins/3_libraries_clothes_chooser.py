@@ -53,7 +53,16 @@ class ClothesTaskView(gui3d.TaskView):
         
     def setClothes(self, human, mhclo):
 
+        print("sc", mhclo)
         proxy = mh2proxy.readProxyFile(human.meshData, mhclo, False)
+        
+        if proxy.clothings:
+            folder = os.path.dirname(mhclo)
+            for piece in proxy.clothings:
+                piecefile = os.path.join(folder, piece, piece+".mhclo")
+                self.setClothes(human, piecefile)
+            return
+            
         #folder = os.path.dirname(mhclo)
         (folder, name) = proxy.obj_file
         obj = os.path.join(folder, name)
@@ -134,7 +143,7 @@ class ClothesTaskView(gui3d.TaskView):
 
     def loadHandler(self, human, values):
 
-	mhclo = values[1]        
+        mhclo = values[1]        
         if not os.path.exists(os.path.realpath(mhclo)):
             print mhclo, "does not exist. Skipping."
             return
