@@ -53,7 +53,6 @@ class ClothesTaskView(gui3d.TaskView):
         
     def setClothes(self, human, mhclo):
 
-        print("sc", mhclo)
         proxy = mh2proxy.readProxyFile(human.meshData, mhclo, False)
         
         if proxy.clothings:
@@ -143,18 +142,18 @@ class ClothesTaskView(gui3d.TaskView):
 
     def loadHandler(self, human, values):
 
-        mhclo = values[1]        
-        if not os.path.exists(os.path.realpath(mhclo)):
-            print mhclo, "does not exist. Skipping."
-            return
-        self.setClothes(human, mhclo)
+        mhclo = export_config.getExistingProxyFile(values, "clothes")
+        if not mhclo:
+            print values[1], "does not exist. Skipping."
+        else:            
+            self.setClothes(human, mhclo)
         
     def saveHandler(self, human, file):
         
         for (name,clo) in human.clothesObjs.items():
             if clo:
                 proxy = human.clothesProxies[name]
-                file.write('clothes %s\n' % proxy.file)
+                file.write('clothes %s %s\n' % (os.path.basename(proxy.file), proxy.uuid))
                 
     def syncMedia(self):
         

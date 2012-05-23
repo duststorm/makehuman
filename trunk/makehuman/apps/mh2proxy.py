@@ -37,6 +37,7 @@ class CProxy:
         self.name = None
         self.type = typ
         self.file = file
+        self.uuid = ""
         self.basemesh = "alpha_7"
         self.xScaleData = None
         self.yScaleData = None
@@ -94,7 +95,6 @@ class CProxy:
         xScale = getScale(self.xScaleData, parent.verts, 0)
         yScale = getScale(self.yScaleData, parent.verts, 1)
         zScale = getScale(self.zScaleData, parent.verts, 2)
-        print("Scales", xScale,yScale,zScale)
 
         for n,vert in enumerate(mesh.verts):
             refVert = self.refVerts[n]
@@ -255,6 +255,8 @@ def readProxyFile(obj, file, evalOnLoad):
                 proxy.texFacesLayers[0] = proxy.texFaces                
             elif key == 'name':
                 proxy.name = words[2]
+            elif key == 'uuid':
+            	proxy.uuid = words[2]
             elif key == 'z_depth':
                 proxy.z_depth = int(words[2])
             elif key == 'wire':
@@ -324,7 +326,6 @@ def readProxyFile(obj, file, evalOnLoad):
                 proxy.shapekeys.append( words[2] )
             elif key == 'basemesh':
                 proxy.basemesh = words[2]
-                print "Base mesh %s" % proxy.basemesh
             else:
                 pass
                 #print "Ignored proxy keyword", key

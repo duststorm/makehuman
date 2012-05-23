@@ -134,43 +134,65 @@ class CProxyFile:
 "    name %s file \"%s\">" % (self.name, self.file))
         
 #
-#   exportConfig(human, useHair, options=None):
 #
-"""
-def findExistingProxyFile(ptype, subfolder, fname):
-    folder = os.path.join(mh.getPath(''), 'data', ptype)
-    path = findExistingProxyFile1(folder, subfolder, fname, 4)
-    if path:
+#
+        
+def getExistingProxyFile(words, category):
+    path = words[1]  
+    if len(words) <= 2:
+        if not os.path.exists(os.path.realpath(path)):
+            return None
+        print ("Found", path)
         return path
-    folder = os.path.join('./data', ptype)
-    path = findExistingProxyFile1(folder, subfolder, fname, 4)
-    if path:
-        return path
-    safePrint("Did not find", fname)                
-    return None
+    else:
+        file = os.path.basename(path)
+        uuid = words[2]
+        paths = []
+        folder = os.path.join(mh.getPath(''), 'data', category)
+        addProxyFiles(file, folder, paths, 6)
+        folder = os.path.join('data', category)
+        addProxyFiles(file, folder, paths, 6)
+        for path in paths:        
+            uuid1 = scanFileForUuid(path)
+            if uuid1 == uuid:
+                print("Found", path, uuid)
+                return path
+        return None                
 
-def findExistingProxyFile1(folder, subfolder, fname, depth):
+
+def addProxyFiles(file, folder, paths, depth):
     if depth < 0:
         return None
-    if subfolder:
-        path = os.path.realpath("%s/%s/%s" % (folder, subfolder, fname))
-    else:
-        path = os.path.realpath("%s/%s" % (folder, fname))
-    if os.path.isfile(path):
-        safePrint("Found", path)
-        return path
     try:
         files = os.listdir(folder)        
     except OSError:
         return None
-    for file in files:
-        newfolder = os.path.join(folder, file)
-        if os.path.isdir(newfolder):
-            path = findExistingProxyFile1(newfolder, subfolder, fname, depth-1)
-            if path:
-                return path
-    return None                
-"""
+    for pname in files:
+        path = os.path.join(folder, pname)
+        if pname == file:
+            paths.append(path)
+        elif os.path.isdir(path):
+            addProxyFiles(file, path, paths, depth-1)
+    return            
+
+
+def scanFileForUuid(path):           
+    fp = open(path)
+    for line in fp:
+        words = line.split()
+        if len(words) == 0:
+            continue
+        elif words[0] == '#':
+            if words[1] == "uuid":
+                fp.close()
+                return words[2]
+            elif words[1] == "verts":
+                break
+        else:
+            break
+    fp.close()
+    return None
+            
 
 def exportConfig(human, useHair, options=None):
     cfg = CExportConfig()

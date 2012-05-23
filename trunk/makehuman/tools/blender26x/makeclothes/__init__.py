@@ -139,7 +139,8 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.prop(scn, "MCAllUVLayers")   
 
         layout.separator()
-        layout.label("Set mesh type")
+        layout.label("Mesh type")
+        layout.prop(scn, "MCIsMHMesh")
         row = layout.row()
         row.operator("mhclo.make_human", text="Human").isHuman = True
         row.operator("mhclo.make_human", text="Clothing").isHuman = False
@@ -155,6 +156,7 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.separator()
         layout.label("UV projection")
         layout.operator("mhclo.recover_seams")
+        layout.operator("mhclo.set_seams")
         layout.operator("mhclo.project_uvs")
         layout.operator("mhclo.reexport_mhclo")        
         
@@ -235,6 +237,7 @@ class MakeUVsPanel(bpy.types.Panel):
 
         layout.separator()
         layout.operator("mhclo.recover_seams")
+        layout.operator("mhclo.set_seams")
 
         layout.separator()
         layout.operator("mhclo.export_uvs")
@@ -293,6 +296,15 @@ class OBJECT_OT_RecoverSeamsButton(bpy.types.Operator):
 
     def execute(self, context):
         makeclothes.recoverSeams(context)
+        return{'FINISHED'}    
+
+
+class OBJECT_OT_SetSeamsButton(bpy.types.Operator):
+    bl_idname = "mhclo.set_seams"
+    bl_label = "Set seams"
+
+    def execute(self, context):
+        makeclothes.setSeams(context)
         return{'FINISHED'}    
 
 #

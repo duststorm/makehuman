@@ -30,6 +30,7 @@
 import bpy
 import os
 import random
+import uuid
 from bpy.props import *
 from mathutils import Vector
 from . import base_uv
@@ -536,6 +537,7 @@ def printClothes(context, bob, pob, data):
 "# author %s\n" % scn.MCAuthor +
 "# license %s\n" % scn.MCLicense +
 "# homepage %s\n" % scn.MCHomePage +
+"# uuid %s\n" % uuid.uuid4() +
 "# basemesh %s\n" % BaseMeshVersion)
 
     fp.write("# name %s\n" % pob.name.replace(" ","_"))
