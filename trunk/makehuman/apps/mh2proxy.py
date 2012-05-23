@@ -38,6 +38,9 @@ class CProxy:
         self.type = typ
         self.file = file
         self.basemesh = "alpha_7"
+        self.xScaleData = None
+        self.yScaleData = None
+        self.zScaleData = None
         self.z_depth = 50
         self.layer = layer
         self.material = CMaterial()
@@ -82,7 +85,16 @@ class CProxy:
         rlen = len(self.refVerts)
         mlen = len(mesh.verts)
         if rlen != mlen:
-            raise NameError( "Bug: %d refVerts != %d meshVerts" % (rlen, mlen) )
+            file = os.path.basename(self.file)
+            (fname, ext) = os.path.splitext(file)
+            raise NameError( 
+                "Inconsistent clothing files: %d verts in %s != %d verts in %s.obj" % (rlen, file, mlen, fname) )
+
+        xScale = getScale(self.xScaleData, parent.verts, 0)
+        yScale = getScale(self.yScaleData, parent.verts, 1)
+        zScale = getScale(self.zScaleData, parent.verts, 2)
+        print("Scales", xScale,yScale,zScale)
+
         for n,vert in enumerate(mesh.verts):
             refVert = self.refVerts[n]
             if type(refVert) == tuple:
@@ -90,9 +102,9 @@ class CProxy:
                 v0 = parent.verts[rv0]
                 v1 = parent.verts[rv1]
                 v2 = parent.verts[rv2]
-                vert.co[0] = w0*v0.co[0] + w1*v1.co[0] + w2*v2.co[0] + d0
-                vert.co[1] = w0*v0.co[1] + w1*v1.co[1] + w2*v2.co[1] + d1
-                vert.co[2] = w0*v0.co[2] + w1*v1.co[2] + w2*v2.co[2] + d2
+                vert.co[0] = w0*v0.co[0] + w1*v1.co[0] + w2*v2.co[0] + d0*xScale
+                vert.co[1] = w0*v0.co[1] + w1*v1.co[1] + w2*v2.co[1] + d1*yScale
+                vert.co[2] = w0*v0.co[2] + w1*v1.co[2] + w2*v2.co[2] + d2*zScale
             else:
                 vert.co = parent.verts[refVert].co
 
@@ -249,11 +261,14 @@ def readProxyFile(obj, file, evalOnLoad):
             elif key == 'cage':
                 proxy.cage = True
             elif key == 'x_scale':
-                xScale = getScale(words, verts, 0)
+                proxy.xScaleData = getScaleData(words)
+                xScale = getScale(proxy.xScaleData, verts, 0)
             elif key == 'y_scale':
-                yScale = getScale(words, verts, 1)
+                proxy.yScaleData = getScaleData(words)
+                yScale = getScale(proxy.yScaleData, verts, 1)
             elif key == 'z_scale':
-                zScale = getScale(words, verts, 2)                
+                proxy.zScaleData = getScaleData(words)
+                zScale = getScale(proxy.zScaleData, verts, 2)
             elif key == 'use_projection':
                 useProjection = int(words[2])
             elif key == 'ignoreOffset':
@@ -331,9 +346,9 @@ def readProxyFile(obj, file, evalOnLoad):
                 w1 = float(words[4])
                 w2 = float(words[5])            
                 if len(words) > 6:
-                    d0 = float(words[6]) * xScale
-                    d1 = float(words[7]) * yScale
-                    d2 = float(words[8]) * zScale
+                    d0 = float(words[6])
+                    d1 = float(words[7])
+                    d2 = float(words[8])
                 else:
                     (d0,d1,d2) = (0,0,0)
                 proxy.refVerts.append( (v0,v1,v2,w0,w1,w2,d0,d1,d2) )
@@ -472,10 +487,26 @@ def copyObjFile(proxy):
 #   getScale(words, verts, index):                
 #
 
+"""
 def getScale(words, verts, index):                
     v1 = int(words[2])
     v2 = int(words[3])
     den = float(words[4])
+    num = abs(verts[v1].co[index] - verts[v2].co[index])
+    return num/den
+"""    
+
+def getScaleData(words):
+    v1 = int(words[2])
+    v2 = int(words[3])
+    den = float(words[4])
+    return (v1, v2, den)
+
+    
+def getScale(data, verts, index):
+    if not data:
+        return 1.0
+    (v1, v2, den) = data
     num = abs(verts[v1].co[index] - verts[v2].co[index])
     return num/den
 
