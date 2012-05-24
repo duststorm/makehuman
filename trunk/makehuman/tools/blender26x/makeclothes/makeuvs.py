@@ -42,11 +42,7 @@ def exportUVs(context):
     (outpath, outfile) = makeclothes.getFileName(ob, context, "mhuv")
     print("Creating UV file %s" % outfile)
     fp= open(outfile, "w")
-    fp.write(
-"# author %s\n" % scn.MCAuthor +
-"# license %s\n" % scn.MCLicense +
-"# homepage %s\n" % scn.MCHomePage)
-
+    makeclothes.printClothesHeader(fp, scn)
     fp.write("# name %s\n" % ob.name.replace(" ","_"))
     
     for mat in ob.data.materials:

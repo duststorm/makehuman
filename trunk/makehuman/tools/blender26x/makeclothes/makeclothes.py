@@ -34,6 +34,7 @@ import uuid
 from bpy.props import *
 from mathutils import Vector
 from . import base_uv
+from . import error
 
 #
 #   Global variables
@@ -91,14 +92,14 @@ def getHuman(context):
     for ob in context.scene.objects:
         if ob.select and isHuman(ob):
             return ob
-    raise NameError("No human selected")
+    raise error.MhcloError("No human selected")
 
         
 def getClothing(context):        
     for ob in context.scene.objects:
         if ob.select and isClothing(ob):
             return ob
-    raise NameError("No clothing selected")
+    raise error.MhcloError("No clothing selected")
     
     
 def getObjectPair(context):
@@ -109,19 +110,19 @@ def getObjectPair(context):
         if ob.select:
             if isHuman(ob):
                 if human:
-                    raise NameError("Two humans selected: %s and %s" % (human.name, ob.name))
+                    raise error.MhcloError("Two humans selected: %s and %s" % (human.name, ob.name))
                 else:
                     human = ob
             elif ob.type == 'MESH':
                 if clothing:
-                    raise NameError("Two pieces of clothing selected: %s and %s" % (clothing.name, ob.name))
+                    raise error.MhcloError("Two pieces of clothing selected: %s and %s" % (clothing.name, ob.name))
                 else:
                     clothing = ob
     if not human:
-        raise NameError("No human selected")
+        raise error.MhcloError("No human selected")
     if isSelfClothed(context):
         if clothing:
-            raise NameError("Clothing %s selected but human %s is self-clothed" % (clothing.name, human.name))
+            raise error.MhcloError("Clothing %s selected but human %s is self-clothed" % (clothing.name, human.name))
         checkObjectOK(human, context)
         nverts = len(human.data.vertices)
         nOldVerts = LastVertices[scn.MCSelfClothed]
@@ -129,7 +130,7 @@ def getObjectPair(context):
         base = copyObject(human, 0, nOldVerts, context, "Base")
         return (base, clothing)
     elif not clothing:
-        raise NameError("No clothing selected")
+        raise error.MhcloError("No clothing selected")
     return (human, clothing)  
 
     
@@ -223,7 +224,7 @@ def findClothes(context, bob, pob, log):
             pindex = -1
         if pindex < 0:
             selectVerts([pv], pob)
-            raise NameError("Clothes %s vert %d not member of any group" % (pob.name, pv.index))
+            raise error.MhcloError("Clothes %s vert %d not member of any group" % (pob.name, pv.index))
 
         gname = pob.vertex_groups[pindex].name
         bindex = None
@@ -231,7 +232,7 @@ def findClothes(context, bob, pob, log):
             if bvg.name == gname:
                 bindex = bvg.index
         if bindex == None:
-            raise NameError("Did not find vertex group %s in base mesh" % gname)            
+            raise error.MhcloError("Did not find vertex group %s in base mesh" % gname)            
 
         mverts = []
         for n in range(theListLength):
@@ -274,7 +275,7 @@ def findClothes(context, bob, pob, log):
             "Vertex coordinates (%.4f %.4f %.4f)\n" % (pv.co[0], pv.co[1], pv.co[2])
             )
             selectVerts([pv], pob)
-            raise NameError(msg)
+            raise error.MhcloError(msg)
         if mindist > 5:
             msg = (
             "Vertex %d is %f dm away from closest body vertex in group %s.\n" % (pv.index, mindist, gname) +
@@ -282,7 +283,7 @@ def findClothes(context, bob, pob, log):
             "Vertex coordinates (%.4f %.4f %.4f)\n" % (pv.co[0], pv.co[1], pv.co[2])
             )
             selectVerts([pv], pob)
-            raise NameError(msg)
+            raise error.MhcloError(msg)
 
         if gname[0:3] != "Mid":
             bindex = -1
@@ -359,7 +360,7 @@ def findClothes(context, bob, pob, log):
                 msg = (
                 "Did not find optimal triangle for %s vert %d.\n" % (pob.name, pv.index) +
                 "Avoid the message by unchecking Forbid failures.")
-                raise NameError(msg)
+                raise error.MhcloError(msg)
             """
             (mv, mdist) = mverts[0]
             bVerts = [mv.index,0,1]
@@ -473,7 +474,7 @@ def cornerWeights(pv, v0, v1, v2, bob, pob):
         print("A [ %.6f %.6f ]\n  [ %.6f %.6f ]" % (a00,a01,a10,a11))
         selectVerts([pv], pob)
         selectVerts([v0, v1, v2], bob)
-        raise NameError("Singular matrix in cornerWeights")
+        raise error.MhcloError("Singular matrix in cornerWeights")
 
     w0 = (a11*b0 - a01*b1)/det
     w1 = (-a10*b0 + a00*b1)/det
@@ -522,6 +523,20 @@ def midWeight(pv, r0, r1):
 #    printClothes(context, bob, pob, data):
 #
         
+def printClothesHeader(fp, scn):
+    fp.write(
+"# author %s\n" % scn.MCAuthor +
+"# license %s\n" % scn.MCLicense +
+"# homepage %s\n" % scn.MCHomePage +
+"# uuid %s\n" % uuid.uuid4() +
+"# basemesh %s\n" % BaseMeshVersion)
+    for n in range(1,6):
+        tag = eval("scn.MCTag%d" % n)
+        if tag:
+            fp.write("# tag %s\n" % tag)
+    fp.write("\n")            
+
+
 def printClothes(context, bob, pob, data):
     scn = context.scene
     if isSelfClothed(context):
@@ -533,13 +548,7 @@ def printClothes(context, bob, pob, data):
         (outpath, outfile) = getFileName(pob, context, "mhclo")
     print("Creating clothes file %s" % outfile)
     fp= open(outfile, "w")
-    fp.write(
-"# author %s\n" % scn.MCAuthor +
-"# license %s\n" % scn.MCLicense +
-"# homepage %s\n" % scn.MCHomePage +
-"# uuid %s\n" % uuid.uuid4() +
-"# basemesh %s\n" % BaseMeshVersion)
-
+    printClothesHeader(fp, scn)
     fp.write("# name %s\n" % pob.name.replace(" ","_"))
     fp.write("# obj_file %s.obj\n" % goodName(pob.name))
     printScale(fp, bob, scn, 'x_scale', 0, 'MCX1', 'MCX2')
@@ -974,14 +983,14 @@ def restoreData(context):
         if status == 0:
             pname = words[0]
             if pname != pob.name:
-                raise NameError(
+                raise error.MhcloError(
                 "Restore error: stored data for %s does not match selected object %s\n" % (pname, pob.name) +
                 "Make clothes for %s first\n" % pob.name)
             status = 10
         elif status == 10:
             bname = words[0]
             if bname != bob.name:
-                raise NameError(
+                raise error.MhcloError(
                 "Restore error: stored human %s does not match selected human %s\n" % (bname, bob.name) +
                 "Make clothes for %s first\n" % pob.name)
             status = 1
@@ -1249,7 +1258,7 @@ def getFaceIndex(vn, f):
             #print(v.index, n, list(f.vertices))            
             return n
         n += 1
-    raise NameError("Vert %d not in face %d %s" % (vn, f.index, list(f.vertices)))
+    raise error.MhcloError("Vert %d not in face %d %s" % (vn, f.index, list(f.vertices)))
 
 
 def getSeamData(me, uvFaceVerts, edgeFaces):    
@@ -1344,7 +1353,7 @@ def getUvLoc(vn, f, uvface):
     for n,vk in enumerate(f.vertices):
         if vk == vn:
             return uvface[n]
-    raise NameError("Vertex %d not in face %d??" % (vn,f))
+    raise error.MhcloError("Vertex %d not in face %d??" % (vn,f))
 
 #
 #   recoverSeams(context):
@@ -1379,7 +1388,7 @@ def setSeams(context):
             else:
                 seams = ob
     if not (clothing and seams):
-        raise NameError("A clothing and a seam object must be selected")
+        raise error.MhcloError("A clothing and a seam object must be selected")
     checkObjectOK(clothing, context)
     checkObjectOK(seams, context)
 
@@ -1529,7 +1538,7 @@ def checkObjectOK(ob, context):
         if error:
             msg +=  "Apply or delete before continuing.\n"
             print(msg)
-            raise NameError(msg)
+            raise error.MhcloError(msg)
         else:
             print(msg)
             print("Fixed automatically")
@@ -1548,7 +1557,7 @@ def checkSingleVGroups(pob):
             n += 1
         if n != 1:
             v.select = True
-            raise NameError("Vertex %d in %s belongs to %d groups. Must be exactly one" % (v.index, pob.name, n))
+            raise error.MhcloError("Vertex %d in %s belongs to %d groups. Must be exactly one" % (v.index, pob.name, n))
     return            
         
 #
@@ -1810,7 +1819,7 @@ def writeQuoted(arg, fp):
             c = ','
         fp.write("]")
     else:
-        raise NameError("Unknown property %s %s" % (arg, typ))
+        raise error.MhcloError("Unknown property %s %s" % (arg, typ))
         fp.write('%s' % arg)
 
 def stringQuote(string):
@@ -2147,7 +2156,7 @@ def checkAndVertexDiamonds(scn, ob):
     me = ob.data
     nverts = len(me.vertices)
     if scn.MCIsMHMesh and (nverts not in LastVertices.values()):
-        raise NameError(
+        raise error.MhcloError(
             "Base object %s has %d vertices. The number of verts in an MH human must be one of %s" % 
             (ob, nverts, LastVertices.values()))
     bpy.ops.object.mode_set(mode='EDIT')
@@ -2278,8 +2287,7 @@ def getTexFaces(me, ln):
                 tf.uvs.append(uvface.uv4)
             texFaces[f.index] = tf
     return texFaces            
-        
-
+      
 #
 #   initInterface():
 #
@@ -2508,6 +2516,31 @@ def initInterface():
         name="HomePage", 
         default="http://www.makehuman.org/",
         maxlen=256)
+
+    bpy.types.Scene.MCTag1 = StringProperty(
+        name="Tag1", 
+        default="",
+        maxlen=32)
+    
+    bpy.types.Scene.MCTag2 = StringProperty(
+        name="Tag2", 
+        default="",
+        maxlen=32)
+    
+    bpy.types.Scene.MCTag3 = StringProperty(
+        name="Tag3", 
+        default="",
+        maxlen=32)
+    
+    bpy.types.Scene.MCTag4 = StringProperty(
+        name="Tag4", 
+        default="",
+        maxlen=32)
+    
+    bpy.types.Scene.MCTag5 = StringProperty(
+        name="Tag5", 
+        default="",
+        maxlen=32)
     
 
     return

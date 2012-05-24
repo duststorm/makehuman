@@ -37,8 +37,10 @@ class CProxy:
         self.name = None
         self.type = typ
         self.file = file
-        self.uuid = ""
+        self.uuid = None
         self.basemesh = "alpha_7"
+        self.tags = []
+        
         self.xScaleData = None
         self.yScaleData = None
         self.zScaleData = None
@@ -143,9 +145,15 @@ class CTexture:
         self.types = []   
                 
 
+def stringFromWords(words):
+    string = words[0]
+    for word in words[1:]:
+        string += " " + word
+    return string
+
+
 def getFileName(folder, file, suffix):
     folder = os.path.realpath(os.path.expanduser(folder))
-    #folder = folder.lower()
     (name, ext) = os.path.split(file)
     if ext:
         return (folder, file)
@@ -164,7 +172,7 @@ doObjData = 5
 doWeights = 6
 doRefVerts = 7
 doFaceNumbers = 8
-doTexFaces = 9
+doTexFaces = 9    
 
 def readProxyFile(obj, file, evalOnLoad):
     if not file:
@@ -226,7 +234,7 @@ def readProxyFile(obj, file, evalOnLoad):
                 proxy.weights[words[2]] = weights
             elif key == 'material':
                 status = doMaterial
-                proxy.material.name = words[2]
+                proxy.material.name = stringFromWords(words[2:])
             elif key == 'useBaseMaterials':
                 proxy.useBaseMaterials = True
             elif key == 'faceNumbers':
@@ -254,9 +262,11 @@ def readProxyFile(obj, file, evalOnLoad):
                 proxy.texVertsLayers[0] = proxy.texVerts
                 proxy.texFacesLayers[0] = proxy.texFaces                
             elif key == 'name':
-                proxy.name = words[2]
+                proxy.name = stringFromWords(words[2:])
             elif key == 'uuid':
-            	proxy.uuid = words[2]
+                proxy.uuid = stringFromWords(words[2:])
+            elif key == 'tag':
+                proxy.tags.append( stringFromWords(words[2:]) )
             elif key == 'z_depth':
                 proxy.z_depth = int(words[2])
             elif key == 'wire':

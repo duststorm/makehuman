@@ -181,13 +181,11 @@ def scanFileForUuid(path):
     for line in fp:
         words = line.split()
         if len(words) == 0:
-            continue
+            break
         elif words[0] == '#':
             if words[1] == "uuid":
                 fp.close()
                 return words[2]
-            elif words[1] == "verts":
-                break
         else:
             break
     fp.close()
