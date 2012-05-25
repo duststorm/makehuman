@@ -971,6 +971,7 @@ def storeData(pob, bob, data):
     fp.close()
     return
     
+    
 def restoreData(context): 
     (bob, pob) = getObjectPair(context)
     fname = settingsFile("stored")
@@ -981,14 +982,14 @@ def restoreData(context):
         #print(line)
         words = line.split()
         if status == 0:
-            pname = words[0]
+            pname = line.rstrip()
             if pname != pob.name:
                 raise error.MhcloError(
                 "Restore error: stored data for %s does not match selected object %s\n" % (pname, pob.name) +
                 "Make clothes for %s first\n" % pob.name)
             status = 10
         elif status == 10:
-            bname = words[0]
+            bname = line.rstrip()
             if bname != bob.name:
                 raise error.MhcloError(
                 "Restore error: stored human %s does not match selected human %s\n" % (bname, bob.name) +
