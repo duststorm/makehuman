@@ -695,6 +695,12 @@ def writeProxyModifiers(fp, proxy):
 "      offset %.4f ;\n" % offset +
 "      use_keep_above_surface True ;\n" +
 "    end Modifier\n")
+        elif mod[0] == 'solidify':
+            thickness = mod[1]
+            fp.write(
+"    Modifier Solidify SOLIDIFY\n" +
+"      thickness %.4f ;\n" % thickness +
+"    end Modifier\n")
     return
 
 #
@@ -786,6 +792,7 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
     bump = None
     normal = None
     displacement = None
+    transparency = None
     if proxy.texture:
         (tex,texname) = writeProxyTexture(fp, proxy.texture, mat, "")
     if proxy.bump:
@@ -796,6 +803,8 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
             )
     if proxy.displacement:
         (displacement,dispname) = writeProxyTexture(fp, proxy.displacement, mat, "")
+    if proxy.transparency:
+        (transparency,transname) = writeProxyTexture(fp, proxy.transparency, mat, "")
            
     prxList = sortedMasks(proxyData)
     nMasks = countMasks(proxy, prxList)
@@ -852,13 +861,26 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
 "    uv_layer '%s' ;\n" % uvlayer +
 "  end MTex\n")
         slot += 1
+
+    if transparency:        
+        fp.write(
+"  MTex %d %s UV ALPHA\n" % (slot, transname) +
+"    texture Refer Texture %s ;\n" % transname +
+"    use_map_alpha True ;\n" +
+"    use_map_color_diffuse False ;\n" +
+"    invert True ;\n" +
+"    use_stencil True ;\n" +
+"    use_rgb_to_intensity True ;\n" +
+"    uv_layer '%s' ;\n" % uvlayer +
+"  end MTex\n")
+        slot += 1        
         
-    if nMasks > 0:
+    if nMasks > 0 or mat.alpha < 0.99:
         fp.write(
 "  use_transparency True ;\n" +
 "  transparency_method 'Z_TRANSPARENCY' ;\n" +
-"  alpha 0 ;\n" +
-"  specular_alpha 0 ;\n")
+"  alpha %3.f ;\n" % mat.alpha +
+"  specular_alpha %.3f ;\n" % mat.alpha)
     if mat.mtexSettings == []:
         fp.write(
 "  use_shadows True ;\n" +

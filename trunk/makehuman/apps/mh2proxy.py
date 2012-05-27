@@ -62,6 +62,7 @@ class CProxy:
         self.bump = None
         self.normal = None
         self.displacement = None
+        self.transparency = None
         self.bumpStrength = 1.0
         self.normalStrength = 1.0
         self.dispStrength = 0.2
@@ -304,6 +305,8 @@ def readProxyFile(obj, file, evalOnLoad):
                 proxy.normal = getFileName(folder, words[2], ".tif")
                 if len(words) > 4:
                     proxy.normalStrength = float(words[4])
+            elif key == 'transparency':
+                proxy.transparency = getFileName(folder, words[2], ".tif")
             elif key == 'displacement':
                 proxy.displacement = getFileName(folder, words[2], ".tif")
                 if len(words) > 4:
@@ -332,6 +335,9 @@ def readProxyFile(obj, file, evalOnLoad):
             elif key == 'shrinkwrap':
                 offset = float(words[2])
                 proxy.modifiers.append( ['shrinkwrap', offset] )
+            elif key == 'solidify':
+                thickness = float(words[2])
+                proxy.modifiers.append( ['solidify', thickness] )
             elif key == 'shapekey':
                 proxy.shapekeys.append( words[2] )
             elif key == 'basemesh':

@@ -132,6 +132,7 @@ class MakeClothesPanel(bpy.types.Panel):
         col.prop(scn, "MCUseBump")   
         col.prop(scn, "MCUseNormal")   
         col.prop(scn, "MCUseDisp")   
+        col.prop(scn, "MCUseTrans")   
         col = row.column()
         col.prop(scn, "MCTextureLayer", text = "")   
         col.prop(scn, "MCMaskLayer", text="")   

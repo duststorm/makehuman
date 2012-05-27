@@ -687,6 +687,8 @@ def printStuff(fp, pob, context):
             fp.write("# shrinkwrap %.3f\n" % (mod.offset))
         elif mod.type == 'SUBSURF':
             fp.write("# subsurf %d %d\n" % (mod.levels, mod.render_levels))
+        elif mod.type == 'SOLIDIFY':
+            fp.write("# solidify %.3f %.3f\n" % (mod.thickness, mod.offset))
             
     for skey in ShapeKeys:            
         if eval("scn.MC" + skey):
@@ -712,40 +714,49 @@ def printStuff(fp, pob, context):
     if scn.MCHairMaterial:
         fp.write(
 "# material %s\n" % pob.name +
-"texture data/hairstyles/%s_texture.tif %d\n" % (pob.name, scn.MCTextureLayer) +
-"diffuse_intensity 0.8\n" +
-"specular_intensity 0.0\n" +
-"specular_hardness 1\n" +
-"use_shadows 1\n" +
-"use_transparent_shadows 1\n" +
-"use_raytrace 0\n" +
-"use_transparency 1\n" +
-"alpha 0.0\n" +
-"specular_alpha 0.0\n" +
-"use_map_color_diffuse 1\n" +
-"use_map_alpha 1\n" +
-"use_alpha 1\n" +
-"diffuse_color_factor 1.0\n" +
-"alpha_factor 1.0\n")
+"  texture data/hairstyles/%s_texture.tif %d\n" % (pob.name, scn.MCTextureLayer) +
+"  diffuse_intensity 0.8\n" +
+"  specular_intensity 0.0\n" +
+"  specular_hardness 1\n" +
+"  use_shadows 1\n" +
+"  use_transparent_shadows 1\n" +
+"  use_raytrace 0\n" +
+"  use_transparency 1\n" +
+"  alpha 0.0\n" +
+"  specular_alpha 0.0\n" +
+"  use_map_color_diffuse 1\n" +
+"  use_map_alpha 1\n" +
+"  use_alpha 1\n" +
+"  diffuse_color_factor 1.0\n" +
+"  alpha_factor 1.0\n")
 
     me = pob.data
 
     useMats = scn.MCMaterials
     useBlender = scn.MCBlenderMaterials
+    alphaDone = False
     if me.materials and (useMats or useBlender) and me.materials[0]:
         mat = me.materials[0]
         fp.write("# material %s\n" % mat.name)
         if useMats:
             writeColor(fp, 'diffuse_color', 'diffuse_intensity', mat.diffuse_color, mat.diffuse_intensity)
-            fp.write('diffuse_shader %s\n' % mat.diffuse_shader)
+            #fp.write('diffuse_shader %s\n' % mat.diffuse_shader)
             writeColor(fp, 'specular_color', 'specular_intensity', mat.specular_color, mat.specular_intensity)
-            fp.write('specular_shader %s\n' % mat.specular_shader)
+            #fp.write('specular_shader %s\n' % mat.specular_shader)
+            if scn.MCUseTrans:
+                alpha = 0
+            else:
+                alpha = mat.alpha            
+            fp.write("alpha %s\n" % alpha)
+            alphaDone = True
         if useBlender:
             (outpath, outfile) = getFileName(pob, context, "mhx")
             mhxfile = exportBlenderMaterial(me, outpath)
             fp.write("# material_file %s\n" % mhxfile)
     elif not scn.MCHairMaterial:
         fp.write("# material %s\n" % pob.name.replace(" ","_"))
+        if scn.MCUseTrans:
+            fp.write("  alpha 0\n")
             
     fp.write("# use_projection 0\n")            
     return  
@@ -760,6 +771,8 @@ def writeTextures(fp, name, scn):
         fp.write("# normal %s_normal.tif %d %.3f\n" % (name, scn.MCTextureLayer, scn.MCNormalStrength))
     if scn.MCUseDisp:
         fp.write("# displacement %s_disp.tif %d %.3f\n" % (name, scn.MCTextureLayer, scn.MCDispStrength))
+    if scn.MCUseTrans:
+        fp.write("# transparency %s_trans.tif %d\n" % (name, scn.MCTextureLayer))
     return
     
 
@@ -2326,6 +2339,11 @@ def initInterface():
     bpy.types.Scene.MCUseDisp = BoolProperty(
         name="Displace", 
         description="Use displacement map",
+        default=False)
+
+    bpy.types.Scene.MCUseTrans = BoolProperty(
+        name="Transparency", 
+        description="Use transparency map",
         default=False)
 
     bpy.types.Scene.MCUseMask = BoolProperty(
