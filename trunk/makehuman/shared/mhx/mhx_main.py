@@ -697,9 +697,11 @@ def writeProxyModifiers(fp, proxy):
 "    end Modifier\n")
         elif mod[0] == 'solidify':
             thickness = mod[1]
+            offset = mod[2]
             fp.write(
 "    Modifier Solidify SOLIDIFY\n" +
 "      thickness %.4f ;\n" % thickness +
+"      offset %.4f ;\n" % offset +
 "    end Modifier\n")
     return
 

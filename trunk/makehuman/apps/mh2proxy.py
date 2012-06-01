@@ -337,7 +337,8 @@ def readProxyFile(obj, file, evalOnLoad):
                 proxy.modifiers.append( ['shrinkwrap', offset] )
             elif key == 'solidify':
                 thickness = float(words[2])
-                proxy.modifiers.append( ['solidify', thickness] )
+                offset = float(words[3])
+                proxy.modifiers.append( ['solidify', thickness, offset] )
             elif key == 'shapekey':
                 proxy.shapekeys.append( words[2] )
             elif key == 'basemesh':
