@@ -220,6 +220,10 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
             elif key == 'rig-actions':
                 fp.write("Pose %s\nend Pose\n" % the.Human)
                 mhx_rig.writeAllActions(fp)
+            elif key == 'if-true':
+                value = eval(words[2])
+                print "if", words[2], value
+                fp.write("#if %s\n" % value)
             elif key == 'rig-drivers':
                 fp.write("AnimationData %s True\n" % the.Human)
                 mhx_rig.writeAllDrivers(fp)
@@ -1172,11 +1176,15 @@ def writeShapeKeys(fp, human, name, proxy):
 
     if (not proxy or proxy.type == 'Proxy'):
         if the.Config.faceshapes:
-            fp.write("#if toggle&T_Face\n")
             if BODY_LANGUAGE:
-                mhx_rig.writeShapeDrivers(fp, rig_panel_25.BodyLanguageShapeDrivers, None)
+                drivers = rig_panel_25.BodyLanguageShapeDrivers
             else:
-                mhx_rig.writeShapeDrivers(fp, rig_panel_25.FaceShapeDrivers, None)
+                drivers = rig_panel_25.FaceShapeDrivers
+            fp.write("#if toggle&T_Face\n")
+            if the.Config.mhxrig in ['mhx','rigify']:
+                mhx_rig.writeShapeDrivers(fp, drivers, None)
+            else:
+                mhx_rig.writeShapePropDrivers(fp, drivers.keys(), proxy, "&")                
             fp.write("#endif\n")
 
     if not proxy:

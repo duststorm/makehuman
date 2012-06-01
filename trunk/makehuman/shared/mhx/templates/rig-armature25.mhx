@@ -27,6 +27,8 @@ end Armature
 
   Property _RNA_UI {} ;
   
+*** if-true (the.Config.mhxrig=='mhx')or(the.Config.mhxrig=='rigify')
+  
   Property &ArmIk_L 0.0 Left_arm_FK/IK ;
   PropKeys &ArmIk_L "min":0.0,"max":1.0, ;
 
@@ -42,7 +44,6 @@ end Armature
   Property &LegIk_L 0.0 Left_leg_FK/IK ;
   PropKeys &LegIk_L "min":0.0,"max":1.0, ;
   
-#if toggle&T_HardParents==0
   Property &LegIkToAnkle_L False Left_leg_IK_to_ankle ;
   PropKeys &LegIkToAnkle_L "type":'BOOLEAN',"min":0,"max":1, ;
 
@@ -57,7 +58,6 @@ end Armature
 
   Property &ElbowFollowsShoulder_L True Left_elbow_follows_shoulder ;
   PropKeys &ElbowFollowsShoulder_L "type":'BOOLEAN',"min":0,"max":1, ;
-#endif
 
   Property &FingerControl_L True Left_fingers_controlled ;
   PropKeys &FingerControl_L "type":'BOOLEAN',"min":0,"max":1, ;
@@ -77,7 +77,6 @@ end Armature
   Property &HandFollowsWrist_R True Right_hand_follows_wrist ;
   PropKeys &HandFollowsWrist_R "type":'BOOLEAN',"min":0,"max":1, ;
 
-#if toggle&T_HardParents==0
   Property &LegIkToAnkle_R False Right_leg_IK_to_ankle ;
   PropKeys &LegIkToAnkle_R "type":'BOOLEAN',"min":0,"max":1, ;
 
@@ -95,7 +94,6 @@ end Armature
 
   Property &GazeFollowsHead 1.0 Gaze_follows_world_or_head ;
   PropKeys &GazeFollowsHead "type":'BOOLEAN',"min":0.0,"max":1.0, ;
-#endif
 
   Property &FingerControl_R True Right_fingers_controlled ;
   PropKeys &FingerControl_R "type":'BOOLEAN',"min":0,"max":1, ;
@@ -142,6 +140,7 @@ end Armature
   Property &TweakDeltoidOn_R False Use_property_to_tweak_right_deltoid_influence ;
   PropKeys &TweakDeltoidOn_R "type":'BOOLEAN',"min":0,"max":1, ;
 
+#endif
   *** properties Object
 end Object
 

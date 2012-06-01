@@ -1792,7 +1792,7 @@ def setupRig(obj, proxyData):
         the.VertexGroupFiles = []
         the.GizmoFiles = []
         the.HeadName = 'Head'
-        the.ObjectProps = []
+        the.ObjectProps = [("MhxRig", '"%s"' % the.Config.mhxrig)]
         the.ArmatureProps = []
         the.CustomProps = []
         print("Default rig %s" % the.Config.mhxrig)
@@ -1968,22 +1968,16 @@ def writeAllDrivers(fp):
         writePropDrivers(fp, rig_arm_25.ArmPropDrivers, "", "&")
         writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_L", "&")
         writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_R", "&")
-        fp.write("#if toggle&T_HardParents==0\n")
         writePropDrivers(fp, rig_arm_25.SoftArmPropLRDrivers, "_L", "&")
         writePropDrivers(fp, rig_arm_25.SoftArmPropLRDrivers, "_R", "&")
-        fp.write("#endif\n")
         writePropDrivers(fp, rig_leg_25.LegPropDrivers, "", "&")
         writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_L", "&")
         writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_R", "&")
-        fp.write("#if toggle&T_HardParents==0\n")
         writePropDrivers(fp, rig_leg_25.SoftLegPropLRDrivers, "_L", "&")
         writePropDrivers(fp, rig_leg_25.SoftLegPropLRDrivers, "_R", "&")
-        fp.write("#endif\n")
         writePropDrivers(fp, rig_body_25.BodyPropDrivers, "", "&")
         writePropDrivers(fp, rig_face_25.FacePropDrivers, "", "&")
-        fp.write("#if toggle&T_HardParents==0\n")
         writePropDrivers(fp, rig_face_25.SoftFacePropDrivers, "", "&")
-        fp.write("#endif\n")
         fingDrivers = rig_finger_25.getFingerPropDrivers()
         writePropDrivers(fp, fingDrivers, "_L", "&")            
         writePropDrivers(fp, fingDrivers, "_R", "&")            
@@ -1997,6 +1991,8 @@ def writeAllDrivers(fp):
         writeDrivers(fp, True, drivers)
     elif the.Config.mhxrig == 'rigify':            
         rig_face_25.FaceDeformDrivers(fp)        
+        writePropDrivers(fp, rig_face_25.FacePropDrivers, "", "&")
+        writePropDrivers(fp, rig_face_25.SoftFacePropDrivers, "", "&")
     return
 
 def writeAllProperties(fp, typ):
@@ -2008,6 +2004,13 @@ def writeAllProperties(fp, typ):
         fp.write(
 '  Property &%s %.2f %s ;\n' % (key, val, string) +
 '  PropKeys &%s "min":-%.2f,"max":%.2f, ;\n\n' % (key, min, max) )        
+    if the.Config.faceshapes and the.Config.mhxrig not in ['mhx', 'rigify']:
+        fp.write("#if toggle&T_Face\n")
+        for skey in rig_panel_25.BodyLanguageShapeDrivers.keys():
+            fp.write(
+"  Property &%s 0.0 %s ;\n" % (skey, skey) +
+"  PropKeys &%s \"min\":-1.0,\"max\":2.0, ;\n" % skey)
+        fp.write("#endif\n")
     if the.Config.expressions:
         fp.write("#if toggle&T_Face\n")
         for skey in read_expression.Expressions:
