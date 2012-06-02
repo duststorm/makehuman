@@ -1339,7 +1339,7 @@ def writeTextureDrivers(fp, drivers):
         drvVars = []
         (texnum, targ, channel, coeff) = vlist
         drvVars.append( (targ, 'TRANSFORMS', [('OBJECT', the.Human, targ, channel, C_LOC)]) )
-        writeDriver(fp, 'toggle&T_Face', 'AVERAGE', "", "texture_slots[%d].normal_factor" % (texnum), -1, coeff, drvVars)
+        writeDriver(fp, 'toggle&T_Shapekeys', 'AVERAGE', "", "texture_slots[%d].normal_factor" % (texnum), -1, coeff, drvVars)
     return
 
 #
@@ -1353,7 +1353,7 @@ def writeShapeDrivers(fp, drivers, proxy):
             drvVars = []
             (targ, channel, coeff) = vlist
             drvVars.append( (targ, 'TRANSFORMS', [('OBJECT', the.Human, targ, channel, C_LOC)]) )
-            writeDriver(fp, 'toggle&T_Face', 'AVERAGE', "", "key_blocks[\"%s\"].value" % (shape), -1, coeff, drvVars)
+            writeDriver(fp, 'toggle&T_Shapekeys', 'AVERAGE', "", "key_blocks[\"%s\"].value" % (shape), -1, coeff, drvVars)
     return
 
 #
@@ -1699,9 +1699,8 @@ def setupRig(obj, proxyData):
             rig_finger_25.FingerJoints +
             rig_leg_25.LegJoints +
             #rig_toe_25.ToeJoints +
-            rig_face_25.FaceJoints +
-            rig_panel_25.PanelJoints
-        )
+            rig_face_25.FaceJoints
+        )            
         
         headsTails = (
             rig_body_25.BodyHeadsTails +
@@ -1710,8 +1709,7 @@ def setupRig(obj, proxyData):
             rig_finger_25.FingerHeadsTails +
             rig_leg_25.LegHeadsTails +
             #rig_toe_25.ToeHeadsTails +
-            rig_face_25.FaceHeadsTails +
-            rig_panel_25.PanelHeadsTails
+            rig_face_25.FaceHeadsTails
         )
 
         the.Armature = (
@@ -1721,8 +1719,7 @@ def setupRig(obj, proxyData):
             rig_finger_25.FingerArmature +
             rig_leg_25.LegArmature +
             #rig_toe_25.ToeArmature +
-            rig_face_25.FaceArmature +
-            rig_panel_25.PanelArmature
+            rig_face_25.FaceArmature
         )
 
     elif the.Config.mhxrig == "blenrig":
@@ -1754,20 +1751,17 @@ def setupRig(obj, proxyData):
             rig_body_25.BodyJoints +
             rig_body_25.FloorJoints +
             rigify_rig.RigifyJoints +
-            rig_face_25.FaceJoints +
-            rig_panel_25.PanelJoints
+            rig_face_25.FaceJoints
         )
         
         headsTails = (
             rigify_rig.RigifyHeadsTails +
-            rig_face_25.FaceHeadsTails +
-            rig_panel_25.PanelHeadsTails
+            rig_face_25.FaceHeadsTails
         )
 
         the.Armature = (
             rigify_rig.RigifyArmature +
-            faceArmature +
-            rig_panel_25.PanelArmature
+            faceArmature
         )
 
         the.ObjectProps = rigify_rig.RigifyObjectProps + [("MhxRig", '"Rigify"')]
@@ -1781,11 +1775,18 @@ def setupRig(obj, proxyData):
             rig_body_25.FloorJoints +
             rig_face_25.FaceJoints
         )
-        newSetupJoints(obj, joints)
-        moveOriginToFloor()
-
         headsTails = []
         the.Armature = []
+        if the.Config.facepanel:            
+            joints += rig_panel_25.PanelJoints
+            headsTails += rig_panel_25.PanelHeadsTails
+            the.Armature += rig_panel_25.PanelArmature
+        newSetupJoints(obj, joints)        
+        moveOriginToFloor()
+        for (bone, head, tail) in headsTails:
+            the.RigHead[bone] = findLocation(head)
+            the.RigTail[bone] = findLocation(tail)
+
         appendRigBones(armature, obj, "", L_MAIN, [])
         the.BoneGroups = []
         the.RecalcRoll = []              
@@ -1798,6 +1799,11 @@ def setupRig(obj, proxyData):
         print("Default rig %s" % the.Config.mhxrig)
         return
         
+    if the.Config.facepanel:            
+        joints += rig_panel_25.PanelJoints
+        headsTails += rig_panel_25.PanelHeadsTails
+        the.Armature += rig_panel_25.PanelArmature
+
     if the.Config.mhxrig == 'mhx':
         if the.Config.skirtrig == "own":
             joints += rig_skirt_25.SkirtJoints
@@ -1916,7 +1922,6 @@ def writeControlPoses(fp):
         rig_leg_25.LegControlPoses(fp)
         #rig_toe_25.ToeControlPoses(fp)
         rig_face_25.FaceControlPoses(fp)
-        rig_panel_25.PanelControlPoses(fp)
         if the.Config.breastrig:
             rig_body_25.BreastControlPoses(fp)
         if the.Config.biceps:
@@ -1930,6 +1935,8 @@ def writeControlPoses(fp):
     elif the.Config.mhxrig == 'rigify':
         rigify_rig.RigifyWritePoses(fp)
         rig_face_25.FaceControlPoses(fp)
+        
+    if the.Config.facepanel:
         rig_panel_25.PanelControlPoses(fp)
         
     for (bone, info) in the.PoseInfo.items():
@@ -2004,15 +2011,15 @@ def writeAllProperties(fp, typ):
         fp.write(
 '  Property &%s %.2f %s ;\n' % (key, val, string) +
 '  PropKeys &%s "min":-%.2f,"max":%.2f, ;\n\n' % (key, min, max) )        
-    if the.Config.faceshapes and the.Config.mhxrig not in ['mhx', 'rigify']:
-        fp.write("#if toggle&T_Face\n")
+    if (the.Config.faceshapes and not the.Config.facepanel):
+        fp.write("#if toggle&T_Shapekeys\n")
         for skey in rig_panel_25.BodyLanguageShapeDrivers.keys():
             fp.write(
 "  Property &%s 0.0 %s ;\n" % (skey, skey) +
 "  PropKeys &%s \"min\":-1.0,\"max\":2.0, ;\n" % skey)
         fp.write("#endif\n")
     if the.Config.expressions:
-        fp.write("#if toggle&T_Face\n")
+        fp.write("#if toggle&T_Shapekeys\n")
         for skey in read_expression.Expressions:
             fp.write(
 "  Property *%s 0.0 %s ;\n" % (skey, skey) +

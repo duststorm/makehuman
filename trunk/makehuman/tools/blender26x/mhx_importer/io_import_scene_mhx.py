@@ -26,7 +26,7 @@
 """
 Abstract
 MHX (MakeHuman eXchange format) importer for Blender 2.5x.
-Version 1.12.0
+Version 1.13.0
 
 This script should be distributed with Blender.
 If not, place it in the .blender/scripts/addons dir
@@ -39,18 +39,18 @@ Alternatively, run the script in the script editor (Alt-P), and access from the 
 bl_info = {
     'name': 'Import: MakeHuman (.mhx)',
     'author': 'Thomas Larsson',
-    'version': (1, 12, 0),
+    'version': (1, 13, 0),
     "blender": (2, 6, 3),
     'location': "File > Import > MakeHuman (.mhx)",
     'description': 'Import files in the MakeHuman eXchange format (.mhx)',
     'warning': '',
-    'wiki_url': "http://www.makehuman.org/node/241",
+    'wiki_url': 'http://sites.google.com/site/makehumandocs/blender-export-and-mhx',
     'tracker_url': 'https://projects.blender.org/tracker/index.php?'\
         'func=detail&aid=21872',
     'category': 'Import-Export'}
 
 MAJOR_VERSION = 1
-MINOR_VERSION = 12
+MINOR_VERSION = 13
 SUB_VERSION = 0
 
 #
@@ -102,8 +102,11 @@ T_CrashSafe = 0x0
 
 T_Diamond = 0x10
 T_Replace = 0x20
-T_Face = 0x40
-T_Shape = 0x80
+T_Shapekeys = 0x40
+T_ShapeDrivers = 0x80
+
+T_Face = T_Shapekeys
+T_Shape = T_Shapekeys
 
 T_Mesh = 0x100
 T_Armature = 0x200
@@ -115,7 +118,7 @@ T_Opcns = 0x2000
 T_Symm = 0x4000
 
 toggle = (T_EnforceVersion + T_Mesh + T_Armature + 
-        T_Face + T_Shape + T_Proxy + T_Clothes + T_Rigify)
+        T_Shapekeys + T_ShapeDrivers + T_Proxy + T_Clothes + T_Rigify)
 
 #
 #    Dictionaries
@@ -1478,7 +1481,7 @@ def parseVertexGroup(ob, me, args, tokens):
 #
 
 def doShape(name):
-    if (toggle & T_Shape+T_Face) and (name == 'Basis'):
+    if (toggle & T_Shapekeys) and (name == 'Basis'):
         return True
     else:
         return (toggle & T_Face)
@@ -2883,8 +2886,8 @@ MhxBoolProps = [
     #("replace", "Replace scene", "Replace scene", T_Replace),
     ("cage", "Cage", "Load mesh deform cage", T_Cage),
     ("clothes", "Clothes", "Include clothes", T_Clothes),
-    ("face", "Face shapes", "Include facial shapekeys", T_Face),
-    ("shape", "Body shapes", "Include body shapekeys", T_Shape),
+    ("shapekeys", "Shapekeys", "Include shapekeys", T_Shapekeys),
+    ("shapedrivers", "Shapekey drivers", "Include shapekey drivers", T_ShapeDrivers),
     #("symm", "Symmetric shapes", "Keep shapekeys symmetric", T_Symm),
     ("diamond", "Helper geometry", "Keep helper geometry", T_Diamond),
     ("rigify", "Rigify", "Create rigify control rig", T_Rigify),
@@ -3954,7 +3957,7 @@ class MhxFKIKPanel(bpy.types.Panel):
     
     @classmethod
     def poll(cls, context):
-        return pollMhxRig(context.object)
+        return (mhxRigName(context.object) == 'MHX')
 
     def draw(self, context):
         rig = context.object
@@ -4035,7 +4038,7 @@ class MhxDriversPanel(bpy.types.Panel):
     
     @classmethod
     def poll(cls, context):
-        return pollMhxRig(context.object)
+        return mhxRigName(context.object)
 
     def draw(self, context):
         lProps = []
@@ -4083,7 +4086,7 @@ class MhxVisibilityPanel(bpy.types.Panel):
     
     @classmethod
     def poll(cls, context):
-        return pollMhxRig(context.object)
+        return mhxRigName(context.object)
 
     def draw(self, context):
         ob = context.object
@@ -4205,7 +4208,7 @@ class MhxLayersPanel(bpy.types.Panel):
     
     @classmethod
     def poll(cls, context):
-        return pollMhxRig(context.object)
+        return (mhxRigName(context.object) == 'MHX')
 
     def draw(self, context):
         layout = self.layout
@@ -4262,11 +4265,11 @@ class VIEW3D_OT_MhxDisableAllLayersButton(bpy.types.Operator):
 #   getMhxRig(ob):
 #
 
-def pollMhxRig(ob):
+def mhxRigName(ob):
     try:
-        return (ob["MhxRig"] == "MHX")
+        return ob["MhxRig"]
     except:
-        return False
+        return None
         
 def getMhxRig(ob):
     if ob.type == 'ARMATURE':

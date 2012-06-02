@@ -23,7 +23,7 @@ MakeHuman to MHX (MakeHuman eXchange format) exporter. MHX files can be loaded i
 """
 
 MAJOR_VERSION = 1
-MINOR_VERSION = 12
+MINOR_VERSION = 13
 BODY_LANGUAGE = True
 
 import module3d
@@ -121,6 +121,11 @@ def exportMhx_25(human, fp):
                 mhx_rig.setupCube(fp, name, 0.1*r, (0,0,0))
             else:
                 halt
+        if the.Config.facepanel:
+            mhx_rig.setupCube(fp, "MHCube025", 0.25, 0)
+            mhx_rig.setupCube(fp, "MHCube05", 0.5, 0)
+            copyFile25(human, "shared/mhx/templates/panel_gizmo25.mhx", fp, None, proxyData)    
+            
     copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", fp, None, proxyData)    
     fp.write("#endif\n")
     
@@ -1129,36 +1134,30 @@ def printProxyShape(fp, shapes):
 
 def writeShapeKeys(fp, human, name, proxy):
     fp.write(
-"#if toggle&(T_Face+T_Shape)\n" +
+"#if toggle&T_Shapekeys\n" +
 "ShapeKeys %s\n" % name +
 "  ShapeKey Basis Sym True\n" +
 "  end ShapeKey\n")
 
     if (not proxy or proxy.type == 'Proxy'):
         if the.Config.faceshapes:
-            fp.write("#if toggle&T_Face\n")  
             if BODY_LANGUAGE:
                 copyShapeKeys("shared/mhx/templates/shapekeys-bodylanguage25.mhx", fp, proxy, True)    
             else:
                 copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy, True)    
-            fp.write("#endif\n")    
 
     if not proxy:
         if the.Config.expressions:
             exprList = read_expression.readExpressions(human)
-            fp.write("#if toggle&T_Face\n")        
             for (name, verts) in exprList:
                 fp.write("ShapeKey %s Sym True\n" % name)
                 for (v, r) in verts.items():
                     (dx, dy, dz) = r
                     fp.write("    sv %d %.4f %.4f %.4f ;\n" % (v, dx, dy, dz))
                 fp.write("end ShapeKey\n")
-            fp.write("#endif\n")
 
     if the.Config.bodyshapes:
-        fp.write("#if toggle&T_Shape\n")
         copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
-        fp.write("#endif\n")
 
     for path in the.Config.customshapes:
         print("    %s" % path)
@@ -1168,36 +1167,32 @@ def writeShapeKeys(fp, human, name, proxy):
 "  AnimationData None (toggle&T_Symm==0)\n")
 
     if the.Config.bodyshapes:
-        fp.write("#if toggle&T_Shape\n")
         mhx_rig.writeRotDiffDrivers(fp, rig_arm_25.ArmShapeDrivers, proxy)
         mhx_rig.writeRotDiffDrivers(fp, rig_leg_25.LegShapeDrivers, proxy)
         mhx_rig.writeShapePropDrivers(fp, rig_body_25.BodyShapes, proxy, "&")
-        fp.write("#endif\n")
 
+    fp.write("#if toggle&T_ShapeDrivers\n")
     if (not proxy or proxy.type == 'Proxy'):
         if the.Config.faceshapes:
             if BODY_LANGUAGE:
                 drivers = rig_panel_25.BodyLanguageShapeDrivers
             else:
                 drivers = rig_panel_25.FaceShapeDrivers
-            fp.write("#if toggle&T_Face\n")
-            if the.Config.mhxrig in ['mhx','rigify']:
+            if the.Config.facepanel:
                 mhx_rig.writeShapeDrivers(fp, drivers, None)
             else:
                 mhx_rig.writeShapePropDrivers(fp, drivers.keys(), proxy, "&")                
-            fp.write("#endif\n")
 
     if not proxy:
         if the.Config.expressions and not proxy:
-            fp.write("#if toggle&T_Face\n")
             mhx_rig.writeShapePropDrivers(fp, read_expression.Expressions, proxy, "*")
-            fp.write("#endif\n")
             
         skeys = []
         for (skey, val, string, min, max) in  the.CustomProps:
             skeys.append(skey)
-        mhx_rig.writeShapePropDrivers(fp, skeys, proxy, "&")
-
+        mhx_rig.writeShapePropDrivers(fp, skeys, proxy, "&")    
+    fp.write("#endif\n")
+        
     fp.write(
 "  end AnimationData\n" +
 "end ShapeKeys\n" +

@@ -88,6 +88,7 @@ class CExportConfig:
         self.expressions = True
         self.faceshapes = True
         self.bodyshapes = True
+        self.facepanel = True
         self.cage = False
         self.breastrig = False
         self.biceps = False
@@ -206,6 +207,7 @@ def exportConfig(human, useHair, options=None):
         cfg.expressions = options['expressions']
         cfg.faceshapes = options['faceshapes']
         cfg.bodyshapes = options['bodyshapes']
+        cfg.facepanel = options['facepanel']
         cfg.separatefolder = options['separatefolder']
         cfg.cage = options['cage']
         cfg.clothesrig = options['clothesrig']
@@ -269,7 +271,7 @@ def exportConfig(human, useHair, options=None):
                     pass
             elif key in [
                 'separatefolder',
-                'expressions', 'faceshapes', 'bodyshapes', 
+                'expressions', 'faceshapes', 'bodyshapes', 'facepanel'
                 'breastrig', 'biceps', 'malerig', 'clothesrig',
                 'clothesvisibilitydrivers'
                 ]:

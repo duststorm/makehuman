@@ -299,6 +299,7 @@ class ExportTaskView(gui3d.TaskView):
         self.exportExpressions = self.mhxOptions.addView(gui3d.CheckBox("Expressions", False));y+=24
         self.exportFaceShapes = self.mhxOptions.addView(gui3d.CheckBox("Face shapes", True));y+=24
         self.exportBodyShapes = self.mhxOptions.addView(gui3d.CheckBox("Body shapes", False));y+=24
+        self.exportFacePanel = self.mhxOptions.addView(gui3d.CheckBox("Face panel", True));y+=24
         self.exportClothes = self.mhxOptions.addView(gui3d.CheckBox("Clothes", True));y+=24
         self.exportClothesRig = self.mhxOptions.addView(gui3d.CheckBox("Clothes rig", True));y+=24
         self.exportCage = self.mhxOptions.addView(gui3d.CheckBox("Cage", False));y+=24
@@ -466,6 +467,7 @@ class ExportTaskView(gui3d.TaskView):
                         'expressions':self.exportExpressions.selected,
                         'faceshapes':self.exportFaceShapes.selected,
                         'bodyshapes':self.exportBodyShapes.selected,
+                        'facepanel':self.exportFacePanel.selected,
                         'clothes':self.exportClothes.selected,
                         'cage':self.exportCage.selected,
                         'separatefolder':self.exportSeparateFolder.selected,

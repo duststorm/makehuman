@@ -27,7 +27,7 @@ end Armature
 
   Property _RNA_UI {} ;
   
-*** if-true (the.Config.mhxrig=='mhx')or(the.Config.mhxrig=='rigify')
+*** if-true the.Config.mhxrig=='mhx'
   
   Property &ArmIk_L 0.0 Left_arm_FK/IK ;
   PropKeys &ArmIk_L "min":0.0,"max":1.0, ;
