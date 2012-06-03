@@ -1181,7 +1181,7 @@ def writeShapeKeys(fp, human, name, proxy):
             if the.Config.facepanel:
                 mhx_rig.writeShapeDrivers(fp, drivers, None)
             else:
-                mhx_rig.writeShapePropDrivers(fp, drivers.keys(), proxy, "&")                
+                mhx_rig.writeShapePropDrivers(fp, drivers.keys(), proxy, "&_")                
 
     if not proxy:
         if the.Config.expressions and not proxy:

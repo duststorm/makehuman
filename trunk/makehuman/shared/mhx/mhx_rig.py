@@ -2015,8 +2015,8 @@ def writeAllProperties(fp, typ):
         fp.write("#if toggle&T_Shapekeys\n")
         for skey in rig_panel_25.BodyLanguageShapeDrivers.keys():
             fp.write(
-"  Property &%s 0.0 %s ;\n" % (skey, skey) +
-"  PropKeys &%s \"min\":-1.0,\"max\":2.0, ;\n" % skey)
+"  Property &_%s 0.0 %s ;\n" % (skey, skey) +
+"  PropKeys &_%s \"min\":-1.0,\"max\":2.0, ;\n" % skey)
         fp.write("#endif\n")
     if the.Config.expressions:
         fp.write("#if toggle&T_Shapekeys\n")
