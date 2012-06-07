@@ -82,6 +82,7 @@ class CExportConfig:
         self.daerig = 'game'
         self.mhxversion = ['25']
         self.separatefolder = False
+        self.feetonground = True
         self.outFolder = None
         self.texFolder = None
         self.proxyList = []
@@ -209,6 +210,7 @@ def exportConfig(human, useHair, options=None):
         cfg.bodyshapes = options['bodyshapes']
         cfg.facepanel = options['facepanel']
         cfg.separatefolder = options['separatefolder']
+        cfg.feetonground = options['feetonground']
         cfg.cage = options['cage']
         cfg.clothesrig = options['clothesrig']
         cfg.breastrig = options['breastrig']
@@ -270,7 +272,7 @@ def exportConfig(human, useHair, options=None):
                 except:
                     pass
             elif key in [
-                'separatefolder',
+                'separatefolder', 'feetonground',
                 'expressions', 'faceshapes', 'bodyshapes', 'facepanel'
                 'breastrig', 'biceps', 'malerig', 'clothesrig',
                 'clothesvisibilitydrivers'

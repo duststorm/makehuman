@@ -123,9 +123,12 @@ def newSetupJoints (obj, joints):
     return
 
 def moveOriginToFloor():
-    the.Origin = the.Locations['floor']
-    for key in the.Locations.keys():
-        the.Locations[key] = aljabr.vsub(the.Locations[key], the.Origin)
+    if the.Config.feetonground:
+        the.Origin = the.Locations['floor']
+        for key in the.Locations.keys():
+            the.Locations[key] = aljabr.vsub(the.Locations[key], the.Origin)
+    else:
+        the.Origin = [0,0,0]
     return
 
 def setupHeadsTails(headsTails):

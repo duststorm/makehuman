@@ -169,11 +169,13 @@ class CProxy:
                     self.refVerts.append( (v0,v1,v2,w0,w1,w2,d0,d1,d2) )
         return
 
+
 def scaleInfo(words):                
     v1 = int(words[2])
     v2 = int(words[3])
     den = float(words[4])
     return (v1, v2, den)
+
 
 def getScale(info, verts, index):
     (v1, v2, den) = info
@@ -243,12 +245,12 @@ def importObj(filepath, context):
     ob = bpy.data.objects.new(obname, me)
     
     try:
-    	me.polygons
-    	BMeshAware = True
-    	print("Using BMesh")
+        me.polygons
+        BMeshAware = True
+        print("Using BMesh")
     except:
-    	BMeshAware = False
-    	print("Not using BMesh")
+        BMeshAware = False
+        print("Not using BMesh")
 
     if texverts:
         if BMeshAware:
@@ -282,6 +284,7 @@ def importObj(filepath, context):
     bpy.ops.object.shade_smooth()
     return ob
     
+
 def parseFace(words):
     face = []
     texface = []
@@ -293,6 +296,7 @@ def parseFace(words):
         except:
             pass
     return (face, texface)
+
 
 def addUvLayerBMesh(obname, me, texverts, texfaces):            
     uvtex = me.uv_textures.new(name=obname)
@@ -311,6 +315,7 @@ def addUvLayerBMesh(obname, me, texverts, texfaces):
             n += 1
     return
 
+
 def addUvLayerNoBMesh(obname, me, texverts, texfaces):            
         uvtex = me.uv_textures.new(name=obname)
         data = uvtex.data
@@ -321,6 +326,7 @@ def addUvLayerNoBMesh(obname, me, texverts, texfaces):
             data[n].uv3 = texverts[tf[2]]
             if len(tf) == 4:
                 data[n].uv4 = texverts[tf[3]]
+
 
 def addMaterials(groups, me, string):        
     mn = 0
@@ -344,28 +350,23 @@ def addMaterials(groups, me, string):
         mn += 1
     return        
 
+
 class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
     bl_idname = "mh.import_base_mhclo"
     bl_label = "Mhclo"
     bl_options = {'UNDO'}
     delete = BoolProperty()
 
-    filename_ext = ".mhclo"
-    filter_glob = StringProperty(default="*.mhclo", options={'HIDDEN'})
-    filepath = bpy.props.StringProperty(
-        name="File Path", 
-        description="File path used for mhclo file", 
-        maxlen= 1024, default= "")
-
     def execute(self, context):
         global theProxy
         if self.delete:
             deleteAll(context)
         theProxy = CProxy()
-        theProxy.read(self.properties.filepath)
+        filepath = os.path.join(context.scene.MhProgramPath, "data/3dobjs/base.mhclo")
+        theProxy.read(filepath)
         ob = importObj(theProxy.obj_file, context)
         ob["NTargets"] = 0
-        ob["ProxyFile"] = self.properties.filepath
+        ob["ProxyFile"] = filepath
         ob["ObjFile"] = theProxy.obj_file
         ob["MhxMesh"] = True
         setupVertexPairs(context)
@@ -374,9 +375,6 @@ class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
         print(theProxy)
         return{'FINISHED'}    
 
-    def invoke(self, context, event):
-        context.window_manager.fileselect_add(self)
-        return {'RUNNING_MODAL'}
 
 class VIEW3D_OT_ImportBaseObjButton(bpy.types.Operator):
     bl_idname = "mh.import_base_obj"
@@ -384,31 +382,22 @@ class VIEW3D_OT_ImportBaseObjButton(bpy.types.Operator):
     bl_options = {'UNDO'}
     delete = BoolProperty()
 
-    filename_ext = ".obj"
-    filter_glob = StringProperty(default="*.obj", options={'HIDDEN'})
-    filepath = bpy.props.StringProperty(
-        name="File Path", 
-        description="File path used for obj file", 
-        maxlen= 1024, default= "")
-
     def execute(self, context):
         global theProxy
         if self.delete:
             deleteAll(context)
         theProxy = None
-        ob = importObj(self.properties.filepath, context)
+        filepath = os.path.join(context.scene.MhProgramPath, "data/3dobjs/base.obj")
+        ob = importObj(filepath, context)
         ob["NTargets"] = 0
         ob["ProxyFile"] = 0
-        ob["ObjFile"] = self.properties.filepath
+        ob["ObjFile"] =  filepath
         ob["MhxMesh"] = True
         setupVertexPairs(context)
         makeRestorePoint()
         print("Base object imported")
         return{'FINISHED'}    
 
-    def invoke(self, context, event):
-        context.window_manager.fileselect_add(self)
-        return {'RUNNING_MODAL'}
 
 def nameFromPath(filepath):
     (name,ext) = os.path.splitext(os.path.basename(filepath))
@@ -461,6 +450,7 @@ def setupVertexPairs(context):
     print("Left-right-mid", len(Left.keys()), len(Right.keys()), len(Mid.keys()))
     return
     
+
 def findVert(verts, v, x, y, z, notfound):
     for (z1,y1,x1,v1) in verts:
         dx = x-x1
@@ -480,7 +470,7 @@ def findVert(verts, v, x, y, z, notfound):
 def loadTarget(filepath, context):
     realpath = os.path.realpath(os.path.expanduser(filepath))
     fp = open(realpath, "rU")  
-    print("Loading target %s" % realpath)
+    #print("Loading target %s" % realpath)
 
     ob = context.object
     bpy.ops.object.mode_set(mode='OBJECT')
@@ -517,13 +507,15 @@ def loadTarget(filepath, context):
     ob["NTargets"] += 1
     ob["FilePath"] = realpath
     ob["SelectedOnly"] = False
-    return
+    return skey
+
 
 def shapeKeyLen(ob):
     n = 0
     for skey in ob.data.shape_keys.key_blocks:
         n += 1
     return n
+
 
 class VIEW3D_OT_LoadTargetButton(bpy.types.Operator):
     bl_idname = "mh.load_target"
@@ -539,7 +531,6 @@ class VIEW3D_OT_LoadTargetButton(bpy.types.Operator):
 
     def execute(self, context):
         loadTarget(self.properties.filepath, context)
-        makeRestorePoint()
         print("Target loaded")
         return {'FINISHED'}
 
@@ -586,6 +577,7 @@ def loadTargetFromMesh(context):
     scn.objects.unlink(trg)
     return
 
+
 class VIEW3D_OT_LoadTargetFromMeshButton(bpy.types.Operator):
     bl_idname = "mh.load_target_from_mesh"
     bl_label = "Load target from mesh"
@@ -614,6 +606,7 @@ def newTarget(context):
     ob["FilePath"] = 0
     ob["SelectedOnly"] = False
     return
+
 
 class VIEW3D_OT_NewTargetButton(bpy.types.Operator):
     bl_idname = "mh.new_target"
@@ -654,6 +647,7 @@ def doSaveTarget(ob, filepath):
     fp.close()    
     ob["FilePath"] = filepath
     return
+
        
 def evalVertLocations(ob):    
     verts = {}
@@ -687,6 +681,7 @@ class VIEW3D_OT_SaveTargetButton(bpy.types.Operator):
             ConfirmString = "Overwrite target file?"
             ConfirmString2 = ' "%s?"' % os.path.basename(path)
         return{'FINISHED'}            
+
 
 class VIEW3D_OT_SaveasTargetButton(bpy.types.Operator, ExportHelper):
     bl_idname = "mh.saveas_target"
@@ -729,6 +724,7 @@ def applyTargets(context):
         v.co = verts[v.index]
     return
 
+
 class VIEW3D_OT_ApplyTargetsButton(bpy.types.Operator):
     bl_idname = "mh.apply_targets"
     bl_label = "Apply targets"
@@ -766,6 +762,7 @@ def batchFixTargets(context, folder):
         elif os.path.isdir(file):
             batchFixTargets(context, file)
     return            
+
             
 class VIEW3D_OT_BatchFixButton(bpy.types.Operator):
     bl_idname = "mh.batch_fix"
@@ -810,6 +807,7 @@ def batchRenderTargets(context, folder, opengl, outdir):
             batchRenderTargets(context, file, opengl, outdir)
     return            
 
+
 class VIEW3D_OT_BatchRenderButton(bpy.types.Operator):
     bl_idname = "mh.batch_render"
     bl_label = "Batch render"
@@ -843,6 +841,7 @@ def relaxTarget(context):
         return
     relaxMesh(skey.data, ob.data.edges, NBodyVerts, context.scene["Relax"])
 
+
 def relaxMesh(verts, edges, first, k):
     neighbors = {}
     for e in edges:
@@ -868,6 +867,7 @@ def relaxMesh(verts, edges, first, k):
     for v in neighbors.keys():
         verts[v].co = (1-k)*verts[v].co + k*average[v]
     return
+
     
 class VIEW3D_OT_RelaxTargetButton(bpy.types.Operator):
     bl_idname = "mh.relax_target"
@@ -906,6 +906,7 @@ def fitTarget(context):
     theProxy.update(ob.active_shape_key.data, ob.data.vertices)
     return
 
+
 class VIEW3D_OT_FitTargetButton(bpy.types.Operator):
     bl_idname = "mh.fit_target"
     bl_label = "Fit target"
@@ -930,6 +931,14 @@ def discardTarget(context):
     ob.active_shape_key_index = ob["NTargets"]
     checkValid(ob)
     return
+
+    
+def discardAllTargets(context):
+    ob = context.object
+    while isTarget(ob):
+        discardTarget(context)
+    return
+    
     
 def checkValid(ob):
     nShapes = shapeKeyLen(ob)
@@ -937,6 +946,7 @@ def checkValid(ob):
         print("Consistency problem:\n  %d shapes, %d targets" % (nShapes, ob["NTargets"]))
         return False
     return True
+
 
 class VIEW3D_OT_DiscardTargetButton(bpy.types.Operator):
     bl_idname = "mh.discard_target"
@@ -951,6 +961,23 @@ class VIEW3D_OT_DiscardTargetButton(bpy.types.Operator):
         else:
             Confirm = "mh.discard_target"
             ConfirmString = "Really discard target?"
+            ConfirmString2 = None
+        return{'FINISHED'}                
+
+
+class VIEW3D_OT_DiscardAllTargetsButton(bpy.types.Operator):
+    bl_idname = "mh.discard_all_targets"
+    bl_label = "Discard all targets"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        global Confirm, ConfirmString, ConfirmString2
+        if Confirm:        
+            Confirm = None
+            discardAllTargets(context)
+        else:
+            Confirm = "mh.discard_all_targets"
+            ConfirmString = "Really discard all targets?"
             ConfirmString2 = None
         return{'FINISHED'}                
 
@@ -1091,14 +1118,28 @@ def makeRestorePoint():
 
 def initScene(scn):
     global TargetSubPaths, Confirm, ConfirmString, ConfirmString2
-    scn["TargetPath"] = "/home/svn/makehuman/data/targets"            
-    scn["Relax"] = 0.5
-    bpy.types.Scene.MhLoadMaterial = EnumProperty(
-        items = [('None','None','None'), ('Groups','Groups','Groups'), ('Materials','Materials','Materials')],
-        name="Load as materials")
-    scn.MhLoadMaterial = 'None'
     Confirm = None
     ConfirmString = "?"
+
+    bpy.types.Scene.MhProgramPath = StringProperty(
+        name = "Program Path",
+        default = "/home/svn/makehuman"
+    )        
+    bpy.types.Scene.MhUserPath = StringProperty(
+        name = "User Path",
+        default = "~/documents/makehuman"
+    )        
+    bpy.types.Scene.MhTargetPath = StringProperty(
+        name = "Target Path",
+        default = "/home/svn/makehuman/data/targets" 
+    )        
+    bpy.types.Scene.MhRelax = FloatProperty(default = 0.5)
+    bpy.types.Scene.MhLoadMaterial = EnumProperty(
+        items = [('None','None','None'), ('Groups','Groups','Groups'), ('Materials','Materials','Materials')],
+        name="Load as materials",
+        default = 'None')
+    return
+
     TargetSubPaths = []
     folder = os.path.realpath(os.path.expanduser(scn["TargetPath"]))
     for fname in os.listdir(folder):
@@ -1111,6 +1152,7 @@ def initScene(scn):
     return  
     
 def isInited(scn):
+    return True
     try:
         TargetSubPaths
         scn["TargetPath"]

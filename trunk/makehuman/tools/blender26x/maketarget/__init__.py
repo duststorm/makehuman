@@ -38,6 +38,7 @@ if "bpy" in locals():
     print("Reloading maketarget")
     import imp
     imp.reload(maketarget)
+    imp.reload(mhm)
     imp.reload(export_mh_obj)
 else:
     print("Loading maketarget")
@@ -46,6 +47,7 @@ else:
     from bpy.props import *
     from bpy_extras.io_utils import ImportHelper, ExportHelper
     from . import maketarget
+    from . import mhm
     from . import export_mh_obj
   
 #----------------------------------------------------------
@@ -71,6 +73,8 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.operator(maketarget.Confirm, text="Yes") 
             layout.operator("mh.skip")
             return            
+        layout.prop(scn, "MhProgramPath")
+        layout.prop(scn, "MhUserPath")
         layout.label("Load materials from")
         layout.prop(scn, "MhLoadMaterial", expand=True)
         layout.separator()
@@ -107,7 +111,8 @@ class MakeTargetPanel(bpy.types.Panel):
                 n += 1
             layout.separator()
             layout.operator("mh.new_target", text="New secondary target")
-            layout.operator("mh.load_target", text="Load secondary target")            
+            layout.operator("mh.load_target", text="Load secondary from file")            
+            layout.operator("mh.load_target_from_mesh", text="Load secondary from mesh")                        
             layout.operator("mh.fit_target")
             layout.operator("mh.symmetrize_target", text="Symm Left->Right").left2right = False
             layout.operator("mh.symmetrize_target", text="Symm Right->Left").left2right = True
@@ -116,6 +121,7 @@ class MakeTargetPanel(bpy.types.Panel):
             #layout.operator("mh.relax_target")
             layout.separator()
             layout.operator("mh.discard_target")
+            layout.operator("mh.discard_all_targets")
             layout.separator()
             layout.operator("mh.apply_targets")
             layout.separator()
@@ -123,6 +129,45 @@ class MakeTargetPanel(bpy.types.Panel):
             if ob["FilePath"]:
                 layout.operator("mh.save_target")           
             layout.operator("mh.saveas_target")           
+
+#----------------------------------------------------------
+#   class MhmPanel(bpy.types.Panel):
+#----------------------------------------------------------
+
+class MhmPanel(bpy.types.Panel):
+    bl_label = "MHM"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_options = {'DEFAULT_CLOSED'}
+    
+    def draw(self, context):
+        layout = self.layout
+        ob = context.object
+        scn = context.scene
+        if not maketarget.isInited(scn):
+            layout.operator("mh.init")
+            return
+        if maketarget.Confirm:
+            layout.label(maketarget.ConfirmString)            
+            if maketarget.ConfirmString2:
+                layout.label(maketarget.ConfirmString2)            
+            layout.operator(maketarget.Confirm, text="Yes") 
+            layout.operator("mh.skip")
+            return            
+        if maketarget.isBaseOrTarget(ob):
+            for (label, names) in mhm.MhmDisplay:
+                layout.label(label)
+                for name in names:
+                    prop = mhm.MhmNameProps[name]
+                    split = layout.split(0.8)
+                    split.prop(ob.data, prop)
+                    split.operator("mh.update_all_sliders")
+            layout.separator()                
+            layout.operator("mh.update_all_sliders")        
+            layout.operator("mh.reset_all_sliders")        
+            layout.operator("mh.load_mhm_file")                        
+            layout.operator("mh.discard_all_targets")
+
 
 #----------------------------------------------------------
 #   class MakeTargetBatchPanel(bpy.types.Panel):
@@ -186,6 +231,7 @@ def register():
         maketarget.initScene(bpy.context.scene)
     except:
         pass
+    mhm.init()        
     bpy.utils.register_module(__name__)
     bpy.types.INFO_MT_file_export.append(menu_func)
   
