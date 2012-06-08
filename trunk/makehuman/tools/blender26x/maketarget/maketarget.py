@@ -369,8 +369,7 @@ class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
         ob["ProxyFile"] = filepath
         ob["ObjFile"] = theProxy.obj_file
         ob["MhxMesh"] = True
-        setupVertexPairs(context)
-        makeRestorePoint()
+        setupVertexPairs(context, True)
         print("Base object imported")
         print(theProxy)
         return{'FINISHED'}    
@@ -393,9 +392,46 @@ class VIEW3D_OT_ImportBaseObjButton(bpy.types.Operator):
         ob["ProxyFile"] = 0
         ob["ObjFile"] =  filepath
         ob["MhxMesh"] = True
-        setupVertexPairs(context)
-        makeRestorePoint()
+        setupVertexPairs(context, True)
         print("Base object imported")
+        return{'FINISHED'}    
+
+
+class VIEW3D_OT_MakeBaseObjButton(bpy.types.Operator):
+    bl_idname = "mh.make_base_obj"
+    bl_label = "Make Base Object"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        global theProxy
+        theProxy = None
+        ob = context.object
+        ob["NTargets"] = 0
+        ob["ProxyFile"] = 0
+        ob["ObjFile"] =  0
+        ob["MhxMesh"] = True        
+        setupVertexPairs(context, True)
+        return{'FINISHED'}    
+
+
+class VIEW3D_OT_DeleteHelpersButton(bpy.types.Operator):
+    bl_idname = "mh.delete_clothes"
+    bl_label = "Delete Clothes Helpers"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        ob = context.object
+        bpy.ops.object.mode_set(mode='OBJECT')
+        nverts = len(ob.data.vertices)
+        for n in range(NBodyVerts):
+            ob.data.vertices[n].select = False
+        for n in range(NBodyVerts,nverts):
+            ob.data.vertices[n].select = True
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.delete(type='VERT')
+        bpy.ops.object.mode_set(mode='OBJECT')
         return{'FINISHED'}    
 
 
@@ -404,16 +440,16 @@ def nameFromPath(filepath):
     return name
 
 #----------------------------------------------------------
-#   setupVertexPairs(ob):
+#   setupVertexPairs(ob, insist):
 #----------------------------------------------------------
 
 Left = {}
 Right = {}
 Mid = {}
 
-def setupVertexPairs(context):
+def setupVertexPairs(context, insist):
     global Left, Right, Mid
-    if Left.keys():
+    if Left.keys() and not insist:
         return
     ob = context.object
     verts = []
@@ -483,12 +519,16 @@ def loadTarget(filepath, context):
     #skey = ob.active_shape_key
     skey.name = name
     #print("Active", ob.active_shape_key.name)
+    nverts = len(ob.data.vertices)
     for line in fp:
         words = line.split()
         if len(words) == 0:
             pass
         else:
             index = int(words[0])
+            if index >= nverts:
+                print("Stopped loading at index %d" % index)
+                break
             dx = float(words[1])
             dy = float(words[2])
             dz = float(words[3])
@@ -585,7 +625,6 @@ class VIEW3D_OT_LoadTargetFromMeshButton(bpy.types.Operator):
 
     def execute(self, context):
         loadTargetFromMesh(context)
-        makeRestorePoint()
         return {'FINISHED'}
 
 #----------------------------------------------------------
@@ -615,7 +654,6 @@ class VIEW3D_OT_NewTargetButton(bpy.types.Operator):
 
     def execute(self, context):
         newTarget(context)
-        makeRestorePoint()
         return {'FINISHED'}
 
 #----------------------------------------------------------
@@ -735,7 +773,6 @@ class VIEW3D_OT_ApplyTargetsButton(bpy.types.Operator):
         if Confirm:
             Confirm = None
             applyTargets(context)
-            makeRestorePoint()
             print("All targets applied")
         else:
             Confirm = "mh.apply_targets"
@@ -987,7 +1024,7 @@ class VIEW3D_OT_DiscardAllTargetsButton(bpy.types.Operator):
 
 def symmetrizeTarget(context, left2right):
     global Left, Mid
-    setupVertexPairs(context)
+    setupVertexPairs(context, False)
     ob = context.object
     scn = context.scene
     if not isTarget(ob):
@@ -1022,7 +1059,6 @@ class VIEW3D_OT_SymmetrizeTargetButton(bpy.types.Operator):
 
     def execute(self, context):
         symmetrizeTarget(context, self.left2right)
-        makeRestorePoint()
         return{'FINISHED'}                
                         
 #----------------------------------------------------------
@@ -1107,9 +1143,6 @@ def deleteAll(context):
         if isBaseOrTarget(ob):
             scn.objects.unlink(ob)
     return                    
-
-def makeRestorePoint():
-    bpy.ops.transform.translate(value=(0,0,0))
 
 
 #----------------------------------------------------------

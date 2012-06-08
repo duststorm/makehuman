@@ -39,6 +39,7 @@ if "bpy" in locals():
     import imp
     imp.reload(maketarget)
     imp.reload(mhm)
+    #imp.reload(rig)
     imp.reload(export_mh_obj)
 else:
     print("Loading maketarget")
@@ -48,6 +49,7 @@ else:
     from bpy_extras.io_utils import ImportHelper, ExportHelper
     from . import maketarget
     from . import mhm
+    #from . import rig
     from . import export_mh_obj
   
 #----------------------------------------------------------
@@ -81,9 +83,12 @@ class MakeTargetPanel(bpy.types.Panel):
         if maketarget.isBaseOrTarget(ob):
             layout.operator("mh.import_base_mhclo", text="Reimport base mhclo").delete = True
             layout.operator("mh.import_base_obj", text="Reimport base obj").delete = True
+            layout.operator("mh.delete_clothes")
+            layout.separator()
         else:
             layout.operator("mh.import_base_mhclo", text="Import base mhclo").delete = False
             layout.operator("mh.import_base_obj", text="Import base obj").delete = False
+            layout.operator("mh.make_base_obj")
         if maketarget.isBase(ob):
             layout.operator("mh.new_target")
             layout.operator("mh.load_target")            
