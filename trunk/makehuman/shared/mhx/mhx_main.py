@@ -1133,19 +1133,13 @@ def printProxyShape(fp, shapes):
 #    writeShapeKeys(fp, human, name, proxy):
 #
 
-def writeTargets(outfp, drivers, folder):    
+def writeTargets(fp, human, drivers, folder):    
     for (fname, bname, typ, targ, angle, lr) in drivers:
-        filepath = os.path.join(folder, "%s.target" % (fname))
-        try:
-            infp = open(filepath, "r")
-        except IOError:
-            continue                           
-        outfp.write("ShapeKey %s %s True\n" % (fname, lr))
-        for line in infp:
-            words = line.split()
-            outfp.write("  sv %s %s %.4f %s ;\n" % (words[0], words[1], -float(words[3]), words[2]))
-        outfp.write("end ShapeKey\n")
-        infp.close()
+    	expr = read_expression.readCorrective(human, "%s/%s/" % (folder,fname))
+        fp.write("ShapeKey %s %s True\n" % (fname, lr))
+        for (index, dr) in expr.items():
+            fp.write("  sv %d %.4f %.4f %.4f ;\n" %  (index, dr[0], dr[1], dr[2]))
+        fp.write("end ShapeKey\n")
     return            
 
 
@@ -1174,7 +1168,7 @@ def writeShapeKeys(fp, human, name, proxy):
                 fp.write("end ShapeKey\n")
 
     if the.Config.bodyshapes:
-        writeTargets(fp, rig_shoulder_25.ShoulderTargetDrivers, "shared/mhx/data/shoulder")                
+        writeTargets(fp, human, rig_shoulder_25.ShoulderTargetDrivers, "shoulder")                
         copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
 
     for path in the.Config.customshapes:

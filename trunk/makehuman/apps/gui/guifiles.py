@@ -287,8 +287,8 @@ class ExportTaskView(gui3d.TaskView):
         y = yy
         self.mhxOptionsSource = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options source', gui3d.GroupBoxStyle._replace(height=25+24*2+6)));y+=25
         source = []
-        self.mhxConfig = self.mhxOptionsSource.addView(gui3d.RadioButton(source, "Use config options", True));y+=24
-        self.mhxGui = self.mhxOptionsSource.addView(gui3d.RadioButton(source, "Use gui options"));y+=24
+        self.mhxConfig = self.mhxOptionsSource.addView(gui3d.RadioButton(source, "Use config options"));y+=24
+        self.mhxGui = self.mhxOptionsSource.addView(gui3d.RadioButton(source, "Use gui options", True));y+=24
         self.mhxOptionsSource.hide()
         y+=16
         
@@ -299,7 +299,7 @@ class ExportTaskView(gui3d.TaskView):
         self.exportFeetOnGround = self.mhxOptions.addView(gui3d.CheckBox("Feet on ground", True));y+=24
         self.exportExpressions = self.mhxOptions.addView(gui3d.CheckBox("Expressions", False));y+=24
         self.exportFaceShapes = self.mhxOptions.addView(gui3d.CheckBox("Face shapes", True));y+=24
-        self.exportBodyShapes = self.mhxOptions.addView(gui3d.CheckBox("Body shapes", False));y+=24
+        self.exportBodyShapes = self.mhxOptions.addView(gui3d.CheckBox("Body shapes", True));y+=24
         self.exportFacePanel = self.mhxOptions.addView(gui3d.CheckBox("Face panel", True));y+=24
         self.exportClothes = self.mhxOptions.addView(gui3d.CheckBox("Clothes", True));y+=24
         self.exportClothesRig = self.mhxOptions.addView(gui3d.CheckBox("Clothes rig", True));y+=24

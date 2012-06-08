@@ -188,8 +188,8 @@ ShoulderArmature = [
     ('ShoulderUp_R',       0, 'ShoulderPivot_R', 0, L_HELP, NoBB),
     ('ShoulderAim_R',      0, 'ShoulderPivot_R', 0, L_HELP, NoBB),
 
-    ('DfmScapula_L',       0, 'ShoulderAim_L', F_DEF, L_DMAIN, NoBB),
-    ('DfmScapula_R',       0, 'ShoulderAim_R', F_DEF, L_DMAIN, NoBB),
+    ('DfmScapula_L',       0, 'ShoulderAim_L', F_DEF1, L_DMAIN, NoBB),
+    ('DfmScapula_R',       0, 'ShoulderAim_R', F_DEF1, L_DMAIN, NoBB),
 
     # Shoulder
     ('ArmTrg_L',          0, 'Shoulder_L', 0, L_HELP, NoBB),
@@ -410,9 +410,9 @@ ShoulderDeformDrivers = []
 
 ShoulderTargetDrivers = [
     ("arms-up-90",  "UpArm", "ROTATION_DIFF", "DirShldrUp", 90, "LR"),
-    ("arms-down-80",  "UpArm", "ROTATION_DIFF", "DirShldrDown", 80, "LR"),
+    ("arms-down-70",  "UpArm", "ROTATION_DIFF", "DirShldrDown", 80, "LR"),
     ("arms-forward-70",  "UpArm", "ROTATION_DIFF", "DirShldrFwd", 70, "LR"),
     ("arms-back-70",  "UpArm", "ROTATION_DIFF", "DirShldrBack", 70, "LR"),
-    ("arms-twist-60",  "UpArm", "ROTATION_DIFF", "DirShldrTwistPos", 60, "LR"),
+    ("arms-twist-pos-60",  "UpArm", "ROTATION_DIFF", "DirShldrTwistPos", 60, "LR"),
     ("arms-twist-neg-60",  "UpArm", "ROTATION_DIFF", "DirShldrTwistNeg", 60, "LR"),
 ]

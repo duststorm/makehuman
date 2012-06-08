@@ -82,7 +82,7 @@ L_DMAIN =   0x80000000
 F_CON = 0x0001
 F_DEF = 0x0002
 F_DEF1 = F_DEF   
-#F_DEF1 = 0	 # Turns off muscle bones if = 0
+F_DEF1 = 0	 # Turns off muscle bones if = 0
 F_RES = 0x0004
 #F_RES = 0
 F_WIR = 0x0008
