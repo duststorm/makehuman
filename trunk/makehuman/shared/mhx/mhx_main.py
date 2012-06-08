@@ -39,6 +39,7 @@ import mhx_globals as the
 import mhx_24
 import mhx_rig
 import rig_panel_25
+import rig_shoulder_25
 import rig_arm_25
 import rig_leg_25
 import rig_body_25
@@ -1132,6 +1133,22 @@ def printProxyShape(fp, shapes):
 #    writeShapeKeys(fp, human, name, proxy):
 #
 
+def writeTargets(outfp, drivers, folder):    
+    for (fname, bname, typ, targ, angle, lr) in drivers:
+        filepath = os.path.join(folder, "%s.target" % (fname))
+        try:
+            infp = open(filepath, "r")
+        except IOError:
+            continue                           
+        outfp.write("ShapeKey %s %s True\n" % (fname, lr))
+        for line in infp:
+            words = line.split()
+            outfp.write("  sv %s %s %.4f %s ;\n" % (words[0], words[1], -float(words[3]), words[2]))
+        outfp.write("end ShapeKey\n")
+        infp.close()
+    return            
+
+
 def writeShapeKeys(fp, human, name, proxy):
     fp.write(
 "#if toggle&T_Shapekeys\n" +
@@ -1157,6 +1174,7 @@ def writeShapeKeys(fp, human, name, proxy):
                 fp.write("end ShapeKey\n")
 
     if the.Config.bodyshapes:
+        writeTargets(fp, rig_shoulder_25.ShoulderTargetDrivers, "shared/mhx/data/shoulder")                
         copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
 
     for path in the.Config.customshapes:
@@ -1166,7 +1184,9 @@ def writeShapeKeys(fp, human, name, proxy):
     fp.write(
 "  AnimationData None (toggle&T_Symm==0)\n")
 
+        
     if the.Config.bodyshapes:
+        mhx_rig.writeTargetDrivers(fp, rig_shoulder_25.ShoulderTargetDrivers, the.Human)
         mhx_rig.writeRotDiffDrivers(fp, rig_arm_25.ArmShapeDrivers, proxy)
         mhx_rig.writeRotDiffDrivers(fp, rig_leg_25.LegShapeDrivers, proxy)
         mhx_rig.writeShapePropDrivers(fp, rig_body_25.BodyShapes, proxy, "&")

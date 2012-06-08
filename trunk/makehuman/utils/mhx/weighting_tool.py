@@ -87,6 +87,7 @@ def selectVertNum(context):
 class VIEW3D_OT_SelectVnumButton(bpy.types.Operator):
     bl_idname = "mhw.select_vnum"
     bl_label = "Select vnum"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         selectVertNum(context)
@@ -150,6 +151,7 @@ def selectQuads(context):
 class VIEW3D_OT_SelectQuadsButton(bpy.types.Operator):
     bl_idname = "mhw.select_quads"
     bl_label = "Select quads"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         import bpy
@@ -171,6 +173,7 @@ def removeVertexGroups(context):
 class VIEW3D_OT_RemoveVertexGroupsButton(bpy.types.Operator):
     bl_idname = "mhw.remove_vertex_groups"
     bl_label = "Unvertex all"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         removeVertexGroups(context)
@@ -199,6 +202,7 @@ def copyVertexGroups(scn, src, trg):
 class VIEW3D_OT_CopyVertexGroupsButton(bpy.types.Operator):
     bl_idname = "mhw.copy_vertex_groups"
     bl_label = "Copy vgroups active => selected"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         src = context.object
@@ -246,6 +250,7 @@ def mergeVertexGroups(scn, ob):
 class VIEW3D_OT_MergeVertexGroupsButton(bpy.types.Operator):
     bl_idname = "mhw.merge_vertex_groups"
     bl_label = "Merge vertex groups"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         mergeVertexGroups(context.scene, context.object)
@@ -265,7 +270,8 @@ def unVertexDiamonds(context):
     bpy.ops.mesh.select_all(action='DESELECT')
     bpy.ops.object.mode_set(mode='OBJECT')
     me = ob.data
-    for f in me.faces:        
+    faces = getFaces(me)
+    for f in faces:        
         if len(f.vertices) < 4:
             for vn in f.vertices:
                 me.vertices[vn].select = True
@@ -277,6 +283,7 @@ def unVertexDiamonds(context):
 class VIEW3D_OT_UnvertexDiamondsButton(bpy.types.Operator):
     bl_idname = "mhw.unvertex_diamonds"
     bl_label = "Unvertex diamonds"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         unVertexDiamonds(context)
@@ -286,6 +293,7 @@ class VIEW3D_OT_UnvertexDiamondsButton(bpy.types.Operator):
 class VIEW3D_OT_UnvertexSelectedButton(bpy.types.Operator):
     bl_idname = "mhw.unvertex_selected"
     bl_label = "Unvertex selected"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         bpy.ops.object.mode_set(mode='EDIT')
@@ -319,6 +327,7 @@ def deleteDiamonds(context):
 class VIEW3D_OT_DeleteDiamondsButton(bpy.types.Operator):
     bl_idname = "mhw.delete_diamonds"
     bl_label = "Delete diamonds"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         deleteDiamonds(context)
@@ -359,6 +368,7 @@ def pairWeight(context):
 class VIEW3D_OT_PairWeightButton(bpy.types.Operator):
     bl_idname = "mhw.pair_weight"
     bl_label = "Weight pair"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         import bpy
@@ -538,6 +548,7 @@ def cleanGroups(me, groups):
 class VIEW3D_OT_SymmetrizeWeightsButton(bpy.types.Operator):
     bl_idname = "mhw.symmetrize_weights"
     bl_label = "Symmetrize weights"
+    bl_options = {'UNDO'}
     left2right = BoolProperty()
 
     def execute(self, context):
@@ -569,6 +580,7 @@ def cleanRight(context, doRight):
 class VIEW3D_OT_CleanRightButton(bpy.types.Operator):
     bl_idname = "mhw.clean_right"
     bl_label = "Clean right"
+    bl_options = {'UNDO'}
     doRight = BoolProperty()
 
     def execute(self, context):
@@ -610,6 +622,7 @@ def symmetrizeShapes(context, left2right):
 class VIEW3D_OT_SymmetrizeShapesButton(bpy.types.Operator):
     bl_idname = "mhw.symmetrize_shapes"
     bl_label = "Symmetrize shapes"
+    bl_options = {'UNDO'}
     left2right = BoolProperty()
 
     def execute(self, context):
@@ -645,6 +658,7 @@ def shapekeyFromObject(ob, targ):
 class VIEW3D_OT_ShapeKeysFromObjectsButton(bpy.types.Operator):
     bl_idname = "mhw.shapekeys_from_objects"
     bl_label = "Shapes from objects"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         import bpy
@@ -751,6 +765,7 @@ def recoverDiamonds(context):
 class VIEW3D_OT_RecoverDiamondsButton(bpy.types.Operator):
     bl_idname = "mhw.recover_diamonds"
     bl_label = "Recover diamonds"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         recoverDiamonds(context)
@@ -785,6 +800,7 @@ def exportVertexGroups(context):
 class VIEW3D_OT_ExportVertexGroupsButton(bpy.types.Operator):
     bl_idname = "mhw.export_vertex_groups"
     bl_label = "Export vertex groups"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         exportVertexGroups(context)
@@ -843,6 +859,7 @@ def exportList(context, weights, name, fp):
 class VIEW3D_OT_ExportSumGroupsButton(bpy.types.Operator):
     bl_idname = "mhw.export_sum_groups"
     bl_label = "Export sum groups"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         exportSumGroups(context)
@@ -882,6 +899,7 @@ def exportShapeKeys(context):
 class VIEW3D_OT_ExportShapeKeysButton(bpy.types.Operator):
     bl_idname = "mhw.export_shapekeys"
     bl_label = "Export shapekeys"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         exportShapeKeys(context)
@@ -932,6 +950,7 @@ def listVertPairs(context):
 class VIEW3D_OT_ListVertPairsButton(bpy.types.Operator):
     bl_idname = "mhw.list_vert_pairs"
     bl_label = "List vert pairs"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         listVertPairs(context)
@@ -1004,6 +1023,7 @@ def appendStuff(ob, v0, verts, faces, texfaces):
 class VIEW3D_OT_JoinMeshesButton(bpy.types.Operator):
     bl_idname = "mhw.join_meshes"
     bl_label = "Join meshes"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         joinMeshes(context)
@@ -1471,6 +1491,7 @@ class MhxWeightExtraPanel(bpy.types.Panel):
     bl_label = "Weight tools extra"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
+    bl_options = {'DEFAULT_CLOSED'}
     
     @classmethod
     def poll(cls, context):

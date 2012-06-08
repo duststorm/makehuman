@@ -24,24 +24,31 @@ from mhx_globals import *
 from mhx_rig import addPoseBone, copyDeform
 
 ShoulderJoints = [
-    ('r-pect1',             'vl', ((0.96, 2870), (0.04, 2591))),
-    ('l-pect1',             'vl', ((0.96, 10804), (0.04, 11017))),
-    ('r-pect2',             'v', 3535),
-    ('l-pect2',             'v', 10257),
-    ('r-pecttrg',           'v', 3008),
-    ('l-pecttrg',           'v', 10718),
+    ('r-shldr-front',       'v', 3008),
+    ('l-shldr-front',       'v', 10718),
+    ('r-shldr-back',        'v', 3452),
+    ('l-shldr-back',        'v', 10316),
+    ('r-shldr-bot',         'v', 3424),
+    ('l-shldr-bot',         'v', 10344),
 
-    ('r-trap1',             'v', 3417),
-    ('l-trap1',             'v', 10347),
-    ('r-trap2',             'v', 2614),
-    ('l-trap2',             'v', 10996),
-    ('r-traptrg',           'v', 3452),
-    ('l-traptrg',           'v', 10316),
+    ('r-pect1',             'vl', ((0.9, 2870), (0.1, 2591))),
+    ('l-pect1',             'vl', ((0.9, 10804), (0.1, 11017))),
+    ('r-pect2',             'vl', ((0.9, 3535), (0.1, 3600))),
+    ('l-pect2',             'vl', ((0.9, 10257), (0.1, 10192))),
+    ('r-pecttrg',           'l', ((0.7, 'r-shldr-front'), (0.3, 'r-shldr-back'))),
+    ('l-pecttrg',           'l', ((0.7, 'l-shldr-front'), (0.3, 'l-shldr-back'))),
 
-    ('r-lattrg',            'v', 3424),
-    ('l-lattrg',            'v', 10344),
-    ('r-lat',               'v', 4430),
-    ('l-lat',               'v', 9997),
+    ('r-trap1',             'vl', ((0.9, 3417), (0.1, 2483))),
+    ('l-trap1',             'vl', ((0.9, 10347), (0.1, 8914))),
+    ('r-trap2',             'vl', ((0.9, 2614), (0.1, 2945))),
+    ('l-trap2',             'vl', ((0.9, 10996), (0.1, 10775))),
+    ('r-traptrg',           'l', ((0.3, 'r-shldr-front'), (0.7, 'r-shldr-back'))),
+    ('l-traptrg',           'l', ((0.3, 'l-shldr-front'), (0.7, 'l-shldr-back'))),
+
+    ('r-lat',               'vl', ((0.9, 4430), (0.1, 2948))),
+    ('l-lat',               'vl', ((0.9, 9997), (0.1, 10772))),
+    ('r-lattrg',            'l', ((0.4, 'r-armtrg'), (0.6, 'r-shldr-bot'))),
+    ('l-lattrg',            'l', ((0.4, 'l-armtrg'), (0.6, 'l-shldr-bot'))),
     
     ('r-deltoid-head',      'vl', ((0.5, 3729), (0.5, 2601))),
     ('l-deltoid-head',      'vl', ((0.5, 10104), (0.5, 11009))),
@@ -64,11 +71,11 @@ ShoulderJoints = [
     ('r-scapula1-head',     'vl', ((0.9, 3044), (0.1, 4444))),
     ('r-scapula1-tail',     'v', 2584),
     ('r-scapula2-head',     'l', ((0.5, 'r-scapula1-head'), (0.5, 'r-scapula1-tail'))),
-    ('r-scapula2-tail',     'v', 2607),
+    ('r-scapula2-tail',     'vl', ((0.9, 2607), (0.1, 3550))),
     ('l-scapula1-head',     'vl', ((0.9, 10687), (0.1, 9983))),
     ('l-scapula1-tail',     'v', 11024),
     ('l-scapula2-head',     'l', ((0.5, 'l-scapula1-head'), (0.5, 'l-scapula1-tail'))),
-    ('l-scapula2-tail',     'v', 11003),
+    ('l-scapula2-tail',     'vl', ((0.9, 11003), (0.1, 10242))),
 ]
 
 ShoulderHeadsTails = [
@@ -118,6 +125,8 @@ ShoulderHeadsTails = [
 
     ('DfmLat_L',             'r-lat', 'r-armtrg'),
     ('DfmLat_R',             'l-lat', 'l-armtrg'),
+    ('LatTrg_L',             'r-lattrg', 'r-armtrg'),
+    ('LatTrg_R',             'l-lattrg', 'l-armtrg'),
     
     ('DfmDeltoid_L',         'r-deltoid-head', 'r-deltoid-tail'),
     ('DfmDeltoid_R',         'l-deltoid-head', 'l-deltoid-tail'),
@@ -145,6 +154,10 @@ ShoulderHeadsTails = [
     ('DirShldrFwd_R',     'l-uparm0', ('l-uparm0', (0,0,1))),
     ('DirShldrBack_L',        'r-uparm0', ('r-uparm0', (0,0,-1))),
     ('DirShldrBack_R',        'l-uparm0', ('l-uparm0', (0,0,-1))),
+    ('DirShldrTwistPos_L',        'r-uparm0', ('r-uparm0', (1,0,0))),
+    ('DirShldrTwistPos_R',        'l-uparm0', ('l-uparm0', (-1,0,0))),
+    ('DirShldrTwistNeg_L',        'r-uparm0', ('r-uparm0', (1,0,0))),
+    ('DirShldrTwistNeg_R',        'l-uparm0', ('l-uparm0', (-1,0,0))),
 ]
 
 L_LSHOULDER = L_LARMFK+L_LARMIK+L_UPSPNFK+L_UPSPNIK
@@ -183,25 +196,27 @@ ShoulderArmature = [
     ('ArmTrg_R',          0, 'Shoulder_R', 0, L_HELP, NoBB),
 
     # Muscles
-    ('DfmPect1_L',         0, 'DfmRib', F_DEF, L_MSCL, NoBB ),
-    ('DfmPect1_R',         0, 'DfmRib', F_DEF, L_MSCL, NoBB ),
-    ('DfmPect2_L',         0, 'DfmRib', F_DEF, L_MSCL, NoBB ),
-    ('DfmPect2_R',         0, 'DfmRib', F_DEF, L_MSCL, NoBB ),
+    ('DfmPect1_L',         0, 'DfmRib', F_DEF1, L_MSCL, NoBB ),
+    ('DfmPect1_R',         0, 'DfmRib', F_DEF1, L_MSCL, NoBB ),
+    ('DfmPect2_L',         0, 'DfmRib', F_DEF1, L_MSCL, NoBB ),
+    ('DfmPect2_R',         0, 'DfmRib', F_DEF1, L_MSCL, NoBB ),
     ('PectTrg_L',          0, 'ArmTrg_L', 0, L_HELP, NoBB),
     ('PectTrg_R',          0, 'ArmTrg_R', 0, L_HELP, NoBB),
     
-    ('DfmTrap1_L',         0, 'DfmNeck', F_DEF, L_MSCL, NoBB ),
-    ('DfmTrap1_R',         0, 'DfmNeck', F_DEF, L_MSCL, NoBB ),
-    ('DfmTrap2_L',         0, 'DfmSpine2', F_DEF, L_MSCL, NoBB ),
-    ('DfmTrap2_R',         0, 'DfmSpine2', F_DEF, L_MSCL, NoBB ),
+    ('DfmTrap1_L',         0, 'DfmNeck', F_DEF1, L_MSCL, NoBB ),
+    ('DfmTrap1_R',         0, 'DfmNeck', F_DEF1, L_MSCL, NoBB ),
+    ('DfmTrap2_L',         0, 'DfmSpine2', F_DEF1, L_MSCL, NoBB ),
+    ('DfmTrap2_R',         0, 'DfmSpine2', F_DEF1, L_MSCL, NoBB ),
     ('TrapTrg_L',          0, 'ArmTrg_L', 0, L_HELP, NoBB),
     ('TrapTrg_R',          0, 'ArmTrg_R', 0, L_HELP, NoBB),
 
-    ('DfmLat_L',           0, 'DfmSpine1', F_DEF, L_MSCL, NoBB ),
-    ('DfmLat_R',           0, 'DfmSpine1', F_DEF, L_MSCL, NoBB ),
+    ('DfmLat_L',           0, 'DfmSpine1', F_DEF1, L_MSCL, NoBB ),
+    ('DfmLat_R',           0, 'DfmSpine1', F_DEF1, L_MSCL, NoBB ),
+    ('LatTrg_L',           0, 'ArmTrg_L', 0, L_HELP, NoBB),
+    ('LatTrg_R',           0, 'ArmTrg_R', 0, L_HELP, NoBB),
 
-    ('DfmDeltoid_L',       0, 'DfmClavicle_L', F_DEF, L_MSCL, NoBB ),
-    ('DfmDeltoid_R',       0, 'DfmClavicle_R', F_DEF, L_MSCL, NoBB ),
+    ('DfmDeltoid_L',       0, 'DfmClavicle_L', F_DEF1, L_MSCL, NoBB ),
+    ('DfmDeltoid_R',       0, 'DfmClavicle_R', F_DEF1, L_MSCL, NoBB ),
     
     # Elbow lock        
     ('Elbow_L',            0, Master, F_WIR, L_LEXTRA, NoBB),
@@ -220,16 +235,18 @@ ShoulderArmature = [
 
     ('DirShldrUp_L',        -90*D, 'Clavicle_L', 0, L_HELP, NoBB),
     ('DirShldrUp_R',        90*D, 'Clavicle_R', 0, L_HELP, NoBB),
+    ('DirShldrDown_L',      90*D, 'Clavicle_L', 0, L_HELP, NoBB),
+    ('DirShldrDown_R',      -90*D, 'Clavicle_R', 0, L_HELP, NoBB),
     ('DirShldrFwd_L',       0*D, 'Clavicle_L', 0, L_HELP, NoBB),
     ('DirShldrFwd_R',       0*D, 'Clavicle_R', 0, L_HELP, NoBB),
     ('DirShldrBack_L',      0*D, 'Clavicle_L', 0, L_HELP, NoBB),
     ('DirShldrBack_R',      0*D, 'Clavicle_R', 0, L_HELP, NoBB),
+    ('DirShldrTwistPos_L',  90*D, 'Clavicle_L', 0, L_HELP, NoBB),
+    ('DirShldrTwistPos_R',  90*D, 'Clavicle_R', 0, L_HELP, NoBB),
+    ('DirShldrTwistNeg_L',  -90*D, 'Clavicle_L', 0, L_HELP, NoBB),
+    ('DirShldrTwistNeg_R',  -90*D, 'Clavicle_R', 0, L_HELP, NoBB),
 ]
-"""
-    ('DirShldrDown_L',      90*D, 'Clavicle_L', 0, L_HELP, NoBB),
-    ('DirShldrDown_R',      -90*D, 'Clavicle_R', 0, L_HELP, NoBB),
-]
-"""
+
 #
 #
 #
@@ -273,35 +290,35 @@ def ShoulderControlPoses(fp):
          
     # Muscles
     addPoseBone(fp, 'DfmPect1_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'PectTrg_L', 0.5, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'PectTrg_L', 1.0, 1])])
 
     addPoseBone(fp, 'DfmPect1_R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'PectTrg_R', 0.5, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'PectTrg_R', 1.0, 1])])
 
     addPoseBone(fp, 'DfmPect2_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'PectTrg_L', 0.5, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'PectTrg_L', 1.0, 1])])
 
     addPoseBone(fp, 'DfmPect2_R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'PectTrg_R', 0.5, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'PectTrg_R', 1.0, 1])])
 
 
     addPoseBone(fp, 'DfmTrap1_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-         [('StretchTo', 0, 1, ['Stretch', 'TrapTrg_L', 0.9, 1])])
+         [('StretchTo', 0, 1, ['Stretch', 'TrapTrg_L', 1.0, 1])])
     addPoseBone(fp, 'DfmTrap1_R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'TrapTrg_R', 0.9, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'TrapTrg_R', 1.0, 1])])
 
     addPoseBone(fp, 'DfmTrap2_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-         [('StretchTo', 0, 1, ['Stretch', 'TrapTrg_L', 0.9, 1])])
+         [('StretchTo', 0, 1, ['Stretch', 'TrapTrg_L', 1.0, 1])])
 
     addPoseBone(fp, 'DfmTrap2_R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'TrapTrg_R', 0.9, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'TrapTrg_R', 1.0, 1])])
 
 
     addPoseBone(fp, 'DfmLat_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'TrapTrg_L', 0.9, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_L', 1.0, 1])])
 
     addPoseBone(fp, 'DfmLat_R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'TrapTrg_R', 0.9, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_R', 1.0, 1])])
 
 
     addPoseBone(fp, 'DfmDeltoid_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
@@ -372,7 +389,8 @@ def ShoulderControlPoses(fp):
 #    (Bone, constraint, driver, rotdiff, keypoints)
 #
 
-ShoulderDeformDrivers = [
+ShoulderDeformDrivers = []
+"""
     ("DfmDeltoid_L", "DampedTrack", "o*i+(1-o)*max(2*cos(u),max(0.5*cos(f),1.5*cos(b)))", 
         [("u", 'ROTATION_DIFF', "DfmUpArm1_L", "DirShldrUp_L"),
          ("f", 'ROTATION_DIFF', "DfmUpArm1_L", "DirShldrFwd_L"),
@@ -387,4 +405,14 @@ ShoulderDeformDrivers = [
          ("i", 'SINGLE_PROP', "&TweakDeltoidInfluence_R", ""),
          ("o", 'SINGLE_PROP', "&TweakDeltoidOn_R", ""),
         ], []),
+]
+"""
+
+ShoulderTargetDrivers = [
+    ("arms-up-90",  "UpArm", "ROTATION_DIFF", "DirShldrUp", 90, "LR"),
+    ("arms-down-80",  "UpArm", "ROTATION_DIFF", "DirShldrDown", 80, "LR"),
+    ("arms-forward-70",  "UpArm", "ROTATION_DIFF", "DirShldrFwd", 70, "LR"),
+    ("arms-back-70",  "UpArm", "ROTATION_DIFF", "DirShldrBack", 70, "LR"),
+    ("arms-twist-60",  "UpArm", "ROTATION_DIFF", "DirShldrTwistPos", 60, "LR"),
+    ("arms-twist-neg-60",  "UpArm", "ROTATION_DIFF", "DirShldrTwistNeg", 60, "LR"),
 ]

@@ -405,13 +405,15 @@ def BreastControlPoses(fp):
     limBreastRot = (-45*D,45*D, -10*D,10*D, -20*D,20*D)
     limBreastScale =  (0.5,1.5, 0.2,2.0, 0.5,1.5)
 
-    addPoseBone(fp,  'Breast_L', 'MHEndCube01', None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, 
-         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limBreastRot, (1,1,1)]),
+    addPoseBone(fp,  'Breast_L', 'MHEndCube01', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, 
+         [
+         #('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limBreastRot, (1,1,1)]),
          #('LimitScale', C_OW_LOCAL, 1, ['Scale', limBreastScale, (1,1,1)])
          ])
 
-    addPoseBone(fp,  'Breast_R', 'MHEndCube01', None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0,
-         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limBreastRot, (1,1,1)]),
+    addPoseBone(fp,  'Breast_R', 'MHEndCube01', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
+         [
+         #('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limBreastRot, (1,1,1)]),
          #('LimitScale', C_OW_LOCAL, 1, ['Scale', limBreastScale, (1,1,1)])
          ])
     return

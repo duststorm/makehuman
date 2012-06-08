@@ -24,6 +24,7 @@ Limit angles from http://hippydrome.com/
 import aljabr
 from aljabr import *
 import math
+import os
 import mhx_globals as the
 from mhx_globals import *
 import mhxbones
@@ -1359,6 +1360,27 @@ def writeShapeDrivers(fp, drivers, proxy):
             writeDriver(fp, 'toggle&T_Shapekeys', 'AVERAGE', "", "key_blocks[\"%s\"].value" % (shape), -1, coeff, drvVars)
     return
 
+
+def writeTargetDrivers(fp, drivers, rig):
+    for (fname, bone, typ, targ, angle, lr) in drivers:
+        if lr:
+            for suffix in ["_L", "_R"]:
+                coeff = [((90-angle)*D,1), (90*D,0)]
+                if typ == "ROTATION_DIFF":
+                    drvVar = ("x", typ, [('OBJECT', rig, bone+suffix, C_LOC),('OBJECT', rig, targ+suffix, C_LOC)])
+                else:
+                    halt
+                writeDriver(fp, True, 'AVERAGE', "", "key_blocks[\"%s\"].value" % (fname+suffix), -1, coeff, [drvVar])
+        else:                
+            coeff = [(0,0), (angle*D,1)]
+            if typ == "ROTATION_DIFF":
+                drvVar = ("x", typ, [('OBJECT', rig, bone, C_LOC),('OBJECT', rig, targ, C_LOC)])
+            else:
+                halt
+            writeDriver(fp, True, 'AVERAGE', "", "key_blocks[\"%s\"].value" % (fname+suffix), -1, coeff, [drvVar])
+    return
+    
+
 #
 #    writeMuscleDrivers(fp, drivers, rig):
 #     ("LegForward_L", "StretchTo", expr, [("f", "UpLegDwn_L", "BendLegForward_L")], [(0,1), (deg30,1), (deg45,0)])
@@ -1454,6 +1476,7 @@ def writeDriver(fp, cond, drvdata, extra, channel, index, coeffs, variables):
 
         elif typ == 'ROTATION_DIFF':
             useKeypoints = True
+            useMod = False
             for (idtype, targ, boneTarg, flags) in targets:
                 fp.write(
 "          Target %s %s\n" % (targ, idtype) +
@@ -1972,6 +1995,7 @@ def writeAllActions(fp):
     #rig_leg_25.LegWriteActions(fp)
     #rig_finger_25.FingerWriteActions(fp)
     return
+
 
 def writeAllDrivers(fp):
     if the.Config.mhxrig == 'mhx':      
