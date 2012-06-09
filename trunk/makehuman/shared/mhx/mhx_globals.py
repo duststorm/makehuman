@@ -19,6 +19,8 @@ Dummy file to put global variables
 
 """
 
+MuscleBones = False
+
 pi = 3.14159
 D = pi/180
 
@@ -81,8 +83,6 @@ L_DMAIN =   0x80000000
 
 F_CON = 0x0001
 F_DEF = 0x0002
-F_DEF1 = F_DEF   
-F_DEF1 = 0	 # Turns off muscle bones if = 0
 F_RES = 0x0004
 #F_RES = 0
 F_WIR = 0x0008
@@ -95,6 +95,10 @@ F_NOSCALE = 0x0200
 F_NOROT = 0x0400
 F_SCALE = 0x0800
 
+if MuscleBones:
+    F_DEF1 = F_DEF   
+else:
+    F_DEF1 = 0
 
 P_LKROT4 = 0x0001
 P_LKROTW = 0x0002

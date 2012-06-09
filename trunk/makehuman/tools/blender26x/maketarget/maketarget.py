@@ -406,6 +406,13 @@ class VIEW3D_OT_MakeBaseObjButton(bpy.types.Operator):
         global theProxy
         theProxy = None
         ob = context.object
+        for mod in ob.modifiers:
+            if mod.type == 'ARMATURE':
+                mod.show_in_editmode = True
+            else:
+                ob.modifiers.remove(mod)
+        removeShapeKeys(ob)
+        ob.shape_key_add(name="Basis")
         ob["NTargets"] = 0
         ob["ProxyFile"] = 0
         ob["ObjFile"] =  0
@@ -421,6 +428,8 @@ class VIEW3D_OT_DeleteHelpersButton(bpy.types.Operator):
 
     def execute(self, context):
         ob = context.object
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.select_all(action='DESELECT')
         bpy.ops.object.mode_set(mode='OBJECT')
         nverts = len(ob.data.vertices)
         for n in range(NBodyVerts):
@@ -450,6 +459,7 @@ Mid = {}
 def setupVertexPairs(context, insist):
     global Left, Right, Mid
     if Left.keys() and not insist:
+        print("Vertex pair already set up")
         return
     ob = context.object
     verts = []
@@ -750,17 +760,24 @@ def applyTargets(context):
     ob = context.object
     bpy.ops.object.mode_set(mode='OBJECT')
     verts = evalVertLocations(ob)   
+    removeShapeKeys(ob)
+    for prop in ob.keys():
+        del ob[prop]
+    for v in ob.data.vertices:
+        v.co = verts[v.index]
+    return
+    
+
+def removeShapeKeys(ob):    
+    if not ob.data.shape_keys:
+        return
     skeys = ob.data.shape_keys.key_blocks
     n = len(skeys)
     while n >= 0:
         ob.active_shape_key_index = n
         bpy.ops.object.shape_key_remove()
         n -= 1
-    for prop in ob.keys():
-        del ob[prop]
-    for v in ob.data.vertices:
-        v.co = verts[v.index]
-    return
+    return        
 
 
 class VIEW3D_OT_ApplyTargetsButton(bpy.types.Operator):
@@ -991,6 +1008,8 @@ class VIEW3D_OT_DiscardTargetButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
+        discardTarget(context)
+        """
         global Confirm, ConfirmString, ConfirmString2
         if Confirm:        
             Confirm = None
@@ -999,6 +1018,7 @@ class VIEW3D_OT_DiscardTargetButton(bpy.types.Operator):
             Confirm = "mh.discard_target"
             ConfirmString = "Really discard target?"
             ConfirmString2 = None
+        """            
         return{'FINISHED'}                
 
 

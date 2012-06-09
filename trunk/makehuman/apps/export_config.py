@@ -92,7 +92,6 @@ class CExportConfig:
         self.facepanel = True
         self.cage = False
         self.breastrig = False
-        self.biceps = False
         self.malerig = False
         self.skirtrig = "inh"
         self.clothesrig = True
@@ -106,7 +105,7 @@ class CExportConfig:
         return (
 "<CExportConfig use:%s mhx:%s daz:%s version%s\n" % (self.mainmesh, self.mhxrig, self.daerig, self.mhxversion) +
 "  expr:%s face:%s body:%s cage:%s\n" % (self.expressions, self.faceshapes, self.bodyshapes, self.cage) +
-"  breastrig:%s biceps:%s gen:%s vis:%s>" % (self.breastrig, self.biceps, self.malerig, self.clothesvisibilitydrivers))
+"  breastrig:%s gen:%s vis:%s>" % (self.breastrig, self.malerig, self.clothesvisibilitydrivers))
 
 #
 #   class CProxyFile:
@@ -274,7 +273,7 @@ def exportConfig(human, useHair, options=None):
             elif key in [
                 'separatefolder', 'feetonground',
                 'expressions', 'faceshapes', 'bodyshapes', 'facepanel'
-                'breastrig', 'biceps', 'malerig', 'clothesrig',
+                'breastrig', 'malerig', 'clothesrig',
                 'clothesvisibilitydrivers'
                 ]:
                 try:

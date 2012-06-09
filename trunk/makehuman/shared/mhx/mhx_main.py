@@ -584,15 +584,19 @@ def writeVertexGroups(fp, proxy):
             copyVertGroups(file, fp, proxy)
             
     if the.Config.mhxrig == 'mhx':            
+        if the.MuscleBones:
+            copyVertGroups("shared/mhx/templates/vertexgroups-muscles25.mhx", fp, proxy)    
         copyVertGroups("shared/mhx/templates/vertexgroups-tight25.mhx", fp, proxy)    
+        if the.MuscleBones:
+            copyVertGroups("shared/mhx/templates/vertexgroups-tight-muscles25.mhx", fp, proxy)    
         if the.Config.skirtrig == "own":
             copyVertGroups("shared/mhx/templates/vertexgroups-skirt-rigged.mhx", fp, proxy)    
         elif the.Config.skirtrig == "inh":
             copyVertGroups("shared/mhx/templates/vertexgroups-skirt25.mhx", fp, proxy)    
+            if the.MuscleBones:
+                copyVertGroups("shared/mhx/templates/vertexgroups-skirt-muscles25.mhx", fp, proxy)    
         if the.Config.breastrig:
             copyVertGroups("shared/mhx/templates/vertexgroups-breasts25.mhx", fp, proxy)    
-        if the.Config.biceps:
-            copyVertGroups("shared/mhx/templates/vertexgroups-biceps25.mhx", fp, proxy)    
 
     for path in the.Config.customvertexgroups:
         print("    %s" % path)
@@ -1135,7 +1139,7 @@ def printProxyShape(fp, shapes):
 
 def writeTargets(fp, human, drivers, folder):    
     for (fname, bname, typ, targ, angle, lr) in drivers:
-    	expr = read_expression.readCorrective(human, "%s/%s/" % (folder,fname))
+        expr = read_expression.readCorrective(human, "%s/%s/" % (folder,fname))
         fp.write("ShapeKey %s %s True\n" % (fname, lr))
         for (index, dr) in expr.items():
             fp.write("  sv %d %.4f %.4f %.4f ;\n" %  (index, dr[0], dr[1], dr[2]))

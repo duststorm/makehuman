@@ -1837,8 +1837,6 @@ def setupRig(obj, proxyData):
             the.Armature += rig_skirt_25.SkirtArmature        
         if the.Config.breastrig:
             the.Armature += rig_body_25.BreastArmature
-        if the.Config.biceps:
-            the.Armature += rig_arm_25.BicepsArmature
         if the.Config.malerig:
             the.Armature += rig_body_25.MaleArmature        
 
@@ -1950,8 +1948,6 @@ def writeControlPoses(fp):
         rig_face_25.FaceControlPoses(fp)
         if the.Config.breastrig:
             rig_body_25.BreastControlPoses(fp)
-        if the.Config.biceps:
-            rig_arm_25.BicepsControlPoses(fp)
         if the.Config.malerig:
             rig_body_25.MaleControlPoses(fp)
         if the.Config.skirtrig == "own":
