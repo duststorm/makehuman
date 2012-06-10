@@ -608,6 +608,8 @@ def writeVertexGroups(fp, proxy):
         fp.write("#endif\n")
     fp.write("#endif\n")
     copyVertGroups("shared/mhx/templates/vertexgroups-leftright25.mhx", fp, proxy)    
+    copyVertGroups("shared/mhx/templates/vertexgroups-tight-leftright25.mhx", fp, proxy)    
+    copyVertGroups("shared/mhx/templates/vertexgroups-skirt-leftright25.mhx", fp, proxy)    
     return
     
 #

@@ -414,6 +414,33 @@ class VIEW3D_OT_RampWeightButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 
+def createLeftRightGroups(context):
+    ob = context.object
+    left = ob.vertex_groups.new(name="Left")
+    right = ob.vertex_groups.new(name="Right")
+    xmax = 0.1
+    factor = 1/(2*xmax)
+    for v in ob.data.vertices:
+        w = factor*(v.co[0]+xmax)
+        if w > 1:
+            left.add([v.index], 1, 'REPLACE')
+        elif w < 0:
+            right.add([v.index], 1, 'REPLACE')
+        else:
+            left.add([v.index], w, 'REPLACE')
+            right.add([v.index], 1-w, 'REPLACE')
+    return
+
+
+class VIEW3D_OT_CreateLeftRightButton(bpy.types.Operator):
+    bl_idname = "mhw.create_left_right"
+    bl_label = "Create Left Right"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        createLeftRightGroups(context)
+        return{'FINISHED'}    
+
 
 #----------------------------------------------------------
 #   setupVertexPairs(ob):
@@ -1560,6 +1587,7 @@ class MhxWeightExtraPanel(bpy.types.Panel):
         layout.prop(context.scene, 'MhxBone2')
         layout.operator("mhw.pair_weight")
         layout.operator("mhw.ramp_weight")
+        layout.operator("mhw.create_left_right")        
         
         layout.label("Helper construction")
         layout.operator("mhw.join_meshes")
