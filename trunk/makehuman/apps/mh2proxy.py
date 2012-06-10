@@ -899,14 +899,15 @@ def getProxyShapes(rawShapes, proxy):
     shapes = []
     for (key, rawShape) in rawShapes:
         shape = []
-        for (v,(dx,dy,dz)) in rawShape.items():
+        for (v,dr) in rawShape.items():
+            (dx,dy,dz) = dr
             try:
                 vlist = proxy.verts[v]
             except:
                 vlist = []
             for (pv, w) in vlist:
                 shape.append((pv, w*dx, w*dy, w*dz))
-        fixedShape = fixProxyShape(fp, shape)
+        fixedShape = fixProxyShape(shape)
 
         shape = {}
         for (v,dx,dy,dz) in fixedShape:

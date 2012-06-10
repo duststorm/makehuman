@@ -95,6 +95,7 @@ def exportMhx_25(human, fp):
     proxyData = {}
     scanProxies(obj, proxyData)
     mhx_rig.setupRig(obj, proxyData)
+    the.correctives = {}
     
     if not the.Config.cage:
         fp.write(
@@ -1139,12 +1140,23 @@ def printProxyShape(fp, shapes):
 #    writeShapeKeys(fp, human, name, proxy):
 #
 
-def writeTargets(fp, human, drivers, folder):    
+def writeTargets(fp, human, drivers, folder, proxy):    
     for (fname, bname, targ, minangle, maxangle, lr) in drivers:
-        expr = read_expression.readCorrective(human, "%s/%s/" % (folder,fname))
+        path = "%s/%s/" % (folder,fname)
+        try:
+            expr = the.correctives[path]
+        except:
+            expr = read_expression.readCorrective(human, path)
+            the.correctives[path] = expr
         fp.write("ShapeKey %s %s True\n" % (fname, lr))
-        for (index, dr) in expr.items():
-            fp.write("  sv %d %.4f %.4f %.4f ;\n" %  (index, dr[0], dr[1], dr[2]))
+        if proxy:
+            shapes = mh2proxy.getProxyShapes([("shape",expr)], proxy)
+            for (pv, dr) in shapes[0].items():
+                (dx, dy, dz) = dr
+                fp.write("  sv %d %.4f %.4f %.4f ;\n" %  (pv, dx, dy, dz))
+        else:
+            for (vn, dr) in expr.items():
+                fp.write("  sv %d %.4f %.4f %.4f ;\n" %  (vn, dr[0], dr[1], dr[2]))
         fp.write("end ShapeKey\n")
     return            
 
@@ -1174,8 +1186,8 @@ def writeShapeKeys(fp, human, name, proxy):
                 fp.write("end ShapeKey\n")
 
     if the.Config.bodyshapes:
-        writeTargets(fp, human, rig_shoulder_25.ShoulderTargetDrivers, "shoulder")                
-        writeTargets(fp, human, rig_leg_25.HipTargetDrivers, "hips")                
+        writeTargets(fp, human, rig_shoulder_25.ShoulderTargetDrivers, "shoulder", proxy)                
+        writeTargets(fp, human, rig_leg_25.HipTargetDrivers, "hips", proxy)                
         copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
 
     for path in the.Config.customshapes:
