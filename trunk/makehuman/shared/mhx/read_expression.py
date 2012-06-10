@@ -129,6 +129,7 @@ def loopGendersAges(name, genders, ages, typ):
                 filename = 'data/targets/expression/%s_%s/neutral_%s_%s_%s.target' % (gender, age, gender, age, name)
             elif typ == "Corrective":
                 filename = "data/correctives/%s/%s-%s.target" % (name, gender, age)
+            #print ("Try", filename)                
             try:
                 fp = open(filename, "rU")
             except:
@@ -171,6 +172,10 @@ def loopGendersAges(name, genders, ages, typ):
                     expr[v] = (x+w*dx, y+w*dy, z+w*dz)
                 except:
                     expr[v] = aexpr[v]
+                    
+    dwarf = 0.8324
+    giant = 1.409
+    
     return (expr, wsum)
 
 

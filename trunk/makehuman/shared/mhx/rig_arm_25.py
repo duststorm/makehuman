@@ -444,7 +444,7 @@ ArmPropLRDrivers = [
     ('Clavicle', 'Elbow', ['ElbowPlant'], 'x1'),
     ('UpArm', 'ArmIK', ['ArmIk', 'ElbowPlant'], 'x1*(1-x2)'),
     ('UpArm', 'Elbow', ['ElbowPlant'], 'x1'),
-    ('Elbow', 'DistSternum', ['ArmStretch', 'ElbowPlant'], '(1-x1)*x2'),
+    #('Elbow', 'DistSternum', ['ArmStretch', 'ElbowPlant'], '(1-x1)*x2'),
     ('LoArm', 'ArmIK', ['ArmIk', 'ElbowPlant'], 'x1*(1-x2)'),
     ('LoArm', 'Wrist', ['ArmIk', 'ElbowPlant'], 'x1*x2'),
     ('Wrist', 'DistShoulder', ['ArmStretch', 'ElbowPlant'], '(1-x1)*(1-x2)'),

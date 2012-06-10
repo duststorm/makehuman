@@ -1362,21 +1362,17 @@ def writeShapeDrivers(fp, drivers, proxy):
 
 
 def writeTargetDrivers(fp, drivers, rig):
-    for (fname, bone, typ, targ, angle, lr) in drivers:
+    for (fname, bone, targ, minangle, maxangle, lr) in drivers:
         if lr:
             for suffix in ["_L", "_R"]:
-                coeff = [((90-angle)*D,1), (90*D,0)]
-                if typ == "ROTATION_DIFF":
-                    drvVar = ("x", typ, [('OBJECT', rig, bone+suffix, C_LOC),('OBJECT', rig, targ+suffix, C_LOC)])
-                else:
-                    halt
+                coeff = [((90-maxangle)*D,1), ((90-minangle)*D,0)]
+                drvVar = ("x", "ROTATION_DIFF", 
+                    [('OBJECT', rig, bone+suffix, C_LOC),('OBJECT', rig, targ+suffix, C_LOC)])
                 writeDriver(fp, True, 'AVERAGE', "", "key_blocks[\"%s\"].value" % (fname+suffix), -1, coeff, [drvVar])
         else:                
             coeff = [(0,0), (angle*D,1)]
-            if typ == "ROTATION_DIFF":
-                drvVar = ("x", typ, [('OBJECT', rig, bone, C_LOC),('OBJECT', rig, targ, C_LOC)])
-            else:
-                halt
+            drvVar = ("x", "ROTATION_DIFF", 
+                    [('OBJECT', rig, bone, C_LOC),('OBJECT', rig, targ, C_LOC)])
             writeDriver(fp, True, 'AVERAGE', "", "key_blocks[\"%s\"].value" % (fname+suffix), -1, coeff, [drvVar])
     return
     
@@ -1713,7 +1709,7 @@ def setupRig(obj, proxyData):
 
         the.VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
                             "./shared/mhx/templates/vertexgroups-bones25.mhx",
-                            genitalia,
+                            # genitalia,
                             "./shared/mhx/templates/vertexgroups-palm25.mhx"]
                                                         
         joints = (
@@ -1835,8 +1831,6 @@ def setupRig(obj, proxyData):
             joints += rig_skirt_25.SkirtJoints
             headsTails += rig_skirt_25.SkirtHeadsTails
             the.Armature += rig_skirt_25.SkirtArmature        
-        if the.Config.breastrig:
-            the.Armature += rig_body_25.BreastArmature
         if the.Config.malerig:
             the.Armature += rig_body_25.MaleArmature        
 
@@ -1946,8 +1940,6 @@ def writeControlPoses(fp):
         rig_leg_25.LegControlPoses(fp)
         #rig_toe_25.ToeControlPoses(fp)
         rig_face_25.FaceControlPoses(fp)
-        if the.Config.breastrig:
-            rig_body_25.BreastControlPoses(fp)
         if the.Config.malerig:
             rig_body_25.MaleControlPoses(fp)
         if the.Config.skirtrig == "own":

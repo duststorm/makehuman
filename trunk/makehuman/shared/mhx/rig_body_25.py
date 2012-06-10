@@ -35,10 +35,15 @@ BodyJoints = [
     ('l-tit',          'v', 10115),
 
     ('neck2',          'vl', ((0.5, 6531), (0.5, 8253))),
+
     ('rib-top',        'vl', ((0.9, 6857), (0.1, 7457))),
-    ('rib-bot',        'vl', ((0.9, 6910), (0.1, 7460))),
+    ('stomach-top',    'vl', ((0.9, 6909), (0.1, 7460))),
+    ('stomach-bot',    'v',  7359),
+]
+
+if MuscleBones:
+    BodyJoints = [
     #('stomach-mid',    'vl', ((0.9, 7315), (0.1, 7489))),    
-    ('stomach-bot',    'vl', ((0.9, 7298), (0.1, 7258))),
     ('stomach-end',    'l', ((0.1, 'rib-bot'), (0.9, 'stomach-bot'))),
     ('stomach-mid',    'l', ((0.3, 'rib-bot'), (0.7, 'stomach-end'))),
 
@@ -103,22 +108,26 @@ BodyHeadsTails = [
     ('DfmNeck',        'neck', 'neck2'),
     ('DfmHead',        'neck2', 'head-end'),
 
+    ('Breast_L',       'r-breast', 'r-tit'),
+    ('Breast_R',       'l-breast', 'l-tit'),
+
+    ('DfmRib',         'rib-top', 'stomach-top'),
+    ('DfmStomach',     'stomach-top', 'stomach-bot'),
+    ('StomachTrg',     'root-tail', 'stomach-bot'),
+]
+
+if MuscleBones:
+    BodyHeadsTails += [
     # Deform torso
-    ('DfmRib',         'rib-top', 'rib-bot'),
     ('DfmStomach1',    'rib-bot', 'stomach-mid'),
     ('Stomach',        'stomach-mid', ('stomach-mid', the.ysmall)),
     ('DfmStomach2',    'stomach-mid', 'stomach-bot'),
-    ('StomachTrg',     'root-tail', 'stomach-bot'),
-    ('StomachPar',     'rib-bot', 'stomach-mid'),
     ('StomachStretch', 'rib-bot', 'stomach-bot'),
 
     ('DfmWaist_L',     'r-waist-up', 'r-waist-down'),
     ('DfmWaist_R',     'l-waist-up', 'l-waist-down'),
     ('WaistTrg_L',     'r-waist-down', ('r-waist-down', the.yunit)),
     ('WaistTrg_R',     'l-waist-down', ('l-waist-down', the.yunit)),
-
-    ('Breast_L',       'r-breast', 'r-tit'),
-    ('Breast_R',       'l-breast', 'l-tit'),
 
     ('Pubis',          'pubis', ('pubis', the.ysmall)),
     ('Pubis_L',        'r-pubis', ('r-pubis', the.yunit)),
@@ -181,6 +190,18 @@ BodyArmature = [
     ('Head',               0, 'DfmNeck', F_WIR, L_UPSPN+L_DNSPN+L_HEAD, NoBB),
     ('DfmHead',            0, 'DfmNeck', F_DEF+F_CON, L_DMAIN, NoBB),
 
+    # Stomach    
+    ('DfmRib',             0, 'DfmSpine3', F_DEF, L_DMAIN, (1,1,5) ),
+    ('DfmStomach',         0, 'DfmRib', F_DEF+F_CON, L_DMAIN, NoBB ),
+    ('StomachTrg',         0, 'DfmHips', 0, L_HELP, NoBB),
+    
+    # Breast
+    ('Breast_L',           -45*D, 'DfmSpine3', F_DEF+F_WIR, L_TWEAK, NoBB),
+    ('Breast_R',           45*D, 'DfmSpine3', F_DEF+F_WIR, L_TWEAK, NoBB),
+]
+
+if MuscleBones:
+    BodyArmature += [
     # Deform torso
     ('DfmRib',             0, 'DfmSpine3', F_DEF, L_DMAIN, NoBB),
     ('StomachPar',         0, 'DfmRib', 0, L_HELP, NoBB),
@@ -204,11 +225,6 @@ MaleArmature = [
     ('DfmPenis1',          0, 'Pubis', F_DEF, L_MSCL, (1,1,3) ),
     ('DfmPenis2',          0, 'DfmPenis1', F_DEF+F_CON, L_MSCL, (1,1,3) ),
     ('DfmScrotum',         0, 'Pubis', F_DEF, L_MSCL, NoBB),
-]
-
-BreastArmature = [
-    ('Breast_L',           -45*D, 'DfmRib', F_DEF+F_WIR, L_TWEAK, NoBB),
-    ('Breast_R',           45*D, 'DfmRib', F_DEF+F_WIR, L_TWEAK, NoBB),
 ]
 
 #
@@ -325,6 +341,20 @@ def BodyControlPoses(fp):
 
     copyDeform(fp, 'DfmHead', 'Head', 0, U_ROT, None, [])
  
+    addPoseBone(fp,  'DfmStomach',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('StretchTo', C_STRVOL, 1, ['Stretch', 'StomachTrg', 1, 1]),
+        ])
+
+    limBreastRot = (-45*D,45*D, -10*D,10*D, -20*D,20*D)
+    limBreastScale =  (0.5,1.5, 0.2,2.0, 0.5,1.5)
+
+    addPoseBone(fp,  'Breast_L', 'MHEndCube01', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, [])
+
+    addPoseBone(fp,  'Breast_R', 'MHEndCube01', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, [])
+
+    if not MuscleBones:
+        return
+
     # Stomach
     addPoseBone(fp,  'Stomach', 'MHBall025', None, (0,0,0), (1,1,1), (0,0,0), (1,1,1), 0, [])
 
@@ -363,6 +393,8 @@ def BodyControlPoses(fp):
 #
 
 def BodyDynamicLocations():    
+    if not MuscleBones:
+        return
     locs = the.Locations
     p = locs['pubis']
     x0 = locs['r-upper-leg']
@@ -395,27 +427,6 @@ def MaleControlPoses(fp):
     addPoseBone(fp,  'DfmScrotum', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0,
         [('CopyTrans', 0, 1, ['Scrotum', 'Scrotum', False])])
 
-    return
-
-#
-#   BreastControlPoses(fp):
-#
-
-def BreastControlPoses(fp):
-    limBreastRot = (-45*D,45*D, -10*D,10*D, -20*D,20*D)
-    limBreastScale =  (0.5,1.5, 0.2,2.0, 0.5,1.5)
-
-    addPoseBone(fp,  'Breast_L', 'MHEndCube01', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, 
-         [
-         #('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limBreastRot, (1,1,1)]),
-         #('LimitScale', C_OW_LOCAL, 1, ['Scale', limBreastScale, (1,1,1)])
-         ])
-
-    addPoseBone(fp,  'Breast_R', 'MHEndCube01', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-         [
-         #('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limBreastRot, (1,1,1)]),
-         #('LimitScale', C_OW_LOCAL, 1, ['Scale', limBreastScale, (1,1,1)])
-         ])
     return
 
 #
@@ -472,7 +483,10 @@ BodyPropDrivers = [
     ('DownSpine2', 'LimitRot', ['RotationLimits'], 'x1'),    
     ('DownSpine3', 'LimitRot', ['RotationLimits'], 'x1'),    
     ('DownNeck', 'LimitRot', ['RotationLimits'], 'x1'),    
-    
+]
+
+if MuscleBones:
+    BodyPropDrivers += [    
     ('Pubis', 'MidPoint', ['FreePubis'], '1-x1'),
 ]
 

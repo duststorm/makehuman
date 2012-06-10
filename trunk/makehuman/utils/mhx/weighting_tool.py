@@ -339,21 +339,29 @@ class VIEW3D_OT_DeleteDiamondsButton(bpy.types.Operator):
 #    pairWeight(context):
 #
 
-def pairWeight(context):
+def findGroupPairs(context):
     ob = context.object
     scn = context.scene
     name1 = scn['MhxBone1']
     name2 = scn['MhxBone2']
     weight = scn['MhxWeight']
-    index1 = -1
-    index2 = -1
+    group1 = None
+    group2 = None
     for vgrp in ob.vertex_groups:
         if vgrp.name == name1:
-            index1 = vgrp.index
+            group1 = vgrp
         if vgrp.name == name2:
-            index2 = vgrp.index
-    if index1 < 0 or index2 < 0:
+            group2 = vgrp
+    if not (group1 and group2):            
         raise NameError("Did not find vertex groups %s or %s" % (name1, name2))
+    return (group1, group2)
+    
+    
+def pairWeight(context):
+    ob = context.object
+    (group1, group2) = findGroupPairs(context)
+    index1 = group1.index
+    index2 = group2.index
     for v in ob.data.vertices:
         if v.select:
             for grp in v.groups:
@@ -365,15 +373,47 @@ def pairWeight(context):
                     ob.remove_from_group(grp, v.index)
     return
 
+
 class VIEW3D_OT_PairWeightButton(bpy.types.Operator):
     bl_idname = "mhw.pair_weight"
     bl_label = "Weight pair"
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        import bpy
         pairWeight(context)
         return{'FINISHED'}    
+
+
+def rampWeight(context):
+    ob = context.object
+    (group1, group2) = findGroupPairs(context)
+    xmin = 1e6
+    xmax = -1e6
+    for v in ob.data.vertices:
+        if v.select:
+            x = v.co[0]
+            if x < xmin: xmin = x
+            if x > xmax: xmax = x
+    factor = 1/(xmax-xmin)            
+    for v in ob.data.vertices:
+        if v.select:
+            x = v.co[0]
+            w = factor*(x-xmin)
+            group1.add([v.index], 1-w, 'REPLACE')
+            group2.add([v.index], w, 'REPLACE')
+    return
+
+
+class VIEW3D_OT_RampWeightButton(bpy.types.Operator):
+    bl_idname = "mhw.ramp_weight"
+    bl_label = "Weight ramp"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        rampWeight(context)
+        return{'FINISHED'}    
+
+
 
 #----------------------------------------------------------
 #   setupVertexPairs(ob):
@@ -1519,6 +1559,7 @@ class MhxWeightExtraPanel(bpy.types.Panel):
         layout.prop(context.scene, 'MhxBone1')
         layout.prop(context.scene, 'MhxBone2')
         layout.operator("mhw.pair_weight")
+        layout.operator("mhw.ramp_weight")
         
         layout.label("Helper construction")
         layout.operator("mhw.join_meshes")

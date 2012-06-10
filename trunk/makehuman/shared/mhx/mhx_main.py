@@ -1138,7 +1138,7 @@ def printProxyShape(fp, shapes):
 #
 
 def writeTargets(fp, human, drivers, folder):    
-    for (fname, bname, typ, targ, angle, lr) in drivers:
+    for (fname, bname, targ, minangle, maxangle, lr) in drivers:
         expr = read_expression.readCorrective(human, "%s/%s/" % (folder,fname))
         fp.write("ShapeKey %s %s True\n" % (fname, lr))
         for (index, dr) in expr.items():
@@ -1173,6 +1173,7 @@ def writeShapeKeys(fp, human, name, proxy):
 
     if the.Config.bodyshapes:
         writeTargets(fp, human, rig_shoulder_25.ShoulderTargetDrivers, "shoulder")                
+        writeTargets(fp, human, rig_leg_25.HipTargetDrivers, "hips")                
         copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
 
     for path in the.Config.customshapes:
@@ -1185,6 +1186,7 @@ def writeShapeKeys(fp, human, name, proxy):
         
     if the.Config.bodyshapes:
         mhx_rig.writeTargetDrivers(fp, rig_shoulder_25.ShoulderTargetDrivers, the.Human)
+        mhx_rig.writeTargetDrivers(fp, rig_leg_25.HipTargetDrivers, the.Human)
         mhx_rig.writeRotDiffDrivers(fp, rig_arm_25.ArmShapeDrivers, proxy)
         mhx_rig.writeRotDiffDrivers(fp, rig_leg_25.LegShapeDrivers, proxy)
         mhx_rig.writeShapePropDrivers(fp, rig_body_25.BodyShapes, proxy, "&")
