@@ -145,13 +145,14 @@ class MhmPanel(bpy.types.Panel):
     bl_region_type = "UI"
     bl_options = {'DEFAULT_CLOSED'}
     
+    @classmethod
+    def poll(self, context):
+        return False and maketarget.isInited(context.scene)
+
     def draw(self, context):
         layout = self.layout
         ob = context.object
         scn = context.scene
-        if not maketarget.isInited(scn):
-            layout.operator("mh.init")
-            return
         if maketarget.Confirm:
             layout.label(maketarget.ConfirmString)            
             if maketarget.ConfirmString2:
@@ -186,14 +187,15 @@ class MakeTargetBatchPanel(bpy.types.Panel):
     
     @classmethod
     def poll(self, context):
-        return False and isInited(context.scene)
+        return context.scene.MhUnlock and maketarget.isInited(context.scene)
         
     def draw(self, context):
-        if isBase(context.object):
+        if maketarget.isBase(context.object):
             layout = self.layout
             scn = context.scene
-            for fname in maketarget.TargetSubPaths:
-                layout.prop(scn, "Mh%s" % fname)
+            #for fname in maketarget.TargetSubPaths:
+            #    layout.prop(scn, "Mh%s" % fname)
+            layout.prop(scn, "MhTargetPath")
             layout.operator("mh.batch_fix")
             layout.operator("mh.batch_render", text="Batch render").opengl = False
             layout.operator("mh.batch_render", text="Batch OpenGL render").opengl = True

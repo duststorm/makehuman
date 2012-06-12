@@ -811,8 +811,7 @@ def batchFixTargets(context, folder):
             loadTarget(file, context)        
             fitTarget(context)
             doSaveTarget(context.object, file)
-            bpy.ops.object.mode_set(mode='OBJECT')
-            bpy.ops.object.shape_key_remove()            
+            discardTarget(context)  
         elif os.path.isdir(file):
             batchFixTargets(context, file)
     return            
@@ -830,12 +829,13 @@ class VIEW3D_OT_BatchFixButton(bpy.types.Operator):
             ConfirmString = "Really batch fix targets?"
             ConfirmString2 = None
             Confirm = "mh.batch_fix"
-            return
+            return {'FINISHED'} 
         Confirm = None
-        folder = os.path.expanduser(scn["TargetPath"])
-        for subfolder in TargetSubPaths:
-            if scn["Mh%s" % subfolder]:
-                batchFixTargets(context, os.path.join(folder, subfolder))
+        folder = os.path.realpath(os.path.expanduser(scn.MhTargetPath))
+        batchFixTargets(context, folder)
+        #for subfolder in TargetSubPaths:
+        #    if scn["Mh%s" % subfolder]:
+        #        batchFixTargets(context, os.path.join(folder, subfolder))
         print("All targets fixed")
         return {'FINISHED'}            
  
@@ -871,7 +871,7 @@ class VIEW3D_OT_BatchRenderButton(bpy.types.Operator):
     def execute(self, context):
         global TargetSubPaths
         scn = context.scene
-        folder = os.path.expanduser(scn["TargetPath"])
+        folder = os.path.expanduser(scn.MhTargetPath)
         outdir = os.path.expanduser("~/makehuman/pictures/")        
         if not os.path.isdir(outdir):
             os.makedirs(outdir)
@@ -1184,9 +1184,10 @@ def initScene(scn):
     )        
     bpy.types.Scene.MhTargetPath = StringProperty(
         name = "Target Path",
-        default = "/home/svn/makehuman/data/targets" 
+        default = "/home/svn/makehuman/data/correctives" 
     )        
     bpy.types.Scene.MhRelax = FloatProperty(default = 0.5)
+    bpy.types.Scene.MhUnlock = BoolProperty(default = False)
     bpy.types.Scene.MhLoadMaterial = EnumProperty(
         items = [('None','None','None'), ('Groups','Groups','Groups'), ('Materials','Materials','Materials')],
         name="Load as materials",
@@ -1194,7 +1195,7 @@ def initScene(scn):
     return
 
     TargetSubPaths = []
-    folder = os.path.realpath(os.path.expanduser(scn["TargetPath"]))
+    folder = os.path.realpath(os.path.expanduser(scn.MhTargetPath))
     for fname in os.listdir(folder):
         file = os.path.join(folder, fname)        
         if os.path.isdir(file) and fname[0] != ".":
@@ -1208,7 +1209,7 @@ def isInited(scn):
     return True
     try:
         TargetSubPaths
-        scn["TargetPath"]
+        scn.MhTargetPath
         return True
     except:
         return False    
