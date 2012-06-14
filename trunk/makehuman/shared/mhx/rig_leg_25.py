@@ -180,7 +180,11 @@ LegHeadsTails = [
     ('DirUpLegBack_R',    'l-upper-leg', ('l-upper-leg', (0,0,-1))),
     ('DirUpLegOut_L',     'r-upper-leg', ('r-upper-leg', (1,0,0))),
     ('DirUpLegOut_R',     'l-upper-leg', ('l-upper-leg', (-1,0,0))),
-    
+
+    ('DirKneeBack_L',     'r-knee', ('r-knee', (0,0,-1))),
+    ('DirKneeBack_R',     'l-knee', ('l-knee', (0,0,-1))),
+    ('DirKneeInv_L',      'r-knee', ('r-knee', (0,1,0))),
+    ('DirKneeInv_R',      'l-knee', ('l-knee', (0,1,0))),
 ]
 
 if MuscleBones:
@@ -303,6 +307,11 @@ LegArmature = [
     ('DirUpLegBack_R',      0*D, 'Hip_R', 0, L_HELP, NoBB),
     ('DirUpLegOut_L',       -90*D, 'Hip_L', 0, L_HELP, NoBB), 
     ('DirUpLegOut_R',       90*D, 'Hip_R', 0, L_HELP, NoBB),
+
+    ('DirKneeBack_L',       0*D, 'UpLeg_L', 0, L_HELP, NoBB),
+    ('DirKneeBack_R',       0*D, 'UpLeg_R', 0, L_HELP, NoBB),
+    ('DirKneeInv_L',        0*D, 'UpLeg_L', 0, L_HELP, NoBB),
+    ('DirKneeInv_R',        0*D, 'UpLeg_R', 0, L_HELP, NoBB),
 ]
 
 if MuscleBones:
@@ -604,10 +613,24 @@ LegDeformDrivers = []
 LegShapeDrivers = {
 }
 
+expr90 = "%.3f*(1-%.3f*x1)" % (90.0/90.0, 2/pi)
+expr70 = "%.3f*(1-%.3f*x1)" % (90.0/70.0, 2/pi)
+expr60 = "%.3f*(1-%.3f*x1)" % (90.0/60.0, 2/pi)
+
 HipTargetDrivers = [
-    ("legs-forward-70",  "UpLeg", "DirUpLegFwd", 0, 70, "LR"),
-    ("legs-back-60",  "UpLeg", "DirUpLegBack", 0, 60, "LR"),
-    ("legs-out-90",  "UpLeg", "DirUpLegOut", 0, 90, "LR"),
+    ("legs-forward-70", "LR", expr70,
+        [("UpLeg", "DirUpLegFwd")]),
+    ("legs-back-60", "LR", expr60,
+        [("UpLeg", "DirUpLegBack")]),
+    ("legs-out-90", "LR", expr90,
+        [("UpLeg", "DirUpLegOut")]),
+]
+
+KneeTargetDrivers = [
+    ("lolegs-back-90", "LR", expr90,
+        [("LoLeg", "DirKneeBack")]),
+    ("lolegs-back-150", "LR", expr60,
+        [("LoLeg", "DirKneeInv")]),
 ]
 
 

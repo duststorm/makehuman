@@ -1341,9 +1341,9 @@ def writePropDriver(fp, props, expr, dataPath, index):
 def writeTextureDrivers(fp, drivers):
     for (tex, vlist) in drivers.items():
         drvVars = []
-        (texnum, targ, channel, coeff) = vlist
+        (texnum, targ, channel, coeffs) = vlist
         drvVars.append( (targ, 'TRANSFORMS', [('OBJECT', the.Human, targ, channel, C_LOC)]) )
-        writeDriver(fp, 'toggle&T_Shapekeys', 'AVERAGE', "", "texture_slots[%d].normal_factor" % (texnum), -1, coeff, drvVars)
+        writeDriver(fp, 'toggle&T_Shapekeys', 'AVERAGE', "", "texture_slots[%d].normal_factor" % (texnum), -1, coeffs, drvVars)
     return
 
 #
@@ -1355,25 +1355,31 @@ def writeShapeDrivers(fp, drivers, proxy):
     for (shape, vlist) in drivers.items():
         if mhx_main.useThisShape(shape, proxy):
             drvVars = []
-            (targ, channel, coeff) = vlist
+            (targ, channel, coeffs) = vlist
             drvVars.append( (targ, 'TRANSFORMS', [('OBJECT', the.Human, targ, channel, C_LOC)]) )
-            writeDriver(fp, 'toggle&T_Shapekeys', 'AVERAGE', "", "key_blocks[\"%s\"].value" % (shape), -1, coeff, drvVars)
+            writeDriver(fp, 'toggle&T_Shapekeys', 'AVERAGE', "", "key_blocks[\"%s\"].value" % (shape), -1, coeffs, drvVars)
     return
 
 
 def writeTargetDrivers(fp, drivers, rig):
-    for (fname, bone, targ, minangle, maxangle, lr) in drivers:
+    coeffs = [(0,0),(1,1)]
+    for (fname, lr, expr, vars) in drivers:
+        drvVars = []        
         if lr:
             for suffix in ["_L", "_R"]:
-                coeff = [((90-maxangle)*D,1), ((90-minangle)*D,0)]
-                drvVar = ("x", "ROTATION_DIFF", 
-                    [('OBJECT', rig, bone+suffix, C_LOC),('OBJECT', rig, targ+suffix, C_LOC)])
-                writeDriver(fp, True, 'AVERAGE', "", "key_blocks[\"%s\"].value" % (fname+suffix), -1, coeff, [drvVar])
+                n = 0
+                for (bone, targ) in vars:
+                    n += 1
+                    drvVars.append( ("x%d" % n, "ROTATION_DIFF", 
+                        [('OBJECT', rig, bone+suffix, C_LOC),('OBJECT', rig, targ+suffix, C_LOC)]) )
+                writeDriver(fp, True, ('SCRIPTED', expr), "", "key_blocks[\"%s\"].value" % (fname+suffix), -1, coeffs, drvVars)
         else:                
-            coeff = [(0,0), (angle*D,1)]
-            drvVar = ("x", "ROTATION_DIFF", 
-                    [('OBJECT', rig, bone, C_LOC),('OBJECT', rig, targ, C_LOC)])
-            writeDriver(fp, True, 'AVERAGE', "", "key_blocks[\"%s\"].value" % (fname+suffix), -1, coeff, [drvVar])
+            n = 0
+            for (bone, targ) in vars:
+                n += 1
+                drvVars.append( ("x%d" % n, "ROTATION_DIFF", 
+                        [('OBJECT', rig, bone, C_LOC),('OBJECT', rig, targ, C_LOC)]) )
+                writeDriver(fp, True, ('SCRIPTED', expr), "", "key_blocks[\"%s\"].value" % (fname+suffix), -1, coeffs, drvVars)
     return
     
 

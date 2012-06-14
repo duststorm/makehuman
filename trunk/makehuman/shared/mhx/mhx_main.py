@@ -1141,7 +1141,7 @@ def printProxyShape(fp, shapes):
 #
 
 def writeTargets(fp, human, drivers, folder, proxy):    
-    for (fname, bname, targ, minangle, maxangle, lr) in drivers:
+    for (fname, lr, expr, vars) in drivers:
         path = "%s/%s/" % (folder,fname)
         try:
             expr = the.correctives[path]

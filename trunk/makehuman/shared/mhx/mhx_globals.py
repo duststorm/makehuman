@@ -19,10 +19,13 @@ Dummy file to put global variables
 
 """
 
-MuscleBones = False
+from math import pi, cos, sin
 
-pi = 3.14159
 D = pi/180
+C20 = cos(20*pi/180)
+S20 = sin(20*pi/180)
+
+MuscleBones = False
 
 yunit = [0,1,0]
 ysmall = [0,0.5,0]

@@ -94,7 +94,11 @@ Expressions = [
 ]
 
 
-def setupGendersAges(human):
+def loopGendersAges(name, human, typ):
+    epsilon = 0.05
+    exprs = {}
+    asums = {}
+    gsum = 0.0
     genders = [
         ('female', human.femaleVal),
         ('male', human.maleVal)
@@ -105,14 +109,7 @@ def setupGendersAges(human):
         ('young', human.youngVal),
         ('old', human.oldVal)
     ]
-    return (genders, ages)
 
-
-def loopGendersAges(name, genders, ages, typ):
-    epsilon = 0.05
-    exprs = {}
-    asums = {}
-    gsum = 0.0
     for (gender, gval) in genders:
         gexprs = {}
         exprs[gender] = gexprs
@@ -172,28 +169,33 @@ def loopGendersAges(name, genders, ages, typ):
                     expr[v] = (x+w*dx, y+w*dy, z+w*dz)
                 except:
                     expr[v] = aexpr[v]
-                    
+                            
     dwarf = 0.8324
     giant = 1.409
+    height = human.getHeight()
+    if height < 0:
+        k = 1 + (1-dwarf)*height
+    else:
+        k = 1 + (giant-1)*height
+    print("Height", height, k)
+    for v in expr.keys():
+        (x,y,z) = expr[v]
+        expr[v] = (k*x, k*y, k*z)
     
     return (expr, wsum)
 
 
 def readExpressions(human):
-    (genders, ages) = setupGendersAges(human)
-    print("    Creating expressions for %s %s" % (genders, ages))
     exprList = []
     for name in Expressions:
-        (expr, wsum) = loopGendersAges(name, genders, ages, "Expressions")
+        (expr, wsum) = loopGendersAges(name, human, "Expressions")
         exprList.append((name, expr))
         print("    Done %s weight %.3f" % (name, wsum))
     return exprList
 
 
 def readCorrective(human, path):
-    (genders, ages) = setupGendersAges(human)
-    print("    Creating corrective for %s %s" % (genders, ages))
-    (expr, wsum) = loopGendersAges(path, genders, ages, "Corrective")
+    (expr, wsum) = loopGendersAges(path, human, "Corrective")
     print("    Done %s weight %.3f" % (path, wsum))
     return expr
 
