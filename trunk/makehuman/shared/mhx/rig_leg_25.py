@@ -616,6 +616,7 @@ LegShapeDrivers = {
 expr90 = "%.3f*(1-%.3f*x1)" % (90.0/90.0, 2/pi)
 expr70 = "%.3f*(1-%.3f*x1)" % (90.0/70.0, 2/pi)
 expr60 = "%.3f*(1-%.3f*x1)" % (90.0/60.0, 2/pi)
+expr45 = "%.3f*(1-%.3f*x1)" % (90.0/45.0, 2/pi)
 
 HipTargetDrivers = [
     ("legs-forward-70", "LR", expr70,
@@ -629,8 +630,8 @@ HipTargetDrivers = [
 KneeTargetDrivers = [
     ("lolegs-back-90", "LR", expr90,
         [("LoLeg", "DirKneeBack")]),
-    ("lolegs-back-150", "LR", expr60,
-        [("LoLeg", "DirKneeInv")]),
+#    ("lolegs-back-135", "LR", expr45,
+#        [("LoLeg", "DirKneeInv")]),
 ]
 
 

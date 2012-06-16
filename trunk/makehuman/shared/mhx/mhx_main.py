@@ -1188,6 +1188,8 @@ def writeShapeKeys(fp, human, name, proxy):
     if the.Config.bodyshapes:
         writeTargets(fp, human, rig_shoulder_25.ShoulderTargetDrivers, "shoulder", proxy)                
         writeTargets(fp, human, rig_leg_25.HipTargetDrivers, "hips", proxy)                
+        writeTargets(fp, human, rig_arm_25.ElbowTargetDrivers, "elbow", proxy)                
+        writeTargets(fp, human, rig_leg_25.KneeTargetDrivers, "knee", proxy)                
         copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
 
     for path in the.Config.customshapes:
@@ -1201,6 +1203,9 @@ def writeShapeKeys(fp, human, name, proxy):
     if the.Config.bodyshapes:
         mhx_rig.writeTargetDrivers(fp, rig_shoulder_25.ShoulderTargetDrivers, the.Human)
         mhx_rig.writeTargetDrivers(fp, rig_leg_25.HipTargetDrivers, the.Human)
+        mhx_rig.writeTargetDrivers(fp, rig_arm_25.ElbowTargetDrivers, the.Human)
+        mhx_rig.writeTargetDrivers(fp, rig_leg_25.KneeTargetDrivers, the.Human)
+
         mhx_rig.writeRotDiffDrivers(fp, rig_arm_25.ArmShapeDrivers, proxy)
         mhx_rig.writeRotDiffDrivers(fp, rig_leg_25.LegShapeDrivers, proxy)
         mhx_rig.writeShapePropDrivers(fp, rig_body_25.BodyShapes, proxy, "&")

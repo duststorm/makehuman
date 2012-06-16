@@ -1364,9 +1364,9 @@ def writeShapeDrivers(fp, drivers, proxy):
 def writeTargetDrivers(fp, drivers, rig):
     coeffs = [(0,0),(1,1)]
     for (fname, lr, expr, vars) in drivers:
-        drvVars = []        
         if lr:
             for suffix in ["_L", "_R"]:
+                drvVars = []        
                 n = 0
                 for (bone, targ) in vars:
                     n += 1
@@ -1374,6 +1374,7 @@ def writeTargetDrivers(fp, drivers, rig):
                         [('OBJECT', rig, bone+suffix, C_LOC),('OBJECT', rig, targ+suffix, C_LOC)]) )
                 writeDriver(fp, True, ('SCRIPTED', expr), "", "key_blocks[\"%s\"].value" % (fname+suffix), -1, coeffs, drvVars)
         else:                
+            drvVars = []        
             n = 0
             for (bone, targ) in vars:
                 n += 1
