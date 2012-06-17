@@ -304,8 +304,8 @@ class ExportTaskView(gui3d.TaskView):
         self.exportClothes = self.mhxOptions.addView(gui3d.CheckBox("Clothes", True));y+=24
         self.exportClothesRig = self.mhxOptions.addView(gui3d.CheckBox("Clothes rig", True));y+=24
         self.exportCage = self.mhxOptions.addView(gui3d.CheckBox("Cage", False));y+=24
-        self.exportBreastRig = self.mhxOptions.addView(gui3d.CheckBox("Breast rig", False));y+=24
-        self.exportMaleRig = self.mhxOptions.addView(gui3d.CheckBox("Male rig", False));y+=24
+        #self.exportBreastRig = self.mhxOptions.addView(gui3d.CheckBox("Breast rig", False));y+=24
+        #self.exportMaleRig = self.mhxOptions.addView(gui3d.CheckBox("Male rig", False));y+=24
         #self.exportSkirtRig = self.mhxOptions.addView(gui3d.CheckBox("Skirt rig", False));y+=24
         rigs = []
         self.mhxMhx = self.mhxOptions.addView(gui3d.RadioButton(rigs, "Use mhx rig", True));y+=24
@@ -473,8 +473,8 @@ class ExportTaskView(gui3d.TaskView):
                         'cage':self.exportCage.selected,
                         'separatefolder':self.exportSeparateFolder.selected,
                         'feetonground':self.exportFeetOnGround.selected,
-                        'breastrig':self.exportBreastRig.selected,
-                        'malerig':self.exportMaleRig.selected,
+                        'breastrig':False, #self.exportBreastRig.selected,
+                        'malerig':False, #self.exportMaleRig.selected,
                         'skirtrig':False, #self.exportSkirtRig.selected,
                         'clothesrig':self.exportClothesRig.selected,
                         'mhxrig': rig,

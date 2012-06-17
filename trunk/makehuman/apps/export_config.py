@@ -212,8 +212,8 @@ def exportConfig(human, useHair, options=None):
         cfg.feetonground = options['feetonground']
         cfg.cage = options['cage']
         cfg.clothesrig = options['clothesrig']
-        cfg.breastrig = options['breastrig']
-        cfg.malerig = options['malerig']
+        #cfg.breastrig = options['breastrig']
+        #cfg.malerig = options['malerig']
         if options['skirtrig']:
             cfg.skirtrig = "own"
         else:
@@ -272,9 +272,9 @@ def exportConfig(human, useHair, options=None):
                     pass
             elif key in [
                 'separatefolder', 'feetonground',
-                'expressions', 'faceshapes', 'bodyshapes', 'facepanel'
-                'breastrig', 'malerig', 'clothesrig',
-                'clothesvisibilitydrivers'
+                'expressions', 'faceshapes', 'bodyshapes', 'facepanel',
+                #'breastrig', 'malerig', 
+                'clothesrig', 'clothesvisibilitydrivers'
                 ]:
                 try:
                     exec("cfg.%s = %s" % (key, truthValue(words[2])))
@@ -320,7 +320,7 @@ def exportConfig(human, useHair, options=None):
                 typ = 'Clothes'
                 layer = int(words[2])
             else:
-                raise NameError('Unrecognized command %s in mh_export.config' % words[1])
+                print('Ignored unrecognized command %s in mh_export.config' % words[1])
         elif status:
             if status == 'customrigs':
                 path = os.path.realpath(os.path.expanduser(words[0]))
