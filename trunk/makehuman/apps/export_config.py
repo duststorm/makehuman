@@ -213,7 +213,7 @@ def exportConfig(human, useHair, options=None):
         cfg.cage = options['cage']
         cfg.clothesrig = options['clothesrig']
         #cfg.breastrig = options['breastrig']
-        #cfg.malerig = options['malerig']
+        cfg.malerig = options['malerig']
         if options['skirtrig']:
             cfg.skirtrig = "own"
         else:
@@ -273,7 +273,8 @@ def exportConfig(human, useHair, options=None):
             elif key in [
                 'separatefolder', 'feetonground',
                 'expressions', 'faceshapes', 'bodyshapes', 'facepanel',
-                #'breastrig', 'malerig', 
+                #'breastrig', 
+                'malerig', 
                 'clothesrig', 'clothesvisibilitydrivers'
                 ]:
                 try:

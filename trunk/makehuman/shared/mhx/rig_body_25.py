@@ -39,6 +39,13 @@ BodyJoints = [
     ('rib-top',        'vl', ((0.9, 6857), (0.1, 7457))),
     ('stomach-top',    'vl', ((0.9, 6909), (0.1, 7460))),
     ('stomach-bot',    'v',  7359),
+
+    ('penis-top',      'vl', ((0.5, 2791), (0.5, 7449))),
+    ('penis-mid',      'vl', ((0.5, 2844), (0.5, 7369))),
+    ('penis-tip',      'v', 7415),
+    ('pubis',          'l', ((1.5, 'penis-top'), (-0.5, 'penis-mid'))),
+    ('scrotum-tip',    'v', 7444),
+    ('scrotum-root',   'vl', ((0.5, 2807), (0.5, 7425))),
 ]
 
 if MuscleBones:
@@ -52,12 +59,6 @@ if MuscleBones:
     ('r-waist-down',   'vl', ((0.9, 2931), (0.1, 7305))),
     ('l-waist-down',   'vl', ((0.1, 2931), (0.9, 7305))),
 
-    ('penis-top',      'vl', ((0.5, 2791), (0.5, 7449))),
-    ('penis-mid',      'vl', ((0.5, 2844), (0.5, 7369))),
-    ('penis-tip',      'v', 7415),
-    ('pubis',          'l', ((1.5, 'penis-top'), (-0.5, 'penis-mid'))),
-    ('scrotum-tip',    'v', 7444),
-    ('scrotum-root',   'vl', ((0.5, 2807), (0.5, 7425))),
 ]
 
 FloorJoints = [
@@ -114,6 +115,11 @@ BodyHeadsTails = [
     ('DfmRib',         'rib-top', 'stomach-top'),
     ('DfmStomach',     'stomach-top', 'stomach-bot'),
     ('StomachTrg',     'root-tail', 'stomach-bot'),
+
+    # Male genitalia
+    ('Penis1',         'pubis', 'penis-mid'),
+    ('Penis2',         'penis-mid', 'penis-tip'),
+    ('Scrotum',        'scrotum-root', 'scrotum-tip'),
 ]
 
 if MuscleBones:
@@ -133,14 +139,6 @@ if MuscleBones:
     ('Pubis_L',        'r-pubis', ('r-pubis', the.yunit)),
     ('Pubis_R',        'l-pubis', 'r-pubis'),
 
-    # Male genitalia
-    ('Penis1',         'pubis', 'penis-mid'),
-    ('Penis2',         'penis-mid', 'penis-tip'),
-    ('Scrotum',        'scrotum-root', 'scrotum-tip'),
-
-    ('DfmPenis1',       'pubis', 'penis-mid'),
-    ('DfmPenis2',       'penis-mid', 'penis-tip'),
-    ('DfmScrotum',     'scrotum-root', 'scrotum-tip'),
 ]
 
 L_UPSPN = L_UPSPNFK+L_UPSPNIK
@@ -219,12 +217,9 @@ if MuscleBones:
 ]
 
 MaleArmature = [
-    ('Penis1',             0, 'Pubis', F_WIR, L_TWEAK, (1,5,1) ),
-    ('Penis2',             0, 'Penis1', F_WIR, L_TWEAK, (1,5,1) ),
-    ('Scrotum',            0, 'Pubis', F_WIR, L_TWEAK, NoBB),
-    ('DfmPenis1',          0, 'Pubis', F_DEF, L_MSCL, (1,1,3) ),
-    ('DfmPenis2',          0, 'DfmPenis1', F_DEF+F_CON, L_MSCL, (1,1,3) ),
-    ('DfmScrotum',         0, 'Pubis', F_DEF, L_MSCL, NoBB),
+    ('Penis1',             0, 'DfmHips', F_DEF+F_WIR, L_TWEAK+L_MSCL, NoBB ),
+    ('Penis2',             0, 'Penis1', F_DEF+F_WIR+F_CON, L_TWEAK+L_MSCL, NoBB ),
+    ('Scrotum',            0, 'DfmHips', F_DEF+F_WIR, L_TWEAK+L_MSCL, NoBB),
 ]
 
 #
@@ -417,15 +412,6 @@ def MaleControlPoses(fp):
     addPoseBone(fp,  'Penis2', 'MHCircle05', None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, [])
 
     addPoseBone(fp,  'Scrotum', 'MHCircle05' , None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, [])
-
-    addPoseBone(fp,  'DfmPenis1', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, 
-        [('CopyTrans', 0, 1, ['Penis1', 'Penis1', False])])
-
-    addPoseBone(fp,  'DfmPenis2', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('CopyTrans', 0, 1, ['Penis2', 'Penis2', False])])
-
-    addPoseBone(fp,  'DfmScrotum', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('CopyTrans', 0, 1, ['Scrotum', 'Scrotum', False])])
 
     return
 

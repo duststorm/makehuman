@@ -1709,15 +1709,12 @@ def setupRig(obj, proxyData):
         the.ArmatureProps = []
         the.HeadName = 'Head'
         
-        if the.Config.malerig:
-            genitalia = "./shared/mhx/templates/vertexgroups-male25.mhx"
-        else:
-            genitalia = "./shared/mhx/templates/vertexgroups-female25.mhx"
 
         the.VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
                             "./shared/mhx/templates/vertexgroups-bones25.mhx",
-                            # genitalia,
                             "./shared/mhx/templates/vertexgroups-palm25.mhx"]
+        if the.Config.malerig:
+            the.VertexGroupFiles.append( "./shared/mhx/templates/vertexgroups-male25.mhx" )
                                                         
         joints = (
             rig_joints_25.DeformJoints +
