@@ -372,22 +372,26 @@ def LegControlPoses(fp):
 
     addPoseBone(fp, 'UpLeg_L', 'GZM_Circle025', 'FK_L', (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpLeg_L, (1,1,1)]),
-         ('CopyTrans', 0, 0, ['LegIK', 'UpLegIK_L', 0])
+         #('CopyTrans', 0, 0, ['LegIK', 'UpLegIK_L', 0])
+         ('IK', 0, 0, ['LegIK', 'LoLegIK_L', 1, None, (1,0,0)]),
         ])
 
     addPoseBone(fp, 'UpLeg_R', 'GZM_Circle025', 'FK_R', (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpLeg_R, (1,1,1)]),
-         ('CopyTrans', 0, 0, ['LegIK', 'UpLegIK_R', 0])
+         #('CopyTrans', 0, 0, ['LegIK', 'UpLegIK_R', 0])
+         ('IK', 0, 0, ['LegIK', 'LoLegIK_R', 1, None, (1,0,0)]),
         ])
 
     addPoseBone(fp, 'LoLeg_L', 'GZM_Circle025', 'FK_L', (1,1,1), (0,0,1), (1,0,1), (1,1,1), 0, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoLeg_L, (1,1,1)]),
-         ('CopyTrans', 0, 0, ['LegIK', 'LoLegIK_L', 0])        
+         #('CopyTrans', 0, 0, ['LegIK', 'LoLegIK_L', 0])        
+         ('IK', 0, 0, ['LegIK', 'AnkleIK_L', 1, None, (1,0,0)]),
         ])
 
     addPoseBone(fp, 'LoLeg_R', 'GZM_Circle025', 'FK_R', (1,1,1), (0,0,1), (1,0,1), (1,1,1), 0, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoLeg_R, (1,1,1)]),
-         ('CopyTrans', 0, 0, ['LegIK', 'LoLegIK_R', 0])
+         #('CopyTrans', 0, 0, ['LegIK', 'LoLegIK_R', 0])
+         ('IK', 0, 0, ['LegIK', 'AnkleIK_R', 1, None, (1,0,0)]),
         ])
 
     addPoseBone(fp, 'Foot_L', 'MHFoot', 'FK_L', (0,0,0), (0,0,1), (1,1,1), (1,1,1), 0, 

@@ -177,7 +177,6 @@ def loopGendersAges(name, human, typ):
         k = 1 + (1-dwarf)*height
     else:
         k = 1 + (giant-1)*height
-    print("Height", height, k)
     for v in expr.keys():
         (x,y,z) = expr[v]
         expr[v] = (k*x, k*y, k*z)
@@ -190,13 +189,13 @@ def readExpressions(human):
     for name in Expressions:
         (expr, wsum) = loopGendersAges(name, human, "Expressions")
         exprList.append((name, expr))
-        print("    Done %s weight %.3f" % (name, wsum))
+        #print("    Done %s weight %.3f" % (name, wsum))
     return exprList
 
 
 def readCorrective(human, path):
     (expr, wsum) = loopGendersAges(path, human, "Corrective")
-    print("    Done %s weight %.3f" % (path, wsum))
+    #print("    Done %s weight %.3f" % (path, wsum))
     return expr
 
             
