@@ -269,8 +269,10 @@ if MuscleBones:
 #
 #
 
-limUpArm_L = (-135*D,135*D, -120*D,90*D, -135*D,135*D)
-limUpArm_R = (-135*D,135*D, -90*D,120*D, -135*D,135*D)
+#limUpArm_L = (-135*D,135*D, -120*D,90*D, -135*D,135*D)
+#limUpArm_R = (-135*D,135*D, -90*D,120*D, -135*D,135*D)
+limUpArm_L = (-135*D,135*D, -60*D,60*D, -135*D,135*D)
+limUpArm_R = (-135*D,135*D, -60*D,60*D, -135*D,135*D)
 
 limLoArm_L = (-10*D,10*D, -178*D,150*D, -175*D,10*D)
 limLoArm_R = (-10*D,10*D, -150*D,178*D, -10*D,175*D)
@@ -292,13 +294,15 @@ def ArmControlPoses(fp):
 
     addPoseBone(fp, 'UpArm_L', 'GZM_Circle025', 'FK_L', (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpArm_L, (True, True, True)]),
-         ('CopyTrans', 0, 0, ['ArmIK', 'UpArmIK_L', 0]),
+         #('CopyTrans', 0, 0, ['ArmIK', 'UpArmIK_L', 0]),
+         ('IK', 0, 0, ['ArmIK', 'LoArmIK_L', 1, None, (True, False,False)]),
          ('CopyTrans', 0, 0, ['Elbow', 'ELUpArm_L', 0])
         ])
 
     addPoseBone(fp, 'LoArm_L', 'GZM_Circle025', 'FK_L', (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoArm_L, (True, True, True)]),
-         ('CopyTrans', 0, 0, ['ArmIK', 'LoArmIK_L', 0]),
+         #('CopyTrans', 0, 0, ['ArmIK', 'LoArmIK_L', 0]),
+         ('IK', 0, 0, ['ArmIK', 'Wrist_L', 1, None, (True, False,False)]),
          ('IK', 0, 0, ['Wrist', 'Wrist_L', 1, None, (True, False,False)]),
         ])
 
@@ -312,13 +316,15 @@ def ArmControlPoses(fp):
         
     addPoseBone(fp, 'UpArm_R', 'GZM_Circle025', 'FK_R', (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpArm_R, (True, True, True)]),
-         ('CopyTrans', 0, 0, ['ArmIK', 'UpArmIK_R', 0]),
+         #('CopyTrans', 0, 0, ['ArmIK', 'UpArmIK_R', 0]),
+         ('IK', 0, 0, ['ArmIK', 'LoArmIK_R', 1, None, (True, False,False)]),
          ('CopyTrans', 0, 0, ['Elbow', 'ELUpArm_R', 0])
         ])
 
     addPoseBone(fp, 'LoArm_R', 'GZM_Circle025', 'FK_R', (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoArm_R, (True, True, True)]),
-         ('CopyTrans', 0, 0, ['ArmIK', 'LoArmIK_R', 0]),
+         #('CopyTrans', 0, 0, ['ArmIK', 'LoArmIK_R', 0]),
+         ('IK', 0, 0, ['ArmIK', 'Wrist_R', 1, None, (True, False,False)]),
          ('IK', 0, 0, ['Wrist', 'Wrist_R', 1, None, (True, False,False)]),
         ])
 
