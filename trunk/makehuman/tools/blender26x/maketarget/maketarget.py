@@ -1164,6 +1164,77 @@ def deleteAll(context):
             scn.objects.unlink(ob)
     return                    
 
+#----------------------------------------------------------
+#   Settings
+#----------------------------------------------------------
+
+def settingsFile(name):
+    outdir = os.path.expanduser("~/makehuman/settings/")        
+    if not os.path.isdir(outdir):
+        os.makedirs(outdir)
+    return os.path.join(outdir, "make_target.%s" % name)
+    
+
+def readDefaultSettings(context):
+    fname = settingsFile("settings")
+    try:
+        fp = open(fname, "rU")
+    except:
+        print("Did not find %s. Using default settings" % fname)
+        return
+    
+    scn = context.scene    
+    for line in fp:
+        words = line.split()
+        prop = words[0]
+        value = words[1].replace("\%20", " ")
+        scn[prop] = value
+    fp.close()
+    return
+    
+
+def saveDefaultSettings(context):
+    fname = settingsFile("settings")
+    fp = open(fname, "w")
+    scn = context.scene
+    for (key, value) in [
+        ("MhProgramPath", scn.MhProgramPath), 
+        ("MhUserPath", scn.MhUserPath), 
+        ("MhTargetPath", scn.MhTargetPath)]:
+        fp.write("%s %s\n" % (key, value.replace(" ", "\%20")))
+    fp.close()
+    return
+
+    
+class OBJECT_OT_FactorySettingsButton(bpy.types.Operator):
+    bl_idname = "mh.factory_settings"
+    bl_label = "Restore factory settings"
+
+    def execute(self, context):
+        scn = context.scene
+        scn.MhProgramPath = "/program/makehuman"
+        scn.MhUserPath = "~/documents/makehuman"
+        scn.MhTargetPath = "/program/makehuman/data/correctives"
+        return{'FINISHED'}    
+
+
+class OBJECT_OT_SaveSettingsButton(bpy.types.Operator):
+    bl_idname = "mh.save_settings"
+    bl_label = "Save settings"
+
+    def execute(self, context):
+        saveDefaultSettings(context)
+        return{'FINISHED'}    
+
+
+class OBJECT_OT_ReadSettingsButton(bpy.types.Operator):
+    bl_idname = "mh.read_settings"
+    bl_label = "Read settings"
+
+    def execute(self, context):
+        readDefaultSettings(context)
+        return{'FINISHED'}    
+
 
 #----------------------------------------------------------
 #   Init
@@ -1176,7 +1247,7 @@ def initScene(scn):
 
     bpy.types.Scene.MhProgramPath = StringProperty(
         name = "Program Path",
-        default = "/home/svn/makehuman"
+        default = "/program/makehuman"
     )        
     bpy.types.Scene.MhUserPath = StringProperty(
         name = "User Path",
@@ -1184,7 +1255,7 @@ def initScene(scn):
     )        
     bpy.types.Scene.MhTargetPath = StringProperty(
         name = "Target Path",
-        default = "/home/svn/makehuman/data/correctives" 
+        default = "/program/makehuman/data/correctives" 
     )        
     bpy.types.Scene.MhRelax = FloatProperty(default = 0.5)
     bpy.types.Scene.MhUnlock = BoolProperty(default = False)

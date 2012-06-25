@@ -75,6 +75,10 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.operator(maketarget.Confirm, text="Yes") 
             layout.operator("mh.skip")
             return            
+        layout.label("Directories")
+        layout.operator("mh.factory_settings")
+        layout.operator("mh.save_settings")
+        layout.operator("mh.read_settings")
         layout.prop(scn, "MhProgramPath")
         layout.prop(scn, "MhUserPath")
         layout.label("Load materials from")
