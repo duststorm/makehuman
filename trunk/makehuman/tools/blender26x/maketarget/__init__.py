@@ -85,13 +85,13 @@ class MakeTargetPanel(bpy.types.Panel):
         layout.prop(scn, "MhLoadMaterial", expand=True)
         layout.separator()
         if maketarget.isBaseOrTarget(ob):
-            layout.operator("mh.import_base_mhclo", text="Reimport base mhclo").delete = True
-            layout.operator("mh.import_base_obj", text="Reimport base obj").delete = True
+            layout.operator("mh.import_base_mhclo", text="Reimport Base Mhclo").delete = True
+            layout.operator("mh.import_base_obj", text="Reimport Base Obj").delete = True
             layout.operator("mh.delete_clothes")
             layout.separator()
         else:
-            layout.operator("mh.import_base_mhclo", text="Import base mhclo").delete = False
-            layout.operator("mh.import_base_obj", text="Import base obj").delete = False
+            layout.operator("mh.import_base_mhclo", text="Import Base Mhclo").delete = False
+            layout.operator("mh.import_base_obj", text="Import Base Obj").delete = False
             layout.operator("mh.make_base_obj")
         if maketarget.isBase(ob):
             layout.operator("mh.new_target")
@@ -119,9 +119,9 @@ class MakeTargetPanel(bpy.types.Panel):
                 row.prop(skey, "value", text=skey.name)
                 n += 1
             layout.separator()
-            layout.operator("mh.new_target", text="New secondary target")
-            layout.operator("mh.load_target", text="Load secondary from file")            
-            layout.operator("mh.load_target_from_mesh", text="Load secondary from mesh")                        
+            layout.operator("mh.new_target", text="New Secondary Target")
+            layout.operator("mh.load_target", text="Load Secondary From File")            
+            layout.operator("mh.load_target_from_mesh", text="Load Secondary From Mesh")                        
             layout.operator("mh.fit_target")
             layout.operator("mh.symmetrize_target", text="Symm Left->Right").left2right = False
             layout.operator("mh.symmetrize_target", text="Symm Right->Left").left2right = True
@@ -201,8 +201,8 @@ class MakeTargetBatchPanel(bpy.types.Panel):
             #    layout.prop(scn, "Mh%s" % fname)
             layout.prop(scn, "MhTargetPath")
             layout.operator("mh.batch_fix")
-            layout.operator("mh.batch_render", text="Batch render").opengl = False
-            layout.operator("mh.batch_render", text="Batch OpenGL render").opengl = True
+            layout.operator("mh.batch_render", text="Batch Render").opengl = False
+            layout.operator("mh.batch_render", text="Batch OpenGL Render").opengl = True
   
 #----------------------------------------------------------
 #   class ExportObj(bpy.types.Operator, ExportHelper):

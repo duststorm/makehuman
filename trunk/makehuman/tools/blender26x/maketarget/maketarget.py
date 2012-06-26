@@ -409,6 +409,7 @@ class VIEW3D_OT_MakeBaseObjButton(bpy.types.Operator):
         for mod in ob.modifiers:
             if mod.type == 'ARMATURE':
                 mod.show_in_editmode = True
+                mod.show_on_cage = True
             else:
                 ob.modifiers.remove(mod)
         removeShapeKeys(ob)
@@ -569,7 +570,7 @@ def shapeKeyLen(ob):
 
 class VIEW3D_OT_LoadTargetButton(bpy.types.Operator):
     bl_idname = "mh.load_target"
-    bl_label = "Load target file"
+    bl_label = "Load Target File"
     bl_options = {'UNDO'}
 
     filename_ext = ".target"
@@ -630,7 +631,7 @@ def loadTargetFromMesh(context):
 
 class VIEW3D_OT_LoadTargetFromMeshButton(bpy.types.Operator):
     bl_idname = "mh.load_target_from_mesh"
-    bl_label = "Load target from mesh"
+    bl_label = "Load Target From Mesh"
     bl_options = {'UNDO'}
 
     def execute(self, context):
@@ -659,7 +660,7 @@ def newTarget(context):
 
 class VIEW3D_OT_NewTargetButton(bpy.types.Operator):
     bl_idname = "mh.new_target"
-    bl_label = "New target"
+    bl_label = "New Target"
     bl_options = {'UNDO'}
 
     def execute(self, context):
@@ -713,7 +714,7 @@ def evalVertLocations(ob):
        
 class VIEW3D_OT_SaveTargetButton(bpy.types.Operator):
     bl_idname = "mh.save_target"
-    bl_label = "Save target"
+    bl_label = "Save Target"
     bl_options = {'UNDO'}
 
     def execute(self, context):
@@ -733,7 +734,7 @@ class VIEW3D_OT_SaveTargetButton(bpy.types.Operator):
 
 class VIEW3D_OT_SaveasTargetButton(bpy.types.Operator, ExportHelper):
     bl_idname = "mh.saveas_target"
-    bl_label = "Save target as"
+    bl_label = "Save Target As"
     bl_options = {'UNDO'}
 
     filename_ext = ".target"
@@ -782,7 +783,7 @@ def removeShapeKeys(ob):
 
 class VIEW3D_OT_ApplyTargetsButton(bpy.types.Operator):
     bl_idname = "mh.apply_targets"
-    bl_label = "Apply targets"
+    bl_label = "Apply Targets"
     bl_options = {'UNDO'}
 
     def execute(self, context):
@@ -819,7 +820,7 @@ def batchFixTargets(context, folder):
             
 class VIEW3D_OT_BatchFixButton(bpy.types.Operator):
     bl_idname = "mh.batch_fix"
-    bl_label = "Batch fix targets"
+    bl_label = "Batch Fix Targets"
     bl_options = {'UNDO'}
 
     def execute(self, context):
@@ -864,7 +865,7 @@ def batchRenderTargets(context, folder, opengl, outdir):
 
 class VIEW3D_OT_BatchRenderButton(bpy.types.Operator):
     bl_idname = "mh.batch_render"
-    bl_label = "Batch render"
+    bl_label = "Batch Render"
     bl_options = {'UNDO'}
     opengl = BoolProperty()
 
@@ -925,7 +926,7 @@ def relaxMesh(verts, edges, first, k):
     
 class VIEW3D_OT_RelaxTargetButton(bpy.types.Operator):
     bl_idname = "mh.relax_target"
-    bl_label = "Relax target"
+    bl_label = "Relax Target"
     bl_options = {'UNDO'}
 
     def execute(self, context):
@@ -963,7 +964,7 @@ def fitTarget(context):
 
 class VIEW3D_OT_FitTargetButton(bpy.types.Operator):
     bl_idname = "mh.fit_target"
-    bl_label = "Fit target"
+    bl_label = "Fit Target"
     bl_options = {'UNDO'}
 
     def execute(self, context):
@@ -1004,7 +1005,7 @@ def checkValid(ob):
 
 class VIEW3D_OT_DiscardTargetButton(bpy.types.Operator):
     bl_idname = "mh.discard_target"
-    bl_label = "Discard target"
+    bl_label = "Discard Target"
     bl_options = {'UNDO'}
 
     def execute(self, context):
@@ -1024,7 +1025,7 @@ class VIEW3D_OT_DiscardTargetButton(bpy.types.Operator):
 
 class VIEW3D_OT_DiscardAllTargetsButton(bpy.types.Operator):
     bl_idname = "mh.discard_all_targets"
-    bl_label = "Discard all targets"
+    bl_label = "Discard All Targets"
     bl_options = {'UNDO'}
 
     def execute(self, context):
@@ -1095,7 +1096,7 @@ def fixInconsistency(context):
 
 class VIEW3D_OT_FixInconsistencyButton(bpy.types.Operator):
     bl_idname = "mh.fix_inconsistency"
-    bl_label = "Fix it!"
+    bl_label = "Fix It!"
     bl_options = {'UNDO'}
 
     def execute(self, context):
@@ -1208,7 +1209,7 @@ def saveDefaultSettings(context):
     
 class OBJECT_OT_FactorySettingsButton(bpy.types.Operator):
     bl_idname = "mh.factory_settings"
-    bl_label = "Restore factory settings"
+    bl_label = "Restore Factory Settings"
 
     def execute(self, context):
         scn = context.scene
@@ -1220,7 +1221,7 @@ class OBJECT_OT_FactorySettingsButton(bpy.types.Operator):
 
 class OBJECT_OT_SaveSettingsButton(bpy.types.Operator):
     bl_idname = "mh.save_settings"
-    bl_label = "Save settings"
+    bl_label = "Save Settings"
 
     def execute(self, context):
         saveDefaultSettings(context)
@@ -1229,7 +1230,7 @@ class OBJECT_OT_SaveSettingsButton(bpy.types.Operator):
 
 class OBJECT_OT_ReadSettingsButton(bpy.types.Operator):
     bl_idname = "mh.read_settings"
-    bl_label = "Read settings"
+    bl_label = "Read Settings"
 
     def execute(self, context):
         readDefaultSettings(context)
