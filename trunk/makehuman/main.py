@@ -899,41 +899,53 @@ class MHApplication(gui3d.Application):
     # Settings
             
     def loadSettings(self):
-        if os.path.isfile(os.path.join(mh.getPath(''), "settings.ini")):
-            f = open(os.path.join(mh.getPath(''), "settings.ini"), 'r')
-            settings = eval(f.read(), {"__builtins__":None}, {'True':True, 'False':False})
-            self.settings.update(settings)
-            f.close()
+        try:
+            if os.path.isfile(os.path.join(mh.getPath(''), "settings.ini")):
+                f = open(os.path.join(mh.getPath(''), "settings.ini"), 'r')
+                settings = eval(f.read(), {"__builtins__":None}, {'True':True, 'False':False})
+                self.settings.update(settings)
+                f.close()
+        except:
+            print("Failed to load settings")
             
         if 'language' in gui3d.app.settings:
             self.setLanguage(gui3d.app.settings['language'])
         
-        if os.path.isfile(os.path.join(mh.getPath(''), "shortcuts.ini")):
-            self.shortcuts = {}
-            f = open(os.path.join(mh.getPath(''), "shortcuts.ini"), 'r')
-            for line in f:
-                modifier, key, method = line.split(' ')
-                #print modifier, key, method[0:-1]
-                if hasattr(self, method[0:-1]):
-                    self.shortcuts[(int(modifier), int(key))] = getattr(self, method[0:-1])
-            f.close()
+        try:
+            if os.path.isfile(os.path.join(mh.getPath(''), "shortcuts.ini")):
+                self.shortcuts = {}
+                f = open(os.path.join(mh.getPath(''), "shortcuts.ini"), 'r')
+                for line in f:
+                    modifier, key, method = line.split(' ')
+                    #print modifier, key, method[0:-1]
+                    if hasattr(self, method[0:-1]):
+                        self.shortcuts[(int(modifier), int(key))] = getattr(self, method[0:-1])
+                f.close()
+        except:
+            print("Failed to load shortcut settings")
  
-        if os.path.isfile(os.path.join(mh.getPath(''), "mouse.ini")):
-            self.mouseActions = {}
-            f = open(os.path.join(mh.getPath(''), "mouse.ini"), 'r')
-            for line in f:
-                modifier, button, method = line.split(' ')
-                #print modifier, button, method[0:-1]
-                if hasattr(self, method[0:-1]):
-                    self.mouseActions[(int(modifier), int(button))] = getattr(self, method[0:-1])
-            f.close()
+        try:
+            if os.path.isfile(os.path.join(mh.getPath(''), "mouse.ini")):
+                self.mouseActions = {}
+                f = open(os.path.join(mh.getPath(''), "mouse.ini"), 'r')
+                for line in f:
+                    modifier, button, method = line.split(' ')
+                    #print modifier, button, method[0:-1]
+                    if hasattr(self, method[0:-1]):
+                        self.mouseActions[(int(modifier), int(button))] = getattr(self, method[0:-1])
+                f.close()
+        except:
+            print("Failed to load mouse settings")
         
-        if os.path.isfile(os.path.join(mh.getPath(''), "help.ini")):
-            self.helpIds = []
-            f = open(os.path.join(mh.getPath(''), "help.ini"), 'r')
-            for line in f:
-                self.helpIds.append(line[0:-1])
-            f.close()
+        try:
+            if os.path.isfile(os.path.join(mh.getPath(''), "help.ini")):
+                self.helpIds = []
+                f = open(os.path.join(mh.getPath(''), "help.ini"), 'r')
+                for line in f:
+                    self.helpIds.append(line[0:-1])
+                f.close()
+        except:
+            print("Failed to load help settings")
         
     def saveSettings(self):
         if not os.path.exists(mh.getPath('')):
@@ -998,7 +1010,7 @@ class MHApplication(gui3d.Application):
                 print('Error in language file %s' % language)
                 self.languageStrings = None
             f.close()
-            if '__options__' in self.languageStrings:
+            if self.languageStrings and '__options__' in self.languageStrings:
                 if 'rtl' in self.languageStrings['__options__']:
                     self.settings['rtl'] = self.languageStrings['__options__']['rtl']
                 else:
@@ -1024,13 +1036,15 @@ class MHApplication(gui3d.Application):
     
         if not hasattr(self, 'missingStrings'):
             return
-            
-        f = open(os.path.join("data/languages/", self.settings['language'] + ".missing"), 'w')
-        for string in self.missingStrings:
-            f.write("'")
-            f.write(string.encode('utf8'))
-            f.write("':'',\n")
-        f.close()
+        try:
+            f = open(os.path.join("data/languages/", self.settings['language'] + ".missing"), 'w')
+            for string in self.missingStrings:
+                f.write("'")
+                f.write(string.encode('utf8'))
+                f.write("':'',\n")
+            f.close()
+        except:
+            pass
       
     # Font resources
     def getFont(self, fontFamily):
