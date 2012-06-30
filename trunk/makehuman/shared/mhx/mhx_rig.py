@@ -1028,8 +1028,10 @@ def addStretchToConstraint(fp, flags, inf, data):
 "      is_proxy_local False ;\n" +
 "      subtarget '%s' ;\n" % subtar +
 "      target_space '%s' ;\n" % targsp+
-"      volume '%s' ;\n" % volume +
-"    end Constraint\n")
+"      volume '%s' ;\n" % volume)
+        if len(data) > 4:
+            fp.write("      rest_length %s ;\n" % data[4])
+        fp.write("    end Constraint\n")
 
     else:
         fp.write(

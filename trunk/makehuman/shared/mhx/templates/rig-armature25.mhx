@@ -47,10 +47,10 @@ end Armature
   Property &LegIkToAnkle_L False Left_leg_IK_to_ankle ;
   PropKeys &LegIkToAnkle_L "type":'BOOLEAN',"min":0,"max":1, ;
 
-  Property &KneeFollowsFoot_L False Left_knee_follows_foot ;
+  Property &KneeFollowsFoot_L True Left_knee_follows_foot ;
   PropKeys &KneeFollowsFoot_L "type":'BOOLEAN',"min":0,"max":1, ;
 
-  Property &KneeFollowsHip_L True Left_knee_follows_hip ;
+  Property &KneeFollowsHip_L False Left_knee_follows_hip ;
   PropKeys &KneeFollowsHip_L "type":'BOOLEAN',"min":0,"max":1, ;
 
   Property &ElbowFollowsWrist_L False Left_elbow_follows_wrist ;
@@ -80,10 +80,10 @@ end Armature
   Property &LegIkToAnkle_R False Right_leg_IK_to_ankle ;
   PropKeys &LegIkToAnkle_R "type":'BOOLEAN',"min":0,"max":1, ;
 
-  Property &KneeFollowsFoot_R False Right_knee_follows_foot ;
+  Property &KneeFollowsFoot_R True Right_knee_follows_foot ;
   PropKeys &KneeFollowsFoot_R "type":'BOOLEAN',"min":0,"max":1, ;
 
-  Property &KneeFollowsHip_R True Right_knee_follows_hip ;
+  Property &KneeFollowsHip_R False Right_knee_follows_hip ;
   PropKeys &KneeFollowsHip_R "type":'BOOLEAN',"min":0,"max":1, ;
 
   Property &ElbowFollowsWrist_R False Right_elbow_follows_wrist ;
