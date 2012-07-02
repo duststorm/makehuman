@@ -68,7 +68,7 @@ Renames = {
     'MasterFloor' : None,
     'DfmNeck' :     'Neck',
     'DfmHips' :     'Hips',
-    'Sternum' :     'Spine3',
+    'DfmSpine3' :   'Spine3',
     'Shoulder_L' :  'Clavicle_L',
     'Shoulder_R' :  'Clavicle_R',
 }
