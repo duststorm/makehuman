@@ -172,10 +172,7 @@ class Skeleton:
 
         # Calculate joint positions
         g = mesh.getFaceGroup(joint.name)
-        verts = []
-        for f in g.faces:
-            for v in f.verts:
-                verts.append(v.co)
+        verts = mesh.getCoords(mesh.getVerticesForGroups([g.name]))
         joint.position = centroid(verts)
         joint.transform[3], joint.transform[7], joint.transform[11] = joint.position
 

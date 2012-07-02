@@ -53,30 +53,35 @@ def exportObj(obj, filename, exportGroups = True, groupFilter=None):
     f.write('# www.makehuman.org\n')
     f.write('mtllib ' + basename(filename) + '.mtl\n')
 
-    for v in obj.verts:
-        f.write('v %f %f %f\n' % tuple(v.co))
+    for v in obj.getCoords():
+        f.write('v %f %f %f\n' % tuple(v))
 
-    if not (obj.uvValues==None):
-        for uv in obj.uvValues:
+    has_uv = obj.hasUVs()
+    if has_uv:
+        for uv in obj.getUVs():
             f.write('vt %f %f\n' % tuple(uv))
 
-    for v in obj.verts:
-        f.write('vn %f %f %f\n' % tuple(v.no))
+    for v in obj.getNormals():
+        f.write('vn %f %f %f\n' % tuple(v))
 
     f.write('usemtl basic\n')
     f.write('s off\n')
-      
+
     for fg in obj.faceGroups:
         if not groupFilter or groupFilter(fg):
             if exportGroups:
                 f.write('g %s\n' % fg.name)
-            for face in fg.faces:
+            faces = obj.getFacesForGroups([fg.name])
+            fv = obj.getFaceVerts(faces)
+            ft = obj.getFaceUVs(faces)
+            for fi in xrange(len(faces)):
                 f.write('f')
-                for i, v in enumerate(face.verts):
-                    if (obj.uvValues == None):
-                        f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
-                    else:
-                        f.write(' %i/%i/%i ' % (v.idx + 1, face.uv[i] + 1, v.idx + 1))
+                if not has_uv:
+                    for i, v in enumerate(fv[fi]):
+                        f.write(' %i//%i ' % (v + 1, v + 1))
+                else:
+                    for i, (v, t) in enumerate(zip(fv[fi], ft[fi])):
+                        f.write(' %i/%i/%i ' % (v + 1, t + 1, v + 1))
                 f.write('\n')
     f.close()
 

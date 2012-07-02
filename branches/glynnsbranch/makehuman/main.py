@@ -75,6 +75,7 @@ def recursiveDirNames(root):
   return(pathlist)
 
 sys.path.append("./")
+sys.path.append('./lib')
 sys.path.append("./apps")
 sys.path.append("./shared")
 sys.path.append("./shared/mhx/templates")
@@ -633,9 +634,10 @@ class MHApplication(gui3d.Application):
         # Load plugins not starting with _    
         self.modules = {}
         
-        self.pluginsToLoad = glob.glob(join("plugins/",'[!_]*.py'))
-        self.pluginsToLoad.sort()
-        self.pluginsToLoad.reverse()
+        # self.pluginsToLoad = glob.glob(join("plugins/",'[!_]*.py'))
+        # self.pluginsToLoad.sort()
+        # self.pluginsToLoad.reverse()
+        self.pluginsToLoad = []
         
         if self.pluginsToLoad:
             mh.callAsync(self.loadNextPlugin)
@@ -1126,8 +1128,8 @@ class MHApplication(gui3d.Application):
     def setCameraGroupsViewDistance(self, groupNames, view='front', distance=10):
     
         human = self.selectedHuman
-        vertices, faces = human.meshData.getVerticesAndFacesForGroups(groupNames)
-        center = centroid([v.co for v in vertices])
+        vertices = human.meshData.getCoords(human.meshData.getVerticesForGroups(groupNames))
+        center = centroid(vertices)
         
         self.setCameraCenterViewDistance(center, view, distance)
     

@@ -53,7 +53,10 @@ is visible to the user through the GUI.
 import os
 import algos3d
 import module3d
-    
+import numpy as np
+
+originalVertexCache = {}
+
 def loadMesh(path, locX=0, locY=0, locZ=0, loadColors=1):
     """
     This function loads the specified mesh objects into internal MakeHuman data structures,
@@ -91,8 +94,13 @@ def loadMesh(path, locX=0, locY=0, locZ=0, loadColors=1):
     except:
         print 'Warning: obj file not found: ', path
         return False
-        
-    obj.uvValues = []
+
+    verts = []
+    uvs = []
+    fverts = []
+    fuvs = []
+    groups = []
+    has_uv = False
 
     for objData in objFile:
 
@@ -102,15 +110,12 @@ def loadMesh(path, locX=0, locY=0, locZ=0, loadColors=1):
             command = lineData[0]
                 
             if command == 'v':
-
-                obj.createVertex([float(lineData[1]), float(lineData[2]), float(lineData[3])])
+                verts.append((float(lineData[1]), float(lineData[2]), float(lineData[3])))
 
             elif command == 'vt':
+                uvs.append((float(lineData[1]), float(lineData[2])))
 
-                obj.uvValues.append([float(lineData[1]), float(lineData[2])])
-                
             elif command == 'f':
-                
                 if not fg:
                     fg =  obj.createFaceGroup('default-dummy-group')
                     
@@ -128,15 +133,18 @@ def loadMesh(path, locX=0, locY=0, locZ=0, loadColors=1):
                 
                 if len(vIndices) == 3:
                     vIndices.append(vIndices[0])
-                f = fg.createFace([obj.verts[i] for i in vIndices])
+                fverts.append(tuple(vIndices))
                     
-                if len(uvIndices) > 0:  # look up uv, if existing, these are in the same order as in the file
+                if len(uvIndices) > 0:
                     if len(uvIndices) == 3:
                         uvIndices.append(uvIndices[0])
-                    f.uv = uvIndices[:]
+                    has_uv = True
+                if len(uvIndices) < 4:
+                    uvIndices = [0, 0, 0, 0]
+                fuvs.append(tuple(uvIndices))
 
-                f.mtl = mtl
-                        
+                groups.append(fg.idx)
+
             elif command == 'g':
                 
                 fg =  obj.createFaceGroup(lineData[1])
@@ -148,9 +156,15 @@ def loadMesh(path, locX=0, locY=0, locZ=0, loadColors=1):
             elif command == 'o':
                 
                 obj.name = lineData[1]
-                
-    obj.calcNormals()
+
+    obj.setCoords(verts)
+    obj.setUVs(uvs)
+    obj.setFaces(fverts, fuvs if has_uv else None, groups)
+
+    originalVertexCache[path] = obj.coord.copy()
+
     obj.updateIndexBuffer()
+    obj.calcNormals()
 
     objFile.close()
 
@@ -177,6 +191,9 @@ def loadVertsCoo(path):
         *string*. The file system path to the file to be read.
        
     """
+
+    if path in originalVertexCache:
+        return originalVertexCache[path]
 
     global originalVertexCoordinates
 

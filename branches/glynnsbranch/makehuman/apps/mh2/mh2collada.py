@@ -348,12 +348,12 @@ def filterMesh(mesh1, obj, deleteGroups, deleteVerts):
     
     killVerts = {}
     killUvs = {}
-    killFaces = {}    
-    for v in obj.verts:
-        killVerts[v.idx] = False
-    for f in obj.faces:
-        killFaces[f.idx] = False        
-        for vt in f.uv:
+    killFaces = {}
+    for vidx in xrange(obj.getVertexCount()):
+        killVerts[vidx] = False
+    for fidx in xrange(obj.getFaceCount()):
+        killFaces[fidx] = False
+        for vt in obj.getFaceUVs(fidx):
             killUvs[vt] = False
             
     for vn in deleteVerts:
@@ -368,11 +368,11 @@ def filterMesh(mesh1, obj, deleteGroups, deleteVerts):
              ("lash" in fg.name)) or
              mh2proxy.deleteGroup(fg.name, deleteGroups)):
             print("  kill %s" % fg.name) 
-            for f in fg.faces:            
-                killFaces[f.idx] = True
-                for v in f.verts:
-                    killVerts[v.idx] = True
-                for vt in f.uv:                    
+            for fidx in obj.getFacesForGroups([fg.name]):
+                killFaces[fidx] = True
+                for vidx in obj.getFaceVerts(fidx):
+                    killVerts[vidx] = True
+                for vt in obj.getFaceUVs(fidx):
                     killUvs[vt] = True
     
     n = 0

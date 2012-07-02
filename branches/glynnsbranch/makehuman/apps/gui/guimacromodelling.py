@@ -130,7 +130,8 @@ class MacroModelingTaskView(gui3d.TaskView):
         
         muscle = (human.getMuscle() * 100.0)
         weight = (50 + (150 - 50) * human.getWeight())
-        height = 10 * max(human.meshData.verts[8223].co[1] - human.meshData.verts[12361].co[1], human.meshData.verts[8223].co[1] - human.meshData.verts[13155].co[1])
+        coords = human.meshData.getCoords([8223,12361,13155])
+        height = 10 * max(coords[0][1] - coords[1][1], coords[0][1] - coords[2][1])
         if gui3d.app.settings['units'] == 'metric':
             units = 'cm'
         else:

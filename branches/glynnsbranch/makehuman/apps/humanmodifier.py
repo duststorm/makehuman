@@ -31,6 +31,7 @@ from string import Template
 from operator import mul
 import math
 import re
+import numpy as np
 
 class DetailAction:
 
@@ -151,41 +152,37 @@ class Modifier:
             return value
         else:
             return 0.0
-            
+
     def updateValue(self, human, value, updateNormals=1):
         
         # Collect vertex and face indices if we didn't yet
-        if not (self.verts or self.faces):
+        if self.verts is None and self.faces is None:
             # Collect verts
-            self.verts = []
+            vmask = np.zeros(human.meshData.getVertexCount(), dtype=bool)
             for target in (self.left, self.right):
                 t = algos3d.getTarget(human.meshData, target)
-                self.verts.extend(t.verts)
-            self.verts = list(set(self.verts))
-            
+                vmask[t.verts] = True
+            self.verts = np.argwhere(vmask)[...,0]
+            del vmask
+
             # collect faces
-            self.faces = []
-            for vindex in self.verts:
-                self.faces += [face.idx for face in human.meshData.verts[vindex].sharedFaces]
-            self.faces = list(set(self.faces))
-        
-        # Remove old targets
-        algos3d.loadTranslationTarget(human.meshData, self.left, -human.getDetail(self.left), None, 0, 0)
-        algos3d.loadTranslationTarget(human.meshData, self.right, -human.getDetail(self.right), None, 0, 0)
-        
+            self.faces = human.meshData.getFacesForVertices(self.verts)
+
         # Update detail state
+        old_detail = [human.getDetail(target) for target in (self.left, self.right)]
         self.setValue(human, value)
-        
-        # Add new targets
-        algos3d.loadTranslationTarget(human.meshData, self.left, human.getDetail(self.left), None, 0, 0)
-        algos3d.loadTranslationTarget(human.meshData, self.right, human.getDetail(self.right), None, 0, 0)
+        new_detail = [human.getDetail(target) for target in (self.left, self.right)]
+
+        # Apply changes
+        for target, old, new in zip((self.left, self.right), old_detail, new_detail):
+            if new == old:
+                continue
+            algos3d.loadTranslationTarget(human.meshData, target[0], new - old, None, 0, 0)
             
         # Update vertices
-        faces = [human.meshData.faces[i] for i in self.faces]
-        vertices = [human.meshData.verts[i] for i in self.verts]
         if updateNormals:
-            human.meshData.calcNormals(1, 1, vertices, faces)
-        human.meshData.update(vertices, updateNormals)
+            human.meshData.calcNormals(1, 1, self.verts, self.faces)
+        human.meshData.update(self.verts, updateNormals)
 
 class GenericModifier:
 
@@ -207,41 +204,37 @@ class GenericModifier:
     def getValue(self, human):
         
         return sum([human.getDetail(target[0]) for target in self.targets])
-        
+
     def updateValue(self, human, value, updateNormals=1):
         
         # Collect vertex and face indices if we didn't yet
-        if not (self.verts or self.faces):
+        if self.verts is None and self.faces is None:
             # Collect verts
-            self.verts = []
+            vmask = np.zeros(human.meshData.getVertexCount(), dtype=bool)
             for target in self.targets:
                 t = algos3d.getTarget(human.meshData, target[0])
-                self.verts.extend(t.verts)
-            self.verts = list(set(self.verts))
-            
+                vmask[t.verts] = True
+            self.verts = np.argwhere(vmask)[...,0]
+            del vmask
+
             # collect faces
-            self.faces = []
-            for vindex in self.verts:
-                self.faces += [face.idx for face in human.meshData.verts[vindex].sharedFaces]
-            self.faces = list(set(self.faces))
-        
-        # Remove old targets
-        for target in self.targets:
-            algos3d.loadTranslationTarget(human.meshData, target[0], -human.getDetail(target[0]), None, 0, 0)
-        
+            self.faces = human.meshData.getFacesForVertices(self.verts)
+
         # Update detail state
+        old_detail = [human.getDetail(target[0]) for target in self.targets]
         self.setValue(human, value)
+        new_detail = [human.getDetail(target[0]) for target in self.targets]
+
+        # Apply changes
+        for target, old, new in zip(self.targets, old_detail, new_detail):
+            if new == old:
+                continue
+            algos3d.loadTranslationTarget(human.meshData, target[0], new - old, None, 0, 0)
         
-        # Add new targets
-        for target in self.targets:
-            algos3d.loadTranslationTarget(human.meshData, target[0], human.getDetail(target[0]), None, 0, 0)
-            
         # Update vertices
-        faces = [human.meshData.faces[i] for i in self.faces]
-        vertices = [human.meshData.verts[i] for i in self.verts]
         if updateNormals:
-            human.meshData.calcNormals(1, 1, vertices, faces)
-        human.meshData.update(vertices, updateNormals)
+            human.meshData.calcNormals(1, 1, self.verts, self.faces)
+        human.meshData.update(self.verts, updateNormals)
 
 class SimpleModifier(GenericModifier):
 

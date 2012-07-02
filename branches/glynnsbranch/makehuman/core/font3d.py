@@ -203,7 +203,6 @@ def createMesh(font, text, object = None, width=0, alignment=AlignLeft, wrap=Fal
         alignment = AlignRight
         
     object = object or module3d.Object3D(text)
-    object.uvValues = object.uvValues or []
     
     # create group
     fg = object.createFaceGroup('text')
@@ -213,6 +212,11 @@ def createMesh(font, text, object = None, width=0, alignment=AlignLeft, wrap=Fal
     yoffset = 0
     zoffset = 0
     previous = -1
+
+    v = []
+    uvs = []
+    f = []
+    base = 0
 
     for line in text.splitlines():
     
@@ -251,7 +255,7 @@ def createMesh(font, text, object = None, width=0, alignment=AlignLeft, wrap=Fal
             xoffset = (width - font.stringWidth(line))
         
         zoffset = 0
-        
+
         for char in line:
 
             co = font.getAbsoluteCoordsForChar(char)
@@ -263,26 +267,25 @@ def createMesh(font, text, object = None, width=0, alignment=AlignLeft, wrap=Fal
 
             # create vertices
 
-            v1 = object.createVertex([xoffset + co[0], yoffset + co[1], zoffset])
-            v2 = object.createVertex([xoffset + co[2], yoffset + co[1], zoffset])
-            v3 = object.createVertex([xoffset + co[2], yoffset + co[3], zoffset])
-            v4 = object.createVertex([xoffset + co[0], yoffset + co[3], zoffset])
+            v.extend([(xoffset + co[i], yoffset + co[j], zoffset) for j in [1,3] for i in [0,2]])
 
             xoffset += co[4]
             zoffset += 0.0001
 
-            uv1 = [uv[0], uv[1]]
-            uv2 = [uv[2], uv[1]]
-            uv3 = [uv[2], uv[3]]
-            uv4 = [uv[0], uv[3]]
+            uvs.extend([(uv[i], uv[j]) for j in [1,3] for i in [0,2]])
 
             # create faces
-            fg.createFace((v1, v4, v3, v2), (uv1, uv4, uv3, uv2))
+            f.append(tuple(base + i for i in [0,2,3,1]))
+
+            base += 4
             
         yoffset += font.lineHeight
+
+    object.setCoords(v)
+    object.setUVs(uvs)
+    object.setFaces(f, f, fg.idx)
 
     object.texture = font.file
     object.updateIndexBuffer()
 
     return object
-

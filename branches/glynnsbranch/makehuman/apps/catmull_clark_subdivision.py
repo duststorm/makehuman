@@ -23,211 +23,347 @@ Mesh Subdivision Plugin.
 
 __docformat__ = 'restructuredtext'
 
-from aljabr import centroid
-from fastmath import vmul3d, vadd3d, vavg2d, vavg2d4, vavg3d, vavg3d4
+import time
+import numpy as np
+
 from module3d import Object3D
 
-def createOriginalVert(object, v):
-    
-    o = object.createVertex(v.co[:])
-    o.data = [v, [], set()] # original, faceVerts, edgeVerts
-    
-    return o
-    
-def initOriginalVert(v):
-    
-    v.co = v.data[0].co[:]
-    
-def updateOriginalVert(v):
-    
-    if not v.data[1] or not v.data[2]: # Joint vertex
-        return
-      
-    n = len(v.data[1])
-    if n == len(v.data[2]): # Inner vertex
-        faceVertAvg = centroid([fv.co for fv in v.data[1]])
-        edgeVertAvg = centroid([ev.co for ev in v.data[2]])
-        v.co = vmul3d(vadd3d(vadd3d(faceVertAvg, vmul3d(edgeVertAvg, 2.0)), vmul3d(v.data[0].co, n - 3.0)), 1.0/n)
-    else: # Outer vertex
-        v.co = centroid([ev.co for ev in v.data[2] if len(ev.data) == 3]+[v.data[0].co])
+class SubdivisionObject(Object3D):
+    def __init__(self, object):
+        name = object.name + '.sub'
+        super(SubdivisionObject, self).__init__(name, 4)
 
-def createFaceVert(object, f):
-    
-    v = object.createVertex(vavg3d4(f.verts[0].co, f.verts[1].co, f.verts[2].co, f.verts[3].co))
-    object.faceVerts.append(v)
-    v.data = f
-    
-    return v
-    
-def updateFaceVert(fv):
-    
-    fv.co = vavg3d4(fv.data.verts[0].co, fv.data.verts[1].co, fv.data.verts[2].co, fv.data.verts[3].co)
+        self.loc = object.loc.copy()
+        self.rot = object.rot.copy()
+        self.scale = object.scale.copy()
+        self.cameraMode = object.cameraMode
+        self.visibility = object.visibility
+        self.pickable = object.pickable
+        self.texture = object.texture
+        self.textureId = object.textureId
+        self.shadeless = object.shadeless
+        self.solid = object.solid
+        self.transparentPrimitives = object.transparentPrimitives * 4
+        self.parent = object
 
-def createEdgeVert(object, edgeVerts, v1, v2, c):
-    
-    key = (v1.idx, v2.idx) if v1.idx < v2.idx else (v2.idx, v1.idx)
-    
-    if key in edgeVerts:
-        v = edgeVerts[key]
-        v.data.append(c)
-    else:
-        v = object.createVertex([0, 0, 0])
-        object.edgeVerts.append(v)
-        v.data = [v1, v2, c]
-        edgeVerts[key] = v
+    def create(self, progressCallback):
+        total = 19
+        now = [time.time()]
+        def progress(x):
+            last = now[0]
+            now[0] = time.time()
+            print '%d: %f' % (x, now[0] - last)
+            if progressCallback:
+                progressCallback(float(x)/total)
+
+        progress(0)
         
-    return v
-    
-def updateEdgeVert(ev):
+        parent = self.parent
+        nverts = len(parent.coord)
+        ntexco = len(parent.texco)
+        nfaces = len(parent.fvert)
 
-    if len(ev.data) > 3: # Inner edge
-        ev.co = vavg3d4(ev.data[0].co, ev.data[1].co, ev.data[2].co, ev.data[3].co)
-    else: # Outer edge
-        ev.co = vavg3d(ev.data[0].co, ev.data[1].co)
+        group_mask = np.ones(len(parent._faceGroups), dtype=bool)
+
+        for g in parent._faceGroups:
+            fg = self.createFaceGroup(g.name)
+            if ('joint' in fg.name or 'helper' in g.name):
+                group_mask[fg.idx] = False
+
+        progress(1)
+
+        face_mask = group_mask[parent.group]
+        self.face_map = np.argwhere(face_mask)[...,0]
+        self.face_rmap = np.zeros(nfaces, dtype=int) - 1
+        nfaces = len(self.face_map)
+        self.face_rmap[self.face_map] = np.arange(nfaces)
+
+        progress(2)
+
+        verts = parent.fvert[face_mask]
+        vert_mask = np.zeros(nverts, dtype = bool)
+        vert_mask[verts] = True
+        self.vtx_map = np.argwhere(vert_mask)[...,0]
+        vtx_rmap = np.zeros(nverts, dtype=int) - 1
+        nverts = len(self.vtx_map)
+        vtx_rmap[self.vtx_map] = np.arange(nverts)
+
+        progress(3)
+
+        uvs = parent.fuvs[face_mask]
+        uv_mask = np.zeros(ntexco, dtype = bool)
+        uv_mask[uvs] = True
+        self.uv_map = np.argwhere(uv_mask)[...,0]
+        uv_rmap = np.zeros(ntexco, dtype=int) - 1
+        ntexco = len(self.uv_map)
+        uv_rmap[self.uv_map] = np.arange(ntexco)
+
+        progress(4)
+
+        vedgelist = []
+        vedgemap = {}
+        fvert = vtx_rmap[parent.fvert[self.face_map]]
+        vedges = np.dstack((fvert,np.roll(fvert,-1,axis=1)))
+        fverts = []
+
+        tedgelist = []
+        tedgemap = {}
+        fuv = uv_rmap[parent.fuvs[self.face_map]]
+        tedges = np.dstack((fuv,np.roll(fuv,-1,axis=1)))
+        fuvs = []
+
+        groups = []
+
+        self.cbase = nverts
+        self.ebase = nverts + nfaces
+
+        self.tcbase = ntexco
+        self.tebase = ntexco + nfaces
+
+        progress(5)
+
+        fvedges2 = []
+        ftedges2 = []
+
+        for i, fi in enumerate(self.face_map):
+            group = parent.group[fi]
+
+            fvedges = []
+            ftedges = []
+
+            for (va,vb) in vedges[i]:
+                if va > vb:
+                    va,vb = vb,va
+                p = va,vb
+
+                vi = vedgemap.get(p)
+                if vi is None:
+                    vi = len(vedgelist)
+                    vedgelist.append((p,(i,i)))
+                    vedgemap[p] = vi
+                else:
+                    p,(j,_) = vedgelist[vi]
+                    vedgelist[vi] = (p,(j,i))
+
+                fvedges.append(vi)
+
+            for j, (ta,tb) in enumerate(tedges[i]):
+                if ta > tb:
+                    ta,tb = tb,ta
+                q = ta,tb
+
+                ti = tedgemap.get(q)
+                if ti is None:
+                    ti = len(tedgelist)
+                    tedgelist.append(q)
+                    tedgemap[q] = ti
+
+                ftedges.append(ti)
+
+            fvedges2.append(fvedges)
+            ftedges2.append(ftedges)
+
+        progress(6)
+
+        nfaces = len(self.face_map)
+
+        self.fvert = np.empty((nfaces,4,4), dtype=np.uint32)
+        self.fuvs  = np.empty((nfaces,4,4), dtype=np.uint32)
+        self.group = np.empty((nfaces,4), dtype=np.uint32)
+
+        # Create faces
+        # v0  e0  v1
+        # 
+        # e3  c   e1
+        #
+        # v3  e2  v2
+
+        self.fvert[:,:,0] = fvert
+        self.fvert[:,:,2] = np.arange(nfaces)[:,None] + self.cbase
+
+        self.fuvs[:,:,0] = fuv
+        self.fuvs[:,:,2] = np.arange(nfaces)[:,None] + self.tcbase
+
+        self.group[...] = parent.group[self.face_map][:,None]
+
+        progress(7)
+
+        fvedges2 = np.asarray(fvedges2, dtype=np.uint32) + self.ebase
+
+        self.fvert[:,:,1] = fvedges2
+        self.fvert[:,:,3] = np.roll(fvedges2,1,axis=-1)
+
+        ftedges2 = np.asarray(ftedges2, dtype=np.uint32) + self.tebase
+
+        self.fuvs[:,:,1] = ftedges2
+        self.fuvs[:,:,3] = np.roll(ftedges2,1,axis=-1)
+
+        progress(8)
+
+        self.evert = np.asarray(vedgelist, dtype = np.uint32)
+        self.etexc = np.asarray(tedgelist, dtype = np.uint32)
+
+        self.vedge = np.zeros((nverts, self.MAX_FACES), dtype=np.uint32)
+        self.nedges = np.zeros(nverts, dtype=np.uint8)
+
+        progress(9)
+
+        for i, (vab,_) in enumerate(self.evert):
+            for v in vab:
+                self.vedge[v, self.nedges[v]] = i
+                self.nedges[v] += 1
+
+        progress(10)
+
+        nverts = self.ebase + len(vedgelist)
+
+        self.coord = np.zeros((nverts, 3), dtype=np.float32)
+        self.vnorm = np.zeros((nverts, 3), dtype=np.float32)
+        self.color = np.zeros((nverts, 4), dtype=np.uint8) + 255
+        self.vface = np.zeros((nverts, self.MAX_FACES), dtype=np.uint32)
+        self.nfaces = np.zeros(nverts, dtype=np.uint8)
+
+        self.ucoor = False
+        self.unorm = False
+        self.ucolr = False
+
+        progress(11)
+
+        ntexco = self.tebase + len(tedgelist)
+
+        self.texco = np.zeros((ntexco, 2), dtype=np.float32)
+
+        self.utexc = False
+
+        progress(12)
+
+        nfaces *= 4
+
+        self.fvert = self.fvert.reshape((nfaces,4))
+        self.fuvs  = self.fuvs.reshape((nfaces,4))
+        self.group = self.group.reshape(nfaces)
+        self.fnorm = np.zeros((nfaces,3))
+
+        # nfaces = len(fverts)
+        # 
+        # self.fvert = np.asarray(fverts, dtype=np.uint32)
+        # self.fnorm = np.zeros((nfaces, 3), dtype=np.float32)
+        # self.fuvs  = np.asarray(fuvs, dtype=np.uint32)
+        # self.group = np.asarray(groups, dtype=np.uint16)
+
+        progress(13)
+
+        self._update_faces()
+
+        progress(14)
+
+        self.updateIndexBuffer()
+
+        progress(15)
+
+        self.update_uvs()
+
+        progress(16)
+
+        self.update_coords()
+
+        progress(17)
+
+        self.calcNormals()
+
+        progress(18)
+
+        self.sync_all()
+
+        progress(19)
+
+    def dump(self):
+        for k in dir(self):
+            v = getattr(self, k)
+            if isinstance(v, type(self.fvert)):
+                fmt = '%.6f' if v.dtype in (np.float32, float) else '%d'
+                if len(v.shape) > 2:
+                    v = v.reshape((-1,v.shape[-1]))
+                np.savetxt('dump/%s.txt' % k, v, fmt=fmt)
+
+    def update_uvs(self):
+        parent = self.parent
+
+        btexc = self.texco[:self.tcbase]
+        ctexc = self.texco[self.tcbase:self.tebase]
+        etexc = self.texco[self.tebase:]
+
+        ctexc[...] = np.sum(parent.texco[parent.fuvs[self.face_map]], axis=1) / 4
+
+        iva = self.etexc[:,0]
+        ivb = self.etexc[:,1]
+
+        ptexco = parent.texco[self.uv_map]
+
+        ta = ptexco[iva]
+        tb = ptexco[ivb]
+        etexc[...] = (ta + tb) / 2
+        del iva, ivb, ta, tb
+
+        btexc[...] = ptexco
+
+        self.markUVs()
+
+    def update_coords(self):
+        parent = self.parent
+
+        bvert = self.coord[:self.cbase]
+        cvert = self.coord[self.cbase:self.ebase]
+        evert = self.coord[self.ebase:]
+
+        cvert[...] = np.sum(parent.coord[parent.fvert[self.face_map]], axis=1) / 4
+
+        pcoord = parent.coord[self.vtx_map]
+
+        iva = self.evert[:,0,0]
+        ivb = self.evert[:,0,1]
+        ic1 = self.evert[:,1,0]
+        ic2 = self.evert[:,1,1]
+
+        va = pcoord[iva]
+        vb = pcoord[ivb]
+        mvert = va + vb
+        del iva, ivb, va, vb
+
+        vc1 = cvert[ic1]
+        vc2 = cvert[ic2]
+        vc = vc1 + vc2
+        del vc1, vc2
+
+        evert[...] = np.where((ic1 == ic2)[:,None], (2 * mvert + vc) / 6, (mvert + vc) / 4)
+        del ic1, ic2, vc
+
+        nvface = parent.nfaces[self.vtx_map]
+
+        edgewt = np.arange(self.MAX_FACES)[None,:,None] < self.nedges[:,None,None]
+        edgewt = edgewt / self.nedges.astype(np.float32)[:,None,None]
+        oevert = np.sum(mvert[self.vedge] * edgewt / 2, axis=1)
+        facewt = np.arange(self.MAX_FACES)[None,:,None] < nvface[:,None,None]
+        facewt = facewt / nvface.astype(np.float32)[:,None,None]
+        ofvert = np.sum(cvert[self.face_rmap[parent.vface[self.vtx_map]]] * facewt, axis=1)
+        opvert = pcoord
+
+        # bvert[...] = (ofvert + 2 * oevert + (nvface[:,None] - 3) * opvert) / nvface[:,None]
+        valid = nvface >= 3
+        bvert[...] = np.where(valid[:,None],(2 * oevert + (nvface[:,None] - 2) * opvert) / nvface[:,None],opvert)
+
+        self.markCoords(coor=True)
+
+    def update(self):
+        self.update_coords()
+        super(SubdivisionObject, self).update()
 
 def createSubdivisionObject(object, progressCallback=None):
-    
-    name = object.name + '.sub'
-    
-    subdivisionObject = Object3D(name)
-    subdivisionObject.x = object.x
-    subdivisionObject.y = object.y
-    subdivisionObject.z = object.z
-    subdivisionObject.rx = object.rx
-    subdivisionObject.ry = object.ry
-    subdivisionObject.rz = object.rz
-    subdivisionObject.sx = object.sx
-    subdivisionObject.sy = object.sy
-    subdivisionObject.sz = object.sz
-    subdivisionObject.visibility = object.visibility
-    subdivisionObject.shadeless = object.shadeless
-    subdivisionObject.pickable = object.pickable
-    subdivisionObject.cameraMode = object.cameraMode
-    subdivisionObject.solid = object.solid
-    subdivisionObject.transparentPrimitives = object.transparentPrimitives * 4
-    subdivisionObject.uvValues = []
-    subdivisionObject.indexBuffer = []
-    
-    subdivisionObject.originalVerts = [createOriginalVert(subdivisionObject, v) for v in object.verts]
-    subdivisionObject.faceVerts = []
-    subdivisionObject.edgeVerts = []
-        
-    edgeVerts = {}
-    
-    if progressCallback:progressCallback(0.0)
-    
-    progress = 0.0
-    groups = 0
-    progressIncr = 0.5 / max(1, object.faceGroupCount / 10)
-    
-    # Create faces
-    # v0  e0  v1
-    # 
-    # e3  c   e1
-    #
-    # v3  e2  v2
-    for g in object.faceGroups:
-        
-        fg = subdivisionObject.createFaceGroup(g.name)
-            
-        for f in g.faces:
-            
-            if ('joint' in f.group.name or
-                'helper' in f.group.name):
-                continue
-            
-            # Create centroid vertex
-            c = createFaceVert(subdivisionObject, f)
-            
-            for v in f.verts:
-                subdivisionObject.verts[v.idx].data[1].append(c)
-            
-            # Create edge vertices
-            e0 = createEdgeVert(subdivisionObject, edgeVerts, f.verts[0], f.verts[1], c)
-            e1 = createEdgeVert(subdivisionObject, edgeVerts, f.verts[1], f.verts[2], c)
-            e2 = createEdgeVert(subdivisionObject, edgeVerts, f.verts[2], f.verts[3], c)
-            e3 = createEdgeVert(subdivisionObject, edgeVerts, f.verts[3], f.verts[0], c)
-            
-            v0 = subdivisionObject.verts[f.verts[0].idx]
-            v0.data[2].add(e0)
-            v0.data[2].add(e3)
-            v1 = subdivisionObject.verts[f.verts[1].idx]
-            v1.data[2].add(e0)
-            v1.data[2].add(e1)
-            v2 = subdivisionObject.verts[f.verts[2].idx]
-            v2.data[2].add(e1)
-            v2.data[2].add(e2)
-            v3 = subdivisionObject.verts[f.verts[3].idx]
-            v3.data[2].add(e2)
-            v3.data[2].add(e3)
-            
-            if object.uvValues:
-            
-                uv0 = object.uvValues[f.uv[0]]
-                uv1 = object.uvValues[f.uv[1]]
-                uv2 = object.uvValues[f.uv[2]]
-                uv3 = object.uvValues[f.uv[3]]
-                
-                uvc = vavg2d4(uv0, uv1, uv2, uv3)
-                uve0 = vavg2d(uv0, uv1)
-                uve1 = vavg2d(uv1, uv2)
-                uve2 = vavg2d(uv2, uv3)
-                uve3 = vavg2d(uv3, uv0)
-                
-                fg.createFace((v0, e0, c, e3), (uv0, uve0, uvc, uve3))
-                fg.createFace((e0, v1, e1, c), (uve0, uv1, uve1, uvc))
-                fg.createFace((e3, c, e2, v3), (uve3, uvc, uve2, uv3))
-                fg.createFace((c, e1, v2, e2), (uvc, uve1, uv2, uve2))
-                
-            else:
-            
-                fg.createFace((v0, e0, c, e3))
-                fg.createFace((e0, v1, e1, c))
-                fg.createFace((e3, c, e2, v3))
-                fg.createFace((c, e1, v2, e2))
-            
-        if progressCallback:
-            groups += 1
-            if not groups % 10:
-                progress += progressIncr
-                progressCallback(progress)
-    
-    for v in subdivisionObject.edgeVerts:
-        updateEdgeVert(v)
-        
-    if progressCallback:progressCallback(0.6)
-    
-    for v in subdivisionObject.originalVerts:
-        updateOriginalVert(v)
-        
-    if progressCallback:progressCallback(0.7)
-    
-    subdivisionObject.updateIndexBuffer()
-    subdivisionObject.object = object.object
-    subdivisionObject.texture = object.texture
-    
-    if progressCallback:progressCallback(0.8)  
-    subdivisionObject.calcNormals()
-    if progressCallback:progressCallback(1.0)
+    obj = SubdivisionObject(object)
+    obj.create(progressCallback)
+    # obj.dump()
+    return obj
 
-    return subdivisionObject
-    
 def updateSubdivisionObject(object, progressCallback=None):
-    
-    if progressCallback:progressCallback(0.0)
-    for v in object.originalVerts:
-        initOriginalVert(v)
-    if progressCallback:progressCallback(0.1)
-    for v in object.faceVerts:
-        updateFaceVert(v)
-    if progressCallback:progressCallback(0.2)
-    for v in object.edgeVerts:
-        updateEdgeVert(v)
-    if progressCallback:progressCallback(0.4)
-    for v in object.originalVerts:
-        updateOriginalVert(v)
-    if progressCallback:progressCallback(0.6)
-    object.calcNormals()
-    if progressCallback:progressCallback(0.8)
     object.update()
-    if progressCallback:progressCallback(1.0)
+    object.calcNormals()

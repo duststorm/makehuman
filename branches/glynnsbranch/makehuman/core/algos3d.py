@@ -47,6 +47,7 @@ import aljabr
 import textures3d
 import files3d
 import os
+import numpy as np
 
 targetBuffer = {}
 
@@ -76,7 +77,7 @@ class Target:
         """
 
         self.name = name
-        self.data = [0, 0, 0] * len(obj.verts)
+        self.data = np.zeros((obj.getVertexCount(),3), dtype=np.float32)
         self.faces = []
         self.verts = []
 
@@ -97,50 +98,37 @@ class Target:
                 translationVector = (float(translationData[1]), float(translationData[2]), float(translationData[3]))
                 self.data[vertIndex] = translationVector
 
-                vertToModify = obj.verts[vertIndex]
-                for face in vertToModify.sharedFaces:
-                    facesToRecalculate.add(face.idx)
-
-        self.faces = tuple(facesToRecalculate)
-        self.verts = tuple(verticesToRecalculate)
+        self.verts = np.array(verticesToRecalculate, dtype=int)
+        self.faces = obj.getFacesForVertices(self.verts)
 
         fileDescriptor.close()
-        
+
     def apply(self, obj, morphFactor, update=True, calcNormals=True, faceGroupToUpdateName=None, scale=(1.0,1.0,1.0)):
           
-        if self.verts:
+        if len(self.verts):
             
             if morphFactor or calcNormals or update:
             
                 if faceGroupToUpdateName:
-
                     # if a facegroup is provided, apply it ONLY to the verts used
                     # by the specified facegroup.
-                
-                    faceGroupToUpdate = obj.getFaceGroup(faceGroupToUpdateName)
-                    verticesToUpdate = set()
-                    facesToRecalculate = list(faceGroupToUpdate.faces)
-                    for f in facesToRecalculate:
-                        for v in f.verts:
-                            verticesToUpdate.add(v)
-                            
-                else:
+                    vmask, fmask = obj.getVertexAndFaceMasksForGroups([faceGroupToUpdateName])
 
+                    verticesToUpdate = self.verts[vmask[self.verts]]
+                    facesToRecalculate = self.faces[fmask[self.faces]]
+                else:
                     # if a vertgroup is not provided, all verts affected by
                     # the targets will be modified
 
-                    facesToRecalculate = [obj.faces[i] for i in self.faces]
-                    verticesToUpdate = [obj.verts[i] for i in self.verts]
+                    facesToRecalculate = self.faces
+                    verticesToUpdate = self.verts
 
             if morphFactor:
-                
                 # Adding the translation vector
 
-                for v in verticesToUpdate:
-                    targetVect = self.data[v.idx]
-                    v.co[0] += targetVect[0] * morphFactor * scale[0]
-                    v.co[1] += targetVect[1] * morphFactor * scale[1]
-                    v.co[2] += targetVect[2] * morphFactor * scale[2]
+                scale = np.array(scale) * morphFactor
+                obj.coord[verticesToUpdate] += self.data[verticesToUpdate] * scale[None,:]
+                obj.markCoords(verticesToUpdate, coor=True)
 
             if calcNormals:
                 obj.calcNormals(1, 1, verticesToUpdate, facesToRecalculate)
@@ -150,7 +138,6 @@ class Target:
             return True
             
         return False
-
 
 def getTarget(obj, targetPath):
     """
@@ -846,12 +833,9 @@ def resetObj(obj, update=None, calcNorm=None):
     """
 
     originalVerts = files3d.loadVertsCoo(obj.path)
-    for (i, v) in enumerate(obj.verts):
-        v.co[0] = originalVerts[i][0]
-        v.co[1] = originalVerts[i][1]
-        v.co[2] = originalVerts[i][2]
-        if update:
-            v.update()
+    obj.changeCoords(originalVerts)
+    if update:
+        obj.update()
     if calcNorm:
         obj.calcNormals()
 

@@ -29,6 +29,7 @@ Categories:
 
 from math import sqrt, cos, sin, tan, atan2, fabs, acos, pi, exp
 from random import random
+import numpy as np
 
 machine_epsilon = 1.0e-16
 degree2rad = pi/180.0
@@ -958,22 +959,11 @@ def centroid(vertsList):
     """
 
     nVerts = len(vertsList)
-    xTot = 0.0
-    yTot = 0.0
-    zTot = 0.0
-    for v in vertsList:
-        xTot += v[0]
-        yTot += v[1]
-        zTot += v[2]
-    if nVerts != 0:
-        centrX = xTot / nVerts
-        centrY = yTot / nVerts
-        centrZ = zTot / nVerts
-    else:
+    if nVerts == 0:
         print 'Warning: no verts to calc centroid'
         return 0
-    return [centrX, centrY, centrZ]
 
+    return np.sum(vertsList, axis = 0) / nVerts
     
 def rotatePoint(center, vect, rotMatrix):
     """

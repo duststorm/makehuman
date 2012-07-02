@@ -44,39 +44,29 @@ class NineSliceMesh(module3d.Object3D):
         if not textureWidth or not textureHeight:
             textureWidth = border[0] + border[2] + 1
             textureHeight = border[1] + border[3] + 1
-            
-        outer=[[0, 0], [width, height]]
-        inner=[[border[0], border[1]], [width - border[2], height - border[3]]]
-            
-        self.uvValues = []
-        self.indexBuffer = []
         
         # create group
         fg = self.createFaceGroup('9slice')
         
-        xc = [outer[0][0], inner[0][0], inner[1][0], outer[1][0]]
-        yc = [outer[0][1], inner[0][1], inner[1][1], outer[1][1]]
+        xc = [0, border[0], width  - border[2], width]
+        yc = [0, border[1], height - border[3], height]
+
         xuv = [0.0, border[0] / textureWidth, (textureWidth - border[2]) / textureWidth, 1.0]
         yuv = [1.0, 1.0 - border[1] / textureHeight, 1.0 - (textureHeight - border[3]) / textureHeight, 0.0]
         
         # The 16 vertices
-        v = []
-        for y in yc:
-            for x in xc:  
-                v.append(self.createVertex([x, y, 0.0]))
-        
+        v = [(x, y, 0.0) for y in yc for x in xc]
+
         # The 16 uv values
-        uv = []
-        for y in yuv:
-            for x in xuv:  
-                uv.append([x, y])
-        
+        uv = [(x, y) for y in yuv for x in xuv]
+
         # The 18 faces (9 quads)
-        for y in xrange(3):
-            for x in xrange(3):
-                o = x + y * 4
-                fg.createFace((v[o+4], v[o+5], v[o+1], v[o]), (uv[o+4], uv[o+5], uv[o+1], uv[o]))
-                
+        f = [[o+4, o+5, o+1, o] for y in xrange(3) for x in xrange(3) for o in [x + y * 4]]
+
+        self.setCoords(v)
+        self.setUVs(uv)
+        self.setFaces(f, f, fg.idx)
+
         self.border = border
         self.texture = texture
         self.setCameraProjection(1)
@@ -84,19 +74,10 @@ class NineSliceMesh(module3d.Object3D):
         self.updateIndexBuffer()
     
     def resize(self, width, height):
-        
-        outer=[[0, 0], [width, height]]
-        inner=[[self.border[0], self.border[1]], [width - self.border[2], height - self.border[3]]]
-        
-        xc = [outer[0][0], inner[0][0], inner[1][0], outer[1][0]]
-        yc = [outer[0][1], inner[0][1], inner[1][1], outer[1][1]]
-        
-        i = 0
-        for y in yc:
-            for x in xc:  
-                self.verts[i].co = [x, y, 0.0]
-                i += 1
-        
+        xc = [0, self.border[0], width  - self.border[2], width]
+        yc = [0, self.border[1], height - self.border[3], height]
+        v = [(x, y, 0.0) for y in yc for x in xc]
+        self.changeCoords(v)
         self.update()
     
 class RectangleMesh(module3d.Object3D):
@@ -116,36 +97,41 @@ class RectangleMesh(module3d.Object3D):
 
         module3d.Object3D.__init__(self, 'rectangle_%s' % texture)
         
-        self.uvValues = []
-        self.indexBuffer = []
-        
         # create group
         fg = self.createFaceGroup('rectangle')
         
         # The 4 vertices
-        v = []
-        v.append(self.createVertex([0.0, 0.0, 0.0]))
-        v.append(self.createVertex([width, 0.0, 0.0]))
-        v.append(self.createVertex([width, height, 0.0]))
-        v.append(self.createVertex([0.0, height, 0.0]))
+        v = [
+            (0.0, 0.0, 0.0),
+            (width, 0.0, 0.0),
+            (width, height, 0.0),
+            (0.0, height, 0.0)
+            ]
         
         # The 4 uv values
-        uv = ([0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0])
+        uv = ((0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0))
         
         # The face
-        fg.createFace((v[3], v[2], v[1], v[0]), uv)
-                
+        fv = [(3,2,1,0)]
+        fuv = [(0,1,2,3)]
+
+        self.setCoords(v)
+        self.setUVs(uv)
+        self.setFaces(fv, fuv, fg.idx)
+
         self.texture = texture
         self.setCameraProjection(1)
         self.setShadeless(1)
         self.updateIndexBuffer()
         
     def resize(self, width, height):
-        
-        self.verts[1].co[0] = width
-        self.verts[2].co[0] = width
-        self.verts[2].co[1] = height
-        self.verts[3].co[1] = height
+        v = [
+            (0.0, 0.0, 0.0),
+            (width, 0.0, 0.0),
+            (width, height, 0.0),
+            (0.0, height, 0.0)
+            ]
+        self.changeCoords(v)
         self.update()     
        
 class FrameMesh(module3d.Object3D):
@@ -163,35 +149,39 @@ class FrameMesh(module3d.Object3D):
 
         module3d.Object3D.__init__(self, 'frame', 2)
         
-        self.uvValues = []
-        self.indexBuffer = []
-        
         # create group
         fg = self.createFaceGroup('frame')
-        
+
         # The 4 vertices
-        v = []
-        v.append(self.createVertex([0.0, 0.0, 0.0]))
-        v.append(self.createVertex([width, 0.0, 0.0]))
-        v.append(self.createVertex([width, height, 0.0]))
-        v.append(self.createVertex([0.0, height, 0.0]))
+        v = [
+            (0.0, 0.0, 0.0),
+            (width, 0.0, 0.0),
+            (width, height, 0.0),
+            (0.0, height, 0.0)
+            ]
         
-        # The face
-        fg.createFace((v[3], v[2]))
-        fg.createFace((v[2], v[1]))
-        fg.createFace((v[1], v[0]))
-        fg.createFace((v[0], v[3]))
+        # The 4 uv values
+        uv = ((0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0))
+        
+        # The faces
+        f = [(3,2),(2,1),(1,0),(0,3)]
+
+        self.setCoords(v)
+        self.setUVs(uv)
+        self.setFaces(f, f, fg.idx)
         
         self.setCameraProjection(1)
         self.setShadeless(1)
         self.updateIndexBuffer()
         
     def resize(self, width, height):
-        
-        self.verts[1].co[0] = width
-        self.verts[2].co[0] = width
-        self.verts[2].co[1] = height
-        self.verts[3].co[1] = height
+        v = [
+            (0.0, 0.0, 0.0),
+            (width, 0.0, 0.0),
+            (width, height, 0.0),
+            (0.0, height, 0.0)
+            ]
+        self.changeCoords(v)
         self.update()     
 
 class Cube(module3d.Object3D):
@@ -217,51 +207,44 @@ class Cube(module3d.Object3D):
         height = height or width
         depth = depth or width
         
-        self.uvValues = []
-        self.indexBuffer = []
-        
         # create group
         fg = self.createFaceGroup('cube')
         
         # The 8 vertices
-        v = []
-        v.append(mesh.createVertex(aljabr.vadd(position, [0,     0,      0])))     # 0         /0-----1\
-        v.append(mesh.createVertex(aljabr.vadd(position, [width, 0,      0])))     # 1        / |     | \
-        v.append(mesh.createVertex(aljabr.vadd(position, [width, height, 0])))     # 2       |4---------5|
-        v.append(mesh.createVertex(aljabr.vadd(position, [0,     height, 0])))     # 3       |  |     |  |
-        v.append(mesh.createVertex(aljabr.vadd(position, [0,     0,      depth]))) # 4       |  3-----2  |  
-        v.append(mesh.createVertex(aljabr.vadd(position, [width, 0,      depth]))) # 5       | /       \ |
-        v.append(mesh.createVertex(aljabr.vadd(position, [width, height, depth]))) # 6       |/         \|
-        v.append(mesh.createVertex(aljabr.vadd(position, [0,     height, depth]))) # 7       |7---------6|
+        v = [(x,y,z) for z in [0,depth] for y in [0,height] for x in [0,width]]
+
+        #         /0-----1\
+        #        / |     | \
+        #       |4---------5|
+        #       |  |     |  |
+        #       |  3-----2  |  
+        #       | /       \ |
+        #       |/         \|
+        #       |7---------6|
         
         # The 4 uv values
         #uv = ([0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0])
         
         # The 6 faces
-        fg.createFace((v[4], v[5], v[6], v[7])) # front
-        fg.createFace((v[1], v[0], v[3], v[2])) # back
-        fg.createFace((v[0], v[4], v[7], v[3])) # left
-        fg.createFace((v[5], v[1], v[2], v[6])) # right
-        fg.createFace((v[0], v[1], v[5], v[4])) # top
-        fg.createFace((v[7], v[6], v[2], v[3])) # bottom
-                
+        f = [
+            (4, 5, 6, 7), # front
+            (1, 0, 3, 2), # back
+            (0, 4, 7, 3), # left
+            (5, 1, 2, 6), # right
+            (0, 1, 5, 4), # top
+            (7, 6, 2, 3), # bottom
+            ]
+
+        self.setCoords(v)
+        # self.setUVs(uv)
+        self.setFaces(f, fg.idx)
+
         self.texture = texture
         self.setCameraProjection(0)
         self.setShadeless(0)
         self.updateIndexBuffer()
         
     def resize(self, width, height, depth):
-        
-        self.verts[1].co[0] = width
-        self.verts[2].co[0] = width
-        self.verts[5].co[0] = width
-        self.verts[6].co[0] = width
-        self.verts[2].co[1] = height
-        self.verts[3].co[1] = height
-        self.verts[6].co[1] = height
-        self.verts[7].co[1] = height
-        self.verts[4].co[1] = depth
-        self.verts[5].co[1] = depth
-        self.verts[6].co[1] = depth
-        self.verts[7].co[1] = depth
-        self.update()     
+        v = [(x,y,z) for z in [0,depth] for y in [0,height] for x in [0,width]]
+        self.changeCoords(v)
+        self.update()

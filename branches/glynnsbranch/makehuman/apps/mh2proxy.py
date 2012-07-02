@@ -838,13 +838,11 @@ def getMeshInfo(obj, proxy, rawWeights, rawShapes, rigname):
         shapes = getProxyShapes(rawShapes, proxy.verts)
         return (verts, vnormals, proxy.texVerts, faces, weights, shapes)
     else:
-        verts = []
-        vnormals = []
-        for v in obj.verts:
-            verts.append(v.co)
-            vnormals.append(v.no)
+        verts = [tuple(v) for v in obj.coord]
+        vnormals = [tuple(n) for n in obj.vnorm]
+        texcoords = [tuple(t) for t in obj.texco]
         faces = mhx_main.loadFacesIndices(obj)
-        return (verts, vnormals, obj.uvValues, faces, rawWeights, rawShapes)
+        return (verts, vnormals, texcoords, faces, rawWeights, rawShapes)
 
 #
 #    getProxyWeights(rawWeights, proxy):

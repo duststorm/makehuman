@@ -1,0 +1,491 @@
+
+import sys
+import math
+import atexit
+import numpy as np
+
+import OpenGL
+OpenGL.ERROR_CHECKING = False
+OpenGL.ERROR_ON_COPY = True
+from OpenGL.GL import *
+from OpenGL.GLU import *
+
+from core import *
+if G.use_pil:
+    import PIL.Image as img
+else:
+    import image_base as img
+
+g_primitiveMap = [GL_POINTS, GL_LINES, GL_TRIANGLES, GL_QUADS]
+
+def createShaderType(source, type):
+    if not bool(glCreateShader):
+        raise RuntimeError("No shader support detected")
+
+    v = glCreateShader(type)
+    glShaderSource(v, source)
+    glCompileShader(v)
+    if not glGetShaderiv(v, GL_COMPILE_STATUS):
+        log = glGetShaderInfoLog(v)
+        raise RuntimeError("Error compiling vertex shader: %s" % log)
+
+    return v
+
+def createVertexShader(source):
+    return createShaderType(source, GL_VERTEX_SHADER)
+
+def createFragmentShader(source):
+    return createShaderType(source, GL_FRAGMENT_SHADER)
+
+def createShader(vertexShader, fragmentShader):
+    if not bool(glCreateProgram):
+        raise RuntimeError("No shader support detected")
+
+    p = glCreateProgram()
+
+    glAttachShader(p, vertexShader)
+    glAttachShader(p, fragmentShader)
+
+    glLinkProgram(p)
+    if not glGetProgramiv(program, GL_LINK_STATUS):
+        raise RuntimeError("Error linking shader: %s" % glGetProgramInfoLog(program))
+
+    return p
+
+def grabScreen(x, y, width, height, filename):
+    if width <= 0 or height <= 0:
+        raise RuntimeError("width or height is 0")
+
+    # Draw before grabbing, to make sure we grab a rendering and not a picking buffer
+    draw()
+
+    viewport = glGetIntegerv(GL_VIEWPORT)
+
+    rwidth = (width + 3) / 4 * 4
+
+    surface = np.empty((height, rwidth, 3), dtype = np.uint8)
+
+    glReadPixels(x, viewport[3] - y - height, rwidth, height, GL_RGB, GL_UNSIGNED_BYTE, surface)
+    surface = img.fromstring('RGB', (width, height), surface[:,:width,:].tostring())
+    surface = surface.transpose(img.FLIP_TOP_BOTTOM)
+
+    surface.save(filename)
+
+pickingBuffer = None
+
+def updatePickingBuffer():
+    viewport = glGetIntegerv(GL_VIEWPORT)
+
+    width = viewport[2]
+    height = viewport[3]
+
+    # Resize the buffer in case the window size has changed
+    global pickingBuffer
+    if pickingBuffer is None or pickingBuffer.shape != (height, width, 3):
+        pickingBuffer = np.empty((height, width, 3), dtype = np.uint8)
+
+    # Turn off lighting
+    glDisable(GL_LIGHTING)
+
+    # Turn off antialiasing
+    glDisable(GL_BLEND)
+    glDisable(GL_MULTISAMPLE)
+
+    # Clear screen
+    glClearColor(0.0, 0.0, 0.0, 0.0)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+    for i, camera in enumerate(G.cameras):
+        cameraPosition(camera, 0)
+        drawMeshes(1, i)
+
+    # Make sure the data is 1 byte aligned
+    glPixelStorei(GL_PACK_ALIGNMENT, 1)
+    #glFlush()
+    #glFinish()
+    glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pickingBuffer)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+    # Turn on antialiasing
+    glEnable(GL_BLEND)
+    glEnable(GL_MULTISAMPLE)
+
+    # restore lighting
+    glEnable(GL_LIGHTING)
+
+    # draw()
+
+def getPickedColor(x, y):
+    viewport = glGetIntegerv(GL_VIEWPORT)
+
+    y = viewport[3] - y
+
+    if y < 0 or y >= viewport[3] or x < 0 or x >= viewport[2]:
+        G.color_picked = (0, 0, 0)
+        return
+
+    if pickingBuffer is None:
+        updatePickingBuffer()
+
+    G.color_picked = tuple(pickingBuffer[y,x,:])
+
+def reshape(w, h):
+    # Prevent a division by zero when minimising the window
+    if h == 0:
+        h = 1
+    # Set the drawable region of the window
+    glViewport(0, 0, w, h)
+    # set up the projection matrix
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+
+    # go back to modelview matrix so we can move the objects about
+    glMatrixMode(GL_MODELVIEW)
+    G.windowHeight = h
+    G.windowWidth = w
+
+    updatePickingBuffer()
+
+    callResize(w, h, False)
+
+def drawBegin():
+    # clear the screen & depth buffer
+    glClearColor(G.clearColor[0], G.clearColor[1], G.clearColor[2], G.clearColor[3])
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT)
+
+def drawEnd():
+    G.swapBuffers()
+
+def OnInit():
+    def A(*args):
+        return np.array(list(args), dtype=np.float32)
+
+    # Lights and materials
+    lightPos = A( -10.99, 20.0, 20.0, 1.0)  # Light - Position
+    ambientLight =  A(0.0, 0.0, 0.0, 1.0)   # Light - Ambient Values
+    diffuseLight =  A(1.0, 1.0, 1.0, 1.0)   # Light - Diffuse Values
+    specularLight = A(1.0, 1.0, 1.0, 1.0)   # Light - Specular Values
+
+    MatAmb = A(0.11, 0.11, 0.11, 1.0)       # Material - Ambient Values
+    MatDif = A(1.0, 1.0, 1.0, 1.0)          # Material - Diffuse Values
+    MatSpc = A(0.2, 0.2, 0.2, 1.0)          # Material - Specular Values
+    MatShn = A(10.0,)                       # Material - Shininess
+    MatEms = A(0.1, 0.05, 0.0, 1.0)         # Material - Emission Values
+
+    glEnable(GL_DEPTH_TEST)                                  # Hidden surface removal
+    # glEnable(GL_CULL_FACE)                                   # Inside face removal
+    # glEnable(GL_ALPHA_TEST)
+    # glAlphaFunc(GL_GREATER, 0.0)
+    glDisable(GL_DITHER)
+    glEnable(GL_LIGHTING)                                    # Enable lighting
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight)
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight)
+    glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight)
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPos)
+    glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR) #  If we enable this, we have stronger specular highlights
+    glMaterialfv(GL_FRONT, GL_AMBIENT, MatAmb)               # Set Material Ambience
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, MatDif)               # Set Material Diffuse
+    glMaterialfv(GL_FRONT, GL_SPECULAR, MatSpc)              # Set Material Specular
+    glMaterialfv(GL_FRONT, GL_SHININESS, MatShn)             # Set Material Shininess
+    # glMaterialfv(GL_FRONT, GL_EMISSION, MatEms)            # Set Material Emission
+    glEnable(GL_LIGHT0)
+    glEnable(GL_COLOR_MATERIAL)
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE)
+    # glEnable(GL_TEXTURE_2D)
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+    # Activate and specify pointers to vertex and normal array
+    glEnableClientState(GL_NORMAL_ARRAY)
+    glEnableClientState(GL_COLOR_ARRAY)
+    glEnableClientState(GL_VERTEX_ARRAY)
+
+def OnExit():
+    # Deactivate the pointers to vertex and normal array
+    glDisableClientState(GL_VERTEX_ARRAY)
+    glDisableClientState(GL_NORMAL_ARRAY)
+    # glDisableClientState(GL_TEXTURE_COORD_ARRAY)
+    glDisableClientState(GL_COLOR_ARRAY)
+    print "Exit from event loop\n"
+
+def cameraPosition(camera, eye):
+    stereoMode = 0
+    if eye:
+        stereoMode = camera.stereoMode
+
+    if stereoMode == 0:
+        # No stereo
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+
+        if camera.projection:
+            gluPerspective(camera.fovAngle, float(G.windowWidth) / float(G.windowHeight), camera.nearPlane, camera.farPlane)
+        elif camera.left == camera.right and camera.top == camera.bottom:
+            glOrtho(0.0, G.windowWidth, G.windowHeight, 0.0, camera.nearPlane, camera.farPlane)
+        else:
+            glOrtho(camera.left, camera.right, camera.bottom, camera.top, camera.nearPlane, camera.farPlane)
+
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
+        gluLookAt(camera.eyeX, camera.eyeY, camera.eyeZ,       # Eye
+                  camera.focusX, camera.focusY, camera.focusZ, # Focus
+                  camera.upX, camera.upY, camera.upZ)          # Up
+    elif stereoMode == 1:
+        # Toe-in method, uses different eye positions, same focus point and projection
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        gluPerspective(camera.fovAngle, float(G.windowWidth)/float(G.windowHeight), camera.nearPlane, camera.farPlane)
+
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
+
+        if eye == 1:
+            gluLookAt(camera.eyeX - 0.5 * camera.eyeSeparation, camera.eyeY, camera.eyeZ, # Eye
+                      camera.focusX, camera.focusY, camera.focusZ,                        # Focus
+                      camera.upX, camera.upY, camera.upZ)                                 # Up
+        elif eye == 2:
+            gluLookAt(camera.eyeX + 0.5 * camera.eyeSeparation, camera.eyeY, camera.eyeZ, # Eye
+                      camera.focusX, camera.focusY, camera.focusZ,                        # Focus
+                      camera.upX, camera.upY, camera.upZ)                                 # Up
+    elif stereoMode == 2:
+        # Off-axis method, uses different eye positions, focus points and projections
+        aspectratio = float(G.windowWidth) / float(G.windowHeight)
+        widthdiv2 = math.tan(math.radians(camera.fovAngle) / 2) * camera.nearPlane
+        left  = - aspectratio * widthdiv2
+        right = aspectratio * widthdiv2
+        top = widthdiv2
+        bottom = -widthdiv2
+
+        if eye == 1:        # Left
+            eyePosition = -0.5 * camera.eyeSeparation
+        elif eye == 2:      # Right
+            eyePosition = 0.5 * camera.eyeSeparation
+        else:
+            eyePosition = 0.0
+
+        left -= eyePosition * camera.nearPlane / camera.eyeZ
+        right -= eyePosition * camera.nearPlane / camera.eyeZ
+
+        # Left frustum is moved right, right frustum moved left
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        glFrustum(left, right, bottom, top, camera.nearPlane, camera.farPlane)
+
+        # Left camera is moved left, right camera moved right
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
+        gluLookAt(camera.eyeX + eyePosition, camera.eyeY, camera.eyeZ,       # Eye
+                  camera.focusX + eyePosition, camera.focusY, camera.focusZ, # Focus
+                  camera.upX, camera.upY, camera.upZ)                        # Up
+
+def transformObject(obj):
+    glTranslatef(obj.x, obj.y, obj.z)
+    glRotatef(obj.rx, 1, 0, 0)
+    glRotatef(obj.ry, 0, 1, 0)
+    glRotatef(obj.rz, 0, 0, 1)
+    glScalef(obj.sx, obj.sy, obj.sz)
+
+def objectTransform(obj):
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
+    transformObject(obj)
+    matrix = glGetDoublev(GL_MODELVIEW_MATRIX)
+    return tuple(matrix)
+
+def drawMesh(obj, cameraType):
+    if obj.cameraMode != cameraType:
+        return
+    if not obj.visibility:
+        return
+
+    glDepthFunc(GL_LEQUAL)
+
+    # Transform the current object
+    glPushMatrix()
+    transformObject(obj)
+
+    if obj.texture and obj.solid:
+        glEnable(GL_TEXTURE_2D)
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY)
+        glBindTexture(GL_TEXTURE_2D, obj.texture)
+        glTexCoordPointer(2, GL_FLOAT, 0, obj.UVs)
+
+        if obj.nTransparentPrimitives:
+            obj.sortFaces()
+
+    # Fill the array pointers with object mesh data
+    glVertexPointer(3, GL_FLOAT, 0, obj.verts)
+    glNormalPointer(GL_FLOAT, 0, obj.norms)
+    glColorPointer(4, GL_UNSIGNED_BYTE, 0, obj.color)
+
+    # Disable lighting if the object is shadeless
+    if obj.shadeless:
+        glDisable(GL_LIGHTING)
+
+    # Enable the shader if the driver supports it and there is a shader assigned
+    if obj.shader and obj.solid:
+        if bool(glUseProgram):
+            glUseProgram(obj.shader)
+
+            # This should be optimized, since we only need to do it when it's changed
+            # Validation should also only be done when it is set
+            if obj.shaderParameters:
+                parameterCount = 0
+                currentTextureSampler = 1
+
+                parameterCount = glGetProgramiv(obj.shader, GL_ACTIVE_UNIFORMS)
+
+                for index in xrange(parameterCount):
+                    name, size, type = glGetActiveUniform(obj.shader, index)
+
+                    value = obj.shaderParameters.get(name)
+
+                    if value is not None:
+                        if type == GL_FLOAT:
+                            glUniform1f(index, value)
+                        elif type == GL_FLOAT_VEC2:
+                            if hasattr(value, '__len__') and len(value) == 2:
+                                glUniform2f(index, *value)
+                        elif type == GL_FLOAT_VEC3:
+                            if hasattr(value, '__len__') and len(value) == 3:
+                                glUniform3f(index, *value)
+                        elif type == GL_FLOAT_VEC4:
+                            if hasattr(value, '__len__') and len(value) == 4:
+                                glUniform4f(index, *value)
+                        elif type == GL_SAMPLER_1D:
+                            glActiveTexture(GL_TEXTURE0 + currentTextureSampler)
+                            glBindTexture(GL_TEXTURE_1D, value)
+                            glUniform1i(index, currentTextureSampler)
+                            currentTextureSampler += 1
+                        elif type == GL_SAMPLER_2D:
+                            glActiveTexture(GL_TEXTURE0 + currentTextureSampler)
+                            glBindTexture(GL_TEXTURE_2D, value)
+                            glUniform1i(index, currentTextureSampler)
+                            currentTextureSampler += 1
+
+    # draw the mesh
+    if not obj.solid:
+        glDisableClientState(GL_COLOR_ARRAY)
+        glColor3f(0.0, 0.0, 0.0)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+        glDrawElements(g_primitiveMap[obj.vertsPerPrimitive-1], obj.primitives.size, GL_UNSIGNED_INT, obj.primitives)
+        glEnableClientState(GL_COLOR_ARRAY)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+        glEnable(GL_POLYGON_OFFSET_FILL)
+        glPolygonOffset(1.0, 1.0)
+        glDrawElements(g_primitiveMap[obj.vertsPerPrimitive-1], obj.primitives.size, GL_UNSIGNED_INT, obj.primitives)
+        glDisable(GL_POLYGON_OFFSET_FILL)
+    elif obj.nTransparentPrimitives:
+        glDepthMask(GL_FALSE)
+        glEnable(GL_ALPHA_TEST)
+        glAlphaFunc(GL_GREATER, 0.0)
+        glDrawElements(g_primitiveMap[obj.vertsPerPrimitive-1], obj.primitives.size, GL_UNSIGNED_INT, obj.primitives)
+        glDisable(GL_ALPHA_TEST)
+        glDepthMask(GL_TRUE)
+    else:
+        glDrawElements(g_primitiveMap[obj.vertsPerPrimitive-1], obj.primitives.size, GL_UNSIGNED_INT, obj.primitives)
+
+    if obj.solid and not obj.nTransparentPrimitives:
+        glDisableClientState(GL_COLOR_ARRAY)
+        for i, (start, count) in enumerate(obj.groups):
+            color = obj.gcolor(i)
+            if color is None or np.all(color[:3] == 255):
+                continue
+            glColor4ub(*color)
+            indices = obj.primitives[start:start+count,:]
+            glDrawElements(g_primitiveMap[obj.vertsPerPrimitive-1], indices.size, GL_UNSIGNED_INT, indices)
+        glEnableClientState(GL_COLOR_ARRAY)
+
+    # Disable the shader if the driver supports it and there is a shader assigned
+    if obj.shader and obj.solid:
+        if bool(glUseProgram):
+            glUseProgram(0)
+        glActiveTexture(GL_TEXTURE0)
+
+    # Enable lighting if the object was shadeless
+    if obj.shadeless:
+        glEnable(GL_LIGHTING)
+
+    if obj.texture and obj.solid:
+        glDisable(GL_TEXTURE_2D)
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY)
+
+    glPopMatrix()
+
+def pickMesh(obj, cameraType):
+    if obj.cameraMode != cameraType:
+        return
+    if not obj.visibility:
+        return
+    if not obj.pickable:
+        return
+
+    # Transform the current object
+    glPushMatrix()
+    transformObject(obj)
+
+    # Fill the array pointers with object mesh data
+    glVertexPointer(3, GL_FLOAT, 0, obj.verts)
+    glNormalPointer(GL_FLOAT, 0, obj.norms)
+
+    # Use color to pick i
+    glDisableClientState(GL_COLOR_ARRAY)
+
+    # Disable lighting
+    glDisable(GL_LIGHTING)
+
+    # draw the meshes
+    for i, (start, count) in enumerate(obj.groups):
+        glColor3ub(*obj.clrid(i))
+        indices = obj.primitives[start:start+count,:]
+        glDrawElements(g_primitiveMap[obj.vertsPerPrimitive-1], indices.size, GL_UNSIGNED_INT, indices)
+
+    glEnable(GL_LIGHTING)
+    glEnableClientState(GL_COLOR_ARRAY)
+
+    glPopMatrix()
+
+def drawMeshes(pickMode, cameraType):
+    if G.world is None:
+        return
+
+    # Draw all objects contained by G.world
+    for obj in G.world:
+        if pickMode:
+            if hasattr(obj, 'pick'):
+                obj.pick(cameraType)
+        else:
+            if hasattr(obj, 'draw'):
+                obj.draw(cameraType)
+
+def draw():
+    drawBegin()
+
+    for i, camera in enumerate(G.cameras):
+        # draw the objects in dynamic camera
+        if camera.stereoMode:
+            glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE) # Red
+            cameraPosition(camera, 1)
+            drawMeshes(0, i)
+            glClear(GL_DEPTH_BUFFER_BIT)
+            glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE) # Cyan
+            cameraPosition(camera, 2)
+            drawMeshes(0, i)
+            # To prevent the GUI from overwritting the red model, we need to render it again in the z-buffer
+            glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE) # None, only z-buffer
+            cameraPosition(camera, 1)
+            drawMeshes(0, i)
+            glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE) # All
+        else:
+            cameraPosition(camera, 0)
+            drawMeshes(0, i)
+
+    drawEnd()
+
+def drawOneMesh(obj):
+    drawEnd()
+    #drawBegin()
+    glClear(GL_DEPTH_BUFFER_BIT)
+    cameraPosition(G.cameras[obj.cameraMode], 0)
+    obj.draw(obj.cameraMode)
+    drawEnd()
+
