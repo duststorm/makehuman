@@ -1,0 +1,104 @@
+
+# ----------------------------- MESH --------------------- # 
+
+  *** Verts
+  end Verts
+
+  Faces
+  *** Faces
+
+    ftn 227 0 1 ;
+    ftn 166 1 1 ;
+    ftn 150 0 1 ;
+    ftn 383 1 1 ;
+    ftn 71 0 1 ;
+    ftn 394 1 1 ;
+    ftn 55 0 1 ;
+    ftn 20 1 1 ;
+    ftn 4 0 1 ;
+    ftn 164 1 1 ;
+    ftn 11 0 1 ;
+    ftn 135 1 1 ;
+    ftn 34 0 1 ;
+    ftn 992 4 1 ;
+    ftn 278 0 1 ;
+    ftn 177 2 1 ;
+    ftn 3013 0 1 ;
+    ftn 1019 1 1 ;
+    ftn 1740 0 1 ;
+    ftn 177 2 1 ;
+    ftn 3009 0 1 ;
+    ftn 1019 1 1 ;
+    ftn 900 0 1 ;
+    ftn 176 2 1 ;
+    ftn 161 3 1 ;
+    ftn 176 2 1 ;
+    ftn 161 3 1 ;
+    ftn 714 7 1 ;
+    ftn 2390 5 1 ;
+
+  *** EndFaces
+  end Faces
+  
+  MeshTextureFaceLayer UVTex
+    Data 
+  *** TexVerts
+    end Data
+    active True ;
+    active_clone True ;
+    active_render True ;
+  end MeshTextureFaceLayer  
+  *** Materials
+  *** VertexGroup
+end Mesh
+
+*** human-object Mesh
+  layers Array 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  ;
+#if toggle&T_Armature
+  *** toggleCage
+    Modifier MeshDeform MESH_DEFORM
+      invert_vertex_group False ;
+      *** refer-human object CageMesh ;
+      precision 6 ;
+      use_dynamic_bind True ;
+    end Modifier
+    Modifier Armature ARMATURE
+      invert_vertex_group False ;
+      *** refer-human object
+      use_bone_envelopes False ;
+      use_deform_preserve_volume False ;
+      use_multi_modifier True ;
+      use_vertex_groups True ;
+      vertex_group 'Cage' ;
+    end Modifier
+  #else
+    Modifier Armature ARMATURE
+      *** refer-human object
+      use_bone_envelopes False ;
+      use_vertex_groups True ;
+    end Modifier
+  #endif
+  *** refer-human parent
+  parent_type 'OBJECT' ;
+#endif
+  color Array 1.0 1.0 1.0 1.0  ;
+  select True ;
+  lock_location Array 1 1 1 ; 
+  lock_rotation Array 1 1 1 ;
+  lock_scale Array 1 1 1  ; 
+  Property MhxScale theScale ;
+  Property MhxMesh True ;
+  Modifier SubSurf SUBSURF
+    levels 0 ;
+    render_levels 1 ;
+  end Modifier
+end Object
+
+*** MeshAnimationData
+
+#if toggle&T_Armature
+# *** rig-process
+#endif
+
+
+

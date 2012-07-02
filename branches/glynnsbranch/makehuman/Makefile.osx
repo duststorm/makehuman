@@ -1,0 +1,156 @@
+#######################################################################
+# Makefile to build MakeHuman for Mac OS-X
+# ---------------------------------------------------------------------
+# This Makefile requires a installation of the Apple Developer-Tools
+# Which are available at http://developer.apple.com/technology/xcode.html
+#######################################################################
+
+DEPS=src/core.d src/main.d src/glmodule.d
+PYTHON_VER=2.7
+RM=rm -rf
+
+
+# Adapt this according your XCode 3.x installation. If you have no Xcode 3.x installed
+# then just leave it. This makefile is smart enough to detect this ;)
+EXPECTED_XCODE3_DIR=/Developer3
+
+# ========================================================================================
+# An Universal build of MakeHuman requires an Xcode version *prior* of 4.x !
+# That is because apple dropped PPC Support in Xcode 4.x.
+# The recommended version of Xcode for an Universal Build is 3.2.5.
+#
+# However it is possible to build MakeHuman even on Macs which runs on newer Version
+# as Mc OS X 10.5.x. In this case you have to install Xcode 3.2.5. It makes no harm
+# if you have installed Xcode 4.x already! Both version can be installed on the same machine.
+#
+# If you want to have a *parallel* installation of Xcode 4 and Xcode 3 you have to follow
+# this rule: Change the install path of Xcode 3.2.5 from /Developer to /Developer3
+#
+# -------------------------------------------------------------------------
+# This makefile is smart enough to detect this:
+#  1) If the Build host is Mac OS 10.5 then the Xcode toolchain (among the SDKs) are
+#     searched at the default location (which is part of $(PATH) already).
+#
+#  2) If the build host is *not* 10.5 - which means that you have installed Snow Leo,
+#     Lion or newer then the Makefile will look if you have installed Xcode 3.2.x either.
+#     If this is the case then this compiler will be used and a Universal Build will be
+#     done.
+#     Otherwise Xcode 4.x will be used and a nativ build will be triggered
+# ========================================================================================
+
+DEVELOPER3_EXISTS = $(strip $(wildcard $(EXPECTED_XCODE3_DIR)))
+HOST_OS_MAJOR_NUM=$(firstword $(subst ., ,$(shell uname -r)))
+OS_RELEASE_NR_FOR_10_5=9
+
+ifneq ($(HOST_OS_MAJOR_NUM),$(OS_RELEASE_NR_FOR_10_5)) # 9 because relevant for Build hosts running on Mac OS 10.5 only!
+	ifneq ($(DEVELOPER3_EXISTS),)
+        PERFORM_UNIVERSAL_BUILD=1
+    	XCODE_BUILD=$(EXPECTED_XCODE3_DIR)/usr/bin/xcodebuild
+    else
+    	XCODE_BUILD=xcodebuild
+	endif
+else
+    PERFORM_UNIVERSAL_BUILD=1
+	XCODE_BUILD=xcodebuild
+endif
+
+# Select the toolchain and the build targets according if we perform an universal Build or not...
+ifeq ($(PERFORM_UNIVERSAL_BUILD),1)
+	DEBUG_CONFIG="Debug_10.5Universal"
+	RELEASE_CONFIG="Release_10.5Universal"
+	NIGHTLY_CONFIG="NightlyBuild_10.5Universal"
+else
+	DEBUG_CONFIG="Debug"
+	RELEASE_CONFIG="Release"
+	NIGHTLY_CONFIG="NightlyBuild"
+endif
+
+XCODE_COMMON_BUILD_OPTS=-project os-x/MakeHuman.xcodeproj -target MakeHuman
+
+cleanbuild: clean build
+
+build: debug
+
+release: clean_release
+	@$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -configuration $(RELEASE_CONFIG) build
+
+	# Create an installer package...
+	hdiutil create -srcfolder os-x/build/Release/ -ov -volname MakeHuman MakeHuman.dmg
+
+debug:
+	@$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -configuration $(DEBUG_CONFIG) build
+
+# A nightly build performs a clean of the (probably) last nightly build artifacts first!
+# -> Make a clean build.
+nightlybuild: clean_nightly
+	@$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -configuration $(NIGHTLY_CONFIG) build
+
+nightlybuild_10.5: nightlybuild
+
+queryopts:
+	@$(XCODE_BUILD) -project os-x/MakeHuman.xcodeproj -list
+
+module: mh.so mhproto_doc
+
+mhproto_doc:
+	cd docs; doxygen ./configs/doxygen_html_config_osx.txt
+
+
+mh.so:
+	@echo "building mh.so ..."
+	@g++ -DMAKEHUMAN_AS_MODULE -arch ppc -arch i386 -Wall -O2 \
+	                       os-x/src/NSFont_OpenGL.m \
+	                       os-x/src/GeneralPreferences.mm \
+	                       os-x/src/SDLMain.mm src/core.c \
+	                       src/main.c \
+	                       src/glmodule.c \
+	                       -I/usr/include/python$(PYTHON_VER)/ \
+	                       -I./include/ \
+	                       -I./os-x/include/ \
+	                       -I./os-x/frameworks/SDL.framework/Headers/ \
+	                       --shared \
+	                       -Fos-x/frameworks/ \
+	                       -framework SDL\
+	                       -framework SDL_image \
+	                       -framework Python \
+	                       -framework GLUT \
+	                       -framework OpenGL \
+	                       -framework Cocoa \
+	                       -dynamiclib -o mh.so
+
+fixmesh:
+	@make -C utils/fixmesh/ -f Makefile.osx
+
+# ---------------------------------------------------------------------
+# Create the API documentation
+# ---------------------------------------------------------------------
+doc:
+	cd docs; doxygen configs/doxygen_html_config.txt
+
+# ---------------------------------------------------------------------
+# Cleanup unused stuff
+# ---------------------------------------------------------------------
+clean: clean_release clean_nightly clean_debug
+	@$(RM) $(OBJS) $(DEPS) *.obj *~ *.bak *%% *~ src/*.o src/*.d mh.so docs/mhproto_cdoc/*
+	@make -C utils/fixmesh/ -f Makefile.osx clean
+
+clean_release:
+	$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -target MakeHuman -configuration $(RELEASE_CONFIG)  clean
+
+clean_nightly:
+	$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -target MakeHuman -configuration $(NIGHTLY_CONFIG)  clean
+
+clean_debug:
+	$(RM) $(OBJS) $(DEPS) *.obj *~ *.bak *%% *~ src/*.o src/*.d mh.so docs/mhproto_cdoc/*
+	$(XCODE_BUILD) $(XCODE_COMMON_BUILD_OPTS) -target MakeHuman -configuration $(DEBUG_CONFIG)  clean
+
+up:
+	@echo "Updating von SVN ..."
+	svn up
+	@make clean
+	@make debug
+# ---------------------------------------------------------------------
+# Include dependencies if exists
+# ---------------------------------------------------------------------
+-include $(DEPS)
+

@@ -1,0 +1,67 @@
+# Written by makehuman 1.0.0 alpha 5
+version 1.0.0
+tags africa-khoisan-female-child
+gender 0.000000
+age 0.000000
+muscle 0.723404
+weight 0.351064
+height -0.617021
+detail l-lowerleg-scale-horiz-incr 0.650000
+detail r-lowerleg-scale-vert-incr 0.750000
+detail l-upperleg-scale-vert-incr 0.050000
+detail hip-trans-forward 1.000000
+detail torso-scale-horiz-decr 0.300000
+detail l-upperarm-scale-vert-incr 0.450000
+detail r-upperarm-scale-vert-incr 0.450000
+microdetail l-torso-upper-shoulder-scale-vert-decr 0.800000
+detail r-upperleg-scale-vert-incr 0.050000
+detail jaw-scale-horiz-decr 0.350000
+detail head-scale-horiz-incr 0.400000
+detail hip-scale-depth-decr 0.800000
+detail l-upperleg-scale-horiz-decr 0.450000
+detail mouth-scale-horiz-incr 0.200000
+detail hip-trans-down 0.150000
+detail head-scale-vert-incr 0.100000
+detail pelvis-scale-vert-decr 0.050000
+microdetail nose-glabella-scale-vert-decr 0.550000
+detail hip-scale-vert-decr 0.100000
+detail r-lowerleg-scale-horiz-incr 0.650000
+detail nose-scale-horiz-incr 0.300000
+microdetail nose-sellion-scale-horiz-incr 0.450000
+detail l-lowerarm-scale-horiz-incr 0.700000
+microdetail nose-glabella-scale-depth-incr 0.500000
+microdetail r-head-zygoma-trans-in -0.400000
+microdetail l-head-zygoma-trans-out -0.400000
+detail torso-scale-vert-incr 0.100000
+microdetail r-torso-upper-shoulder-scale-vert-decr 0.800000
+detail mouth-scale-vert-decr 0.100000
+detail pelvis-trans-down 0.250000
+detail mouth-trans-forward 0.450000
+detail jaw-scale-vert-incr 0.100000
+detail pelvis-trans-forward 0.050000
+detail hip-scale-horiz-incr 0.100000
+detail pelvis-scale-depth-decr 0.150000
+detail l-lowerleg-scale-vert-incr 0.750000
+detail r-lowerarm-scale-horiz-incr 0.700000
+detail mouth-scale-depth-incr 0.350000
+microdetail jaw-chin-trans-down 0.350000
+detail r-upperleg-scale-horiz-decr 0.450000
+genitals 0.000000
+buttocks -0.638298
+stomach -0.404255
+faceAngle -0.425532
+breastFirmness 0.340426
+breastSize 0.117021
+headAge -0.574468
+pelvisTone 0.000000
+ethnic africa-khoisan-female-child 1.000000
+face nose2 0.117247
+face nose1 0.781250
+face mouth2 0.049796
+face head4 0.348574
+face mouth3 0.162970
+face head3 0.119511
+face jaw1 0.019805
+face eyes3 0.047079
+face eyes2 0.697917
+skinTexture texture_african.tif

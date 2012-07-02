@@ -1,0 +1,22 @@
+# --------------- Shapekeys ----------------------------- # 
+
+*** proxy-shapeKey
+#if toggle&T_Mesh
+*** mesh-shapeKey
+#endif
+
+# --------------- Actions ----------------------------- # 
+
+#if toggle&T_Armature
+# *** rig-actions
+*** rig-poses
+*** rig-drivers
+*** rig-correct
+#endif 
+
+# *** material-drivers
+
+# ---------------- Groups -------------------------------- # 
+
+*** group
+ 
