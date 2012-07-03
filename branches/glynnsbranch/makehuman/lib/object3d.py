@@ -8,6 +8,7 @@ class Object3D(object):
         self.texture = 0
         self.shader = 0
         self.nTransparentPrimitives = 0
+        self.uniforms = None
 
     @property
     def verts(self):

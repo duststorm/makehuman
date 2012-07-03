@@ -27,7 +27,10 @@ _types = {
     '.xpm':  wx.BITMAP_TYPE_XPM
     }
 
-def save(path, ext, data):
+def save(path, data):
+    base, ext = os.path.splitext(path)
+    ext = ext.lower()
+
     h, w, d = data.shape
     if d == 1:
         data = np.dstack((data, data, data))

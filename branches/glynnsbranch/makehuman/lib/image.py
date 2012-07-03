@@ -1,8 +1,4 @@
-from core import G
-if G.use_pil:
-    import PIL.Image as img
-else:
-    import image_base as img
+import image_base as img
 
 class Image(object):
     def __new__(cls, *args, **kwargs):
@@ -23,7 +19,7 @@ class Image(object):
         "Loads the specified image from file"
         self.surface = img.open(path)
         if self.surface.mode not in ("L", "RGB", "RGBA"):
-            self.surface = self.surface.convert("RGBA");
+            self.surface = self.surface.convert("RGBA")
 
     def save(self, path):
         if self.surface is None:
@@ -34,12 +30,7 @@ class Image(object):
         if self.surface is None:
             raise RuntimeError("image not initialized")
 
-        if width * height < self.width * self.height:
-            filter = img.ANTIALIAS
-        else:
-            filter = img.BILINEAR
-
-        return self.surface.resize((width, height), filter)
+        return self.surface.resize(width, height)
 
     def resized(self, width, height):
         im = Image()

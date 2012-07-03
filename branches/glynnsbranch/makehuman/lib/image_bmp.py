@@ -1,7 +1,13 @@
+import os
 import struct
 import numpy as np
 
 def save(path, data):
+    base, ext = os.path.splitext(path)
+    ext = ext.lower()
+    if ext != '.bmp':
+        raise NotImplementedError()
+        
     h, w, c = data.shape
 
     rowsize = w * c

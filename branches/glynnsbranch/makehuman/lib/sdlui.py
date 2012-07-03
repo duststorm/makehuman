@@ -346,7 +346,7 @@ def eventLoop():
                 keyUp(event.key.keysym.sym, event.key.keysym.unicode, event.key.keysym.mod)
 
         elif event.type == SDL_MOUSEMOTION:
-            if sys.platform in ('win32', 'darwin'):
+            if True: # sys.platform in ('win32', 'darwin'):
                 mouseMotion(event.motion.state, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel)
             else:
                 x = c_int()

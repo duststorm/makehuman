@@ -11,10 +11,8 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 
 from core import *
-if G.use_pil:
-    import PIL.Image as img
-else:
-    import image_base as img
+import image_base as img
+import matrix
 
 g_primitiveMap = [GL_POINTS, GL_LINES, GL_TRIANGLES, GL_QUADS]
 
@@ -59,25 +57,21 @@ def grabScreen(x, y, width, height, filename):
     # Draw before grabbing, to make sure we grab a rendering and not a picking buffer
     draw()
 
-    viewport = glGetIntegerv(GL_VIEWPORT)
-
     rwidth = (width + 3) / 4 * 4
 
     surface = np.empty((height, rwidth, 3), dtype = np.uint8)
 
-    glReadPixels(x, viewport[3] - y - height, rwidth, height, GL_RGB, GL_UNSIGNED_BYTE, surface)
-    surface = img.fromstring('RGB', (width, height), surface[:,:width,:].tostring())
-    surface = surface.transpose(img.FLIP_TOP_BOTTOM)
+    glReadPixels(x, G.windowHeight - y - height, rwidth, height, GL_RGB, GL_UNSIGNED_BYTE, surface)
+    surface = img.fromdata(surface[:,:width,:])
+    surface = surface.flip_vertical()
 
     surface.save(filename)
 
 pickingBuffer = None
 
 def updatePickingBuffer():
-    viewport = glGetIntegerv(GL_VIEWPORT)
-
-    width = viewport[2]
-    height = viewport[3]
+    width = G.windowWidth
+    height = G.windowHeight
 
     # Resize the buffer in case the window size has changed
     global pickingBuffer
@@ -116,11 +110,9 @@ def updatePickingBuffer():
     # draw()
 
 def getPickedColor(x, y):
-    viewport = glGetIntegerv(GL_VIEWPORT)
+    y = G.windowHeight - y
 
-    y = viewport[3] - y
-
-    if y < 0 or y >= viewport[3] or x < 0 or x >= viewport[2]:
+    if y < 0 or y >= G.windowHeight or x < 0 or x >= G.windowWidth:
         G.color_picked = (0, 0, 0)
         return
 
@@ -208,88 +200,58 @@ def OnExit():
     print "Exit from event loop\n"
 
 def cameraPosition(camera, eye):
-    stereoMode = 0
-    if eye:
-        stereoMode = camera.stereoMode
-
-    if stereoMode == 0:
-        # No stereo
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-
-        if camera.projection:
-            gluPerspective(camera.fovAngle, float(G.windowWidth) / float(G.windowHeight), camera.nearPlane, camera.farPlane)
-        elif camera.left == camera.right and camera.top == camera.bottom:
-            glOrtho(0.0, G.windowWidth, G.windowHeight, 0.0, camera.nearPlane, camera.farPlane)
-        else:
-            glOrtho(camera.left, camera.right, camera.bottom, camera.top, camera.nearPlane, camera.farPlane)
-
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
-        gluLookAt(camera.eyeX, camera.eyeY, camera.eyeZ,       # Eye
-                  camera.focusX, camera.focusY, camera.focusZ, # Focus
-                  camera.upX, camera.upY, camera.upZ)          # Up
-    elif stereoMode == 1:
-        # Toe-in method, uses different eye positions, same focus point and projection
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        gluPerspective(camera.fovAngle, float(G.windowWidth)/float(G.windowHeight), camera.nearPlane, camera.farPlane)
-
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
-
-        if eye == 1:
-            gluLookAt(camera.eyeX - 0.5 * camera.eyeSeparation, camera.eyeY, camera.eyeZ, # Eye
-                      camera.focusX, camera.focusY, camera.focusZ,                        # Focus
-                      camera.upX, camera.upY, camera.upZ)                                 # Up
-        elif eye == 2:
-            gluLookAt(camera.eyeX + 0.5 * camera.eyeSeparation, camera.eyeY, camera.eyeZ, # Eye
-                      camera.focusX, camera.focusY, camera.focusZ,                        # Focus
-                      camera.upX, camera.upY, camera.upZ)                                 # Up
-    elif stereoMode == 2:
-        # Off-axis method, uses different eye positions, focus points and projections
-        aspectratio = float(G.windowWidth) / float(G.windowHeight)
-        widthdiv2 = math.tan(math.radians(camera.fovAngle) / 2) * camera.nearPlane
-        left  = - aspectratio * widthdiv2
-        right = aspectratio * widthdiv2
-        top = widthdiv2
-        bottom = -widthdiv2
-
-        if eye == 1:        # Left
-            eyePosition = -0.5 * camera.eyeSeparation
-        elif eye == 2:      # Right
-            eyePosition = 0.5 * camera.eyeSeparation
-        else:
-            eyePosition = 0.0
-
-        left -= eyePosition * camera.nearPlane / camera.eyeZ
-        right -= eyePosition * camera.nearPlane / camera.eyeZ
-
-        # Left frustum is moved right, right frustum moved left
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        glFrustum(left, right, bottom, top, camera.nearPlane, camera.farPlane)
-
-        # Left camera is moved left, right camera moved right
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
-        gluLookAt(camera.eyeX + eyePosition, camera.eyeY, camera.eyeZ,       # Eye
-                  camera.focusX + eyePosition, camera.focusY, camera.focusZ, # Focus
-                  camera.upX, camera.upY, camera.upZ)                        # Up
+    proj, mv = camera.getMatrices(eye)
+    glMatrixMode(GL_PROJECTION)
+    glLoadMatrixd(np.ascontiguousarray(proj.T))
+    glMatrixMode(GL_MODELVIEW)
+    glLoadMatrixd(np.ascontiguousarray(mv.T))
 
 def transformObject(obj):
-    glTranslatef(obj.x, obj.y, obj.z)
-    glRotatef(obj.rx, 1, 0, 0)
-    glRotatef(obj.ry, 0, 1, 0)
-    glRotatef(obj.rz, 0, 0, 1)
-    glScalef(obj.sx, obj.sy, obj.sz)
+    glMultMatrixd(np.ascontiguousarray(objectTransform(obj).T))
 
 def objectTransform(obj):
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
-    transformObject(obj)
-    matrix = glGetDoublev(GL_MODELVIEW_MATRIX)
-    return tuple(matrix)
+    m = matrix.translate((obj.x, obj.y, obj.z))
+    m = m * matrix.rotx(obj.rx)
+    m = m * matrix.roty(obj.ry)
+    m = m * matrix.rotz(obj.rz)
+    m = m * matrix.scale((obj.sx, obj.sy, obj.sz))
+    return m
+
+def setObjectUniforms(obj):
+    if obj.uniforms is None:
+        obj.uniforms = []
+        parameterCount = glGetProgramiv(obj.shader, GL_ACTIVE_UNIFORMS)
+        for index in xrange(parameterCount):
+            name, size, type = glGetActiveUniform(obj.shader, index)
+            obj.uniforms.append((name, size, type))
+
+    currentTextureSampler = 1
+
+    for index, (name, size, type) in enumerate(obj.uniforms):
+        value = obj.shaderParameters.get(name)
+
+        if value is not None:
+            if type == GL_FLOAT:
+                glUniform1f(index, value)
+            elif type == GL_FLOAT_VEC2:
+                if hasattr(value, '__len__') and len(value) == 2:
+                    glUniform2f(index, *value)
+            elif type == GL_FLOAT_VEC3:
+                if hasattr(value, '__len__') and len(value) == 3:
+                    glUniform3f(index, *value)
+            elif type == GL_FLOAT_VEC4:
+                if hasattr(value, '__len__') and len(value) == 4:
+                    glUniform4f(index, *value)
+            elif type == GL_SAMPLER_1D:
+                glActiveTexture(GL_TEXTURE0 + currentTextureSampler)
+                glBindTexture(GL_TEXTURE_1D, value)
+                glUniform1i(index, currentTextureSampler)
+                currentTextureSampler += 1
+            elif type == GL_SAMPLER_2D:
+                glActiveTexture(GL_TEXTURE0 + currentTextureSampler)
+                glBindTexture(GL_TEXTURE_2D, value)
+                glUniform1i(index, currentTextureSampler)
+                currentTextureSampler += 1
 
 def drawMesh(obj, cameraType):
     if obj.cameraMode != cameraType:
@@ -329,38 +291,7 @@ def drawMesh(obj, cameraType):
             # This should be optimized, since we only need to do it when it's changed
             # Validation should also only be done when it is set
             if obj.shaderParameters:
-                parameterCount = 0
-                currentTextureSampler = 1
-
-                parameterCount = glGetProgramiv(obj.shader, GL_ACTIVE_UNIFORMS)
-
-                for index in xrange(parameterCount):
-                    name, size, type = glGetActiveUniform(obj.shader, index)
-
-                    value = obj.shaderParameters.get(name)
-
-                    if value is not None:
-                        if type == GL_FLOAT:
-                            glUniform1f(index, value)
-                        elif type == GL_FLOAT_VEC2:
-                            if hasattr(value, '__len__') and len(value) == 2:
-                                glUniform2f(index, *value)
-                        elif type == GL_FLOAT_VEC3:
-                            if hasattr(value, '__len__') and len(value) == 3:
-                                glUniform3f(index, *value)
-                        elif type == GL_FLOAT_VEC4:
-                            if hasattr(value, '__len__') and len(value) == 4:
-                                glUniform4f(index, *value)
-                        elif type == GL_SAMPLER_1D:
-                            glActiveTexture(GL_TEXTURE0 + currentTextureSampler)
-                            glBindTexture(GL_TEXTURE_1D, value)
-                            glUniform1i(index, currentTextureSampler)
-                            currentTextureSampler += 1
-                        elif type == GL_SAMPLER_2D:
-                            glActiveTexture(GL_TEXTURE0 + currentTextureSampler)
-                            glBindTexture(GL_TEXTURE_2D, value)
-                            glUniform1i(index, currentTextureSampler)
-                            currentTextureSampler += 1
+                setObjectUniforms(obj)
 
     # draw the mesh
     if not obj.solid:

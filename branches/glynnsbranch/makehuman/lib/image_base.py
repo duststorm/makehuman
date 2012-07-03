@@ -6,11 +6,13 @@ if G.use_wximage:
     import image_wx
 elif G.use_sdlimage:
     import image_sdl
+if G.use_pil:
+    import image_pil
 else:
     import image_png
 import image_bmp
 
-_all = ['new', 'open', 'fromstring']
+_all = ['new', 'open', 'fromstring', 'fromdata']
 
 def new(mode, size):
     return Image(mode, size)
@@ -20,6 +22,8 @@ def open(path):
         return load_wx(path)
     if G.use_sdlimage:
         return load_sdl(path)
+    if G.use_pil:
+        return load_pil(path)
     return load_png(path)
 
 def fromstring(mode, size, data):
@@ -27,19 +31,8 @@ def fromstring(mode, size, data):
     im._data = np.fromstring(data, dtype=np.uint8).reshape(im._data.shape)
     return im
 
-# resampling filters
-NONE = 0
-NEAREST = 0
-ANTIALIAS = 1 # 3-lobed lanczos
-LINEAR = BILINEAR = 2
-CUBIC = BICUBIC = 3
-
-# transpose
-FLIP_LEFT_RIGHT = 0
-FLIP_TOP_BOTTOM = 1
-ROTATE_90 = 2
-ROTATE_180 = 3
-ROTATE_270 = 4
+def fromdata(data):
+    return Image(data = data)
 
 class Image(object):
     def __init__(self, mode = None, size = None, data = None):
@@ -64,14 +57,13 @@ class Image(object):
         base, ext = os.path.splitext(path)
         ext = ext.lower()
         if G.use_wximage:
-            image_wx.save(path, ext, self._data)
-        elif ext == '.bmp':
-            return image_bmp.save(path, self._data)
+            image_wx.save(path, self._data)
+        elif G.use_pil:
+            image_pil.save(path, self._data)
         else:
-            raise NotImplementedError()
+            image_bmp.save(path, self._data)
 
     def resize(self, size, filter):
-        # todo: interpolation methods
         dw, dh = size
         sh, sw, _ = self._data.shape
         xmap = np.floor((np.arange(dw) + 0.5) * sw / dw).astype(int)
@@ -114,23 +106,19 @@ class Image(object):
         else:
             raise RuntimeError()
 
-    def transpose(self, op):
-        if op == FLIP_TOP_BOTTOM:
-            other = Image(self.mode, self.size)
-            other._data[...] = self._data[::-1,:,:]
-            return other
-        elif op == FLIP_LEFT_RIGHT:
-            other = Image(self.mode, self.size)
-            other._data[...] = self._data[:,::-1,:]
-            return other
-        else:
-            raise NotImplementedError()
+    def flip_vertical(self):
+        other = Image(self.mode, self.size)
+        other._data[...] = self._data[::-1,:,:]
+        return other
 
-    def tostring(self, fmt, mode):
-        if fmt != 'raw':
-            raise NotImplementedError()
-        im = self.convert(mode)
-        return im._data.tostring()
+    def flip_horizontal(self):
+        other = Image(self.mode, self.size)
+        other._data[...] = self._data[:,::-1,:]
+        return other
+
+    def data(self):
+        self._data = np.ascontiguousarray(self._data)
+        return self._data
 
 def load_png(path):
     return Image(data = image_png.load(path))
@@ -140,3 +128,7 @@ def load_sdl(path):
 
 def load_wx(path):
     return Image(data = image_wx.load(path))
+
+def load_pil(path):
+    return Image(data = image_pil.load(path))
+

@@ -1,10 +1,7 @@
 from OpenGL.GL import *
 from OpenGL.GL.ARB.texture_non_power_of_two import *
 from core import G
-if G.use_pil:
-    import PIL.Image as img
-else:
-    import image_base as img
+import image_base as img
 from image import Image
 
 class Texture(object):
@@ -53,8 +50,8 @@ class Texture(object):
         else:
             raise RuntimeError("Could not load image, unsupported pixel format")
 
-        surface = surface.transpose(img.FLIP_TOP_BOTTOM)
-        pixels = surface.tostring("raw", surface.mode)
+        surface = surface.flip_vertical()
+        pixels = surface.data()
 
         if surface.size[1] == 1:
             glBindTexture(GL_TEXTURE_1D, texture)
@@ -113,8 +110,8 @@ class Texture(object):
         else:
             raise RuntimeError("Could not load image, unsupported pixel format")
 
-        surface = surface.transpose(img.FLIP_TOP_BOTTOM)
-        pixels = surface.tostring("raw", surface.mode)
+        surface = surface.flip_vertical()
+        pixels = surface.data()
 
         if surface.size[1] == 1:
             glBindTexture(GL_TEXTURE_1D, texture)
