@@ -173,10 +173,10 @@ L_RSHOULDER = L_RARMFK+L_RARMIK+L_UPSPNFK+L_UPSPNIK
 
 ShoulderArmature = [
     # Clavicle
-    ('Clavicle_L',         0, 'Spine3', F_WIR, L_LSHOULDER, NoBB),
-    ('Clavicle_R',         0, 'Spine3', F_WIR, L_RSHOULDER, NoBB),
-    ('DfmClavicle_L',      0, 'Spine3', F_DEF, L_DMAIN, NoBB),
-    ('DfmClavicle_R',      0, 'Spine3', F_DEF, L_DMAIN, NoBB),
+    ('Clavicle_L',         0, 'DfmSpine3', F_WIR, L_LSHOULDER, NoBB),
+    ('Clavicle_R',         0, 'DfmSpine3', F_WIR, L_RSHOULDER, NoBB),
+    ('DfmClavicle_L',      0, 'DfmSpine3', F_DEF, L_DMAIN, NoBB),
+    ('DfmClavicle_R',      0, 'DfmSpine3', F_DEF, L_DMAIN, NoBB),
     
     # Shoulder    
     ('ShoulderEnd_L',      0, 'Clavicle_L', 0, L_HELP, NoBB),
