@@ -40,6 +40,10 @@ SDL_RLEACCEL		= 0x00004000
 SDL_SRCALPHA		= 0x00010000
 SDL_PREALLOC		= 0x01000000
 
+SDL_SWSURFACE		= 0x00000000
+SDL_HWSURFACE		= 0x00000001
+SDL_ASYNCBLIT		= 0x00000004
+
 SDL_QUERY		= -1
 SDL_IGNORE		= 0
 SDL_DISABLE		= 0
@@ -454,6 +458,26 @@ SDL_Quit.restype = None
 SDL_GetError = _sdl.SDL_GetError
 SDL_GetError.argtypes = []
 SDL_GetError.restype = c_char_p
+
+# SDL_Surface* SDL_ConvertSurface(SDL_Surface *src, SDL_PixelFormat *fmt, Uint32 flags);
+SDL_ConvertSurface = _sdl.SDL_ConvertSurface
+SDL_ConvertSurface.argtypes = [POINTER(SDL_Surface), POINTER(SDL_PixelFormat), c_uint]
+SDL_ConvertSurface.restype = POINTER(SDL_Surface)
+
+# void SDL_FreeSurface(SDL_Surface *surface);
+SDL_FreeSurface = _sdl.SDL_FreeSurface
+SDL_FreeSurface.argtypes = [POINTER(SDL_Surface)]
+SDL_FreeSurface.restype = None
+
+# int SDL_LockSurface(SDL_Surface *surface);
+SDL_LockSurface = _sdl.SDL_LockSurface
+SDL_LockSurface.argtypes = [POINTER(SDL_Surface)]
+SDL_LockSurface.restype = c_int
+
+# void SDL_UnlockSurface(SDL_Surface *surface);
+SDL_UnlockSurface = _sdl.SDL_UnlockSurface
+SDL_UnlockSurface.argtypes = [POINTER(SDL_Surface)]
+SDL_UnlockSurface.restype = None
 
 ### Macros
 

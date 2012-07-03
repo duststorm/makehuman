@@ -28,6 +28,7 @@ class Globals(object):
         self.use_glut = False
         self.use_wx = False
         self.use_wximage = False
+        self.use_sdlimage = False
 
 G = Globals()
 
