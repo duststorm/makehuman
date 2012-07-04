@@ -153,7 +153,10 @@ class ClothesTaskView(gui3d.TaskView):
         for (name,clo) in human.clothesObjs.items():
             if clo:
                 proxy = human.clothesProxies[name]
-                file.write('clothes %s %s\n' % (os.path.basename(proxy.file), proxy.uuid))
+                if proxy.uuid:
+                    file.write('clothes %s %s\n' % (os.path.basename(proxy.file), proxy.uuid))
+                else:
+                    file.write('clothes %s\n' % proxy.file)
                 
     def syncMedia(self):
         
