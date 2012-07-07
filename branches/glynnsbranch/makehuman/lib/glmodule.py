@@ -413,10 +413,9 @@ def draw():
     drawEnd()
 
 def drawOneMesh(obj):
-    drawEnd()
-    #drawBegin()
+    glDrawBuffer(GL_FRONT)
     glClear(GL_DEPTH_BUFFER_BIT)
     cameraPosition(G.cameras[obj.cameraMode], 0)
     obj.draw(obj.cameraMode)
-    drawEnd()
-
+    glDrawBuffer(GL_BACK)
+    glFlush()
