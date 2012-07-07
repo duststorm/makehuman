@@ -1,4 +1,5 @@
 import traceback
+import profiler
 
 class Globals(object):
     def __init__(self):
@@ -29,20 +30,31 @@ class Globals(object):
         self.use_wx = False
         self.use_wximage = False
         self.use_sdlimage = False
+        self.profile = False
 
 G = Globals()
 
 def callMouseButtonDown(b, x, y):
     if G.mouseDownCallback:
-        G.mouseDownCallback(b, x, y)
+        if G.profile:
+            profiler.run('G.mouseDownCallback(b, x, y)', globals(), locals())
+        else:
+            G.mouseDownCallback(b, x, y)
 
 def callMouseButtonUp(b, x, y):
+    profiler.flush()
     if G.mouseUpCallback:
-        G.mouseUpCallback(b, x, y)
+        if G.profile:
+            profiler.run('G.mouseUpCallback(b, x, y)', globals(), locals())
+        else:
+            G.mouseUpCallback(b, x, y)
 
 def callMouseMotion(s, x, y, xrel, yrel):
     if G.mouseMovedCallback:
-        G.mouseMovedCallback(s, x, y, xrel, yrel)
+        if G.profile:
+            profiler.accum('G.mouseMovedCallback(s, x, y, xrel, yrel)', globals(), locals())
+        else:
+            G.mouseMovedCallback(s, x, y, xrel, yrel)
 
 def callKeyDown(key, character, modifiers):
     if G.keyDownCallback:
