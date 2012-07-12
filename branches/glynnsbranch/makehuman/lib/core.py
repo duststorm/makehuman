@@ -33,6 +33,8 @@ class Globals(object):
         self.profile = False
 
 G = Globals()
+G.use_pil = True
+G.use_glut = True
 
 def callMouseButtonDown(b, x, y):
     if G.mouseDownCallback:
