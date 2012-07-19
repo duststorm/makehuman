@@ -405,16 +405,16 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
 #
 
 MaterialNumbers = {
-    "skin" : 0,
-    "nail" : 0,
-    "teeth" : 1,
-    "eye": 2,
-    "cornea" : 2,
-    "brows" : 3,
-    "joint" : 4,
-    "red" : 5,
-    "green" : 6,
-    "blue" : 7
+    "ski" : 0,     # skin
+    "nai" : 0,     # nail
+    "tee" : 1,     # teeth
+    "eye" : 2,     # eye
+    "cor" : 2,     # cornea
+    "bro" : 3,     # brows
+    "joi" : 4,     # joint
+    "red" : 5,     # red
+    "gre" : 6,     # green
+    "blu" : 7      # blue
 }
     
 def writeFaceNumbers(fp, human, proxyData):
@@ -427,7 +427,7 @@ def writeFaceNumbers(fp, human, proxyData):
         obj = human.meshData
         fmats = {}
         for f in obj.faces:
-            fmats[f.idx] = MaterialNumbers[f.mtl]
+            fmats[f.idx] = MaterialNumbers[f.mtl[0:3]]
         deleteGroups = []
         deleteVerts = None
         for proxy in proxyData.values():
