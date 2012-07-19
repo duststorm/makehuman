@@ -30,7 +30,7 @@ class ProxyTaskView(gui3d.TaskView):
     def __init__(self, category):
         
         gui3d.TaskView.__init__(self, category, 'Proxies')
-        self.filechooser = self.addView(gui3d.FileChooser('data/proxymeshes', 'proxy', 'png', 'notfound.png'))
+        self.filechooser = self.addView(gui3d.FileChooser('data/proxymeshes', 'proxy', 'png', 'data/proxymeshes/notfound.png'))
 
         @self.filechooser.event
         def onFileSelected(filename):

@@ -27,7 +27,7 @@ class EyesTaskView(gui3d.TaskView):
     def __init__(self, category):
         
         gui3d.TaskView.__init__(self, category, 'Eyes')
-        self.filechooser = self.addView(gui3d.FileChooser('data/eyes', 'mhstx', 'png', 'notfound.png'))
+        self.filechooser = self.addView(gui3d.FileChooser('data/eyes', 'mhstx', 'png', 'data/eyes/notfound.png'))
 
         @self.filechooser.event
         def onFileSelected(filename):
