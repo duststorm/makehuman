@@ -74,9 +74,9 @@ def exportObj(obj, filename, exportGroups = True, groupFilter=None):
                 f.write('f')
                 for i, v in enumerate(face.verts):
                     if (obj.uvValues == None):
-                        f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
+                        f.write(' %i//%i' % (v.idx + 1, v.idx + 1))
                     else:
-                        f.write(' %i/%i/%i ' % (v.idx + 1, face.uv[i] + 1, v.idx + 1))
+                        f.write(' %i/%i/%i' % (v.idx + 1, face.uv[i] + 1, v.idx + 1))
                 f.write('\n')
     f.close()
 
