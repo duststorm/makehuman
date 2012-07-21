@@ -298,13 +298,12 @@ class ExportTaskView(gui3d.TaskView):
         self.exportSeparateFolder = self.mhxOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
         self.exportFeetOnGround = self.mhxOptions.addView(gui3d.CheckBox("Feet on ground", True));y+=24
         self.exportExpressions = self.mhxOptions.addView(gui3d.CheckBox("Expressions", False));y+=24
-        self.exportFaceShapes = self.mhxOptions.addView(gui3d.CheckBox("Face shapes", False));y+=24
+        self.exportFaceShapes = self.mhxOptions.addView(gui3d.CheckBox("Face shapes", True));y+=24
         self.exportBodyShapes = self.mhxOptions.addView(gui3d.CheckBox("Body shapes", True));y+=24
-        self.exportFacePanel = self.mhxOptions.addView(gui3d.CheckBox("Face panel", False));y+=24
+        self.exportFacePanel = self.mhxOptions.addView(gui3d.CheckBox("Face panel", True));y+=24
         self.exportClothes = self.mhxOptions.addView(gui3d.CheckBox("Clothes", True));y+=24
         self.exportClothesRig = self.mhxOptions.addView(gui3d.CheckBox("Clothes rig", True));y+=24
         self.exportCage = self.mhxOptions.addView(gui3d.CheckBox("Cage", False));y+=24
-        #self.exportBreastRig = self.mhxOptions.addView(gui3d.CheckBox("Breast rig", False));y+=24
         self.exportMaleRig = self.mhxOptions.addView(gui3d.CheckBox("Male rig", False));y+=24
         #self.exportSkirtRig = self.mhxOptions.addView(gui3d.CheckBox("Skirt rig", False));y+=24
         rigs = []
