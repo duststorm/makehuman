@@ -32,7 +32,7 @@ class UvTaskView(gui3d.TaskView):
         uvDir = os.path.join(mh.getPath(''), 'data', 'uvs')
         if not os.path.exists(uvDir):
             os.makedirs(uvDir)
-        self.filechooser = self.addView(gui3d.FileChooser([uvDir , 'data/uvs'], 'mhuv', 'png', 'notfound.png'))
+        self.filechooser = self.addView(gui3d.FileChooser([uvDir , 'data/uvs'], 'mhuv', 'png', 'data/uvs/notfound.png'))
 
         @self.filechooser.event
         def onFileSelected(filename):

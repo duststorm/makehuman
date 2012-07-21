@@ -78,10 +78,10 @@ def exportObj(obj, filename, exportGroups = True, groupFilter=None):
                 f.write('f')
                 if not has_uv:
                     for i, v in enumerate(fv[fi]):
-                        f.write(' %i//%i ' % (v + 1, v + 1))
+                        f.write(' %i//%i' % (v + 1, v + 1))
                 else:
                     for i, (v, t) in enumerate(zip(fv[fi], ft[fi])):
-                        f.write(' %i/%i/%i ' % (v + 1, t + 1, v + 1))
+                        f.write(' %i/%i/%i' % (v + 1, t + 1, v + 1))
                 f.write('\n')
     f.close()
 

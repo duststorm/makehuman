@@ -178,6 +178,8 @@ def activeFrames(ob):
 
 def fCurveIdentity(fcu):
     words = fcu.data_path.split('"')
+    if len(words) < 2:
+        return (None, None)
     name = words[1]
     words = fcu.data_path.split('.')
     mode = words[-1]

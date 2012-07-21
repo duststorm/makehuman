@@ -102,6 +102,8 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.operator("mhclo.save_settings")
         layout.separator()
         layout.prop(scn, "MCDirectory")
+        
+        #layout.operator("mhclo.snap_selected_verts")
 
         layout.separator()
         layout.label("Vertex groups")
@@ -280,6 +282,7 @@ class OBJECT_OT_InitInterfaceButton(bpy.types.Operator):
 class OBJECT_OT_FactorySettingsButton(bpy.types.Operator):
     bl_idname = "mhclo.factory_settings"
     bl_label = "Restore factory settings"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         makeclothes.initInterface()
@@ -298,12 +301,26 @@ class OBJECT_OT_SaveSettingsButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
+#    class OBJECT_OT_SnapSelectedVertsButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_SnapSelectedVertsButton(bpy.types.Operator):
+    bl_idname = "mhclo.snap_selected_verts"
+    bl_label = "Snap selected"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        makeclothes.snapSelectedVerts(context)
+        return{'FINISHED'}    
+
+#
 #    class OBJECT_OT_RecoverSeamsButton(bpy.types.Operator):
 #
 
 class OBJECT_OT_RecoverSeamsButton(bpy.types.Operator):
     bl_idname = "mhclo.recover_seams"
     bl_label = "Recover seams"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         try:
@@ -316,6 +333,7 @@ class OBJECT_OT_RecoverSeamsButton(bpy.types.Operator):
 class OBJECT_OT_SetSeamsButton(bpy.types.Operator):
     bl_idname = "mhclo.set_seams"
     bl_label = "Set seams"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         try:
@@ -331,6 +349,7 @@ class OBJECT_OT_SetSeamsButton(bpy.types.Operator):
 class OBJECT_OT_MakeClothesButton(bpy.types.Operator):
     bl_idname = "mhclo.make_clothes"
     bl_label = "Make clothes"
+    bl_options = {'UNDO'}
 
     def execute(self, context): 
         try:
@@ -342,6 +361,7 @@ class OBJECT_OT_MakeClothesButton(bpy.types.Operator):
 class OBJECT_OT_PrintClothesButton(bpy.types.Operator):
     bl_idname = "mhclo.print_clothes"
     bl_label = "Print mhclo file"
+    bl_options = {'UNDO'}
 
     def execute(self, context):   
         try:
@@ -357,6 +377,7 @@ class OBJECT_OT_PrintClothesButton(bpy.types.Operator):
 class OBJECT_OT_ProjectUVsButton(bpy.types.Operator):
     bl_idname = "mhclo.project_uvs"
     bl_label = "Project UVs"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         try:
@@ -375,6 +396,7 @@ class OBJECT_OT_ProjectUVsButton(bpy.types.Operator):
 class OBJECT_OT_CopyVertLocsButton(bpy.types.Operator):
     bl_idname = "mhclo.copy_vert_locs"
     bl_label = "Copy vertex locations"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         src = context.object
@@ -395,6 +417,7 @@ class OBJECT_OT_CopyVertLocsButton(bpy.types.Operator):
 class OBJECT_OT_ExportObjFileButton(bpy.types.Operator):
     bl_idname = "mhclo.export_obj_file"
     bl_label = "Export Obj file"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         try:
@@ -410,6 +433,7 @@ class OBJECT_OT_ExportObjFileButton(bpy.types.Operator):
 class OBJECT_OT_ReexportMhcloButton(bpy.types.Operator):
     bl_idname = "mhclo.reexport_mhclo"
     bl_label = "Reexport Mhclo file"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         try:
@@ -426,6 +450,7 @@ class OBJECT_OT_ReexportMhcloButton(bpy.types.Operator):
 class OBJECT_OT_ExportBaseUvsPyButton(bpy.types.Operator):
     bl_idname = "mhclo.export_base_uvs_py"
     bl_label = "Export base UV py file"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         try:
@@ -437,6 +462,7 @@ class OBJECT_OT_ExportBaseUvsPyButton(bpy.types.Operator):
 class OBJECT_OT_SplitHumanButton(bpy.types.Operator):
     bl_idname = "mhclo.split_human"
     bl_label = "Split human"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         try:
@@ -452,6 +478,7 @@ class OBJECT_OT_SplitHumanButton(bpy.types.Operator):
 class OBJECT_OT_ExportBlenderMaterialButton(bpy.types.Operator):
     bl_idname = "mhclo.export_blender_material"
     bl_label = "Export Blender material"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         try:
@@ -469,6 +496,7 @@ class OBJECT_OT_ExportBlenderMaterialButton(bpy.types.Operator):
 class OBJECT_OT_MakeHumanButton(bpy.types.Operator):
     bl_idname = "mhclo.make_human"
     bl_label = "Make human"
+    bl_options = {'UNDO'}
     isHuman = BoolProperty()
 
     def execute(self, context):
@@ -487,6 +515,7 @@ class OBJECT_OT_MakeHumanButton(bpy.types.Operator):
 class OBJECT_OT_SetBoundaryButton(bpy.types.Operator):
     bl_idname = "mhclo.set_boundary"
     bl_label = "Set boundary"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         try:
@@ -502,6 +531,7 @@ class OBJECT_OT_SetBoundaryButton(bpy.types.Operator):
 class OBJECT_OT_OffsetClothesButton(bpy.types.Operator):
     bl_idname = "mhclo.offset_clothes"
     bl_label = "Offset clothes"
+    bl_options = {'UNDO'}
 
     def execute(self, context):     
         try:
@@ -517,6 +547,7 @@ class OBJECT_OT_OffsetClothesButton(bpy.types.Operator):
 class OBJECT_OT_SetZDepthButton(bpy.types.Operator):
     bl_idname = "mhclo.set_zdepth"
     bl_label = "Set Z depth"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         try:
@@ -532,6 +563,7 @@ class OBJECT_OT_SetZDepthButton(bpy.types.Operator):
 class VIEW3D_OT_PrintVnumsButton(bpy.types.Operator):
     bl_idname = "mhclo.print_vnums"
     bl_label = "Print vertex numbers"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         try:
@@ -547,6 +579,7 @@ class VIEW3D_OT_PrintVnumsButton(bpy.types.Operator):
 class VIEW3D_OT_DeleteHelpersButton(bpy.types.Operator):
     bl_idname = "mhclo.delete_helpers"
     bl_label = "Delete helpers until above"
+    bl_options = {'UNDO'}
     answer = StringProperty()
 
     def execute(self, context):
@@ -573,6 +606,7 @@ class VIEW3D_OT_DeleteHelpersButton(bpy.types.Operator):
 class VIEW3D_OT_RemoveVertexGroupsButton(bpy.types.Operator):
     bl_idname = "mhclo.remove_vertex_groups"
     bl_label = "Remove vertex groups"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         try:
@@ -588,6 +622,7 @@ class VIEW3D_OT_RemoveVertexGroupsButton(bpy.types.Operator):
 class VIEW3D_OT_AutoVertexGroupsButton(bpy.types.Operator):
     bl_idname = "mhclo.auto_vertex_groups"
     bl_label = "Auto vertex groups"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         try:
@@ -605,6 +640,7 @@ class VIEW3D_OT_AutoVertexGroupsButton(bpy.types.Operator):
 class OBJECT_OT_ExportUVsButton(bpy.types.Operator):
     bl_idname = "mhclo.export_uvs"
     bl_label = "Export UVs"
+    bl_options = {'UNDO'}
 
     def execute(self, context):
         try:    

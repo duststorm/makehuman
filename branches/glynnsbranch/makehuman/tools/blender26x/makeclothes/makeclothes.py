@@ -160,6 +160,31 @@ def copyObject(human, n0, n1, context, name):
     return ob
 
 #
+#   snapSelectedVerts(context):
+#
+
+def snapSelectedVerts(context):
+    ob = context.object
+    bpy.ops.object.mode_set(mode='OBJECT')
+    selected = []
+    for v in ob.data.vertices:
+        if v.select:
+            selected.append(v)
+    bpy.ops.object.mode_set(mode='EDIT')
+    for v in selected:
+        v.select = True
+        bpy.ops.mesh.select_all(action='DESELECT')
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.transform.translate(
+            snap=True, 
+            snap_target='CLOSEST', 
+            snap_point=(0, 0, 0), 
+            snap_align=False, 
+            snap_normal=(0, 0, 0))
+    return
+
+#
 #    printMverts(stuff, mverts):
 #
 
@@ -720,7 +745,7 @@ def printStuff(fp, pob, context):
 "  specular_hardness 1\n" +
 "  use_shadows 1\n" +
 "  use_transparent_shadows 1\n" +
-"  use_raytrace 0\n" +
+"  use_raytrace 1\n" +
 "  use_transparency 1\n" +
 "  alpha 0.0\n" +
 "  specular_alpha 0.0\n" +
@@ -775,13 +800,34 @@ def writeTextures(fp, name, scn):
         fp.write("# transparency %s_trans.tif %d\n" % (name, scn.MCTextureLayer))
     return
     
+#
+#   deleteStrayVerts(context, ob):
+#
 
+def deleteStrayVerts(context, ob):
+    scn = context.scene
+    scn.objects.active = ob
+    bpy.ops.object.mode_set(mode='OBJECT')
+    verts = ob.data.vertices
+    onFaces = {}
+    for v in verts:
+        onFaces[v.index] = False
+    faces = getFaces(ob.data)
+    for f in faces:
+        for vn in f.vertices:
+            onFaces[vn] = True
+    for v in verts:
+        if not onFaces[v.index]:
+            raise NameError("Mesh %s has stray vert %d" % (ob.name, v.index))
+        return
+    
 #
 #   exportObjFile(context):
 #
 
 def exportObjFile(context):
     ob = getClothing(context)
+    deleteStrayVerts(context, ob)
     (objpath, objfile) = getFileName(ob, context, "obj")
     print("Open", objfile)
     fp = open(objfile, "w")

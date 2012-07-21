@@ -2468,7 +2468,7 @@ class FileChooser(View):
     :type extension: str or list
     :param previewExtension: The extension of the preview for the files. None if the file itself is to be used.
     :type previewExtension: str or None
-    :param notFoundImage: The filename of the image to be used in case the preview is not found.
+    :param notFoundImage: The full filepath of the image to be used in case the preview is not found.
     :type notFoundImage: str or None
     :param sort: A file sorting instance which will be used to provide sorting of the found files.
     :type sort: gui3d.FileSort
@@ -2521,7 +2521,9 @@ class FileChooser(View):
             preview = filename
             
         if not os.path.exists(preview) and self.notFoundImage:
-            preview = os.path.join(self.path, self.notFoundImage)
+            # preview = os.path.join(self.path, self.notFoundImage)
+            # TL: full filepath needed, so we don't look into user dir.
+            preview = self.notFoundImage
             
         return preview
         

@@ -10,7 +10,7 @@ specular_intensity 0.0
 specular_hardness 1
 use_shadows 1
 use_transparent_shadows 1
-use_raytrace 0
+use_raytrace 1
 use_transparency 1
 alpha 0.0
 specular_alpha 0.0

@@ -37,12 +37,10 @@ class HairTaskView(gui3d.TaskView):
     def __init__(self, category):
         
         gui3d.TaskView.__init__(self, category, 'Hair')        
-        # TL: look in user directory as well.
-        # self.filechooser = self.addView(gui3d.FileChooser('data/hairstyles', 'obj', 'png', 'notfound.png'))
         hairDir = os.path.join(mh.getPath(''), 'data', 'hairstyles')
         if not os.path.exists(hairDir):
             os.makedirs(hairDir)
-        self.filechooser = self.addView(gui3d.FileChooser([hairDir , 'data/hairstyles'], 'obj', 'png', 'notfound.png'))
+        self.filechooser = self.addView(gui3d.FileChooser([hairDir , 'data/hairstyles'], 'obj', 'png', 'data/hairstyles/notfound.png'))
       
         self.hairButton = gui3d.app.categories['Modelling'].addView(gui3d.Button(style=HairButtonStyle._replace(left=800-216, top=600-36, zIndex=9.2, normal='data/hairstyles/clear.png')))
         
