@@ -25,34 +25,30 @@ from mhx_rig import addPoseBone, writeDrivers
 
 FaceJoints = [
     ('head-end',        'l', ((2.0, 'head'), (-1.0, 'neck'))),
-    ('r-mouth',            'v', 2490),
-    ('l-mouth',            'v', 8907),
+    ('r-mouth',         'v', 2490),
+    ('l-mouth',         'v', 8907),
 
-    ('mid-eyes',        'l', ((0.5, 'l-eye'), (0.5, 'r-eye'))),
-    ('gaze',            'o', ('mid-eyes', [0.0, 0.0, 5.2])),
-    ('gaze-target',        'o', ('mid-eyes', [0.0, 0.0, 4.2])),
-    ('l-gaze',            'o', ('l-eye', [0.0, 0.0, 5.0])),
-    ('l-gaze-target',    'o', ('l-eye', [0.0, 0.0, 4.5])),
-    ('r-gaze',            'o', ('r-eye', [0.0, 0.0, 5.0])),
-    ('r-gaze-target',    'o', ('r-eye', [0.0, 0.0, 4.5])),
+    ('l-gaze',          'l', ((-9,'l-eye'), (10,'l-eye-target'))),
+    ('r-gaze',          'l', ((-9,'r-eye'), (10,'r-eye-target'))),
+    ('gaze',            'l', ((0.5, 'l-gaze'), (0.5, 'r-gaze'))),
 ]
 
 FaceHeadsTails = [
-    ('Jaw',                    'mouth', 'jaw'),
-    ('TongueBase',            'tongue-1', 'tongue-2'),
+    ('Jaw',                  'mouth', 'jaw'),
+    ('TongueBase',           'tongue-1', 'tongue-2'),
     ('TongueMid',            'tongue-2', 'tongue-3'),
     ('TongueTip',            'tongue-3', 'tongue-4'),
 
     ('Eye_R',                'l-eye', 'l-eye-target'),
-    ('DfmUpLid_R',            'l-eye', 'l-upperlid'),
-    ('DfmLoLid_R',            'l-eye', 'l-lowerlid'),
+    ('DfmUpLid_R',           'l-eye', 'l-upperlid'),
+    ('DfmLoLid_R',           'l-eye', 'l-lowerlid'),
     ('Eye_L',                'r-eye', 'r-eye-target'),
-    ('DfmUpLid_L',            'r-eye', 'r-upperlid'),
-    ('DfmLoLid_L',            'r-eye', 'r-lowerlid'),
+    ('DfmUpLid_L',           'r-eye', 'r-upperlid'),
+    ('DfmLoLid_L',           'r-eye', 'r-lowerlid'),
 
-    ('Gaze',                'gaze', 'gaze-target'),
-    ('Gaze_R',                'l-gaze', 'l-gaze-target'),
-    ('Gaze_L',                'r-gaze', 'r-gaze-target'),
+    ('Gaze',                  ('gaze',(0,0,-0.25)), ('gaze',(0,0,0.75))),
+    ('Gaze_R',                'l-gaze', ('l-gaze',(0,0,0.5))),
+    ('Gaze_L',                'r-gaze', ('r-gaze',(0,0,0.5))),
 ]
 
 
