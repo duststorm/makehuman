@@ -177,7 +177,7 @@ class Modifier:
         for target, old, new in zip((self.left, self.right), old_detail, new_detail):
             if new == old:
                 continue
-            algos3d.loadTranslationTarget(human.meshData, target[0], new - old, None, 0, 0)
+            algos3d.loadTranslationTarget(human.meshData, target, new - old, None, 0, 0)
             
         # Update vertices
         if updateNormals:
