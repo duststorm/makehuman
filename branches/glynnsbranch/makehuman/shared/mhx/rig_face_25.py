@@ -25,34 +25,33 @@ from mhx_rig import addPoseBone, writeDrivers
 
 FaceJoints = [
     ('head-end',        'l', ((2.0, 'head'), (-1.0, 'neck'))),
-    ('r-mouth',            'v', 2490),
-    ('l-mouth',            'v', 8907),
+    ('r-mouth',         'v', 2490),
+    ('l-mouth',         'v', 8907),
 
-    ('mid-eyes',        'l', ((0.5, 'l-eye'), (0.5, 'r-eye'))),
-    ('gaze',            'o', ('mid-eyes', [0.0, 0.0, 5.2])),
-    ('gaze-target',        'o', ('mid-eyes', [0.0, 0.0, 4.2])),
-    ('l-gaze',            'o', ('l-eye', [0.0, 0.0, 5.0])),
-    ('l-gaze-target',    'o', ('l-eye', [0.0, 0.0, 4.5])),
-    ('r-gaze',            'o', ('r-eye', [0.0, 0.0, 5.0])),
-    ('r-gaze-target',    'o', ('r-eye', [0.0, 0.0, 4.5])),
+    ('l-gaze',          'l', ((-19,'l-eye'), (20,'l-eye-target'))),
+    ('r-gaze',          'l', ((-19,'r-eye'), (20,'r-eye-target'))),
+    ('gaze',            'l', ((0.5, 'l-gaze'), (0.5, 'r-gaze'))),
+    ('l-gaze-tail',     'l', ((-20,'l-eye'), (21,'l-eye-target'))),
+    ('r-gaze-tail',     'l', ((-20,'r-eye'), (21,'r-eye-target'))),
+    ('gaze-tail',       'l', ((0.5, 'l-gaze-tail'), (0.5, 'r-gaze-tail'))),
 ]
 
 FaceHeadsTails = [
-    ('Jaw',                    'mouth', 'jaw'),
-    ('TongueBase',            'tongue-1', 'tongue-2'),
+    ('Jaw',                  'mouth', 'jaw'),
+    ('TongueBase',           'tongue-1', 'tongue-2'),
     ('TongueMid',            'tongue-2', 'tongue-3'),
     ('TongueTip',            'tongue-3', 'tongue-4'),
 
     ('Eye_R',                'l-eye', 'l-eye-target'),
-    ('DfmUpLid_R',            'l-eye', 'l-upperlid'),
-    ('DfmLoLid_R',            'l-eye', 'l-lowerlid'),
+    ('DfmUpLid_R',           'l-eye', 'l-upperlid'),
+    ('DfmLoLid_R',           'l-eye', 'l-lowerlid'),
     ('Eye_L',                'r-eye', 'r-eye-target'),
-    ('DfmUpLid_L',            'r-eye', 'r-upperlid'),
-    ('DfmLoLid_L',            'r-eye', 'r-lowerlid'),
+    ('DfmUpLid_L',           'r-eye', 'r-upperlid'),
+    ('DfmLoLid_L',           'r-eye', 'r-lowerlid'),
 
-    ('Gaze',                'gaze', 'gaze-target'),
-    ('Gaze_R',                'l-gaze', 'l-gaze-target'),
-    ('Gaze_L',                'r-gaze', 'r-gaze-target'),
+    ('Gaze',                  'gaze', 'gaze-tail'),
+    ('Gaze_R',                'l-gaze', 'l-gaze-tail'),
+    ('Gaze_L',                'r-gaze', 'r-gaze-tail'),
 ]
 
 
@@ -87,7 +86,7 @@ def FaceControlPoses(fp):
 
     addPoseBone(fp, 'TongueTip', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
 
-    addPoseBone(fp, 'Gaze', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+    addPoseBone(fp, 'Gaze', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
         [('ChildOf', C_CHILDOF, 1, ['Head', 'Head', (1,1,1), (1,1,1), (1,1,1)]),
          ('ChildOf', C_CHILDOF, 0, ['World', 'MasterFloor', (1,1,1), (1,1,1), (1,1,1)]),
         ])

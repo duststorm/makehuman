@@ -52,6 +52,12 @@ class ClothesTaskView(gui3d.TaskView):
             self.syncMedia()
         
     def setClothes(self, human, mhclo):
+    
+        if os.path.basename(mhclo) == "clear.mhclo":
+            for name,clo in human.clothesObjs.items():
+                gui3d.app.removeObject(clo)
+                del human.clothesObjs[name]
+            return
 
         proxy = mh2proxy.readProxyFile(human.meshData, mhclo, False)
         
