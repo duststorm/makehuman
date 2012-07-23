@@ -48,6 +48,7 @@ import textures3d
 import files3d
 import os
 import numpy as np
+import traceback
 
 targetBuffer = {}
 
@@ -77,31 +78,77 @@ class Target:
         """
 
         self.name = name
-        self.data = np.zeros((obj.getVertexCount(),3), dtype=np.float32)
-        self.faces = []
-        self.verts = []
 
         try:
-            fileDescriptor = open(name)
+            self._load(self.name)
         except:
+            self.verts = []
             print 'Unable to open %s'%(name)
             return
 
-        facesToRecalculate = set()  # Indices of faces affected by the target, to put in buffer
-        verticesToRecalculate = []  # Indices of vertices affected by the targets, to put in buffer
-
-        for line in fileDescriptor:
-            translationData = line.split()
-            if len(translationData) == 4:
-                vertIndex = int(translationData[0])
-                verticesToRecalculate.append(vertIndex)
-                translationVector = (float(translationData[1]), float(translationData[2]), float(translationData[3]))
-                self.data[vertIndex] = translationVector
-
-        self.verts = np.array(verticesToRecalculate, dtype=int)
         self.faces = obj.getFacesForVertices(self.verts)
 
-        fileDescriptor.close()
+    @staticmethod
+    def convert_all():
+        obj = Target(None, None)
+        for root, dirs, files in os.walk('data'):
+            for name in files:
+                base, ext = os.path.splitext(name)
+                if ext != '.target':
+                    continue
+                path = os.path.join(root, name)
+                try:
+                    obj._load_text(path)
+                    obj._save_binary(path)
+                except StandardError, e:
+                    print name, e
+
+    dtype = [('index','u4'),('vector','(3,)f4')]
+    dtype_ext = [('index','<u4'),('vector','(3,)<f4')]
+
+    def _load_text(self, name):
+        data = []
+        with open(name) as fd:
+            for line in fd:
+                translationData = line.split()
+                if len(translationData) != 4:
+                    continue
+                vertIndex = int(translationData[0])
+                translationVector = (float(translationData[1]), float(translationData[2]), float(translationData[3]))
+                data.append((vertIndex, translationVector))
+
+        self.raw = np.asarray(data, dtype=Target.dtype)
+
+    def _save_binary(self, name):
+        print 'compiling %s' % name
+        try:
+            name, ext = os.path.splitext(name)
+            name = '%s%s%s' % (name, os.path.extsep, 'bin')
+            np.asarray(self.raw, dtype=Target.dtype_ext).tofile(name)
+        except StandardError, e:
+            traceback.print_exc()
+            # pass
+
+    def _load_binary(self, name):
+        if not os.path.exists(name):
+            raise RuntimeError()
+        bname = '%s%s%s' % (os.path.splitext(name)[0], os.path.extsep, 'bin')
+        if not os.path.exists(bname):
+            print 'compiled file missing: %s' % bname
+            raise RuntimeError()
+        if os.stat(bname).st_mtime < os.stat(name).st_mtime:
+            print 'compiled file out of date: %s' % bname
+            raise RuntimeError()
+        self.raw = np.asarray(np.fromfile(bname, dtype=Target.dtype_ext), dtype=Target.dtype)
+
+    def _load(self, name):
+        try:
+            self._load_binary(name)
+        except StandardError, e:
+            self._load_text(name)
+            self._save_binary(name)
+        self.verts = self.raw['index']
+        self.data = self.raw['vector']
 
     def apply(self, obj, morphFactor, update=True, calcNormals=True, faceGroupToUpdateName=None, scale=(1.0,1.0,1.0)):
           
@@ -114,26 +161,28 @@ class Target:
                     # by the specified facegroup.
                     vmask, fmask = obj.getVertexAndFaceMasksForGroups([faceGroupToUpdateName])
 
-                    verticesToUpdate = self.verts[vmask[self.verts]]
+                    srcVerts = np.argwhere(vmask[self.verts])[...,0]
                     facesToRecalculate = self.faces[fmask[self.faces]]
                 else:
                     # if a vertgroup is not provided, all verts affected by
                     # the targets will be modified
 
                     facesToRecalculate = self.faces
-                    verticesToUpdate = self.verts
+                    srcVerts = np.s_[...]
+
+                dstVerts = self.verts[srcVerts]
 
             if morphFactor:
                 # Adding the translation vector
 
                 scale = np.array(scale) * morphFactor
-                obj.coord[verticesToUpdate] += self.data[verticesToUpdate] * scale[None,:]
-                obj.markCoords(verticesToUpdate, coor=True)
+                obj.coord[dstVerts] += self.data[srcVerts] * scale[None,:]
+                obj.markCoords(dstVerts, coor=True)
 
             if calcNormals:
-                obj.calcNormals(1, 1, verticesToUpdate, facesToRecalculate)
+                obj.calcNormals(1, 1, dstVerts, facesToRecalculate)
             if update:
-                obj.update(verticesToUpdate)
+                obj.update(dstVerts)
 
             return True
             
