@@ -20,24 +20,54 @@ class MitsubaTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Mitsuba')
 
         # Buttons
+        '''
+        resBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Resolution', gui3d.GroupBoxStyle._replace(height=25+24*2+6)))
+        rendering_width = gui3d.app.settings.get('rendering_width', 800)
+        self.width= resBox.addView(gui3d.TextEdit(str(rendering_width), gui3d.TextEditStyle._replace(width=112), gui3d.filenameValidator))
         
-        renderBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Render Options', gui3d.GroupBoxStyle._replace(height=25+24*7+6)))
+        @self.width.event
+        def onChange(value):
+            gui3d.app.settings['rendering_width'] = 0 if not value else int(value)
+        
+        '''
+        #Test for Path to binaries
+        pathBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Mitsuba path', gui3d.GroupBoxStyle._replace(height=25+24*2+6)))
+        path_bin = gui3d.app.settings.get('path_bin', 'h:/')
+        self.path= pathBox.addView(gui3d.TextEdit(str(path_bin), gui3d.TextEditStyle._replace(width=112)))
+        #
+        @self.path.event
+        def onChange(value):
+            gui3d.app.settings['path_bin'] = '' if not value else str(value)
+        
+        #
+        lightingBox = self.addView(gui3d.GroupBox([10, 140, 9.0], 'Integrators', gui3d.GroupBoxStyle._replace(height=25+24*7+6)))
+        lighting = []
+        self.dlButton = lightingBox.addView(gui3d.RadioButton(lighting, 'DirectLighting', selected = True))
+        self.ptButton = lightingBox.addView(gui3d.RadioButton(lighting, 'Path Tracing'))
+        self.pmButton = lightingBox.addView(gui3d.RadioButton(lighting, 'Photon Mapping'))
+        
+        #
+        samplerBox = self.addView(gui3d.GroupBox([10, 250, 9.0], 'Sampler Options', gui3d.GroupBoxStyle._replace(height=25+24*7+6)))
+        sampler = []
+        self.lowdButton = samplerBox.addView(gui3d.RadioButton(sampler, 'Low Discrepancy', selected = True))
+        self.indepButton = samplerBox.addView(gui3d.RadioButton(sampler, 'Independent'))
+        #
+        renderBox = self.addView(gui3d.GroupBox([10, 336, 9.0], 'Render Options', gui3d.GroupBoxStyle._replace(height=25+24*7+6)))
         source=[]
         self.consoleButton = renderBox.addView(gui3d.RadioButton(source, 'Render console'))
         self.guiButton = renderBox.addView(gui3d.RadioButton(source, 'Render GUI', selected = True))
         self.xmlButton = renderBox.addView(gui3d.RadioButton(source, 'Write XML'))
-        self.renderButton = renderBox.addView(gui3d.Button('Render'))            
+        self.renderButton = renderBox.addView(gui3d.Button('Render'))
+               
 
         @self.renderButton.event
         def onClicked(event):            
             
             reload(mh2mitsuba)  # Avoid having to close and reopen MH for every coding change (can be removed once testing is complete)
             mh2mitsuba.MitsubaExport(gui3d.app.selectedHuman.mesh, gui3d.app,
-                {'source':'console' if self.consoleButton.selected else 'gui' if self.guiButton.selected else 'xml'})
-            '''
-                 'lighting':'dl' if self.dlButton.selected else 'pm',
-                 'world':'sunsky' if self.sunskyButton.selected else 'texture' if self.texButton.selected else 'color'})
-            '''
+                {'source':'console' if self.consoleButton.selected else 'gui' if self.guiButton.selected else 'xml',
+                 'lighting':'dl' if self.dlButton.selected else 'pt' if self.ptButton.selected else 'pm',
+                 'sampler':'low' if self.lowdButton.selected else 'ind'})
 
     def onShow(self, event):
         self.renderButton.setFocus()

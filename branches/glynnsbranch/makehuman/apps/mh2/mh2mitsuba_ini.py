@@ -61,12 +61,17 @@ sys.path.append(MITSUBA_PATH)
        
 # The output path defines the standard output directory and the generated include file name.
 # The default directory is mitsuba_output, within the MakeHuman installation directory.
-# The default include file name is makehuman.inc.
 
 outputpath = 'mitsuba_output/'
 
 # use 'gui' for use QT4 Mitsuba interface, 'console' for Mitsuba render console or 'xml' for export to .xml file
 source = 'gui'
+
+# define  light integrator ( direct light, path tracer or photon mapping
+lighting = 'dl'
+
+# define sampler used; low discrepance, independent, etc..
+sampler = 'low'
 
 # define action : render or export
 action = 'render' 

@@ -37,6 +37,7 @@ import mh
 from os.path import basename
 #
 import sys
+#from mh2collada import exportDae
 
 
 def MitsubaExport(obj, app, settings):
@@ -55,23 +56,18 @@ def MitsubaExport(obj, app, settings):
     out_path = os.path.join(mh.getPath('render'), mh2mitsuba_ini.outputpath)
     #
     source = mh2mitsuba_ini.source if settings['source'] == 'gui' else settings['source']
+    #
+    lighting = mh2mitsuba_ini.lighting if settings['lighting'] == 'dl' else settings['lighting']
+    #
+    sampler = mh2mitsuba_ini.sampler if settings['sampler'] == 'low' else settings['sampler']
+    #
     action = mh2mitsuba_ini.action
     #
     outputDirectory = os.path.dirname(out_path)
     #
     if not os.path.exists(out_path):
         os.mkdir(out_path)
-    #
-    # Copy the textures.png file into the output directory ?
-    # because to copy, if we can use it directly from source?
-    # well... Mitsuba required the image file into same folder of file .xml, atm...
-    pigmentMap = 'data/textures/texture.png'
-    #
-    try:
-        shutil.copy(pigmentMap, outputDirectory)
-    except (IOError, os.error), why:
-        print "Can't copy %s" % str(why)
-
+    
     # The ini action option defines whether or not to attempt to render the file once
     # it's been written.
     if action == 'render':
@@ -80,6 +76,9 @@ def MitsubaExport(obj, app, settings):
         fileobj = 'human.obj'
         filename = out_path + fileobj
         previewMat = False
+        #human = 'human.obj'
+        #from export_config import exportConfig
+        options = True
 
         #
         if not previewMat:
@@ -94,10 +93,14 @@ def MitsubaExport(obj, app, settings):
         mitsubaXmlFile(filexml)
 
         # create a integrator
-        mitsubaIntegrator(filexml)
+        mitsubaIntegrator(filexml, lighting)
+        
+        # create sampler
+        samplerData = mitsubaSampler(sampler)
+        
 
         # create camera
-        mitsubaCamera(camera, resolution, filexml)
+        mitsubaCamera(camera, resolution, filexml, samplerData)
 
         # add light
         mitsubaLights(filexml)
@@ -157,7 +160,7 @@ def exportObj(obj, filename):
     for v in obj.verts:
         f.write('vn %f %f %f\n' % tuple(v.no))
 
-    # it is not necessary to declare a texture
+    # declare a texture
     #f.write('usemtl basic\n')
     f.write('s off\n') # need more info about this command
 
@@ -185,22 +188,6 @@ def exportObj(obj, filename):
 
     f.close()
 
-    # not is need material file,  remove it?
-    #
-    '''
-    f = open(file_mtl, 'w')
-    f.write('# MakeHuman exported MTL\n')
-    f.write('# www.makehuman.org\n')
-    f.write('newmtl basic\n')
-    f.write('Ka 1.0 1.0 1.0\n')
-    f.write('Kd 1.0 1.0 1.0\n')
-    f.write('Ks 0.33 0.33 0.52\n')
-    f.write('illum 5\n')
-    f.write('Ns 50.0\n')
-    if not (obj.texture == None): f.write('map_Kd %s\n' % basename(obj.texture))
-    f.close()
-    '''
-
 def mitsubaXmlFile(filexml):
     #
     # declare 'header' of .xml file
@@ -209,123 +196,180 @@ def mitsubaXmlFile(filexml):
             '<scene version="0.3.0">\n')
     f.close()
 
-def mitsubaIntegrator(filexml):
+def mitsubaIntegrator(filexml, lighting):
     #
     # lack more options
     f = open(filexml, 'a')
-    f.write('\n' +
-            '    <integrator type="path">\n' +
-            '        <integer name="maxDepth" value="8"/>\n' +
-            '    </integrator>\n')
+    if lighting == 'dl':
+        f.write('\n' +
+                '\t<integrator type="direct">\n' +
+                '\t    <integer name="luminaireSamples" value="12"/>\n' +
+                '\t    <integer name="bsdfSamples" value="8"/>\n' +
+                '\t</integrator>\n'
+                )
+    else:
+        f.write('\n' + 
+                '\t<integrator type="path">\n' + 
+                '\t    <integer name="maxDepth" value="-1"/>\n' + # % int(safeAttributes(_intg, 'maxDepth')) + 
+                '\t    <integer name="rrDepth" value="10"/>\n' + # % int(safeAttributes(_intg, 'rrDepth')) + 
+                '\t    <boolean name="strictNormals" value="false"/>\n' + # % _strictN + 
+                '\t</integrator>\n'
+                )
     f.close()
-
-def mitsubaCamera(camera, resolution, filexml):
+    
+def mitsubaSampler(sampler):
     #
-    fov = 37
+    samplerData = ''
+    if sampler == 'ind':
+        samplerData =('\n' +
+                      '\t    <sampler type="independent">\n' + 
+                      '\t        <integer name="sampleCount" value="16"/>\n' + 
+                      '\t    </sampler>\n'
+                      )
+    else:
+        samplerData =('\n' +
+                      '\t    <sampler type="ldsampler">\n' +
+                      '\t        <integer name="depth" value="4"/>\n' +
+                      '\t        <integer name="sampleCount" value="16"/>\n' +
+                      '\t    </sampler>\n'
+                      )
+    return samplerData
+    
+
+def mitsubaCamera(camera, resolution, filexml, samplerData):
+    #
+    fov = 27
     f = open(filexml, 'a')
     f.write('\n' +
-            '    <camera type="perspective" id="Camera01-lib">\n' +
-            '        <float name="fov" value="%f"/>\n' % fov +
-            '        <float name="nearClip" value="1"/>\n' +
-            '        <float name="farClip" value="1000"/>\n' +
-            '        <boolean name="mapSmallerSide" value="true"/>\n' +
-            '        <transform name="toWorld">\n' +
-            '            <scale x="-1"/>\n' +
-            '            <lookAt origin="%f, %f, %f" target="%f, %f, %f" up="0, 1, 0"/>\n' % (camera.eyeX, camera.eyeY, camera.eyeZ, camera.focusX, camera.focusY, camera.focusZ) +
-            '        </transform>\n' +
-            '        <film type="exrfilm" id="film">\n' +
-            '            <integer name="width" value="%i"/>\n'  % resolution[0] +
-            '            <integer name="height" value="%i"/>\n' % resolution[1] +
-            '            <rfilter type="gaussian"/>\n' +
-            '        </film>\n' +
-            '    </camera>\n')
+            '\t<camera type="perspective" id="Camera01-lib">\n' +
+            '\t    <float name="fov" value="%f"/>\n' % fov +
+            '\t    <float name="nearClip" value="1"/>\n' +
+            '\t    <float name="farClip" value="1000"/>\n' +
+            '\t    <boolean name="mapSmallerSide" value="true"/>\n' +
+            '\t    <transform name="toWorld">\n' +
+            '\t        <scale x="-1"/>\n' +
+            '\t        <lookAt origin="%f, %f, %f" target="%f, %f, %f" up="0, 1, 0"/>\n' % (camera.eyeX, camera.eyeY, camera.eyeZ, camera.focusX, camera.focusY, camera.focusZ) +
+            '\t    </transform>\n' +
+            '\t    <film type="exrfilm" id="film">\n' +
+            '\t        <integer name="width" value="%i"/>\n'  % resolution[0] +
+            '\t        <integer name="height" value="%i"/>\n' % resolution[1] +
+            '\t        <rfilter type="gaussian"/>\n' +
+            '\t    </film>\n' +
+            '\t    %s\n' % samplerData +
+            '\t</camera>\n')
     f.close()
 
-#
 def mitsubaLights(filexml):
+    # TODO: create a menu option
+    env_path = os.getcwd() + '/data/mitsuba/envmap.exr'
+    env = True
+    sky = False
     #
-    env = False
-    sky = True
-    #
-    '''
+
     f = open(filexml, 'a')
     # test for image environment lighting
     if env:
         f.write('\n' +
-                '    <luminaire type="envmap" id="Area_002-light">\n' +
-                '        <string name="filename" value="envmap.exr"/>\n' +
-                '        <transform name="toWorld">\n' +
-                '            <rotate z="1" angle="90"/>\n' +
-                '            <matrix value="-0.224951 -0.000001 -0.974370 0.000000 -0.974370 0.000000 0.224951 0.000000 0.000000 1.000000 -0.000001 8.870000 0.000000 0.000000 0.000000 1.000000 "/>\n' +
-                '        </transform>\n' +
-                '        <float name="intensityScale" value="3"/>\n' +
-                '    </luminaire>\n' )
+                '\t<luminaire type="envmap" id="Area_002-light">\n' +
+                '\t    <string name="filename" value="%s"/>\n' % env_path +
+                '\t    <transform name="toWorld">\n' +
+                '\t        <rotate z="1" angle="-90"/>\n' +
+                '\t        <matrix value="-0.224951 -0.000001 -0.974370 0.000000 -0.974370 0.000000 0.224951 0.000000 0.000000 1.000000 -0.000001 8.870000 0.000000 0.000000 0.000000 1.000000 "/>\n' +
+                '\t    </transform>\n' +
+                '\t    <float name="intensityScale" value="3"/>\n' +
+                '\t</luminaire>\n' )
     elif sky:
         f.write('\n'+
-                '    <luminaire type="sky">\n' +
-                '    </luminaire>\n')
+                '\t<luminaire type="sky">\n' +
+                '\t   <float name="intensityScale" value="1"/>\n' +
+                '\t</luminaire>\n')
     else:
         f.write('\n' + # test for sphere light
-                '    <shape type="sphere">\n' +
-                '       <point name="center" x="-1" y="4" z="60"/>\n' +
-                '        <float name="radius" value="1"/>\n' +
-                '            <luminaire type="area">\n' +
-                '                <blackbody name="intensity" temperature="7000K"/>\n' +
-                '            </luminaire>\n' +
-                '    </shape>\n')
+                '\t<shape type="sphere">\n' +
+                '\t    <point name="center" x="-1" y="4" z="60"/>\n' +
+                '\t    <float name="radius" value="1"/>\n' +
+                '\t    <luminaire type="area">\n' +
+                '\t        <blackbody name="intensity" temperature="4500K"/>\n' +
+                '\t    </luminaire>\n' +
+                '\t</shape>\n')
     f.close()
-    '''
-#
+
 def mitsubaTexture(filexml):
-    #
+    #pigment
+    texture_path = os.getcwd() + '/data/textures/texture.png'
+        
     f = open(filexml, 'a')
     f.write('\n' +
-            '    <texture type="bitmap" id="imageh">\n' +
-            '        <string name="filename" value="texture.png"/>\n' +
-            '    </texture>\n')
+            '\t<texture type="bitmap" id="imageh">\n' +
+            '\t    <string name="filename" value="%s"/>\n' % texture_path +
+            '\t</texture>\n')
+    # texture for plane
+    f.write('\n' +
+            '\t<texture type="checkerboard" id="__planetex">\n' +
+            '\t    <rgb name="darkColor" value="0.200 0.200 0.200"/>\n' +
+            '\t    <rgb name="brightColor" value="0.400 0.400 0.400"/>\n' +
+            '\t    <float name="uscale" value="4.0"/>\n' +
+            '\t    <float name="vscale" value="4.0"/>\n' +
+            '\t    <float name="uoffset" value="0.0"/>\n' +
+            '\t    <float name="voffset" value="0.0"/>\n' +
+            '\t</texture>\n')
     f.close()
 
 def mitsubaMaterials(filexml):
     #
     f = open(filexml, 'a')
+    # material for human obj
     f.write('\n' +
-            '    <bsdf type="diffuse" id="humanMat">\n' + # create a 'instantiate' material definition (id)
-            '        <texture type="bitmap" name="reflectance">\n' +
-            '            <string name="filename" value="texture.png"/>\n' +
-            '        </texture>\n' +
-            '    </bsdf>\n')
+            '\t<bsdf type="plastic" id="humanMat">\n' + #% mat_type +  
+            '\t    <rgb name="specularReflectance" value="0.35, 0.25, 0.25"/>\n' +
+            #'    <rgb name="diffuseReflectance" value="0.5, 0.5, 0.5"/>\n' + 
+            '\t    <float name="specularSamplingWeight" value="1.0"/>\n' +
+            '\t    <float name="diffuseSamplingWeight" value="1.0"/>\n' +
+            '\t    <boolean name="nonlinear" value="false"/>\n' +
+            '\t    <float name="intIOR" value="1.52"/>\n' +
+            '\t    <float name="extIOR" value="1.000277"/>\n' +
+            '\t    <float name="fdrInt" value="0.5"/>\n' +
+            '\t    <float name="fdrExt" value="0.5"/>\n' +
+            '\t    <ref name="diffuseReflectance" id="imageh"/>\n' + # aplic image to diffuse chanel
+            '\t</bsdf>\n'
+            )
+    #f.write('\n' +
+    #        '    <bsdf type="diffuse" id="humanMat">\n' +
+    #        #'        <srgb name="reflectance" value="#6d7185"/>\n' +
+    #        '        <ref name="reflectance" id="imageh"/>\n' +
+    #        '    </bsdf>\n')
+
+    # material for plane
+    f.write('\n' +
+            '\t<bsdf type="diffuse" id="__planemat">\n' +
+            '\t    <ref name="reflectance" id="__planetex"/>\n' +
+            '\t</bsdf>\n'
+            )
     f.close()
 
 def mitsubaGeometry(filexml, previewMat, fileobj):
     #
-    pos = (0, 4, 0)
-    size = 5
+    objpath = os.getcwd() + '/data/mitsuba/plane.obj'
     f = open(filexml, 'a')
     # write plane
-    '''
-    f.write('    <shape type="disk">\n' +
-            '        <bsdf type="diffuse">\n' +
-            '            <texture name="reflectance" type="checkerboard">\n' +
-            '                <float name="uvscale" value=".4"/>\n' +
-            '            </texture>\n' +
-            '        </bsdf>\n' +
-            '    </shape>\n')
 
-    if previewMat:
-        f.write('\n' +
-                '    <shape type="sphere">\n' +
-                '        <point name="center" x="%f" y="%f" z="%f"/>\n' % pos +
-                '        <float name="radius" value="%i"/>\n' % size +
-                '        <bsdf type="diffuse"/>\n' +
-                '        <ref id="humanMat"/>\n' +
-                '    </shape>\n')
-    #else:
-    '''
     f.write('\n' +
-            '    <shape type="obj">\n' +
-            '        <string name="filename" value="%s"/>\n' % fileobj +
-            '        <ref id="humanMat"/>\n' + # use 'instantiate' material declaration (id)
-            '    </shape>\n')
+            '\t<shape type="obj">\n' +
+            '\t    <string name="filename" value="%s"/>\n' % objpath +
+            '\t    <ref name="bsdf" id="__planemat"/>\n' +
+            '\t</shape>\n'
+            )
+
+    f.write('\n' +
+            '\t<shape type="obj">\n' +
+            '\t    <string name="filename" value="%s"/>\n' % fileobj +
+            '\t    <subsurface type="dipole">\n' +
+            '\t        <float name="densityMultiplier" value=".002"/>\n' +
+            '\t        <string name="material" value="skin2"/>\n' +
+            '\t    </subsurface>\n' +
+            '\t    <ref id="humanMat"/>\n' + # use 'instantiate' material declaration (id)
+            '\t</shape>\n'
+            )
     f.close()
 
 def mitsubaFileClose(filexml):
