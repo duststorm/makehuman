@@ -211,10 +211,12 @@ def transformObject(obj):
 
 def objectTransform(obj):
     m = matrix.translate((obj.x, obj.y, obj.z))
-    m = m * matrix.rotx(obj.rx)
-    m = m * matrix.roty(obj.ry)
-    m = m * matrix.rotz(obj.rz)
-    m = m * matrix.scale((obj.sx, obj.sy, obj.sz))
+    if any(x != 0 for x in obj.parent.rot):
+        m = m * matrix.rotx(obj.rx)
+        m = m * matrix.roty(obj.ry)
+        m = m * matrix.rotz(obj.rz)
+    if any(x != 1 for x in obj.parent.scale):
+        m = m * matrix.scale((obj.sx, obj.sy, obj.sz))
     return m
 
 def setObjectUniforms(obj):
@@ -388,7 +390,7 @@ def drawMeshes(pickMode, cameraType):
             if hasattr(obj, 'draw'):
                 obj.draw(cameraType)
 
-def draw():
+def _draw():
     drawBegin()
 
     for i, camera in enumerate(G.cameras):
@@ -411,6 +413,12 @@ def draw():
             drawMeshes(0, i)
 
     drawEnd()
+
+def draw():
+    if G.profile:
+        profiler.accum('_draw()', globals(), locals())
+    else:
+        _draw()
 
 def drawOneMesh(obj):
     glDrawBuffer(GL_FRONT)

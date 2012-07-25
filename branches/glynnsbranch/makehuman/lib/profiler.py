@@ -1,44 +1,31 @@
 from cProfile import Profile
 
-_prof = None
-_sort = -1
-_print = False
-_accum = None
+_sort = 'cumulative'
+_accum = {}
 
 def run(cmd, globals, locals):
-    flush()
+    prof = Profile()
     try:
-        _prof.runctx(cmd, globals, locals)
+        prof.runctx(cmd, globals, locals)
     finally:
-        show()
+        show(prof)
 
 def accum(cmd, globals, locals):
-    global _accum
-    if _accum != cmd:
-        flush()
-        _accum = cmd
-    _prof.runctx(cmd, globals, locals)
+    if cmd not in _accum:
+        prof = Profile()
+        _accum[cmd] = prof
+    else:
+        prof = _accum[cmd]
+    prof.runctx(cmd, globals, locals)
 
 def flush():
-    if _accum is not None:
-        show()
-    reset()
+    for cmd in sorted(_accum.keys()):
+        show(_accum[cmd])
+    _accum.clear()
 
-def show():
-    _prof.print_stats(_sort)
-
-def reset():
-    global _prof, _accum
-    _prof = Profile()
-    _accum = None
+def show(prof):
+    prof.print_stats(_sort)
 
 def set_sort(sort):
     global _sort
     _sort = sort
-
-def set_print(enable):
-    global _print
-    _print = enable
-
-reset()
-set_sort('cumulative')

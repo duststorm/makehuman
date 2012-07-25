@@ -35,6 +35,7 @@ class Globals(object):
 G = Globals()
 
 def callMouseButtonDown(b, x, y):
+    profiler.flush()
     if G.mouseDownCallback:
         if G.profile:
             profiler.run('G.mouseDownCallback(b, x, y)', globals(), locals())
