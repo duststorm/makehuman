@@ -20,26 +20,17 @@ class MitsubaTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Mitsuba')
 
         # Buttons
-        '''
-        resBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Resolution', gui3d.GroupBoxStyle._replace(height=25+24*2+6)))
-        rendering_width = gui3d.app.settings.get('rendering_width', 800)
-        self.width= resBox.addView(gui3d.TextEdit(str(rendering_width), gui3d.TextEditStyle._replace(width=112), gui3d.filenameValidator))
-        
-        @self.width.event
-        def onChange(value):
-            gui3d.app.settings['rendering_width'] = 0 if not value else int(value)
-        
-        '''
-        #Test for Path to binaries
+        # Test for path to Mitsuba binaries
         pathBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Mitsuba path', gui3d.GroupBoxStyle._replace(height=25+24*2+6)))
-        path_bin = gui3d.app.settings.get('path_bin', 'h:/')
+        binpath = []
+        path_bin = gui3d.app.settings.get('path_bin', 'c:/Mitsuba')
         self.path= pathBox.addView(gui3d.TextEdit(str(path_bin), gui3d.TextEditStyle._replace(width=112)))
         #
         @self.path.event
         def onChange(value):
-            gui3d.app.settings['path_bin'] = '' if not value else str(value)
+            gui3d.app.settings['path_bin'] = 'Enter your path' if not value else str(value)
         
-        #
+        # Type of lighting method
         lightingBox = self.addView(gui3d.GroupBox([10, 140, 9.0], 'Integrators', gui3d.GroupBoxStyle._replace(height=25+24*7+6)))
         lighting = []
         self.dlButton = lightingBox.addView(gui3d.RadioButton(lighting, 'DirectLighting', selected = True))

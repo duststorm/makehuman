@@ -37,7 +37,6 @@ import mh
 from os.path import basename
 #
 import sys
-#from mh2collada import exportDae
 
 
 def MitsubaExport(obj, app, settings):
@@ -49,40 +48,42 @@ def MitsubaExport(obj, app, settings):
     # application for the changes to take effect.
 
     camera = app.modelCamera
+    #
     resolution = (app.settings.get('rendering_width', 800), app.settings.get('rendering_height', 600))
-
+    #
     reload(mh2mitsuba_ini)
-
-    out_path = os.path.join(mh.getPath('render'), mh2mitsuba_ini.outputpath)
     #
     source = mh2mitsuba_ini.source if settings['source'] == 'gui' else settings['source']
     #
     lighting = mh2mitsuba_ini.lighting if settings['lighting'] == 'dl' else settings['lighting']
     #
     sampler = mh2mitsuba_ini.sampler if settings['sampler'] == 'low' else settings['sampler']
-    #
-    action = mh2mitsuba_ini.action
+        
+    # test: Mitsuba binaries path
+    Path_bin = (app.settings.get('path_bin', ''))
+    
+    # output directory for rendering
+    out_path = os.path.join(mh.getPath('render'), mh2mitsuba_ini.outputpath)
+    
+    # Make sure the directory exists
+    if not os.path.exists(out_path):
+        os.makedirs(out_path)
     #
     outputDirectory = os.path.dirname(out_path)
-    #
-    if not os.path.exists(out_path):
-        os.mkdir(out_path)
     
     # The ini action option defines whether or not to attempt to render the file once
     # it's been written.
+    #
+    action = mh2mitsuba_ini.action
+    #
     if action == 'render':
 
         # exporting human mesh. Use mh2obj.py and some variances..!
         fileobj = 'human.obj'
         filename = out_path + fileobj
-        previewMat = False
-        #human = 'human.obj'
-        #from export_config import exportConfig
-        options = True
-
+        
         #
-        if not previewMat:
-            exportObj(obj, filename)
+        exportObj(obj, filename)
 
         # create name for Mitsuba xml scene file
         # this name is different to the name use for command line?
@@ -98,7 +99,6 @@ def MitsubaExport(obj, app, settings):
         # create sampler
         samplerData = mitsubaSampler(sampler)
         
-
         # create camera
         mitsubaCamera(camera, resolution, filexml, samplerData)
 
@@ -111,21 +111,24 @@ def MitsubaExport(obj, app, settings):
         # add materials
         mitsubaMaterials(filexml)
 
-        # add geometry (Human  or previewMat mesh)
-        mitsubaGeometry(filexml, previewMat, fileobj)
+        # add geometry
+        mitsubaGeometry(filexml, fileobj)
 
         # closed scene file
         mitsubaFileClose(filexml)
 
         #
         xmlDataFile = str(fileobj).replace('.obj', '.xml')
+        #
         if source == 'gui':
-            pathHandle = subprocess.Popen(cwd=outputDirectory, args = mh2mitsuba_ini.mitsuba_gui +' '+ xmlDataFile)
+            render_mode  = str(Path_bin)+'/mtsgui.exe'
+            pathHandle = subprocess.Popen(cwd=outputDirectory, args = render_mode +' '+ xmlDataFile)
         #
         elif source == 'console':
-            pathHandle = subprocess.Popen(cwd=outputDirectory, args = mh2mitsuba_ini.mitsuba_console +' '+ xmlDataFile)
+            render_mode  = str(Path_bin)+'/mitsuba.exe'
+            pathHandle = subprocess.Popen(cwd=outputDirectory, args = render_mode +' '+ xmlDataFile)
         else:
-            print 'nothing for renderer'
+            print 'File xml created into output folder. Ready for renderer \n', filexml
 
 def exportObj(obj, filename):
     """
@@ -161,8 +164,7 @@ def exportObj(obj, filename):
         f.write('vn %f %f %f\n' % tuple(v.no))
 
     # declare a texture
-    #f.write('usemtl basic\n')
-    f.write('s off\n') # need more info about this command
+    f.write('s off\n') # need more info about this option
 
     #
     groupFilter = None
@@ -173,10 +175,10 @@ def exportObj(obj, filename):
             if exportGroups:
                 f.write('g %s\n' % fg.name)
         # filter eyebrown, lash and joint objects
-        # TO Do; separate this objects for applicate a special texture values?
+        # TO DO; separate this objects for applicate a special texture values?
         if not '-eyebrown' in fg.name:
             if not '-lash' in fg.name:
-                if not 'joint-' in fg.name: # if 'smmoth' option is 'ON', not show joints?
+                if not 'joint-' in fg.name: # if 'smooth' option is 'ON', not show joints?
                     for face in fg.faces:
                         f.write('f')
                         for i, v in enumerate(face.verts):
@@ -197,7 +199,6 @@ def mitsubaXmlFile(filexml):
     f.close()
 
 def mitsubaIntegrator(filexml, lighting):
-    #
     # lack more options
     f = open(filexml, 'a')
     if lighting == 'dl':
@@ -210,9 +211,9 @@ def mitsubaIntegrator(filexml, lighting):
     else:
         f.write('\n' + 
                 '\t<integrator type="path">\n' + 
-                '\t    <integer name="maxDepth" value="-1"/>\n' + # % int(safeAttributes(_intg, 'maxDepth')) + 
-                '\t    <integer name="rrDepth" value="10"/>\n' + # % int(safeAttributes(_intg, 'rrDepth')) + 
-                '\t    <boolean name="strictNormals" value="false"/>\n' + # % _strictN + 
+                '\t    <integer name="maxDepth" value="-1"/>\n' + 
+                '\t    <integer name="rrDepth" value="10"/>\n' +
+                '\t    <boolean name="strictNormals" value="false"/>\n' + 
                 '\t</integrator>\n'
                 )
     f.close()
@@ -235,7 +236,6 @@ def mitsubaSampler(sampler):
                       )
     return samplerData
     
-
 def mitsubaCamera(camera, resolution, filexml, samplerData):
     #
     fov = 27
@@ -295,7 +295,7 @@ def mitsubaLights(filexml):
     f.close()
 
 def mitsubaTexture(filexml):
-    #pigment
+    #pigment map
     texture_path = os.getcwd() + '/data/textures/texture.png'
         
     f = open(filexml, 'a')
@@ -318,21 +318,22 @@ def mitsubaTexture(filexml):
 def mitsubaMaterials(filexml):
     #
     f = open(filexml, 'a')
-    # material for human obj
+    # material for human mesh
     f.write('\n' +
             '\t<bsdf type="plastic" id="humanMat">\n' + #% mat_type +  
             '\t    <rgb name="specularReflectance" value="0.35, 0.25, 0.25"/>\n' +
             #'    <rgb name="diffuseReflectance" value="0.5, 0.5, 0.5"/>\n' + 
-            '\t    <float name="specularSamplingWeight" value="1.0"/>\n' +
+            '\t    <float name="specularSamplingWeight" value="0.50"/>\n' +
             '\t    <float name="diffuseSamplingWeight" value="1.0"/>\n' +
             '\t    <boolean name="nonlinear" value="false"/>\n' +
             '\t    <float name="intIOR" value="1.52"/>\n' +
             '\t    <float name="extIOR" value="1.000277"/>\n' +
             '\t    <float name="fdrInt" value="0.5"/>\n' +
             '\t    <float name="fdrExt" value="0.5"/>\n' +
-            '\t    <ref name="diffuseReflectance" id="imageh"/>\n' + # aplic image to diffuse chanel
+            '\t    <ref name="diffuseReflectance" id="imageh"/>\n' + # aplic texture image to diffuse chanel
             '\t</bsdf>\n'
             )
+    # simple material
     #f.write('\n' +
     #        '    <bsdf type="diffuse" id="humanMat">\n' +
     #        #'        <srgb name="reflectance" value="#6d7185"/>\n' +
@@ -347,26 +348,25 @@ def mitsubaMaterials(filexml):
             )
     f.close()
 
-def mitsubaGeometry(filexml, previewMat, fileobj):
+def mitsubaGeometry(filexml, fileobj):
     #
     objpath = os.getcwd() + '/data/mitsuba/plane.obj'
     f = open(filexml, 'a')
     # write plane
-
     f.write('\n' +
             '\t<shape type="obj">\n' +
             '\t    <string name="filename" value="%s"/>\n' % objpath +
             '\t    <ref name="bsdf" id="__planemat"/>\n' +
             '\t</shape>\n'
             )
-
+    # human mesh
     f.write('\n' +
             '\t<shape type="obj">\n' +
             '\t    <string name="filename" value="%s"/>\n' % fileobj +
-            '\t    <subsurface type="dipole">\n' +
-            '\t        <float name="densityMultiplier" value=".002"/>\n' +
-            '\t        <string name="material" value="skin2"/>\n' +
-            '\t    </subsurface>\n' +
+            #'\t    <subsurface type="dipole">\n' +
+            #'\t        <float name="densityMultiplier" value=".002"/>\n' +
+            #'\t        <string name="material" value="skin2"/>\n' +
+            #'\t    </subsurface>\n' +
             '\t    <ref id="humanMat"/>\n' + # use 'instantiate' material declaration (id)
             '\t</shape>\n'
             )

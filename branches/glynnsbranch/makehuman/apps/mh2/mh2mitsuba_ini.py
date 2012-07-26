@@ -37,7 +37,7 @@ MITSUBA_PATH = ''
 
 if sys.platform == 'win32':
     if MITSUBA_PATH == '':
-        MITSUBA_PATH = "H:/Mitsuba31"
+        MITSUBA_PATH = "C:\Mitsuba 0.3.1"
        
     # this part is only for test with Mitsuba Python API [ ---------------
     #dllArray = ['mitsuba','zlib1','boost_python-vc100-mt-1_44', 'boost_system-vc100-mt-1_44', 'boost_filesystem-vc100-mt-1_44']
