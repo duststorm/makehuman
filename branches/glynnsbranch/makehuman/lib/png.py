@@ -3,6 +3,8 @@ from ctypes import *
 
 if sys.platform == 'win32':
     _png = CDLL('bin/win/libpng12-0.dll')
+elif sys.platform == 'darwin':
+    _png = CDLL('/opt/local/lib/libpng.dylib')
 else:
     _png = CDLL('libpng.so')
 

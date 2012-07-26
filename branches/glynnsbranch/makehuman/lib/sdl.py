@@ -6,6 +6,8 @@ if sys.platform == 'win32':
         _sdl = cdll.SDL
     except:
         _sdl = CDLL('bin/win/SDL.dll')
+elif sys.platform == 'darwin':
+    _sdl = CDLL('/opt/local/lib/libSDL.dylib')
 else:
     _sdl = CDLL('libSDL.so')
 
