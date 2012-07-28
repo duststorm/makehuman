@@ -20,9 +20,8 @@ class MitsubaTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Mitsuba')
 
         # Buttons
-        # Test for path to Mitsuba binaries
+        # Test for path to Mitsuba binaries FileChooser
         pathBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Mitsuba path', gui3d.GroupBoxStyle._replace(height=25+24*2+6)))
-        binpath = []
         path_bin = gui3d.app.settings.get('path_bin', 'c:/Mitsuba')
         self.path= pathBox.addView(gui3d.TextEdit(str(path_bin), gui3d.TextEditStyle._replace(width=112)))
         #

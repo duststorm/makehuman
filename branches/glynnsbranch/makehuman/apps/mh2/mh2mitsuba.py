@@ -34,6 +34,9 @@ import subprocess
 import mh2mitsuba_ini
 import random
 import mh
+# povman
+import gui3d
+# end
 from os.path import basename
 #
 import sys
@@ -58,14 +61,10 @@ def MitsubaExport(obj, app, settings):
     lighting = mh2mitsuba_ini.lighting if settings['lighting'] == 'dl' else settings['lighting']
     #
     sampler = mh2mitsuba_ini.sampler if settings['sampler'] == 'low' else settings['sampler']
-        
-    # test: Mitsuba binaries path
-    Path_bin = (app.settings.get('path_bin', ''))
-    
+           
     # output directory for rendering
-    out_path = os.path.join(mh.getPath('render'), mh2mitsuba_ini.outputpath)
-    
     # Make sure the directory exists
+    out_path = os.path.join(mh.getPath('render'), mh2mitsuba_ini.outputpath)
     if not os.path.exists(out_path):
         os.makedirs(out_path)
     #
@@ -73,12 +72,14 @@ def MitsubaExport(obj, app, settings):
     
     # The ini action option defines whether or not to attempt to render the file once
     # it's been written.
-    #
     action = mh2mitsuba_ini.action
+    
+    # Mitsuba binaries path
+    Path_bin = (app.settings.get('path_bin', ''))
     #
-    if action == 'render':
-
-        # exporting human mesh. Use mh2obj.py and some variances..!
+    if os.path.exists(Path_bin) and action == 'render':
+        
+        # exporting human mesh.
         fileobj = 'human.obj'
         filename = out_path + fileobj
         
@@ -88,7 +89,7 @@ def MitsubaExport(obj, app, settings):
         # create name for Mitsuba xml scene file
         # this name is different to the name use for command line?
         filexml = str(filename).replace('.obj','.xml')
-        print filexml
+        #print filexml
 
         # open xml file scene
         mitsubaXmlFile(filexml)
@@ -102,7 +103,7 @@ def MitsubaExport(obj, app, settings):
         # create camera
         mitsubaCamera(camera, resolution, filexml, samplerData)
 
-        # add light
+        # add lights
         mitsubaLights(filexml)
 
         # add texture data
@@ -112,7 +113,8 @@ def MitsubaExport(obj, app, settings):
         mitsubaMaterials(filexml)
 
         # add geometry
-        mitsubaGeometry(filexml, fileobj)
+        subSurfaceData = '' # mitsubaSSS()
+        mitsubaGeometry(filexml, fileobj, subSurfaceData)
 
         # closed scene file
         mitsubaFileClose(filexml)
@@ -127,8 +129,16 @@ def MitsubaExport(obj, app, settings):
         elif source == 'console':
             render_mode  = str(Path_bin)+'/mitsuba.exe'
             pathHandle = subprocess.Popen(cwd=outputDirectory, args = render_mode +' '+ xmlDataFile)
+        #
         else:
             print 'File xml created into output folder. Ready for renderer \n', filexml
+    
+    # if not valid path
+    else:
+        app.prompt('WARNING!!',
+                   'Path to Mitsuba is not correct or not exist.\n'\
+                   'Please, enter a valid path to Mitsuba folder.',
+                   'Accept')    
 
 def exportObj(obj, filename):
     """
@@ -151,8 +161,7 @@ def exportObj(obj, filename):
     f = open(filename, 'w')
     f.write('# MakeHuman exported OBJ for Mitsuba\n')
     f.write('# www.makehuman.org\n')
-    # it is not necessary to create  mtllib
-
+    # 
     for v in obj.verts:
         f.write('v %f %f %f\n' % tuple(v.co))
 
@@ -163,9 +172,6 @@ def exportObj(obj, filename):
     for v in obj.verts:
         f.write('vn %f %f %f\n' % tuple(v.no))
 
-    # declare a texture
-    f.write('s off\n') # need more info about this option
-
     #
     groupFilter = None
     exportGroups = False
@@ -174,20 +180,32 @@ def exportObj(obj, filename):
         if not groupFilter or groupFilter(fg):
             if exportGroups:
                 f.write('g %s\n' % fg.name)
-        # filter eyebrown, lash and joint objects
-        # TO DO; separate this objects for applicate a special texture values?
-        if not '-eyebrown' in fg.name:
+            # filter eyebrown, lash and joint objects
+            # TO DO; separate this objects for applicate a special texture values?
+            '''
+            if ['head', 'nose', 'mouth', 'chin'] in fg.name:
+                for face in fg.faces:
+                    f.write('f')
+                    for i, v in enumerate(face.verts):
+                        if (obj.uvValues == None):
+                            f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
+                        else:
+                            f.write(' %i/%i/%i ' % (v.idx + 1, face.uv[i] + 1, v.idx + 1))
+                    f.write('\n')
+            '''
             if not '-lash' in fg.name:
-                if not 'joint-' in fg.name: # if 'smooth' option is 'ON', not show joints?
-                    for face in fg.faces:
-                        f.write('f')
-                        for i, v in enumerate(face.verts):
-                            if (obj.uvValues == None):
-                                f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
-                            else:
-                                f.write(' %i/%i/%i ' % (v.idx + 1, face.uv[i] + 1, v.idx + 1))
-                        f.write('\n')
-
+                if not 'joint-' in fg.name:
+                    if not '-eyebrown' in fg.name:
+                        for face in fg.faces:
+                            f.write('f')
+                            for i, v in enumerate(face.verts):
+                                if (obj.uvValues == None):
+                                    f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
+                                else:
+                                    f.write(' %i/%i/%i ' % (v.idx + 1, face.uv[i] + 1, v.idx + 1))
+                            #
+                            f.write('\n')   
+    #
     f.close()
 
 def mitsubaXmlFile(filexml):
@@ -217,7 +235,18 @@ def mitsubaIntegrator(filexml, lighting):
                 '\t</integrator>\n'
                 )
     f.close()
-    
+
+def mitsubaSSS():
+    #subSurfaceData = ''
+    subSurfaceData = ('\n' +
+                      '\t    <subsurface type="dipole">\n' +
+                      '\t        <float name="densityMultiplier" value=".002"/>\n' +
+                      '\t        <string name="material" value="skin2"/>\n' +
+                      '\t    </subsurface>\n'
+                      )
+    return subSurfaceData
+
+   
 def mitsubaSampler(sampler):
     #
     samplerData = ''
@@ -348,25 +377,24 @@ def mitsubaMaterials(filexml):
             )
     f.close()
 
-def mitsubaGeometry(filexml, fileobj):
+def mitsubaGeometry(filexml, fileobj, subSurfaceData):
     #
     objpath = os.getcwd() + '/data/mitsuba/plane.obj'
     f = open(filexml, 'a')
     # write plane
+    '''
     f.write('\n' +
             '\t<shape type="obj">\n' +
             '\t    <string name="filename" value="%s"/>\n' % objpath +
             '\t    <ref name="bsdf" id="__planemat"/>\n' +
             '\t</shape>\n'
             )
+    '''
     # human mesh
     f.write('\n' +
             '\t<shape type="obj">\n' +
             '\t    <string name="filename" value="%s"/>\n' % fileobj +
-            #'\t    <subsurface type="dipole">\n' +
-            #'\t        <float name="densityMultiplier" value=".002"/>\n' +
-            #'\t        <string name="material" value="skin2"/>\n' +
-            #'\t    </subsurface>\n' +
+            '\t    %s\n' % subSurfaceData +
             '\t    <ref id="humanMat"/>\n' + # use 'instantiate' material declaration (id)
             '\t</shape>\n'
             )

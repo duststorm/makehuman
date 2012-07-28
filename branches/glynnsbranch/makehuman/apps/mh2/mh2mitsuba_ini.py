@@ -30,34 +30,6 @@ to reload the application.
 print 'Mitsuba Renderer Parameter File'
 
 import sys
-
-# config path to Mitsuba. Change for your own path
-# TO DO: create option menu into 'render settings' gui ?
-MITSUBA_PATH = ''
-
-if sys.platform == 'win32':
-    if MITSUBA_PATH == '':
-        MITSUBA_PATH = "C:\Mitsuba 0.3.1"
-       
-    # this part is only for test with Mitsuba Python API [ ---------------
-    #dllArray = ['mitsuba','zlib1','boost_python-vc100-mt-1_44', 'boost_system-vc100-mt-1_44', 'boost_filesystem-vc100-mt-1_44']
-    # ----------- ]
-elif sys.platform == 'darwin':
-    MITSUBA_PATH= '/home/user/programs/mitsuba'  # need revision
-    
-else:
-    MITSUBA_PATH="/home/user/programs/mitsuba"  #change for your own installation path
-       
-#
-sys.path.append(MITSUBA_PATH)
-
-# this part is only for test with Mitsuba Python API [ -----------
-#for dll in dllArray:
-#    try:
-#        ctypes.cdll.LoadLibrary(os.path.join(MITSUBA_PATH, dll))
-#    except Exception as e:
-#        print("ERROR: Failed to load library " + dll + ", " + repr(e))
-#---------------- ]
        
 # The output path defines the standard output directory and the generated include file name.
 # The default directory is mitsuba_output, within the MakeHuman installation directory.
@@ -75,12 +47,4 @@ sampler = 'low'
 
 # define action : render or export
 action = 'render' 
-
-# Configure the following variable to point to the Mitsuba executable on your system.
-# A number of examples for all executables are provided.
-# Don't use the backslash character in the path.
-
-mitsuba_import = MITSUBA_PATH + '/mtsimport.exe'  
-mitsuba_console = MITSUBA_PATH + '/mitsuba.exe'
-mitsuba_gui = MITSUBA_PATH + '/mtsgui.exe'
 
