@@ -1702,7 +1702,7 @@ def setupRig(obj, proxyData):
             ('IK_L', 'THEME03'),
             ('IK_R', 'THEME04'),
         ]
-        the.RecalcRoll = "['Foot_L','Toe_L','Foot_R','Toe_R','DfmFoot_L','DfmToe_L','DfmFoot_R','DfmToe_R']"
+        the.RecalcRoll = "['EyeParent_L','EyeParent_R','Foot_L','Toe_L','Foot_R','Toe_R','DfmFoot_L','DfmToe_L','DfmFoot_R','DfmToe_R']"
         the.GizmoFiles = ["./shared/mhx/templates/custom-shapes25.mhx", 
                       "./shared/mhx/templates/panel_gizmo25.mhx",
                       "./shared/mhx/templates/gizmos25.mhx"]

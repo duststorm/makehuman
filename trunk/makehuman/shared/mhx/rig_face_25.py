@@ -28,12 +28,8 @@ FaceJoints = [
     ('r-mouth',         'v', 2490),
     ('l-mouth',         'v', 8907),
 
-    ('l-gaze',          'l', ((-19,'l-eye'), (20,'l-eye-target'))),
-    ('r-gaze',          'l', ((-19,'r-eye'), (20,'r-eye-target'))),
-    ('gaze',            'l', ((0.5, 'l-gaze'), (0.5, 'r-gaze'))),
-    ('l-gaze-tail',     'l', ((-20,'l-eye'), (21,'l-eye-target'))),
-    ('r-gaze-tail',     'l', ((-20,'r-eye'), (21,'r-eye-target'))),
-    ('gaze-tail',       'l', ((0.5, 'l-gaze-tail'), (0.5, 'r-gaze-tail'))),
+    ('eyes',            'l', ((0.5, 'l-eye'), (0.5,'r-eye'))),
+    ('gaze',            'o', ('eyes', (0,0,5))),
 ]
 
 FaceHeadsTails = [
@@ -43,32 +39,37 @@ FaceHeadsTails = [
     ('TongueTip',            'tongue-3', 'tongue-4'),
 
     ('Eye_R',                'l-eye', 'l-eye-target'),
+    ('EyeParent_R',          'l-eye', 'l-eye-target'),
     ('DfmUpLid_R',           'l-eye', 'l-upperlid'),
     ('DfmLoLid_R',           'l-eye', 'l-lowerlid'),
+    
     ('Eye_L',                'r-eye', 'r-eye-target'),
+    ('EyeParent_L',          'r-eye', 'r-eye-target'),
     ('DfmUpLid_L',           'r-eye', 'r-upperlid'),
     ('DfmLoLid_L',           'r-eye', 'r-lowerlid'),
 
-    ('Gaze',                  'gaze', 'gaze-tail'),
-    ('Gaze_R',                'l-gaze', 'l-gaze-tail'),
-    ('Gaze_L',                'r-gaze', 'r-gaze-tail'),
+    ('Eyes',                 'eyes', ('eyes', (0,0,1))),
+    ('Gaze',                 'gaze', ('gaze', (0,0,1))),
+    ('GazeParent',           'neck2', 'head-end'),
 ]
 
 
 FaceArmature = [
-    ('Jaw',                0.0, 'Head', F_DEF+F_WIR, L_HEAD, NoBB),
-    ('TongueBase',        0.0, 'Jaw', F_DEF+F_WIR, L_HEAD, NoBB),
-    ('TongueMid',        0.0, 'TongueBase', F_DEF+F_WIR, L_HEAD, NoBB),
-    ('TongueTip',        0.0, 'TongueMid', F_DEF+F_WIR, L_HEAD, NoBB),
-    ('Gaze',            pi, (None, 'Head'), F_WIR, L_HEAD, NoBB),
-    ('Gaze_R',            pi, 'Gaze', F_WIR, L_HEAD, NoBB),
-    ('Gaze_L',            pi, 'Gaze', F_WIR, L_HEAD, NoBB),
-    ('Eye_R',            0.0, 'Head', F_DEF, L_DEF, NoBB),
-    ('Eye_L',            0.0, 'Head', F_DEF, L_DEF, NoBB),
-    ('DfmUpLid_R',        0.279253, 'Head', F_DEF, L_DEF, NoBB),
-    ('DfmLoLid_R',        0.0, 'Head', F_DEF, L_DEF, NoBB),
-    ('DfmUpLid_L',        -0.279253, 'Head', F_DEF, L_DEF, NoBB),
-    ('DfmLoLid_L',        0.0, 'Head', F_DEF, L_DEF, NoBB),
+    ('Jaw',              0, 'Head', F_DEF, L_HEAD, NoBB),
+    ('TongueBase',       0, 'Jaw', F_DEF, L_HEAD, NoBB),
+    ('TongueMid',        0, 'TongueBase', F_DEF, L_HEAD, NoBB),
+    ('TongueTip',        0, 'TongueMid', F_DEF, L_HEAD, NoBB),
+    ('GazeParent',       0, 'MasterFloor', 0, L_HELP, NoBB),
+    ('Gaze',             pi, 'GazeParent', 0, L_HEAD, NoBB),
+    ('EyeParent_R',      0, 'Head', 0, L_HELP, NoBB),
+    ('EyeParent_L',      0, 'Head', 0, L_HELP, NoBB),
+    ('Eye_R',            0, 'EyeParent_R', F_DEF, L_HEAD+L_DEF, NoBB),
+    ('Eye_L',            0, 'EyeParent_L', F_DEF, L_HEAD+L_DEF, NoBB),
+    ('Eyes',             0, 'Head', 0, L_HELP, NoBB),
+    ('DfmUpLid_R',       0.279253, 'Head', F_DEF, L_DEF, NoBB),
+    ('DfmLoLid_R',       0, 'Head', F_DEF, L_DEF, NoBB),
+    ('DfmUpLid_L',       -0.279253, 'Head', F_DEF, L_DEF, NoBB),
+    ('DfmLoLid_L',       0, 'Head', F_DEF, L_DEF, NoBB),
 ]
 
 
@@ -86,14 +87,10 @@ def FaceControlPoses(fp):
 
     addPoseBone(fp, 'TongueTip', None, None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [])
 
-    addPoseBone(fp, 'Gaze', 'MHCircle05', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-        [('ChildOf', C_CHILDOF, 1, ['Head', 'Head', (1,1,1), (1,1,1), (1,1,1)]),
-         ('ChildOf', C_CHILDOF, 0, ['World', 'MasterFloor', (1,1,1), (1,1,1), (1,1,1)]),
-        ])
+    addPoseBone(fp, 'Gaze', 'MHGaze', None, (0,0,0), (1,1,1), (0,1,1), (1,1,1), 0, [])
 
-    addPoseBone(fp, 'Gaze_R', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
-
-    addPoseBone(fp, 'Gaze_L', 'MHCircle025', None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+    addPoseBone(fp, 'GazeParent', None, None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
+         [('CopyTrans', 0, 1, ['Head', 'Head', 0])])
 
     addPoseBone(fp, 'DfmUpLid_R', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
@@ -103,11 +100,19 @@ def FaceControlPoses(fp):
 
     addPoseBone(fp, 'DfmLoLid_L', None, None, (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, [])
 
-    addPoseBone(fp, 'Eye_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
-        [('IK', 0, 1, ['IK', 'Gaze_R', 1, None, (True, False,False), 1.0])])
+    addPoseBone(fp, 'Eyes', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+        [('IK', 0, 1, ['IK', 'Gaze', 1, None, (True, False,False), 1.0])])
 
-    addPoseBone(fp, 'Eye_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
-        [('IK', 0, 1, ['IK', 'Gaze_L', 1, None, (True, False,False), 1.0])])
+    addPoseBone(fp, 'Eye_R', 'MHCircle025', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+
+    addPoseBone(fp, 'Eye_L', 'MHCircle025', None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+
+    addPoseBone(fp, 'EyeParent_L', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
+        [('CopyRot', C_LOCAL, 1, ['Eyes', 'Eyes', (1,1,1), (0,0,0), True])])
+
+    addPoseBone(fp, 'EyeParent_R', None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
+        [('CopyRot', C_LOCAL, 1, ['Eyes', 'Eyes', (1,1,1), (0,0,0), True])])
+
     return
 
 #
@@ -137,7 +142,6 @@ def FaceDeformDrivers(fp):
 FacePropDrivers = []
 
 SoftFacePropDrivers = [
-    ('Gaze', 'Head', ['GazeFollowsHead'], 'x1'),
-    ('Gaze', 'World', ['GazeFollowsHead'], '1-x1'),
+    ('GazeParent', 'Head', ['GazeFollowsHead'], 'x1'),
 ]
 
