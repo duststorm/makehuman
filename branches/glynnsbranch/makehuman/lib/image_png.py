@@ -97,3 +97,74 @@ def load(path):
     png.destroy_read_struct(byref(png_ptr), byref(info_ptr), None)
 
     return pixels
+
+def _write_data(png_ptr, data, length):
+    userp = png.get_io_ptr(png_ptr)
+    userp = cast(userp, POINTER(py_object))
+    outf = userp.contents.value
+    outf.write(cast(data, POINTER(c_char))[:length])
+
+def _flush_data(png_ptr):
+    userp = png.get_io_ptr(png_ptr)
+    userp = cast(userp, POINTER(py_object))
+    outf = userp.contents.value
+    outf.flush()
+
+_color_types = [
+    None, 
+    png.COLOR_TYPE_GRAY,
+    png.COLOR_TYPE_GRAY_ALPHA,
+    png.COLOR_TYPE_RGB,
+    png.COLOR_TYPE_RGB_ALPHA
+    ]
+
+def save(path, data):
+    base, ext = os.path.splitext(path)
+    ext = ext.lower()
+    if ext != '.png':
+        raise NotImplementedError()
+
+    global _version
+    if _version is None:
+        _version = png.get_header_ver(c_void_p(0))
+
+    png_ptr = png.create_write_struct(_version, None, None, None)
+    png_ptr = c_void_p(png_ptr)
+    if not png_ptr:
+        raise RuntimeError("Couldn't allocate PNG structure")
+
+    info_ptr = png.create_info_struct(png_ptr)
+    info_ptr = c_void_p(info_ptr)
+    if not info_ptr:
+        raise RuntimeError("Couldn't allocate PNG info structure")
+
+    outf = open(path, 'wb')
+    outfp = pointer(py_object(outf))
+
+    write_data = png.rw_func(_write_data)
+    flush_data = png.flush_func(_flush_data)
+    png.set_write_fn(png_ptr, cast(outfp, c_void_p), write_data, flush_data)
+
+    h, w, c = data.shape
+
+    color_type = _color_types[c]
+
+    png.set_IHDR(png_ptr, info_ptr, w, h, 8, color_type,
+                 png.INTERLACE_NONE,
+                 png.COMPRESSION_TYPE_DEFAULT,
+                 png.FILTER_TYPE_DEFAULT)
+
+    buf = data.tostring()
+    buf = cast(c_char_p(buf), c_void_p)
+    row_pointers = (c_void_p * h)()
+    for i in xrange(h):
+        row_pointers[i] = c_void_p(buf.value + i * w * c)
+
+    png.set_rows(png_ptr, info_ptr, cast(row_pointers, POINTER(c_void_p)))
+
+    png.write_png(png_ptr, info_ptr, 0, None)
+
+    png.destroy_write_struct(byref(png_ptr), byref(info_ptr))
+
+    del outfp
+    outf.close()

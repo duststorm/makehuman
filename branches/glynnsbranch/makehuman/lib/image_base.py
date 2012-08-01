@@ -4,13 +4,15 @@ import numpy as np
 from core import G
 if G.use_wximage:
     import image_wx
+elif G.use_pil:
+    import image_pil
 elif G.use_sdlimage:
     import image_sdl
-if G.use_pil:
-    import image_pil
+    import image_bmp
+    import image_png
 else:
     import image_png
-import image_bmp
+    import image_bmp
 
 _all = ['new', 'open', 'fromstring', 'fromdata']
 
@@ -54,14 +56,19 @@ class Image(object):
         return {1: 'L', 2: 'LA', 3: 'RGB', 4: 'RGBA'}[c]
 
     def save(self, path):
-        base, ext = os.path.splitext(path)
-        ext = ext.lower()
         if G.use_wximage:
             image_wx.save(path, self._data)
         elif G.use_pil:
             image_pil.save(path, self._data)
         else:
-            image_bmp.save(path, self._data)
+            base, ext = os.path.splitext(path)
+            ext = ext.lower()
+            if ext == '.bmp':
+                image_bmp.save(path, self._data)
+            elif ext == '.png':
+                image_png.save(path, self._data)
+            else:
+                raise NotImplementedError()
 
     def resize(self, size, filter):
         dw, dh = size

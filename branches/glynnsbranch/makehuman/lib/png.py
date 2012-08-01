@@ -38,7 +38,19 @@ COLOR_TYPE_GRAY_ALPHA	= COLOR_MASK_ALPHA
 COLOR_TYPE_RGBA		= COLOR_TYPE_RGB_ALPHA
 COLOR_TYPE_GA		= COLOR_TYPE_GRAY_ALPHA
 
+COMPRESSION_TYPE_BASE	= 0
+COMPRESSION_TYPE_DEFAULT = COMPRESSION_TYPE_BASE
+
+FILTER_TYPE_BASE	= 0	# Single row per-byte filtering
+INTRAPIXEL_DIFFERENCING = 64	# Used only in MNG datastreams
+FILTER_TYPE_DEFAULT	= FILTER_TYPE_BASE
+
+INTERLACE_NONE		= 0	# Non-interlaced image
+INTERLACE_ADAM7		= 1	# Adam7 interlacing
+INTERLACE_LAST		= 2	# Not a valid value
+
 rw_func = CFUNCTYPE(None, c_void_p, c_void_p, c_size_t)
+flush_func = CFUNCTYPE(None, c_void_p)
 
 # png_structp png_create_read_struct(png_const_charp user_png_ver, png_voidp error_ptr, png_error_ptr error_fn, png_error_ptr warn_fn)
 create_read_struct = _png.png_create_read_struct
@@ -129,3 +141,33 @@ get_io_ptr.restype = c_void_p
 get_header_ver = _png.png_get_header_ver
 get_header_ver.argtypes = [c_void_p]
 get_header_ver.restype = c_char_p
+
+# png_structp png_create_write_struct(png_const_charp user_png_ver, png_voidp error_ptr, png_error_ptr error_fn, png_error_ptr warn_fn)
+create_write_struct = _png.png_create_write_struct
+create_write_struct.argtypes = [c_char_p, c_void_p, c_void_p, c_void_p]
+create_write_struct.restype = c_void_p
+
+# void png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
+destroy_write_struct = _png.png_destroy_write_struct
+destroy_write_struct.argtypes = [POINTER(c_void_p), POINTER(c_void_p)]
+destroy_write_struct.restype = None
+
+# void png_set_IHDR(png_structp png_ptr, png_infop info_ptr, png_uint_32 width, png_uint_32 height, int bit_depth, int color_type, int interlace_method, int compression_method, int filter_method)
+set_IHDR = _png.png_set_IHDR
+set_IHDR.argtypes = [c_void_p, c_void_p, c_uint, c_uint, c_int, c_int, c_int, c_int, c_int]
+set_IHDR.restype = None
+
+# void png_set_rows(png_structp png_ptr, png_infop info_ptr, png_bytepp row_pointers)
+set_rows = _png.png_set_rows
+set_rows.argtypes = [c_void_p, c_void_p, POINTER(c_void_p)]
+set_rows.restype = None
+
+# void png_set_write_fn(png_structp png_ptr, png_voidp io_ptr, png_rw_ptr write_data_fn, png_flush_ptr output_flush_fn)
+set_write_fn = _png.png_set_write_fn
+set_write_fn.argtypes = [c_void_p, c_void_p, rw_func, flush_func]
+set_write_fn.restype = None
+
+# void png_write_png(png_structp png_ptr, png_infop info_ptr, int transforms, png_voidp params)
+write_png = _png.png_write_png
+write_png.argtypes = [c_void_p, c_void_p, c_int, c_void_p]
+write_png.restype = None
