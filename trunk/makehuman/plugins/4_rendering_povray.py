@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import sys
+import sys, os
 if 'nt' in sys.builtin_module_names:
     sys.path.append('./pythonmodules')
 
@@ -18,8 +18,31 @@ class PovrayTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Povray')
-
-        optionsBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*7+6)))
+        
+        # for path to PovRay binaries file
+        bintype=[]
+        pathBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Povray  bin  path', gui3d.GroupBoxStyle._replace(height=25+24*2+6)))
+        povray_bin = gui3d.app.settings.get('povray_bin', '')
+        self.path= pathBox.addView(gui3d.TextEdit(str(povray_bin), gui3d.TextEditStyle._replace(width=112)))
+        
+        # value for dynamic GUI
+        place_new_Box = 0
+        #
+        if os.name == 'nt':
+            self.win32Button = pathBox.addView(gui3d.RadioButton(bintype, 'Use win32 bin'))
+            self.win32sse2Button = pathBox.addView(gui3d.RadioButton(bintype, 'Use SSE2 bin', selected = True))
+            place_new_Box = 188
+        #
+        if os.environ['PROCESSOR_ARCHITECTURE'] == "AMD64":
+            self.win64Button = pathBox.addView(gui3d.RadioButton(bintype, 'Use win64 bin'))
+            place_new_Box = 212
+            
+        
+        @self.path.event
+        def onChange(value):
+            gui3d.app.settings['povray_bin'] = 'Enter your path' if not value else str(value)
+        
+        optionsBox = self.addView(gui3d.GroupBox([10, place_new_Box, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*7+6)))
         
         #Buttons
         source=[]
@@ -40,7 +63,8 @@ class PovrayTaskView(gui3d.TaskView):
             mh2povray.povrayExport(gui3d.app.selectedHuman.mesh, gui3d.app,
                 {'source':'ini' if self.iniButton.selected else 'gui',
                  'format':'array' if self.arrayButton.selected else 'mesh2',
-                 'action':'export' if self.exportButton.selected else 'render'})
+                 'action':'export' if self.exportButton.selected else 'render',
+                 'bintype':'win32' if self.win32Button.selected else 'win32sse2' if self.win32sse2Button.selected else 'win64'})
 
     def onShow(self, event):
         self.renderButton.setFocus()

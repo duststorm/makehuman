@@ -35,7 +35,7 @@ import mh2mitsuba_ini
 import random
 import mh
 # povman
-import gui3d
+#import gui3d
 # end
 from os.path import basename
 #
@@ -75,9 +75,9 @@ def MitsubaExport(obj, app, settings):
     action = mh2mitsuba_ini.action
     
     # Mitsuba binaries path
-    Path_bin = (app.settings.get('path_bin', ''))
+    Mitsuba_bin = app.settings.get('mitsuba_bin', '')
     #
-    if os.path.exists(Path_bin) and action == 'render':
+    if os.path.exists(Mitsuba_bin) and action == 'render':
         
         # exporting human mesh.
         fileobj = 'human.obj'
@@ -123,15 +123,18 @@ def MitsubaExport(obj, app, settings):
         xmlDataFile = str(fileobj).replace('.obj', '.xml')
         #
         if source == 'gui':
-            render_mode  = str(Path_bin)+'/mtsgui.exe'
+            render_mode  = str(Mitsuba_bin)+'/mtsgui.exe'
             pathHandle = subprocess.Popen(cwd=outputDirectory, args = render_mode +' '+ xmlDataFile)
         #
         elif source == 'console':
-            render_mode  = str(Path_bin)+'/mitsuba.exe'
+            render_mode  = str(Mitsuba_bin)+'/mitsuba.exe'
             pathHandle = subprocess.Popen(cwd=outputDirectory, args = render_mode +' '+ xmlDataFile)
         #
         else:
-            print 'File xml created into output folder. Ready for renderer \n', filexml
+            app.prompt('INFO ',
+                       'Created .xml file in output folder.\n'\
+                       'Ready to render',
+                       'Close')
     
     # if not valid path
     else:
@@ -181,9 +184,9 @@ def exportObj(obj, filename):
             if exportGroups:
                 f.write('g %s\n' % fg.name)
             # filter eyebrown, lash and joint objects
-            # TO DO; separate this objects for applicate a special texture values?
+            # TO DO; separate objects for materials?
             '''
-            if ['head', 'nose', 'mouth', 'chin'] in fg.name:
+            if 'head' in fg.name or 'nose' in fg.name or 'chin' in fg.name or 'mouth' in fg.name:
                 for face in fg.faces:
                     f.write('f')
                     for i, v in enumerate(face.verts):
@@ -204,7 +207,8 @@ def exportObj(obj, filename):
                                 else:
                                     f.write(' %i/%i/%i ' % (v.idx + 1, face.uv[i] + 1, v.idx + 1))
                             #
-                            f.write('\n')   
+                            f.write('\n')
+            #'''   
     #
     f.close()
 
@@ -245,7 +249,6 @@ def mitsubaSSS():
                       '\t    </subsurface>\n'
                       )
     return subSurfaceData
-
    
 def mitsubaSampler(sampler):
     #
@@ -382,14 +385,12 @@ def mitsubaGeometry(filexml, fileobj, subSurfaceData):
     objpath = os.getcwd() + '/data/mitsuba/plane.obj'
     f = open(filexml, 'a')
     # write plane
-    '''
     f.write('\n' +
             '\t<shape type="obj">\n' +
             '\t    <string name="filename" value="%s"/>\n' % objpath +
             '\t    <ref name="bsdf" id="__planemat"/>\n' +
             '\t</shape>\n'
             )
-    '''
     # human mesh
     f.write('\n' +
             '\t<shape type="obj">\n' +

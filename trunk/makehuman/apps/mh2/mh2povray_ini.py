@@ -51,12 +51,13 @@ action = 'export'  # "export" or "render"
 
 renderscenefile = ''  # Use "" to render the default scene file.
 
-# Configure the following variable to point to the POV-Ray executable on your system.
-# A number of typical examples are provided.
-# Don't use the backslash character in the path.
+# Configure the type of binarie file. 
+# Single Processor Version :  'win32'     (pvengine.exe)
+# MultiProcessor Version :    'win32sse2' (pvengine-sse2.exe)
+# Win64 systems : win64
 
-povray_path = 'C:\\Users\\mflerackers\\AppData\\Local\\Programs\\POV-Ray\\3.7\\bin\\pvengine64.exe'  # MultiProcessor Version
+bintype = 'win32'
 
-# povray_path  = "C:/Users/Chris/AppData/Roaming/POV-Ray/v3.7/bin/pvengine.exe"     # Single Processor Version
+# povray_path  = "C:/Users/Chris/AppData/Roaming/POV-Ray/v3.7/bin/pvengine.exe"
 # povray_path  = "C:/POV-Ray for Windows v3.6/bin/pvengine.exe"                     # Typical POV-Ray 3.6
 
