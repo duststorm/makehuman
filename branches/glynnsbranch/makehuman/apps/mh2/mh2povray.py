@@ -108,11 +108,37 @@ def povrayExport(obj, app, settings):
 
     # The ini action option defines whether or not to attempt to render the file once
     # it's been written.
+    
+    # povman; test for added path to  binaries
+    # this code only is used in Windows sytems
+    # TODO: test for Linux and OSX systems
+    
+    povray_path = ''
+    #
+    povray_bin = (app.settings.get('povray_bin', ''))
+    #
+    if os.path.exists(povray_bin):
+        exetype = mh2povray_ini.bintype if settings['bintype'] == 'win32' else settings['bintype']
+        #
+        if exetype == 'win64':
+            mode = '/pvengine64.exe'
+        #
+        elif exetype == 'win32sse2':
+            mode = '/pvengine-sse2.exe'
+        else:
+            mode = '/pvengine.exe'
+        #
+        povray_path = povray_bin + mode
 
     if action == 'render':
        
-        if not os.path.isfile(mh2povray_ini.povray_path):
-            app.prompt('POV-Ray not found', 'You don\'t seem to have POV-Ray installed or the path in mh2povray_ini.py is incorrect.', 'Download', 'Cancel', downloadPovRay)
+        #if not os.path.isfile(mh2povray_ini.povray_path):
+        if not os.path.isfile(povray_path):
+            app.prompt('POV-Ray not found',
+                       'You don\'t seem to have POV-Ray installed or the path is incorrect.',
+                       'Download',
+                       'Cancel', 
+                       downloadPovRay)
             return
     
         if mh2povray_ini.renderscenefile == '':
@@ -129,7 +155,7 @@ def povrayExport(obj, app, settings):
     
         #print mh2povray_ini.povray_path + cmdLineOpt
 
-        pathHandle = subprocess.Popen(cwd=outputDirectory, args=mh2povray_ini.povray_path + cmdLineOpt)
+        pathHandle = subprocess.Popen(cwd=outputDirectory, args = povray_path + cmdLineOpt)
 
 def povrayExportArray(obj, camera, resolution, path):
     """

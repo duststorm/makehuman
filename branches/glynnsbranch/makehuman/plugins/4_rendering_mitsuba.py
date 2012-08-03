@@ -20,14 +20,14 @@ class MitsubaTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Mitsuba')
 
         # Buttons
-        # Test for path to Mitsuba binaries FileChooser
-        pathBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Mitsuba path', gui3d.GroupBoxStyle._replace(height=25+24*2+6)))
-        path_bin = gui3d.app.settings.get('path_bin', 'c:/Mitsuba')
-        self.path= pathBox.addView(gui3d.TextEdit(str(path_bin), gui3d.TextEditStyle._replace(width=112)))
+        # Test for path to Mitsuba binaries file
+        pathBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Mitsuba  bin  path', gui3d.GroupBoxStyle._replace(height=25+24*2+6)))
+        mitsuba_bin = gui3d.app.settings.get('mitsuba_bin', '')
+        self.path= pathBox.addView(gui3d.TextEdit(str(mitsuba_bin), gui3d.TextEditStyle._replace(width=112)))
         #
         @self.path.event
         def onChange(value):
-            gui3d.app.settings['path_bin'] = 'Enter your path' if not value else str(value)
+            gui3d.app.settings['mitsuba_bin'] = 'Enter your path' if not value else str(value)
         
         # Type of lighting method
         lightingBox = self.addView(gui3d.GroupBox([10, 140, 9.0], 'Integrators', gui3d.GroupBoxStyle._replace(height=25+24*7+6)))
