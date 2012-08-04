@@ -28,9 +28,10 @@
 import bpy
 from bpy.props import *
 import math
+import os
 
 from . import utils
-from . import target_rigs
+#from . import target_rigs
 #from .target_rigs import rig_mhx, rig_simple, rig_game, rig_second_life
 from . import globvar as the
 from .utils import MocapError
@@ -62,13 +63,14 @@ def getTargetArmature(rig, scn):
     bones = rig.data.bones.keys()
     if scn.McpGuessTargetRig:
         name = guessArmature(rig, bones, scn)
+        scn.McpTargetRig = name
     else:
         try:
             name = scn.McpTargetRig
         except:
             raise MocapError("Initialize Target Panel first")
     the.target = name        
-    (boneAssoc, the.Renames, the.IkBones) = target_rigs.TargetInfo[name]
+    (boneAssoc, the.Renames, the.IkBones) = the.TargetInfo[name]
     if not testTargetRig(name, bones, boneAssoc):
         print("Bones", bones)
         raise MocapError("Target armature %s does not match armature %s" % (rig.name, name))
@@ -78,11 +80,12 @@ def getTargetArmature(rig, scn):
 
 
 def guessArmature(rig, bones, scn):
+    ensureTargetInited(scn)
     print("Guessing")
     if 'KneePT_L' in bones:
         return 'MHX'
     else:
-        for (name, info) in target_rigs.TargetInfo.items():
+        for (name, info) in the.TargetInfo.items():
             (boneAssoc, the.Renames, the.IkBones) = info
             if testTargetRig(name, bones, boneAssoc):           
                 return name
@@ -184,6 +187,9 @@ TargetBoneNames = [
 ###############################################################################
 
 
+def loadTargets():
+    the.TargetInfo = {}
+    
 def isTargetInited(scn):
     try:
         scn.McpTargetRig
@@ -193,8 +199,17 @@ def isTargetInited(scn):
 
 
 def initTargets(scn):        
+    the.TargetInfo = {}
+    path = os.path.join(os.path.dirname(__file__), "target_rigs")
+    for fname in os.listdir(path):
+        file = os.path.join(path, fname)
+        (name, ext) = os.path.splitext(fname)
+        if ext == ".trg" and os.path.isfile(file):
+            (name, stuff) = readTrgArmature(file, name)
+            the.TargetInfo[name] = stuff
+
     the.trgArmatureEnums = []
-    keys = list(target_rigs.TargetInfo.keys())
+    keys = list(the.TargetInfo.keys())
     keys.sort()
     for key in keys:
         the.trgArmatureEnums.append((key,key,key))
@@ -208,6 +223,39 @@ def initTargets(scn):
     return    
        
 
+def readTrgArmature(file, name):
+    print("Read target file", file)
+    fp = open(file, "r")
+    status = 0    
+    bones = []
+    renames = {}
+    ikbones = []
+    for line in fp:
+        words = line.split()
+        if len(words) > 0:
+            key = words[0].lower()
+            if key[0] == "#":
+                continue
+            elif key == "name:":
+                name = words[1]
+            elif key == "bones:":
+                status = 1
+            elif key == "ikbones:":
+                status = 2
+            elif key == "renames:":
+                status = 3
+            elif len(words) != 2:
+                print("Ignored illegal line", line)
+            elif status == 1:
+                bones.append( (words[0], utils.nameOrNone(words[1])) )
+            elif status == 2:
+                ikbones.append( (words[0], utils.nameOrNone(words[1])) )
+            elif status == 3:
+                renames[words[0]] = utils.nameOrNone(words[1])
+    fp.close()                
+    return (name, (bones,renames,ikbones))                
+  
+  
 def ensureTargetInited(scn):
     if not isTargetInited(scn):
         initTargets(scn)

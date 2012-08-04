@@ -33,13 +33,15 @@ from bpy_extras.io_utils import ImportHelper
 
 from . import target
 from . import globvar as the
+from . import utils
 from .utils import MocapError
               
 #
-#    guessSrcArmature(rig):
+#    guessSrcArmature(rig, scn):
 #
 
-def guessSrcArmature(rig):
+def guessSrcArmature(rig, scn):
+    ensureSourceInited(scn)
     bestMisses = 1000
     misses = {}
     bones = rig.data.bones
@@ -56,7 +58,9 @@ def guessSrcArmature(rig):
             best = amt
             bestName = name
             bestMisses = nMisses
-    if bestMisses > 0:
+    if bestMisses == 0:
+        scn.McpSourceRig = name
+    else:
         for bone in bones:
             print("'%s'" % bone.name)
         for (name, n) in misses.items():
@@ -71,7 +75,7 @@ def guessSrcArmature(rig):
 def findSrcArmature(context, rig):
     scn = context.scene
     if scn.McpGuessSourceRig:
-        (the.srcArmature, name) = guessSrcArmature(rig)
+        (the.srcArmature, name) = guessSrcArmature(rig, scn)
     else:
         name = scn.McpSourceRig
         the.srcArmature = the.sourceArmatures[name]
@@ -129,7 +133,15 @@ def isSourceInited(scn):
         return False
 
 
-def initSources(scn):        
+def initSources(scn):       
+    the.sourceArmatures = {}
+    path = os.path.join(os.path.dirname(__file__), "source_rigs")
+    for fname in os.listdir(path):
+        file = os.path.join(path, fname)
+        (name, ext) = os.path.splitext(fname)
+        if ext == ".src" and os.path.isfile(file):
+            (name, armature) = readSrcArmature(file, name)
+            the.sourceArmatures[name] = armature
     the.srcArmatureEnums = []
     keys = list(the.sourceArmatures.keys())
     keys.sort()
@@ -143,7 +155,32 @@ def initSources(scn):
     scn.McpSourceRig = 'MB'
     print("Defined McpSourceRig")
     return    
-       
+
+
+def readSrcArmature(file, name):
+    print("Read source file", file)
+    fp = open(file, "r")
+    status = 0    
+    armature = {}
+    for line in fp:
+        words = line.split()
+        if len(words) > 0:
+            key = words[0].lower()
+            if key[0] == "#":
+                continue
+            elif key == "name:":
+                name = words[1]
+            elif key == "armature:":
+                status = 1
+            elif len(words) < 3:
+                print("Ignored illegal line", line)
+            elif status == 1:
+                for n in range(1,len(words)-2):
+                    key += " " + words[n].lower()                    
+                armature[key] = (utils.nameOrNone(words[-2]), float(words[-1]))
+    fp.close()                
+    return (name, armature)                
+    
 
 def ensureSourceInited(scn):
     if not isSourceInited(scn):

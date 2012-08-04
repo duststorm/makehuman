@@ -71,7 +71,17 @@ def quadDict():
         3: {},
     }
     
- 
+
+#
+#   nameOrNone(string):
+#
+
+def nameOrNone(string):
+    if string == "None":
+        return None
+    else:
+        return string
+        
 #
 #   getRoll(bone):
 #
