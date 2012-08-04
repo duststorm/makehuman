@@ -32,19 +32,21 @@ FaceJoints = [
     ('gaze',            'o', ('eyes', (0,0,5))),
 ]
 
+eyeOffs = (0,0,0.3)
+
 FaceHeadsTails = [
     ('Jaw',                  'mouth', 'jaw'),
     ('TongueBase',           'tongue-1', 'tongue-2'),
     ('TongueMid',            'tongue-2', 'tongue-3'),
     ('TongueTip',            'tongue-3', 'tongue-4'),
 
-    ('Eye_R',                'l-eye', 'l-eye-target'),
-    ('EyeParent_R',          'l-eye', 'l-eye-target'),
+    ('Eye_R',                'l-eye', ('l-eye', eyeOffs)),
+    ('EyeParent_R',          'l-eye', ('l-eye', eyeOffs)),
     ('DfmUpLid_R',           'l-eye', 'l-upperlid'),
     ('DfmLoLid_R',           'l-eye', 'l-lowerlid'),
     
-    ('Eye_L',                'r-eye', 'r-eye-target'),
-    ('EyeParent_L',          'r-eye', 'r-eye-target'),
+    ('Eye_L',                'r-eye', ('r-eye', eyeOffs)),
+    ('EyeParent_L',          'r-eye', ('r-eye', eyeOffs)),
     ('DfmUpLid_L',           'r-eye', 'r-upperlid'),
     ('DfmLoLid_L',           'r-eye', 'r-lowerlid'),
 
