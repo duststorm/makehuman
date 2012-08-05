@@ -98,6 +98,8 @@ def povrayExport(obj, app, settings):
         povrayExportMesh2(obj, camera, resolution, path)
 
     outputDirectory = os.path.dirname(path)
+    #
+    print 'out folder: ', outputDirectory
 
     # Export the hair model as a set of spline definitions.
     # Load the test hair dataand write it out in POV-Ray format.
@@ -109,53 +111,61 @@ def povrayExport(obj, app, settings):
     # The ini action option defines whether or not to attempt to render the file once
     # it's been written.
     
-    # povman; test for added path to  binaries
-    # this code only is used in Windows sytems
-    # TODO: test for Linux and OSX systems
-    
+    #
     povray_path = ''
     #
     povray_bin = (app.settings.get('povray_bin', ''))
-    #
+   
+    # try for use better binarie 
     if os.path.exists(povray_bin):
         exetype = mh2povray_ini.bintype if settings['bintype'] == 'win32' else settings['bintype']
         #
         if exetype == 'win64':
-            mode = '/pvengine64.exe'
+            povray_bin += '/pvengine64.exe'
         #
         elif exetype == 'win32sse2':
-            mode = '/pvengine-sse2.exe'
-        else:
-            mode = '/pvengine.exe'
+            povray_bin += '/pvengine-sse2.exe'
         #
-        povray_path = povray_bin + mode
+        elif exetype == 'win32':
+            povray_bin += '/pvengine.exe'
+        #
+        elif exetype == 'linux':
+            povray_bin += '/povray'
+        #
+        povray_path += povray_bin
+        
+        print '[DEBUG]: Povray path: ', povray_path
 
+    #
     if action == 'render':
-       
-        #if not os.path.isfile(mh2povray_ini.povray_path):
-        if not os.path.isfile(povray_path):
+        #
+        if os.path.isfile(povray_path):
+            #
+            if mh2povray_ini.renderscenefile == '': # always true?
+                outputSceneFile = path.replace('.inc', '.pov')
+                baseName = os.path.basename(outputSceneFile)
+            else:
+                baseName = mh2povray_ini.renderscenefile
+            #
+            cmdLineOpt = ' +I%s' %  baseName
+            #
+            if os.name == 'nt':
+                cmdLineOpt = ' /RENDER %s' % baseName
+            #
+            cmdLineOpt += ' +W%d +H%d' % resolution
+        
+            #print mh2povray_ini.povray_path + cmdLineOpt
+            print '[DEBUG]: Full command line: ', outputDirectory, povray_path + cmdLineOpt
+            #
+            pathHandle = subprocess.Popen(cwd=outputDirectory, args = povray_path + cmdLineOpt)
+        #
+        else:
             app.prompt('POV-Ray not found',
                        'You don\'t seem to have POV-Ray installed or the path is incorrect.',
                        'Download',
-                       'Cancel', 
-                       downloadPovRay)
+                       'Cancel',
+                       downloadPovRay )
             return
-    
-        if mh2povray_ini.renderscenefile == '':
-            outputSceneFile = path.replace('.inc', '.pov')
-            baseName = os.path.basename(outputSceneFile)
-        else:
-            baseName = mh2povray_ini.renderscenefile
-        cmdLineOpt = ' +I%s' % baseName
-        if os.name == 'nt':
-            cmdLineOpt = ' /RENDER %s' % baseName
-        cmdLineOpt += ' +W%d +H%d' % resolution
-
-        # pathHandle = subprocess.Popen(cwd = outputDirectory, args = mh2povray_ini.povray_path + " /RENDER " + baseName)
-    
-        #print mh2povray_ini.povray_path + cmdLineOpt
-
-        pathHandle = subprocess.Popen(cwd=outputDirectory, args = povray_path + cmdLineOpt)
 
 def povrayExportArray(obj, camera, resolution, path):
     """
