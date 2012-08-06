@@ -22,6 +22,14 @@
 # Script copyright (C) MakeHuman Team 2001-2011
 # Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
 
+#
+# Implementation of the multi-resolution filtering algorithm in
+#
+# A. Bruderlin and L. Williams, Motion signal processing, SIGGRAPH 95 
+# http://research.cs.wisc.edu/graphics/Courses/cs-838-1999/Papers/BRUDRLIN.PDF
+#
+
+
 import bpy
 from bpy.props import StringProperty, FloatProperty, IntProperty, BoolProperty, EnumProperty
 from . import utils, simplify
@@ -180,7 +188,7 @@ def reconstructAction(context):
 
 ########################################################################
 #
-#   class VIEW3D_OT_CalcFiltersButton(bpy.types.Operator):
+#   Buttons
 #
 
 class VIEW3D_OT_CalcFiltersButton(bpy.types.Operator):
@@ -196,9 +204,20 @@ class VIEW3D_OT_CalcFiltersButton(bpy.types.Operator):
             bpy.ops.mcp.error('INVOKE_DEFAULT')
         return{'FINISHED'}    
 
-#
-#   class VIEW3D_OT_ReconstructActionButton(bpy.types.Operator):
-#
+
+class VIEW3D_OT_DiscardFiltersButton(bpy.types.Operator):
+    bl_idname = "mcp.discard_filters"
+    bl_label = "Discard Filters"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        rig = context.object
+        try:
+            del the.filterData[rig.name]
+        except:
+            pass
+        return{'FINISHED'}    
+
 
 class VIEW3D_OT_ReconstructActionButton(bpy.types.Operator):
     bl_idname = "mcp.reconstruct_action"

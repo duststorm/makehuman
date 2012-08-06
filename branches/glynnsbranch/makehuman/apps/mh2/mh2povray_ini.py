@@ -54,10 +54,7 @@ renderscenefile = ''  # Use "" to render the default scene file.
 # Configure the type of binarie file. 
 # Single Processor Version :  'win32'     (pvengine.exe)
 # MultiProcessor Version :    'win32sse2' (pvengine-sse2.exe)
-# Win64 systems : win64
+# AMD64 systems :             'win64'     (pvengine64.exe)
 
 bintype = 'win32'
-
-# povray_path  = "C:/Users/Chris/AppData/Roaming/POV-Ray/v3.7/bin/pvengine.exe"
-# povray_path  = "C:/POV-Ray for Windows v3.6/bin/pvengine.exe"                     # Typical POV-Ray 3.6
 

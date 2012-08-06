@@ -232,13 +232,15 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
                 print "if", words[2], value
                 fp.write("#if %s\n" % value)
             elif key == 'rig-drivers':
-                fp.write("AnimationData %s True\n" % the.Human)
-                mhx_rig.writeAllDrivers(fp)
-                rigDriversEnd(fp)
+                if the.Config.mhxrig=="mhx":
+                    fp.write("AnimationData %s True\n" % the.Human)
+                    mhx_rig.writeAllDrivers(fp)
+                    rigDriversEnd(fp)
             elif key == 'rig-correct':
                 fp.write("CorrectRig %s ;\n" % the.Human)
             elif key == 'recalc-roll':
-                fp.write("  RecalcRoll %s ;\n" % the.RecalcRoll)
+                if the.Config.mhxrig=="mhx":
+                    fp.write("  RecalcRoll %s ;\n" % the.RecalcRoll)
             elif key == 'ProxyMesh':
                 writeProxyMesh(fp, proxy, proxyData)
             elif key == 'ProxyObject':
@@ -1185,7 +1187,7 @@ def writeShapeKeys(fp, human, name, proxy):
                     fp.write("    sv %d %.4f %.4f %.4f ;\n" % (v, dx, dy, dz))
                 fp.write("end ShapeKey\n")
 
-    if the.Config.bodyshapes:
+    if the.Config.bodyshapes and the.Config.mhxrig=="mhx":
         writeTargets(fp, human, rig_shoulder_25.ShoulderTargetDrivers, "shoulder", proxy)                
         writeTargets(fp, human, rig_leg_25.HipTargetDrivers, "hips", proxy)                
         writeTargets(fp, human, rig_arm_25.ElbowTargetDrivers, "elbow", proxy)                
@@ -1200,7 +1202,7 @@ def writeShapeKeys(fp, human, name, proxy):
 "  AnimationData None (toggle&T_Symm==0)\n")
 
         
-    if the.Config.bodyshapes:
+    if the.Config.bodyshapes and the.Config.mhxrig=="mhx":
         mhx_rig.writeTargetDrivers(fp, rig_shoulder_25.ShoulderTargetDrivers, the.Human)
         mhx_rig.writeTargetDrivers(fp, rig_leg_25.HipTargetDrivers, the.Human)
         mhx_rig.writeTargetDrivers(fp, rig_arm_25.ElbowTargetDrivers, the.Human)

@@ -84,8 +84,8 @@ Batch run:
 if "bpy" in locals():
     print("Reloading Mocap tool")
     import imp
-    imp.reload(source_rigs)
-    imp.reload(target_rigs)
+    #imp.reload(source_rigs)
+    #imp.reload(target_rigs)
     imp.reload(utils)
     imp.reload(globvar)
     imp.reload(props)
@@ -107,8 +107,8 @@ else:
     from bpy_extras.io_utils import ImportHelper
     from bpy.props import *
 
-    from . import source_rigs
-    from . import target_rigs
+    #from . import source_rigs
+    #from . import target_rigs
     from . import utils
     from . import globvar as the
     from . import props
@@ -198,7 +198,7 @@ class MhxTargetBonesPanel(bpy.types.Panel):
         layout.prop(scn, "McpTargetRig")
 
         if scn.McpTargetRig:
-            (bones, renames, ikBones) = target_rigs.TargetInfo[scn.McpTargetRig]
+            (bones, renames, ikBones) = the.TargetInfo[scn.McpTargetRig]
 
             layout.label("FK bones")
             box = layout.box()
@@ -377,6 +377,7 @@ class EditPanel(bpy.types.Panel):
         except:
             fd = None
         if fd:
+            layout.operator("mcp.discard_filters")
             for k in range(fd.fb-1):
                 layout.prop(ob, '["s_%d"]' % k)
             layout.operator("mcp.reconstruct_action")

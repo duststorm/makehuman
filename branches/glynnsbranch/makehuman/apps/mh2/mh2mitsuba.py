@@ -46,10 +46,9 @@ def MitsubaExport(obj, app, settings):
 
     print 'Mitsuba Export object: ', obj.name
 
-    # Read settings from an ini file. This reload enables the settings to be
-    # changed dynamically without forcing the user to restart the MH
-    # application for the changes to take effect.
-
+    # Read settings from an ini file. This reload enables the settings to be changed dynamically 
+    # without forcing the user to restart the MH application for the changes to take effect.
+    
     camera = app.modelCamera
     #
     resolution = (app.settings.get('rendering_width', 800), app.settings.get('rendering_height', 600))
@@ -101,7 +100,7 @@ def MitsubaExport(obj, app, settings):
         samplerData = mitsubaSampler(sampler)
         
         # create camera
-        mitsubaCamera(camera, resolution, filexml, samplerData)
+        mitsubaCamera(camera, resolution, filexml, samplerData, obj)
 
         # add lights
         mitsubaLights(filexml)
@@ -145,8 +144,9 @@ def MitsubaExport(obj, app, settings):
 
 def exportObj(obj, filename):
     """
-    This function exports a mesh object in Wavefront obj format. It is assumed that obj will have at least vertices and
-    faces (exception handling for vertices/faces must be done outside this method).
+    This function exports a mesh object in Wavefront obj format. 
+    It is assumed that obj will have at least vertices and faces,
+    (exception handling for vertices/faces must be done outside this method).
 
     Parameters
     ----------
@@ -178,13 +178,14 @@ def exportObj(obj, filename):
     #
     groupFilter = None
     exportGroups = False
+    #faces = [f for f in obj.faces if  not 'joint-' in f.group.name ]
     #
     for fg in obj.faceGroups:
         if not groupFilter or groupFilter(fg):
             if exportGroups:
                 f.write('g %s\n' % fg.name)
             # filter eyebrown, lash and joint objects
-            # TO DO; separate objects for materials?
+            # TO DO; separate faces for material..?
             '''
             if 'head' in fg.name or 'nose' in fg.name or 'chin' in fg.name or 'mouth' in fg.name:
                 for face in fg.faces:
@@ -268,8 +269,8 @@ def mitsubaSampler(sampler):
                       )
     return samplerData
     
-def mitsubaCamera(camera, resolution, filexml, samplerData):
-    #
+def mitsubaCamera(camera, resolution, filexml, samplerData, obj):
+    # TODO; camera fov
     fov = 27
     f = open(filexml, 'a')
     f.write('\n' +
@@ -279,8 +280,14 @@ def mitsubaCamera(camera, resolution, filexml, samplerData):
             '\t    <float name="farClip" value="1000"/>\n' +
             '\t    <boolean name="mapSmallerSide" value="true"/>\n' +
             '\t    <transform name="toWorld">\n' +
+            '\t        <lookAt origin="%f, %f, %f"\n' % (camera.eyeX, camera.eyeY, camera.eyeZ) +
+            '\t                target="%f, %f, %f"\n' % (camera.focusX, camera.focusY, camera.focusZ) +
+            '\t                up="0, 1, 0"/>\n' + 
             '\t        <scale x="-1"/>\n' +
-            '\t        <lookAt origin="%f, %f, %f" target="%f, %f, %f" up="0, 1, 0"/>\n' % (camera.eyeX, camera.eyeY, camera.eyeZ, camera.focusX, camera.focusY, camera.focusZ) +
+            '\t        <rotate x="1" angle="%f"/>\n' % -obj.rx +
+            '\t        <rotate y="1" angle="%f"/>\n' % -obj.ry +
+            '\t        <rotate z="1" angle="%f"/>\n' % obj.rz +
+            '\t        <translate x="%f" y="%f" z="%f"/>\n' % (obj.x, -obj.y, obj.z) +
             '\t    </transform>\n' +
             '\t    <film type="exrfilm" id="film">\n' +
             '\t        <integer name="width" value="%i"/>\n'  % resolution[0] +
@@ -306,7 +313,10 @@ def mitsubaLights(filexml):
                 '\t    <string name="filename" value="%s"/>\n' % env_path +
                 '\t    <transform name="toWorld">\n' +
                 '\t        <rotate z="1" angle="-90"/>\n' +
-                '\t        <matrix value="-0.224951 -0.000001 -0.974370 0.000000 -0.974370 0.000000 0.224951 0.000000 0.000000 1.000000 -0.000001 8.870000 0.000000 0.000000 0.000000 1.000000 "/>\n' +
+                '\t        <matrix value="-0.224951 -0.000001 -0.974370 0.000000\n' +
+                '\t                       -0.974370 0.000000 0.224951 0.000000\n' +
+                '\t                       0.000000 1.000000 -0.000001 8.870000\n' +
+                '\t                       0.000000 0.000000 0.000000 1.000000"/>\n' +
                 '\t    </transform>\n' +
                 '\t    <float name="intensityScale" value="3"/>\n' +
                 '\t</luminaire>\n' )
@@ -385,12 +395,14 @@ def mitsubaGeometry(filexml, fileobj, subSurfaceData):
     objpath = os.getcwd() + '/data/mitsuba/plane.obj'
     f = open(filexml, 'a')
     # write plane
+    '''
     f.write('\n' +
             '\t<shape type="obj">\n' +
             '\t    <string name="filename" value="%s"/>\n' % objpath +
             '\t    <ref name="bsdf" id="__planemat"/>\n' +
             '\t</shape>\n'
             )
+    '''
     # human mesh
     f.write('\n' +
             '\t<shape type="obj">\n' +

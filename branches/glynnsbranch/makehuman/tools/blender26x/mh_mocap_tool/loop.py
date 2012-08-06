@@ -27,7 +27,7 @@ import bpy
 from math import pi, sqrt
 from mathutils import *
 from . import utils, load, simplify, props, action
-from .target_rigs import rig_mhx
+#from .target_rigs import rig_mhx
 from . import globvar as the
 from .utils import MocapError
 

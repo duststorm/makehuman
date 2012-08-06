@@ -32,7 +32,7 @@ from bpy_extras.io_utils import ImportHelper
 from bpy.props import *
 
 from . import utils, props, source, target, toggle, load, simplify
-from .target_rigs import rig_mhx
+#from .target_rigs import rig_mhx
 from . import globvar as the
 from .utils import MocapError
 
