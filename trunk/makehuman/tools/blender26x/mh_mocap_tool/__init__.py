@@ -377,6 +377,7 @@ class EditPanel(bpy.types.Panel):
         except:
             fd = None
         if fd:
+            layout.operator("mcp.discard_filters")
             for k in range(fd.fb-1):
                 layout.prop(ob, '["s_%d"]' % k)
             layout.operator("mcp.reconstruct_action")
