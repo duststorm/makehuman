@@ -69,6 +69,7 @@ def listAllActions(context):
     print("Actions declared")
     return
 
+
 def findActionNumber(name):
     for n,enum in enumerate(the.actions):
         (name1, name2, name3) = enum        
@@ -116,6 +117,7 @@ def deleteAction(context):
     else:
         print("Cannot delete. %s has %d users." % (act, act.users))
 
+
 class VIEW3D_OT_McpDeleteButton(bpy.types.Operator):
     bl_idname = "mcp.delete"
     bl_label = "Delete Action"
@@ -151,6 +153,7 @@ def deleteHash():
         if act.name[0] == '#':
             utils.deleteAction(act)
     return 
+
     
 class VIEW3D_OT_McpDeleteHashButton(bpy.types.Operator):
     bl_idname = "mcp.delete_hash"
@@ -171,15 +174,20 @@ class VIEW3D_OT_McpDeleteHashButton(bpy.types.Operator):
 
 def setCurrentAction(context, prop):
     listAllActions(context)
-    scn = context.scene
-    try:
-        act = bpy.data.actions[scn.McpActions]
-    except KeyError:
-        print("Did not find action %s" % scn.McpActions)
-        return
+    name = eval("context.scene." + prop)
+    act = getAction(name)
     context.object.animation_data.action = act
     print("Action set to %s" % act)
     return
+
+
+def getAction(name):
+    try:
+        return bpy.data.actions[name]
+    except KeyError:
+        pass
+    raise MocapError("Did not find action %s" % name)
+        
     
 class VIEW3D_OT_McpSetCurrentActionButton(bpy.types.Operator):
     bl_idname = "mcp.set_current_action"

@@ -175,9 +175,8 @@ def initInterface(context):
         default=1)
         
     bpy.types.Scene.McpActionTarget = EnumProperty(
-        items = [('Second to new','Second to new','Second to new'),
-                 ('Extend second', 'Extend second', 'Extend second'),
-                 ('Stitch new', 'Stitch new', 'Stitch new')],
+        items = [('Stitch new', 'Stitch new', 'Stitch new'),
+                 ('Prepend second', 'Prepend second', 'Prepend second')],
         name = "Action Target")
 
     bpy.types.Scene.McpOutputActionName = StringProperty(
