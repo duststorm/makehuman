@@ -409,6 +409,7 @@ class EditPanel(bpy.types.Panel):
         row = layout.row()
         row.prop(scn, "McpSecondStartFrame")
         row.operator("mcp.set_current_action").prop = "McpSecondAction"        
+        layout.prop(scn, "McpLoopBlendRange")
         layout.prop(scn, "McpActionTarget")
         layout.prop(scn, "McpOutputActionName")        
         layout.operator("mcp.stitch_actions")

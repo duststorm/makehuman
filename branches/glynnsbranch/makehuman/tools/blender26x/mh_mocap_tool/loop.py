@@ -219,10 +219,8 @@ def stitchActions(context):
     action.listAllActions(context)
     scn = context.scene
     rig = context.object
-    act1 = action.selectedAction(scn.McpFirstAction)
-    if not act1: return
-    act2 = action.selectedAction(scn.McpSecondAction)
-    if not act2: return
+    act1 = action.getAction(scn.McpFirstAction)
+    act2 = action.getAction(scn.McpSecondAction)
     frame1 = scn.McpFirstEndFrame
     frame2 = scn.McpSecondStartFrame
     delta = scn.McpLoopBlendRange
@@ -231,84 +229,40 @@ def stitchActions(context):
         pb = context.active_posebone
         pb.keyframe_insert("location", group=pb.name)
         rig.animation_data.action = None
-        
+
     actionTarget = scn.McpActionTarget
     print("Acttar", actionTarget)
-    if actionTarget == 0:   # Second to new
-        act = None
-    elif actionTarget == 1:   # Extend second
-        act = act2
-    elif actionTarget == 2:   # Stitch new
-        act = None        
-    if not act:
-        act = utils.copyAction(act2, "#TmpAct")
-
-    matrix = {}
-    matrix1 = {}
-    matrix2 = {}
-    rig.animation_data.action = act1
-    scn.frame_set(frame1)
-    for pb in context.selected_pose_bones:
-        matrix1[pb.name] = pb.bone.matrix_local.inverted() * pb.matrix
-    rig.animation_data.action = act2
-    scn.frame_set(frame2)
-    for pb in context.selected_pose_bones:
-        matrix2[pb.name] = pb.bone.matrix_local.inverted() * pb.matrix
-        matrix[pb.name] = matrix1[pb.name] * matrix2[pb.name].inverted()
-        #print(pb.name, scn.frame_current)        
-        #print(pb.matrix)
-        #print(matrix1[pb.name])
-        #print(matrix2[pb.name])
-        #print(matrix[pb.name])
-
-    #act = bpy.data.actions.new(name=act1.name)
-    #rig.animation_data.action = act
-    frames = utils.activeFrames(rig)
-    for frame in frames:
-        scn.frame_set(frame)
-        for pb in context.selected_pose_bones:
-            if pb.rotation_mode == 'QUATERNION':
-                mode = 'rotation_quaternion'
-            else:
-                mode = 'rotation_euler'
-            pb.matrix_basis = matrix[pb.name] * pb.matrix_basis
-            pb.keyframe_insert("location", frame=frame, group=pb.name)
-            pb.keyframe_insert(mode, frame=frame, group=pb.name)
-        
-    if act:
-        name = act2.name
+    if actionTarget == "Stitch new":
+        act2 = utils.copyAction(act2, scn.McpOutputActionName)
+    elif actionTarget == "Prepend second":
         act2.name = scn.McpOutputActionName
-        act.name = name
-        act = None
 
-    if actionTarget == 0:   # Second to new
-        translateFCurves(act2.fcurves, delta - frame2)
-        utils.setInterpolation(rig)
-    elif actionTarget == 1:   # Extend second
-        return
-    elif actionTarget == 2:   # Stitch new
-        shift = frame1 - frame2 + 2*delta
-        translateFCurves(act2.fcurves, shift)
-        for fcu2 in act2.fcurves:
-            fcu1 = utils.findFCurve(fcu2.data_path, fcu2.array_index, act1.fcurves)
-            for kp1 in fcu1.keyframe_points:
-                t = kp1.co[0]
-                y1 = kp1.co[1]
-                if t <= frame1 - delta:
-                    y = y1
-                elif t <= frame1 + delta:
-                    y2 = fcu2.evaluate(t+shift)
-                    eps = (t - frame1 + delta)/(2*delta)
-                    y = y1*(1-eps) + y2*eps
-                else:
-                    break
-                fcu2.keyframe_points.insert(t, y, options={'FAST'})
-            for kp2 in fcu2.keyframe_points:
-                t = kp2.co[0] - shift
-                if t >= frame1 + delta:
-                    fcu2.keyframe_points.insert(t, kp2.co[1], options={'FAST'})
-        utils.setInterpolation(rig)
+    shift = frame1 - frame2 + 2*delta
+    translateFCurves(act2.fcurves, shift)
+
+    for fcu2 in act2.fcurves:
+        fcu1 = utils.findFCurve(fcu2.data_path, fcu2.array_index, act1.fcurves)
+        for kp1 in fcu1.keyframe_points:
+            t = kp1.co[0]
+            y1 = kp1.co[1]
+            if t <= frame1 - delta:
+                y = y1
+            elif t <= frame1 + delta:
+                y2 = fcu2.evaluate(t+shift)
+                eps = (t - frame1 + delta)/(2*delta)
+                y = y1*(1-eps) + y2*eps
+            else:
+                break
+            fcu2.keyframe_points.insert(t, y, options={'FAST'})
+        for kp2 in fcu2.keyframe_points:
+            t = kp2.co[0] - shift
+            if t >= frame1 + delta:
+                fcu2.keyframe_points.insert(t, kp2.co[1], options={'FAST'})
+
+    rig.animation_data.action = action.getAction(scn.McpOutputActionName)
+    utils.setInterpolation(rig)
     return        
+
 
 def translateFCurves(fcurves, dt):
     for fcu in fcurves:
@@ -321,6 +275,7 @@ def translateFCurves(fcurves, dt):
             for kp in fcu.keyframe_points:
                 kp.co[0] += dt
     return
+   
     
 class VIEW3D_OT_McpStitchActionsButton(bpy.types.Operator):
     bl_idname = "mcp.stitch_actions"
