@@ -165,8 +165,8 @@ LegHeadsTails = [
     # Muscles
     ('DfmLegOut_L',     'r-legout-head', 'r-legout-tail'),
     ('DfmLegOut_R',     'l-legout-head', 'l-legout-tail'),
-    ('DfmLegFront_L',   'r-legfront-head', 'r-legfront-tail'),
-    ('DfmLegFront_R',   'l-legfront-head', 'l-legfront-tail'),
+    #('DfmLegFront_L',   'r-legfront-head', 'r-legfront-tail'),
+    #('DfmLegFront_R',   'l-legfront-head', 'l-legfront-tail'),
 
     ('LegOutTrg_L',     'r-knee', 'r-legout-tail'),
     ('LegOutTrg_R',     'l-knee', 'l-legout-tail'),
@@ -292,8 +292,8 @@ LegArmature = [
     # Muscles
     ('DfmLegOut_L',     0, 'DfmHips', F_DEF, L_MSCL, NoBB),
     ('DfmLegOut_R',     0, 'DfmHips', F_DEF, L_MSCL, NoBB),
-    ('DfmLegFront_L',   0, 'DfmHips', F_DEF, L_MSCL, NoBB),
-    ('DfmLegFront_R',   0, 'DfmHips', F_DEF, L_MSCL, NoBB),
+    #('DfmLegFront_L',   0, 'DfmHips', F_DEF, L_MSCL, NoBB),
+    #('DfmLegFront_R',   0, 'DfmHips', F_DEF, L_MSCL, NoBB),
 
     ('LegOutTrg_L',     0, 'DfmUpLeg_L', 0, L_HELP, NoBB),
     ('LegOutTrg_R',     0, 'DfmUpLeg_R', 0, L_HELP, NoBB),
@@ -519,11 +519,11 @@ def LegControlPoses(fp):
     addPoseBone(fp, 'DfmLegOut_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegOutTrg_R', 1, 1])])
 
-    addPoseBone(fp, 'DfmLegFront_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegFrontTrg_L', 1, 1])])
+    #addPoseBone(fp, 'DfmLegFront_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+    #    [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegFrontTrg_L', 1, 1])])
 
-    addPoseBone(fp, 'DfmLegFront_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegFrontTrg_R', 1, 1])])
+    #addPoseBone(fp, 'DfmLegFront_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+    #    [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegFrontTrg_R', 1, 1])])
 
 
     if not MuscleBones:
@@ -615,7 +615,7 @@ expr60 = "%.3f*(1-%.3f*x1)" % (90.0/60.0, 2/pi)
 expr45 = "%.3f*(1-%.3f*x1)" % (90.0/45.0, 2/pi)
 
 HipTargetDrivers = [
-    ("legs-forward-70", "LR", expr70,
+    ("legs-forward-90", "LR", expr90,
         [("UpLeg", "DirUpLegFwd")]),
     ("legs-back-60", "LR", expr60,
         [("UpLeg", "DirUpLegBack")]),
