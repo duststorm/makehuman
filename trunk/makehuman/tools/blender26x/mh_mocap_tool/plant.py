@@ -25,6 +25,7 @@
 
 import bpy
 from . import simplify
+from .utils import MocapError
 
 #
 #    plantKeys(context)
@@ -34,16 +35,13 @@ def plantKeys(context):
     rig = context.object
     scn = context.scene
     if not rig.animation_data:
-        print("Cannot plant: no animation data")
-        return
+        raise MocapError("Cannot plant: no animation data")
     act = rig.animation_data.action
     if not act:
-        print("Cannot plant: no action")
-        return
+        raise MocapError("Cannot plant: no action")
     bone = rig.data.bones.active
     if not bone:
-        print("Cannot plant: no active bone")
-        return
+        raise MocapError("Cannot plant: no active bone")
 
     fromIndex = int(scn.McpPlantFrom)
     pb = rig.pose.bones[bone.name]
@@ -112,7 +110,10 @@ class VIEW3D_OT_McpPlantButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        plantKeys(context)
+        try:
+            plantKeys(context)
+        except MocapError:
+            bpy.ops.mcp.error('INVOKE_DEFAULT')
         print("Keys planted")
         return{'FINISHED'}    
 

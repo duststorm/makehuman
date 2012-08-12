@@ -359,8 +359,7 @@ def retargetMhxRig(context, srcRig, trgRig, doFK, doIK):
     try:
         scn.frame_current = frames[0]
     except:
-        print("No frames found. Quitting.")
-        return
+        raise MocapError("No frames found.")
     oldData = changeTargetData(trgRig, anim)
     clearPose()
     frameBlock = frames[0:100]

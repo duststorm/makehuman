@@ -102,8 +102,9 @@ def deleteAction(context):
     try:
         act = bpy.data.actions[scn.McpActions]
     except KeyError:
-        print("Did not find action %s" % scn.McpActions)
-        return
+        act = None
+    if not act:     
+        raise MocapError("Did not find action %s" % scn.McpActions)
     print('Delete action', act)    
     act.use_fake_user = False
     if act.users == 0:
@@ -115,7 +116,7 @@ def deleteAction(context):
         listAllActions(context)
         #del act
     else:
-        print("Cannot delete. %s has %d users." % (act, act.users))
+        raise MocapError("Cannot delete. Action %s has %d users." % (act.name, act.users))
 
 
 class VIEW3D_OT_McpDeleteButton(bpy.types.Operator):
