@@ -23,7 +23,7 @@ import mhx_globals as the
 from mhx_globals import *
 from mhx_rig import addPoseBone, copyDeform, copyDeformPartial
 
-prcArmTrg    = 0.15
+prcUpArmVec    = 0.15
 offs = (0,0.6,0)
 
 ArmJoints = [
@@ -50,13 +50,13 @@ ArmJoints = [
     ('l-loarm1',            'l', ((0.67, 'l-elbow'), (0.33, 'l-hand'))),
     ('l-loarm2',            'l', ((0.33, 'l-elbow'), (0.67, 'l-hand'))),
 
-    #('r-armtrg',            'l', ((1-prcArmTrg, 'r-uparm0'), (prcArmTrg, 'r-elbow'))),
-    #('l-armtrg',            'l', ((1-prcArmTrg, 'l-uparm0'), (prcArmTrg, 'l-elbow'))),
+    #('r-armtrg',            'l', ((1-prcUpArmVec, 'r-uparm0'), (prcUpArmVec, 'r-elbow'))),
+    #('l-armtrg',            'l', ((1-prcUpArmVec, 'l-uparm0'), (prcUpArmVec, 'l-elbow'))),
     ('r-armtrg',            'o', ('r-uparm0', [1,0,0])),
     ('l-armtrg',            'o', ('l-uparm0', [-1,0,0])),
     
-    ('r-uparmrot',          'l', ((1-2*prcArmTrg, 'r-uparm0'), (2*prcArmTrg, 'r-elbow'))),
-    ('l-uparmrot',          'l', ((1-2*prcArmTrg, 'l-uparm0'), (2*prcArmTrg, 'l-elbow'))),
+    ('r-uparmrot',          'l', ((1-2*prcUpArmVec, 'r-uparm0'), (2*prcUpArmVec, 'r-elbow'))),
+    ('l-uparmrot',          'l', ((1-2*prcUpArmVec, 'l-uparm0'), (2*prcUpArmVec, 'l-elbow'))),
 
     ('r-elbow-pt',          'o', ('r-elbow', [0,0,-3])),
     ('l-elbow-pt',          'o', ('l-elbow', [0,0,-3])),
@@ -68,6 +68,7 @@ ArmJoints = [
     
 ]
 
+"""
 if MuscleBones:
     ArmJoints += [    
     ('r-loarm-fan',         'l', ((0.25, 'r-hand'), (0.75, 'r-elbow'))),
@@ -79,27 +80,28 @@ if MuscleBones:
     ('l-elbow-compress2',     'l', ((0.5, 'l-elbow'), (0.5, 'l-hand'))),
     
 ]
+"""
 
 ArmHeadsTails = [
     # Upper arm
-    ('ArmTrg_L',            'r-uparm0', 'r-armtrg'),
-    ('ArmTrgPos_L',         'r-uparm0', 'r-armtrg'),
-    ('ArmTrgNeg_L',         'r-uparm0', 'r-armtrg'),
+    ('UpArmVec_L',            'r-uparm0', 'r-armtrg'),
+    ('UpArmVecPos_L',         'r-uparm0', 'r-armtrg'),
+    ('UpArmVecNeg_L',         'r-uparm0', 'r-armtrg'),
     ('UpArm_L',             'r-uparm0', 'r-elbow'),
     ('UpArmIK_L',           'r-uparm0', 'r-elbow'),
     ('UpArmRot_L',          'r-uparm0', 'r-uparm1'),
     ('DfmUpArm_L',          'r-uparm0', 'r-elbow'),
 
-    ('ArmTrg_R',            'l-uparm0', 'l-armtrg'),
-    ('ArmTrgPos_R',         'l-uparm0', 'l-armtrg'),
-    ('ArmTrgNeg_R',         'l-uparm0', 'l-armtrg'),
+    ('UpArmVec_R',            'l-uparm0', 'l-armtrg'),
+    ('UpArmVecPos_R',         'l-uparm0', 'l-armtrg'),
+    ('UpArmVecNeg_R',         'l-uparm0', 'l-armtrg'),
     ('UpArm_R',             'l-uparm0', 'l-elbow'),
     ('UpArmIK_R',           'l-uparm0', 'l-elbow'),
     ('UpArmRot_R',          'l-uparm0', 'l-uparm1'),
     ('DfmUpArm_R',          'l-uparm0', 'l-elbow'),
 
     # Lower arm
-    ('LoArmTrg_L',          'r-elbow', ('r-elbow', (1,0,0))),
+    ('LoArmVec_L',          'r-elbow', 'r-loarm1'),
     ('LoArm_L',             'r-elbow', 'r-hand'),
     ('LoArmIK_L',           'r-elbow', 'r-hand'),
     ('LoArmRot_L',          'r-elbow', 'r-loarm1'),
@@ -108,7 +110,7 @@ ArmHeadsTails = [
     ('DfmLoArm2_L',         'r-loarm1', 'r-loarm2'),
     ('DfmLoArm3_L',         'r-loarm2', 'r-hand'),
 
-    ('LoArmTrg_R',          'l-elbow', ('l-elbow', (-1,0,0))),
+    ('LoArmVec_R',          'l-elbow', 'l-loarm1'),
     ('LoArm_R',             'l-elbow', 'l-hand'),
     ('LoArmIK_R',           'l-elbow', 'l-hand'),
     ('LoArmRot_R',          'l-elbow', 'l-loarm1'),
@@ -203,15 +205,15 @@ ArmArmature = [
     ('Wrist_R',            handRoll, Master, F_WIR, L_RARMIK, NoBB),
     
      # Arm targets
-    ('ArmTrg_L',          0, 'Shoulder_L', 0, L_HELP, NoBB),
-    ('ArmTrg_R',          0, 'Shoulder_R', 0, L_HELP, NoBB),
-    ('ArmTrgPos_L',       60*D, 'Shoulder_L', 0, L_HELP, NoBB),
-    ('ArmTrgPos_R',       -60*D, 'Shoulder_R', 0, L_HELP, NoBB),
-    ('ArmTrgNeg_L',       -60*D, 'Shoulder_L', 0, L_HELP, NoBB),
-    ('ArmTrgNeg_R',       60*D, 'Shoulder_R', 0, L_HELP, NoBB),
+    ('UpArmVec_L',          0, 'Shoulder_L', 0, L_HELP, NoBB),
+    ('UpArmVec_R',          0, 'Shoulder_R', 0, L_HELP, NoBB),
+    ('UpArmVecPos_L',       60*D, 'Shoulder_L', 0, L_HELP, NoBB),
+    ('UpArmVecPos_R',       -60*D, 'Shoulder_R', 0, L_HELP, NoBB),
+    ('UpArmVecNeg_L',       -60*D, 'Shoulder_L', 0, L_HELP, NoBB),
+    ('UpArmVecNeg_R',       60*D, 'Shoulder_R', 0, L_HELP, NoBB),
 
-    ('LoArmTrg_L',        0, 'UpArm_L', 0, L_HELP, NoBB),
-    ('LoArmTrg_R',        0, 'UpArm_R', 0, L_HELP, NoBB),
+    ('LoArmVec_L',        0, 'UpArm_L', 0, L_HELP, NoBB),
+    ('LoArmVec_R',        0, 'UpArm_R', 0, L_HELP, NoBB),
     
     # Pole target
     ('ElbowPT_L',         0, (None, 'Shoulder_L'), F_WIR, L_LARMIK, NoBB),
@@ -295,12 +297,14 @@ def ArmControlPoses(fp):
 
     addPoseBone(fp, 'UpArm_L', 'GZM_Circle025', 'FK_L', (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limUpArm_L, (True, True, True)]),
+         #('CopyTrans', 0, 0, ['ArmIK', 'UpArmIK_L', 0]),
          ('IK', 0, 0, ['ArmIK', 'LoArmIK_L', 1, None, (True, False,False)]),
          ('CopyTrans', 0, 0, ['Elbow', 'ELUpArm_L', 0])
         ])
 
-    addPoseBone(fp, 'LoArm_L', 'GZM_Circle025', 'FK_L', (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, 
+    addPoseBone(fp, 'LoArm_L', 'GZM_Circle025', 'FK_L', (1,1,1), (1,0,0), (1,0,1), (1,1,1), P_YXZ, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoArm_L, (True, True, True)]),
+         #('CopyTrans', 0, 0, ['ArmIK', 'LoArmIK_L', 0]),
          ('IK', 0, 0, ['ArmIK', 'Wrist_L', 1, None, (True, False,False)]),
          ('IK', 0, 0, ['Wrist', 'Wrist_L', 1, None, (True, False,False)]),
         ])
@@ -320,7 +324,7 @@ def ArmControlPoses(fp):
          ('CopyTrans', 0, 0, ['Elbow', 'ELUpArm_R', 0])
         ])
 
-    addPoseBone(fp, 'LoArm_R', 'GZM_Circle025', 'FK_R', (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, 
+    addPoseBone(fp, 'LoArm_R', 'GZM_Circle025', 'FK_R', (1,1,1), (1,0,0), (1,0,1), (1,1,1), P_YXZ, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limLoArm_R, (True, True, True)]),
          #('CopyTrans', 0, 0, ['ArmIK', 'LoArmIK_R', 0]),
          ('IK', 0, 0, ['ArmIK', 'Wrist_R', 1, None, (True, False,False)]),
@@ -340,7 +344,7 @@ def ArmControlPoses(fp):
             ((1,1,1), (0,0,0), 0.05, limUpArm_L), 0, [])
 
     addPoseBone(fp, 'LoArmIK_L', None, 'IK_L', (1,1,1), (0,0,0), (1,1,1), 
-                ((1,1,1), (0,0,0), 0.05, limLoArm_L), 0, 
+                ((0,1,1), (0,0,0), 0.05, limLoArm_L), 0, 
         [('IK', 0, 1, ['ArmIK', 'Wrist_L', 2, (pi-deltaElbow, 'ElbowPT_L'), (True, False,False)]),
          ])
 
@@ -359,7 +363,7 @@ def ArmControlPoses(fp):
             ((1,1,1), (0,0,0), 0.05, limUpArm_R), 0, [])
 
     addPoseBone(fp, 'LoArmIK_R', None, 'IK_R', (1,1,1), (0,0,0), (1,1,1), 
-            ((1,1,1), (0,0,0), 0.05, limLoArm_R), 0, 
+            ((0,1,1), (0,0,0), 0.05, limLoArm_R), 0, 
         [('IK', 0, 1, ['ArmIK', 'Wrist_R', 2, (deltaElbow, 'ElbowPT_R'), (True, False,False)]),        
         ])
 
@@ -395,20 +399,20 @@ def ArmControlPoses(fp):
     # Targets
     
     armTrgIk_L = ('IK', 0, 1, ['ArmIK', 'LoArm_L', 1, None, (True, False,True)])
-    addPoseBone(fp, 'ArmTrg_L', None, 'FK_L', (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0, [armTrgIk_L])
-    addPoseBone(fp, 'ArmTrgPos_L', None, 'FK_L', (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0, [armTrgIk_L])
-    addPoseBone(fp, 'ArmTrgNeg_L', None, 'FK_L', (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0, [armTrgIk_L])
+    addPoseBone(fp, 'UpArmVec_L', None, 'FK_L', (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0, [armTrgIk_L])
+    addPoseBone(fp, 'UpArmVecPos_L', None, 'FK_L', (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0, [armTrgIk_L])
+    addPoseBone(fp, 'UpArmVecNeg_L', None, 'FK_L', (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0, [armTrgIk_L])
 
     armTrgIk_R = ('IK', 0, 1, ['ArmIK', 'LoArm_R', 1, None, (True, False,True)])
-    addPoseBone(fp, 'ArmTrg_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0, [armTrgIk_R])
-    addPoseBone(fp, 'ArmTrgPos_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0, [armTrgIk_R])
-    addPoseBone(fp, 'ArmTrgNeg_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0, [armTrgIk_R])
+    addPoseBone(fp, 'UpArmVec_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0, [armTrgIk_R])
+    addPoseBone(fp, 'UpArmVecPos_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0, [armTrgIk_R])
+    addPoseBone(fp, 'UpArmVecNeg_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0, [armTrgIk_R])
     
-    loArmTrgIk_L = ('IK', 0, 1, ['IK', 'Hand_L', 1, None, (True, False,True)])
-    addPoseBone(fp, 'LoArmTrg_L', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0, [loArmTrgIk_L])
+    loUpArmVecIk_L = ('IK', 0, 1, ['IK', 'Hand_L', 1, None, (True, False,True)])
+    addPoseBone(fp, 'LoArmVec_L', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0, [loUpArmVecIk_L])
     
-    loArmTrgIk_R = ('IK', 0, 1, ['IK', 'Hand_R', 1, None, (True, False,True)])
-    addPoseBone(fp, 'LoArmTrg_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0, [loArmTrgIk_R])
+    loUpArmVecIk_R = ('IK', 0, 1, ['IK', 'Hand_R', 1, None, (True, False,True)])
+    addPoseBone(fp, 'LoArmVec_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0, [loUpArmVecIk_R])
     
 
     deltaUpArm = 3*D
@@ -556,7 +560,7 @@ expr135 = "2*(1-%.3f*x1)" % (2/pi)
 
 ElbowTargetDrivers = [    
     ("loarms-forward-90",  "LR", expr90,
-        [("LoArmTrg", "DirElbowFwd")]),
+        [("LoArmVec", "DirElbowFwd")]),
 #    ("loarms-forward-135",  "LR", expr135,
-#        [("LoArmTrg", "DirElbowInv")]),
+#        [("LoArmVec", "DirElbowInv")]),
 ]    

@@ -214,7 +214,7 @@ ShoulderArmature = [
     ('DirShldrBack_L',      0*D, 'Clavicle_L', 0, L_HELP, NoBB),
     ('DirShldrBack_R',      0*D, 'Clavicle_R', 0, L_HELP, NoBB),
 ]    
-
+"""
 if MuscleBones:
     ShoulderArmature += [
     ('Sternum',            0, 'DfmSpine3', 0, L_HELP, NoBB),
@@ -237,25 +237,25 @@ if MuscleBones:
     ('DfmPect1_R',         0, 'DfmRib', F_DEF1, L_MSCL, NoBB ),
     ('DfmPect2_L',         0, 'DfmRib', F_DEF1, L_MSCL, NoBB ),
     ('DfmPect2_R',         0, 'DfmRib', F_DEF1, L_MSCL, NoBB ),
-    ('PectTrg_L',          0, 'ArmTrg_L', 0, L_HELP, NoBB),
-    ('PectTrg_R',          0, 'ArmTrg_R', 0, L_HELP, NoBB),
+    ('PectTrg_L',          0, 'UpArmVec_L', 0, L_HELP, NoBB),
+    ('PectTrg_R',          0, 'UpArmVec_R', 0, L_HELP, NoBB),
     
     ('DfmTrap1_L',         0, 'DfmNeck', F_DEF1, L_MSCL, NoBB ),
     ('DfmTrap1_R',         0, 'DfmNeck', F_DEF1, L_MSCL, NoBB ),
     ('DfmTrap2_L',         0, 'DfmSpine2', F_DEF1, L_MSCL, NoBB ),
     ('DfmTrap2_R',         0, 'DfmSpine2', F_DEF1, L_MSCL, NoBB ),
-    ('TrapTrg_L',          0, 'ArmTrg_L', 0, L_HELP, NoBB),
-    ('TrapTrg_R',          0, 'ArmTrg_R', 0, L_HELP, NoBB),
+    ('TrapTrg_L',          0, 'UpArmVec_L', 0, L_HELP, NoBB),
+    ('TrapTrg_R',          0, 'UpArmVec_R', 0, L_HELP, NoBB),
 
     ('DfmLat_L',           0, 'DfmSpine1', F_DEF1, L_MSCL, NoBB ),
     ('DfmLat_R',           0, 'DfmSpine1', F_DEF1, L_MSCL, NoBB ),
-    ('LatTrg_L',           0, 'ArmTrg_L', 0, L_HELP, NoBB),
-    ('LatTrg_R',           0, 'ArmTrg_R', 0, L_HELP, NoBB),
+    ('LatTrg_L',           0, 'UpArmVec_L', 0, L_HELP, NoBB),
+    ('LatTrg_R',           0, 'UpArmVec_R', 0, L_HELP, NoBB),
 
     ('DfmDeltoid_L',       0, 'DfmClavicle_L', F_DEF1, L_MSCL, NoBB ),
     ('DfmDeltoid_R',       0, 'DfmClavicle_R', F_DEF1, L_MSCL, NoBB ),
 ]
-
+"""
 #
 #
 #
@@ -365,10 +365,10 @@ def ShoulderControlPoses(fp):
 
 
     addPoseBone(fp, 'DfmLat_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_L', 1.0, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'UpArmVec_L', 1.0, 1])])
 
     addPoseBone(fp, 'DfmLat_R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'ArmTrg_R', 1.0, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'UpArmVec_R', 1.0, 1])])
 
 
     addPoseBone(fp, 'DfmDeltoid_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
@@ -431,49 +431,49 @@ else:
 
     ShoulderTargetDrivers = [
     ("arms-up-70", "LR", expr70_60, 
-        [("ArmTrg", "DirShldrUp"),
-         ("UpArm", "ArmTrg")]),
+        [("UpArmVec", "DirShldrUp"),
+         ("UpArm", "UpArmVec")]),
     ("arms-up-70-pos-60", "LR", expr70_60,
-        [("ArmTrg", "DirShldrUp"),
-         ("UpArm", "ArmTrgPos")]),
+        [("UpArmVec", "DirShldrUp"),
+         ("UpArm", "UpArmVecPos")]),
     ("arms-up-70-neg-60", "LR", expr70_60,
-        [("ArmTrg", "DirShldrUp"),
-         ("UpArm", "ArmTrgNeg")]),
+        [("UpArmVec", "DirShldrUp"),
+         ("UpArm", "UpArmVecNeg")]),
 
     ("arms-down-70", "LR", expr70_60,
-        [("ArmTrg", "DirShldrDown"),
-         ("UpArm", "ArmTrg")]),
+        [("UpArmVec", "DirShldrDown"),
+         ("UpArm", "UpArmVec")]),
     ("arms-down-70-pos-60", "LR", expr70_60,
-        [("ArmTrg", "DirShldrDown"),
-         ("UpArm", "ArmTrgPos")]),
+        [("UpArmVec", "DirShldrDown"),
+         ("UpArm", "UpArmVecPos")]),
     ("arms-down-70-neg-60", "LR", expr70_60,
-        [("ArmTrg", "DirShldrDown"),
-         ("UpArm", "ArmTrgNeg")]),
+        [("UpArmVec", "DirShldrDown"),
+         ("UpArm", "UpArmVecNeg")]),
 
     ("arms-forward-70", "LR", expr70_60,
-        [("ArmTrg", "DirShldrFwd"),
-         ("UpArm", "ArmTrg")]),
+        [("UpArmVec", "DirShldrFwd"),
+         ("UpArm", "UpArmVec")]),
     ("arms-forward-70-pos-60", "LR", expr70_60,
-        [("ArmTrg", "DirShldrFwd"),
-         ("UpArm", "ArmTrgPos")]),
+        [("UpArmVec", "DirShldrFwd"),
+         ("UpArm", "UpArmVecPos")]),
     ("arms-forward-70-neg-60", "LR", expr70_60,
-        [("ArmTrg", "DirShldrFwd"),
-         ("UpArm", "ArmTrgNeg")]),
+        [("UpArmVec", "DirShldrFwd"),
+         ("UpArm", "UpArmVecNeg")]),
 
     ("arms-back-70", "LR", expr70_60,
-        [("ArmTrg", "DirShldrBack"),
-         ("UpArm", "ArmTrg")]),
+        [("UpArmVec", "DirShldrBack"),
+         ("UpArm", "UpArmVec")]),
     ("arms-back-70-pos-60", "LR", expr70_60,
-        [("ArmTrg", "DirShldrBack"),
-         ("UpArm", "ArmTrgPos")]),
+        [("UpArmVec", "DirShldrBack"),
+         ("UpArm", "UpArmVecPos")]),
     ("arms-back-70-neg-60", "LR", expr70_60,
-        [("ArmTrg", "DirShldrBack"),
-         ("UpArm", "ArmTrgNeg")]),
+        [("UpArmVec", "DirShldrBack"),
+         ("UpArm", "UpArmVecNeg")]),
     
     ("arms-twist-pos-60", "LR", expr70_60,  
-        [("ArmTrg", "DirShldrOut"),
-         ("UpArm", "ArmTrgPos")]),
+        [("UpArmVec", "DirShldrOut"),
+         ("UpArm", "UpArmVecPos")]),
     ("arms-twist-neg-60", "LR", expr70_60,  
-        [("ArmTrg", "DirShldrOut"),
-         ("UpArm", "ArmTrgNeg")]),
+        [("UpArmVec", "DirShldrOut"),
+         ("UpArm", "UpArmVecNeg")]),
 ]
