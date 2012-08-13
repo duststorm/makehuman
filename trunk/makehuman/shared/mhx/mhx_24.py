@@ -32,7 +32,6 @@ import sys
 import time
 
 import mh2proxy
-import export_config
 import mhx_globals as the
 import mhxbones 
 import mhx_main
@@ -50,15 +49,15 @@ def exportMhx(human, filename, options):
     filename = name+"-24"+ext
     try:
         fp = open(filename, 'w')
-        export_config.safePrint("Writing MHX 2.4x file",  filename )
+        print("Writing MHX 2.4x file",  filename )
     except:
-        export_config.safePrint("Unable to open file for writing", filename)
+        print("Unable to open file for writing", filename)
         fp = 0
     if fp:
         exportMhx_24(human.meshData, fp)
         fp.close()
         time2 = time.clock()
-        export_config.safePrint("Wrote MHX 2.4x file in %g s:" % (time2-time1), filename)
+        print("Wrote MHX 2.4x file in %g s:" % (time2-time1), filename)
     return
  
  #

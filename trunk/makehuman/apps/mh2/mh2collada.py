@@ -57,14 +57,14 @@ def exportCollada(human, filename, options):
     outfile = export_config.getOutFileFolder(filename+".dae", the.Config)        
     try:
         fp = open(outfile, 'w')
-        export_config.safePrint("Writing Collada file", outfile)
+        print("Writing Collada file", outfile)
     except:
-        export_config.safePrint("Unable to open file for writing", outfile)
+        print("Unable to open file for writing", outfile)
     (name,ext) = os.path.splitext(os.path.basename(outfile))
     exportDae(human, name, fp)
     fp.close()
     time2 = time.clock()
-    export_config.safePrint("Wrote Collada file in %g s:" % (time2-time1), outfile)
+    print("Wrote Collada file in %g s:" % (time2-time1), outfile)
     return
 
 #

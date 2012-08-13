@@ -189,33 +189,6 @@ LegHeadsTails = [
     ('DirKneeInv_R',      'l-knee', ('l-knee', (0,1,0))),
 ]
 
-if MuscleBones:
-    LegHeadsTails += [
-
-    ('DfmButt_L',       'r-upper-leg', 'r-butt'),
-    ('Butt_L',          'r-butt', ('r-butt', the.yunit)),
-    ('DfmButt_R',       'l-upper-leg', 'l-butt'),
-    ('Butt_R',          'l-butt', ('l-butt', the.yunit)),
-
-    # Muscles
-    ('DfmLegback_L',    'r-legback-head', 'r-legback-tail'),
-    ('DfmLegback_R',    'l-legback-head', 'l-legback-tail'),
-    ('DfmLegIn_L',      'r-legin-head', 'r-legin-tail'),
-    ('DfmLegIn_R',      'l-legin-head', 'l-legin-tail'),
-
-    ('LegbackTrg_L',    'r-upper-leg', 'r-legback-tail'),
-    ('LegbackTrg_R',    'l-upper-leg', 'l-legback-tail'),
-    ('LegInTrg_L',      'r-knee', 'r-legin-tail'),
-    ('LegInTrg_R',      'l-knee', 'l-legin-tail'),
-
-    # Knee deform
-    ('DfmKnee_L',       'r-knee-head', 'r-knee-tail'),
-    ('KneeTrg_L',       'r-knee-tail', ('r-knee-tail', the.ysmall)),
-    ('DfmKnee_R',       'l-knee-head', 'l-knee-tail'),
-    ('KneeTrg_R',       'l-knee-tail', ('l-knee-tail', the.ysmall)),
-
-]
-
 #
 #   LegArmature
 #

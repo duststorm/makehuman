@@ -91,10 +91,12 @@ ShoulderHeadsTails = [
     ('DfmClavicle_R',       'l-clavicle', 'l-clav-tail'),
 
     # Shoulder
-    ('ShoulderEnd_L',       'r-uparm0', ('r-uparm0', the.yunit)),
-    ('ShoulderEnd_R',       'l-uparm0', ('l-uparm0', the.yunit)),
-    ('Shoulder_L',          'r-uparm0', ('r-uparm0', the.ysmall)),
-    ('Shoulder_R',          'l-uparm0', ('l-uparm0', the.ysmall)),
+    ('Shoulder_L',          'r-uparm0', ('r-uparm0', (0,1,0))),
+    ('Shoulder_R',          'l-uparm0', ('l-uparm0', (0,1,0))),
+    ('UpArmSocket_L',       'r-uparm0', ('r-uparm0', (0,0.5,0))),
+    ('UpArmSocket_R',       'l-uparm0', ('l-uparm0', (0,0.5,0))),
+    ('UpArmHinge_L',        ('r-clav-tail', (0,1,0)), 'r-clav-tail'),
+    ('UpArmHinge_R',        ('l-clav-tail', (0,1,0)), 'l-clav-tail'),
 
     # Elbow lock
 
@@ -179,10 +181,12 @@ ShoulderArmature = [
     ('DfmClavicle_R',      0, 'DfmSpine3', F_DEF, L_DMAIN, NoBB),
     
     # Shoulder    
-    ('ShoulderEnd_L',      0, 'Clavicle_L', 0, L_HELP, NoBB),
-    ('ShoulderEnd_R',      0, 'Clavicle_R', 0, L_HELP, NoBB),
-    ('Shoulder_L',         0, 'ShoulderEnd_L', F_WIR+F_NOROT, L_TWEAK, NoBB),
-    ('Shoulder_R',         0, 'ShoulderEnd_R', F_WIR+F_NOROT, L_TWEAK, NoBB),
+    ('Shoulder_L',         0, 'Clavicle_L', F_WIR, L_TWEAK, NoBB),
+    ('Shoulder_R',         0, 'Clavicle_R', F_WIR, L_TWEAK, NoBB),
+    ('UpArmSocket_L',      0, 'Root', 0, L_HELP, NoBB),
+    ('UpArmSocket_R',      0, 'Root', 0, L_HELP, NoBB),
+    ('UpArmHinge_L',       0, 'UpArmSocket_L', 0, L_HELP, NoBB),
+    ('UpArmHinge_R',       0, 'UpArmSocket_R', 0, L_HELP, NoBB),
     
     # Elbow lock        
     ('Elbow_L',            0, Master, F_WIR, L_LEXTRA, NoBB),
@@ -285,14 +289,23 @@ def ShoulderControlPoses(fp):
 
     # Shoulder
     
-    addPoseBone(fp, 'Shoulder_L', 'MHBall025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('CopyRot', 0, 1, ['Shoulder', 'ShoulderEnd_L', (1,1,1), (0,0,0), False]),
-         ('CopyRot', 0, 0, ['Root', 'BendRoot', (1,1,1), (0,0,0), False])])
+    addPoseBone(fp, 'Shoulder_L', 'MHBall025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-    addPoseBone(fp, 'Shoulder_R', 'MHBall025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('CopyRot', 0, 1, ['Shoulder', 'ShoulderEnd_R', (1,1,1), (0,0,0), False]),
-         ('CopyRot', 0, 0, ['Root', 'BendRoot', (1,1,1), (0,0,0), False])])
+    addPoseBone(fp, 'Shoulder_R', 'MHBall025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+
+    addPoseBone(fp, 'UpArmSocket_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('CopyLoc', 0, 1, ['CopyLoc', 'Shoulder_L', (1,1,1), (0,0,0), 0, False]),
+         ('CopyTrans', 0, 0, ['Shoulder', 'Shoulder_L', 0])])
+
+    addPoseBone(fp, 'UpArmSocket_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('CopyLoc', 0, 1, ['CopyLoc', 'Shoulder_R', (1,1,1), (0,0,0), 0, False]),
+         ('CopyTrans', 0, 0, ['Shoulder', 'Shoulder_R', 0])])
+
+    addPoseBone(fp, 'UpArmHinge_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
+
+    addPoseBone(fp, 'UpArmHinge_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
          
+
     # Elbow lock
     
     addPoseBone(fp, 'Elbow_L', 'MHBall025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 

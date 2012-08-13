@@ -441,7 +441,8 @@ def changeTargetData(rig, anim):
         pb.lock_rotation = [False, False, False]
         pb.lock_scale = [False, False, False]
         
-    norotBones = []      
+    norotBones = []    
+    """
     if the.target == 'MHX':
         for (name, parent) in [("UpLegRot_L", "Hip_L"), ("UpLegRot_R", "Hip_R")]:
             try:
@@ -453,6 +454,7 @@ def changeTargetData(rig, anim):
             if not isPermanent:
                 norotBones.append(b)
             b.use_inherit_rotation = False
+    """
     return (props, layers, locks, norotBones)
 
     

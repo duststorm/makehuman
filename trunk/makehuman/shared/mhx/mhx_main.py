@@ -66,15 +66,15 @@ def exportMhx(human, filename, options):
         outfile = export_config.getOutFileFolder(filename, the.Config)        
         try:
             fp = open(outfile, 'w')
-            export_config.safePrint("Writing MHX 2.5x file",  outfile )
+            print("Writing MHX 2.5x file",  outfile )
         except:
-            export_config.safePrint("Unable to open file for writing", outfile)
+            print("Unable to open file for writing", outfile)
             fp = 0
         if fp:
             exportMhx_25(human, fp)
             fp.close()
             time2 = time.clock()
-            export_config.safePrint("Wrote MHX 2.5x file in %g s:" % (time2-time1), outfile)
+            print("Wrote MHX 2.5x file in %g s:" % (time2-time1), outfile)
 
     return        
 
