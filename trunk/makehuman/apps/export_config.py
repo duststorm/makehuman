@@ -101,6 +101,7 @@ class CExportConfig:
         self.customshapes = []
         self.customvertexgroups = []
         self.copiedFiles = {}
+        self.warpField = {}
         
     def __repr__(self):
         return (
