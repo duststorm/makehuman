@@ -29,6 +29,9 @@ from math import sqrt, cos, sin, tan, atan2, fabs, acos, pow
 def vadd3d(v1, v2):
     return [v1[0]+v2[0], v1[1]+v2[1], v1[2]+v2[2]]
 
+def vsub3d(v1, v2):
+    return [v1[0]-v2[0], v1[1]-v2[1], v1[2]-v2[2]]
+
 def vmul3d(v, s):
     return [v[0]*s, v[1]*s, v[2]*s]
     

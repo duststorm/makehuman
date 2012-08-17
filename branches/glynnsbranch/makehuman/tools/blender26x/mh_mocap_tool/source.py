@@ -50,7 +50,7 @@ def guessSrcArmature(rig, scn):
         nMisses = 0
         for bone in bones:
             try:
-                amt[bone.name.lower()]
+                amt[canonicalSrcName(bone.name)]
             except:
                 nMisses += 1
         misses[name] = nMisses
@@ -113,10 +113,15 @@ def findSourceKey(mhx, struct):
             return (bone, twist)
     return (None, 0)
     
+    
 def getSourceRoll(mhx):
     (bone, roll) = findSourceKey(mhx, the.srcArmature)
     return roll
             
+    
+def canonicalSrcName(string):
+    return string.lower().replace(' ','_').replace('-','_')
+    
     
 ###############################################################################
 #
@@ -176,8 +181,8 @@ def readSrcArmature(file, name):
                 print("Ignored illegal line", line)
             elif status == 1:
                 for n in range(1,len(words)-2):
-                    key += " " + words[n].lower()                    
-                armature[key] = (utils.nameOrNone(words[-2]), float(words[-1]))
+                    key += "_" + words[n]                    
+                armature[canonicalSrcName(key)] = (utils.nameOrNone(words[-2]), float(words[-1]))
     fp.close()                
     return (name, armature)                
     

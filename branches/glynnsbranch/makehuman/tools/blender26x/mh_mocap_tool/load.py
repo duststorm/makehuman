@@ -144,6 +144,7 @@ def readBvhFile(context, filepath, scn, scan):
     level = 0
     nErrors = 0
     scn = context.scene
+    rig = None
             
     fp = open(fileName, "rU")
     print( "Reading skeleton" )
@@ -240,6 +241,8 @@ def readBvhFile(context, filepath, scn, scan):
             frame += 1
 
     fp.close()
+    if not rig:
+    	raise MocapError("Bvh file \n%s\n is corrupt: No rig defined" % filepath)
     utils.setInterpolation(rig)
     time2 = time.clock()
     print("Bvh file %s loaded in %.3f s" % (filepath, time2-time1))
@@ -396,17 +399,12 @@ def renameBones(srcRig, scn):
 
 
 def getTargetFromSource(srcName):    
-    lname = srcName.lower()
+    lname = source.canonicalSrcName(srcName)
     try:
         return the.srcArmature[lname]     
     except KeyError:
         pass
-    lname = lname.replace(' ','_')        
-    try:
-        return the.srcArmature[lname]     
-    except KeyError:
-        pass
-    raise MocapError("No target bone corresponding to source bone %s" % srcName)
+    raise MocapError("No target bone corresponding to source bone %s (%s)" % (srcName, lname))
 
 #
 #    createExtraBones(ebones, trgBones):
@@ -535,8 +533,7 @@ def rescaleRig(scn, trgRig, srcRig):
 def renameAndRescaleBvh(context, srcRig, trgRig):
     try:
         if srcRig["McpRenamed"]:
-            print("%s already renamed and rescaled." % srcRig.name)
-            return
+            raise MocapError("%s already renamed and rescaled." % srcRig.name)
     except:
         pass
         
@@ -594,10 +591,9 @@ class VIEW3D_OT_RenameBvhButton(bpy.types.Operator):
             if ob.type == 'ARMATURE' and ob.select and ob != srcRig:
                 trgRig = ob
                 break
-        if not trgRig:
-            print("No target rig selected")
-            return{'FINISHED'}    
         try:
+            if not trgRig:
+                raise MocapError("No target rig selected")
             renameAndRescaleBvh(context, srcRig, trgRig)
             if scn.McpRescale:
                 simplify.rescaleFCurves(context, srcRig, scn.McpRescaleFactor)

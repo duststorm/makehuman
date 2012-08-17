@@ -11,6 +11,7 @@ Armature:
 	head		Head		0 
 	left eye	None		0
 	right eye	None		0
+	hair		None		0
 
 	left collar	Clavicle_L	0
 	left shoulder	UpArm_L		0 

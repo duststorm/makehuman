@@ -1125,13 +1125,12 @@ def projectUVs(bob, pob, context):
         modifyTexFaces(bFaces, bTexFaces)
     for (pv, exact, verts, wts, diff) in data:
         if exact:
-            print("Exact", pv.index)
             (v0, x) = verts[0]            
-            for f0 in bVertFaces[v0.index]:
+            vn0 = v0.index
+            for f0 in bVertFaces[vn0]:
                 uvf = bTexFaces[f0.index].uvs
-                uv0 = getUvLoc(v0, f0, uvs)
+                uv0 = getUvLoc(vn0, f0, uvf)
                 table[pv.index] = (1, uv0, 1)
-                print(pv.index, table[pv.index])
                 break
         else:
             vn0 = verts[0]

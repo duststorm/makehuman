@@ -37,7 +37,11 @@ bl_info = {
 if "bpy" in locals():
     print("Reloading maketarget")
     import imp
+    imp.reload(globvars)
+    imp.reload(proxy)
+    imp.reload(import_obj)
     imp.reload(maketarget)
+    imp.reload(makeface)
     imp.reload(mhm)
     #imp.reload(rig)
     imp.reload(export_mh_obj)
@@ -47,7 +51,11 @@ else:
     import os
     from bpy.props import *
     from bpy_extras.io_utils import ImportHelper, ExportHelper
+    from . import globvars as the
+    from . import proxy
+    from . import import_obj
     from . import maketarget
+    from . import makeface
     from . import mhm
     #from . import rig
     from . import export_mh_obj
@@ -68,11 +76,11 @@ class MakeTargetPanel(bpy.types.Panel):
         if not maketarget.isInited(scn):
             layout.operator("mh.init")
             return
-        if maketarget.Confirm:
-            layout.label(maketarget.ConfirmString)            
-            if maketarget.ConfirmString2:
-                layout.label(maketarget.ConfirmString2)            
-            layout.operator(maketarget.Confirm, text="Yes") 
+        if the.Confirm:
+            layout.label(the.ConfirmString)            
+            if the.ConfirmString2:
+                layout.label(the.ConfirmString2)            
+            layout.operator(the.Confirm, text="Yes") 
             layout.operator("mh.skip")
             return            
         layout.label("Directories")
@@ -140,6 +148,56 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.operator("mh.saveas_target")           
 
 #----------------------------------------------------------
+#   class MakeFacePanel(bpy.types.Panel):
+#----------------------------------------------------------
+
+class MakeFacePanel(bpy.types.Panel):
+    bl_label = "Make Face"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    
+    def draw(self, context):
+        layout = self.layout
+        ob = context.object
+        scn = context.scene
+        layout.label("Directories")
+        layout.operator("mh.factory_settings")
+        layout.operator("mh.save_settings")
+        layout.operator("mh.read_settings")
+        layout.prop(scn, "MhProgramPath")
+        layout.prop(scn, "MhUserPath")
+        
+        layout.separator()
+        layout.label("Mask")
+        if not makeface.isMask(ob):
+            layout.operator("mh.generate_mask", text="Generate Mask").delete = False
+        else:
+            layout.operator("mh.generate_mask", text="Regenerate Mask").delete = True
+        layout.prop(scn, "MhGender", expand=True)
+        layout.prop(scn, "MhAge", expand=True)
+        layout.operator("mh.make_mask")    
+        if not makeface.isMask(ob):
+            return
+        layout.operator("mh.shapekey_mask")    
+        layout.separator()
+        
+        if not the.foundNumpy:        
+            layout.label("numpy could not be loaded,")
+            layout.label("either because it was not found")
+            layout.label("or this is a 64-bit Blender.")
+            layout.label("MakeFace will not work")
+            return
+
+        layout.label("Face")
+        layout.operator("mh.generate_face")
+        #layout.prop(scn, "MhStiffness")
+        #layout.prop(scn, "MhLambda")
+        #layout.prop(scn, "MhIterations")
+        if ob["MaskFilePath"]:
+            layout.operator("mh.save_face")
+        layout.operator("mh.save_face_as")
+
+#----------------------------------------------------------
 #   class MhmPanel(bpy.types.Panel):
 #----------------------------------------------------------
 
@@ -157,11 +215,11 @@ class MhmPanel(bpy.types.Panel):
         layout = self.layout
         ob = context.object
         scn = context.scene
-        if maketarget.Confirm:
-            layout.label(maketarget.ConfirmString)            
-            if maketarget.ConfirmString2:
-                layout.label(maketarget.ConfirmString2)            
-            layout.operator(maketarget.Confirm, text="Yes") 
+        if the.Confirm:
+            layout.label(the.ConfirmString)            
+            if the.ConfirmString2:
+                layout.label(the.ConfirmString2)            
+            layout.operator(the.Confirm, text="Yes") 
             layout.operator("mh.skip")
             return            
         if maketarget.isBaseOrTarget(ob):
@@ -238,8 +296,10 @@ def menu_func(self, context):
     self.layout.operator(ExportObj.bl_idname, text="MakeHuman OBJ (.obj)...")
  
 def register():
+    maketarget.init()
+    makeface.init()
     try:
-        maketarget.initScene(bpy.context.scene)
+        maketarget.initBatch(bpy.context.scene)
     except:
         pass
     mhm.init()        

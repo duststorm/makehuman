@@ -60,10 +60,12 @@ HumanTextureButtonStyle = gui3d.Style(**{
 class HumanTextureTaskView(gui3d.TaskView):
 
     def __init__(self, category):
+        self.systemSkins = os.path.join('data', 'skins')
+        self.userSkins = os.path.join(mh.getPath(''), 'data', 'skins')
         gui3d.TaskView.__init__(self, category, 'Human texture', label='Skin')
         if not os.path.exists(os.path.join(mh.getPath(''), 'data', 'skins')):
             os.makedirs(os.path.join(mh.getPath(''), 'data', 'skins'))
-        self.filechooser = self.addView(gui3d.FileChooser(os.path.join(mh.getPath(''), 'data', 'skins'), 'tif', 'png'))
+        self.filechooser = self.addView(gui3d.FileChooser([self.systemSkins, self.userSkins], 'tif', 'png'))
         self.update = self.filechooser.sortBox.addView(gui3d.Button('Check for updates'))
         self.mediaSync = None
         self.currentTexture = gui3d.app.categories['Modelling'].addView(gui3d.Button(style=HumanTextureButtonStyle._replace(left=800-252, top=600-36, zIndex=9.2, normal=gui3d.app.selectedHuman.getTexture())))
@@ -99,8 +101,11 @@ class HumanTextureTaskView(gui3d.TaskView):
         gui3d.TaskView.onShow(self, event)
         gui3d.app.selectedHuman.hide()
         self.filechooser.setFocus()
+	
+	self.numSkin = len([filename for filename in os.listdir(os.path.join(mh.getPath(''), 'data', 'skins')) if filename.lower().endswith('tif')])
+	self.numSkin = self.numSkin + len([filename for filename in os.listdir(os.path.join('data', 'skins')) if filename.lower().endswith('tif')])
         
-        if not len([filename for filename in os.listdir(os.path.join(mh.getPath(''), 'data', 'skins')) if filename.lower().endswith('tif')]):    
+        if self.numSkin < 1:    
             gui3d.app.prompt('No skins found', 'You don\'t seem to have any skins, download them from the makehuman media repository?\nNote: this can take some time depending on your connection speed.', 'Yes', 'No', self.syncMedia)
 
     def onHide(self, event):

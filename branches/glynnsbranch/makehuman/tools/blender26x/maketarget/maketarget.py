@@ -49,307 +49,29 @@ from mathutils import Vector
 from bpy.props import *
 from bpy_extras.io_utils import ExportHelper, ImportHelper
 
+from . import globvars as the
+from . import proxy
+from . import import_obj
+
+
 #----------------------------------------------------------
-#   Global variables
-#----------------------------------------------------------
-
-# Distance below which translations are ignored (in mm)
-Epsilon = 1e-3
-
-# Number of verts which are body, not clothes
-NBodyVerts = 15340
-
-theProxy = None
-
-BMeshAware = False
-        
-#----------------------------------------------------------
-# 
+#   
 #----------------------------------------------------------
 
-#
-#    class CProxy
-#
-
-class CProxy:
-    def __init__(self):
-        self.name = None
-        self.obj_file = None
-        self.refVerts = []
-        self.firstVert = 0
-        self.xScale = None
-        self.yScale = None
-        self.zScale = None
-        return
-        
-    def __repr__(self):
-        return ("<CProxy %s %d\n  %s\n  x %s\n  y %s\n  z %s>" % 
-            (self.name, self.firstVert, self.obj_file, self.xScale, self.yScale, self.zScale))
-        
-    def update(self, verts, bverts):
-        rlen = len(self.refVerts)
-        mlen = len(verts)
-        first = self.firstVert
-        if (first+rlen) != mlen:
-            raise NameError( "Bug: %d refVerts != %d meshVerts" % (first+rlen, mlen) )
-        s0 = getScale(self.xScale, verts, 0)
-        s1 = getScale(self.yScale, verts, 2)
-        s2 = getScale(self.zScale, verts, 1)
-        #print("Scales", s0, s1, s2)
-        for n in range(rlen):
-            vert = verts[n+first]
-            refVert = self.refVerts[n]
-            if type(refVert) == tuple:
-                (rv0, rv1, rv2, w0, w1, w2, d0, d1, d2) = refVert
-                v0 = verts[rv0]
-                v1 = verts[rv1]
-                v2 = verts[rv2]
-                vert.co[0] = w0*v0.co[0] + w1*v1.co[0] + w2*v2.co[0] + d0*s0
-                vert.co[1] = w0*v0.co[1] + w1*v1.co[1] + w2*v2.co[1] - d2*s2
-                vert.co[2] = w0*v0.co[2] + w1*v1.co[2] + w2*v2.co[2] + d1*s1
-                bverts[n+first].select = (bverts[rv0].select or bverts[rv1].select or bverts[rv2].select)
-            else:
-                v0 = verts[refVert]
-                vert.co = v0.co
-                bvert[n+first].select = bverts[rv0].select
-        return
-
-    def read(self, filepath):
-        realpath = os.path.realpath(os.path.expanduser(filepath))
-        folder = os.path.dirname(realpath)
-        try:
-            tmpl = open(filepath, "rU")
-        except:
-            tmpl = None
-        if tmpl == None:
-            print("*** Cannot open %s" % realpath)
-            return None
-
-        status = 0
-        doVerts = 1
-        vn = 0
-        for line in tmpl:
-            words= line.split()
-            if len(words) == 0:
-                pass
-            elif words[0] == '#':
-                status = 0
-                if len(words) == 1:
-                    pass
-                elif words[1] == 'verts':
-                    if len(words) > 2:
-                        self.firstVert = int(words[2])                    
-                    status = doVerts
-                elif words[1] == 'name':
-                    self.name = words[2]
-                elif words[1] == 'x_scale':
-                    self.xScale = scaleInfo(words)
-                elif words[1] == 'y_scale':
-                    self.yScale = scaleInfo(words)
-                elif words[1] == 'z_scale':
-                    self.zScale = scaleInfo(words)                
-                elif words[1] == 'obj_file':
-                    self.obj_file = os.path.join(folder, words[2])
-                else:
-                    pass
-            elif status == doVerts:
-                if len(words) == 1:
-                    v = int(words[0])
-                    self.refVerts.append(v)
-                else:                
-                    v0 = int(words[0])
-                    v1 = int(words[1])
-                    v2 = int(words[2])
-                    w0 = float(words[3])
-                    w1 = float(words[4])
-                    w2 = float(words[5])            
-                    d0 = float(words[6])
-                    d1 = float(words[7])
-                    d2 = float(words[8])
-                    self.refVerts.append( (v0,v1,v2,w0,w1,w2,d0,d1,d2) )
-        return
-
-
-def scaleInfo(words):                
-    v1 = int(words[2])
-    v2 = int(words[3])
-    den = float(words[4])
-    return (v1, v2, den)
-
-
-def getScale(info, verts, index):
-    (v1, v2, den) = info
-    num = abs(verts[v1].co[index] - verts[v2].co[index])
-    return num/den
-    
-#----------------------------------------------------------
-#   importObj(filepath, context):
-#   Simple obj importer which reads only verts, faces, and texture verts
-#----------------------------------------------------------
-
-def importObj(filepath, context):
-    global BMeshAware
-    scn = context.scene
-    obname = nameFromPath(filepath)
-    fp = open(filepath, "rU")  
-    print("Importing %s" % filepath)
-
-    verts = []
-    faces = []
-    texverts = []
-    texfaces = []
-    groups = {}
-    materials = {}
-
-    group = []
-    matlist = []
-    nf = 0
-    for line in fp:
-        words = line.split()
-        if len(words) == 0:
-            pass
-        elif words[0] == "v":
-            verts.append( (float(words[1]), -float(words[3]), float(words[2])) )
-        elif words[0] == "vt":
-            texverts.append( (float(words[1]), float(words[2])) )
-        elif words[0] == "f":
-            (f,tf) = parseFace(words)
-            faces.append(f)
-            if tf:
-                texfaces.append(tf)
-            group.append(nf)
-            matlist.append(nf)
-            nf += 1
-        elif words[0] == "g":
-            name = words[1]
-            try:
-                group = groups[name]
-            except KeyError:
-                group = []
-                groups[name] = group
-        elif words[0] == "usemtl":
-            name = words[1]
-            try:
-                matlist = materials[name]
-            except KeyError:
-                matlist = []
-                materials[name] = matlist
-        else:
-            pass
-    print("%s successfully imported" % filepath)
-    fp.close()
-
-    me = bpy.data.meshes.new(obname)
-    me.from_pydata(verts, [], faces)
-    me.update()
-    ob = bpy.data.objects.new(obname, me)
-    
-    try:
-        me.polygons
-        BMeshAware = True
-        print("Using BMesh")
-    except:
-        BMeshAware = False
-        print("Not using BMesh")
-
-    if texverts:
-        if BMeshAware:
-            addUvLayerBMesh(obname, me, texverts, texfaces)
-        else:
-            addUvLayerNoBMesh(obname, me, texverts, texfaces)
-                
-    if scn.MhLoadMaterial == 'Groups':
-        addMaterials(groups, me, "Group")
-    elif scn.MhLoadMaterial == 'Materials':
-        addMaterials(materials, me, "Material")
-        for (name,group) in groups.items():
-            vgrp = ob.vertex_groups.new(name=name)
-            if vgrp.name != name:
-                print("WARNING: Group name %s => %s" % (name, vgrp.name))
-            if BMeshAware:
-                for nf in group:
-                    f = me.polygons[nf]
-                    for v in f.vertices:
-                        vgrp.add([v], 1.0, 'REPLACE')
-            else:
-                for nf in group:
-                    f = me.faces[nf]
-                    for v in f.vertices:
-                        vgrp.add([v], 1.0, 'REPLACE')
-                    
-    scn.objects.link(ob)
-    ob.select = True
-    scn.objects.active = ob
-    ob.shape_key_add(name="Basis")
-    bpy.ops.object.shade_smooth()
+def importBaseMhclo(context):
+    the.Proxy = proxy.CProxy()
+    filepath = os.path.join(context.scene.MhProgramPath, "data/3dobjs/base.mhclo")
+    the.Proxy.read(filepath)
+    ob = import_obj.importObj(the.Proxy.obj_file, context)
+    ob["NTargets"] = 0
+    ob["ProxyFile"] = filepath
+    ob["ObjFile"] = the.Proxy.obj_file
+    ob["MhxMesh"] = True
+    setupVertexPairs(context, True)
+    print("Base object imported")
+    print(the.Proxy)
     return ob
     
-
-def parseFace(words):
-    face = []
-    texface = []
-    for n in range(1, len(words)):
-        li = words[n].split("/")
-        face.append( int(li[0])-1 )
-        try:
-            texface.append( int(li[1])-1 )
-        except:
-            pass
-    return (face, texface)
-
-
-def addUvLayerBMesh(obname, me, texverts, texfaces):            
-    uvtex = me.uv_textures.new(name=obname)
-    uvloop = me.uv_layers[-1]
-    data = uvloop.data
-    n = 0
-    for tf in texfaces:
-        data[n].uv = texverts[tf[0]]
-        n += 1
-        data[n].uv = texverts[tf[1]]
-        n += 1
-        data[n].uv = texverts[tf[2]]
-        n += 1
-        if len(tf) == 4:
-            data[n].uv = texverts[tf[3]]
-            n += 1
-    return
-
-
-def addUvLayerNoBMesh(obname, me, texverts, texfaces):            
-        uvtex = me.uv_textures.new(name=obname)
-        data = uvtex.data
-        for n in range(len(texfaces)):
-            tf = texfaces[n]
-            data[n].uv1 = texverts[tf[0]]
-            data[n].uv2 = texverts[tf[1]]
-            data[n].uv3 = texverts[tf[2]]
-            if len(tf) == 4:
-                data[n].uv4 = texverts[tf[3]]
-
-
-def addMaterials(groups, me, string):        
-    mn = 0
-    for (name,group) in groups.items():
-        try:
-            mat = bpy.data.materials[name]
-        except:
-            mat = bpy.data.materials.new(name=name)
-        if mat.name != name:
-            print("WARNING: %s name %s => %s" % (string, name, mat.name))
-        mat.diffuse_color = (random.random(), random.random(), random.random())
-        me.materials.append(mat)
-        if BMeshAware:
-            for nf in group:
-                f = me.polygons[nf]
-                f.material_index = mn
-        else:
-            for nf in group:
-                f = me.faces[nf]
-                f.material_index = mn
-        mn += 1
-    return        
-
 
 class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
     bl_idname = "mh.import_base_mhclo"
@@ -357,22 +79,24 @@ class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
     bl_options = {'UNDO'}
     delete = BoolProperty()
 
-    def execute(self, context):
-        global theProxy
+    def execute(self, context):    
         if self.delete:
             deleteAll(context)
-        theProxy = CProxy()
-        filepath = os.path.join(context.scene.MhProgramPath, "data/3dobjs/base.mhclo")
-        theProxy.read(filepath)
-        ob = importObj(theProxy.obj_file, context)
-        ob["NTargets"] = 0
-        ob["ProxyFile"] = filepath
-        ob["ObjFile"] = theProxy.obj_file
-        ob["MhxMesh"] = True
-        setupVertexPairs(context, True)
-        print("Base object imported")
-        print(theProxy)
+        importBaseMhclo(context)
         return{'FINISHED'}    
+
+
+def importBaseObj(context):
+    the.Proxy = None
+    filepath = os.path.join(context.scene.MhProgramPath, "data/3dobjs/base.obj")
+    ob = import_obj.importObj(filepath, context)
+    ob["NTargets"] = 0
+    ob["ProxyFile"] = 0
+    ob["ObjFile"] =  filepath
+    ob["MhxMesh"] = True
+    setupVertexPairs(context, True)
+    print("Base object imported")
+    return ob
 
 
 class VIEW3D_OT_ImportBaseObjButton(bpy.types.Operator):
@@ -382,18 +106,9 @@ class VIEW3D_OT_ImportBaseObjButton(bpy.types.Operator):
     delete = BoolProperty()
 
     def execute(self, context):
-        global theProxy
         if self.delete:
             deleteAll(context)
-        theProxy = None
-        filepath = os.path.join(context.scene.MhProgramPath, "data/3dobjs/base.obj")
-        ob = importObj(filepath, context)
-        ob["NTargets"] = 0
-        ob["ProxyFile"] = 0
-        ob["ObjFile"] =  filepath
-        ob["MhxMesh"] = True
-        setupVertexPairs(context, True)
-        print("Base object imported")
+        importBaseObj(context)
         return{'FINISHED'}    
 
 
@@ -403,8 +118,7 @@ class VIEW3D_OT_MakeBaseObjButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        global theProxy
-        theProxy = None
+        the.Proxy = None
         ob = context.object
         for mod in ob.modifiers:
             if mod.type == 'ARMATURE':
@@ -433,9 +147,9 @@ class VIEW3D_OT_DeleteHelpersButton(bpy.types.Operator):
         bpy.ops.mesh.select_all(action='DESELECT')
         bpy.ops.object.mode_set(mode='OBJECT')
         nverts = len(ob.data.vertices)
-        for n in range(NBodyVerts):
+        for n in range(the.NBodyVerts):
             ob.data.vertices[n].select = False
-        for n in range(NBodyVerts,nverts):
+        for n in range(the.NBodyVerts,nverts):
             ob.data.vertices[n].select = True
         bpy.ops.object.mode_set(mode='EDIT')
         bpy.ops.object.mode_set(mode='OBJECT')
@@ -444,10 +158,6 @@ class VIEW3D_OT_DeleteHelpersButton(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='OBJECT')
         return{'FINISHED'}    
 
-
-def nameFromPath(filepath):
-    (name,ext) = os.path.splitext(os.path.basename(filepath))
-    return name
 
 #----------------------------------------------------------
 #   setupVertexPairs(ob, insist):
@@ -484,9 +194,9 @@ def setupVertexPairs(context, insist):
         vmir = findVert(verts[n1:n2], vn, -x, y, z, notfound)
         if vmir < 0:
             Mid[vn] = vn
-        elif x > Epsilon:
+        elif x > the.Epsilon:
             Left[vn] = vmir
-        elif x < -Epsilon:
+        elif x < -the.Epsilon:
             Right[vn] = vmir
         else:
             Mid[vn] = vmir
@@ -504,9 +214,9 @@ def findVert(verts, v, x, y, z, notfound):
         dy = y-y1
         dz = z-z1
         dist = math.sqrt(dx*dx + dy*dy + dz*dz)
-        if dist < Epsilon:
+        if dist < the.Epsilon:
             return v1
-    if abs(x) > Epsilon:            
+    if abs(x) > the.Epsilon:            
         notfound.append("  %d at (%.4f %.4f %.4f)" % (v, x, y, z))
     return -1            
 
@@ -523,7 +233,7 @@ def loadTarget(filepath, context):
     bpy.ops.object.mode_set(mode='OBJECT')
     for v in ob.data.vertices:
         v.select = False
-    name = nameFromPath(filepath)
+    name = the.nameFromPath(filepath)
     skey = ob.shape_key_add(name=name, from_mix=False)
     ob.active_shape_key_index = shapeKeyLen(ob) - 1
     #bpy.ops.object.shape_key_add(from_mix=False)
@@ -681,7 +391,7 @@ def doSaveTarget(ob, filepath):
     saveAll = not ob["SelectedOnly"]
     skey = ob.active_shape_key    
     if skey.name[0:6] == "Target":
-        skey.name = nameFromPath(filepath)
+        skey.name = the.nameFromPath(filepath)
     verts = evalVertLocations(ob)
     
     (fname,ext) = os.path.splitext(filepath)
@@ -691,7 +401,7 @@ def doSaveTarget(ob, filepath):
     for n,vco in verts.items():
         bv = ob.data.vertices[n]
         vec = vco - bv.co
-        if vec.length > Epsilon and (saveAll or bv.select):
+        if vec.length > the.Epsilon and (saveAll or bv.select):
             fp.write("%d %.6f %.6f %.6f\n" % (n, vec[0], vec[2], -vec[1]))
     fp.close()    
     ob["FilePath"] = filepath
@@ -718,17 +428,16 @@ class VIEW3D_OT_SaveTargetButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        global Confirm, ConfirmString, ConfirmString2
         ob = context.object
         path = ob["FilePath"]
-        if Confirm:
-            Confirm = None
+        if the.Confirm:
+            the.Confirm = None
             doSaveTarget(ob, path)
             print("Target saved")
         else:
-            Confirm = "mh.save_target"
-            ConfirmString = "Overwrite target file?"
-            ConfirmString2 = ' "%s?"' % os.path.basename(path)
+            the.Confirm = "mh.save_target"
+            the.ConfirmString = "Overwrite target file?"
+            the.ConfirmString2 = ' "%s?"' % os.path.basename(path)
         return{'FINISHED'}            
 
 
@@ -787,15 +496,14 @@ class VIEW3D_OT_ApplyTargetsButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        global Confirm, ConfirmString, ConfirmString2
-        if Confirm:
-            Confirm = None
+        if the.Confirm:
+            the.Confirm = None
             applyTargets(context)
             print("All targets applied")
         else:
-            Confirm = "mh.apply_targets"
-            ConfirmString = "Apply all targets to mesh?"
-            ConfirmString2 = None
+            the.Confirm = "mh.apply_targets"
+            the.ConfirmString = "Apply all targets to mesh?"
+            the.ConfirmString2 = None
         return{'FINISHED'}            
 
 #----------------------------------------------------------
@@ -824,14 +532,14 @@ class VIEW3D_OT_BatchFixButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        global TargetSubPaths, Confirm, ConfirmString, ConfirmString2
+        global TargetSubPaths
         scn = context.scene
-        if not Confirm:
-            ConfirmString = "Really batch fix targets?"
-            ConfirmString2 = None
-            Confirm = "mh.batch_fix"
+        if not the.Confirm:
+            the.ConfirmString = "Really batch fix targets?"
+            the.ConfirmString2 = None
+            the.Confirm = "mh.batch_fix"
             return {'FINISHED'} 
-        Confirm = None
+        the.Confirm = None
         folder = os.path.realpath(os.path.expanduser(scn.MhTargetPath))
         batchFixTargets(context, folder)
         #for subfolder in TargetSubPaths:
@@ -894,7 +602,7 @@ def relaxTarget(context):
     if not skey:
         print("No active shapekey")
         return
-    relaxMesh(skey.data, ob.data.edges, NBodyVerts, context.scene["Relax"])
+    relaxMesh(skey.data, ob.data.edges, the.NBodyVerts, context.scene["Relax"])
 
 
 def relaxMesh(verts, edges, first, k):
@@ -939,7 +647,6 @@ class VIEW3D_OT_RelaxTargetButton(bpy.types.Operator):
 #----------------------------------------------------------
 
 def fitTarget(context):
-    global theProxy
     ob = context.object
     bpy.ops.object.mode_set(mode='OBJECT')
     scn = context.scene
@@ -948,17 +655,17 @@ def fitTarget(context):
     ob.active_shape_key_index = ob["NTargets"]
     if not checkValid(ob):
         return
-    if not theProxy:
+    if not the.Proxy:
         path = ob["ProxyFile"]
         if path:
             print("Rereading %s" % path)
-            theProxy = CProxy()
-            theProxy.read(path)
+            the.Proxy = proxy.CProxy()
+            the.Proxy.read(path)
         else:
             raise NameError("Object %s has no associated mhclo file. Cannot fit" % ob.name)
             return
-    #print(theProxy)
-    theProxy.update(ob.active_shape_key.data, ob.data.vertices)
+    #print(the.Proxy)
+    the.Proxy.update(ob.active_shape_key.data, ob.active_shape_key.data)
     return
 
 
@@ -1011,14 +718,13 @@ class VIEW3D_OT_DiscardTargetButton(bpy.types.Operator):
     def execute(self, context):
         discardTarget(context)
         """
-        global Confirm, ConfirmString, ConfirmString2
-        if Confirm:        
-            Confirm = None
+        if the.Confirm:        
+            the.Confirm = None
             discardTarget(context)
         else:
-            Confirm = "mh.discard_target"
-            ConfirmString = "Really discard target?"
-            ConfirmString2 = None
+            the.Confirm = "mh.discard_target"
+            the.ConfirmString = "Really discard target?"
+            the.ConfirmString2 = None
         """            
         return{'FINISHED'}                
 
@@ -1029,14 +735,13 @@ class VIEW3D_OT_DiscardAllTargetsButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        global Confirm, ConfirmString, ConfirmString2
-        if Confirm:        
-            Confirm = None
+        if the.Confirm:        
+            the.Confirm = None
             discardAllTargets(context)
         else:
-            Confirm = "mh.discard_all_targets"
-            ConfirmString = "Really discard all targets?"
-            ConfirmString2 = None
+            the.Confirm = "mh.discard_all_targets"
+            the.ConfirmString = "Really discard all targets?"
+            the.ConfirmString2 = None
         return{'FINISHED'}                
 
 #----------------------------------------------------------
@@ -1109,11 +814,10 @@ class VIEW3D_OT_SkipButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        global Confirm, ConfirmString, ConfirmString2
-        print("Skipped:", ConfirmString)
-        Confirm = None
-        ConfirmString = "?"
-        ConfirmString2 = None
+        print("Skipped:", the.ConfirmString)
+        the.Confirm = None
+        the.ConfirmString = "?"
+        the.ConfirmString2 = None
         return{'FINISHED'}            
 
 
@@ -1241,10 +945,9 @@ class OBJECT_OT_ReadSettingsButton(bpy.types.Operator):
 #   Init
 #----------------------------------------------------------
 
-def initScene(scn):
-    global TargetSubPaths, Confirm, ConfirmString, ConfirmString2
-    Confirm = None
-    ConfirmString = "?"
+def init():
+    the.Confirm = None
+    the.ConfirmString = "?"
 
     bpy.types.Scene.MhProgramPath = StringProperty(
         name = "Program Path",
@@ -1266,6 +969,9 @@ def initScene(scn):
         default = 'None')
     return
 
+
+def initBatch():
+    global TargetSubPaths
     TargetSubPaths = []
     folder = os.path.realpath(os.path.expanduser(scn.MhTargetPath))
     for fname in os.listdir(folder):
@@ -1276,6 +982,7 @@ def initScene(scn):
             exec(expr)
             scn["Mh%s" % fname] = False
     return  
+
     
 def isInited(scn):
     return True

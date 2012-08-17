@@ -28,6 +28,7 @@ import shutil
 #    Utility for evading encoding errors
 #
 
+"""
 def safePrint( string, filename ):
     try:
         print("%s %s" % (string, filename))
@@ -45,7 +46,7 @@ def safePrint( string, filename ):
         else:
             ascii += chr(d)
     print("%s %s" % (string, ascii))
-
+"""
 #
 #
 #
@@ -65,10 +66,10 @@ def proxyFilePtr(name):
         filename = os.path.realpath( os.path.join(path, name) )
         try:
             fp = open(filename, "r")
-            safePrint("    Using config file", filename )
+            print("    Using config file", filename )
             return fp
         except:
-            safePrint("*** Cannot open",  filename )
+            print("*** Cannot open",  filename )
     return None
     
 #
@@ -100,6 +101,7 @@ class CExportConfig:
         self.customshapes = []
         self.customvertexgroups = []
         self.copiedFiles = {}
+        self.warpField = {}
         
     def __repr__(self):
         return (

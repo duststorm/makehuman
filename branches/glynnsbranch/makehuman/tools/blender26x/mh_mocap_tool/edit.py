@@ -48,8 +48,7 @@ def getUndoAction(rig):
 def startEdit(context):
     rig = context.object
     if getUndoAction(rig):
-        print("Action already being edited. Undo or confirm edit first")
-        return
+        raise MocapError("Action already being edited. Undo or confirm edit first")
     act = utils.getAction(rig)
     if not act:
         return
