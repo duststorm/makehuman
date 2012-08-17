@@ -46,32 +46,32 @@ class CProxy:
         return ("<CProxy %s %d\n  %s\n  x %s\n  y %s\n  z %s>" % 
             (self.name, self.firstVert, self.obj_file, self.xScale, self.yScale, self.zScale))
         
-    def update(self, verts, bverts):
+    def update(self, srcVerts, trgVerts):
         rlen = len(self.refVerts)
-        mlen = len(verts)
+        mlen = len(trgVerts)
         first = self.firstVert
         if (first+rlen) != mlen:
             raise NameError( "Bug: %d refVerts != %d meshVerts" % (first+rlen, mlen) )
-        s0 = getScale(self.xScale, verts, 0)
-        s1 = getScale(self.yScale, verts, 2)
-        s2 = getScale(self.zScale, verts, 1)
+        s0 = getScale(self.xScale, srcVerts, 0)
+        s1 = getScale(self.yScale, srcVerts, 2)
+        s2 = getScale(self.zScale, srcVerts, 1)
         #print("Scales", s0, s1, s2)
         for n in range(rlen):
-            vert = verts[n+first]
+            trgVert = trgVerts[n+first]
             refVert = self.refVerts[n]
             if type(refVert) == tuple:
                 (rv0, rv1, rv2, w0, w1, w2, d0, d1, d2) = refVert
-                v0 = verts[rv0]
-                v1 = verts[rv1]
-                v2 = verts[rv2]
-                vert.co[0] = w0*v0.co[0] + w1*v1.co[0] + w2*v2.co[0] + d0*s0
-                vert.co[1] = w0*v0.co[1] + w1*v1.co[1] + w2*v2.co[1] - d2*s2
-                vert.co[2] = w0*v0.co[2] + w1*v1.co[2] + w2*v2.co[2] + d1*s1
-                bverts[n+first].select = (bverts[rv0].select or bverts[rv1].select or bverts[rv2].select)
+                v0 = srcVerts[rv0]
+                v1 = srcVerts[rv1]
+                v2 = srcVerts[rv2]
+                trgVert.co[0] = w0*v0.co[0] + w1*v1.co[0] + w2*v2.co[0] + d0*s0
+                trgVert.co[1] = w0*v0.co[1] + w1*v1.co[1] + w2*v2.co[1] - d2*s2
+                trgVert.co[2] = w0*v0.co[2] + w1*v1.co[2] + w2*v2.co[2] + d1*s1
+                #bverts[n+first].select = (bverts[rv0].select or bverts[rv1].select or bverts[rv2].select)
             else:
-                v0 = verts[refVert]
-                vert.co = v0.co
-                bvert[n+first].select = bverts[rv0].select
+                v0 = srcVerts[refVert]
+                trgVert.co = v0.co
+                #bvert[n+first].select = bverts[rv0].select
         return
 
     def read(self, filepath):

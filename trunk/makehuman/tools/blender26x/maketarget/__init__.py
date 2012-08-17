@@ -166,17 +166,34 @@ class MakeFacePanel(bpy.types.Panel):
         layout.operator("mh.read_settings")
         layout.prop(scn, "MhProgramPath")
         layout.prop(scn, "MhUserPath")
+        
+        layout.separator()
+        layout.label("Mask")
         if not makeface.isMask(ob):
             layout.operator("mh.generate_mask", text="Generate Mask").delete = False
         else:
             layout.operator("mh.generate_mask", text="Regenerate Mask").delete = True
         layout.prop(scn, "MhGender", expand=True)
         layout.prop(scn, "MhAge", expand=True)
+        layout.operator("mh.make_mask")    
         if not makeface.isMask(ob):
             return
+        layout.operator("mh.shapekey_mask")    
         layout.separator()
+        
+        if not the.foundNumpy:        
+            layout.label("numpy could not be loaded,")
+            layout.label("either because it was not found")
+            layout.label("or this is a 64-bit Blender.")
+            layout.label("MakeFace will not work")
+            return
+
+        layout.label("Face")
         layout.operator("mh.generate_face")
-        if ob["FaceFilePath"]:
+        #layout.prop(scn, "MhStiffness")
+        #layout.prop(scn, "MhLambda")
+        #layout.prop(scn, "MhIterations")
+        if ob["MaskFilePath"]:
             layout.operator("mh.save_face")
         layout.operator("mh.save_face_as")
 

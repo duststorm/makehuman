@@ -58,27 +58,45 @@ from . import import_obj
 #   
 #----------------------------------------------------------
 
+def importBaseMhclo(context):
+    the.Proxy = proxy.CProxy()
+    filepath = os.path.join(context.scene.MhProgramPath, "data/3dobjs/base.mhclo")
+    the.Proxy.read(filepath)
+    ob = import_obj.importObj(the.Proxy.obj_file, context)
+    ob["NTargets"] = 0
+    ob["ProxyFile"] = filepath
+    ob["ObjFile"] = the.Proxy.obj_file
+    ob["MhxMesh"] = True
+    setupVertexPairs(context, True)
+    print("Base object imported")
+    print(the.Proxy)
+    return ob
+    
+
 class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
     bl_idname = "mh.import_base_mhclo"
     bl_label = "Mhclo"
     bl_options = {'UNDO'}
     delete = BoolProperty()
 
-    def execute(self, context):
+    def execute(self, context):    
         if self.delete:
             deleteAll(context)
-        the.Proxy = proxy.CProxy()
-        filepath = os.path.join(context.scene.MhProgramPath, "data/3dobjs/base.mhclo")
-        the.Proxy.read(filepath)
-        ob = import_obj.importObj(the.Proxy.obj_file, context)
-        ob["NTargets"] = 0
-        ob["ProxyFile"] = filepath
-        ob["ObjFile"] = the.Proxy.obj_file
-        ob["MhxMesh"] = True
-        setupVertexPairs(context, True)
-        print("Base object imported")
-        print(the.Proxy)
+        importBaseMhclo(context)
         return{'FINISHED'}    
+
+
+def importBaseObj(context):
+    the.Proxy = None
+    filepath = os.path.join(context.scene.MhProgramPath, "data/3dobjs/base.obj")
+    ob = import_obj.importObj(filepath, context)
+    ob["NTargets"] = 0
+    ob["ProxyFile"] = 0
+    ob["ObjFile"] =  filepath
+    ob["MhxMesh"] = True
+    setupVertexPairs(context, True)
+    print("Base object imported")
+    return ob
 
 
 class VIEW3D_OT_ImportBaseObjButton(bpy.types.Operator):
@@ -90,15 +108,7 @@ class VIEW3D_OT_ImportBaseObjButton(bpy.types.Operator):
     def execute(self, context):
         if self.delete:
             deleteAll(context)
-        the.Proxy = None
-        filepath = os.path.join(context.scene.MhProgramPath, "data/3dobjs/base.obj")
-        ob = import_obj.importObj(filepath, context)
-        ob["NTargets"] = 0
-        ob["ProxyFile"] = 0
-        ob["ObjFile"] =  filepath
-        ob["MhxMesh"] = True
-        setupVertexPairs(context, True)
-        print("Base object imported")
+        importBaseObj(context)
         return{'FINISHED'}    
 
 
@@ -655,7 +665,7 @@ def fitTarget(context):
             raise NameError("Object %s has no associated mhclo file. Cannot fit" % ob.name)
             return
     #print(the.Proxy)
-    the.Proxy.update(ob.active_shape_key.data, ob.data.vertices)
+    the.Proxy.update(ob.active_shape_key.data, ob.active_shape_key.data)
     return
 
 
