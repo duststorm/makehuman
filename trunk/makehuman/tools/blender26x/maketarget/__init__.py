@@ -41,6 +41,8 @@ if "bpy" in locals():
     imp.reload(proxy)
     imp.reload(import_obj)
     imp.reload(maketarget)
+    imp.reload(character)
+    imp.reload(warp)
     imp.reload(makeface)
     imp.reload(mhm)
     #imp.reload(rig)
@@ -55,11 +57,41 @@ else:
     from . import proxy
     from . import import_obj
     from . import maketarget
+    from . import character
+    from . import warp
     from . import makeface
     from . import mhm
     #from . import rig
     from . import export_mh_obj
   
+        
+#----------------------------------------------------------
+#   Common panel parts
+#----------------------------------------------------------
+
+def drawConfirm(layout, scn):        
+    if not maketarget.isInited(scn):
+        layout.operator("mh.init")
+        return False
+    if the.Confirm:
+        layout.label(the.ConfirmString)            
+        if the.ConfirmString2:
+           layout.label(the.ConfirmString2)            
+        layout.operator(the.Confirm, text="Yes") 
+        layout.operator("mh.skip")
+        return False
+    return True
+            
+def drawDirectories(layout, scn):          
+    layout.label("Directories")
+    layout.operator("mh.factory_settings")
+    layout.operator("mh.save_settings")
+    layout.operator("mh.read_settings")
+    layout.prop(scn, "MhProgramPath")
+    layout.prop(scn, "MhUserPath")
+    layout.separator()
+    return
+          
 #----------------------------------------------------------
 #   class MakeTargetPanel(bpy.types.Panel):
 #----------------------------------------------------------
@@ -73,22 +105,10 @@ class MakeTargetPanel(bpy.types.Panel):
         layout = self.layout
         ob = context.object
         scn = context.scene
-        if not maketarget.isInited(scn):
-            layout.operator("mh.init")
+        if not drawConfirm(layout, scn):
             return
-        if the.Confirm:
-            layout.label(the.ConfirmString)            
-            if the.ConfirmString2:
-                layout.label(the.ConfirmString2)            
-            layout.operator(the.Confirm, text="Yes") 
-            layout.operator("mh.skip")
-            return            
-        layout.label("Directories")
-        layout.operator("mh.factory_settings")
-        layout.operator("mh.save_settings")
-        layout.operator("mh.read_settings")
-        layout.prop(scn, "MhProgramPath")
-        layout.prop(scn, "MhUserPath")
+        drawDirectories(layout, scn)
+
         layout.label("Load materials from")
         layout.prop(scn, "MhLoadMaterial", expand=True)
         layout.separator()
@@ -147,6 +167,45 @@ class MakeTargetPanel(bpy.types.Panel):
                 layout.operator("mh.save_target")           
             layout.operator("mh.saveas_target")           
 
+
+#----------------------------------------------------------
+#   class WarpTargetPanel(bpy.types.Panel):
+#----------------------------------------------------------
+
+class WarpTargetPanel(bpy.types.Panel):
+    bl_label = "Warp Target"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    
+    def draw(self, context):
+        layout = self.layout
+        scn = context.scene        
+        if not drawConfirm(layout, scn):
+            return
+        drawDirectories(layout, scn)
+
+        layout.label("Source Character")
+        the.SourceCharacter.draw(layout, scn)
+
+        layout.label("Source Morph")
+        layout.operator("mh.set_source_morph")
+        layout.prop(scn, "MhSourceMorphDir")
+        layout.prop(scn, "MhSourceMorphFile")
+
+        layout.separator()
+        layout.label("Target Character")
+        character.drawItems(layout, scn)
+        layout.operator("mh.update_target_character")
+        the.TargetCharacter.draw(layout, scn)
+        
+        layout.label("Target Morph")
+        layout.prop(scn, "MhTargetMorphDir")
+        layout.prop(scn, "MhTargetMorphFile")
+
+        layout.separator()
+        layout.operator("mh.warp_morph")
+
+
 #----------------------------------------------------------
 #   class MakeFacePanel(bpy.types.Panel):
 #----------------------------------------------------------
@@ -160,14 +219,10 @@ class MakeFacePanel(bpy.types.Panel):
         layout = self.layout
         ob = context.object
         scn = context.scene
-        layout.label("Directories")
-        layout.operator("mh.factory_settings")
-        layout.operator("mh.save_settings")
-        layout.operator("mh.read_settings")
-        layout.prop(scn, "MhProgramPath")
-        layout.prop(scn, "MhUserPath")
+        if not drawConfirm(layout, scn):
+            return
+        drawDirectories(layout, scn)
         
-        layout.separator()
         layout.label("Mask")
         if not makeface.isMask(ob):
             layout.operator("mh.generate_mask", text="Generate Mask").delete = False
@@ -178,7 +233,7 @@ class MakeFacePanel(bpy.types.Panel):
         layout.operator("mh.make_mask")    
         if not makeface.isMask(ob):
             return
-        layout.operator("mh.shapekey_mask")    
+        #layout.operator("mh.shapekey_mask")    
         layout.separator()
         
         if not the.foundNumpy:        
@@ -296,6 +351,7 @@ def menu_func(self, context):
     self.layout.operator(ExportObj.bl_idname, text="MakeHuman OBJ (.obj)...")
  
 def register():
+    character.init()
     maketarget.init()
     makeface.init()
     try:

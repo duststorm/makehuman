@@ -49,7 +49,10 @@ from bpy.props import *
 from . import globvars as the
 from . import proxy
 from . import import_obj
+from . import character
+from . import warp
 from . import maketarget
+
 
 #----------------------------------------------------------
 #   Generate mask
@@ -93,16 +96,18 @@ class VIEW3D_OT_GenerateMaskButton(bpy.types.Operator):
         scn = context.scene
             
         base = maketarget.importBaseObj(context)
+        base.layers[1] = True
+        base.layers[0] = False
         scn.objects.active = base
-        if scn.MhGender == 'neutral':
-            loadMaskTarget(context, 'female', scn.MhAge, 0.5)
-            loadMaskTarget(context, 'male', scn.MhAge, 0.5)
-        else:
-            loadMaskTarget(context, scn.MhGender, scn.MhAge, 1.0)
-        maskProxy = loadMaskProxy(context, scn.MhGender, scn.MhAge)
+        loadMaskTarget(context, scn.MhGender, scn.MhAge, 1.0)
         
+        maskProxy = loadMaskProxy(context, scn.MhGender, scn.MhAge)
         mask = import_obj.importObj(maskProxy.obj_file, context)
+        print(mask)
+        mask.draw_type = 'WIRE'
+        mask.show_x_ray = True        
         scn.objects.active = mask
+
         #maketarget.removeShapeKeys(mask)
         skey = mask.shape_key_add(name=base.active_shape_key.name)
         skey.value = 1.0
@@ -118,11 +123,6 @@ class VIEW3D_OT_GenerateMaskButton(bpy.types.Operator):
         mask["MaskFilePath"] = ""
         mask["MaskObjFile"] = maskProxy.obj_file
         
-        layers = 20*[False]
-        layers[1] = True
-        base.layers = layers
-        mask.draw_type = 'WIRE'
-        mask.show_x_ray = True        
         
 
         print("Mask imported")
@@ -162,252 +162,16 @@ class VIEW3D_OT_ShapekeyMaskButton(bpy.types.Operator):
         return{'FINISHED'}    
     
       
-#----------------------------------------------------------
-#   Try to load numpy.
-#   Will only work if it is installed and for 32 bits.
-#----------------------------------------------------------
 
-#import numpy
-import sys
-import imp
-
-def getModule(modname):        
-    try:
-        return sys.modules[modname]
-    except KeyError:
-        pass
-    print("Trying to load %s" % modname)
-    fp, pathname, description = imp.find_module(modname)
-    try:
-        imp.load_module(modname, fp, pathname, description)
-    finally:
-        if fp:
-            fp.close()
-    return sys.modules[modname]
-    
-try:    
-    numpy = getModule("numpy")  
-    the.foundNumpy = True
-    print("Numpy successfully loaded")
-except:
-    numpy = None
-    the.foundNumpy = False
-    print("Failed to load numpy. MakeFace will not work")
-    
-#----------------------------------------------------------
-#   Generate face
-#----------------------------------------------------------
-
-class CMatch:
-    def __init__(self, mask, scn):
-        self.name = mask.name
-        self.stiffness = scn.MhStiffness
-        xverts = mask.data.vertices
-        self.n = len(xverts)   
-        n = self.n
-        yverts = self.getShapeSumVerts(mask)
-                
-        xsum = mathutils.Vector((0,0,0))
-        for k in range(n):
-            xsum += xverts[k].co
-        
-        self.y = {}
-        self.w = {}       
-        for k in range(3):
-            self.w[k] = numpy.arange(n, dtype=float)
-            for i in range(n):
-                self.w[k][i] = 0.1
-            """
-            for j in range(3):
-                self.w[k][n+j] = -xsum[j]
-            self.w[k][n+3] = -n*0.1
-            """
-            self.y[k] = numpy.arange(n, dtype=float)
-            for i in range(n):
-                self.y[k][i] = yverts[i][k]
-            """                
-            for j in range(4):
-                self.y[k][n+j] = 0
-            """
-            
-        self.x = {}
-        self.s2 = {}
-        self.lamb = 0
-        self.zMin = 1e6
-
-        for i in range(n):
-            vx0 = xverts[i]
-            self.x[i] = vx0.co.copy()
-            if yverts[i][2] < self.zMin:
-                self.zMin = yverts[i][2]
-            mindist = 1e6
-            for vx1 in xverts:
-                if vx1 != vx0:
-                    vec = vx0.co - vx1.co
-                    if vec.length < mindist:                        
-                        mindist = vec.length
-                        if mindist < 1e-3:
-                            print(vx0.index, vx1.index, mindist)
-                            print("  ", vx0.co, vx1.co)
-            self.s2[k] = (mindist*mindist)
-                
-        # Set up matrix
-        self.H = numpy.identity(n, float)
-        for i in range(n):
-            xi = xverts[i].co
-            for j in range(n):
-                self.H[i][j] = self.rbf(j, xi)
-        
-        """                
-            for j in range(4):
-                self.H[i][n+j] = 0
-        for i in range(3):                
-            xj = xverts[j].co
-            for j in range(n):
-                self.H[n+i][j] = xj[i]
-        for j in range(n):
-            self.H[n+3][j] = 1
-        for j in range(4):
-            self.H[n+3][n+j] = 0
-        """
-        """
-        for i in range(6):
-            printVec("X%d" % i, self.x[i])            
-        for i in range(3):
-            print("Y%d" % i, self.y[i])            
-        print(self.H)
-        """
-        
-        self.HT = self.H.transpose()
-        self.HTH = numpy.dot(self.HT, self.H)      
-        print("Match set up")        
-        return
-
-        uc,zc = numpy.linalg.eig(HH)
-        self.u = uc.real
-        self.z = zc.real
-        print("Eval", self.u)
-        print("Match set up")
-        
-        return
-        
-        
-    def getShapeSumVerts(self, ob):
-        verts = {}
-        for v in ob.data.vertices:
-            verts[v.index] = v.co.copy()
-        for skey in ob.data.shape_keys.key_blocks[1:]:
-            for v in ob.data.vertices:
-                vn = v.index
-                verts[vn] += skey.data[vn].co - v.co
-        return verts
-
-
-    def train(self, index):        
-        A = self.HTH + self.lamb * numpy.identity(self.n, float) 
-        b = numpy.dot(self.HT, self.y[index])
-        self.w[index] = numpy.linalg.solve(A, b)
-        #self.w[index] = numpy.linalg.solve(self.H, self.y[index])
-        e = self.y[index] - numpy.dot(self.H, self.w[index])
-        ee = numpy.dot(e.transpose(), e)
-        print("Trained for index", index, "Error", math.sqrt(ee))
-        #print(self.w[index])
-        return
-        
-        eta = 0
-        ee = 0
-        wAw = 0
-        ngamma = 0
-        for i in range(self.n):
-            ui = self.u[i]
-            zi = self.z[i]
-            zi2 = numpy.dot(zi.transpose(),zi)
-            uil = ui + self.lamb
-            eta += ui/(uil*uil)
-            ee += self.lamb*self.lamb*zi2/(uil*uil)
-            wAw += ui*zi2/(uil*uil*uil)
-            ngamma += self.lamb/uil
-        gcv = self.n*ee/(ngamma*ngamma)
-        self.lamb = eta/ngamma * ee/wAw
-        print("GCV", gcv, "Lambda", self.lamb)            
-        
-        return gcv
-
-        
-    def rbf(self, vn, x):
-        vec = x - self.x[vn]
-        vec2 = vec.dot(vec)
-        #return math.sqrt(vec2 + self.s2[vn])
-        r = math.sqrt(vec2)
-        return math.exp(-self.stiffness*r)
-        
-        
-    def estimate(self, x):
-        y = mathutils.Vector((0,0,0))
-        f = {}        
-        for i in range(self.n):
-            f[i] = self.rbf(i, x)
-        for k in range(3):
-            w = self.w[k]
-            for i in range(self.n):
-                y[k] += w[i]*f[i]
-            """                
-            for k in range(3):
-                y[k] += w[self.n+k]*x[k]
-            y[k] += w[self.n+3]
-            """
-        return y    
-        
-        
-    def warpMesh(self, mask, base):
-        xverts = self.getShapeSumVerts(base)
-        skey = base.shape_key_add(name=self.name, from_mix=False) 
-        blocks = base.data.shape_keys.key_blocks
-        nKeys = len(blocks)
-        base.active_shape_key_index = nKeys-1
-        skey.value = 1.0
-        basis = blocks[0]
-        n = len(base.data.vertices)
-        nwarped = 0
-        for i in range(n):
-            if i%1000 == 0:
-                print(i)
-            x = xverts[i]
-            if x[2] > self.zMin:
-                x0 = basis.data[i].co
-                xest = self.estimate(x0)
-                skey.data[i].co = xest - x + x0
-                nwarped += 1
-        print("%d vertices warped" % nwarped)                
-           
-            
         
     
 
 def generateFace(context):
     mask,base = findMaskAndBase(context)
-    match = CMatch(mask, context.scene)
-    for n in range(context.scene.MhIterations):
-        match.train(0)
-        match.train(1)
-        match.train(2)
-        print("Match trained")
-
-    """        
-    skey = mask.active_shape_key        
-    for v in mask.data.vertices:        
-        x = v.co
-        y = skey.data[v.index].co
-        z = match.estimate(x)
-        n = v.index
-        if n == 16:
-            print(" ")
-            printVec("X%d" % n, x)
-            printVec("Y%d" % n, y)
-            printVec("Z%d" % n, z)
-    """            
-    createTestFace(context, match, mask)
-    match.warpMesh(mask, base)
+    warpField = warp.CWarp(context)
+    warpField.setupFromObject(mask, context)
+    createTestFace(context, warpField, mask)
+    warpField.warpMesh(mask, base)
 
 
 def printVec(string, vec):
@@ -415,7 +179,7 @@ def printVec(string, vec):
     
     
 
-def createTestFace(context, match, mask):
+def createTestFace(context, warpField, mask):
     bpy.ops.object.duplicate()
     ob = context.object
     ob.name = "Test"
@@ -425,7 +189,7 @@ def createTestFace(context, match, mask):
     print(ob)
     for v in mask.data.vertices:
         v1 = ob.data.vertices[v.index]
-        v1.co = match.estimate(v.co)
+        v1.co = warpField.estimate(v.co)
         #printVec("X%d" % v.index, v.co)
         #printVec("Y%d" % v1.index, v1.co)
 
