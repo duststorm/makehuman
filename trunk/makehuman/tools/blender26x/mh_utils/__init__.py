@@ -23,7 +23,6 @@
 # Script copyright (C) MakeHuman Team 2001-2011
 # Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
 
-
 if "bpy" in locals():
     print("Reloading mh_utils")
     import imp
@@ -33,12 +32,24 @@ if "bpy" in locals():
     imp.reload(proxy)
     imp.reload(warp)
     imp.reload(import_obj)
+    imp.reload(character)
 else:
     print("Loading mh_utils")
+    import bpy
     from . import globvars as the
     from . import utils
     from . import settings
     from . import proxy
     from . import warp
     from . import import_obj
+    from . import character
 
+
+def init():
+    the.Confirm = None
+    the.ConfirmString = "?"
+
+    settings.init()
+    import_obj.init()
+    character.init()
+    

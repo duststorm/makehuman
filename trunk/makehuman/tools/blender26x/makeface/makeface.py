@@ -314,6 +314,7 @@ def findMaskAndBase(context):
 #----------------------------------------------------------
 
 def init():
+    mh_utils.init()
 
     bpy.types.Scene.MhAge = EnumProperty(
         items = [('child','child','child'), ('young','young','young'), ('old','old','old')],
@@ -325,17 +326,5 @@ def init():
         name="Gender",
         default = 'female')
 
-    bpy.types.Scene.MhStiffness = FloatProperty(
-        name="Stiffness",
-        default = 0.06)
-
-    bpy.types.Scene.MhLambda = FloatProperty(
-        name="Lambda",
-        default = 0.0)
-
-    bpy.types.Scene.MhIterations = IntProperty(
-        name="Iterations",
-        default = 1)
-        
     return  
     

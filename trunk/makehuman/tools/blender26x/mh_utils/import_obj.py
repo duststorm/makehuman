@@ -236,3 +236,10 @@ def addMaterials(groups, me, string):
                 f.material_index = mn
         mn += 1
     return        
+
+
+def init():
+    bpy.types.Scene.MhLoadMaterial = EnumProperty(
+        items = [('None','None','None'), ('Groups','Groups','Groups'), ('Materials','Materials','Materials')],
+        name="Load as materials",
+        default = 'None')

@@ -147,7 +147,7 @@ class OBJECT_OT_ReadSettingsButton(bpy.types.Operator):
 
 def register():
     makeface.init()
-    character.init()
+    #character.init()
     bpy.utils.register_module(__name__)
   
 def unregister():

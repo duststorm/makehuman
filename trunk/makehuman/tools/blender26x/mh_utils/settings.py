@@ -25,6 +25,7 @@
 
 import bpy
 import os
+from bpy.props import *
 
 #----------------------------------------------------------
 #   Settings
@@ -81,8 +82,24 @@ def saveDefaultSettings(context):
 
 
 def restoreFactorySettings(context):
-        scn = context.scene
-        scn.MhProgramPath = "/program/makehuman"
-        scn.MhUserPath = "~/documents/makehuman"
-        scn.MhTargetPath = "/program/makehuman/data/correctives"
+    scn = context.scene
+    scn.MhProgramPath = "/program/makehuman"
+    scn.MhUserPath = "~/documents/makehuman"
+    scn.MhTargetPath = "/program/makehuman/data/correctives"
+    
+    
+def init():
+    bpy.types.Scene.MhProgramPath = StringProperty(
+        name = "Program Path",
+        default = "/program/makehuman"
+    )        
+    bpy.types.Scene.MhUserPath = StringProperty(
+        name = "User Path",
+        default = "~/documents/makehuman"
+    )        
+    bpy.types.Scene.MhTargetPath = StringProperty(
+        name = "Target Path",
+        default = "/program/makehuman/data/correctives" 
+    )        
+
 

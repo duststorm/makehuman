@@ -218,7 +218,7 @@ class CWarp:
         return math.exp(-self.stiffness*r)
         
         
-    def estimate(self, x):
+    def warpLoc(self, x):
         y = mathutils.Vector((0,0,0))
         f = {}        
         for i in range(self.n):
@@ -233,6 +233,13 @@ class CWarp:
             y[k] += w[self.n+3]
             """
         return y    
+        
+        
+    def warpLocations(self, xlocs):
+        ylocs = {}
+        for n in xlocs.keys():
+            ylocs[n] = self.warpLoc(xlocs[n])
+        return ylocs
         
         
     def warpMesh(self, mask, base):
@@ -251,23 +258,25 @@ class CWarp:
             x = xverts[i]
             if x[2] > self.zMin:
                 x0 = basis.data[i].co
-                xest = self.estimate(x0)
+                xest = self.warpLoc(x0)
                 skey.data[i].co = xest - x + x0
                 nwarped += 1
         print("%d vertices warped" % nwarped)                
            
         
-       
+def init():
+    bpy.types.Scene.MhStiffness = FloatProperty(
+        name="Stiffness",
+        default = 0.06)
 
-class VIEW3D_OT_WarpMorphButton(bpy.types.Operator):
-    bl_idname = "mh.warp_morph"
-    bl_label = "Warp Morph"
-    bl_options = {'UNDO'}
+    bpy.types.Scene.MhLambda = FloatProperty(
+        name="Lambda",
+        default = 0.0)
 
-    def execute(self, context):
-        warp = CWarp(context)
-        warp.setupFromCharacters(context, the.SourceCharacter, the.TargetCharacter)
+    bpy.types.Scene.MhIterations = IntProperty(
+        name="Iterations",
+        default = 1)
         
-        return{'FINISHED'}    
 
+       
         

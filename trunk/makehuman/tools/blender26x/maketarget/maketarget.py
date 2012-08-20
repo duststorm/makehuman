@@ -665,27 +665,8 @@ class VIEW3D_OT_SkipButton(bpy.types.Operator):
 #----------------------------------------------------------
 
 def init():
-    the.Confirm = None
-    the.ConfirmString = "?"
-
-    bpy.types.Scene.MhProgramPath = StringProperty(
-        name = "Program Path",
-        default = "/program/makehuman"
-    )        
-    bpy.types.Scene.MhUserPath = StringProperty(
-        name = "User Path",
-        default = "~/documents/makehuman"
-    )        
-    bpy.types.Scene.MhTargetPath = StringProperty(
-        name = "Target Path",
-        default = "/program/makehuman/data/correctives" 
-    )        
     bpy.types.Scene.MhRelax = FloatProperty(default = 0.5)
     bpy.types.Scene.MhUnlock = BoolProperty(default = False)
-    bpy.types.Scene.MhLoadMaterial = EnumProperty(
-        items = [('None','None','None'), ('Groups','Groups','Groups'), ('Materials','Materials','Materials')],
-        name="Load as materials",
-        default = 'None')
     return
 
 

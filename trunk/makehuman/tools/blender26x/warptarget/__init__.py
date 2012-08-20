@@ -44,6 +44,8 @@ if "bpy" in locals():
     imp.reload(warp)
     imp.reload(import_obj)
     imp.reload(character)    
+
+    imp.reload(warptarget)    
 else:
     print("Loading warptarget")
     import bpy
@@ -59,6 +61,8 @@ else:
     from mh_utils import warp
     from mh_utils import import_obj
     from mh_utils import character
+    
+    from . import warptarget
         
 #----------------------------------------------------------
 #   class WarpTargetPanel(bpy.types.Panel):
@@ -77,7 +81,7 @@ class WarpTargetPanel(bpy.types.Panel):
         settings.drawDirectories(layout, scn)
 
         layout.label("Source Character")
-        the.SourceCharacter.draw(layout, scn)
+        the.SourceCharacter.character.draw(layout, scn)
 
         layout.label("Source Morph")
         layout.operator("mh.set_source_morph")
@@ -88,7 +92,7 @@ class WarpTargetPanel(bpy.types.Panel):
         layout.label("Target Character")
         character.drawItems(layout, scn)
         layout.operator("mh.update_target_character")
-        the.TargetCharacter.draw(layout, scn)
+        the.TargetCharacter.character.draw(layout, scn)
         
         layout.label("Target Morph")
         layout.prop(scn, "MhTargetMorphDir")
@@ -132,7 +136,9 @@ class OBJECT_OT_ReadSettingsButton(bpy.types.Operator):
 #----------------------------------------------------------
 
 def register():
-    character.init()
+    mh_utils.init()  
+    warp.init()
+    warptarget.init()
     bpy.utils.register_module(__name__)
   
 def unregister():
