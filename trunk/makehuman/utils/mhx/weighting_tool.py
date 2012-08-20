@@ -50,7 +50,25 @@ class VIEW3D_OT_PrintVnumsButton(bpy.types.Operator):
     def execute(self, context):
         printVertNums(context)
         return{'FINISHED'}    
+     
+
+class VIEW3D_OT_PrintVnumsToFileButton(bpy.types.Operator):
+    bl_idname = "mhw.print_vnums_to_file"
+    bl_label = "Print Vnums To File"
+
+    def execute(self, context):
+        ob = context.object
+        scn = context.scene
+        path = os.path.expanduser(scn['MhxVertexGroupFile'])
+        fp = open(path, "w")
+        for v in ob.data.vertices:
+            if v.select:
+                fp.write("%d\n" % v.index)
+        fp.close()
+        print(path, "written")
+        return{'FINISHED'}    
         
+     
 def printFirstVertNum(context):
     ob = context.object
     print("First vert in ", ob)
@@ -734,6 +752,36 @@ class VIEW3D_OT_ShapeKeysFromObjectsButton(bpy.types.Operator):
             if targ.type == 'MESH' and targ.select and targ != ob:
                 shapekeyFromObject(ob, targ)
         print("Shapekeys created for %s" % ob)
+        return{'FINISHED'}    
+
+#
+#
+#
+
+
+def symmetrizeSelection(context, left2right):
+    ob = context.object
+    bpy.ops.object.mode_set(mode='OBJECT')
+    scn = context.scene
+    (lverts, rverts, mverts) = setupVertexPairs(context)
+    if not left2right:
+        rverts = lverts
+    for (vn, rvn) in rverts.items():
+        v = ob.data.vertices[vn]
+        rv = ob.data.vertices[rvn]
+        rv.select = v.select
+    return            
+
+
+class VIEW3D_OT_SymmetrizeSelectionButton(bpy.types.Operator):
+    bl_idname = "mhw.symmetrize_selection"
+    bl_label = "Symmetrize Selection"
+    bl_options = {'UNDO'}
+    left2right = BoolProperty()
+
+    def execute(self, context):
+        symmetrizeSelection(context, self.left2right)
+        print("Selection symmetrized")
         return{'FINISHED'}    
 
 #
@@ -1545,6 +1593,8 @@ class MhxWeightToolsPanel(bpy.types.Panel):
         layout.operator("mhw.clean_right", text="Clean left side of right vgroups").doRight = False
         layout.operator("mhw.symmetrize_shapes", text="Symm shapes L=>R").left2right = True    
         layout.operator("mhw.symmetrize_shapes", text="Symm shapes R=>L").left2right = False
+        layout.operator("mhw.symmetrize_selection", text="Symm sel L=>R").left2right = True    
+        layout.operator("mhw.symmetrize_selection", text="Symm sel R=>L").left2right = False
 
         layout.separator()
         layout.prop(context.scene, 'MhxVertexGroupFile')
@@ -1553,6 +1603,7 @@ class MhxWeightToolsPanel(bpy.types.Panel):
         layout.prop(context.scene, 'MhxVertexOffset')
         layout.operator("mhw.export_vertex_groups")    
         layout.operator("mhw.export_sum_groups")    
+        layout.operator("mhw.print_vnums_to_file")
 
 class MhxWeightExtraPanel(bpy.types.Panel):
     bl_label = "Weight tools extra"
