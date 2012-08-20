@@ -1421,6 +1421,19 @@ def writeRotDiffDrivers(fp, drivers, proxy):
     return
 
 #
+#    writeScriptedBoneDrivers(fp, bones)
+#
+
+def writeScriptedBoneDrivers(fp, bones):
+    drivers = []
+    for (driven, driver, channel, expr) in bones:
+        drivers.append( 
+            (driven, 'ROTE', ('SCRIPTED', expr), None, 0, (0, 1),
+                [("x", 'TRANSFORMS', [('OBJECT', the.Human, driver, channel, C_LOC)])]) )
+    writeDrivers(fp, True, drivers)
+    return
+    
+#
 #    writeDrivers(fp, cond, drivers):
 #
 
@@ -1703,6 +1716,7 @@ def setupRig(obj, proxyData):
             ('IK_R', 'THEME04'),
         ]
         the.RecalcRoll = "['Foot_L','Toe_L','Foot_R','Toe_R','DfmFoot_L','DfmToe_L','DfmFoot_R','DfmToe_R']"
+        #the.RecalcRoll = []
         the.GizmoFiles = ["./shared/mhx/templates/custom-shapes25.mhx", 
                       "./shared/mhx/templates/panel_gizmo25.mhx",
                       "./shared/mhx/templates/gizmos25.mhx"]
@@ -1998,6 +2012,7 @@ def writeAllDrivers(fp):
         writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_R", "&")
         writePropDrivers(fp, rig_arm_25.SoftArmPropLRDrivers, "_L", "&")
         writePropDrivers(fp, rig_arm_25.SoftArmPropLRDrivers, "_R", "&")
+        #writeScriptedBoneDrivers(fp, rig_leg_25.LegBoneDrivers)
         writePropDrivers(fp, rig_leg_25.LegPropDrivers, "", "&")
         writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_L", "&")
         writePropDrivers(fp, rig_leg_25.LegPropLRDrivers, "_R", "&")
