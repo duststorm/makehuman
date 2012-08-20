@@ -49,29 +49,14 @@ from mathutils import Vector
 from bpy.props import *
 from bpy_extras.io_utils import ExportHelper, ImportHelper
 
-from . import globvars as the
-from . import proxy
-from . import import_obj
-
+from mh_utils import globvars as the
+from mh_utils import utils
+from mh_utils import proxy
+from mh_utils import import_obj
 
 #----------------------------------------------------------
 #   
 #----------------------------------------------------------
-
-def importBaseMhclo(context):
-    the.Proxy = proxy.CProxy()
-    filepath = os.path.join(context.scene.MhProgramPath, "data/3dobjs/base.mhclo")
-    the.Proxy.read(filepath)
-    ob = import_obj.importObj(the.Proxy.obj_file, context)
-    ob["NTargets"] = 0
-    ob["ProxyFile"] = filepath
-    ob["ObjFile"] = the.Proxy.obj_file
-    ob["MhxMesh"] = True
-    setupVertexPairs(context, True)
-    print("Base object imported")
-    print(the.Proxy)
-    return ob
-    
 
 class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
     bl_idname = "mh.import_base_mhclo"
@@ -81,22 +66,9 @@ class VIEW3D_OT_ImportBaseMhcloButton(bpy.types.Operator):
 
     def execute(self, context):    
         if self.delete:
-            deleteAll(context)
-        importBaseMhclo(context)
+            utils.deleteAll(context)
+        import_obj.importBaseMhclo(context)
         return{'FINISHED'}    
-
-
-def importBaseObj(context):
-    the.Proxy = None
-    filepath = os.path.join(context.scene.MhProgramPath, "data/3dobjs/base.obj")
-    ob = import_obj.importObj(filepath, context)
-    ob["NTargets"] = 0
-    ob["ProxyFile"] = 0
-    ob["ObjFile"] =  filepath
-    ob["MhxMesh"] = True
-    setupVertexPairs(context, True)
-    print("Base object imported")
-    return ob
 
 
 class VIEW3D_OT_ImportBaseObjButton(bpy.types.Operator):
@@ -107,8 +79,8 @@ class VIEW3D_OT_ImportBaseObjButton(bpy.types.Operator):
 
     def execute(self, context):
         if self.delete:
-            deleteAll(context)
-        importBaseObj(context)
+            utils.deleteAll(context)
+        import_obj.importBaseObj(context)
         return{'FINISHED'}    
 
 
@@ -126,13 +98,13 @@ class VIEW3D_OT_MakeBaseObjButton(bpy.types.Operator):
                 mod.show_on_cage = True
             else:
                 ob.modifiers.remove(mod)
-        removeShapeKeys(ob)
+        utils.removeShapeKeys(ob)
         ob.shape_key_add(name="Basis")
         ob["NTargets"] = 0
         ob["ProxyFile"] = 0
         ob["ObjFile"] =  0
         ob["MhxMesh"] = True        
-        setupVertexPairs(context, True)
+        utils.setupVertexPairs(context, True)
         return{'FINISHED'}    
 
 
@@ -157,126 +129,7 @@ class VIEW3D_OT_DeleteHelpersButton(bpy.types.Operator):
         bpy.ops.mesh.delete(type='VERT')
         bpy.ops.object.mode_set(mode='OBJECT')
         return{'FINISHED'}    
-
-
-#----------------------------------------------------------
-#   setupVertexPairs(ob, insist):
-#----------------------------------------------------------
-
-Left = {}
-Right = {}
-Mid = {}
-
-def setupVertexPairs(context, insist):
-    global Left, Right, Mid
-    if Left.keys() and not insist:
-        print("Vertex pair already set up")
-        return
-    ob = context.object
-    verts = []
-    for v in ob.data.vertices:
-        x = v.co[0]
-        y = v.co[1]
-        z = v.co[2]
-        verts.append((z,y,x,v.index))
-    verts.sort()        
-    Left = {}
-    Right = {}
-    Mid = {}
-    nmax = len(verts)
-    notfound = []
-    for n,data in enumerate(verts):
-        (z,y,x,vn) = data
-        n1 = n - 20
-        n2 = n + 20
-        if n1 < 0: n1 = 0
-        if n2 >= nmax: n2 = nmax
-        vmir = findVert(verts[n1:n2], vn, -x, y, z, notfound)
-        if vmir < 0:
-            Mid[vn] = vn
-        elif x > the.Epsilon:
-            Left[vn] = vmir
-        elif x < -the.Epsilon:
-            Right[vn] = vmir
-        else:
-            Mid[vn] = vmir
-    if notfound:            
-        print("Did not find mirror image for vertices:")
-        for msg in notfound:
-            print(msg)
-    print("Left-right-mid", len(Left.keys()), len(Right.keys()), len(Mid.keys()))
-    return
-    
-
-def findVert(verts, v, x, y, z, notfound):
-    for (z1,y1,x1,v1) in verts:
-        dx = x-x1
-        dy = y-y1
-        dz = z-z1
-        dist = math.sqrt(dx*dx + dy*dy + dz*dz)
-        if dist < the.Epsilon:
-            return v1
-    if abs(x) > the.Epsilon:            
-        notfound.append("  %d at (%.4f %.4f %.4f)" % (v, x, y, z))
-    return -1            
-
-#----------------------------------------------------------
-#   loadTarget(filepath, context):
-#----------------------------------------------------------
-
-def loadTarget(filepath, context):
-    realpath = os.path.realpath(os.path.expanduser(filepath))
-    fp = open(realpath, "rU")  
-    #print("Loading target %s" % realpath)
-
-    ob = context.object
-    bpy.ops.object.mode_set(mode='OBJECT')
-    for v in ob.data.vertices:
-        v.select = False
-    name = the.nameFromPath(filepath)
-    skey = ob.shape_key_add(name=name, from_mix=False)
-    ob.active_shape_key_index = shapeKeyLen(ob) - 1
-    #bpy.ops.object.shape_key_add(from_mix=False)
-    #skey = ob.active_shape_key
-    skey.name = name
-    #print("Active", ob.active_shape_key.name)
-    nverts = len(ob.data.vertices)
-    for line in fp:
-        words = line.split()
-        if len(words) == 0:
-            pass
-        else:
-            index = int(words[0])
-            if index >= nverts:
-                print("Stopped loading at index %d" % index)
-                break
-            dx = float(words[1])
-            dy = float(words[2])
-            dz = float(words[3])
-            #vec = ob.data.vertices[index].co
-            vec = skey.data[index].co
-            vec[0] += dx
-            vec[1] += -dz
-            vec[2] += dy
-            ob.data.vertices[index].select = True
-    fp.close()     
-    skey.slider_min = -1.0
-    skey.slider_max = 1.0
-    skey.value = 1.0
-    ob.show_only_shape_key = False
-    ob.use_shape_key_edit_mode = True
-    ob["NTargets"] += 1
-    ob["FilePath"] = realpath
-    ob["SelectedOnly"] = False
-    return skey
-
-
-def shapeKeyLen(ob):
-    n = 0
-    for skey in ob.data.shape_keys.key_blocks:
-        n += 1
-    return n
-
+        
 
 class VIEW3D_OT_LoadTargetButton(bpy.types.Operator):
     bl_idname = "mh.load_target"
@@ -291,7 +144,7 @@ class VIEW3D_OT_LoadTargetButton(bpy.types.Operator):
         maxlen= 1024, default= "")
 
     def execute(self, context):
-        loadTarget(self.properties.filepath, context)
+        utils.loadTarget(self.properties.filepath, context)
         print("Target loaded")
         return {'FINISHED'}
 
@@ -305,7 +158,7 @@ class VIEW3D_OT_LoadTargetButton(bpy.types.Operator):
 
 def loadTargetFromMesh(context):
     ob = context.object
-    if not isBaseOrTarget(ob):
+    if not utils.isBaseOrTarget(ob):
         raise NameError("Active object %s is not a base object" % ob.name)
     scn = context.scene
     trg = None
@@ -323,7 +176,7 @@ def loadTargetFromMesh(context):
     scn.objects.active = ob
     name = trg.name
     skey = ob.shape_key_add(name=name, from_mix=False)
-    ob.active_shape_key_index = shapeKeyLen(ob) - 1
+    ob.active_shape_key_index = utils.shapeKeyLen(ob) - 1
     skey.name = name
     for v in trg.data.vertices:
         skey.data[v.index].co = v.co
@@ -356,7 +209,7 @@ def newTarget(context):
     ob = context.object
     bpy.ops.object.mode_set(mode='OBJECT')
     skey = ob.shape_key_add(name="Target", from_mix=False)
-    ob.active_shape_key_index = shapeKeyLen(ob) - 1
+    ob.active_shape_key_index = utils.shapeKeyLen(ob) - 1
     skey.slider_min = -1.0
     skey.slider_max = 1.0
     skey.value = 1.0
@@ -382,7 +235,7 @@ class VIEW3D_OT_NewTargetButton(bpy.types.Operator):
 #----------------------------------------------------------
     
 def doSaveTarget(ob, filepath):    
-    if not isTarget(ob):
+    if not utils.isTarget(ob):
         raise NameError("%s is not a target")
     bpy.ops.object.mode_set(mode='OBJECT')
     ob.active_shape_key_index = ob["NTargets"]
@@ -391,7 +244,7 @@ def doSaveTarget(ob, filepath):
     saveAll = not ob["SelectedOnly"]
     skey = ob.active_shape_key    
     if skey.name[0:6] == "Target":
-        skey.name = the.nameFromPath(filepath)
+        skey.name = utils.nameFromPath(filepath)
     verts = evalVertLocations(ob)
     
     (fname,ext) = os.path.splitext(filepath)
@@ -470,25 +323,13 @@ def applyTargets(context):
     ob = context.object
     bpy.ops.object.mode_set(mode='OBJECT')
     verts = evalVertLocations(ob)   
-    removeShapeKeys(ob)
+    utils.removeShapeKeys(ob)
     for prop in ob.keys():
         del ob[prop]
     for v in ob.data.vertices:
         v.co = verts[v.index]
     return
     
-
-def removeShapeKeys(ob):    
-    if not ob.data.shape_keys:
-        return
-    skeys = ob.data.shape_keys.key_blocks
-    n = len(skeys)
-    while n >= 0:
-        ob.active_shape_key_index = n
-        bpy.ops.object.shape_key_remove()
-        n -= 1
-    return        
-
 
 class VIEW3D_OT_ApplyTargetsButton(bpy.types.Operator):
     bl_idname = "mh.apply_targets"
@@ -517,7 +358,7 @@ def batchFixTargets(context, folder):
         file = os.path.join(folder, fname)        
         if os.path.isfile(file) and ext == ".target":
             print(file)            
-            loadTarget(file, context)        
+            utils.loadTarget(file, context)        
             fitTarget(context)
             doSaveTarget(context.object, file)
             discardTarget(context)  
@@ -560,7 +401,7 @@ def batchRenderTargets(context, folder, opengl, outdir):
         if os.path.isfile(file) and ext == ".target":
             print(file)                    
             context.scene.render.filepath = os.path.join(outdir, root)
-            loadTarget(file, context)        
+            utils.loadTarget(file, context)        
             if opengl:
                 bpy.ops.render.opengl(animation=True)
             else:
@@ -650,7 +491,7 @@ def fitTarget(context):
     ob = context.object
     bpy.ops.object.mode_set(mode='OBJECT')
     scn = context.scene
-    if not isTarget(ob):
+    if not utils.isTarget(ob):
         return
     ob.active_shape_key_index = ob["NTargets"]
     if not checkValid(ob):
@@ -684,7 +525,7 @@ class VIEW3D_OT_FitTargetButton(bpy.types.Operator):
 
 def discardTarget(context):
     ob = context.object
-    if not isTarget(ob):
+    if not utils.isTarget(ob):
         return
     bpy.ops.object.mode_set(mode='OBJECT')
     ob.active_shape_key_index = ob["NTargets"]
@@ -697,13 +538,13 @@ def discardTarget(context):
     
 def discardAllTargets(context):
     ob = context.object
-    while isTarget(ob):
+    while utils.isTarget(ob):
         discardTarget(context)
     return
     
     
 def checkValid(ob):
-    nShapes = shapeKeyLen(ob)
+    nShapes = utils.shapeKeyLen(ob)
     if nShapes != ob["NTargets"]+1:
         print("Consistency problem:\n  %d shapes, %d targets" % (nShapes, ob["NTargets"]))
         return False
@@ -749,19 +590,18 @@ class VIEW3D_OT_DiscardAllTargetsButton(bpy.types.Operator):
 #----------------------------------------------------------
 
 def symmetrizeTarget(context, left2right):
-    global Left, Mid
-    setupVertexPairs(context, False)
+    utils.setupVertexPairs(context, False)
     ob = context.object
     scn = context.scene
-    if not isTarget(ob):
+    if not utils.isTarget(ob):
         return
     bpy.ops.object.mode_set(mode='OBJECT')
     verts = ob.active_shape_key.data
     bverts = ob.data.vertices
-    for vn in Mid.keys():
+    for vn in the.Mid.keys():
         v = verts[vn]
         v.co[0] = 0
-    for (lvn,rvn) in Left.items():
+    for (lvn,rvn) in the.Left.items():
         lv = verts[lvn].co
         rv = verts[rvn].co
         if left2right:
@@ -819,127 +659,6 @@ class VIEW3D_OT_SkipButton(bpy.types.Operator):
         the.ConfirmString = "?"
         the.ConfirmString2 = None
         return{'FINISHED'}            
-
-
-#----------------------------------------------------------
-#   Utililies
-#----------------------------------------------------------
-
-def findBase(context):
-    for ob in context.scene.objects:
-        if isBase(ob):
-            return ob
-    raise NameError("No base object found")
-
-def isBase(ob):
-    try:
-        return (ob["NTargets"] == 0)
-    except:
-        return False
-
-def isTarget(ob):
-    try:
-        return (ob["NTargets"] > 0)
-    except:
-        return False
-        
-def isBaseOrTarget(ob):
-    try:
-        ob["NTargets"]
-        return True
-    except:
-        return False
-
-def isSaving(ob):
-    try:
-        return ob["Saving"]
-    except:
-        return False
-        
-def isDiscarding(ob):
-    try:
-        return ob["Discarding"]
-    except:
-        return False
-        
-def deleteAll(context):
-    scn = context.scene
-    for ob in scn.objects:
-        if isBaseOrTarget(ob):
-            scn.objects.unlink(ob)
-    return                    
-
-#----------------------------------------------------------
-#   Settings
-#----------------------------------------------------------
-
-def settingsFile(name):
-    outdir = os.path.expanduser("~/makehuman/settings/")        
-    if not os.path.isdir(outdir):
-        os.makedirs(outdir)
-    return os.path.join(outdir, "make_target.%s" % name)
-    
-
-def readDefaultSettings(context):
-    fname = settingsFile("settings")
-    try:
-        fp = open(fname, "rU")
-    except:
-        print("Did not find %s. Using default settings" % fname)
-        return
-    
-    scn = context.scene    
-    for line in fp:
-        words = line.split()
-        prop = words[0]
-        value = words[1].replace("\%20", " ")
-        scn[prop] = value
-    fp.close()
-    return
-    
-
-def saveDefaultSettings(context):
-    fname = settingsFile("settings")
-    fp = open(fname, "w")
-    scn = context.scene
-    for (key, value) in [
-        ("MhProgramPath", scn.MhProgramPath), 
-        ("MhUserPath", scn.MhUserPath), 
-        ("MhTargetPath", scn.MhTargetPath)]:
-        fp.write("%s %s\n" % (key, value.replace(" ", "\%20")))
-    fp.close()
-    return
-
-    
-class OBJECT_OT_FactorySettingsButton(bpy.types.Operator):
-    bl_idname = "mh.factory_settings"
-    bl_label = "Restore Factory Settings"
-
-    def execute(self, context):
-        scn = context.scene
-        scn.MhProgramPath = "/program/makehuman"
-        scn.MhUserPath = "~/documents/makehuman"
-        scn.MhTargetPath = "/program/makehuman/data/correctives"
-        return{'FINISHED'}    
-
-
-class OBJECT_OT_SaveSettingsButton(bpy.types.Operator):
-    bl_idname = "mh.save_settings"
-    bl_label = "Save Settings"
-
-    def execute(self, context):
-        saveDefaultSettings(context)
-        return{'FINISHED'}    
-
-
-class OBJECT_OT_ReadSettingsButton(bpy.types.Operator):
-    bl_idname = "mh.read_settings"
-    bl_label = "Read Settings"
-
-    def execute(self, context):
-        readDefaultSettings(context)
-        return{'FINISHED'}    
-
 
 #----------------------------------------------------------
 #   Init

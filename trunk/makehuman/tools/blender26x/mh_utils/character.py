@@ -46,7 +46,7 @@ from bpy.props import *
 import mathutils
 
 from . import globvars as the
-from . import maketarget
+from . import utils
 
 class CCharacter:
 
@@ -166,13 +166,13 @@ class CCharacter:
         scn = context.scene
         prefix = os.path.join(scn.MhProgramPath, "data/targets/macrodetails/")
         ext = ".target"
-        base = maketarget.importBaseObj(context)
+        base = import_obj.importBaseObj(context)
         scn.objects.active = base
         for (file, value) in self.files:
             path = os.path.join(prefix, file + ".target")
             print(path, value)
             try:
-                skey = maketarget.loadTarget(path, context)
+                skey = utils.loadTarget(path, context)
                 skey.value = value
             except IOError:
                 skey = None

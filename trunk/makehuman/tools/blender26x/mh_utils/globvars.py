@@ -42,14 +42,3 @@ Confirm = None
 ConfirmString = "" 
 ConfirmString2 = ""
         
-
-#----------------------------------------------------------
-#   Utilities
-#----------------------------------------------------------
-
-import os
-
-def nameFromPath(filepath):
-    (name,ext) = os.path.splitext(os.path.basename(filepath))
-    return name
-

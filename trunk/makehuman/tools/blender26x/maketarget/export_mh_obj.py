@@ -32,6 +32,7 @@ Custom obj exporter for MakeHuman Maketarget
 import bpy, os, mathutils
 import math
 from mathutils import *
+
 from . import maketarget
 
 #

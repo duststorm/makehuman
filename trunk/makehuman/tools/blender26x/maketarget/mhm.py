@@ -32,7 +32,8 @@ from mathutils import Vector
 from bpy.props import *
 from bpy_extras.io_utils import ExportHelper, ImportHelper
 
-from . import maketarget
+from mh_utils import globvars as the
+from mh_utils import utils
 
 #----------------------------------------------------------
 #   loadMhmFile(context):
@@ -189,7 +190,7 @@ class CMhmFile:
             path = os.path.join(context.scene.MhProgramPath, "data/targets", file)
             #print(path, value)
             try:
-                skey = maketarget.loadTarget(path, context)
+                skey = utils.loadTarget(path, context)
             except IOError:
                 skey = None
             if skey:

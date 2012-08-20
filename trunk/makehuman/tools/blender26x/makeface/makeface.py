@@ -46,13 +46,12 @@ import mathutils
 import math
 from bpy.props import *
 
-from . import globvars as the
-from . import proxy
-from . import import_obj
-from . import character
-from . import warp
-from . import maketarget
-
+from mh_utils import globvars as the
+from mh_utils import utils
+from mh_utils import proxy
+from mh_utils import character
+from mh_utils import warp
+from mh_utils import import_obj
 
 #----------------------------------------------------------
 #   Generate mask
@@ -63,7 +62,7 @@ def loadMaskTarget(context, gender, age, value):
     path = os.path.join(context.scene.MhProgramPath, "data/targets/macrodetails/", file)
     print(path, value)
     try:
-        skey = maketarget.loadTarget(path, context)
+        skey = utils.loadTarget(path, context)
     except IOError:
         skey = None
     if skey:
@@ -92,10 +91,10 @@ class VIEW3D_OT_GenerateMaskButton(bpy.types.Operator):
 
     def execute(self, context):
         if self.delete:
-            deleteAll(context)
+            utils.deleteAll(context)
         scn = context.scene
             
-        base = maketarget.importBaseObj(context)
+        base = import_obj.importBaseObj(context)
         base.layers[1] = True
         base.layers[0] = False
         scn.objects.active = base
@@ -108,7 +107,7 @@ class VIEW3D_OT_GenerateMaskButton(bpy.types.Operator):
         mask.show_x_ray = True        
         scn.objects.active = mask
 
-        #maketarget.removeShapeKeys(mask)
+        #utils.removeShapeKeys(mask)
         skey = mask.shape_key_add(name=base.active_shape_key.name)
         skey.value = 1.0
         mask.active_shape_key_index = 1        
@@ -183,7 +182,7 @@ def createTestFace(context, warpField, mask):
     bpy.ops.object.duplicate()
     ob = context.object
     ob.name = "Test"
-    maketarget.removeShapeKeys(ob)
+    utils.removeShapeKeys(ob)
     ob.layers[2] = True
     ob.layers[0] = False
     print(ob)
@@ -299,7 +298,7 @@ def findMaskAndBase(context):
     mask = None
     base = None
     for ob in scn.objects:
-        if maketarget.isBaseOrTarget(ob):
+        if utils.isBaseOrTarget(ob):
             base = ob
         elif isMask(ob):
             mask = ob
@@ -309,14 +308,6 @@ def findMaskAndBase(context):
         raise NameError("No mask found")
     return mask,base        
 
-
-def deleteAll(context):
-    scn = context.scene
-    for ob in scn.objects:
-        if maketarget.isBaseOrTarget(ob) or isMask(ob):
-            scn.objects.unlink(ob)
-            del ob
-    return                    
 
 #----------------------------------------------------------
 #   Init
