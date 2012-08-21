@@ -161,8 +161,10 @@ class CCharacter:
                                         
                     
     def draw(self, layout, scn):
+        layout.label("Files:")
+        box = layout.box()
         for (file, weight) in self.files:
-            split = layout.split(0.8)
+            split = box.split(0.8)
             split.label("    " + file)
             split.label("%.2f" % weight)
         if self.files:            

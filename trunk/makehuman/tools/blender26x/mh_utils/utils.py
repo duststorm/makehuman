@@ -48,6 +48,53 @@ def drawConfirm(layout, scn):
     return True
             
 #----------------------------------------------------------
+#   Check for numpy
+#----------------------------------------------------------
+            
+def checkForNumpy(layout, string):            
+    if not the.foundNumpy:        
+        layout.label("numpy could not be loaded,")
+        layout.label("either because it was not found")
+        layout.label("or this is a 64-bit Blender.")
+        layout.label("%s will not work" % string)
+        return False
+    return True            
+            
+#----------------------------------------------------------
+#   Try to load numpy.
+#   Will only work if it is installed and for 32 bits.
+#----------------------------------------------------------
+
+#import numpy
+import sys
+import imp
+
+def getModule(modname):        
+    try:
+        return sys.modules[modname]
+    except KeyError:
+        pass
+    print("Trying to load %s" % modname)
+    fp, pathname, description = imp.find_module(modname)
+    try:
+        imp.load_module(modname, fp, pathname, description)
+    finally:
+        if fp:
+            fp.close()
+    return sys.modules[modname]
+    
+def getNumpy(string):    
+    try:    
+        numpy = getModule("numpy")  
+        the.foundNumpy = True
+        print("Numpy successfully loaded")
+    except:
+        numpy = None
+        the.foundNumpy = False
+        print("Failed to load numpy. %s will not work" % string)
+    return numpy        
+
+#----------------------------------------------------------
 #   Utililies
 #----------------------------------------------------------
 

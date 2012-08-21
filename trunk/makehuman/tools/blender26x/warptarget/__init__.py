@@ -80,11 +80,15 @@ class WarpTargetPanel(bpy.types.Panel):
             return
         settings.drawDirectories(layout, scn)
 
+        if not utils.checkForNumpy(layout, "WarpTarget"):
+            return
+
         layout.label("Source Character")
         the.SourceCharacter.character.draw(layout, scn)
 
         layout.label("Source Morph")
         layout.operator("mh.set_source_morph")
+        layout.prop(scn, "MhSourceMorphTopDir")
         layout.prop(scn, "MhSourceMorphDir")
         layout.prop(scn, "MhSourceMorphFile")
 
@@ -95,10 +99,13 @@ class WarpTargetPanel(bpy.types.Panel):
         the.TargetCharacter.character.draw(layout, scn)
         
         layout.label("Target Morph")
+        layout.prop(scn, "MhTargetMorphTopDir")
         layout.prop(scn, "MhTargetMorphDir")
         layout.prop(scn, "MhTargetMorphFile")
 
         layout.separator()
+        layout.prop(scn, "MhLandmarks")
+        layout.prop(scn, "MhWarpAllMorphsInDir")
         layout.operator("mh.warp_morph")
 
 #----------------------------------------------------------

@@ -47,39 +47,9 @@ import math
 from bpy.props import *
 
 from . import globvars as the
+from . import utils
 
-
-#----------------------------------------------------------
-#   Try to load numpy.
-#   Will only work if it is installed and for 32 bits.
-#----------------------------------------------------------
-
-#import numpy
-import sys
-import imp
-
-def getModule(modname):        
-    try:
-        return sys.modules[modname]
-    except KeyError:
-        pass
-    print("Trying to load %s" % modname)
-    fp, pathname, description = imp.find_module(modname)
-    try:
-        imp.load_module(modname, fp, pathname, description)
-    finally:
-        if fp:
-            fp.close()
-    return sys.modules[modname]
-    
-try:    
-    numpy = getModule("numpy")  
-    the.foundNumpy = True
-    print("Numpy successfully loaded")
-except:
-    numpy = None
-    the.foundNumpy = False
-    print("Failed to load numpy. MakeFace will not work")
+numpy = utils.getNumpy("Warping")
     
 #----------------------------------------------------------
 #   class CWarp
@@ -263,8 +233,36 @@ class CWarp:
                 nwarped += 1
         print("%d vertices warped" % nwarped)                
            
+
+def readLandMarks(context, verts):       
+    filenames = {
+        'Body' : "body.txt",
+        'Face' : "face.txt",
+    }
+    path = os.path.join( os.path.dirname(__file__), "landmarks", filenames[context.scene.MhLandmarks])
+    print("Load", path)
+    landmarks = {}
+    locs = {}
+    n = 0
+    fp = open(path, "r")
+    for line in fp:
+        words = line.split()    
+        if len(words) > 0:
+            m = int(words[0])
+            landmarks[n] = m
+            locs[n] = verts[m]
+            n += 1
+    fp.close()
+    print("   ...done")       
+    return (landmarks, locs)
+        
         
 def init():
+    bpy.types.Scene.MhLandmarks = EnumProperty(
+        items = [('Body', 'Body', 'Body'), ('Face', 'Face', 'Face')],
+        name = "Landmarks",
+        default = 'Face')
+        
     bpy.types.Scene.MhStiffness = FloatProperty(
         name="Stiffness",
         default = 0.06)
