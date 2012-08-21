@@ -29,73 +29,35 @@ import mhx_globals as the
 import fastmath
 import math
 
-Expressions = [
-    'smile',
-    'hopeful',
-    'innocent',
-    'tender',
-    'seductive',
 
-    'grin',
-    'excited',
-    'ecstatic',
+NMhVerts = 18528
 
-    'proud',
-    'pleased',
-    'amused',
-    'laughing1',
-    'laughing2',
+#----------------------------------------------------------
+#   Setup expressions
+#----------------------------------------------------------
 
-    'so-so',
-    'blue',
-    'depressed',
-    'sad',
-    'distressed',
-    'crying',
-    'pain',
+def setupExpressions(folder, prefix):
+    expressions = []
+    for file in os.listdir(folder):
+        (fname, ext) = os.path.splitext(file)
+        if ext == ".target":
+            if prefix:
+                (before, sep, after) = fname.partition(prefix)
+                if sep:
+                    expressions.append(after)
+            else:
+                expressions.append(fname)
+    return(expressions)
 
-    'disappointed',
-    'frustrated',
-    'stressed',
-    'worried',
-    'scared',
-    'terrified',
 
-    'shy',
-    'guilty',
-    'embarassed',
-    'relaxed',
-    'peaceful',
-    'refreshed',
+Expressions = setupExpressions("data/targets/expression/female_young", 
+                               "neutral_female_young_")
 
-    'lazy',
-    'bored',
-    'tired',
-    'drained',
-    'sleepy',
-    'groggy',
+ExpressionUnits = setupExpressions("data/targets/expression/units/caucasian/female_young", "")
 
-    'curious',
-    'surprised',
-    'impressed',
-    'puzzled',
-    'shocked',
-    'frown',
-    'upset',
-    'angry',
-    'enraged',
-
-    'skeptical',
-    'vindictive',
-    'pout',
-    'furious',
-    'grumpy',
-    'arrogant',
-    'sneering',
-    'haughty',
-    'disgusted',
-]
-
+#----------------------------------------------------------
+#   Loop
+#----------------------------------------------------------
 
 def loopGendersAges(name, human, typ):
     epsilon = 0.05
@@ -129,7 +91,9 @@ def loopGendersAges(name, human, typ):
                 aexpr = {}                    
                 for line in fp:
                     words = line.split()
-                    aexpr[int(words[0])] = (float(words[1]), -float(words[3]), float(words[2]))    
+                    n = int(words[0])
+                    if n < NMhVerts:
+                        aexpr[n] = (float(words[1]), -float(words[3]), float(words[2]))    
                 fp.close()
                 print("    %s copied" % filename)
                 gexprs[age] = aexpr
@@ -178,9 +142,16 @@ def loopGendersAges(name, human, typ):
 
 def targetFile(typ, name, gender, age):                
     if typ == "Expressions":        
-        filename = 'data/targets/expression/%s_%s/neutral_%s_%s_%s.target' % (gender, age, gender, age, name)
+        filename = ('data/targets/expression/%s_%s/neutral_%s_%s_%s.target' % 
+                    (gender, age, gender, age, name) )
+    elif typ == "ExpressionUnits":        
+        filename = ('data/targets/expression/units/caucasian/%s_%s/%s.target' % 
+                    (gender, age, name) )
     elif typ == "Corrective":
-        filename = "data/correctives/%s/%s-%s.target" % (name, gender, age)
+        filename = ("data/correctives/%s/%s-%s.target" % 
+                    (name, gender, age))
+    else:
+        raise NameError("Unknown type %s" % typ)
     #print ("Try", filename)        
     try:
         fp = open(filename, "rU")
@@ -189,7 +160,7 @@ def targetFile(typ, name, gender, age):
         print("*** Cannot open %s" % filename)
         return 0,filename
 
-
+"""
 def readTarget(name, human, typ):
     warp = setupWarpField(human.meshData)
     fp,filename = targetFile(typ, name, "female", "young")
@@ -269,12 +240,23 @@ def setupWarpField(obj):
             fp.write("%.4g %.4g %.4g\n" % (sx,sy,sz))
         fp.close()
         halt
-
+"""
 
 def readExpressions(human):
     exprList = []
+
     for name in Expressions:
         (expr, wsum) = loopGendersAges(name, human, "Expressions")
+        #expr = readTarget(name, human, "Expressions")
+        exprList.append((name, expr))
+        #print("    Done %s weight %.3f" % (name, wsum))
+    return exprList
+
+
+def readExpressionUnits(human):
+    exprList = []
+    for name in ExpressionUnits:
+        (expr, wsum) = loopGendersAges(name, human, "ExpressionUnits")
         #expr = readTarget(name, human, "Expressions")
         exprList.append((name, expr))
         #print("    Done %s weight %.3f" % (name, wsum))

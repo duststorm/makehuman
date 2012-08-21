@@ -297,7 +297,8 @@ class ExportTaskView(gui3d.TaskView):
         self.version25 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.5", True));y+=24
         self.exportSeparateFolder = self.mhxOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
         self.exportFeetOnGround = self.mhxOptions.addView(gui3d.CheckBox("Feet on ground", True));y+=24
-        self.exportExpressions = self.mhxOptions.addView(gui3d.CheckBox("Expressions", False));y+=24
+        self.exportExpressions = self.mhxOptions.addView(gui3d.CheckBox("Expressions (old)", False));y+=24
+        self.exportExpressionUnits = self.mhxOptions.addView(gui3d.CheckBox("Expression units", False));y+=24
         self.exportFaceShapes = self.mhxOptions.addView(gui3d.CheckBox("Face shapes", True));y+=24
         self.exportBodyShapes = self.mhxOptions.addView(gui3d.CheckBox("Body shapes", True));y+=24
         self.exportFacePanel = self.mhxOptions.addView(gui3d.CheckBox("Face panel", True));y+=24
@@ -465,6 +466,7 @@ class ExportTaskView(gui3d.TaskView):
                     options = {
                         'mhxversion':mhxversion,
                         'expressions':self.exportExpressions.selected,
+                        'expressionunits':self.exportExpressionUnits.selected,
                         'faceshapes':self.exportFaceShapes.selected,
                         'bodyshapes':self.exportBodyShapes.selected,
                         'facepanel':self.exportFacePanel.selected,

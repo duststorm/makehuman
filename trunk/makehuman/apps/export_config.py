@@ -88,6 +88,7 @@ class CExportConfig:
         self.texFolder = None
         self.proxyList = []
         self.expressions = True
+        self.expressionUnits = True
         self.faceshapes = True
         self.bodyshapes = True
         self.facepanel = True
@@ -207,6 +208,7 @@ def exportConfig(human, useHair, options=None):
         print(options)
         cfg.mhxversion = options['mhxversion']
         cfg.expressions = options['expressions']
+        cfg.expressionunits = options['expressionunits']
         cfg.faceshapes = options['faceshapes']
         cfg.bodyshapes = options['bodyshapes']
         cfg.facepanel = options['facepanel']
@@ -274,7 +276,7 @@ def exportConfig(human, useHair, options=None):
                     pass
             elif key in [
                 'separatefolder', 'feetonground',
-                'expressions', 'faceshapes', 'bodyshapes', 'facepanel',
+                'expressions', 'expressionunits', 'faceshapes', 'bodyshapes', 'facepanel',
                 #'breastrig', 
                 'malerig', 
                 'clothesrig', 'clothesvisibilitydrivers'
