@@ -253,10 +253,11 @@ def loadTarget(filepath, context):
             dz = float(words[3])
             #vec = ob.data.vertices[index].co
             vec = skey.data[index].co
-            vec[0] += dx
-            vec[1] += -dz
-            vec[2] += dy
-            ob.data.vertices[index].select = True
+            if vec.length > 1e-4:
+                vec[0] += dx
+                vec[1] += -dz
+                vec[2] += dy
+                ob.data.vertices[index].select = True
     fp.close()     
     skey.slider_min = -1.0
     skey.slider_max = 1.0

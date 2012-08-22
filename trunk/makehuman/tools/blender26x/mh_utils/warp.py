@@ -86,6 +86,18 @@ class CWarp:
             for i in range(n):
                 self.y[k][i] = yverts[i][k]
 
+        for i in range(n):
+            mindist = 1e6
+            vxi = xverts[i]
+            for j in range(n):
+                if i != j:
+                    vec = vxi - xverts[j]
+                    if vec.length < mindist:                        
+                        mindist = vec.length
+                        if mindist < 1e-3:
+                            print("  ", mindist, i, j)
+            self.s2[i] = (mindist*mindist)
+
         self.H = numpy.identity(n, float)
         for i in range(n):
             xi = xverts[i]
@@ -118,16 +130,6 @@ class CWarp:
         for i in range(self.n):
             if yverts[i][2] < self.zMin:
                 self.zMin = yverts[i][2]
-            mindist = 1e6
-            vxi = xverts[i]
-            for j in range(self.n):
-                if i != j:
-                    vec = vxi - xverts[j]
-                    if vec.length < mindist:                        
-                        mindist = vec.length
-                        if mindist < 1e-3:
-                            print("  ", mindist, i, j)
-            self.s2[i] = (mindist*mindist)
 
         self.setup(xverts, yverts)
         return
@@ -186,7 +188,7 @@ class CWarp:
     def rbf(self, vn, x):
         vec = x - self.x[vn]
         vec2 = vec.dot(vec)
-        #return math.sqrt(vec2 + self.s2[vn])
+        return math.sqrt(vec2 + self.s2[vn])
         r = math.sqrt(vec2)
         return math.exp(-self.stiffness*r)
         
