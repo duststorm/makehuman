@@ -23,23 +23,6 @@
 # Script copyright (C) MakeHuman Team 2001-2011
 # Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
 
-"""
-Abstract
-
-The MakeHuman application uses predefined morph target files to distort
-the humanoid model when physiological changes or changes to the pose are
-applied by the user. The morph target files contain extreme mesh
-deformations for individual joints and features which can used
-proportionately to apply less extreme deformations and which can be
-combined to provide a very wide range of options to the user of the
-application.
-
-This module contains a set of functions used by 3d artists during the
-development cycle to create these extreme morph target files from
-hand-crafted models.
-
-"""
-
 import bpy
 import os
 import mathutils
@@ -53,132 +36,121 @@ from mh_utils import character
 from mh_utils import warp
 from mh_utils import import_obj
 
+
+#----------------------------------------------------------
+#   Base character
+#----------------------------------------------------------
+
+class VIEW3D_OT_CreateBaseCharacterButton(bpy.types.Operator):
+    bl_idname = "mh.create_base_character"
+    bl_label = "Create Base Character"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        scn = context.scene
+        try:
+            base = getBaseChar(context)
+        except:
+            base = None
+        if base:
+            scn.objects.unlink(base)
+            
+        char = character.CCharacter("Base")
+        char.setCharacterProps(context)
+        char.updateFiles()
+        char.loadTargets(context)
+        
+        base = char.object
+        layers = 20*[False]
+        layers[1] = True
+        base.layers = layers
+        base["MhStatus"] = "Base"
+        
+        scn = context.scene
+        scn.layers[0] = True
+        scn.layers[1] = True
+        scn.objects.active = base
+        scn["MhBaseChar"] = base.name
+
+        return{'FINISHED'}    
+
 #----------------------------------------------------------
 #   Generate mask
 #----------------------------------------------------------
 
-def loadMaskTarget(context, gender, age, value):
-    file = "neutral-%s-%s.target" % (gender, age)
-    path = os.path.join(context.scene.MhProgramPath, "data/targets/macrodetails/", file)
-    print(path, value)
+def generateMask(context):
+    scn = context.scene
+    base = getBaseChar(context)
     try:
-        skey = utils.loadTarget(path, context)
-    except IOError:
-        skey = None
-    if skey:
-        skey.value = value
-    else:
-        print("No such file", path)
-    return
-
-
-def loadMaskProxy(context, gender, age):
+        mask = getMask(context)
+    except:
+        mask = None
+    if mask:
+        scn.objects.unlink(mask)
+    
+    # Load proxy
     maskProxy = proxy.CProxy()
-    #userpath = os.path.expanduser(scn.MhUserPath)
-    #filepath = os.path.join(userpath, "data/clothes/mask/mask.mhclo")
     userpath = os.path.expanduser(os.path.dirname(__file__))
     filepath = os.path.join(userpath, "mask.mhclo")
-    print(filepath)
+    print("Proxy", filepath)
     maskProxy.read(filepath)
-    return maskProxy
+
+    # Create mask object
+    mask = import_obj.importObj(maskProxy.obj_file, context)
+    print(mask)
+    layers = 20*[False]
+    layers[0] = True
+    mask.layers = layers
+    mask.draw_type = 'WIRE'
+    mask.show_x_ray = True        
+    scn["MhMask"] = mask.name
+    mask["MhStatus"] = "Mask"
+    scn.objects.active = mask
+
+    # Load targets      
+    n = 1
+    for baseKey in base.data.shape_keys.key_blocks[1:]:
+        maskKey = mask.shape_key_add(name=baseKey.name, from_mix=False)
+        maskKey.value = baseKey.value
+        mask.active_shape_key_index = n
+        maskProxy.update(baseKey.data, maskKey.data)
+        n += 1
+        
+    skey = mask.shape_key_add(name="Shape", from_mix=False)
+    skey.value = 1.0
+    mask.use_shape_key_edit_mode = True
+    mask.active_shape_key_index = n
+    mask["MhMaskObjFile"] = maskProxy.obj_file
 
 
 class VIEW3D_OT_GenerateMaskButton(bpy.types.Operator):
     bl_idname = "mh.generate_mask"
     bl_label = "Generate Mask"
     bl_options = {'UNDO'}
-    delete = BoolProperty()
 
     def execute(self, context):
-        if self.delete:
-            utils.deleteAll(context)
-        scn = context.scene
-            
-        base = import_obj.importBaseObj(context)
-        base.layers[1] = True
-        base.layers[0] = False
-        scn.objects.active = base
-        loadMaskTarget(context, scn.MhGender, scn.MhAge, 1.0)
-        
-        maskProxy = loadMaskProxy(context, scn.MhGender, scn.MhAge)
-        mask = import_obj.importObj(maskProxy.obj_file, context)
-        print(mask)
-        mask.draw_type = 'WIRE'
-        mask.show_x_ray = True        
-        scn.objects.active = mask
-
-        #utils.removeShapeKeys(mask)
-        skey = mask.shape_key_add(name=base.active_shape_key.name)
-        skey.value = 1.0
-        mask.active_shape_key_index = 1        
-        maskProxy.update(base.active_shape_key.data, mask.active_shape_key.data)
-        skey = mask.shape_key_add(name="Shape", from_mix=False)
-        skey.value = 1.0
-        mask.use_shape_key_edit_mode = True
-        mask.active_shape_key_index = 2
-
-        mask["MhAge"] = scn.MhAge
-        mask["MhGender"] = scn.MhGender
-        mask["MaskFilePath"] = ""
-        mask["MaskObjFile"] = maskProxy.obj_file
-        
-        
-
+        generateMask(context)
         print("Mask imported")
-        print(maskProxy)
-        return{'FINISHED'}    
+        return{'FINISHED'}          
 
-
-def shapekeyMask(context):
-    scn = context.scene
-    mask,base = findMaskAndBase(context)
-    if mask.data.shape_keys:
-        print("Mask already has shapekeys")
-        return
-    verts = {}
-    for v in mask.data.vertices:
-        verts[v.index] = v.co.copy()
-    maskProxy = loadMaskProxy(context, mask["MhGender"], mask["MhAge"])
-    maskProxy.update(base.active_shape_key.data, mask.data.vertices)
-    scn.objects.active = mask
-    mask.shape_key_add(name="Basis")
-    skey = mask.shape_key_add(name="Shape")
-    mask.active_shape_key_index = 1
-    for (i,x) in verts.items():
-        skey.data[i].co = x
-    print("Mask shapekeys generated")
-    return            
-    
-    
-class VIEW3D_OT_ShapekeyMaskButton(bpy.types.Operator):
-    bl_idname = "mh.shapekey_mask"
-    bl_label = "Shapekey Mask"
-    bl_options = {'UNDO'}
-    delete = BoolProperty()
-
-    def execute(self, context):
-        shapekeyMask(context)
-        return{'FINISHED'}    
-    
-      
-
-        
-    
+#----------------------------------------------------------
+#   Generate face
+#----------------------------------------------------------
 
 def generateFace(context):
-    mask,base = findMaskAndBase(context)
+    mask = getMask(context)
+    base = getBaseChar(context)
     warpField = warp.CWarp(context)
     warpField.setupFromObject(mask, context)
-    createTestFace(context, warpField, mask)
+    #createTestFace(context, warpField, mask)
     warpField.warpMesh(mask, base)
+    scn = context.scene
+    scn.objects.active = base
 
-
-def printVec(string, vec):
-    print(string, "(%.4f %.4f %.4f)" % (vec[0], vec[1], vec[2]))
-    
-    
 
 def createTestFace(context, warpField, mask):
+    scn = context.scene
+    scn.objects.active = mask
     bpy.ops.object.duplicate()
     ob = context.object
     ob.name = "Test"
@@ -188,9 +160,9 @@ def createTestFace(context, warpField, mask):
     print(ob)
     for v in mask.data.vertices:
         v1 = ob.data.vertices[v.index]
-        v1.co = warpField.estimate(v.co)
-        #printVec("X%d" % v.index, v.co)
-        #printVec("Y%d" % v1.index, v1.co)
+        v1.co = warpField.warpLoc(v.co)
+        #utils.printVec("X%d" % v.index, v.co)
+        #utils.printVec("Y%d" % v1.index, v1.co)
 
     
 class VIEW3D_OT_GenerateFaceButton(bpy.types.Operator):
@@ -201,6 +173,7 @@ class VIEW3D_OT_GenerateFaceButton(bpy.types.Operator):
 
     def execute(self, context):
         generateFace(context)
+        print("Face generated")
         return{'FINISHED'}    
 
 #----------------------------------------------------------
@@ -213,8 +186,7 @@ class VIEW3D_OT_SaveFaceButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        mask,base = findMaskAndBase(context)
-        path = mask["MaskFilePath"]
+        path = context.object.MhMaskFilePath
         if the.Confirm:
             the.Confirm = None
             doSaveTarget(context, path, False)
@@ -247,7 +219,8 @@ class VIEW3D_OT_SaveFaceAsButton(bpy.types.Operator):
 
 
 def doSaveTarget(context, filepath, saveas):    
-    mask,base = findMaskAndBase(context)    
+    mask = getMask(context)
+    base = getBaseChar(context)
     (fname,ext) = os.path.splitext(filepath)
     filepath = fname + ".target"
     fp = open(filepath, "w")  
@@ -261,7 +234,7 @@ def doSaveTarget(context, filepath, saveas):
         if vec.length > the.Epsilon:
             fp.write("%d %.4f %.4f %.4f\n" % (vn, vec[0], vec[2], -vec[1]))
     fp.close()    
-    mask["MaskFilePath"] = filepath
+    base["MhMaskFilePath"] = filepath
     print("Target saved")
     return
 
@@ -276,8 +249,7 @@ class VIEW3D_OT_MakeMaskButton(bpy.types.Operator):
 
     def execute(self, context):
         ob = context.object
-        ob["MhAge"] = "old"
-        ob["MaskFilePath"] = ""
+        the.Mask.object = ob
         ob.shape_key_add(name="Basis")
         ob.shape_key_add(name="Target")
         ob.shape_key_add(name="Shape")
@@ -285,46 +257,51 @@ class VIEW3D_OT_MakeMaskButton(bpy.types.Operator):
         return {'FINISHED'}
 
 
-def isMask(ob):
-    try:
-        ob["MhAge"]
-        return True
-    except:
-        return False
-
-
-def findMaskAndBase(context):
+def getMask(context):
     scn = context.scene
+    print("Look for mask", scn.MhMask)
     mask = None
+    for ob in scn.objects:
+        if ob.name == scn.MhMask:
+            return ob
+        if ob.MhStatus == 'Mask':
+            mask = ob
+    if mask:
+        return mask
+    raise NameError("Did not find mask")            
+    
+
+def getBaseChar(context):
+    scn = context.scene
+    print("Look for base", scn.MhBaseChar)
     base = None
     for ob in scn.objects:
-        if utils.isBaseOrTarget(ob):
+        if ob.name == scn.MhBaseChar:
+            return ob
+        if ob.MhStatus == 'Base':
             base = ob
-        elif isMask(ob):
-            mask = ob
-    if not base:
-        raise NameError("No base object found")
-    if not mask:
-        raise NameError("No mask found")
-    return mask,base        
+    if base:
+        return base
+    raise NameError("Did not find base charact")            
+    
 
+class VIEW3D_OT_SkipButton(bpy.types.Operator):
+    bl_idname = "mh.skip"
+    bl_label = "No"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        utils.skipConfirm()
+        return{'FINISHED'}            
 
 #----------------------------------------------------------
 #   Init
 #----------------------------------------------------------
 
 def init():
-    mh_utils.init()
-
-    bpy.types.Scene.MhAge = EnumProperty(
-        items = [('child','child','child'), ('young','young','young'), ('old','old','old')],
-        name="Age",
-        default = 'child')
-
-    bpy.types.Scene.MhGender = EnumProperty(
-        items = [('female','female','female'), ('male','male','male')],
-        name="Gender",
-        default = 'female')
-
+    bpy.types.Object.MhStatus = StringProperty(default = "")
+    bpy.types.Object.MhMaskFilePath = StringProperty(default = "")
+    bpy.types.Scene.MhMask = StringProperty(default = "")
+    bpy.types.Scene.MhBaseChar = StringProperty(default = "")
     return  
     

@@ -654,11 +654,8 @@ class VIEW3D_OT_SkipButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        print("Skipped:", the.ConfirmString)
-        the.Confirm = None
-        the.ConfirmString = "?"
-        the.ConfirmString2 = None
-        return{'FINISHED'}            
+        utils.skipConfirm()
+        return{'FINISHED'}           
 
 #----------------------------------------------------------
 #   Init

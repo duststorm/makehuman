@@ -46,6 +46,14 @@ def drawConfirm(layout, scn):
         layout.operator("mh.skip")
         return False
     return True
+    
+    
+def skipConfirm():            
+    print("Skipped:", the.ConfirmString)
+    the.Confirm = None
+    the.ConfirmString = "?"
+    the.ConfirmString2 = None
+    
             
 #----------------------------------------------------------
 #   Check for numpy
@@ -146,6 +154,10 @@ def removeShapeKeys(ob):
         n -= 1
     return        
 
+
+def printVec(string, vec):
+    print(string, "(%.4f %.4f %.4f)" % (vec[0], vec[1], vec[2]))
+    
 #----------------------------------------------------------
 #   setupVertexPairs(ob, insist):
 #----------------------------------------------------------

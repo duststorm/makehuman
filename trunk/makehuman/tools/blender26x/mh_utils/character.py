@@ -37,6 +37,8 @@ class CCharacter:
     def __init__(self, name):
         self.name = name
         self.files = []
+        self.object = None
+        self.objectName = None
         
         self.race = "neutral"
         self.gender = "female"
@@ -55,6 +57,15 @@ class CCharacter:
             "  tone %s\n" % self.tone +
             ">")
             
+
+    def getObject(self):
+        if not self.objectName:
+            return None
+        for ob in bpy.data.objects:
+            if ob.name == self.objectName:
+                return ob
+        return None       
+        
             
     def setCharacterProps(self, context):
         scn = context.scene
@@ -147,8 +158,9 @@ class CCharacter:
         scn = context.scene
         prefix = os.path.join(scn.MhProgramPath, "data/targets/macrodetails/")
         ext = ".target"
-        base = import_obj.importBaseObj(context)
-        scn.objects.active = base
+        self.object = import_obj.importBaseObj(context)
+        self.objectName = self.object.name
+        scn.objects.active = self.object
         for (file, value) in self.files:
             path = os.path.join(prefix, file + ".target")
             print(path, value)
@@ -160,15 +172,13 @@ class CCharacter:
                 print("No such file", path)
                                         
                     
-    def draw(self, layout, scn):
+    def drawFiles(self, layout, scn):
         layout.label("Files:")
         box = layout.box()
         for (file, weight) in self.files:
             split = box.split(0.8)
             split.label("    " + file)
             split.label("%.2f" % weight)
-        if self.files:            
-            layout.operator("mh.load_character", text="Load %s Character" % self.name).name = self.name
 
 
 #----------------------------------------------------------

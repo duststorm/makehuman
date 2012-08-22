@@ -109,24 +109,25 @@ class CWarp:
     
     def setupFromObject(self, mask, context):
         self.name = mask.name
+        self.n = len(mask.data.vertices)
         xverts = {}
         for v in mask.data.vertices:
-            xverts[v.index] = v.co
+            xverts[v.index] = v.co.copy()
         yverts = self.getShapeSumVerts(mask)
 
         for i in range(self.n):
             if yverts[i][2] < self.zMin:
                 self.zMin = yverts[i][2]
             mindist = 1e6
-            for vx1 in xverts:
-                if vx1 != vx0:
-                    vec = vx0.co - vx1.co
+            vxi = xverts[i]
+            for j in range(self.n):
+                if i != j:
+                    vec = vxi - xverts[j]
                     if vec.length < mindist:                        
                         mindist = vec.length
                         if mindist < 1e-3:
-                            print(vx0.index, vx1.index, mindist)
-                            print("  ", vx0.co, vx1.co)
-            self.s2[k] = (mindist*mindist)
+                            print("  ", mindist, i, j)
+            self.s2[i] = (mindist*mindist)
 
         self.setup(xverts, yverts)
         return
@@ -140,8 +141,10 @@ class CWarp:
         
     def getShapeSumVerts(self, ob):
         verts = {}
-        for v in ob.data.vertices:
-            verts[v.index] = v.co.copy()
+        basis = ob.data.shape_keys.key_blocks[0]
+        nverts = len(ob.data.vertices)
+        for n in range(nverts):
+            verts[n] = basis.data[n].co.copy()
         for skey in ob.data.shape_keys.key_blocks[1:]:
             for v in ob.data.vertices:
                 vn = v.index

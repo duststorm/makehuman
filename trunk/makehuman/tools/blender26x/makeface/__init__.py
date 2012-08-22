@@ -25,7 +25,7 @@
 
 bl_info = {
     "name": "Make Face",
-    "author": "Manuel Bastioni, Thomas Larsson",
+    "author": "Thomas Larsson",
     "version": "0.1",
     "blender": (2, 6, 4),
     "location": "View3D > Properties > Make Face",
@@ -75,30 +75,23 @@ class MakeFacePanel(bpy.types.Panel):
     
     def draw(self, context):
         layout = self.layout
-        ob = context.object
         scn = context.scene
         if not utils.drawConfirm(layout, scn):
             return
         settings.drawDirectories(layout, scn)
-        
+
+        layout.label("Base Character")
+        character.drawItems(layout, scn)
+        layout.operator("mh.create_base_character")
+
+        layout.separator()
         layout.label("Mask")
-        if not makeface.isMask(ob):
-            layout.operator("mh.generate_mask", text="Generate Mask").delete = False
-        else:
-            layout.operator("mh.generate_mask", text="Regenerate Mask").delete = True
-        layout.prop(scn, "MhGender", expand=True)
-        layout.prop(scn, "MhAge", expand=True)
-        layout.operator("mh.make_mask")    
-        if not makeface.isMask(ob):
-            return
+        layout.operator("mh.generate_mask")
+        #layout.operator("mh.make_mask")    
         #layout.operator("mh.shapekey_mask")    
         layout.separator()
-        
-        if not the.foundNumpy:        
-            layout.label("numpy could not be loaded,")
-            layout.label("either because it was not found")
-            layout.label("or this is a 64-bit Blender.")
-            layout.label("MakeFace will not work")
+
+        if not utils.checkForNumpy(layout, "MakeFace"):
             return
 
         layout.label("Face")
@@ -106,7 +99,9 @@ class MakeFacePanel(bpy.types.Panel):
         #layout.prop(scn, "MhStiffness")
         #layout.prop(scn, "MhLambda")
         #layout.prop(scn, "MhIterations")
-        if ob["MaskFilePath"]:
+
+        ob = context.object
+        if ob and ob.MhMaskFilePath:
             layout.operator("mh.save_face")
         layout.operator("mh.save_face_as")
 
@@ -146,8 +141,9 @@ class OBJECT_OT_ReadSettingsButton(bpy.types.Operator):
 #----------------------------------------------------------
 
 def register():
+    mh_utils.init()
+    warp.init()
     makeface.init()
-    #character.init()
     bpy.utils.register_module(__name__)
   
 def unregister():

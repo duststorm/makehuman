@@ -84,7 +84,10 @@ class WarpTargetPanel(bpy.types.Panel):
             return
 
         layout.label("Source Character")
-        the.SourceCharacter.character.draw(layout, scn)
+        srcChar = the.SourceCharacter.character
+        srcChar.drawFiles(layout, scn)
+        if srcChar.files:            
+            layout.operator("mh.load_source_character")
 
         layout.label("Source Morph")
         layout.operator("mh.set_source_morph")
@@ -94,9 +97,12 @@ class WarpTargetPanel(bpy.types.Panel):
 
         layout.separator()
         layout.label("Target Character")
+        trgChar = the.TargetCharacter.character
         character.drawItems(layout, scn)
         layout.operator("mh.update_target_character")
-        the.TargetCharacter.character.draw(layout, scn)
+        trgChar.drawFiles(layout, scn)
+        if trgChar.files:            
+            layout.operator("mh.load_target_character")
         
         layout.label("Target Morph")
         layout.prop(scn, "MhTargetMorphTopDir")

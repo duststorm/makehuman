@@ -90,23 +90,23 @@ class CWarpCharacter:
 #   Load Character
 #----------------------------------------------------------
 
-def findCharacter(name):
-    struct = {
-        "Source" : the.SourceCharacter,
-        "Target" : the.TargetCharacter,
-    }    
-    return struct[name]
-    
-        
-class VIEW3D_OT_LoadCharacterButton(bpy.types.Operator):
-    bl_idname = "mh.load_character"
-    bl_label = "Load Character"
+class VIEW3D_OT_LoadSourceCharacterButton(bpy.types.Operator):
+    bl_idname = "mh.load_source_character"
+    bl_label = "Load Source Character"
     bl_options = {'UNDO'}
-    name = StringProperty()
 
     def execute(self, context):
-        char = findCharacter(self.name)
-        char.character.loadTargets(context)
+        the.SourceCharacter.character.loadTargets(context)
+        return{'FINISHED'}    
+    
+
+class VIEW3D_OT_LoadTargetCharacterButton(bpy.types.Operator):
+    bl_idname = "mh.load_target_character"
+    bl_label = "Load Target Character"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        the.TargetCharacter.character.loadTargets(context)
         return{'FINISHED'}    
     
         
