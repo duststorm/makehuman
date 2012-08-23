@@ -1180,13 +1180,11 @@ def writeShapeKeys(fp, human, name, proxy):
     if not proxy:
         if the.Config.expressions:
             exprList = read_expression.readExpressions(human)
-            for (name, verts) in exprList:
-                fp.write("ShapeKey %s Sym True\n" % name)
-                for (v, r) in verts.items():
-                    (dx, dy, dz) = r
-                    fp.write("    sv %d %.4f %.4f %.4f ;\n" % (v, dx, dy, dz))
-                fp.write("end ShapeKey\n")
-
+            writeExpressionList(fp, exprList)
+        if the.Config.expressionunits:
+            exprList = read_expression.readExpressionUnits(human)
+            writeExpressionList(fp, exprList)
+        
     if the.Config.bodyshapes and the.Config.mhxrig=="mhx":
         writeTargets(fp, human, rig_shoulder_25.ShoulderTargetDrivers, "shoulder", proxy)                
         writeTargets(fp, human, rig_leg_25.HipTargetDrivers, "hips", proxy)                
@@ -1227,6 +1225,8 @@ def writeShapeKeys(fp, human, name, proxy):
     if not proxy:
         if the.Config.expressions and not proxy:
             mhx_rig.writeShapePropDrivers(fp, read_expression.Expressions, proxy, "*")
+        if the.Config.expressionunits and not proxy:
+            mhx_rig.writeShapePropDrivers(fp, read_expression.ExpressionUnits, proxy, "*")
             
         skeys = []
         for (skey, val, string, min, max) in  the.CustomProps:
@@ -1239,6 +1239,19 @@ def writeShapeKeys(fp, human, name, proxy):
 "end ShapeKeys\n" +
 "#endif\n")
     return    
+
+
+#
+#   writeExpressionList(fp, exprList):
+#
+
+def writeExpressionList(fp, exprList):
+    for (name, verts) in exprList:
+        fp.write("ShapeKey %s Sym True\n" % name)
+        for (v, r) in verts.items():
+            (dx, dy, dz) = r
+            fp.write("    sv %d %.4f %.4f %.4f ;\n" % (v, dx, dy, dz))
+        fp.write("end ShapeKey\n")
 
 #
 #    proxyShapes(typ, human, proxyData, fp):

@@ -34,6 +34,41 @@ from bpy.props import *
 from bpy_extras.io_utils import ExportHelper, ImportHelper
 
 from . import globvars as the
+from . import utils
+from . import proxy
+
+#----------------------------------------------------------
+#   importBaseObj(context):
+#   Simple obj importer which reads only verts, faces, and texture verts
+#----------------------------------------------------------
+
+def importBaseObj(context):
+    the.Proxy = None
+    filepath = os.path.join(context.scene.MhProgramPath, "data/3dobjs/base.obj")
+    ob = importObj(filepath, context)
+    ob["NTargets"] = 0
+    ob["ProxyFile"] = 0
+    ob["ObjFile"] =  filepath
+    ob["MhxMesh"] = True
+    utils.setupVertexPairs(context, True)
+    print("Base object imported")
+    return ob
+
+
+def importBaseMhclo(context):
+    the.Proxy = proxy.CProxy()
+    filepath = os.path.join(context.scene.MhProgramPath, "data/3dobjs/base.mhclo")
+    the.Proxy.read(filepath)
+    ob = importObj(the.Proxy.obj_file, context)
+    ob["NTargets"] = 0
+    ob["ProxyFile"] = filepath
+    ob["ObjFile"] = the.Proxy.obj_file
+    ob["MhxMesh"] = True
+    utils.setupVertexPairs(context, True)
+    print("Base object imported")
+    print(the.Proxy)
+    return ob
+    
 
 #----------------------------------------------------------
 #   importObj(filepath, context):
@@ -42,7 +77,7 @@ from . import globvars as the
 
 def importObj(filepath, context):
     scn = context.scene
-    obname = the.nameFromPath(filepath)
+    obname = utils.nameFromPath(filepath)
     fp = open(filepath, "rU")  
     print("Importing %s" % filepath)
 
@@ -201,3 +236,10 @@ def addMaterials(groups, me, string):
                 f.material_index = mn
         mn += 1
     return        
+
+
+def init():
+    bpy.types.Scene.MhLoadMaterial = EnumProperty(
+        items = [('None','None','None'), ('Groups','Groups','Groups'), ('Materials','Materials','Materials')],
+        name="Load as materials",
+        default = 'None')

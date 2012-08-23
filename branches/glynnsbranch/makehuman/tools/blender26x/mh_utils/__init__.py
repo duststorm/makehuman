@@ -23,33 +23,33 @@
 # Script copyright (C) MakeHuman Team 2001-2011
 # Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
 
+if "bpy" in locals():
+    print("Reloading mh_utils")
+    import imp
+    imp.reload(globvars)
+    imp.reload(utils)
+    imp.reload(settings)
+    imp.reload(proxy)
+    imp.reload(warp)
+    imp.reload(import_obj)
+    imp.reload(character)
+else:
+    print("Loading mh_utils")
+    import bpy
+    from . import globvars as the
+    from . import utils
+    from . import settings
+    from . import proxy
+    from . import warp
+    from . import import_obj
+    from . import character
 
-#----------------------------------------------------------
-#   Global variables
-#----------------------------------------------------------
 
-# Distance below which translations are ignored (in mm)
-Epsilon = 1e-3
+def init():
+    the.Confirm = None
+    the.ConfirmString = "?"
 
-# Number of verts which are body, not clothes
-NBodyVerts = 15340
-
-Proxy = None
-
-BMeshAware = False
-
-Confirm = None
-ConfirmString = "" 
-ConfirmString2 = ""
-        
-
-#----------------------------------------------------------
-#   Utilities
-#----------------------------------------------------------
-
-import os
-
-def nameFromPath(filepath):
-    (name,ext) = os.path.splitext(os.path.basename(filepath))
-    return name
-
+    settings.init()
+    import_obj.init()
+    character.init()
+    
