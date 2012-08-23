@@ -4,6 +4,7 @@
 
 import gui3d
 import humanmodifier
+import warpmodifier
 
 print 'Expression imported'
 
@@ -61,7 +62,12 @@ class ExpressionTaskView(gui3d.TaskView):
             # Create sliders
             for subname in subnames:
                 
-                modifier = humanmodifier.GenderAgeModifier('data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % subname)
+                #modifier = humanmodifier.GenderAgeModifier('data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % subname)
+                modifier = warpmodifier.WarpModifier(
+                    'data/targets/expression/female_young/neutral_female_young_%s.target' % subname,
+                    "face",
+                    "GenderAgeModifier",
+                    'data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % subname)
                 self.modifiers[subname] = modifier
                 slider = box.addView(ExpressionSlider(subname.capitalize(), modifier))
                 self.sliders.append(slider)
