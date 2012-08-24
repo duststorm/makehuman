@@ -283,7 +283,7 @@ class FaceProxy(object):
     """
 
     def __init__(self, object, idx):
-        self.object = idx
+        self.object = object
         self.idx = idx
         self.color = None
 

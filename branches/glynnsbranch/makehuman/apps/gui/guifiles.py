@@ -305,6 +305,7 @@ class ExportTaskView(gui3d.TaskView):
         self.exportClothes = self.mhxOptions.addView(gui3d.CheckBox("Clothes", True));y+=24
         self.exportClothesRig = self.mhxOptions.addView(gui3d.CheckBox("Clothes rig", True));y+=24
         self.exportCage = self.mhxOptions.addView(gui3d.CheckBox("Cage", False));y+=24
+        self.exportAdvancedSpine = self.mhxOptions.addView(gui3d.CheckBox("Advanced spine", False));y+=24
         self.exportMaleRig = self.mhxOptions.addView(gui3d.CheckBox("Male rig", False));y+=24
         #self.exportSkirtRig = self.mhxOptions.addView(gui3d.CheckBox("Skirt rig", False));y+=24
         rigs = []
@@ -474,7 +475,7 @@ class ExportTaskView(gui3d.TaskView):
                         'cage':self.exportCage.selected,
                         'separatefolder':self.exportSeparateFolder.selected,
                         'feetonground':self.exportFeetOnGround.selected,
-                        'breastrig':False, #self.exportBreastRig.selected,
+                        'advancedspine':self.exportAdvancedSpine.selected,
                         'malerig':self.exportMaleRig.selected,
                         'skirtrig':False, #self.exportSkirtRig.selected,
                         'clothesrig':self.exportClothesRig.selected,
