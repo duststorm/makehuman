@@ -200,14 +200,12 @@ footCtrlRoll = 0
 
 LegArmature = [
     # Leg
-    ('Hip_L',           0, 'DfmHips', F_WIR, L_TWEAK, NoBB),
     ('UpLeg_L',         0, 'Hip_L', F_WIR, L_LLEGFK, NoBB),
     ('LoLeg_L',         0, 'UpLeg_L', F_WIR+F_SCALE, L_LLEGFK, NoBB),
     ('Foot_L',          footRoll, 'LoLeg_L', F_WIR+F_CON, L_LLEGFK+L_LEXTRA, NoBB),
     ('Toe_L',           toeRoll, 'Foot_L', F_WIR, L_LLEGFK+L_LEXTRA, NoBB),
     ('LegFK_L',         footCtrlRoll, 'Toe_L', 0, L_HELP, NoBB),
 
-    ('Hip_R',           0, 'DfmHips', F_WIR, L_TWEAK, NoBB),
     ('UpLeg_R',         -0, 'Hip_R', F_WIR, L_RLEGFK, NoBB),
     ('LoLeg_R',         -0, 'UpLeg_R', F_WIR+F_SCALE, L_RLEGFK, NoBB),
     ('Foot_R',          -footRoll, 'LoLeg_R', F_WIR+F_CON, L_RLEGFK+L_REXTRA, NoBB),

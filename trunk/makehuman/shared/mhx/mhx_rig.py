@@ -1754,9 +1754,18 @@ def setupRig(obj, proxyData):
             rig_face_25.FaceHeadsTails
         )
 
-        the.Armature = (
-            rig_body_25.BodyArmature +
-            rig_shoulder_25.ShoulderArmature +
+        the.Armature = list(rig_body_25.BodyArmature1)
+        if the.Config.advancedspine:
+            the.Armature += rig_body_25.BodyArmature2Advanced
+        else:
+            the.Armature += rig_body_25.BodyArmature2Simple
+        the.Armature += rig_body_25.BodyArmature3
+        if the.Config.advancedspine:
+            the.Armature += rig_shoulder_25.ShoulderArmature1Advanced
+        else:
+            the.Armature += rig_shoulder_25.ShoulderArmature1Simple
+        the.Armature += (
+            rig_shoulder_25.ShoulderArmature2 +
             rig_arm_25.ArmArmature +            
             rig_finger_25.FingerArmature +
             rig_leg_25.LegArmature +
@@ -2019,6 +2028,8 @@ def writeAllDrivers(fp):
         writePropDrivers(fp, rig_leg_25.SoftLegPropLRDrivers, "_L", "&")
         writePropDrivers(fp, rig_leg_25.SoftLegPropLRDrivers, "_R", "&")
         writePropDrivers(fp, rig_body_25.BodyPropDrivers, "", "&")
+        if the.Config.advancedspine:
+            writePropDrivers(fp, rig_body_25.BodyPropDriversAdvanced, "", "&")
         writePropDrivers(fp, rig_face_25.FacePropDrivers, "", "&")
         writePropDrivers(fp, rig_face_25.SoftFacePropDrivers, "", "&")
         fingDrivers = rig_finger_25.getFingerPropDrivers()

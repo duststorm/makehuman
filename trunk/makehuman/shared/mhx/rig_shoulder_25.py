@@ -173,10 +173,20 @@ if MuscleBones:
 L_LSHOULDER = L_LARMFK+L_LARMIK+L_UPSPNFK+L_UPSPNIK
 L_RSHOULDER = L_RARMFK+L_RARMIK+L_UPSPNFK+L_UPSPNIK
 
-ShoulderArmature = [
+ShoulderArmature1Advanced = [
     # Clavicle
     ('Clavicle_L',         0, 'DfmSpine3', F_WIR, L_LSHOULDER, NoBB),
     ('Clavicle_R',         0, 'DfmSpine3', F_WIR, L_RSHOULDER, NoBB),
+]
+
+ShoulderArmature1Simple = [
+    # Clavicle
+    ('Clavicle_L',         0, 'Spine3', F_WIR, L_LSHOULDER, NoBB),
+    ('Clavicle_R',         0, 'Spine3', F_WIR, L_RSHOULDER, NoBB),
+]
+
+ShoulderArmature2 = [
+    # Clavicle
     ('DfmClavicle_L',      0, 'DfmSpine3', F_DEF, L_DMAIN, NoBB),
     ('DfmClavicle_R',      0, 'DfmSpine3', F_DEF, L_DMAIN, NoBB),
     
