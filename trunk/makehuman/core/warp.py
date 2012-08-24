@@ -23,6 +23,7 @@ TO DO
 
 """
    
+import math
 import fastmath
 
 #----------------------------------------------------------
@@ -96,16 +97,17 @@ class CWarp:
                 self.y[k][i] = yverts[i][k]
 
         for i in range(n):
-            mindist = 1e6
+            mindist2 = 1e12
             vxi = xverts[i]
             for j in range(n):
                 if i != j:
-                    vec = vxi - xverts[j]
-                    if vec.length < mindist:                        
-                        mindist = vec.length
-                        if mindist < 1e-3:
-                            print("  ", mindist, i, j)
-            self.s2[i] = (mindist*mindist)
+                    vec = fastmath.vsub3d(vxi, xverts[j])
+                    dist2 = fastmath.vsqr3d(vec)
+                    if dist2 < mindist2:
+                        mindist2 = dist2
+                        if mindist2 < 1e-6:
+                            print("  ", mindist2, i, j)
+            self.s2[i] = mindist2
 
         self.H = numpy.identity(n, float)
         for i in range(n):
@@ -124,37 +126,43 @@ class CWarp:
     
     
     def solve(self, index):        
-        A = self.HTH + self.lamb * numpy.identity(self.n, float) 
+        A = self.HTH
         b = numpy.dot(self.HT, self.y[index])
         self.w[index] = numpy.linalg.solve(A, b)
         e = self.y[index] - numpy.dot(self.H, self.w[index])
         ee = numpy.dot(e.transpose(), e)
-        print("Solved for index %d: Error %g" % (index, math.sqrt(ee)))
+        #print("Solved for index %d: Error %g" % (index, math.sqrt(ee)))
         #print(self.w[index])
         return
        
 
     def rbf(self, vn, x):
-        vec = x - self.x[vn]
-        vec2 = vec.dot(vec)
+        vec = fastmath.vsub3d(x, self.x[vn])
+        vec2 = fastmath.vsqr3d(vec)
         return math.sqrt(vec2 + self.s2[vn])
         
         
     def warpLoc(self, x):
-        y = mathutils.Vector((0,0,0))
         f = {}        
         for i in range(self.n):
             f[i] = self.rbf(i, x)
-        for k in range(3):
-            w = self.w[k]
-            for i in range(self.n):
-                y[k] += w[i]*f[i]
-            """                
-            for k in range(3):
-                y[k] += w[self.n+k]*x[k]
-            y[k] += w[self.n+3]
-            """
-        return y    
+
+        y0 = 0
+        w = self.w[0]            
+        for i in range(self.n):
+            y0 += w[i]*f[i]
+
+        y1 = 0
+        w = self.w[1]            
+        for i in range(self.n):
+            y1 += w[i]*f[i]
+
+        y2 = 0
+        w = self.w[2]            
+        for i in range(self.n):
+            y2 += w[i]*f[i]
+            
+        return [y0,y1,y2]
         
         
     def warpTarget(self, morph, source, target, landmarks):
@@ -163,7 +171,7 @@ class CWarp:
         m = 0
         for n in landmarks:
             xverts[m] = source[n]
-            yverts[m] = target[n]
+            yverts[m] = target[n].co
             m += 1
 
         self.setup(xverts, yverts)
@@ -172,10 +180,10 @@ class CWarp:
         self.solve(2)
 
         ymorph = {}
-        for n in morph.verts.keys():
-            xloc = fastmath.vadd3d(morph.verts[n].co, source.verts[n].co)
+        for n in morph.keys():
+            xloc = fastmath.vadd3d(morph[n], source[n])
             yloc = self.warpLoc(xloc)
-            ymorph[n] = fastmath.vsub3d(yloc, target.verts[n].co)
+            ymorph[n] = fastmath.vsub3d(yloc, target[n].co)
         return ymorph        
         
            

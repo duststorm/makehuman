@@ -35,6 +35,9 @@ import warp
 import humanmodifier
 
 
+NMHVerts = 18528
+
+
 class WarpModifier:
 
     def __init__(self, target, part, fallback, template):
@@ -58,8 +61,6 @@ class WarpModifier:
             
         value = self.clampValue(value)
         human.setDetail(self.target, value)
-        print(dir(human.meshData))
-        print(human.meshData)
             
 
     def getValue(self, human):
@@ -77,8 +78,9 @@ class WarpModifier:
             
         # Collect vertex and face indices if we didn't yet
         if not (self.verts or self.faces):
-            refTarget = algos3d.getTarget(theRefObject, self.target)
-            self.verts = self.warp.warpTarget(refTarget.data, theRefVerts, human.meshData.verts, self.landmarks)
+            #refTarget = algos3d.getTarget(theRefObject, self.target)
+            refTarget = getRefTarget(self.target)
+            self.verts = self.warp.warpTarget(refTarget, theRefVerts, human.meshData.verts, self.landmarks)
 
             self.faces = []
             for vindex in self.verts:
@@ -106,9 +108,38 @@ class WarpModifier:
         return max(0.0, min(1.0, value))
 
 
+def getRefTarget(path):
+    global theRefTargets
+    try:
+        return theRefTargets[path]
+    except:
+        pass
+
+    target = {}
+    try:        
+        fp = open(path, "r")
+    except:
+        fp = None
+    if fp:
+        print("Loading reference target %s" % path)
+        for line in fp:
+            words = line.split()
+            if len(words) >= 4:
+                n = int(words[0])
+                if n < NMHVerts:
+                    target[n] = [float(words[1]), float(words[2]), float(words[3])]
+        fp.close()
+        print("  ...done")
+    else:
+        print("Could not find %s" % path)
+    theRefTargets[path] = target
+    return target
+
     
 def defineGlobals():
-    global theLandMarks, theRefObject, theRefVerts
+    global theLandMarks, theRefObject, theRefVerts, theRefTargets
+    
+    theRefTargets = {}
     
     theLandMarks = {}
     folder = "apps/landmarks"

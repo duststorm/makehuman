@@ -38,6 +38,9 @@ def vmul3d(v, s):
 def vlen3d(v):
     return sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2])
     
+def vsqr3d(v):
+    return (v[0]*v[0]+v[1]*v[1]+v[2]*v[2])
+    
 def vnorm3d(v):
     len = sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2])
     if len:
