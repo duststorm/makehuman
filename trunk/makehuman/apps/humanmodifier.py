@@ -31,6 +31,7 @@ from string import Template
 from operator import mul
 import math
 import re
+import warpmodifier
 
 class DetailAction:
 
@@ -195,6 +196,7 @@ class GenericModifier:
         self.targets = self.expandTemplate([(self.template, [])])
         self.verts = None
         self.faces = None
+        self.isWarp = False
         
     def setValue(self, human, value):
     

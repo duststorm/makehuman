@@ -95,7 +95,6 @@ def exportMhx_25(human, fp):
     proxyData = {}
     scanProxies(obj, proxyData)
     mhx_rig.setupRig(obj, proxyData)
-    the.correctives = {}
     
     if not the.Config.cage:
         fp.write(
@@ -1142,23 +1141,18 @@ def printProxyShape(fp, shapes):
 #    writeShapeKeys(fp, human, name, proxy):
 #
 
-def writeTargets(fp, human, drivers, folder, proxy):    
-    for (fname, lr, expr, vars) in drivers:
-        path = "%s/%s/" % (folder,fname)
-        try:
-            expr = the.correctives[path]
-        except:
-            expr = read_expression.readCorrective(human, path)
-            the.correctives[path] = expr
-        fp.write("ShapeKey %s %s True\n" % (fname, lr))
+def writeTargets(fp, human, drivers, part, proxy):    
+    for (pose, lr, expr, vars) in drivers:
+        expr = read_expression.readCorrective(human, part, pose)
+        fp.write("ShapeKey %s %s True\n" % (pose, lr))
         if proxy:
             shapes = mh2proxy.getProxyShapes([("shape",expr)], proxy)
             for (pv, dr) in shapes[0].items():
                 (dx, dy, dz) = dr
-                fp.write("  sv %d %.4f %.4f %.4f ;\n" %  (pv, dx, dy, dz))
+                fp.write("  sv %d %.4f %.4f %.4f ;\n" %  (pv, dx, -dz, dy))
         else:
             for (vn, dr) in expr.items():
-                fp.write("  sv %d %.4f %.4f %.4f ;\n" %  (vn, dr[0], dr[1], dr[2]))
+                fp.write("  sv %d %.4f %.4f %.4f ;\n" %  (vn, dr[0], -dr[2], dr[1]))
         fp.write("end ShapeKey\n")
     return            
 
@@ -1248,9 +1242,9 @@ def writeShapeKeys(fp, human, name, proxy):
 def writeExpressionList(fp, exprList):
     for (name, verts) in exprList:
         fp.write("ShapeKey %s Sym True\n" % name)
-        for (v, r) in verts.items():
-            (dx, dy, dz) = r
-            fp.write("    sv %d %.4f %.4f %.4f ;\n" % (v, dx, dy, dz))
+        for (n, dr) in verts.items():
+            (dx, dy, dz) = dr
+            fp.write("    sv %d %.4f %.4f %.4f ;\n" % (n, dx, -dz, dy))
         fp.write("end ShapeKey\n")
 
 #

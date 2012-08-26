@@ -27,6 +27,7 @@ import algos3d
 import gui3d
 import os
 import humanmodifier
+import warpmodifier
 import hair
 import events3d
 

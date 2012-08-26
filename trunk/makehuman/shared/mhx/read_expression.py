@@ -28,6 +28,8 @@ import os
 import mhx_globals as the
 import fastmath
 import math
+import warp
+import warpmodifier
 
 
 NMhVerts = 18528
@@ -52,6 +54,8 @@ def setupExpressions(folder, prefix):
 
 Expressions = setupExpressions("data/targets/expression/female_young", 
                                "neutral_female_young_")
+                               
+#Expressions = ["laughing1"]                               
 
 ExpressionUnits = setupExpressions("data/targets/expression/units/caucasian/female_young", "")
 
@@ -93,7 +97,7 @@ def loopGendersAges(name, human, typ):
                     words = line.split()
                     n = int(words[0])
                     if n < NMhVerts:
-                        aexpr[n] = (float(words[1]), -float(words[3]), float(words[2]))    
+                        aexpr[n] = (float(words[1]), float(words[2]), float(words[3]))    
                 fp.close()
                 print("    %s copied" % filename)
                 gexprs[age] = aexpr
@@ -131,13 +135,15 @@ def loopGendersAges(name, human, typ):
     height = human.getHeight()
     if height < 0:
         k = 1 + (1-dwarf)*height
-    else:
+    elif height > 0:
         k = 1 + (giant-1)*height
+    else:
+        return expr
+        
     for v in expr.keys():
         (x,y,z) = expr[v]
-        expr[v] = (k*x, k*y, k*z)
-    
-    return (expr, wsum)
+        expr[v] = (k*x, k*y, k*z)    
+    return expr
 
 
 def targetFile(typ, name, gender, age):                
@@ -160,113 +166,56 @@ def targetFile(typ, name, gender, age):
         print("*** Cannot open %s" % filename)
         return 0,filename
 
-"""
-def readTarget(name, human, typ):
-    warp = setupWarpField(human.meshData)
-    fp,filename = targetFile(typ, name, "female", "young")
-    if fp:
-        expr = {}            
-        for line in fp:
-            words = line.split()
-            vn = int(words[0])
-            s = warp[vn]
-            expr[vn] = (s[0]*float(words[1]), -s[2]*float(words[3]), s[1]*float(words[2]))    
-        fp.close()
-        print("    %s copied" % filename)
-    return expr
-
-
-def setupWarpField(obj):
-    warp = the.Config.warpField
-    if warp:
-        return warp
-
-    vertEdges = {}
-    for v in obj.verts:
-        vertEdges[v.idx] = []
-        
-    for f in obj.faces:
-        vn0 = f.verts[-1].idx
-        for v1 in f.verts:
-            vn1 = v1.idx
-            if vn0 < vn1:
-                e = (vn0,vn1)
-            else:
-                e = (vn1,vn0)
-            try:
-                test = (e in vertEdges[vn0])
-            except:
-                test = False
-            if not test:
-                vertEdges[vn0].append(e)
-                vertEdges[vn1].append(e)
-            vn0 = vn1                
-
-    for v in obj.verts:
-        (sx,sy,sz) = (0,0,0)
-        for (vn0,vn1) in vertEdges[v.idx]:
-            v0 = obj.verts[vn0]
-            v1 = obj.verts[vn1]
-            s = fastmath.vsub3d(v0.co, v1.co)
-            sx += math.fabs(s[0])
-            sy += math.fabs(s[1])
-            sz += math.fabs(s[2])
-        warp[v.idx] = (sx,sy,sz)            
-
-    if True:        
-        fp = open("shared/mhx/female_young_warp.txt", "r")
-        vn = 0
-        for line in fp:
-            words = line.split()
-            (sx,sy,sz) = warp[vn]
-            (rx,ry,rz) = (float(words[0]), float(words[1]), float(words[2]))
-            #print vn
-            #print "  ", (sx,sy,sz)
-            #print "  ", (rx,ry,rz)
-            warp[vn] = (sx/rx, sy/ry, sz/rz)
-            vn += 1
-        fp.close()
-        the.Config.warpField = warp
-        return warp        
-    else:        
-        fp = open("shared/mhx/female_young_warp.txt", "w")
-        n = len(obj.verts)
-        eps = 1e-4
-        for vn in range(n):
-            (sx,sy,sz) = warp[vn]
-            if sx < eps: sx = eps
-            if sy < eps: sy = eps
-            if sz < eps: sz = eps
-            fp.write("%.4g %.4g %.4g\n" % (sx,sy,sz))
-        fp.close()
-        halt
-"""
 
 def readExpressions(human):
+    if warp.numpy:
+        warpmodifier.removeAllWarpModifiers(human)
     exprList = []
-
     for name in Expressions:
-        (expr, wsum) = loopGendersAges(name, human, "Expressions")
-        #expr = readTarget(name, human, "Expressions")
+        if warp.numpy:
+            modifier = warpmodifier.WarpModifier(
+                'data/targets/expression/female_young/neutral_female_young_%s.target' % name,
+                "face",
+                "GenderAgeModifier",
+                'data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % name)
+            expr = modifier.updateValue(human, 1.0, updateHuman=False)
+        else:
+            expr = loopGendersAges(name, human, "Expressions")
         exprList.append((name, expr))
-        #print("    Done %s weight %.3f" % (name, wsum))
     return exprList
 
 
 def readExpressionUnits(human):
     exprList = []
     for name in ExpressionUnits:
-        (expr, wsum) = loopGendersAges(name, human, "ExpressionUnits")
+        if 0 and warp.numpy:
+            modifier = warpmodifier.WarpModifier(
+                "data/targets/expression/units/caucasian/female_young/%s.target" % name,
+                "face",
+                "GenderAgeModifier",
+                'data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % name)
+            expr = modifier.updateValue(human, 1.0, updateHuman=False)
+        else:
+            expr = loopGendersAges(name, human, "ExpressionUnits")
         #expr = readTarget(name, human, "Expressions")
         exprList.append((name, expr))
         #print("    Done %s weight %.3f" % (name, wsum))
     return exprList
 
 
-def readCorrective(human, path):
-    (expr, wsum) = loopGendersAges(path, human, "Corrective")
-    #expr = readTarget(path, human, "Corrective")
-    #print("    Done %s weight %.3f" % (path, wsum))
+def readCorrective(human, part, pose):
+    print "Corrective", part, pose
+    if 0 and warp.numpy:
+        modifier = warpmodifier.WarpModifier(
+            "data/correctives/%s/%s/female-young.target" % (part, pose),
+            part,
+            "GenderAgeModifier",
+            'data/correctives/%s/%s/${gender}_${age}.target' % (part, pose))
+        expr = modifier.updateValue(human, 1.0, updateHuman=False)
+    else:
+        expr = loopGendersAges("%s/%s" % (part, pose), human, "Corrective")
+    #for e in list(expr.items())[:10]:
+    #    print e
     return expr
 
             

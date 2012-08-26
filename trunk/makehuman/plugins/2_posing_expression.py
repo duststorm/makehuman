@@ -98,6 +98,8 @@ class ExpressionTaskView(gui3d.TaskView):
         
         human = event.human
         
+        #print "HC", event
+
         for slider in self.sliders:
             value = slider.modifier.getValue(human)
             if value:

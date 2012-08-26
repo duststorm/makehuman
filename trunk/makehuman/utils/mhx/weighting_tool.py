@@ -1547,10 +1547,68 @@ class VIEW3D_OT_InitInterfaceButton(bpy.types.Operator):
     bl_label = "Initialize"
 
     def execute(self, context):
-        import bpy
         initInterface(context)
         print("Interface initialized")
         return{'FINISHED'}    
+
+#
+#   class VIEW3D_OT_LocalizeFilesButton(bpy.types.Operator):
+#
+
+def localizeFile(context, path):
+    print("Localizing", path)
+    ob = context.object
+    lines = []
+
+    fp = open(path, "r")
+    for line in fp:
+        words = line.split()
+        vn = int(words[0])
+        v = ob.data.vertices[vn]
+        if v.select:
+            lines.append(line)
+        else:
+            print(line)
+    fp.close()
+    
+    fp = open(path, "w")
+    for line in lines:
+        fp.write(line)
+    fp.close()
+    
+    return
+    
+    
+def localizeFiles(context, path):
+    print("Local files in ", path)
+    folder = os.path.dirname(path)
+    for file in os.listdir(folder):
+        (fname, ext) = os.path.splitext(file)
+        if ext == ".target":
+            localizeFile(context, os.path.join(folder, file))
+
+
+class VIEW3D_OT_LocalizeFilesButton(bpy.types.Operator):
+    bl_idname = "mhw.localize_files"
+    bl_label = "Localize Files"
+    bl_options = {'UNDO'}
+
+    filename_ext = ".target"
+    filter_glob = StringProperty(default="*.target", options={'HIDDEN'})
+    filepath = bpy.props.StringProperty(
+        name="File Path", 
+        maxlen= 1024, default= "")
+
+    def execute(self, context):
+        print("Exec localize files")
+        localizeFiles(context, self.properties.filepath)
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+
 
 #
 #    class MhxWeightToolsPanel(bpy.types.Panel):
@@ -1604,6 +1662,9 @@ class MhxWeightToolsPanel(bpy.types.Panel):
         layout.operator("mhw.export_vertex_groups")    
         layout.operator("mhw.export_sum_groups")    
         layout.operator("mhw.print_vnums_to_file")
+
+        layout.separator()
+        layout.operator("mhw.localize_files")
 
 class MhxWeightExtraPanel(bpy.types.Panel):
     bl_label = "Weight tools extra"
