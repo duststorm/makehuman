@@ -66,6 +66,7 @@ class ExpressionTaskView(gui3d.TaskView):
                 modifier = warpmodifier.WarpModifier(
                     'data/targets/expression/female_young/neutral_female_young_%s.target' % subname,
                     "face",
+                    True,
                     "GenderAgeModifier",
                     'data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % subname)
                 self.modifiers[subname] = modifier

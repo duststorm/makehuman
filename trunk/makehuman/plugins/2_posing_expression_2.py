@@ -4,6 +4,7 @@
 
 import gui3d
 import humanmodifier
+import warpmodifier
 
 print 'Expression 2 imported'
 
@@ -54,7 +55,13 @@ class ExpressionTaskView(gui3d.TaskView):
             for subname in subnames:
                 
                 #modifier = humanmodifier.GenderAgeModifier('data/targets/expression/units/${gender}_${age}/%s-%s.target' % (name, subname))
-                modifier = humanmodifier.GenderAgeEthnicModifier2('data/targets/expression/units/${ethnic}/${gender}_${age}/%s-%s.target' % (name, subname))
+                #modifier = humanmodifier.GenderAgeEthnicModifier2('data/targets/expression/units/${ethnic}/${gender}_${age}/%s-%s.target' % (name, subname))
+                modifier = warpmodifier.WarpModifier(
+                    'data/targets/expression/units/caucasian/female_young/%s-%s.target' % (name, subname),
+                    "face",
+                    True,
+                    "GenderAgeEthnicModifier2",
+                    'data/targets/expression/units/${ethnic}/${gender}_${age}/%s-%s.target' % (name, subname))
                 self.modifiers[subname] = modifier
                 slider = box.addView(ExpressionSlider(subname.capitalize(), modifier))
                 self.sliders.append(slider)
@@ -113,7 +120,7 @@ def load(app):
     
     #app.addLoadHandler('expression', taskview.loadHandler)
     #app.addSaveHandler(taskview.saveHandler)
-
+    
     print 'Expression 2 loaded'
 
 # This method is called when the plugin is unloaded from makehuman

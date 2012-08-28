@@ -195,6 +195,7 @@ def readFaceShapes(human, drivers):
                 modifier = warpmodifier.WarpModifier(
                     filename,
                     "face",
+                    False,
                     "GenderAgeModifier",
                     filename)
                 shape = modifier.updateValue(human, 1.0, updateHuman=False)
@@ -213,6 +214,7 @@ def readExpressions(human):
             modifier = warpmodifier.WarpModifier(
                 'data/targets/expression/female_young/neutral_female_young_%s.target' % name,
                 "face",
+                False,
                 "GenderAgeModifier",
                 'data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % name)
             shape = modifier.updateValue(human, 1.0, updateHuman=False)
@@ -229,6 +231,7 @@ def readExpressionUnits(human):
             modifier = warpmodifier.WarpModifier(
                 "data/targets/expression/units/caucasian/female_young/%s.target" % name,
                 "face",
+                False,
                 "GenderAgeModifier",
                 'data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % name)
             shape = modifier.updateValue(human, 1.0, updateHuman=False)
@@ -248,6 +251,7 @@ def readCorrectives(drivers, human, part):
             modifier = warpmodifier.WarpModifier(
                 "data/correctives/%s/%s/female-young.target" % (part, pose),
                 part,
+                False,
                 "GenderAgeModifier",
                 'data/correctives/%s/%s/${gender}_${age}.target' % (part, pose))
             shape = modifier.updateValue(human, 1.0, updateHuman=False)

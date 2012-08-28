@@ -546,6 +546,8 @@ class Human(gui3d.Object):
         
         self.setTexture("data/textures/texture.png")
         
+        warpmodifier.resetAllWarpModifiers()
+        
         self.callEvent('onChanging', HumanEvent(self, 'reset'))
 
     def load(self, filename, update=True, progressCallback=None):

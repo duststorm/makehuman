@@ -42,25 +42,26 @@ NMHVerts = 18528
 
 class WarpModifier:
 
-    def __init__(self, target, part, fallback, template):
+    def __init__(self, target, part, permanent, fallback, template):
         global theWarpModifiers
-        theWarpModifiers.append(self)            
                 
         self.target = target
         self.verts = None
         self.faces = None
         self.landmarks = theLandMarks[part]
         self.warp = warp.CWarp()
-        self.isDirty = False
 
         if warp.numpy:
             self.fallback = None
         else:
             self.fallback = eval( "humanmodifier.%s('%s')" % (fallback, template))
+
+        if permanent:
+            theWarpModifiers.append(self)            
             
     
     def __repr__(self):
-        return ("<WarpModifier %s %s>" % (self.target, self.isDirty))
+        return ("<WarpModifier %s>" % (self.target))
             
 
     def setValue(self, human, value):
@@ -85,6 +86,12 @@ class WarpModifier:
         if self.fallback:
             return self.fallback.updateValue(human, morphFactor, updateNormals)
             
+        # Return morphed verts if called by exporter
+        if not updateHuman:
+            refTarget = getRefTarget(self.target)
+            print "Compiling warp target"
+            return self.warp.warpTarget(refTarget, theRefVerts, human.meshData.verts, self.landmarks)
+
         # Collect vertex and face indices if we didn't yet
         if not self.verts:
             refTarget = getRefTarget(self.target)
@@ -92,11 +99,6 @@ class WarpModifier:
             self.verts = self.warp.warpTarget(refTarget, theRefVerts, human.meshData.verts, self.landmarks)
             print "  ...done"
 
-        # Return morphed verts if called by exporter
-        if not updateHuman:
-            return self.verts
-
-        self.isDirty = True
         target = getWarpTarget(human.meshData, self.target)    
         target.apply(human.meshData, morphFactor, self.verts)
         
@@ -166,6 +168,15 @@ class CWarpTarget:
 #   
 #----------------------------------------------------------
 
+def resetAllWarpModifiers():
+    global theWarpModifiers, theWarpTargetBuffer
+
+    for mod in theWarpModifiers:
+        if mod.verts:
+          print "Reset", mod
+        mod.verts = []
+    
+
 def removeAllWarpModifiers(human):
     global theWarpModifiers, theWarpTargetBuffer
     return
@@ -173,7 +184,7 @@ def removeAllWarpModifiers(human):
     print "Removing warps"
     verticesToUpdate = []
     for mod in theWarpModifiers:
-        if mod.isDirty:
+        if mod.verts:
             print "  Remove", mod
             target = getWarpTarget(human.meshData, mod.target)    
             verticesToUpdate += target.remove(human.meshData) 
