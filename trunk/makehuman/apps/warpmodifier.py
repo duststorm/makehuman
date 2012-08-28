@@ -224,7 +224,7 @@ def getRefTarget(path):
         fp.close()
         print("  ...done")
     else:
-        print("Could not find %s" % path)
+        raise NameError("Could not find %s" % path)
     theRefTargets[path] = target
     return target
 
