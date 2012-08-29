@@ -155,6 +155,9 @@ class Modifier:
             
     def updateValue(self, human, value, updateNormals=1):
         
+        if not self.isWarp:
+            warpmodifier.resetAllWarpTargets()
+            
         # Collect vertex and face indices if we didn't yet
         if not (self.verts or self.faces):
             # Collect verts
@@ -212,6 +215,9 @@ class GenericModifier:
         
     def updateValue(self, human, value, updateNormals=1):
         
+        if not self.isWarp:
+            warpmodifier.resetAllWarpTargets()
+            
         # Collect vertex and face indices if we didn't yet
         if not (self.verts or self.faces):
             # Collect verts

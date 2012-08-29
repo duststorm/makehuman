@@ -43,13 +43,13 @@ NMHVerts = 18528
 
 class WarpTarget(algos3d.Target):
 
-    def __init__(self, obj, refpath, warppath, landmarks):
+    def __init__(self, obj, refpath, warppath, bodypart):
         
         algos3d.Target.__init__(self, obj, warppath)
         
         self.refpath = refpath
         self.warppath = warppath
-        self.landmarks = landmarks
+        self.bodypart = bodypart
         self.isWarp = True
         self.isDirty = True
         
@@ -57,10 +57,9 @@ class WarpTarget(algos3d.Target):
     def reinit(self, obj):
     
         if self.isDirty:
-            print "reinit", self.warppath
-            shape = compileWarpTarget1(self.refpath, obj, self.landmarks)
+            shape = compileWarpTarget(self.refpath, obj, self.bodypart)
             saveWarpedTarget(shape, self.warppath)
-            self.__init__(obj, self.refpath, self.warppath, self.landmarks)
+            self.__init__(obj, self.refpath, self.warppath, self.bodypart)
             self.isDirty = False
         
 
@@ -70,16 +69,12 @@ class WarpTarget(algos3d.Target):
         algos3d.Target.apply(self, obj, morphFactor, update, calcNormals, faceGroupToUpdateName, scale)
 
 
-
-def compileWarpTarget(path, obj, part):
-    return compileWarpTarget1(path, obj, theLandMarks[part])
-
-def compileWarpTarget1(path, obj, landmarks):
+def compileWarpTarget(path, obj, bodypart):
+    print "Warp", path
+    landmarks = theLandMarks[bodypart]
     refTarget = getRefTarget(path)
-    print "Compiling warp target"
     warpfield = warp.CWarp()
     shape = warpfield.warpTarget(refTarget, theRefVerts, obj.verts, landmarks)
-    print "  ...done"
     return shape
 
 
@@ -92,7 +87,7 @@ def saveWarpedTarget(shape, path):
     fp.close()
     
     
-def getWarpTarget(obj, refpath, warppath, landmarks):
+def getWarpTarget(obj, refpath, warppath, bodypart):
     try:
         target = algos3d.targetBuffer[warppath]
     except KeyError:
@@ -103,13 +98,14 @@ def getWarpTarget(obj, refpath, warppath, landmarks):
             raise NameError("Target %s should be warp" % warppath)
         return target
         
-    target = WarpTarget(obj, refpath, warppath, landmarks)
+    target = WarpTarget(obj, refpath, warppath, bodypart)
     algos3d.targetBuffer[warppath] = target
     
     return target
 
 
 def resetAllWarpTargets():
+    print "Resetting warp targets"
     for target in algos3d.targetBuffer.values():
         if target.isWarp:
             target.isDirty = True
@@ -120,7 +116,7 @@ def resetAllWarpTargets():
 
 class WarpModifier (humanmodifier.SimpleModifier):
 
-    def __init__(self, target, part, fallback, template):
+    def __init__(self, target, bodypart, fallback, template):
         
         warppath = os.path.join(mh.getPath(""), "warp", target)
         if not os.path.exists(os.path.dirname(warppath)):
@@ -133,8 +129,8 @@ class WarpModifier (humanmodifier.SimpleModifier):
 
         self.warppath = warppath
         self.refpath = target
-        self.landmarks = theLandMarks[part]
-        self.warp = warp.CWarp()
+        self.isWarp = True
+        self.bodypart = bodypart
 
         if warp.numpy:
             self.fallback = None
@@ -167,7 +163,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
         if self.fallback:
             return self.fallback.updateValue(human, value, updateNormals)
         else:            
-            target = getWarpTarget(human.meshData, self.refpath, self.warppath, self.landmarks)    
+            target = getWarpTarget(human.meshData, self.refpath, self.warppath, self.bodypart)    
             target.reinit(human.meshData)
             return humanmodifier.SimpleModifier.updateValue(self, human, value, updateNormals)
         
@@ -175,47 +171,6 @@ class WarpModifier (humanmodifier.SimpleModifier):
     def clampValue(self, value):
         return max(0.0, min(1.0, value))
 
-#----------------------------------------------------------
-#   class CWarpTarget
-#----------------------------------------------------------
-
-"""
-class CWarpTarget:
-    def __init__(self, path):
-        self.path = path
-        self.verts = {}
-        self.morphFactor = 0
-        
-        
-    def apply(self, obj, morphFactor, verts):
-
-        verticesToUpdate = self.remove(obj)
-
-        for (n, dr) in verts.items():
-            v = obj.verts[n]
-            v.co[0] += morphFactor * dr[0]
-            v.co[1] += morphFactor * dr[1]
-            v.co[2] += morphFactor * dr[2]
-            verticesToUpdate.append(v)
-
-        verticesToUpdate = set(verticesToUpdate)
-        if verticesToUpdate:
-            obj.update(verticesToUpdate)            
-
-        self.verts = verts
-        self.morphFactor = morphFactor
-        
-        
-    def remove(self, obj):
-        verticesToUpdate = []
-        for (n, dr) in self.verts.items():
-            v = obj.verts[n]
-            v.co[0] -= self.morphFactor * dr[0]
-            v.co[1] -= self.morphFactor * dr[1]
-            v.co[2] -= self.morphFactor * dr[2]
-            verticesToUpdate.append(v)
-        return verticesToUpdate
-"""
                    
 #----------------------------------------------------------
 #   Reference object
@@ -234,7 +189,7 @@ def getRefTarget(path):
     except:
         fp = None
     if fp:
-        print("Loading reference target %s" % path)
+        #print("Loading reference target %s" % path)
         for line in fp:
             words = line.split()
             if len(words) >= 4:
@@ -242,9 +197,8 @@ def getRefTarget(path):
                 if n < NMHVerts:
                     target[n] = [float(words[1]), float(words[2]), float(words[3])]
         fp.close()
-        print("  ...done")
     else:
-        raise NameError("Could not find %s" % path)
+        raise NameError("Could not find %s" % os.path.realpath(path))
     theRefTargets[path] = target
     return target
 

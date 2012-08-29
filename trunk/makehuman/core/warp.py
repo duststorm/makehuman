@@ -177,7 +177,7 @@ class CWarp:
         
         self.HT = self.H.transpose()
         self.HTH = numpy.dot(self.HT, self.H)    
-        print("  Warp field set up: %d points" % n)
+        #print("  Warp field set up: %d points" % n)
 
         self.solve(0)
         self.solve(1)

@@ -190,7 +190,7 @@ def readFaceShapes(human, drivers):
         except:
             doLoad = True
         if doLoad:
-            filename = 'shared/mhx/targets/body_language/female-young/%s.target' % fname
+            filename = ('shared/mhx/targets/body_language/female-young/%s.target' % fname)
             if warp.numpy:
                 shape = warpmodifier.compileWarpTarget(filename, human.meshData, "face")
             else:
@@ -205,7 +205,7 @@ def readExpressions(human):
     shapeList = []
     for name in Expressions:
         if warp.numpy:
-            filename = 'data/targets/expression/female_young/neutral_female_young_%s.target' % name
+            filename = ('data/targets/expression/female_young/neutral_female_young_%s.target' % name)
             shape = warpmodifier.compileWarpTarget(filename, human.meshData, "face")
         else:
             shape = loopGendersAges(name, human, "Expressions")
@@ -217,7 +217,7 @@ def readExpressionUnits(human):
     shapeList = []
     for name in ExpressionUnits:
         if warp.numpy:
-            filename = "data/targets/expression/units/caucasian/female_young/%s.target" % name,
+            filename = ("data/targets/expression/units/caucasian/female_young/%s.target" % name)
             shape = warpmodifier.compileWarpTarget(filename, human.meshData, "face")
         else:
             shape = loopGendersAges(name, human, "ExpressionUnits")
@@ -230,7 +230,7 @@ def readCorrectives(drivers, human, part):
     for (pose, lr, expr, vars) in drivers:
         print "Corrective", part, pose
         if 0 and warp.numpy:
-            filename = "data/correctives/%s/%s/female-young.target" % (part, pose)
+            filename = ("data/correctives/%s/%s/female-young.target" % (part, pose))
             shape = warpmodifier.compileWarpTarget(filename, human.meshData, part)
         else:
             shape = loopGendersAges("%s/%s" % (part, pose), human, "Corrective")
