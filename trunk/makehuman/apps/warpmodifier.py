@@ -29,6 +29,7 @@ import algos3d
 import files3d
 import fastmath
 import math
+import mh
 import os
 import warp
 import humanmodifier
@@ -37,17 +38,101 @@ import humanmodifier
 NMHVerts = 18528
 
 #----------------------------------------------------------
-#   class CModifier
+#   class WarpTarget
 #----------------------------------------------------------
 
-class WarpModifier:
+class WarpTarget(algos3d.Target):
 
-    def __init__(self, target, part, permanent, fallback, template):
-        global theWarpModifiers
-                
-        self.target = target
-        self.verts = None
-        self.faces = None
+    def __init__(self, obj, refpath, warppath, landmarks):
+        
+        algos3d.Target.__init__(self, obj, warppath)
+        
+        self.refpath = refpath
+        self.warppath = warppath
+        self.landmarks = landmarks
+        self.isWarp = True
+        self.isDirty = True
+        
+        
+    def reinit(self, obj):
+    
+        if self.isDirty:
+            print "reinit", self.warppath
+            shape = compileWarpTarget1(self.refpath, obj, self.landmarks)
+            saveWarpedTarget(shape, self.warppath)
+            self.__init__(obj, self.refpath, self.warppath, self.landmarks)
+            self.isDirty = False
+        
+
+    def apply(self, obj, morphFactor, update=True, calcNormals=True, faceGroupToUpdateName=None, scale=(1.0,1.0,1.0)):
+    
+        self.reinit(obj)
+        algos3d.Target.apply(self, obj, morphFactor, update, calcNormals, faceGroupToUpdateName, scale)
+
+
+
+def compileWarpTarget(path, obj, part):
+    return compileWarpTarget1(path, obj, theLandMarks[part])
+
+def compileWarpTarget1(path, obj, landmarks):
+    refTarget = getRefTarget(path)
+    print "Compiling warp target"
+    warpfield = warp.CWarp()
+    shape = warpfield.warpTarget(refTarget, theRefVerts, obj.verts, landmarks)
+    print "  ...done"
+    return shape
+
+
+def saveWarpedTarget(shape, path): 
+    slist = list(shape.items())
+    slist.sort()
+    fp = open(path, "w")
+    for (n, dr) in slist:
+        fp.write("%d %.4f %.4f %.4f\n" % (n, dr[0], dr[1], dr[2]))
+    fp.close()
+    
+    
+def getWarpTarget(obj, refpath, warppath, landmarks):
+    try:
+        target = algos3d.targetBuffer[warppath]
+    except KeyError:
+        target = None
+
+    if target:
+        if not target.isWarp:
+            raise NameError("Target %s should be warp" % warppath)
+        return target
+        
+    target = WarpTarget(obj, refpath, warppath, landmarks)
+    algos3d.targetBuffer[warppath] = target
+    
+    return target
+
+
+def resetAllWarpTargets():
+    for target in algos3d.targetBuffer.values():
+        if target.isWarp:
+            target.isDirty = True
+
+#----------------------------------------------------------
+#   class WarpModifier
+#----------------------------------------------------------
+
+class WarpModifier (humanmodifier.SimpleModifier):
+
+    def __init__(self, target, part, fallback, template):
+        
+        warppath = os.path.join(mh.getPath(""), "warp", target)
+        if not os.path.exists(os.path.dirname(warppath)):
+            os.makedirs(os.path.dirname(warppath))
+        if not os.path.exists(warppath):
+            fp = open(warppath, "w")
+            fp.close()
+            
+        humanmodifier.SimpleModifier.__init__(self, warppath)
+
+        self.warppath = warppath
+        self.refpath = target
         self.landmarks = theLandMarks[part]
         self.warp = warp.CWarp()
 
@@ -55,9 +140,6 @@ class WarpModifier:
             self.fallback = None
         else:
             self.fallback = eval( "humanmodifier.%s('%s')" % (fallback, template))
-
-        if permanent:
-            theWarpModifiers.append(self)            
             
     
     def __repr__(self):
@@ -68,57 +150,27 @@ class WarpModifier:
     
         if self.fallback:
             return self.fallback.setValue(human, value)
-            
-        value = self.clampValue(value)
-        human.setDetail(self.target, value)
-            
+        else:    
+            return humanmodifier.SimpleModifier.setValue(self, human, value)
+                        
 
     def getValue(self, human):
         
         if self.fallback:
             return self.fallback.getValue(human)
-            
-        return human.getDetail(self.target)
+        else:    
+            return humanmodifier.SimpleModifier.getValue(self, human)
         
 
-    def updateValue(self, human, morphFactor, updateNormals=1, updateHuman=True):
+    def updateValue(self, human, value, updateNormals=1):
         
         if self.fallback:
-            return self.fallback.updateValue(human, morphFactor, updateNormals)
-            
-        # Return morphed verts if called by exporter
-        if not updateHuman:
-            refTarget = getRefTarget(self.target)
-            print "Compiling warp target"
-            return self.warp.warpTarget(refTarget, theRefVerts, human.meshData.verts, self.landmarks)
-
-        # Collect vertex and face indices if we didn't yet
-        if not self.verts:
-            refTarget = getRefTarget(self.target)
-            print "Compiling warp target"
-            self.verts = self.warp.warpTarget(refTarget, theRefVerts, human.meshData.verts, self.landmarks)
-            print "  ...done"
-
-        target = getWarpTarget(human.meshData, self.target)    
-        target.apply(human.meshData, morphFactor, self.verts)
+            return self.fallback.updateValue(human, value, updateNormals)
+        else:            
+            target = getWarpTarget(human.meshData, self.refpath, self.warppath, self.landmarks)    
+            target.reinit(human.meshData)
+            return humanmodifier.SimpleModifier.updateValue(self, human, value, updateNormals)
         
-        # Update detail state
-        self.setValue(human, morphFactor)
-
-        if not self.faces:        
-            self.faces = []
-            for vindex in self.verts:
-                self.faces += [face.idx for face in human.meshData.verts[vindex].sharedFaces]
-            self.faces = list(set(self.faces))
-            
-        # Update vertices
-        faces = [human.meshData.faces[i] for i in self.faces]
-        vertices = [human.meshData.verts[i] for i in self.verts]
-        
-        if updateNormals:
-            human.meshData.calcNormals(1, 1, vertices, faces)
-        human.meshData.update(vertices, updateNormals)
-
 
     def clampValue(self, value):
         return max(0.0, min(1.0, value))
@@ -127,6 +179,7 @@ class WarpModifier:
 #   class CWarpTarget
 #----------------------------------------------------------
 
+"""
 class CWarpTarget:
     def __init__(self, path):
         self.path = path
@@ -162,56 +215,12 @@ class CWarpTarget:
             v.co[2] -= self.morphFactor * dr[2]
             verticesToUpdate.append(v)
         return verticesToUpdate
-
+"""
                    
 #----------------------------------------------------------
-#   
+#   Reference object
 #----------------------------------------------------------
 
-def resetAllWarpModifiers():
-    global theWarpModifiers, theWarpTargetBuffer
-
-    for mod in theWarpModifiers:
-        if mod.verts:
-          print "Reset", mod
-        mod.verts = []
-    
-
-def removeAllWarpModifiers(human):
-    global theWarpModifiers, theWarpTargetBuffer
-    return
-    
-    print "Removing warps"
-    verticesToUpdate = []
-    for mod in theWarpModifiers:
-        if mod.verts:
-            print "  Remove", mod
-            target = getWarpTarget(human.meshData, mod.target)    
-            verticesToUpdate += target.remove(human.meshData) 
-
-    verticesToUpdate = set(verticesToUpdate)
-    if verticesToUpdate:
-        human.meshData.update(verticesToUpdate)            
-        
-    theWarpTargetBuffer = {}
-    theWarpModifiers = []
-        
-
-def getWarpTarget(obj, path):
-    global theWarpTargetBuffer
-    
-    try:
-        target = theWarpTargetBuffer[path]
-    except KeyError:
-        pass
-    else:
-        return target
-        
-    target = CWarpTarget(path)
-    theWarpTargetBuffer[path] = target    
-    return target
-
-    
 def getRefTarget(path):
     global theRefTargets
     try:
@@ -242,11 +251,8 @@ def getRefTarget(path):
         
 def defineGlobals():
     global theLandMarks, theRefObject, theRefVerts, theRefTargets
-    global theWarpTargetBuffer, theWarpModifiers
     
     theRefTargets = {}
-    theWarpTargetBuffer = {}
-    theWarpModifiers = []
     
     theLandMarks = {}
     folder = "data/landmarks"

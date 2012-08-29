@@ -76,6 +76,7 @@ class Target:
         """
 
         self.name = name
+        self.isWarp = False
         self.data = [0, 0, 0] * len(obj.verts)
         self.faces = []
         self.verts = []
@@ -189,13 +190,16 @@ def getTarget(obj, targetPath):
     try:
         target = targetBuffer[targetPath]
     except KeyError:
-        pass
-    else:
+        target = None
+        
+    if target:
+        if target.isWarp:
+            target.reinit(obj)
         return target
         
     target = Target(obj, targetPath)
     targetBuffer[targetPath] = target
-    
+
     return target
 
 def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName=None, update=1, calcNorm=1, scale=[1.0,1.0,1.0]):
@@ -251,7 +255,7 @@ def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName=No
         return
 
     target = getTarget(obj, targetPath)
-
+    
     target.apply(obj, morphFactor, update, calcNorm, faceGroupToUpdateName, scale)
 
 

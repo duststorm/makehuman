@@ -192,13 +192,7 @@ def readFaceShapes(human, drivers):
         if doLoad:
             filename = 'shared/mhx/targets/body_language/female-young/%s.target' % fname
             if warp.numpy:
-                modifier = warpmodifier.WarpModifier(
-                    filename,
-                    "face",
-                    False,
-                    "GenderAgeModifier",
-                    filename)
-                shape = modifier.updateValue(human, 1.0, updateHuman=False)
+                shape = warpmodifier.compileWarpTarget(filename, human.meshData, "face")
             else:
                 shape = readShape(filename)  
             shapes[fname] = shape                
@@ -211,13 +205,8 @@ def readExpressions(human):
     shapeList = []
     for name in Expressions:
         if warp.numpy:
-            modifier = warpmodifier.WarpModifier(
-                'data/targets/expression/female_young/neutral_female_young_%s.target' % name,
-                "face",
-                False,
-                "GenderAgeModifier",
-                'data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % name)
-            shape = modifier.updateValue(human, 1.0, updateHuman=False)
+            filename = 'data/targets/expression/female_young/neutral_female_young_%s.target' % name
+            shape = warpmodifier.compileWarpTarget(filename, human.meshData, "face")
         else:
             shape = loopGendersAges(name, human, "Expressions")
         shapeList.append((name, shape))
@@ -228,18 +217,11 @@ def readExpressionUnits(human):
     shapeList = []
     for name in ExpressionUnits:
         if warp.numpy:
-            modifier = warpmodifier.WarpModifier(
-                "data/targets/expression/units/caucasian/female_young/%s.target" % name,
-                "face",
-                False,
-                "GenderAgeModifier",
-                'data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % name)
-            shape = modifier.updateValue(human, 1.0, updateHuman=False)
+            filename = "data/targets/expression/units/caucasian/female_young/%s.target" % name,
+            shape = warpmodifier.compileWarpTarget(filename, human.meshData, "face")
         else:
             shape = loopGendersAges(name, human, "ExpressionUnits")
-        #shape = readTarget(name, human, "Expressions")
         shapeList.append((name, shape))
-        #print("    Done %s weight %.3f" % (name, wsum))
     return shapeList
 
 
@@ -248,13 +230,8 @@ def readCorrectives(drivers, human, part):
     for (pose, lr, expr, vars) in drivers:
         print "Corrective", part, pose
         if 0 and warp.numpy:
-            modifier = warpmodifier.WarpModifier(
-                "data/correctives/%s/%s/female-young.target" % (part, pose),
-                part,
-                False,
-                "GenderAgeModifier",
-                'data/correctives/%s/%s/${gender}_${age}.target' % (part, pose))
-            shape = modifier.updateValue(human, 1.0, updateHuman=False)
+            filename = "data/correctives/%s/%s/female-young.target" % (part, pose)
+            shape = warpmodifier.compileWarpTarget(filename, human.meshData, part)
         else:
             shape = loopGendersAges("%s/%s" % (part, pose), human, "Corrective")
 
