@@ -57,10 +57,9 @@ class ExpressionTaskView(gui3d.TaskView):
                 #modifier = humanmodifier.GenderAgeModifier('data/targets/expression/units/${gender}_${age}/%s-%s.target' % (name, subname))
                 #modifier = humanmodifier.GenderAgeEthnicModifier2('data/targets/expression/units/${ethnic}/${gender}_${age}/%s-%s.target' % (name, subname))
                 modifier = warpmodifier.WarpModifier(
-                    'data/targets/expression/units/caucasian/female_young/%s-%s.target' % (name, subname),
+                    'data/targets/expression/units/${ethnic}/${gender}_${age}/%s-%s.target' % (name, subname),
                     "face",
-                    "GenderAgeEthnicModifier2",
-                    'data/targets/expression/units/${ethnic}/${gender}_${age}/%s-%s.target' % (name, subname))
+                    "GenderAgeEthnicModifier2")
                 self.modifiers[subname] = modifier
                 slider = box.addView(ExpressionSlider(subname.capitalize(), modifier))
                 self.sliders.append(slider)

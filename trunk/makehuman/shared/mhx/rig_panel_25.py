@@ -79,7 +79,7 @@ PanelHeadsTails = [
 
 PanelArmature = [
     ('PFace',       pi, None, F_WIR, L_PANEL, NoBB),
-    ('PFaceDisp',   pi, 'PFace', F_WIR+F_RES, L_PANEL, NoBB),
+    ('PFaceDisp',   pi, 'PFace', F_WIR, L_PANEL, NoBB),
     ('PBrow_R',     pi, 'PFace', 0, L_PANEL, NoBB),
     ('PBrow_L',     pi, 'PFace', 0, L_PANEL, NoBB),
     ('PBrows',      pi, 'PFace', 0, L_PANEL, NoBB),

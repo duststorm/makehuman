@@ -125,6 +125,7 @@ if numpy:
     print("Numpy successfully loaded")
 else:
     print("Failed to load numpy. Warping will not work")
+    print("Continuing happily.")
 
 #----------------------------------------------------------
 #   class CWarp
