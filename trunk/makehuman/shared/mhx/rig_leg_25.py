@@ -32,9 +32,13 @@ LegJoints = [
 
     ('r-upleg1',            'l', ((0.75, 'r-upper-leg'), (0.25, 'r-knee'))),
     ('r-upleg2',            'l', ((0.5, 'r-upper-leg'), (0.5, 'r-knee'))),
-
     ('l-upleg1',            'l', ((0.75, 'l-upper-leg'), (0.25, 'l-knee'))),
     ('l-upleg2',            'l', ((0.5, 'l-upper-leg'), (0.5, 'l-knee'))),
+
+    ('r-upleg3',            'vl', ((0.25, 3985), (0.75, 3794))),
+    ('r-loleg1',            'vl', ((0.25, 3860), (0.75, 5710))),
+    ('l-upleg3',            'vl', ((0.25, 7024), (0.75, 7217))), 
+    ('l-loleg1',            'vl', ((0.25, 7149), (0.75, 6772))),
 
     ('r-legtrg',            'l', ((1-prcLegTrg, 'r-upper-leg'), (prcLegTrg, 'r-knee'))),
     ('l-legtrg',            'l', ((1-prcLegTrg, 'l-upper-leg'), (prcLegTrg, 'l-knee'))),
@@ -174,6 +178,11 @@ LegHeadsTails = [
     ('LegOutTrg_R',     'l-knee', 'l-legout-tail'),
     ('LegFrontTrg_L',   'r-knee', 'r-legfront-tail'),
     ('LegFrontTrg_R',   'l-knee', 'l-legfront-tail'),
+    
+    ('DfmKneeBack_L',   'r-upleg3', 'r-loleg1'),
+    ('DfmKneeBack_R',   'l-upleg3', 'l-loleg1'),
+    ('KneeBackTrg_L',	'r-ankle', 'r-loleg1'),
+    ('KneeBackTrg_R',	'l-ankle', 'l-loleg1'),
 
     # Directions    
     ('DirUpLegFwd_L',     'r-upper-leg', ('r-upper-leg', (0,0,1))),
@@ -267,13 +276,19 @@ LegArmature = [
     # Muscles
     ('DfmLegOut_L',     0, 'DfmHips', F_DEF, L_MSCL, NoBB),
     ('DfmLegOut_R',     0, 'DfmHips', F_DEF, L_MSCL, NoBB),
-    #('DfmLegFront_L',   0, 'DfmHips', F_DEF, L_MSCL, NoBB),
-    #('DfmLegFront_R',   0, 'DfmHips', F_DEF, L_MSCL, NoBB),
-
     ('LegOutTrg_L',     0, 'DfmUpLeg_L', 0, L_HELP, NoBB),
     ('LegOutTrg_R',     0, 'DfmUpLeg_R', 0, L_HELP, NoBB),
+
+    #('DfmLegFront_L',   0, 'DfmHips', F_DEF, L_MSCL, NoBB),
+    #('DfmLegFront_R',   0, 'DfmHips', F_DEF, L_MSCL, NoBB),
     #('LegFrontTrg_L',   0, 'DfmUpLeg_L', 0, L_HELP, NoBB),
     #('LegFrontTrg_R',   0, 'DfmUpLeg_R', 0, L_HELP, NoBB),
+
+
+    ('DfmKneeBack_L',   0, 'DfmUpLeg_L', F_DEF, L_MSCL, NoBB),
+    ('DfmKneeBack_R',   0, 'DfmUpLeg_R', F_DEF, L_MSCL, NoBB),
+    ('KneeBackTrg_L',   0, 'DfmLoLeg_L', 0, L_HELP, NoBB),
+    ('KneeBackTrg_R',   0, 'DfmLoLeg_R', 0, L_HELP, NoBB),
 
     # Directions
     ('DirUpLegFwd_L',       180*D, 'Hip_L', 0, L_HELP, NoBB),
@@ -506,6 +521,12 @@ def LegControlPoses(fp):
     #addPoseBone(fp, 'DfmLegFront_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
     #    [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegFrontTrg_R', 1, 1])])
 
+    addPoseBone(fp, 'DfmKneeBack_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('StretchTo', 0, 1, ['Stretch', 'KneeBackTrg_L', 1, 1])])
+
+    addPoseBone(fp, 'DfmKneeBack_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('StretchTo', 0, 1, ['Stretch', 'KneeBackTrg_R', 1, 1])])
+
 
     if not MuscleBones:
         return
@@ -611,8 +632,8 @@ HipTargetDrivers = [
 ]
 
 KneeTargetDrivers = [
-    ("lolegs-back-90", "LR", expr90,
-        [("LoLeg", "DirKneeBack")]),
+#    ("lolegs-back-90", "LR", expr90,
+#        [("LoLeg", "DirKneeBack")]),
 #    ("lolegs-back-135", "LR", expr45,
 #        [("LoLeg", "DirKneeInv")]),
 ]
