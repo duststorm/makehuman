@@ -109,16 +109,26 @@ class VIEW3D_OT_LoadTargetCharacterButton(bpy.types.Operator):
         the.TargetCharacter.character.loadTargets(context)
         return{'FINISHED'}    
     
-        
+    
+class VIEW3D_OT_UpdateLandmarksButton(bpy.types.Operator):
+    bl_idname = "mh.update_landmarks"
+    bl_label = "Update Landmarks"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        warp.updateLandmarks(context)
+        return{'FINISHED'}    
+    
+       
 #----------------------------------------------------------
 #   Set Morph
 #----------------------------------------------------------
 
 def partitionTargetPath(path):
-    (before, sep, after) = path.partition("data/targets/")
+    (before, sep, after) = path.partition("/targets/")
     if sep:
         return (before+sep, after)
-    (before, sep, after) = path.partition("data\\targets\\")
+    (before, sep, after) = path.partition("\\targets\\")
     if sep:
         return (before+sep, after)
     return ("", path)        

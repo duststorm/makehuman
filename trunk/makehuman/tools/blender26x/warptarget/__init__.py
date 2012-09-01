@@ -110,7 +110,9 @@ class WarpTargetPanel(bpy.types.Panel):
         layout.prop(scn, "MhTargetMorphFile")
 
         layout.separator()
-        layout.prop(scn, "MhLandmarks")
+        split = layout.split(0.8)
+        split.prop(scn, "MhLandmarks")
+        split.operator("mh.update_landmarks")
         layout.prop(scn, "MhWarpAllMorphsInDir")
         layout.operator("mh.warp_morph")
 
