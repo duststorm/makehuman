@@ -45,7 +45,7 @@ class WarpTarget(algos3d.Target):
 
     def __init__(self, modifier, human):
         
-        algos3d.Target.__init__(self, human.meshData, modifier.warppath)
+        algos3d.Target.__init__(self, human, modifier.warppath)
         
         self.human = human
         self.modifier = modifier
@@ -57,23 +57,23 @@ class WarpTarget(algos3d.Target):
         
 
     def __repr__(self):
-        return ( "<WarpTarget %s>" % self.modifier.warppath )
+        return ( "<WarpTarget %s %s>" % (os.path.basename(self.modifier.warppath), self.isDirty) )
         
         
-    def reinit(self, obj):
+    def reinit(self, human):
     
         if self.isDirty:
-            print "reinit"
             shape = self.modifier.compileWarpTarget(self.human)
             saveWarpedTarget(shape, self.modifier.warppath)
             self.__init__(self.modifier, self.human)
             self.isDirty = False
+    #print "After reinit", self            
         
 
-    def apply(self, obj, morphFactor, update=True, calcNormals=True, faceGroupToUpdateName=None, scale=(1.0,1.0,1.0)):
+    def apply(self, human, morphFactor, update=True, calcNormals=True, faceGroupToUpdateName=None, scale=(1.0,1.0,1.0)):
     
-        self.reinit(obj)
-        algos3d.Target.apply(self, obj, morphFactor, update, calcNormals, faceGroupToUpdateName, scale)
+        self.reinit(human)
+        algos3d.Target.apply(self, human, morphFactor, update, calcNormals, faceGroupToUpdateName, scale)
 
 
 def saveWarpedTarget(shape, path): 
@@ -85,12 +85,6 @@ def saveWarpedTarget(shape, path):
     fp.close()
     
     
-def resetAllWarpTargets():
-    print "Resetting warp targets"
-    for target in algos3d.targetBuffer.values():
-        if target.isWarp:
-            target.isDirty = True
-
 #----------------------------------------------------------
 #   class WarpModifier
 #----------------------------------------------------------
@@ -115,7 +109,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
         paths = self.fallback.expandTemplate([(self.template, [])])
         self.bases = {}
         for path in paths:
-            self.bases[path[0]] = (getBaseCharacter(path[1]), -1, -1)
+            self.bases[path[0]] = (getBaseCharacter(path[1]), -1)
         self.isWarp = True
         self.bodypart = bodypart
         self.refTargets = {}
@@ -123,14 +117,14 @@ class WarpModifier (humanmodifier.SimpleModifier):
             
     
     def __repr__(self):
-        return ("<WarpModifier %s>" % (self.template))
+        return ("<WarpModifier %s>" % (os.path.basename(self.template)))
             
 
     def updateValue(self, human, value, updateNormals=1):
         
         if warp.numpy:
             target = self.getWarpTarget(human)    
-            target.reinit(human.meshData)
+            target.reinit(human)
             return humanmodifier.SimpleModifier.updateValue(self, human, value, updateNormals)
         else:            
             return self.fallback.updateValue(human, value, updateNormals)
@@ -143,85 +137,65 @@ class WarpModifier (humanmodifier.SimpleModifier):
         
         
     def compileWarpTarget(self, human):
-        print "Warp", self.warppath
+        print "Warp", self
         landmarks = theLandMarks[self.bodypart]
         self.getRefTarget(human)
-        warpfield = warp.CWarp()
-        shape = warpfield.warpTarget(self.refTargetVerts, theRefObjectVerts, human.meshData.verts, landmarks)
+        warpfield = warp.CWarp()        
+        shape = warpfield.warpTarget(self.refTargetVerts, theRefObjectVerts, human.shadowVerts, landmarks)
         return shape
     
     
     def getRefTarget(self, human):
         global theRefObjects, theRefObjectVerts, theBaseObjectVerts
         
-        charChanged = False
-        targetChanged = False
-        for target in self.bases.keys():
-            char,cval0,tval0 = self.bases[target]
-    
-            try:
-                verts = theRefObjects[char]
-            except KeyError:
-                verts = None
-            if verts == None:
-                verts = readTarget(char)
-                theRefObjects[char] = verts
-            if not verts:
-                self.bases[target] = char,0,0
-                continue
-    
-            if verts:
-                cval1 = human.getDetail(char)            
-            else:
-                cval1 = 0
-            if cval0 != cval1:
-                #print "Character changed", os.path.basename(char), cval0, cval1
-                self.bases[target] = char,cval1,tval0
-                charChanged = True
-    
-            try:
-                verts = self.refTargets[target]
-            except KeyError:
-                verts = None
-            if verts == None:
-                verts = readTarget(target)
-                self.refTargets[target] = verts
-                
-            if verts:
-                tval1 = human.getDetail(target)            
-            else:
-                tval1 = 0
-            if tval0 != tval1:
-                #print "Target changed", target, tval0, tval1
-                self.bases[target] = char,cval1,tval1
-                targetChanged = True
-    
-        
-        if charChanged:
+        if algos3d.theCharacterHasChanged:
             print "Reference character changed"
+            algos3d.theCharacterHasChanged = False                        
     
             theRefObjectVerts = {}
             for n,v in theBaseObjectVerts.items():
                 theRefObjectVerts[n] = list(v)
     
-            for target in self.bases.keys():
-                char,cval,tval = self.bases[target]
+            for (char, verts) in theRefObjects.items():
+                cval = human.getDetail(char)
                 if cval:
                     print "  ", os.path.basename(char), cval
-                    verts = theRefObjects[char]
                     for n,v in verts.items():
-                        r = fastmath.vmul3d(v, cval)
-                        theRefObjectVerts[n] = fastmath.vadd3d(theRefObjectVerts[n], r)
+                        dr = fastmath.vmul3d(v, cval)
+                        theRefObjectVerts[n] = fastmath.vadd3d(theRefObjectVerts[n], dr)
+                            
+        targetChanged = False
+        for target in self.bases.keys():
+            char,cval0 = self.bases[target]
     
-        if targetChanged or charChanged:
+            verts = theRefObjects[char]
+            if not verts:
+                self.bases[target] = char,0
+                continue
+    
+            cval1 = human.getDetail(char)            
+            if cval0 != cval1:
+                #print "Target changed", os.path.basename(char), cval0, cval1
+                self.bases[target] = char,cval1
+                targetChanged = True
+            
+        if targetChanged:
             print "Reference target changed"
     
             self.refTargetVerts = {}
             for target in self.bases.keys():
-                char,cval,tval = self.bases[target]
+                char,cval = self.bases[target]
                 if cval:
-                    print "   ", target, cval, tval
-                    verts = self.refTargets[target]
+                    print "   ", target, cval
+
+                    try:
+                        verts = self.refTargets[target]
+                    except KeyError:
+                        verts = None
+                    if verts == None:
+                        verts = readTarget(target)
+                        self.refTargets[target] = verts
+
                     for n,v in verts.items():
                         dr = fastmath.vmul3d(v, cval)
                         try:
@@ -334,7 +308,14 @@ def defineGlobals():
     theBaseObjectVerts = {}
     for n,v in enumerate(obj.verts):
         theBaseObjectVerts[n] = v.co
+        
     theRefObjects = {}
+    for race in ["african", "asian", "neutral"]:
+        for gender in ["female", "male"]:
+            for age in ["child", "young", "old"]:
+                path = "data/targets/macrodetails/%s-%s-%s.target" % (race, gender, age)
+                theRefObjects[path] = readTarget(path)
+    
 
 
 defineGlobals()

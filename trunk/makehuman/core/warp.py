@@ -231,7 +231,7 @@ class CWarp:
         yverts = {}  
         for (m,n) in landmarks.items():
             xverts[m] = list(source[n])
-            yverts[m] = list(target[n].co)
+            yverts[m] = list(target[n])
     
         self.setup(xverts, yverts)
         self.solve(0)
@@ -242,7 +242,7 @@ class CWarp:
         for n in morph.keys():
             xloc = fastmath.vadd3d(morph[n], source[n])
             yloc = self.warpLoc(xloc)
-            ymorph[n] = fastmath.vsub3d(yloc, target[n].co)
+            ymorph[n] = fastmath.vsub3d(yloc, target[n])
             
         """
             print n

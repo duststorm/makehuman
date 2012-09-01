@@ -27,7 +27,6 @@ import algos3d
 import gui3d
 import os
 import humanmodifier
-import warpmodifier
 import hair
 import events3d
 
@@ -49,7 +48,9 @@ class Human(gui3d.Object):
         self.mesh.setCameraProjection(0)
         self.mesh.setShadeless(0)
         self.meshData = self.mesh
-
+        self.shadowVerts = []
+        self.syncShadowVerts()
+        
         self.hairModelling = False #temporary variable for easier integration of makehair, will be cleaned later.
         self.hairObj = hairObj
         self.hairProxy = None
@@ -101,6 +102,11 @@ class Human(gui3d.Object):
         self.baseModifier = humanmodifier.GenderAgeEthnicModifier('data/targets/macrodetails/${ethnic}-${gender}-${age}.target')
         
         self.setTexture("data/textures/texture.png")
+
+
+    def syncShadowVerts(self):
+        self.shadowVerts = [ list(v.co) for v in self.meshData.verts ]
+
 
     # Overriding hide and show to account for both human base and the hairs!
 
@@ -372,6 +378,7 @@ class Human(gui3d.Object):
         self.baseModifier.setValue(self, 1.0)
 
         algos3d.resetObj(self.meshData)
+        self.syncShadowVerts()
 
         if progressCallback:
             progressCallback(0.0)
@@ -379,7 +386,7 @@ class Human(gui3d.Object):
         progressIncr = 0.5 / (len(self.targetsDetailStack) + 1)
 
         for (k, v) in self.targetsDetailStack.iteritems():
-            algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
+            algos3d.loadTranslationTarget(self, k, v, None, 0, 0)
             progressVal += progressIncr
             if progressCallback:
                 progressCallback(progressVal)
@@ -467,7 +474,7 @@ class Human(gui3d.Object):
 
             if targetName[:2] == prefix2:
                 targetVal = self.targetsDetailStack[target]
-                algos3d.loadTranslationTarget(self.meshData, target, -targetVal, None, 1, 0)
+                algos3d.loadTranslationTarget(self, target, -targetVal, None, 1, 0)
                 del self.targetsDetailStack[target]
 
         # Apply symm target. For horiz movement the value must be inverted
@@ -482,7 +489,7 @@ class Human(gui3d.Object):
                 elif 'trans-out' in targetSym:
                     targetSym = targetSym.replace('trans-out', 'trans-in')
 
-                algos3d.loadTranslationTarget(self.meshData, targetSym, targetSymVal, None, 1, 1)
+                algos3d.loadTranslationTarget(self, targetSym, targetSymVal, None, 1, 1)
                 self.targetsDetailStack[targetSym] = targetSymVal
         
         self.updateProxyMesh()        
@@ -494,7 +501,7 @@ class Human(gui3d.Object):
     def rotateLimb(self, targetPath, morphFactor):
         targetPath1 = targetPath+".target"
         targetPath2 = targetPath+".rot"
-        algos3d.loadTranslationTarget(self.meshData, targetPath1, morphFactor, None, 1, 0)
+        algos3d.loadTranslationTarget(self, targetPath1, morphFactor, None, 1, 0)
         algos3d.loadRotationTarget(self.meshData, targetPath2, morphFactor)
 
 
@@ -546,7 +553,7 @@ class Human(gui3d.Object):
         
         self.setTexture("data/textures/texture.png")
         
-        warpmodifier.resetAllWarpTargets()
+        algos3d.resetAllWarpTargets()
         
         self.callEvent('onChanging', HumanEvent(self, 'reset'))
 
