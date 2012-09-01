@@ -108,13 +108,16 @@ class WarpModifier (humanmodifier.SimpleModifier):
         self.template = template
         paths = self.fallback.expandTemplate([(self.template, [])])
         self.bases = {}
+        self.useRace = False
+        self.useGender = False
+        self.useAge = False
         if len(paths) == 1:
             path = paths[0]
-            char = getBaseCharacter(path[0])
+            char = self.getBaseCharacter(path[0])            
             self.bases[path[0]] = (char, -1)
         else:
             for path in paths:
-                char = getBaseCharacter(path[1])            
+                char = self.getBaseCharacter(path[1])            
                 self.bases[path[0]] = (char, -1)
         self.isWarp = True
         self.bodypart = bodypart
@@ -224,30 +227,43 @@ class WarpModifier (humanmodifier.SimpleModifier):
         target = WarpTarget(self, human)
         algos3d.targetBuffer[self.warppath] = target
         return target    
+        
+
+    def getBaseCharacter(self, path):    
+        if "african" in path:
+            race = "african"
+            self.useRace = True
+        elif "asian" in path:
+            race = "asian"
+            self.useRace = True
+        elif "caucasian" in path:
+            race = "neutral"
+            self.useRace = True
+        else:
+            race = "neutral"
     
-
-def getBaseCharacter(path):
-    if "african" in path:
-        race = "african"
-    elif "asian" in path:
-        race = "asian"
-    else:
-        race = "neutral"
-
-    if "female" in path:
-        gender = "female"
-    else:
-        gender = "male"
-
-    if "child" in path:
-        age = "child"
-    elif "old" in path:
-        age = "old"
-    else:
-        age = "young"
-        
-    return "data/targets/macrodetails/%s-%s-%s.target" % (race, gender, age)
-        
+        if "female" in path:
+            gender = "female"
+            self.useGender = True
+        elif "male" in path:
+            gender = "male"
+            self.useGender = True
+        else:
+            gender = "female"
+    
+        if "child" in path:
+            age = "child"
+            self.useAge = True
+        elif "young" in path:
+            age = "young"
+            self.useAge = True
+        elif "old" in path:
+            age = "old"
+            self.useAge = True
+        else:
+            age = "young"
+            
+        return "data/targets/macrodetails/%s-%s-%s.target" % (race, gender, age)
 
 #----------------------------------------------------------
 #   Call from exporter
@@ -257,21 +273,9 @@ def compileWarpTarget(template, fallback, human, bodypart):
     mod = WarpModifier(template, bodypart, fallback)
     return mod.compileWarpTarget(human)
                 
-                
-def compileSimpleWarpTarget(filepath, human, bodypart):    
-    landmarks = theLandMarks[bodypart]
-    base = getBaseCharacter(filepath)
-    baseVerts = theRefObjects[base]
-    targetVerts = readTarget(filepath)
-    return targetVerts
-    warpfield = warp.CWarp()        
-    shape = warpfield.warpTarget(targetVerts, baseVerts, human.shadowVerts, landmarks)
-    return shape
-    
 #----------------------------------------------------------
 #   Reference object
-#----------------------------------------------------------
-                
+#----------------------------------------------------------                
 
 def readTarget(path):
     target = {}

@@ -145,7 +145,9 @@ def targetFileName(typ, name, gender, age):
     elif typ == "ExpressionUnits":        
         return ('data/targets/expression/units/caucasian/%s_%s/%s.target' %  (gender, age, name) )
     elif typ == "Corrective":
-        return ("data/correctives/%s/%s-%s.target" % (name, gender, age))
+        (part, pose) = name
+        #return ("shared/mhx/targets/correctives/%s/caucasian/%s-%s/%s.target" % (part, gender, age, pose))
+        return ("data/correctives/%s/%s/%s-%s.target" % (part, pose, gender, age))
     else:
         raise NameError("Unknown type %s" % typ)
         
@@ -190,9 +192,11 @@ def readFaceShapes(human, drivers):
         except:
             doLoad = True
         if doLoad:
-            if warp.numpy:
-                shape = warpmodifier.compileSimpleWarpTarget(
-                    'shared/mhx/targets/body_language/female-young/%s.target' % fname, 
+            filename = 'shared/mhx/targets/body_language/female-young/%s.target' % fname
+            if 0 and warp.numpy:
+                shape = warpmodifier.compileWarpTarget(
+                    filename, 
+                    "SimpleModifier",
                     human, 
                     "face")
             else:
@@ -239,12 +243,12 @@ def readCorrectives(drivers, human, part):
         print "Corrective", part, pose
         if 0 and warp.numpy:
             shape = warpmodifier.compileWarpTarget(
-                "data/correctives/%s/%s/female-young.target" % (part, pose), 
-                'SimpleModifier',
+                "shared/mhx/targets/correctives/%s/caucasian/${gender}_${age}/%s.target" % (part, pose),
+                'GenderAgeModifier',
                 human, 
                 part)
         else:
-            shape = loopGendersAges("%s/%s" % (part, pose), human, "Corrective")
+            shape = loopGendersAges((part, pose), human, "Corrective")
 
         shapeList.append((shape, pose, lr))
     return shapeList        

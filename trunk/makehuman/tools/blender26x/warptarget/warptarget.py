@@ -198,7 +198,11 @@ def subFromMorph(ylocs, y0):
     
     
 def saveTarget(path, dxs):
-    #print("Saving target %s" % path)
+    print("Saving target %s" % path)
+    folder = os.path.dirname(path)
+    if not os.path.isdir(folder):
+    	print("Creating target folder %s" % folder)
+    	os.makedirs(folder)    
     fp = open(path, "w")
     keys = list( dxs.keys() )
     keys.sort()

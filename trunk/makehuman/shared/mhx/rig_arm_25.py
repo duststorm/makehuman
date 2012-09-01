@@ -127,7 +127,11 @@ ArmHeadsTails = [
     ('Hand_R',              'l-hand', 'hand_R_tail'),
     ('DfmHand_R',           'l-hand', 'hand_R_tail'),
 
-
+    # Tweak
+    
+    ('DfmElbowFwd_L',       'r-uparm2', 'r-loarm1'),
+    ('DfmElbowFwd_R',       'l-uparm2', 'l-loarm1'),
+    
    # Pole Targets
 
     ('UpArmDir_L',         'r-uparm1', ('r-uparm1', the.yunit)),
@@ -231,7 +235,7 @@ ArmArmature = [
     ('DfmLoArm2_L',       loArmRoll, 'DfmLoArm1_L', F_DEF+F_SCALE, L_DMAIN, NoBB ),
     ('DfmLoArm3_L',       loArmRoll, 'LoArm_L', F_DEF, L_DMAIN, NoBB),
     ('DfmHand_L',         handRoll, 'LoArm_L', F_DEF, L_DMAIN, NoBB),
-
+    
     #('UpArmRot_R',        upArmRoll, 'UpArm_R', F_WIR, L_TWEAK, NoBB),
     ('DfmUpArm_R',        upArmRoll, 'UpArm_R', F_DEF, L_DMAIN, NoBB),
     ('LoArmRot_R',        loArmRoll, 'UpArm_R', F_WIR, L_TWEAK, NoBB),
@@ -240,6 +244,10 @@ ArmArmature = [
     ('DfmLoArm3_R',       loArmRoll, 'LoArm_R', F_DEF, L_DMAIN, NoBB),
     ('DfmHand_R',         handRoll, 'LoArm_R', F_DEF, L_DMAIN, NoBB),
     
+    # Tweak
+    ('DfmElbowFwd_L',     0, 'UpArm_L', F_DEF, L_DMAIN, NoBB),
+    ('DfmElbowFwd_R',     0, 'UpArm_R', F_DEF, L_DMAIN, NoBB),
+
     # Pole targets
     ('LoArm2PT_L',        0, 'DfmLoArm1_L', 0, L_HELP, NoBB),
     ('LoArm3PT_L',        0, 'HlpLoArm_L', 0, L_HELP, NoBB),
@@ -476,6 +484,15 @@ def ArmControlPoses(fp):
 
     copyDeform(fp, 'DfmHand_R', 'Hand_R', 0, U_LOC+U_ROT, None, [])
     
+    # Tweak
+    
+    addPoseBone(fp, 'DfmElbowFwd_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('StretchTo', 0, 1, ['Stretch', 'DfmLoArm1_L', 1, 1])])
+
+    addPoseBone(fp, 'DfmElbowFwd_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('StretchTo', 0, 1, ['Stretch', 'DfmLoArm1_R', 1, 1])])
+    
+    
     return
 
 #
@@ -558,8 +575,8 @@ expr90 = "(1-%.3f*x1)" % (2/pi)
 expr135 = "2*(1-%.3f*x1)" % (2/pi)
 
 ElbowTargetDrivers = [    
-    ("loarms-forward-90",  "LR", expr90,
-        [("LoArmVec", "DirElbowFwd")]),
+#    ("loarms-forward-90",  "LR", expr90,
+#        [("LoArmVec", "DirElbowFwd")]),
 #    ("loarms-forward-135",  "LR", expr135,
 #        [("LoArmVec", "DirElbowInv")]),
 ]    

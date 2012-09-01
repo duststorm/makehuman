@@ -40,7 +40,7 @@ class CCharacter:
         self.object = None
         self.objectName = None
         
-        self.race = "neutral"
+        self.race = "caucasian"
         self.gender = "female"
         self.age = "young"
         self.weight = "normal"
@@ -115,6 +115,7 @@ class CCharacter:
 
         table = {
             "caucasian" : "race",
+            "neutral" : "race",
             "asian" : "race",
             "african" : "race",
             
@@ -131,7 +132,8 @@ class CCharacter:
             "light" : "weight",
             "heavy" : "weight",
         }
-                
+
+                        
         if update:                
             for word in words:
                 try:
