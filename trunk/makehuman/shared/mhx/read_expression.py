@@ -191,9 +191,8 @@ def readFaceShapes(human, drivers):
             doLoad = True
         if doLoad:
             if warp.numpy:
-                shape = warpmodifier.compileWarpTarget(
+                shape = warpmodifier.compileSimpleWarpTarget(
                     'shared/mhx/targets/body_language/female-young/%s.target' % fname, 
-                    'SimpleModifier',
                     human, 
                     "face")
             else:

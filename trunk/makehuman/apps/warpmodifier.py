@@ -108,8 +108,14 @@ class WarpModifier (humanmodifier.SimpleModifier):
         self.template = template
         paths = self.fallback.expandTemplate([(self.template, [])])
         self.bases = {}
-        for path in paths:
-            self.bases[path[0]] = (getBaseCharacter(path[1]), -1)
+        if len(paths) == 1:
+            path = paths[0]
+            char = getBaseCharacter(path[0])
+            self.bases[path[0]] = (char, -1)
+        else:
+            for path in paths:
+                char = getBaseCharacter(path[1])            
+                self.bases[path[0]] = (char, -1)
         self.isWarp = True
         self.bodypart = bodypart
         self.refTargets = {}
@@ -228,10 +234,10 @@ def getBaseCharacter(path):
     else:
         race = "neutral"
 
-    if "male" in path:
-        gender = "male"
-    else:
+    if "female" in path:
         gender = "female"
+    else:
+        gender = "male"
 
     if "child" in path:
         age = "child"
@@ -251,6 +257,17 @@ def compileWarpTarget(template, fallback, human, bodypart):
     mod = WarpModifier(template, bodypart, fallback)
     return mod.compileWarpTarget(human)
                 
+                
+def compileSimpleWarpTarget(filepath, human, bodypart):    
+    landmarks = theLandMarks[bodypart]
+    base = getBaseCharacter(filepath)
+    baseVerts = theRefObjects[base]
+    targetVerts = readTarget(filepath)
+    return targetVerts
+    warpfield = warp.CWarp()        
+    shape = warpfield.warpTarget(targetVerts, baseVerts, human.shadowVerts, landmarks)
+    return shape
+    
 #----------------------------------------------------------
 #   Reference object
 #----------------------------------------------------------
