@@ -34,11 +34,13 @@ LegJoints = [
     ('r-upleg2',            'l', ((0.5, 'r-upper-leg'), (0.5, 'r-knee'))),
     ('l-upleg1',            'l', ((0.75, 'l-upper-leg'), (0.25, 'l-knee'))),
     ('l-upleg2',            'l', ((0.5, 'l-upper-leg'), (0.5, 'l-knee'))),
+    ('r-loleg1',            'l', ((0.75, 'r-knee'), (0.25, 'r-ankle'))),
+    ('l-loleg1',            'l', ((0.75, 'l-knee'), (0.25, 'l-ankle'))),
 
-    ('r-upleg3',            'vl', ((0.25, 3985), (0.75, 3794))),
-    ('r-loleg1',            'vl', ((0.25, 3860), (0.75, 5710))),
-    ('l-upleg3',            'vl', ((0.25, 7024), (0.75, 7217))), 
-    ('l-loleg1',            'vl', ((0.25, 7149), (0.75, 6772))),
+    ('r-knee-stretch1',     'vl', ((0.25, 3985), (0.75, 3794))),
+    ('r-knee-stretch2',     'vl', ((0.25, 3860), (0.75, 5710))),
+    ('l-knee-stretch1',     'vl', ((0.25, 7024), (0.75, 7217))), 
+    ('l-knee-stretch2',     'vl', ((0.25, 7149), (0.75, 6772))),
 
     ('r-legtrg',            'l', ((1-prcLegTrg, 'r-upper-leg'), (prcLegTrg, 'r-knee'))),
     ('l-legtrg',            'l', ((1-prcLegTrg, 'l-upper-leg'), (prcLegTrg, 'l-knee'))),
@@ -68,10 +70,10 @@ LegJoints = [
     ('l-knee-head',         'v', 6865),
     ('l-knee-tail',         'v', 6779),
 
-    ('r-legout-head',       'vl', ((0.4, 3042), (0.6, 2929))),
-    ('r-legout-tail',       'vl', ((0.7, 3973), (0.3, 3832))),
-    ('l-legout-head',       'vl', ((0.4, 7280), (0.6, 7307))),
-    ('l-legout-tail',       'vl', ((0.7, 7035), (0.3, 7177))),
+    ('r-legout-head',       'vl', ((0.4, 6555), (0.6, 4462))),
+    ('r-legout-tail',       'vl', ((1.0, 3973), (0.0, 3832))),
+    ('l-legout-head',       'vl', ((0.4, 6757), (0.6, 6903))),
+    ('l-legout-tail',       'vl', ((1.0, 7035), (0.0, 7177))),
 
     ('r-legfront-head',     'vl', ((0.8, 6562), (0.2, 4463))),
     ('r-legfront-tail',     'vl', ((0.7, 3942), (0.3, 3841))),
@@ -180,11 +182,23 @@ LegHeadsTails = [
     ('LegOutTrg_R',     'l-knee', 'l-legout-tail'),
     ('LegFrontTrg_L',   'r-knee', 'r-legfront-tail'),
     ('LegFrontTrg_R',   'l-knee', 'l-legfront-tail'),
-    
-    ('DfmKneeBack_L',   'r-upleg3', 'r-loleg1'),
-    ('DfmKneeBack_R',   'l-upleg3', 'l-loleg1'),
-    ('KneeBackTrg_L',	'r-ankle', 'r-loleg1'),
-    ('KneeBackTrg_R',	'l-ankle', 'l-loleg1'),
+
+    # Fan bones    
+    ('DfmHipFan_L',      'r-upper-leg', 'r-upleg1'),
+    ('DfmHipFan_R',      'l-upper-leg', 'l-upleg1'),
+
+    ('DfmKneeFan_L',      'r-knee', 'r-loleg1'),
+    ('DfmKneeFan_R',      'l-knee', 'l-loleg1'),
+
+    ('DfmKneeBack_L',   'r-knee-stretch1', 'r-knee-stretch2'),
+    ('DfmKneeBack_R',   'l-knee-stretch1', 'l-knee-stretch2'),
+    ('KneeBackTrg_L',   'r-ankle', 'r-knee-stretch2'),
+    ('KneeBackTrg_R',   'l-ankle', 'l-knee-stretch2'),
+
+    #('DfmKneeBack_L',   ('r-upper-leg', (0,0,-1)), ('r-ankle', (0,0,-1))),
+    #('DfmKneeBack_R',   ('l-upper-leg', (0,0,-1)), ('l-ankle', (0,0,-1))),
+    #('KneeBackTrg_L',  'r-ankle', ('r-ankle', (0,0,-1))),
+    #('KneeBackTrg_R',  'l-ankle', ('l-ankle', (0,0,-1))),
 
     # Directions    
     ('DirUpLegFwd_L',     'r-upper-leg', ('r-upper-leg', (0,0,1))),
@@ -288,6 +302,12 @@ LegArmature = [
     #('LegFrontTrg_L',   0, 'DfmUpLeg_L', 0, L_HELP, NoBB),
     #('LegFrontTrg_R',   0, 'DfmUpLeg_R', 0, L_HELP, NoBB),
 
+    # Fan bones
+    ('DfmHipFan_L',     0, 'Hip_L', F_DEF, L_MSCL, NoBB),
+    ('DfmHipFan_R',     0, 'Hip_R', F_DEF, L_MSCL, NoBB),
+    
+    ('DfmKneeFan_L',   0, 'DfmUpLeg_L', F_DEF, L_MSCL, NoBB),
+    ('DfmKneeFan_R',   0, 'DfmUpLeg_R', F_DEF, L_MSCL, NoBB),
 
     ('DfmKneeBack_L',   0, 'DfmUpLeg_L', F_DEF, L_MSCL, NoBB),
     ('DfmKneeBack_R',   0, 'DfmUpLeg_R', F_DEF, L_MSCL, NoBB),
@@ -514,10 +534,10 @@ def LegControlPoses(fp):
 
 
     addPoseBone(fp, 'DfmLegOut_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegOutTrg_L', 1, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'LegOutTrg_L', 1, 1])])
 
     addPoseBone(fp, 'DfmLegOut_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegOutTrg_R', 1, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'LegOutTrg_R', 1, 1])])
 
     #addPoseBone(fp, 'DfmLegFront_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
     #    [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegFrontTrg_L', 1, 1])])
@@ -532,15 +552,23 @@ def LegControlPoses(fp):
         [('StretchTo', 0, 1, ['Stretch', 'KneeBackTrg_R', 1, 1])])
 
 
+    # Fan bones
+    
+    addPoseBone(fp, 'DfmHipFan_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('CopyRot', C_LOCAL, 0.5, ['Rot', 'UpLeg_L', (1,1,1), (0,0,0), False])])
+
+    addPoseBone(fp, 'DfmHipFan_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('CopyRot', C_LOCAL, 0.5, ['Rot', 'UpLeg_R', (1,1,1), (0,0,0), False])])
+
+    addPoseBone(fp, 'DfmKneeFan_L', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
+        [('CopyRot', C_LOCAL, 0.5, ['Rot', 'LoLeg_L', (1,0,1), (0,0,0), False])])
+
+    addPoseBone(fp, 'DfmKneeFan_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
+        [('CopyRot', C_LOCAL, 0.5, ['Rot', 'LoLeg_R', (1,0,1), (0,0,0), False])])
+
     if not MuscleBones:
         return
         
-    addPoseBone(fp, 'DfmLoLegFan_L', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
-        [('CopyRot', 0, 0.5, ['Rot', 'LoLeg_L', (1,1,1), (0,0,0), False])])
-
-    addPoseBone(fp, 'DfmLoLegFan_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
-        [('CopyRot', 0, 0.5, ['Rot', 'LoLeg_R', (1,1,1), (0,0,0), False])])
-
     # Tweak
     """
     addPoseBone(fp, 'DfmButt_L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, 
@@ -622,7 +650,8 @@ expr45 = "%.3f*(1-%.3f*x1)" % (90.0/45.0, 2/pi)
 expr90_90 = "%.3f*max(1-%.3f*x1,0)*max(1-%.3f*x2,0)" % (90.0/90.0, 2/pi, 2/pi)
 
 
-HipTargetDrivers = [
+HipTargetDrivers = []
+"""
     ("legs-forward-90", "LR", expr90,
         [("UpLegVec", "DirUpLegFwd")]),
     ("legs-back-60", "LR", expr60,
@@ -634,7 +663,7 @@ HipTargetDrivers = [
         [("UpLegVec", "DirUpLegOut"),
          ("UpLeg", "UpLegVecNeg")]),
 ]
-
+"""
 KneeTargetDrivers = [
 #    ("lolegs-back-90", "LR", expr90,
 #        [("LoLeg", "DirKneeBack")]),
