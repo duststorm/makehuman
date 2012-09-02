@@ -321,6 +321,33 @@ class VIEW3D_OT_UnvertexSelectedButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
+#
+#
+
+class VIEW3D_OT_MultiplyWeightsButton(bpy.types.Operator):
+    bl_idname = "mhw.multiply_weights"
+    bl_label = "Multiply weights"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        bpy.ops.object.mode_set(mode='EDIT')    
+        bpy.ops.wm.context_set_value(data_path="tool_settings.mesh_select_mode", value="(True,False,False)")
+        bpy.ops.object.mode_set(mode='OBJECT')
+        ob = context.object
+        factor = context.scene.MhxWeight
+        index = ob.vertex_groups.active_index
+        for v in ob.data.vertices:
+            if v.select:
+                print(v, index)
+                for g in v.groups:
+                    if g.group == index:
+                        g.weight *= factor                   
+        bpy.ops.object.mode_set(mode='EDIT')    
+        bpy.ops.wm.context_set_value(data_path="tool_settings.mesh_select_mode", value="(False,True,False)")
+        print("Weights multiplied")
+        return{'FINISHED'}    
+
+#
 #    deleteDiamonds(context)
 #    Delete joint diamonds in main mesh
 #    class VIEW3D_OT_DeleteDiamondsButton(bpy.types.Operator):
@@ -1695,6 +1722,7 @@ class MhxWeightExtraPanel(bpy.types.Panel):
 
         layout.label('Weight pair')
         layout.prop(context.scene, 'MhxWeight')
+        layout.operator("mhw.multiply_weights")
         layout.prop(context.scene, 'MhxBone1')
         layout.prop(context.scene, 'MhxBone2')
         layout.operator("mhw.pair_weight")
