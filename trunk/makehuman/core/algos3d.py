@@ -179,7 +179,7 @@ theCharacterHasChanged = True
 
 def resetAllWarpTargets():
     global targetBuffer, theCharacterHasChanged
-    print "Resetting warp targets"
+    #print "Resetting warp targets"
     theCharacterHasChanged = True
     for target in targetBuffer.values():
         if target.isWarp:

@@ -146,8 +146,7 @@ def targetFileName(typ, name, gender, age):
         return ('data/targets/expression/units/caucasian/%s_%s/%s.target' %  (gender, age, name) )
     elif typ == "Corrective":
         (part, pose) = name
-        #return ("shared/mhx/targets/correctives/%s/caucasian/%s-%s/%s.target" % (part, gender, age, pose))
-        return ("data/correctives/%s/%s/%s-%s.target" % (part, pose, gender, age))
+        return ("shared/mhx/targets/correctives/%s/caucasian/%s-%s/%s.target" % (part, gender, age, pose))
     else:
         raise NameError("Unknown type %s" % typ)
         
@@ -192,15 +191,14 @@ def readFaceShapes(human, drivers):
         except:
             doLoad = True
         if doLoad:
-            filename = 'shared/mhx/targets/body_language/female-young/%s.target' % fname
-            if 0 and warp.numpy:
+            if warp.numpy:
                 shape = warpmodifier.compileWarpTarget(
-                    filename, 
-                    "SimpleModifier",
+                    'shared/mhx/targets/body_language/${gender}-${age}/%s.target' % fname, 
+                    "GenderAgeEthnicModifier",
                     human, 
                     "face")
             else:
-                shape = readShape(filename)  
+                shape = readShape('shared/mhx/targets/body_language/female-young/%s.target' % fname)  
             shapes[fname] = shape                
             shapeList.append((sname, shape, lr, min, max))
     shapeList.sort()
@@ -241,10 +239,10 @@ def readCorrectives(drivers, human, part):
     shapeList = []
     for (pose, lr, expr, vars) in drivers:
         print "Corrective", part, pose
-        if 0 and warp.numpy:
+        if warp.numpy:
             shape = warpmodifier.compileWarpTarget(
-                "shared/mhx/targets/correctives/%s/caucasian/${gender}_${age}/%s.target" % (part, pose),
-                'GenderAgeModifier',
+                "shared/mhx/targets/correctives/%s/${ethnic}/${gender}-${age}/%s.target" % (part, pose),
+                'GenderAgeEthnicModifier',
                 human, 
                 part)
         else:

@@ -108,17 +108,14 @@ class WarpModifier (humanmodifier.SimpleModifier):
         self.template = template
         paths = self.fallback.expandTemplate([(self.template, [])])
         self.bases = {}
-        self.useRace = False
-        self.useGender = False
-        self.useAge = False
         if len(paths) == 1:
             path = paths[0]
-            char = self.getBaseCharacter(path[0])            
-            self.bases[path[0]] = (char, -1)
+            char,key = getBaseCharacter(path[0])            
+            self.bases[key] = (path[0], char, -1)
         else:
             for path in paths:
-                char = self.getBaseCharacter(path[1])            
-                self.bases[path[0]] = (char, -1)
+                char,key = getBaseCharacter(path[1])            
+                self.bases[key] = (path[0], char, -1)
         self.isWarp = True
         self.bodypart = bodypart
         self.refTargets = {}
@@ -148,6 +145,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
     def compileWarpTarget(self, human):
         print "Warp", self
         landmarks = theLandMarks[self.bodypart]
+        getRefObject(human)
         self.getRefTarget(human)
         warpfield = warp.CWarp()        
         shape = warpfield.warpTarget(self.refTargetVerts, theRefObjectVerts, human.shadowVerts, landmarks)
@@ -155,56 +153,32 @@ class WarpModifier (humanmodifier.SimpleModifier):
     
     
     def getRefTarget(self, human):
-        global theRefObjects, theRefObjectVerts, theBaseObjectVerts
+        global theRefObjects
         
-        if algos3d.theCharacterHasChanged:
-            print "Reference character changed"
-            algos3d.theCharacterHasChanged = False                        
-    
-            theRefObjectVerts = {}
-            for n,v in theBaseObjectVerts.items():
-                theRefObjectVerts[n] = list(v)
-    
-            for (char, verts) in theRefObjects.items():
-                cval = human.getDetail(char)
-                if cval:
-                    print "  ", os.path.basename(char), cval
-                    for n,v in verts.items():
-                        dr = fastmath.vmul3d(v, cval)
-                        theRefObjectVerts[n] = fastmath.vadd3d(theRefObjectVerts[n], dr)
-                            
         targetChanged = False
-        for target in self.bases.keys():
-            char,cval0 = self.bases[target]
+        for key in self.bases.keys():
+            target,char,cval0 = self.bases[key]
     
             verts = theRefObjects[char]
             if not verts:
-                self.bases[target] = char,0
+                self.bases[key] = target,char,0
                 continue
     
             cval1 = human.getDetail(char)            
             if cval0 != cval1:
                 #print "Target changed", os.path.basename(char), cval0, cval1
-                self.bases[target] = char,cval1
+                self.bases[key] = target,char,cval1
                 targetChanged = True
             
         if targetChanged:
             print "Reference target changed"
     
             self.refTargetVerts = {}
-            for target in self.bases.keys():
-                char,cval = self.bases[target]
+            for key in self.bases.keys():
+                target,char,cval = self.bases[key]
                 if cval:
-                    print "   ", target, cval
-
-                    try:
-                        verts = self.refTargets[target]
-                    except KeyError:
-                        verts = None
-                    if verts == None:
-                        verts = readTarget(target)
-                        self.refTargets[target] = verts
-
+                    #print "ch", target, cval
+                    verts = self.getTargetInsist(target)
                     for n,v in verts.items():
                         dr = fastmath.vmul3d(v, cval)
                         try:
@@ -212,6 +186,41 @@ class WarpModifier (humanmodifier.SimpleModifier):
                         except KeyError:
                             self.refTargetVerts[n] = dr
                             
+
+    def getTargetInsist(self, target):
+        verts = self.getTarget(target)
+        if verts:
+            self.refTargets[target] = verts
+            return verts
+        target1 = target.replace("asian", "caucasian").replace("neutral", "caucasian").replace("african", "caucasian")
+        target1 = target1.replace("caucaucasian", "caucasian")
+        verts = self.getTarget(target1)
+        if verts:
+            self.refTargets[target] = verts
+            return verts
+        target2 = target1.replace("child", "young").replace("old", "young")
+        verts = self.getTarget(target2)
+        if verts:
+            self.refTargets[target] = verts
+            return verts
+        target3 = target2.replace("male", "female")
+        target3 = target3.replace("fefemale", "female")
+        verts = self.getTarget(target3)
+        self.refTargets[target] = verts
+        if not verts:
+            print("Warning: Found none of:\n    %s\n    %s\n    %s\n    %s" % (target, target1, target2, target3))
+        return verts
+
+
+    def getTarget(self, target):
+        try:
+            verts = self.refTargets[target]
+        except KeyError:
+            verts = None
+        if verts == None:
+            verts = readTarget(target)
+        return verts            
+          
 
     def getWarpTarget(self, human):
         try:
@@ -229,41 +238,51 @@ class WarpModifier (humanmodifier.SimpleModifier):
         return target    
         
 
-    def getBaseCharacter(self, path):    
-        if "african" in path:
-            race = "african"
-            self.useRace = True
-        elif "asian" in path:
-            race = "asian"
-            self.useRace = True
-        elif "caucasian" in path:
-            race = "neutral"
-            self.useRace = True
-        else:
-            race = "neutral"
+def getRefObject(human):
+    global theRefObjects, theRefObjectVerts, theBaseObjectVerts
+       
+    if algos3d.theCharacterHasChanged:
+        print "Reference character changed"
+        algos3d.theCharacterHasChanged = False                        
     
-        if "female" in path:
-            gender = "female"
-            self.useGender = True
-        elif "male" in path:
-            gender = "male"
-            self.useGender = True
-        else:
-            gender = "female"
+        theRefObjectVerts = {}
+        for n,v in theBaseObjectVerts.items():
+            theRefObjectVerts[n] = list(v)
     
-        if "child" in path:
-            age = "child"
-            self.useAge = True
-        elif "young" in path:
-            age = "young"
-            self.useAge = True
-        elif "old" in path:
-            age = "old"
-            self.useAge = True
-        else:
-            age = "young"
-            
-        return "data/targets/macrodetails/%s-%s-%s.target" % (race, gender, age)
+        for (char, verts) in theRefObjects.items():
+            cval = human.getDetail(char)
+            if cval:
+                print "  ", os.path.basename(char), cval
+                for n,v in verts.items():
+                    dr = fastmath.vmul3d(v, cval)
+                    theRefObjectVerts[n] = fastmath.vadd3d(theRefObjectVerts[n], dr)
+
+
+def getBaseCharacter(path):    
+    if "african" in path:
+        race = "african"
+    elif "asian" in path:
+        race = "asian"
+    else:
+        race = "neutral"
+    
+    if "female" in path:
+        gender = "female"
+    elif "male" in path:
+        gender = "male"
+    else:
+        gender = "female"
+    
+    if "child" in path:
+        age = "child"
+    elif "old" in path:
+        age = "old"
+    else:
+        age = "young"
+
+    path = "data/targets/macrodetails/%s-%s-%s.target" % (race, gender, age)
+    key = "%s-%s-%s" % (race, gender, age)
+    return path,key
 
 #----------------------------------------------------------
 #   Call from exporter
@@ -274,7 +293,7 @@ def compileWarpTarget(template, fallback, human, bodypart):
     return mod.compileWarpTarget(human)
                 
 #----------------------------------------------------------
-#   Reference object
+#   Read target
 #----------------------------------------------------------                
 
 def readTarget(path):
@@ -294,10 +313,10 @@ def readTarget(path):
         fp.close()
         return target
     else:
-        print("Could not find %s" % os.path.realpath(path))
+        #print("Could not find %s" % os.path.realpath(path))
         return {}
 
-        
+ 
 #----------------------------------------------------------
 #   Init globals
 #----------------------------------------------------------
