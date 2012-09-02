@@ -187,8 +187,8 @@ ShoulderArmature1Simple = [
 
 ShoulderArmature2 = [
     # Clavicle
-    ('DfmClavicle_L',      0, 'DfmSpine3', F_DEF, L_DMAIN, NoBB),
-    ('DfmClavicle_R',      0, 'DfmSpine3', F_DEF, L_DMAIN, NoBB),
+    ('DfmClavicle_L',      0, 'Clavicle_L', F_DEF, L_DMAIN, NoBB),
+    ('DfmClavicle_R',      0, 'Clavicle_R', F_DEF, L_DMAIN, NoBB),
     
     # Shoulder    
     ('Shoulder_L',         0, 'Clavicle_L', F_WIR, L_TWEAK, NoBB),
@@ -293,8 +293,8 @@ def ShoulderControlPoses(fp):
          ('CopyTrans', 0, 0, ['Elbow', 'ELClavicle_R', 0])
         ])
 
-    copyDeform(fp, 'DfmClavicle_L', 'Clavicle_L', 0, U_LOC+U_ROT, None, [])
-    copyDeform(fp, 'DfmClavicle_R', 'Clavicle_R', 0, U_LOC+U_ROT, None, [])
+    #copyDeform(fp, 'DfmClavicle_L', 'Clavicle_L', 0, U_LOC+U_ROT, None, [])
+    #copyDeform(fp, 'DfmClavicle_R', 'Clavicle_R', 0, U_LOC+U_ROT, None, [])
     
 
     # Shoulder

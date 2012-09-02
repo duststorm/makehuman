@@ -153,6 +153,7 @@ LegHeadsTails = [
     #('LegTrg_L',        'r-upper-leg', 'r-legtrg'),
     ('UpLeg2PT_L',      ('r-upleg1', (0,0,-1)), ('r-upleg1', (0,0,-2))),
     ('UpLeg3PT_L',      ('r-upleg2', (0,0,-1)), ('r-upleg2', (0,0,-2))),
+    ('KneePT0_L',        'r-knee-pt', ('r-knee-pt', offs)),
     ('KneePT_L',        'r-knee-pt', ('r-knee-pt', offs)),
     ('KneePTFK_L',      'r-knee-pt', ('r-knee-pt', offs)),
     ('KneeLinkPT_L',    'r-knee', 'r-knee-pt'),
@@ -162,6 +163,7 @@ LegHeadsTails = [
     #('LegTrg_R',        'l-upper-leg', 'l-legtrg'),
     ('UpLeg2PT_R',      ('l-upleg1', (0,0,-1)), ('l-upleg1', (0,0,-2))),
     ('UpLeg3PT_R',      ('l-upleg2', (0,0,-1)), ('l-upleg2', (0,0,-2))),
+    ('KneePT0_R',        'l-knee-pt', ('l-knee-pt', offs)),
     ('KneePT_R',        'l-knee-pt', ('l-knee-pt', offs)),
     ('KneePTFK_R',      'l-knee-pt', ('l-knee-pt', offs)),
     ('KneeLinkPT_R',    'l-knee', 'l-knee-pt'),
@@ -260,14 +262,16 @@ LegArmature = [
 
     # Pole targets
     #('LegTrg_L',        0.0, 'Hip_L', 0, L_HELP, NoBB),
-    ('KneePT_L',        0.0, (None, 'FootRev_L'), F_WIR, L_LLEGIK+L_LEXTRA, NoBB),
+    ('KneePT0_L',       0.0, 'FootRev_L', 0, L_HELP, NoBB),
+    ('KneePT_L',        0.0, 'Hip_L', F_WIR, L_LLEGIK+L_LEXTRA, NoBB),
     ('KneePTFK_L',      0.0, 'UpLeg_L', 0, L_HELP, NoBB),
     ('KneeLinkPT_L',    0.0, 'UpLeg_L', F_RES, L_LLEGIK+L_LEXTRA, NoBB),
     ('FootPT_L',        0.0, 'FootRev_L', 0, L_HELP, NoBB),
     ('ToePT_L',         0.0, 'ToeRev_L', 0, L_HELP, NoBB),
 
     #('LegTrg_R',        0.0, 'Hip_R', 0, L_HELP, NoBB),
-    ('KneePT_R',        0.0, (None, 'FootRev_R'), F_WIR, L_RLEGIK+L_REXTRA, NoBB),
+    ('KneePT0_R',       0.0, 'FootRev_R', 0, L_HELP, NoBB),
+    ('KneePT_R',        0.0, 'Hip_R', F_WIR, L_RLEGIK+L_REXTRA, NoBB),
     ('KneePTFK_R',      0.0, 'UpLeg_R', 0, L_HELP, NoBB),
     ('KneeLinkPT_R',    0.0, 'UpLeg_R', F_RES, L_RLEGIK+L_REXTRA, NoBB),
     ('FootPT_R',        0.0, 'FootRev_R', 0, L_HELP, NoBB),
@@ -421,11 +425,13 @@ def LegControlPoses(fp):
         ])
 
     addPoseBone(fp, 'LegIK_L', 'MHFootCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-        [('ChildOf', C_CHILDOF, 0, ['Hip', 'Hip_L', (1,1,1), (1,1,1), (1,1,1)]),
+        [
+        #('ChildOf', C_CHILDOF, 0, ['Hip', 'Hip_L', (1,1,1), (1,1,1), (1,1,1)]),
         ('LimitDist', 0, 1, ['DistHip', 'Hip_L', 'LIMITDIST_INSIDE'])])
 
     addPoseBone(fp, 'LegIK_R', 'MHFootCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-        [('ChildOf', C_CHILDOF, 0, ['Hip', 'Hip_R', (1,1,1), (1,1,1), (1,1,1)]),
+        [
+        #('ChildOf', C_CHILDOF, 0, ['Hip', 'Hip_R', (1,1,1), (1,1,1), (1,1,1)]),
         ('LimitDist', 0, 1, ['DistHip', 'Hip_R', 'LIMITDIST_INSIDE'])])
 
     addPoseBone(fp, 'FootRev_L', 'MHRevFoot', 'IK_L', (1,1,1), (0,1,1), (1,1,1), (1,1,1), 0, 
@@ -456,8 +462,7 @@ def LegControlPoses(fp):
     # Pole target
 
     addPoseBone(fp, 'KneePT_L', 'MHCube025', 'IK_L', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('ChildOf', C_CHILDOF, 1, ['Foot', 'LegIK_L', (1,1,1), (1,1,1), (1,1,1)]),
-         ('ChildOf', C_CHILDOF, 0, ['Hip', 'Hip_L', (1,1,1), (1,1,1), (1,1,1)]) ])
+        [('CopyLoc', 0, 1, ['Foot', 'KneePT0_L', (1,1,1), (0,0,0), 0, False]) ])
 
     addPoseBone(fp, 'KneeLinkPT_L', None, 'IK_L', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'KneePT_L', 0, 1, 3.0])])
@@ -467,8 +472,7 @@ def LegControlPoses(fp):
 
 
     addPoseBone(fp, 'KneePT_R', 'MHCube025', 'IK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-        [('ChildOf', C_CHILDOF, 1, ['Foot', 'LegIK_R', (1,1,1), (1,1,1), (1,1,1)]),
-         ('ChildOf', C_CHILDOF, 0, ['Hip', 'Hip_R', (1,1,1), (1,1,1), (1,1,1)]) ])
+        [('CopyLoc', 0, 1, ['Foot', 'KneePT0_R', (1,1,1), (0,0,0), 0, False]) ])
 
     addPoseBone(fp, 'KneeLinkPT_R', None, 'IK_R', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'KneePT_R', 0, 1, 3.0])])
@@ -581,7 +585,7 @@ LegPropLRDrivers = [
 
 SoftLegPropLRDrivers = [
     ('KneePT', 'Foot', ['KneeFollowsFoot'], 'x1'),
-    ('KneePT', 'Hip', ['KneeFollowsHip', 'KneeFollowsFoot'], 'x1*(1-x2)'),  
+    #('KneePT', 'Hip', ['KneeFollowsHip', 'KneeFollowsFoot'], 'x1*(1-x2)'),  
     ('AnkleIK', 'Foot', ['LegIkToAnkle'], '1-x1'),
     ('AnkleIK', 'Ankle', ['LegIkToAnkle'], 'x1'),
 ]

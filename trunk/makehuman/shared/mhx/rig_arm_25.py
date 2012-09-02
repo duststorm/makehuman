@@ -142,6 +142,8 @@ ArmHeadsTails = [
     ('LoArm2PT_R',         ('l-loarm1', the.yunit), ('l-loarm1', ybis)),
     ('LoArm3PT_R',         ('l-loarm2', the.yunit), ('l-loarm2', ybis)),
 
+    ('ElbowPT0_L',         'r-elbow-pt', ('r-elbow-pt', offs)),
+    ('ElbowPT0_R',         'l-elbow-pt', ('l-elbow-pt', offs)),
     ('ElbowPT_L',         'r-elbow-pt', ('r-elbow-pt', offs)),
     ('ElbowPT_R',         'l-elbow-pt', ('l-elbow-pt', offs)),
     ('ElbowPTFK_L',       'r-elbow-pt', ('r-elbow-pt', offs)),
@@ -220,8 +222,10 @@ ArmArmature = [
     ('LoArmVec_R',        0, 'UpArm_R', 0, L_HELP, NoBB),
     
     # Pole target
-    ('ElbowPT_L',         0, (None, 'UpArmSocket_L'), F_WIR, L_LARMIK, NoBB),
-    ('ElbowPT_R',         0, (None, 'UpArmSocket_R'), F_WIR, L_RARMIK, NoBB),
+    ('ElbowPT0_L',        0, 'UpArmSocket_L', 0, L_HELP, NoBB),
+    ('ElbowPT0_R',        0, 'UpArmSocket_R', 0, L_HELP, NoBB),
+    ('ElbowPT_L',         0, 'Wrist_L', F_WIR, L_LARMIK, NoBB),
+    ('ElbowPT_R',         0, 'Wrist_R', F_WIR, L_RARMIK, NoBB),
     ('ElbowPTFK_L',       0, 'UpArm_L', 0, L_HELP, NoBB),
     ('ElbowPTFK_R',       0, 'UpArm_R', 0, L_HELP, NoBB),
     ('ElbowLinkPT_L',     0, 'UpArm_L', F_RES, L_LARMIK, NoBB),
@@ -362,7 +366,7 @@ def ArmControlPoses(fp):
         ])
 
     addPoseBone(fp, 'Wrist_L', 'MHHandCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
-        [('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Clavicle_L', (1,1,1), (1,1,1), (1,1,1)]),
+        [#('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Clavicle_L', (1,1,1), (1,1,1), (1,1,1)]),
          ('LimitDist', 0, 0, ['DistShoulder', 'Shoulder_L', 'LIMITDIST_INSIDE']),
          ('LimitDist', 0, 0, ['DistElbow', 'Elbow_L', 'LIMITDIST_ONSURFACE']),
         ])
@@ -381,7 +385,7 @@ def ArmControlPoses(fp):
         ])
 
     addPoseBone(fp, 'Wrist_R', 'MHHandCtrl_R', 'IK_R', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
-        [('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Clavicle_R', (1,1,1), (1,1,1), (1,1,1)]),
+        [#('ChildOf', C_CHILDOF, 0, ['Shoulder', 'Clavicle_R', (1,1,1), (1,1,1), (1,1,1)]),
         ('LimitDist', 0, 0, ['DistShoulder', 'Shoulder_R', 'LIMITDIST_INSIDE']),
         ('LimitDist', 0, 0, ['DistElbow', 'Elbow_R', 'LIMITDIST_ONSURFACE']),
         ])
@@ -389,17 +393,13 @@ def ArmControlPoses(fp):
     # Pole target
     
     addPoseBone(fp, 'ElbowPT_L', 'MHCube025', 'IK_L', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-        [('ChildOf', C_CHILDOF, 1, ['Shoulder', 'Clavicle_L', (1,1,1), (1,1,1), (1,1,1)]),
-         ('ChildOf', C_CHILDOF, 0, ['Hand', 'Wrist_L', (1,1,1), (1,1,1), (1,1,1)]),
-         ])
+        [('CopyLoc', 0, 1, ['Shoulder', 'ElbowPT0_L', (1,1,1), (0,0,0), 0, False]) ])
 
     addPoseBone(fp, 'ElbowLinkPT_L', None, 'IK_L', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'ElbowPT_L', 0, 1, 3.0])])
 
     addPoseBone(fp, 'ElbowPT_R', 'MHCube025', 'IK_R', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('ChildOf', C_CHILDOF, 1, ['Shoulder', 'Clavicle_R', (1,1,1), (1,1,1), (1,1,1)]),
-         ('ChildOf', C_CHILDOF, 0, ['Hand', 'Wrist_R', (1,1,1), (1,1,1), (1,1,1)]),
-         ])
+        [('CopyLoc', 0, 1, ['Shoulder', 'ElbowPT0_R', (1,1,1), (0,0,0), 0, False]) ])
 
     addPoseBone(fp, 'ElbowLinkPT_R', None, 'IK_R', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'ElbowPT_R', 0, 1, 3.0])])
@@ -539,8 +539,8 @@ ArmPropLRDrivers = [
 
 SoftArmPropLRDrivers = [
     ('UpArmSocket', 'Shoulder', ['ArmHinge'], '1-x1'),
-    ('ElbowPT', 'Hand', ['ElbowFollowsWrist'], 'x1'),
-    ('ElbowPT', 'Shoulder', ['ElbowFollowsShoulder', 'ElbowFollowsWrist'], 'x1*(1-x2)'),
+    #('ElbowPT', 'Hand', ['ElbowFollowsWrist'], 'x1'),
+    ('ElbowPT', 'Shoulder', ['ElbowFollowsWrist'], '(1-x1)'),
 ]
 
 ArmPropDrivers = [

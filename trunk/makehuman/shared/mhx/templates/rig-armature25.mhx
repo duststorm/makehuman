@@ -50,14 +50,14 @@ end Armature
   Property &KneeFollowsFoot_L True Left_knee_follows_foot ;
   PropKeys &KneeFollowsFoot_L "type":'BOOLEAN',"min":0,"max":1, ;
 
-  Property &KneeFollowsHip_L False Left_knee_follows_hip ;
-  PropKeys &KneeFollowsHip_L "type":'BOOLEAN',"min":0,"max":1, ;
+  # Property &KneeFollowsHip_L False Left_knee_follows_hip ;
+  # PropKeys &KneeFollowsHip_L "type":'BOOLEAN',"min":0,"max":1, ;
 
   Property &ElbowFollowsWrist_L False Left_elbow_follows_wrist ;
   PropKeys &ElbowFollowsWrist_L "type":'BOOLEAN',"min":0,"max":1, ;
 
-  Property &ElbowFollowsShoulder_L True Left_elbow_follows_shoulder ;
-  PropKeys &ElbowFollowsShoulder_L "type":'BOOLEAN',"min":0,"max":1, ;
+  # Property &ElbowFollowsShoulder_L True Left_elbow_follows_shoulder ;
+  # PropKeys &ElbowFollowsShoulder_L "type":'BOOLEAN',"min":0,"max":1, ;
 
   Property &FingerControl_L True Left_fingers_controlled ;
   PropKeys &FingerControl_L "type":'BOOLEAN',"min":0,"max":1, ;
@@ -83,14 +83,14 @@ end Armature
   Property &KneeFollowsFoot_R True Right_knee_follows_foot ;
   PropKeys &KneeFollowsFoot_R "type":'BOOLEAN',"min":0,"max":1, ;
 
-  Property &KneeFollowsHip_R False Right_knee_follows_hip ;
-  PropKeys &KneeFollowsHip_R "type":'BOOLEAN',"min":0,"max":1, ;
+  # Property &KneeFollowsHip_R False Right_knee_follows_hip ;
+  # PropKeys &KneeFollowsHip_R "type":'BOOLEAN',"min":0,"max":1, ;
 
   Property &ElbowFollowsWrist_R False Right_elbow_follows_wrist ;
   PropKeys &ElbowFollowsWrist_R "type":'BOOLEAN',"min":0,"max":1, ;
 
-  Property &ElbowFollowsShoulder_R True Right_elbow_follows_shoulder ;
-  PropKeys &ElbowFollowsShoulder_R "type":'BOOLEAN',"min":0,"max":1, ;
+  # Property &ElbowFollowsShoulder_R True Right_elbow_follows_shoulder ;
+  # PropKeys &ElbowFollowsShoulder_R "type":'BOOLEAN',"min":0,"max":1, ;
 
   Property &GazeFollowsHead 1.0 Gaze_follows_world_or_head ;
   PropKeys &GazeFollowsHead "type":'BOOLEAN',"min":0.0,"max":1.0, ;

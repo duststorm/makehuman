@@ -1763,6 +1763,11 @@ def setupRig(obj, proxyData):
             the.Armature += rig_body_25.BodyArmature2Simple
         the.Armature += rig_body_25.BodyArmature3
         if the.Config.advancedspine:
+            the.Armature += rig_body_25.BodyArmature4Advanced
+        else:
+            the.Armature += rig_body_25.BodyArmature4Simple
+        the.Armature += rig_body_25.BodyArmature5
+        if the.Config.advancedspine:
             the.Armature += rig_shoulder_25.ShoulderArmature1Advanced
         else:
             the.Armature += rig_shoulder_25.ShoulderArmature1Simple

@@ -158,23 +158,33 @@ BodyArmature1 = [
     ('Spine2',             0, 'Spine1', F_WIR, L_UPSPNFK, NoBB),
     ('Spine3',             0, 'Spine2', F_WIR, L_UPSPNFK, NoBB),
     ('Neck',               0, 'Spine3', F_WIR, L_UPSPN+L_HEAD, NoBB),
+]    
 
-    # Deform spine    
+BodyArmature2Simple = [
+    ('DfmPelvis',          0, 'Pelvis', 0, L_HELP, NoBB),
+    ('DfmHips',            0, 'Hips', F_DEF, L_DMAIN, NoBB),
+]
+
+BodyArmature2Advanced = [
     ('DfmPelvis',          0, None, 0, L_HELP, NoBB),
     ('DfmHips',            0, 'DfmPelvis', F_DEF, L_DMAIN, NoBB),
+]
+
+BodyArmature3 = [
+    # Deform spine    
     ('DfmSpine1',          0, 'DfmPelvis', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
     ('DfmSpine2',          0, 'DfmSpine1', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
     ('DfmSpine3',          0, 'DfmSpine2', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
     ('DfmNeck',            0, 'DfmSpine3', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
-]    
+]
 
-BodyArmature2Simple = [
+BodyArmature4Simple = [
     ('Hip_L',             0, 'Hips', F_WIR, L_TWEAK, NoBB),
     ('Hip_R',             0, 'Hips', F_WIR, L_TWEAK, NoBB),
     ('Head',               0, 'Neck', F_WIR, L_UPSPN+L_DNSPN+L_HEAD, NoBB),
 ]
 
-BodyArmature2Advanced = [
+BodyArmature4Advanced = [
     ('Hip_L',             0, 'DfmHips', F_WIR, L_TWEAK, NoBB),
     ('Hip_R',             0, 'DfmHips', F_WIR, L_TWEAK, NoBB),
     ('Head',               0, 'DfmNeck', F_WIR, L_UPSPN+L_DNSPN+L_HEAD, NoBB),
@@ -197,7 +207,7 @@ BodyArmature2Advanced = [
     #('DownSpineLinkPT',    0, 'DownSpine2', F_RES, L_DNSPNIK, NoBB),
 ]
  
-BodyArmature3 = [
+BodyArmature5 = [
     ('DfmHead',            0, 'DfmNeck', F_DEF+F_CON, L_DMAIN, NoBB),
 
     # Stomach    
@@ -253,7 +263,7 @@ def BodyControlPoses(fp):
 
     addPoseBone(fp,  'Shoulders', 'MHCrown', 'Master', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (0,0, -45*D,45*D, 0,0), (1,1,1)]),
-         ('LimitDist', 0, 1, ['LimitDist', 'Root', 'LIMITDIST_INSIDE'])
+         #('LimitDist', 0, 1, ['LimitDist', 'Root', 'LIMITDIST_INSIDE'])
         ])
 
     # Up spine
@@ -489,7 +499,7 @@ BodyPropDriversAdvanced = [
 
     ('Root', 'LimitRot', ['SpineInvert'], 'x1'),
     ('Shoulders', 'LimitRot', ['SpineInvert'], '1-x1'),
-    ('Shoulders', 'LimitDist', ['SpineStretch', 'SpineInvert'], '(1-x1)*(1-x2)'),
+    #('Shoulders', 'LimitDist', ['SpineStretch', 'SpineInvert'], '(1-x1)*(1-x2)'),
     
     ('Spine3', 'IK', ['SpineIk', 'SpineInvert'], 'x1*(1-x2)'),
 
