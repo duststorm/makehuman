@@ -76,64 +76,64 @@ def MitsubaExport(obj, app, settings):
     # Mitsuba binaries path
     Mitsuba_bin = app.settings.get('mitsuba_bin', '')
     #
-    if os.path.exists(Mitsuba_bin) and action == 'render':
+    if os.path.exists(Mitsuba_bin):
+        if action == 'render':
+            # exporting human mesh.
+            fileobj = 'human.obj'
+            filename = out_path + fileobj
         
-        # exporting human mesh.
-        fileobj = 'human.obj'
-        filename = out_path + fileobj
+            #
+            exportObj(obj, filename)
+
+            # create name for Mitsuba xml scene file
+            # this name is different to the name use for command line?
+            filexml = str(filename).replace('.obj','.xml')
+            #print filexml
+
+            # open xml file scene
+            mitsubaXmlFile(filexml)
+
+            # create a integrator
+            mitsubaIntegrator(filexml, lighting)
         
-        #
-        exportObj(obj, filename)
-
-        # create name for Mitsuba xml scene file
-        # this name is different to the name use for command line?
-        filexml = str(filename).replace('.obj','.xml')
-        #print filexml
-
-        # open xml file scene
-        mitsubaXmlFile(filexml)
-
-        # create a integrator
-        mitsubaIntegrator(filexml, lighting)
+            # create sampler
+            samplerData = mitsubaSampler(sampler)
         
-        # create sampler
-        samplerData = mitsubaSampler(sampler)
-        
-        # create camera
-        mitsubaCamera(camera, resolution, filexml, samplerData, obj)
+            # create camera
+            mitsubaCamera(camera, resolution, filexml, samplerData, obj)
 
-        # add lights
-        mitsubaLights(filexml)
+            # add lights
+            mitsubaLights(filexml)
 
-        # add texture data
-        mitsubaTexture(filexml)
+            # add texture data
+            mitsubaTexture(filexml)
 
-        # add materials
-        mitsubaMaterials(filexml)
+            # add materials
+            mitsubaMaterials(filexml)
 
-        # add geometry
-        subSurfaceData = '' # mitsubaSSS()
-        mitsubaGeometry(filexml, fileobj, subSurfaceData)
+            # add geometry
+            subSurfaceData = '' # mitsubaSSS()
+            mitsubaGeometry(filexml, fileobj, subSurfaceData)
 
-        # closed scene file
-        mitsubaFileClose(filexml)
+            # closed scene file
+            mitsubaFileClose(filexml)
 
-        #
-        xmlDataFile = str(fileobj).replace('.obj', '.xml')
-        #
-        if source == 'gui':
-            render_mode  = str(Mitsuba_bin)+'/mtsgui.exe'
-            pathHandle = subprocess.Popen(cwd=outputDirectory, args = render_mode +' '+ xmlDataFile)
-        #
-        elif source == 'console':
-            render_mode  = str(Mitsuba_bin)+'/mitsuba.exe'
-            pathHandle = subprocess.Popen(cwd=outputDirectory, args = render_mode +' '+ xmlDataFile)
-        #
-        else:
-            app.prompt('INFO ',
-                       'Created .xml file in output folder.\n'\
-                       'Ready to render',
-                       'Close')
+            #
+            xmlDataFile = str(fileobj).replace('.obj', '.xml')
+            #
+            if source == 'gui':
+                render_mode  = str(Mitsuba_bin)+'/mtsgui.exe'
+                pathHandle = subprocess.Popen(cwd=outputDirectory, args = render_mode +' '+ xmlDataFile)
+            #
+            elif source == 'console':
+                render_mode  = str(Mitsuba_bin)+'/mitsuba.exe'
+                pathHandle = subprocess.Popen(cwd=outputDirectory, args = render_mode +' '+ xmlDataFile)
+            #
+            else:
+                app.prompt('INFO ',
+                           'Created .xml file in output folder.\n'\
+                           'Ready to render',
+                           'Close')
     
     # if not valid path
     else:
@@ -156,6 +156,12 @@ def exportObj(obj, filename):
     filename:
       *string*.  The filename of the file to export the object to.
     """
+    '''
+    mh2obj.exportObj(mesh,
+                    os.path.join(exportPath, filename + ".obj"),
+                    self.exportGroups.selected,
+                    filter)
+    '''
 
     # Write obj file
     # not is need mtl file. The material is created into Mitsuba .xml file
@@ -178,38 +184,22 @@ def exportObj(obj, filename):
     #
     groupFilter = None
     exportGroups = False
-    #faces = [f for f in obj.faces if  not 'joint-' in f.group.name ]
+    # basic filter..
+    faces = [fa for fa in obj.faces if not 'joint-' in fa.group.name and not 'helper' in fa.group.name]
+    
+    # filter eyebrown and lash for use an special material with 'alpha' value
+    # SSS not work fine, cause: the geometry is not closed solid?
+    faces = [fa for fa in faces if not '-eyebrown' in fa.group.name and not '-lash' in fa.group.name]
     #
-    for fg in obj.faceGroups:
-        if not groupFilter or groupFilter(fg):
-            if exportGroups:
-                f.write('g %s\n' % fg.name)
-            # filter eyebrown, lash and joint objects
-            # TO DO; separate faces for material..?
-            '''
-            if 'head' in fg.name or 'nose' in fg.name or 'chin' in fg.name or 'mouth' in fg.name:
-                for face in fg.faces:
-                    f.write('f')
-                    for i, v in enumerate(face.verts):
-                        if (obj.uvValues == None):
-                            f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
-                        else:
-                            f.write(' %i/%i/%i ' % (v.idx + 1, face.uv[i] + 1, v.idx + 1))
-                    f.write('\n')
-            '''
-            if not '-lash' in fg.name:
-                if not 'joint-' in fg.name:
-                    if not '-eyebrown' in fg.name:
-                        for face in fg.faces:
-                            f.write('f')
-                            for i, v in enumerate(face.verts):
-                                if (obj.uvValues == None):
-                                    f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
-                                else:
-                                    f.write(' %i/%i/%i ' % (v.idx + 1, face.uv[i] + 1, v.idx + 1))
-                            #
-                            f.write('\n')
-            #'''   
+    for face in faces:
+        f.write('f')
+        for i, v in enumerate(face.verts):
+            if (obj.uvValues == None):
+                f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
+            else:
+                f.write(' %i/%i/%i ' % (v.idx + 1, face.uv[i] + 1, v.idx + 1))
+        #
+        f.write('\n')  
     #
     f.close()
 
@@ -364,7 +354,7 @@ def mitsubaMaterials(filexml):
     f.write('\n' +
             '\t<bsdf type="plastic" id="humanMat">\n' + #% mat_type +  
             '\t    <rgb name="specularReflectance" value="0.35, 0.25, 0.25"/>\n' +
-            #'    <rgb name="diffuseReflectance" value="0.5, 0.5, 0.5"/>\n' + 
+            '\t    <ref name="diffuseReflectance" id="imageh"/>\n' + # aplic texture image to diffuse chanel
             '\t    <float name="specularSamplingWeight" value="0.50"/>\n' +
             '\t    <float name="diffuseSamplingWeight" value="1.0"/>\n' +
             '\t    <boolean name="nonlinear" value="false"/>\n' +
@@ -372,7 +362,6 @@ def mitsubaMaterials(filexml):
             '\t    <float name="extIOR" value="1.000277"/>\n' +
             '\t    <float name="fdrInt" value="0.5"/>\n' +
             '\t    <float name="fdrExt" value="0.5"/>\n' +
-            '\t    <ref name="diffuseReflectance" id="imageh"/>\n' + # aplic texture image to diffuse chanel
             '\t</bsdf>\n'
             )
     # simple material
