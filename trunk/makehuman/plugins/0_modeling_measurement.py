@@ -9,6 +9,49 @@ import os
 import humanmodifier
 import aljabr
 import mh
+import math
+
+class MeasurementValueConverter(gui3d.ValueConverter):
+
+    def __init__(self, task, measure, modifier):
+
+        self.task = task
+        self.measure = measure
+        self.modifier = modifier
+        self.value = 0.0
+
+    def dataToDisplay(self, value):
+        self.value = value
+        return self.task.getMeasure(self.measure)
+
+    def displayToData(self, value):
+        goal = float(value)
+        measure = self.task.getMeasure(self.measure)
+        minValue = -1.0
+        maxValue = 1.0
+        if math.fabs(measure - goal) < 0.01:
+            return self.value
+        else:
+            tries = 10
+            while tries:
+                if math.fabs(measure - goal) < 0.01:
+                    break;
+                if goal < measure:
+                    maxValue = self.value
+                    if value == minValue:
+                        break
+                    self.value = minValue + (self.value - minValue) / 2.0
+                    self.modifier.updateValue(gui3d.app.selectedHuman, self.value, 0)
+                    measure = self.task.getMeasure(self.measure)
+                else:
+                    minValue = self.value
+                    if value == maxValue:
+                        break
+                    self.value = self.value + (maxValue - self.value) / 2.0
+                    self.modifier.updateValue(gui3d.app.selectedHuman, self.value, 0)
+                    measure = self.task.getMeasure(self.measure)
+                tries -= 1
+        return self.value
 
 class GroupBoxRadioButton(gui3d.RadioButton):
     def __init__(self, group, label, groupBox, selected=False):
@@ -22,11 +65,10 @@ class GroupBoxRadioButton(gui3d.RadioButton):
         self.groupBox.children[0].setFocus()
 
 class MeasureSlider(humanmodifier.ModifierSlider):
-    def __init__(self, template, task, measure, modifier):
+    def __init__(self, label, task, measure, modifier):
 
         humanmodifier.ModifierSlider.__init__(self, value=0.0, min=-1.0, max=1.0,
-            label=template + task.getMeasure(measure), modifier=modifier)
-        self.template = template
+            label=label, modifier=modifier, valueConverter=MeasurementValueConverter(task, measure, modifier))
         self.measure = measure
 
     def onChanging(self, value):
@@ -46,7 +88,8 @@ class MeasureSlider(humanmodifier.ModifierSlider):
         self.parent.parent.onSliderBlur()
 
     def updateLabel(self):
-        self.label.setText(self.template + self.parent.parent.getMeasure(self.measure))
+        #self.label.setText(self.template + self.parent.parent.getMeasure(self.measure))
+        pass
 
     def update(self):
         humanmodifier.ModifierSlider.update(self)
@@ -92,25 +135,25 @@ class MeasureTaskView(gui3d.TaskView):
         ]
 
         sliderLabel = {
-            'neckcirc':'Neck circum: ',
-            'neckheight':'Neck height: ',
-            'upperarm':'Upper arm circum: ',
-            'upperarmlenght':'Upperarm lenght: ',
-            'lowerarmlenght':'Lowerarm lenght: ',
-            'wrist':'Wrist circum: ',
-            'frontchest':'Front chest dist: ',
-            'bust':'Bust circum: ',
-            'underbust':'Underbust circum: ',
-            'waist':'Waist circum: ',
-            'napetowaist':'Nape to waist: ',
-            'waisttohip':'Waist to hip: ',
-            'shoulder':'Shoulder dist: ',
-            'hips':'Hips circum: ',
-            'upperlegheight':'Upperleg height: ',
-            'thighcirc':'Thigh circ.: ',
-            'lowerlegheight':'Lowerleg height: ',
-            'calf':'Calf circum: ',
-            'ankle':'Ankle circum: '
+            'neckcirc':'Neck circum: %.2f cm',
+            'neckheight':'Neck height: %.2f cm',
+            'upperarm':'Upper arm circum: %.2f cm',
+            'upperarmlenght':'Upperarm lenght: %.2f cm',
+            'lowerarmlenght':'Lowerarm lenght: %.2f cm',
+            'wrist':'Wrist circum: %.2f cm',
+            'frontchest':'Front chest dist: %.2f cm',
+            'bust':'Bust circum: %.2f cm',
+            'underbust':'Underbust circum: %.2f cm',
+            'waist':'Waist circum: %.2f cm',
+            'napetowaist':'Nape to waist: %.2f cm',
+            'waisttohip':'Waist to hip: %.2f cm',
+            'shoulder':'Shoulder dist: %.2f cm',
+            'hips':'Hips circum: %.2f cm',
+            'upperlegheight':'Upperleg height: %.2f cm',
+            'thighcirc':'Thigh circ.: %.2f cm',
+            'lowerlegheight':'Lowerleg height: %.2f cm',
+            'calf':'Calf circum: %.2f cm',
+            'ankle':'Ankle circum: %.2f cm'
         }
 
         self.groupBoxes = {}
@@ -159,10 +202,11 @@ class MeasureTaskView(gui3d.TaskView):
 
         human = gui3d.app.selectedHuman
         measure = self.ruler.getMeasure(human, measure, gui3d.app.settings['units'])
-        if gui3d.app.settings['units'] == 'metric':
-            return '%.1f cm' % measure
-        else:
-            return '%.1f in' % measure
+        #if gui3d.app.settings['units'] == 'metric':
+        #    return '%.1f cm' % measure
+        #else:
+        #    return '%.1f in' % measure
+        return measure
 
     def hideAllBoxes(self):
 
