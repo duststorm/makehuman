@@ -134,26 +134,28 @@ class MeasureTaskView(gui3d.TaskView):
             ('ankle', ['ankle']),
         ]
 
+        metric = gui3d.app.settings['units'] == 'metric'
+
         sliderLabel = {
-            'neckcirc':'Neck circum: %.2f cm',
-            'neckheight':'Neck height: %.2f cm',
-            'upperarm':'Upper arm circum: %.2f cm',
-            'upperarmlenght':'Upperarm lenght: %.2f cm',
-            'lowerarmlenght':'Lowerarm lenght: %.2f cm',
-            'wrist':'Wrist circum: %.2f cm',
-            'frontchest':'Front chest dist: %.2f cm',
-            'bust':'Bust circum: %.2f cm',
-            'underbust':'Underbust circum: %.2f cm',
-            'waist':'Waist circum: %.2f cm',
-            'napetowaist':'Nape to waist: %.2f cm',
-            'waisttohip':'Waist to hip: %.2f cm',
-            'shoulder':'Shoulder dist: %.2f cm',
-            'hips':'Hips circum: %.2f cm',
-            'upperlegheight':'Upperleg height: %.2f cm',
-            'thighcirc':'Thigh circ.: %.2f cm',
-            'lowerlegheight':'Lowerleg height: %.2f cm',
-            'calf':'Calf circum: %.2f cm',
-            'ankle':'Ankle circum: %.2f cm'
+            'neckcirc':'Neck circum: %.2f ' + 'cm' if metric else 'in',
+            'neckheight':'Neck height: %.2f ' + 'cm' if metric else 'in',
+            'upperarm':'Upper arm circum: %.2f ' + 'cm' if metric else 'in',
+            'upperarmlenght':'Upperarm lenght: %.2f ' + 'cm' if metric else 'in',
+            'lowerarmlenght':'Lowerarm lenght: %.2f ' + 'cm' if metric else 'in',
+            'wrist':'Wrist circum: %.2f ' + 'cm' if metric else 'in',
+            'frontchest':'Front chest dist: %.2f ' + 'cm' if metric else 'in',
+            'bust':'Bust circum: %.2f ' + 'cm' if metric else 'in',
+            'underbust':'Underbust circum: %.2f ' + 'cm' if metric else 'in',
+            'waist':'Waist circum: %.2f ' + 'cm' if metric else 'in',
+            'napetowaist':'Nape to waist: %.2f ' + 'cm' if metric else 'in',
+            'waisttohip':'Waist to hip: %.2f ' + 'cm' if metric else 'in',
+            'shoulder':'Shoulder dist: %.2f ' + 'cm' if metric else 'in',
+            'hips':'Hips circum: %.2f ' + 'cm' if metric else 'in',
+            'upperlegheight':'Upperleg height: %.2f ' + 'cm' if metric else 'in',
+            'thighcirc':'Thigh circ.: %.2f ' + 'cm' if metric else 'in',
+            'lowerlegheight':'Lowerleg height: %.2f ' + 'cm' if metric else 'in',
+            'calf':'Calf circum: %.2f ' + 'cm' if metric else 'in',
+            'ankle':'Ankle circum: %.2f ' + 'cm' if metric else 'in'
         }
 
         self.groupBoxes = {}
