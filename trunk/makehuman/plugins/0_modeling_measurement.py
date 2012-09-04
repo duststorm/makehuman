@@ -71,10 +71,6 @@ class MeasureSlider(humanmodifier.ModifierSlider):
             label=label, modifier=modifier, valueConverter=MeasurementValueConverter(task, measure, modifier))
         self.measure = measure
 
-    def onChanging(self, value):
-        humanmodifier.ModifierSlider.onChanging(self, value)
-        self.updateLabel()
-
     def onChange(self, value):
         humanmodifier.ModifierSlider.onChange(self, value)
         self.parent.parent.syncSliderLabels()
@@ -86,14 +82,6 @@ class MeasureSlider(humanmodifier.ModifierSlider):
     def onBlur(self, event):
         humanmodifier.ModifierSlider.onBlur(self, event)
         self.parent.parent.onSliderBlur()
-
-    def updateLabel(self):
-        #self.label.setText(self.template + self.parent.parent.getMeasure(self.measure))
-        pass
-
-    def update(self):
-        humanmodifier.ModifierSlider.update(self)
-        self.updateLabel()
 
 class MeasureTaskView(gui3d.TaskView):
 
@@ -398,7 +386,7 @@ def load(app):
 
     @taskview.event
     def onMouseDown(event):
-        part = app.scene3d.getSelectedFacesGroup()
+        part = app.getSelectedFaceGroup()
         bodyZone = app.selectedHuman.getPartNameForGroupName(part.name)
         print bodyZone
         if bodyZone in app.selectedHuman.bodyZones:
