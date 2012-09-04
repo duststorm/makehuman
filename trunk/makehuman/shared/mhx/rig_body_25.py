@@ -36,9 +36,9 @@ BodyJoints = [
 
     ('neck2',          'vl', ((0.5, 6531), (0.5, 8253))),
 
-    ('rib-top',        'vl', ((0.9, 6857), (0.1, 7457))),
-    ('stomach-top',    'vl', ((0.9, 6909), (0.1, 7460))),
-    ('stomach-bot',    'v',  7359),
+    ('rib-top',        'vl', ((0.8, 6857), (0.2, 7457))),
+    ('stomach-top',    'vl', ((0.8, 6909), (0.2, 7460))),
+    ('stomach-bot',    'vl', ((0.8, 7359), (0.2, 7186))),
 
     ('penis-top',      'vl', ((0.5, 2791), (0.5, 7449))),
     ('penis-mid',      'vl', ((0.5, 2844), (0.5, 7369))),
@@ -383,7 +383,7 @@ def BodyControlPoses(fp):
     copyDeform(fp, 'DfmHead', 'Head', 0, U_ROT, None, [])
  
     addPoseBone(fp,  'DfmStomach',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'StomachTrg', 1, 1]),
+        [('StretchTo', 0, 1, ['Stretch', 'StomachTrg', 1, 1]),
         ])
 
     limBreastRot = (-45*D,45*D, -10*D,10*D, -20*D,20*D)
@@ -400,11 +400,11 @@ def BodyControlPoses(fp):
     addPoseBone(fp,  'Stomach', 'MHBall025', None, (0,0,0), (1,1,1), (0,0,0), (1,1,1), 0, [])
 
     addPoseBone(fp,  'DfmStomach1',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'Stomach', 0, 1]),
+        [('StretchTo', 0, 1, ['Stretch', 'Stomach', 0, 1]),
         ])
 
     addPoseBone(fp,  'DfmStomach2',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'StomachTrg', 1, 1]),
+        [('StretchTo', 0, 1, ['Stretch', 'StomachTrg', 1, 1]),
         ])
 
     addPoseBone(fp,  'StomachPar',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
@@ -412,10 +412,10 @@ def BodyControlPoses(fp):
 
 
     addPoseBone(fp,  'DfmWaist_L',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'WaistTrg_L', 0, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'WaistTrg_L', 0, 1])])
 
     addPoseBone(fp,  'DfmWaist_R',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'WaistTrg_R', 0, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'WaistTrg_R', 0, 1])])
 
     # Pubis
     

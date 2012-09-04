@@ -537,10 +537,10 @@ def LegControlPoses(fp):
         [('StretchTo', 0, 1, ['Stretch', 'LegOutTrg_R', 1, 1])])
 
     #addPoseBone(fp, 'DfmLegFront_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-    #    [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegFrontTrg_L', 1, 1])])
+    #    [('StretchTo', 0, 1, ['Stretch', 'LegFrontTrg_L', 1, 1])])
 
     #addPoseBone(fp, 'DfmLegFront_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-    #    [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegFrontTrg_R', 1, 1])])
+    #    [('StretchTo', 0, 1, ['Stretch', 'LegFrontTrg_R', 1, 1])])
 
     addPoseBone(fp, 'DfmKneeBack_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'KneeBackTrg_L', 1, 1])])
@@ -569,28 +569,28 @@ def LegControlPoses(fp):
     # Tweak
     """
     addPoseBone(fp, 'DfmButt_L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, 
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'Butt_L', 0, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'Butt_L', 0, 1])])
 
     addPoseBone(fp, 'Butt_L', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
     addPoseBone(fp, 'DfmButt_R', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'Butt_R', 0, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'Butt_R', 0, 1])])
 
     addPoseBone(fp, 'Butt_R', 'MHCube01', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
     """
     # Muscles
 
     addPoseBone(fp, 'DfmLegback_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegbackTrg_L', 1, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'LegbackTrg_L', 1, 1])])
 
     addPoseBone(fp, 'DfmLegback_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegbackTrg_R', 1, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'LegbackTrg_R', 1, 1])])
 
     addPoseBone(fp, 'DfmLegIn_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegInTrg_L', 1, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'LegInTrg_L', 1, 1])])
 
     addPoseBone(fp, 'DfmLegIn_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', C_STRVOL, 1, ['Stretch', 'LegInTrg_R', 1, 1])])
+        [('StretchTo', 0, 1, ['Stretch', 'LegInTrg_R', 1, 1])])
 
     return
 
