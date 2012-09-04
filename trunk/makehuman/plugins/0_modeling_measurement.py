@@ -306,9 +306,6 @@ class MeasureTaskView(gui3d.TaskView):
 
     def syncSliderLabels(self):
 
-        for slider in self.sliders:
-            slider.updateLabel()
-
         self.syncStatistics()
         self.syncBraSizes()
 
