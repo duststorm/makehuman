@@ -32,6 +32,8 @@ ShoulderJoints = [
     ('r-clav-tail',         'l', ((0.5, 'r-clav-top'), (0.5, 'r-uparm0'))),
     ('l-clav-tail',         'l', ((0.5, 'l-clav-top'), (0.5, 'l-uparm0'))),
 
+    ('r-deltoid-head',      'l', ((0.6, 'r-clav-tail'), (0.4, 'l-clav-tail'))),
+    ('l-deltoid-head',      'l', ((0.4, 'r-clav-tail'), (0.6, 'l-clav-tail'))),
 ]
 
 if MuscleBones:
@@ -86,9 +88,11 @@ if MuscleBones:
 ShoulderHeadsTails = [
     # Clavicle
     ('Clavicle_L',          'r-clavicle', 'r-clav-tail'),
-    ('DfmClavicle_L',       'r-clavicle', 'r-clav-tail'),
     ('Clavicle_R',          'l-clavicle', 'l-clav-tail'),
+    ('DfmClavicle_L',       'r-clavicle', 'r-clav-tail'),
     ('DfmClavicle_R',       'l-clavicle', 'l-clav-tail'),
+    ('DfmDeltoid_L',        'r-deltoid-head', 'r-clav-tail'),
+    ('DfmDeltoid_R',        'l-deltoid-head', 'l-clav-tail'),
 
     # Shoulder
     ('Shoulder_L',          'r-uparm0', ('r-uparm0', (0,1,0))),
@@ -189,6 +193,8 @@ ShoulderArmature2 = [
     # Clavicle
     ('DfmClavicle_L',      0, 'Clavicle_L', F_DEF, L_DMAIN, NoBB),
     ('DfmClavicle_R',      0, 'Clavicle_R', F_DEF, L_DMAIN, NoBB),
+    ('DfmDeltoid_L',       0, 'DfmClavicle_L', F_DEF, L_MSCL, NoBB ),
+    ('DfmDeltoid_R',       0, 'DfmClavicle_R', F_DEF, L_MSCL, NoBB ),
     
     # Shoulder    
     ('Shoulder_L',         0, 'Clavicle_L', F_WIR, L_TWEAK, NoBB),
@@ -352,6 +358,21 @@ def ShoulderControlPoses(fp):
 
     addPoseBone(fp, 'ELClavLinkPT_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'ELClavPT_R', 0, 1])])
+
+
+    addPoseBone(fp, 'DfmDeltoid_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
+        [('Transform', C_LOCAL, 1, 
+            ['Transform', 'UpArm_L', 
+            'ROTATION', (0,0,0), (120,0,0), ('X','Y','Z'),
+            'ROTATION', (0,0,0), (60,0,0)]) ])
+
+    addPoseBone(fp, 'DfmDeltoid_R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,
+        [('Transform', C_LOCAL, 1, 
+            ['Transform', 'UpArm_R', 
+            'ROTATION', (0,0,0), (120,0,0), ('X','Y','Z'),
+            'ROTATION', (0,0,0), (60,0,0)]) ])
+
+
         
     if not MuscleBones:
         return        
@@ -448,7 +469,9 @@ if MuscleBones:
     ShoulderTargetDrivers = []
 else:
     ShoulderDeformDrivers = []
+    ShoulderTargetDrivers = []
     
+"""    
     expr70 = "%.3f*(1-%.3f*x1)" % (90.0/70.0, 2/pi)
     expr70_60 = "%.3f*max(1-%.3f*x1,0)*max(1-%.3f*x2,0)" % (90.0/70.0, 2/pi, 3/pi)
 
@@ -500,3 +523,4 @@ else:
         [("UpArmVec", "DirShldrOut"),
          ("UpArm", "UpArmVecNeg")]),
 ]
+"""
