@@ -69,6 +69,7 @@ class ExpressionTaskView(gui3d.TaskView):
                     "GenderAgeModifier")
                 self.modifiers[subname] = modifier
                 slider = box.addView(ExpressionSlider(subname.capitalize(), modifier))
+                modifier.slider = slider
                 self.sliders.append(slider)
             
             # Create radiobutton

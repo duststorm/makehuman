@@ -154,8 +154,8 @@ class Modifier:
             
     def updateValue(self, human, value, updateNormals=1):
         
-        if not hasattr(self, "isWarp") or not self.isWarp:
-            algos3d.resetAllWarpTargets()
+        #if not hasattr(self, "isWarp") or not self.isWarp:
+        #    algos3d.resetAllWarpTargets()
             
         # Collect vertex and face indices if we didn't yet
         if not (self.verts or self.faces):
@@ -214,8 +214,8 @@ class GenericModifier:
         
     def updateValue(self, human, value, updateNormals=1):
         
-        if not self.isWarp:
-            algos3d.resetAllWarpTargets()
+        #if not self.isWarp:
+        #    algos3d.resetAllWarpTargets()
             
         # Collect vertex and face indices if we didn't yet
         if not (self.verts or self.faces):

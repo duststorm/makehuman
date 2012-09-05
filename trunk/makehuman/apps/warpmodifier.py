@@ -35,8 +35,6 @@ import warp
 import humanmodifier
 
 
-NMHVerts = 18528
-
 #----------------------------------------------------------
 #   class WarpTarget
 #----------------------------------------------------------
@@ -49,20 +47,21 @@ class WarpTarget(algos3d.Target):
         
         self.human = human
         self.modifier = modifier
-        #self.bases = modifier.bases
-        #self.warppath = modifier.warppath
-        #self.bodypart = modifier.bodypart
         self.isWarp = True
         self.isDirty = True
+        self.isObsolete = False
         
 
     def __repr__(self):
-        return ( "<WarpTarget %s %s>" % (os.path.basename(self.modifier.warppath), self.isDirty) )
+        return ( "<WarpTarget %s d:%s o:%s>" % (os.path.basename(self.modifier.warppath), self.isDirty, self.isObsolete) )
         
         
     def reinit(self, human):
     
+        if self.isObsolete:
+            halt
         if self.isDirty:
+            #print "reinit", self
             shape = self.modifier.compileWarpTarget(self.human)
             saveWarpedTarget(shape, self.modifier.warppath)
             self.__init__(self.modifier, self.human)
@@ -118,6 +117,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
                 self.bases[key] = (path[0], char, -1)
         self.isWarp = True
         self.bodypart = bodypart
+        self.slider = None
         self.refTargets = {}
         self.refTargetVerts = {}
             
@@ -143,11 +143,11 @@ class WarpModifier (humanmodifier.SimpleModifier):
         
         
     def compileWarpTarget(self, human):
-        print "Warp", self
         landmarks = theLandMarks[self.bodypart]
-        getRefObject(human)
+        hasChanged = getRefObject(human)
         self.getRefTarget(human)
-        warpfield = warp.CWarp()        
+        warpfield = warp.CWarp()     
+        print "Compile", self
         shape = warpfield.warpTarget(self.refTargetVerts, theRefObjectVerts, human.shadowVerts, landmarks)
         return shape
     
@@ -230,7 +230,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
     
         if target:
             if not target.isWarp:
-                raise NameError("Target %s should be warp" % self.warppath)
+                raise NameError("%s should be warp" % target)
             return target
             
         target = WarpTarget(self, human)
@@ -241,9 +241,9 @@ class WarpModifier (humanmodifier.SimpleModifier):
 def getRefObject(human):
     global theRefObjects, theRefObjectVerts, theBaseObjectVerts
        
-    if algos3d.theCharacterHasChanged:
+    if human.iHaveChanged:
         print "Reference character changed"
-        algos3d.theCharacterHasChanged = False                        
+        human.iHaveChanged = False                        
     
         theRefObjectVerts = {}
         for n,v in theBaseObjectVerts.items():
@@ -256,6 +256,10 @@ def getRefObject(human):
                 for n,v in verts.items():
                     dr = fastmath.vmul3d(v, cval)
                     theRefObjectVerts[n] = fastmath.vadd3d(theRefObjectVerts[n], dr)
+        return True
+    else:
+        return False
+    
 
 
 def getBaseCharacter(path):    
@@ -288,6 +292,10 @@ def getBaseCharacter(path):
 #   Call from exporter
 #----------------------------------------------------------
 
+def resetWarpTargets(human):
+    human.applyAllTargets(forceWarpReset=True)    
+
+
 def compileWarpTarget(template, fallback, human, bodypart):
     mod = WarpModifier(template, bodypart, fallback)
     return mod.compileWarpTarget(human)
@@ -308,7 +316,7 @@ def readTarget(path):
             words = line.split()
             if len(words) >= 4:
                 n = int(words[0])
-                if n < NMHVerts:
+                if n < algos3d.NMHVerts:
                     target[n] = [float(words[1]), float(words[2]), float(words[3])]
         fp.close()
         return target

@@ -48,6 +48,8 @@ import textures3d
 import files3d
 import os
 
+NMHVerts = 18528
+
 targetBuffer = {}
 
 class Target:
@@ -95,6 +97,8 @@ class Target:
             translationData = line.split()
             if len(translationData) == 4:
                 vertIndex = int(translationData[0])
+                if vertIndex >= NMHVerts:
+                    continue
                 verticesToRecalculate.append(vertIndex)
                 translationVector = (float(translationData[1]), float(translationData[2]), float(translationData[3]))
                 self.data[vertIndex] = translationVector
@@ -115,8 +119,6 @@ class Target:
         
     def apply(self, human, morphFactor, update=True, calcNormals=True, faceGroupToUpdateName=None, scale=(1.0,1.0,1.0)):
 
-        if (not self.isWarp) and (morphFactor != self.morphFactor):
-            resetAllWarpTargets()
         self.morphFactor = morphFactor                
 
         obj = human.meshData        
@@ -173,18 +175,6 @@ class Target:
             return True
             
         return False
-
-
-theCharacterHasChanged = True
-
-def resetAllWarpTargets():
-    global targetBuffer, theCharacterHasChanged
-    #print "Resetting warp targets"
-    theCharacterHasChanged = True
-    for target in targetBuffer.values():
-        if target.isWarp:
-            target.isDirty = True
-
 
 
 def getTarget(human, targetPath):
