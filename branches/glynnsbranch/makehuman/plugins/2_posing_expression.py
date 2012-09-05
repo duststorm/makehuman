@@ -64,10 +64,9 @@ class ExpressionTaskView(gui3d.TaskView):
                 
                 #modifier = humanmodifier.GenderAgeModifier('data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % subname)
                 modifier = warpmodifier.WarpModifier(
-                    'data/targets/expression/female_young/neutral_female_young_%s.target' % subname,
+                    'data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % subname,
                     "face",
-                    "GenderAgeModifier",
-                    'data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % subname)
+                    "GenderAgeModifier")
                 self.modifiers[subname] = modifier
                 slider = box.addView(ExpressionSlider(subname.capitalize(), modifier))
                 self.sliders.append(slider)
@@ -98,6 +97,8 @@ class ExpressionTaskView(gui3d.TaskView):
         
         human = event.human
         
+        #print "HC", event
+
         for slider in self.sliders:
             value = slider.modifier.getValue(human)
             if value:

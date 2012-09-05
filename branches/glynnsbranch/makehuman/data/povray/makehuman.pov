@@ -58,7 +58,7 @@
     MakeHuman_Mesh(0)
     translate <MakeHuman_TranslateX, MakeHuman_TranslateY, MakeHuman_TranslateZ>
     rotate <MakeHuman_RotateX, MakeHuman_RotateY, MakeHuman_RotateZ>
-    texture {MakeHuman_Texture}
+    material { MakeHuman_Material} //texture {MakeHuman_Texture}
   } 
 #end
 

@@ -46,6 +46,7 @@ import rig_body_25
 import read_expression
 import read_rig
 
+
 the.Human = 'Human'
 
 #
@@ -95,7 +96,6 @@ def exportMhx_25(human, fp):
     proxyData = {}
     scanProxies(obj, proxyData)
     mhx_rig.setupRig(obj, proxyData)
-    the.correctives = {}
     
     if not the.Config.cage:
         fp.write(
@@ -1016,7 +1016,7 @@ def printProxyVGroup(fp, vgroups):
 #
 #    copyShapeKeys(tmplName, fp, proxy, doScale):
 #
-
+"""
 def copyShapeKeys(tmplName, fp, proxy, doScale):
     tmpl = open(tmplName)
     shapes = []
@@ -1080,18 +1080,7 @@ def copyShapeKeys(tmplName, fp, proxy, doScale):
     tmpl.close()
     return
 
-def useThisShape(name, proxy):
-    if not proxy:
-        return True
-    if proxy.type == 'Proxy':
-        return True
-    if name in proxy.shapekeys:
-        return True
-    if name[:-2] in proxy.shapekeys:
-        return True
-    return False
 
-#
 #    setShapeScale(words):    
 #
 
@@ -1137,30 +1126,31 @@ def printProxyShape(fp, shapes):
     if (pv >= 0 and aljabr.vlen([dx,dy,dz]) > 0):
         fp.write("    sv %d %.4f %.4f %.4f ;\n" % (pv, dx, dy, dz))
     return
-
+"""
 #
 #    writeShapeKeys(fp, human, name, proxy):
 #
 
-def writeTargets(fp, human, drivers, folder, proxy):    
-    for (fname, lr, expr, vars) in drivers:
-        path = "%s/%s/" % (folder,fname)
-        try:
-            expr = the.correctives[path]
-        except:
-            expr = read_expression.readCorrective(human, path)
-            the.correctives[path] = expr
-        fp.write("ShapeKey %s %s True\n" % (fname, lr))
-        if proxy:
-            shapes = mh2proxy.getProxyShapes([("shape",expr)], proxy)
-            for (pv, dr) in shapes[0].items():
-                (dx, dy, dz) = dr
-                fp.write("  sv %d %.4f %.4f %.4f ;\n" %  (pv, dx, dy, dz))
-        else:
-            for (vn, dr) in expr.items():
-                fp.write("  sv %d %.4f %.4f %.4f ;\n" %  (vn, dr[0], dr[1], dr[2]))
-        fp.write("end ShapeKey\n")
-    return            
+def writeCorrectives(fp, human, drivers, part, proxy):    
+    shapeList = read_expression.readCorrectives(drivers, human, part)
+    for (shape, pose, lr) in shapeList:
+        writeShape(fp, pose, lr, shape, 0, 1, proxy)
+    
+
+def writeShape(fp, pose, lr, shape, min, max, proxy):
+    fp.write(
+    	"ShapeKey %s %s True\n" % (pose, lr) +
+    	"  slider_min %.3g ;\n" % min +
+    	"  slider_max %.3g ;\n" % max)
+    if proxy:
+        pshape = mh2proxy.getProxyShapes([("shape",shape)], proxy)
+        for (pv, dr) in pshape[0].items():
+            (dx, dy, dz) = dr
+            fp.write("  sv %d %.4f %.4f %.4f ;\n" %  (pv, dx, -dz, dy))
+    else:
+        for (vn, dr) in shape.items():
+           fp.write("  sv %d %.4f %.4f %.4f ;\n" %  (vn, dr[0], -dr[2], dr[1]))
+    fp.write("end ShapeKey\n")
 
 
 def writeShapeKeys(fp, human, name, proxy):
@@ -1172,33 +1162,33 @@ def writeShapeKeys(fp, human, name, proxy):
 
     if (not proxy or proxy.type == 'Proxy'):
         if the.Config.faceshapes:
-            if BODY_LANGUAGE:
-                copyShapeKeys("shared/mhx/templates/shapekeys-bodylanguage25.mhx", fp, proxy, True)    
-            else:
-                copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy, True)    
+            shapeList = read_expression.readFaceShapes(human, rig_panel_25.BodyLanguageShapeDrivers)
+            for (pose, shape, lr, min, max) in shapeList:
+                writeShape(fp, pose, lr, shape, min, max, proxy)
 
     if not proxy:
         if the.Config.expressions:
-            exprList = read_expression.readExpressions(human)
-            writeExpressionList(fp, exprList)
+            shapeList = read_expression.readExpressions(human)
+            for (pose, shape) in shapeList:
+                writeShape(fp, pose, "Sym", shape, 0, 1, proxy)
         if the.Config.expressionunits:
-            exprList = read_expression.readExpressionUnits(human)
-            writeExpressionList(fp, exprList)
+            shapeList = read_expression.readExpressionUnits(human)
+            for (pose, shape) in shapeList:
+                writeShape(fp, pose, "Sym", shape, 0, 1, proxy)
         
     if the.Config.bodyshapes and the.Config.mhxrig=="mhx":
-        writeTargets(fp, human, rig_shoulder_25.ShoulderTargetDrivers, "shoulder", proxy)                
-        writeTargets(fp, human, rig_leg_25.HipTargetDrivers, "hips", proxy)                
-        writeTargets(fp, human, rig_arm_25.ElbowTargetDrivers, "elbow", proxy)                
-        writeTargets(fp, human, rig_leg_25.KneeTargetDrivers, "knee", proxy)                
-        copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
+        writeCorrectives(fp, human, rig_shoulder_25.ShoulderTargetDrivers, "shoulder", proxy)                
+        writeCorrectives(fp, human, rig_leg_25.HipTargetDrivers, "hips", proxy)                
+        writeCorrectives(fp, human, rig_arm_25.ElbowTargetDrivers, "elbow", proxy)                
+        writeCorrectives(fp, human, rig_leg_25.KneeTargetDrivers, "knee", proxy)                
+        #copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
 
     for path in the.Config.customshapes:
         print("    %s" % path)
-        copyShapeKeys(path, fp, proxy, False)   
+        #copyShapeKeys(path, fp, proxy, False)   
 
     fp.write(
 "  AnimationData None (toggle&T_Symm==0)\n")
-
         
     if the.Config.bodyshapes and the.Config.mhxrig=="mhx":
         mhx_rig.writeTargetDrivers(fp, rig_shoulder_25.ShoulderTargetDrivers, the.Human)
@@ -1208,15 +1198,12 @@ def writeShapeKeys(fp, human, name, proxy):
 
         mhx_rig.writeRotDiffDrivers(fp, rig_arm_25.ArmShapeDrivers, proxy)
         mhx_rig.writeRotDiffDrivers(fp, rig_leg_25.LegShapeDrivers, proxy)
-        mhx_rig.writeShapePropDrivers(fp, rig_body_25.BodyShapes, proxy, "&")
+        #mhx_rig.writeShapePropDrivers(fp, rig_body_25.BodyShapes, proxy, "&")
 
     fp.write("#if toggle&T_ShapeDrivers\n")
     if (not proxy or proxy.type == 'Proxy'):
         if the.Config.faceshapes:
-            if BODY_LANGUAGE:
-                drivers = rig_panel_25.BodyLanguageShapeDrivers
-            else:
-                drivers = rig_panel_25.FaceShapeDrivers
+            drivers = rig_panel_25.BodyLanguageShapeDrivers
             if the.Config.facepanel:
                 mhx_rig.writeShapeDrivers(fp, drivers, None)
             else:
@@ -1241,21 +1228,17 @@ def writeShapeKeys(fp, human, name, proxy):
     return    
 
 
-#
-#   writeExpressionList(fp, exprList):
-#
+def useThisShape(name, proxy):
+    if not proxy:
+        return True
+    if proxy.type == 'Proxy':
+        return True
+    if name in proxy.shapekeys:
+        return True
+    if name[:-2] in proxy.shapekeys:
+        return True
+    return False
 
-def writeExpressionList(fp, exprList):
-    for (name, verts) in exprList:
-        fp.write("ShapeKey %s Sym True\n" % name)
-        for (v, r) in verts.items():
-            (dx, dy, dz) = r
-            fp.write("    sv %d %.4f %.4f %.4f ;\n" % (v, dx, dy, dz))
-        fp.write("end ShapeKey\n")
-
-#
-#    proxyShapes(typ, human, proxyData, fp):
-#
 
 def proxyShapes(typ, human, proxyData, fp):
     fp.write("#if toggle&T_%s\n" % typ)

@@ -288,7 +288,7 @@ class Limb():
         for targetPath in traslPaths:
             if (scale == None): scale = algos3d.computeScale(self.oBoundingBox, targetPath, self.character.meshData)
             morphFactor = self.trasl[targetPath]
-            algos3d.loadTranslationTarget(self.character.meshData, targetPath, morphFactor, None, 1, 0, scale)
+            algos3d.loadTranslationTarget(self.character, targetPath, morphFactor, None, 1, 0, scale)
             if savePath:
                 fileDescriptor.write("%s %f\n" % (targetPath, morphFactor))
 

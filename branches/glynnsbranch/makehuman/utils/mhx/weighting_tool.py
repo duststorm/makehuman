@@ -321,6 +321,33 @@ class VIEW3D_OT_UnvertexSelectedButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
+#
+#
+
+class VIEW3D_OT_MultiplyWeightsButton(bpy.types.Operator):
+    bl_idname = "mhw.multiply_weights"
+    bl_label = "Multiply weights"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        bpy.ops.object.mode_set(mode='EDIT')    
+        bpy.ops.wm.context_set_value(data_path="tool_settings.mesh_select_mode", value="(True,False,False)")
+        bpy.ops.object.mode_set(mode='OBJECT')
+        ob = context.object
+        factor = context.scene.MhxWeight
+        index = ob.vertex_groups.active_index
+        for v in ob.data.vertices:
+            if v.select:
+                print(v, index)
+                for g in v.groups:
+                    if g.group == index:
+                        g.weight *= factor                   
+        bpy.ops.object.mode_set(mode='EDIT')    
+        bpy.ops.wm.context_set_value(data_path="tool_settings.mesh_select_mode", value="(False,True,False)")
+        print("Weights multiplied")
+        return{'FINISHED'}    
+
+#
 #    deleteDiamonds(context)
 #    Delete joint diamonds in main mesh
 #    class VIEW3D_OT_DeleteDiamondsButton(bpy.types.Operator):
@@ -1547,10 +1574,68 @@ class VIEW3D_OT_InitInterfaceButton(bpy.types.Operator):
     bl_label = "Initialize"
 
     def execute(self, context):
-        import bpy
         initInterface(context)
         print("Interface initialized")
         return{'FINISHED'}    
+
+#
+#   class VIEW3D_OT_LocalizeFilesButton(bpy.types.Operator):
+#
+
+def localizeFile(context, path):
+    print("Localizing", path)
+    ob = context.object
+    lines = []
+
+    fp = open(path, "r")
+    for line in fp:
+        words = line.split()
+        vn = int(words[0])
+        v = ob.data.vertices[vn]
+        if v.select:
+            lines.append(line)
+        else:
+            print(line)
+    fp.close()
+    
+    fp = open(path, "w")
+    for line in lines:
+        fp.write(line)
+    fp.close()
+    
+    return
+    
+    
+def localizeFiles(context, path):
+    print("Local files in ", path)
+    folder = os.path.dirname(path)
+    for file in os.listdir(folder):
+        (fname, ext) = os.path.splitext(file)
+        if ext == ".target":
+            localizeFile(context, os.path.join(folder, file))
+
+
+class VIEW3D_OT_LocalizeFilesButton(bpy.types.Operator):
+    bl_idname = "mhw.localize_files"
+    bl_label = "Localize Files"
+    bl_options = {'UNDO'}
+
+    filename_ext = ".target"
+    filter_glob = StringProperty(default="*.target", options={'HIDDEN'})
+    filepath = bpy.props.StringProperty(
+        name="File Path", 
+        maxlen= 1024, default= "")
+
+    def execute(self, context):
+        print("Exec localize files")
+        localizeFiles(context, self.properties.filepath)
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+
 
 #
 #    class MhxWeightToolsPanel(bpy.types.Panel):
@@ -1605,6 +1690,9 @@ class MhxWeightToolsPanel(bpy.types.Panel):
         layout.operator("mhw.export_sum_groups")    
         layout.operator("mhw.print_vnums_to_file")
 
+        layout.separator()
+        layout.operator("mhw.localize_files")
+
 class MhxWeightExtraPanel(bpy.types.Panel):
     bl_label = "Weight tools extra"
     bl_space_type = "VIEW_3D"
@@ -1634,6 +1722,7 @@ class MhxWeightExtraPanel(bpy.types.Panel):
 
         layout.label('Weight pair')
         layout.prop(context.scene, 'MhxWeight')
+        layout.operator("mhw.multiply_weights")
         layout.prop(context.scene, 'MhxBone1')
         layout.prop(context.scene, 'MhxBone2')
         layout.operator("mhw.pair_weight")

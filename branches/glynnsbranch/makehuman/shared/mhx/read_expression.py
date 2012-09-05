@@ -28,6 +28,8 @@ import os
 import mhx_globals as the
 import fastmath
 import math
+import warp
+import warpmodifier
 
 
 NMhVerts = 18528
@@ -52,6 +54,8 @@ def setupExpressions(folder, prefix):
 
 Expressions = setupExpressions("data/targets/expression/female_young", 
                                "neutral_female_young_")
+                               
+#Expressions = ["laughing1"]                               
 
 ExpressionUnits = setupExpressions("data/targets/expression/units/caucasian/female_young", "")
 
@@ -61,7 +65,7 @@ ExpressionUnits = setupExpressions("data/targets/expression/units/caucasian/fema
 
 def loopGendersAges(name, human, typ):
     epsilon = 0.05
-    exprs = {}
+    shapes = {}
     asums = {}
     gsum = 0.0
     genders = [
@@ -76,8 +80,8 @@ def loopGendersAges(name, human, typ):
     ]
 
     for (gender, gval) in genders:
-        gexprs = {}
-        exprs[gender] = gexprs
+        gshapes = {}
+        shapes[gender] = gshapes
         asums[gender] = 0.0
         if gval < epsilon:
             continue
@@ -86,188 +90,171 @@ def loopGendersAges(name, human, typ):
         for (age, aval) in ages:
             if aval < epsilon:
                 continue
-            fp,filename = targetFile(typ, name, gender, age)                
-            if fp:
-                aexpr = {}                    
-                for line in fp:
-                    words = line.split()
-                    n = int(words[0])
-                    if n < NMhVerts:
-                        aexpr[n] = (float(words[1]), -float(words[3]), float(words[2]))    
-                fp.close()
-                print("    %s copied" % filename)
-                gexprs[age] = aexpr
+            filename = targetFileName(typ, name, gender, age) 
+            ashape = readShape(filename)
+            if ashape:
+                gshapes[age] = ashape
                 asums[gender] += aval
                     
-    expr = {}
+    shape = {}
     wsum = 0.0
     for (gender, gval) in genders:
         if gval < epsilon or asums[gender] < epsilon:
             continue
         gw = gval/gsum
-        gexprs = exprs[gender]
+        gshapes = shapes[gender]
         for (age, aval) in ages:
             if aval < epsilon:
                 continue
             aw = aval/asums[gender]
             w = gw*aw
             try:
-                aexpr = gexprs[age]
+                ashape = gshapes[age]
             except:
-                aexpr = None
-            if not aexpr:
+                ashape = None
+            if not ashape:
                 continue
             wsum += w
-            for v in aexpr.keys():
+            for v in ashape.keys():
                 try:
-                    (x,y,z) = expr[v]
-                    (dx,dy,dz) = aexpr[v]
-                    expr[v] = (x+w*dx, y+w*dy, z+w*dz)
+                    (x,y,z) = shape[v]
+                    (dx,dy,dz) = ashape[v]
+                    shape[v] = (x+w*dx, y+w*dy, z+w*dz)
                 except:
-                    expr[v] = aexpr[v]
+                    shape[v] = ashape[v]
                             
     dwarf = 0.8324
     giant = 1.409
     height = human.getHeight()
     if height < 0:
         k = 1 + (1-dwarf)*height
-    else:
+    elif height > 0:
         k = 1 + (giant-1)*height
-    for v in expr.keys():
-        (x,y,z) = expr[v]
-        expr[v] = (k*x, k*y, k*z)
-    
-    return (expr, wsum)
+    else:
+        return shape
+        
+    for v in shape.keys():
+        (x,y,z) = shape[v]
+        shape[v] = (k*x, k*y, k*z)    
+    return shape
 
 
-def targetFile(typ, name, gender, age):                
+def targetFileName(typ, name, gender, age):                
     if typ == "Expressions":        
-        filename = ('data/targets/expression/%s_%s/neutral_%s_%s_%s.target' % 
-                    (gender, age, gender, age, name) )
+        return ('data/targets/expression/%s_%s/neutral_%s_%s_%s.target' % (gender, age, gender, age, name) )
     elif typ == "ExpressionUnits":        
-        filename = ('data/targets/expression/units/caucasian/%s_%s/%s.target' % 
-                    (gender, age, name) )
+        return ('data/targets/expression/units/caucasian/%s_%s/%s.target' %  (gender, age, name) )
     elif typ == "Corrective":
-        filename = ("data/correctives/%s/%s-%s.target" % 
-                    (name, gender, age))
+        (part, pose) = name
+        return ("shared/mhx/targets/correctives/%s/caucasian/%s-%s/%s.target" % (part, gender, age, pose))
     else:
         raise NameError("Unknown type %s" % typ)
+        
+
+def readShape(filename):                
     #print ("Try", filename)        
     try:
         fp = open(filename, "rU")
-        return fp,filename
     except:
         print("*** Cannot open %s" % filename)
-        return 0,filename
-
-"""
-def readTarget(name, human, typ):
-    warp = setupWarpField(human.meshData)
-    fp,filename = targetFile(typ, name, "female", "young")
-    if fp:
-        expr = {}            
-        for line in fp:
-            words = line.split()
-            vn = int(words[0])
-            s = warp[vn]
-            expr[vn] = (s[0]*float(words[1]), -s[2]*float(words[3]), s[1]*float(words[2]))    
-        fp.close()
-        print("    %s copied" % filename)
-    return expr
-
-
-def setupWarpField(obj):
-    warp = the.Config.warpField
-    if warp:
-        return warp
-
-    vertEdges = {}
-    for v in obj.verts:
-        vertEdges[v.idx] = []
+        return None
         
-    for f in obj.faces:
-        vn0 = f.verts[-1].idx
-        for v1 in f.verts:
-            vn1 = v1.idx
-            if vn0 < vn1:
-                e = (vn0,vn1)
+    shape = {}                    
+    for line in fp:
+        words = line.split()
+        n = int(words[0])
+        if n < NMhVerts:
+            shape[n] = (float(words[1]), float(words[2]), float(words[3]))    
+    fp.close()
+    print("    %s copied" % filename)
+    return shape
+
+#----------------------------------------------------------
+#   
+#----------------------------------------------------------
+
+def readFaceShapes(human, drivers):
+    shapeList = []
+    shapes = {}
+    for name,value in drivers.items():
+        (fname, bone, channel, sign, min, max) = value
+        if (name[-2:] in ["_L", "_R"]):
+            lr = "LR"
+            sname = name[:-2]
+        else:
+            lr = "Sym"
+            sname = name
+
+        try:
+            shape = shapes[fname]
+            doLoad = False
+        except:
+            doLoad = True
+        if doLoad:
+            if warp.numpy:
+                shape = warpmodifier.compileWarpTarget(
+                    'shared/mhx/targets/body_language/${gender}-${age}/%s.target' % fname, 
+                    "GenderAgeEthnicModifier",
+                    human, 
+                    "face")
             else:
-                e = (vn1,vn0)
-            try:
-                test = (e in vertEdges[vn0])
-            except:
-                test = False
-            if not test:
-                vertEdges[vn0].append(e)
-                vertEdges[vn1].append(e)
-            vn0 = vn1                
-
-    for v in obj.verts:
-        (sx,sy,sz) = (0,0,0)
-        for (vn0,vn1) in vertEdges[v.idx]:
-            v0 = obj.verts[vn0]
-            v1 = obj.verts[vn1]
-            s = fastmath.vsub3d(v0.co, v1.co)
-            sx += math.fabs(s[0])
-            sy += math.fabs(s[1])
-            sz += math.fabs(s[2])
-        warp[v.idx] = (sx,sy,sz)            
-
-    if True:        
-        fp = open("shared/mhx/female_young_warp.txt", "r")
-        vn = 0
-        for line in fp:
-            words = line.split()
-            (sx,sy,sz) = warp[vn]
-            (rx,ry,rz) = (float(words[0]), float(words[1]), float(words[2]))
-            #print vn
-            #print "  ", (sx,sy,sz)
-            #print "  ", (rx,ry,rz)
-            warp[vn] = (sx/rx, sy/ry, sz/rz)
-            vn += 1
-        fp.close()
-        the.Config.warpField = warp
-        return warp        
-    else:        
-        fp = open("shared/mhx/female_young_warp.txt", "w")
-        n = len(obj.verts)
-        eps = 1e-4
-        for vn in range(n):
-            (sx,sy,sz) = warp[vn]
-            if sx < eps: sx = eps
-            if sy < eps: sy = eps
-            if sz < eps: sz = eps
-            fp.write("%.4g %.4g %.4g\n" % (sx,sy,sz))
-        fp.close()
-        halt
-"""
+                shape = readShape('shared/mhx/targets/body_language/female-young/%s.target' % fname)  
+            shapes[fname] = shape                
+            shapeList.append((sname, shape, lr, min, max))
+    shapeList.sort()
+    return shapeList
+        
 
 def readExpressions(human):
-    exprList = []
-
+    shapeList = []
     for name in Expressions:
-        (expr, wsum) = loopGendersAges(name, human, "Expressions")
-        #expr = readTarget(name, human, "Expressions")
-        exprList.append((name, expr))
-        #print("    Done %s weight %.3f" % (name, wsum))
-    return exprList
+        if warp.numpy:
+            shape = warpmodifier.compileWarpTarget(
+                'data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % name,
+                "GenderAgeEthnicModifier", 
+                human, 
+                "face")
+        else:
+            shape = loopGendersAges(name, human, "Expressions")
+        shapeList.append((name, shape))
+    return shapeList
 
 
 def readExpressionUnits(human):
-    exprList = []
+    shapeList = []
     for name in ExpressionUnits:
-        (expr, wsum) = loopGendersAges(name, human, "ExpressionUnits")
-        #expr = readTarget(name, human, "Expressions")
-        exprList.append((name, expr))
-        #print("    Done %s weight %.3f" % (name, wsum))
-    return exprList
+        if warp.numpy:
+            shape = warpmodifier.compileWarpTarget(
+                'data/targets/expression/units/${ethnic}/${gender}_${age}/%s.target' % name,
+                "GenderAgeEthnicModifier2",
+                human, 
+                "face")
+        else:
+            shape = loopGendersAges(name, human, "ExpressionUnits")
+        shapeList.append((name, shape))
+    return shapeList
 
 
-def readCorrective(human, path):
-    (expr, wsum) = loopGendersAges(path, human, "Corrective")
-    #expr = readTarget(path, human, "Corrective")
-    #print("    Done %s weight %.3f" % (path, wsum))
-    return expr
+def readCorrectives(drivers, human, part):
+    shapeList = []
+    for (pose, lr, expr, vars) in drivers:
+        print "Corrective", part, pose
+        if warp.numpy:
+            shape = warpmodifier.compileWarpTarget(
+                "shared/mhx/targets/correctives/%s/${ethnic}/${gender}-${age}/%s.target" % (part, pose),
+                'GenderAgeEthnicModifier',
+                human, 
+                part)
+        else:
+            shape = loopGendersAges((part, pose), human, "Corrective")
+
+        shapeList.append((shape, pose, lr))
+    return shapeList        
+
+def readCorrective(human, part, pose):
+    #for e in list(shape.items())[:10]:
+    #    print e
+    return shape
 
             
 

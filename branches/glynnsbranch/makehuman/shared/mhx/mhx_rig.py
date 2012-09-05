@@ -1354,10 +1354,12 @@ def writeTextureDrivers(fp, drivers):
 #
 
 def writeShapeDrivers(fp, drivers, proxy):
-    for (shape, vlist) in drivers.items():
+    dlist = list(drivers.items())
+    dlist.sort()
+    for (shape, vlist) in dlist:
         if mhx_main.useThisShape(shape, proxy):
             drvVars = []
-            (targ, channel, coeffs) = vlist
+            (file, targ, channel, coeffs, min, max) = vlist
             drvVars.append( (targ, 'TRANSFORMS', [('OBJECT', the.Human, targ, channel, C_LOC)]) )
             writeDriver(fp, 'toggle&T_Shapekeys', 'AVERAGE', "", "key_blocks[\"%s\"].value" % (shape), -1, coeffs, drvVars)
     return
@@ -1760,6 +1762,11 @@ def setupRig(obj, proxyData):
         else:
             the.Armature += rig_body_25.BodyArmature2Simple
         the.Armature += rig_body_25.BodyArmature3
+        if the.Config.advancedspine:
+            the.Armature += rig_body_25.BodyArmature4Advanced
+        else:
+            the.Armature += rig_body_25.BodyArmature4Simple
+        the.Armature += rig_body_25.BodyArmature5
         if the.Config.advancedspine:
             the.Armature += rig_shoulder_25.ShoulderArmature1Advanced
         else:

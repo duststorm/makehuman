@@ -240,11 +240,10 @@ class CWarp:
            
 
 def readLandMarks(context, verts):       
-    filenames = {
-        'Body' : "body.txt",
-        'Face' : "face.txt",
-    }
-    path = os.path.join( os.path.dirname(__file__), "landmarks", filenames[context.scene.MhLandmarks])
+    scn = context.scene
+    enum = scn.MhLandmarks
+    file = enum.lower() + ".lmk"
+    path = os.path.join( scn.MhProgramPath, "data/landmarks", file)
     print("Load", path)
     landmarks = {}
     locs = {}
@@ -260,6 +259,28 @@ def readLandMarks(context, verts):
     fp.close()
     print("   ...done")       
     return (landmarks, locs)
+    
+    
+def updateLandmarks(context):
+    scn = context.scene
+    enums = []
+    path = os.path.join( scn.MhProgramPath, "data/landmarks")
+    for file in os.listdir(path):
+        (fname, ext) = os.path.splitext(file)
+        if ext == ".lmk":
+            name = fname.capitalize()
+            enums.append((name,name,name))
+
+    if not enums:
+        print("No enums found")
+        return
+        
+    default= scn.MhLandmarks            
+    bpy.types.Scene.MhLandmarks = EnumProperty(
+        items = enums,
+        name = "Landmarks",
+        default = scn.MhLandmarks)
+    print("Landmarks updated")        
         
         
 def init():

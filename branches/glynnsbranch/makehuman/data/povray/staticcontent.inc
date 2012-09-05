@@ -1,3 +1,4 @@
+//
 // Create a camera definition based on the MakeHuman camera settings when this 
 // file was generated. We need to convert between the OpenGL vertical FOV and 
 // the horizontal POV-Ray camera angle. We also need to account for the way 
@@ -19,16 +20,38 @@
 // Assign default values.
 // This texture uses the standard pigment map as a uv-mapped pigment and adds a
 // little disruption to the surface normals.  
-#ifndef (MakeHuman_Texture)
-  #declare MakeHuman_Texture = texture {
-    pigment {
-      image_map {
-        tiff "texture.tif"
-      }
-    }
-    normal {agate 0.3 scale 0.002}
-    finish {phong 0.25}
-  }
+#ifndef (MakeHuman_Material)
+
+  #declare DIFFUSE = pigment { 
+        image_map { tiff "texture.tif"}
+        }
+
+#declare NORMAL = normal {
+        wrinkles 0.23 scale 0.0002
+        }
+ 
+#declare FINISH = finish { 
+        specular 0            // Max highlight intensity: 0 -> 1
+        roughness 0.02203444  // surface roughness: 0.0005 -> 1
+        phong 0 phong_size 0  // Phong specular disabled
+
+        ambient 0.01 // rgb <0.00,0.00,0.00>
+        diffuse 0.6
+        reflection{0 } conserve_energy
+        subsurface {translucency 0.6} //0.8}
+        }
+
+// material
+#declare MakeHuman_Material = material {
+        texture { uv_mapping
+                pigment { DIFFUSE }
+                normal  { NORMAL }
+                finish  { FINISH }
+        }
+        
+        interior{ior 1.33}
+}
+  
 #end
 
 // This texture attempts to simulate a simple X-Ray texture.  

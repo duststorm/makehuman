@@ -50,26 +50,7 @@ PanelJoints = [
     ('PTongue',     'o', ('origin', [0.45, -1.5, 0.0])),
     ('PJaw',        'o', ('origin', [0.0, -1.1, 0.0])),
 ]    
-"""    
-SwitchJoints = [
-    ('PArmIK_R',        'o', ('origin', [-1.1, 2.0, 0.0])),
-    ('PArmIK_L',        'o', ('origin', [0.1, 2.0, 0.0])),
-    ('PLegIK_R',        'o', ('origin', [-1.1, 1.5, 0.0])),
-    ('PLegIK_L',        'o', ('origin', [0.1, 1.5, 0.0])),
 
-    ('PFinger-1_R',     'o', ('origin', [-2.0, 1.0, 0.0])),
-    ('PFinger-2_R',     'o', ('origin', [-2.0, 0.5, 0.0])),
-    ('PFinger-3_R',     'o', ('origin', [-2.0, 0.0, 0.0])),
-    ('PFinger-4_R',     'o', ('origin', [-2.0, -0.5, 0.0])),
-    ('PFinger-5_R',     'o', ('origin', [-2.0, -1.0, 0.0])),
-
-    ('PFinger-1_L',     'o', ('origin', [1.2, 1.0, 0.0])),
-    ('PFinger-2_L',     'o', ('origin', [1.2, 0.5, 0.0])),
-    ('PFinger-3_L',     'o', ('origin', [1.2, 0.0, 0.0])),
-    ('PFinger-4_L',     'o', ('origin', [1.2, -0.5, 0.0])),
-    ('PFinger-5_L',     'o', ('origin', [1.2, -1.0, 0.0])),
-]
-"""
 PanelHeadsTails = [
     ('PFace',           'PFace', ('PFace', [0,0,-1])),
     ('PFaceDisp',           'origin', ('origin', [0,0,-1])),
@@ -95,26 +76,6 @@ PanelHeadsTails = [
     ('PTongue',         'PTongue', ('PTongue', offs)),
     ('PJaw',            'PJaw', ('PJaw', offs)),
 ]
-"""
-SwitchHeadsTails = [
-    ('PArmIK_R',            'PArmIK_R', ('PArmIK_R', offs)),
-    ('PArmIK_L',            'PArmIK_L', ('PArmIK_L', offs)),
-    ('PLegIK_R',            'PLegIK_R', ('PLegIK_R', offs)),
-    ('PLegIK_L',            'PLegIK_L', ('PLegIK_L', offs)),
-
-    ('PFinger-1_L',         'PFinger-1_L', ('PFinger-1_L', offs)),
-    ('PFinger-2_L',         'PFinger-2_L', ('PFinger-2_L', offs)),
-    ('PFinger-3_L',         'PFinger-3_L', ('PFinger-3_L', offs)),
-    ('PFinger-4_L',         'PFinger-4_L', ('PFinger-4_L', offs)),
-    ('PFinger-5_L',         'PFinger-5_L', ('PFinger-5_L', offs)),
-
-    ('PFinger-1_R',         'PFinger-1_R', ('PFinger-1_R', offs)),
-    ('PFinger-2_R',         'PFinger-2_R', ('PFinger-2_R', offs)),
-    ('PFinger-3_R',         'PFinger-3_R', ('PFinger-3_R', offs)),
-    ('PFinger-4_R',         'PFinger-4_R', ('PFinger-4_R', offs)),
-    ('PFinger-5_R',         'PFinger-5_R', ('PFinger-5_R', offs)),
-]
-"""
 
 PanelArmature = [
     ('PFace',       pi, None, F_WIR, L_PANEL, NoBB),
@@ -140,25 +101,6 @@ PanelArmature = [
     ('PMouth_L',    pi, 'PFace', 0, L_PANEL, NoBB),
     ('PTongue',     pi, 'PFace', 0, L_PANEL, NoBB),
     ('PJaw',        pi, 'PFace', 0, L_PANEL, NoBB),
-]
-
-SwitchArmature = [
-    ('PArmIK_R',    pi, 'PFace', 0, L_PANEL, NoBB),
-    ('PArmIK_L',    pi, 'PFace', 0, L_PANEL, NoBB),
-    ('PLegIK_R',    pi, 'PFace', 0, L_PANEL, NoBB),
-    ('PLegIK_L',    pi, 'PFace', 0, L_PANEL, NoBB),
-
-    ('PFinger-1_L', pi, 'PFace', 0, L_PANEL, NoBB),
-    ('PFinger-2_L', pi, 'PFace', 0, L_PANEL, NoBB),
-    ('PFinger-3_L', pi, 'PFace', 0, L_PANEL, NoBB),
-    ('PFinger-4_L', pi, 'PFace', 0, L_PANEL, NoBB),
-    ('PFinger-5_L', pi, 'PFace', 0, L_PANEL, NoBB),
-
-    ('PFinger-1_R', pi, 'PFace', 0, L_PANEL, NoBB),
-    ('PFinger-2_R', pi, 'PFace', 0, L_PANEL, NoBB),
-    ('PFinger-3_R', pi, 'PFace', 0, L_PANEL, NoBB),
-    ('PFinger-4_R', pi, 'PFace', 0, L_PANEL, NoBB),
-    ('PFinger-5_R', pi, 'PFace', 0, L_PANEL, NoBB),
 ]
 
 #
@@ -202,30 +144,11 @@ def PanelControlPoses(fp):
     addCSlider(fp, 'PTongue', MX)
     addYSlider(fp, 'PJaw', MX)
     return
-"""
-def SwitchControlPoses(fp):
-    addXSlider(fp, 'PArmIK_L', 0.0, 1.0, 0.0)
-    addXSlider(fp, 'PArmIK_R', 0.0, 1.0, 0.0)
-    addXSlider(fp, 'PLegIK_L', 0.0, 1.0, 0.0)
-    addXSlider(fp, 'PLegIK_R', 0.0, 1.0, 0.0)
 
-    addXSlider(fp, 'PFinger-1_L', 0.0, FMX, FMX)
-    addXSlider(fp, 'PFinger-2_L', 0.0, FMX, FMX)
-    addXSlider(fp, 'PFinger-3_L', 0.0, FMX, FMX)
-    addXSlider(fp, 'PFinger-4_L', 0.0, FMX, FMX)
-    addXSlider(fp, 'PFinger-5_L', 0.0, FMX, FMX)
-
-    addXSlider(fp, 'PFinger-1_R', 0.0, FMX, FMX)
-    addXSlider(fp, 'PFinger-2_R', 0.0, FMX, FMX)
-    addXSlider(fp, 'PFinger-3_R', 0.0, FMX, FMX)
-    addXSlider(fp, 'PFinger-4_R', 0.0, FMX, FMX)
-    addXSlider(fp, 'PFinger-5_R', 0.0, FMX, FMX)
-    return
-"""
 #
 #   Face representation
 #
-
+"""
 FaceShapeDrivers = {
     # Brows
     'BrowsMidDown' : ('PBrows', 'LOC_Z', pos),
@@ -276,82 +199,60 @@ FaceShapeDrivers = {
     'LoLipDown_L' : ('PLoLip_L', 'LOC_Z', pos), 
     'LoLipDown_R' : ('PLoLip_R', 'LOC_Z', pos), 
 }
-
-"""
-    "MouthOpen" : ("Sym", -0.5, 2.0),
-    "MouthCornerDepth" : ("LR", -0.5, 2.0),
-    "LipsOut" : ("LRHJ", -0.5, 2.0),
-    "LipsIn" : ("LRHJ", -0.5, 2.0),
-    "MouthHeight" : ("LR", -0.5, 2.0),
-    "LipsMidHeight" : ("HJ", -0.5, 2.0),
-    "MouthCornerHeight" : ("LRHJ", -0.5, 2.0),
-    "MouthWidth" : ("LR", 0, 2.0),
-    "MouthNarrow" : ("Sym", 0, 2.0),
-    "LipsPart" : ("Sym", -0.5, 2.0),
-    "TongueHeight" : ("Sym", -0.5, 2.0),
-    "TongueDepth" : ("Sym", -0.5, 2.0),
-    "TongueWidth" : ("Sym", -0.5, 2.0),
-    "TongueBackHeight" : ("Sym", -0.5, 2.0),
-    "BrowsMidHeight" : ("Sym", 0, 2.0),
-    "BrowsMidDown" : ("Sym", 0, 2.0),
-    "BrowsSqueeze" : ("Sym", -0.5, 2.0),
-    "BrowsOuterHeight" : ("LR", -0.5, 2.0),
-    "NoseWrinkle" : ("Sym", -0.5, 2.0),
-    "CheekFlex" : ("LR", -0.0, 2.0),
-    "Squint" : ("LR", -0.5, 2.0),
-    "CheekBalloon" : ("Sym", -1, 2.0),
 """
 
 BodyLanguageShapeDrivers = {
     # Brows
-    'BrowsMidHeight' : ('PBrows', 'LOC_Z', neg),
-    'BrowsMidDown' : ('PBrows', 'LOC_Z', pos),
-    'BrowsSqueeze' : ('PBrows', 'LOC_X', neg),
-    'BrowsOuterHeight_L' : ('PBrow_L', 'LOC_Z', neg),
-    'BrowsOuterHeight_R' : ('PBrow_R', 'LOC_Z', neg),
+    'BrowsMidHeight' : ('brows_mid_height', 'PBrows', 'LOC_Z', neg, 0, 1),
+    'BrowsMidDown' : ('brows_mid_down', 'PBrows', 'LOC_Z', pos, 0, 1),
+    'BrowsSqueeze' : ('brows_squeeze', 'PBrows', 'LOC_X', neg, 0, 2),
+    'BrowsOuterHeight_L' : ('brows_outer_height', 'PBrow_L', 'LOC_Z', neg, -1, 2),
+    'BrowsOuterHeight_R' : ('brows_outer_height', 'PBrow_R', 'LOC_Z', neg, -1, 2),
 
 #   Nose and jaw
 
-    'NoseWrinkle' : ('PNose', 'LOC_Z', neg), 
-    'CheekBalloon' : ('PNose', 'LOC_X', pos), 
-    'CheekFlex_L' : ('PCheek_L', 'LOC_Z', neg),
-    'CheekFlex_R' : ('PCheek_R', 'LOC_Z', neg),
-    'Squint_L' : ('PCheek_L', 'LOC_X', pos),
-    'Squint_R' : ('PCheek_R', 'LOC_X', neg),
+    'NoseWrinkle' : ('nose_wrinkle', 'PNose', 'LOC_Z', neg, 0, 2), 
+    'CheekBalloon' : ('cheek_balloon', 'PNose', 'LOC_X', pos, -1, 2), 
+    'CheekFlex_L' : ('cheek_flex', 'PCheek_L', 'LOC_Z', neg, 0, 2),
+    'CheekFlex_R' : ('cheek_flex', 'PCheek_R', 'LOC_Z', neg, 0, 2),
+    'Squint_L' : ('squint', 'PCheek_L', 'LOC_X', pos, 0, 2),
+    'Squint_R' : ('squint', 'PCheek_R', 'LOC_X', neg, 0, 2),
 
 #   Jaw and tongue
-    'MouthOpen' : ('PJaw', 'LOC_Z', pos),
-    'TongueDepth' : ('PJaw', 'LOC_X', neg),
-    'TongueHeight' : ('PTongue', 'LOC_Z', neg),
-    'TongueWidth' : ('PTongue', 'LOC_X', pos),
-    'TongueBackHeight' : ('PTongue', 'LOC_X', neg),
+    'MouthOpen' : ('mouth_open', 'PJaw', 'LOC_Z', pos, 0, 2),
+    'TongueDepth' : ('tongue_depth', 'PJaw', 'LOC_X', neg, 0, 2),
+    'TongueHeight' : ('tongue_height', 'PTongue', 'LOC_Z', neg, 0, 2),
+    'TongueWidth' : ('tongue_width', 'PTongue', 'LOC_X', pos, 0, 1),
+    'TongueBackHeight' : ('tongue_back_height', 'PTongue', 'LOC_X', neg, 0, 1),
 
 #   Mouth expressions
-    'MouthWidth_L' : ('PMouth_L', 'LOC_X', pos),
-    'MouthWidth_R' : ('PMouth_R', 'LOC_X', neg),
-    'MouthCornerDepth_L' : ('PMouth_L', 'LOC_Z', neg),
-    'MouthCornerDepth_R' : ('PMouth_R', 'LOC_Z', neg), 
-    'MouthNarrow_L' : ('PMouth_L', 'LOC_X', neg), 
-    'MouthNarrow_R' : ('PMouth_R', 'LOC_X', pos),
+    'MouthWidth_L' : ('mouth_width', 'PMouth_L', 'LOC_X', pos, 0, 1),
+    'MouthWidth_R' : ('mouth_width', 'PMouth_R', 'LOC_X', neg, 0, 1),
+    'MouthCornerDepth_L' : ('mouth_corner_depth', 'PMouth_L', 'LOC_Z', neg, -1, 2),
+    'MouthCornerDepth_R' : ('mouth_corner_depth', 'PMouth_R', 'LOC_Z', neg, -1, 2), 
+    'MouthNarrow_L' : ('mouth_narrow', 'PMouth_L', 'LOC_X', neg, 0, 1), 
+    'MouthNarrow_R' : ('mouth_narrow', 'PMouth_R', 'LOC_X', pos, 0, 1),
 
 #   Lips part
-    'LipsPart' : ('PMouthMid', 'LOC_Z', neg),
+    'LipsPart' : ('lips_part', 'PMouthMid', 'LOC_Z', neg, -1, 2),
+    'MouthHeight_L' : ('mouth_height', 'PMouthMid', 'LOC_X', pos, -1, 2),
+    'MouthHeight_R' : ('mouth_height', 'PMouthMid', 'LOC_X', neg, -1, 2),
 
 #
-    'UpMouthCornerHeight_L' : ('PUpLip_L', 'LOC_Z', pos),
-    'LoMouthCornerHeight_L' : ('PLoLip_L', 'LOC_Z', pos),
-    'UpMouthCornerHeight_R' : ('PUpLip_R', 'LOC_Z', pos),
-    'LoMouthCornerHeight_R' : ('PLoLip_R', 'LOC_Z', pos),
+    'UpMouthCornerHeight_L' : ('upper_mouth_corner_height', 'PUpLip_L', 'LOC_Z', pos, -1, 2),
+    'LoMouthCornerHeight_L' : ('lower_mouth_corner_height', 'PLoLip_L', 'LOC_Z', pos, -1, 2),
+    'UpMouthCornerHeight_R' : ('upper_mouth_corner_height', 'PUpLip_R', 'LOC_Z', pos, -1, 2),
+    'LoMouthCornerHeight_R' : ('lower_mouth_corner_height', 'PLoLip_R', 'LOC_Z', pos, -1, 2),
 
 #   Lips in - out
-    'UpLipsOut' : ('PUpLipMid', 'LOC_X', pos), 
-    'UpLipsIn' : ('PUpLipMid', 'LOC_X', neg), 
-    'LoLipsOut' : ('PLoLipMid', 'LOC_X', pos), 
-    'LoLipsIn' : ('PLoLipMid', 'LOC_X', neg), 
+    'UpLipsOut' : ('upper_lips_out', 'PUpLipMid', 'LOC_X', pos, 0, 2), 
+    'UpLipsIn' : ('upper_lips_in', 'PUpLipMid', 'LOC_X', neg, 0, 2), 
+    'LoLipsOut' : ('lower_lips_out', 'PLoLipMid', 'LOC_X', pos, 0, 2), 
+    'LoLipsIn' : ('lower_lips_in', 'PLoLipMid', 'LOC_X', neg, 0, 2), 
 
 #   Lips up - down
-    'UpLipsMidHeight' : ('PUpLipMid', 'LOC_Z', neg), 
-    'LoLipsMidHeight' : ('PLoLipMid', 'LOC_Z', neg), 
+    'UpLipsMidHeight' : ('upper_lips_mid_height', 'PUpLipMid', 'LOC_Z', neg, -1, 2), 
+    'LoLipsMidHeight' : ('lower_lips_mid_height', 'PLoLipMid', 'LOC_Z', neg, -1, 2), 
 
 }
 
@@ -363,6 +264,7 @@ BodyLanguageTextureDrivers = {
     'squint_R' : (6, 'PCheek_R', 'LOC_X', neg),
 }
 
+"""
 #
 #   FaceShapeKeyScale
 #
@@ -422,24 +324,4 @@ FaceShapeKeyScale = {
 
 }
 
-#
-#   FingerWriteDrivers(fp):
-#
 """
-def FingerWriteDrivers(fp):
-    drivers = []
-    coeff = (0, 1.0/FMX)
-    for suffix in ['_L', '_R']:
-        for fnum in range(1,6):
-            driver = "PFinger-%d%s" % (fnum, suffix)
-            if fnum == 1:
-                first = 2
-            else:
-                first = 1
-            for lnum in range(first,4):
-                driven = "Finger-%d-%d%s" % (fnum, lnum, suffix)
-                cnsData = ("var", 'TRANSFORMS', [(the.Human, driver, 'LOC_X', C_LOC)])
-                writeDriver(fp, True, 'AVERAGE', "", "pose.bones[\"%s\"].constraints[\"Rot\"].influence" % driven, -1, coeff, [cnsData])
-    return
-"""
-

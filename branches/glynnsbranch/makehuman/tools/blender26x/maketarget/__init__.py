@@ -270,6 +270,7 @@ def menu_func(self, context):
     self.layout.operator(ExportObj.bl_idname, text="MakeHuman OBJ (.obj)...")
  
 def register():
+    mh_utils.init()
     maketarget.init()
     try:
         maketarget.initBatch(bpy.context.scene)
