@@ -1453,6 +1453,14 @@ VerticalSliderStyle = Style(**{
     'orientation':OrientationVertical
     })
 
+class ValueConverter(object):
+
+    def dataToDisplay(self, value):
+        return value
+
+    def displayToData(self, value):
+        return value
+
 class Slider(View):
     
     """
@@ -1476,11 +1484,12 @@ class Slider(View):
     """
 
     def __init__(self, value=0.0, min=0.0, max=1.0, label=None,
-        style=SliderStyle, thumbStyle=SliderThumbStyle):
+        style=SliderStyle, thumbStyle=SliderThumbStyle, valueConverter=ValueConverter()):
 
         View.__init__(self, style)
         
         self.thumbStyle = thumbStyle
+        self.valueConverter = valueConverter;
         
         self.thumbTexture = app.getThemeResource('images', thumbStyle.normal)
         self.focusedThumbTexture = app.getThemeResource('images', thumbStyle.focused)
@@ -1511,7 +1520,7 @@ class Slider(View):
                     
                     if self.edit.getText():
                         oldValue = self.__value
-                        self.setValue(self.edit.getText())
+                        self.setValue(self.valueConverter.displayToData(self.edit.getText()))
                         if oldValue != self.__value:
                             self.callEvent('onChange', self.__value)
 
@@ -1565,7 +1574,7 @@ class Slider(View):
             
         # Update label if needed
         if self.labelFormat:
-            self.label.setText(self.labelFormat % self.__value)
+            self.label.setText(self.labelFormat % self.valueConverter.dataToDisplay(self.__value))
         
     def __setValueFromCursor(self, x, y):
         
@@ -1670,7 +1679,7 @@ class Slider(View):
         self.__setValueFromCursor(event.x, event.y)
             
         if self.labelFormat:
-            self.label.setText(self.labelFormat % self.__value)
+            self.label.setText(self.labelFormat % self.valueConverter.dataToDisplay(self.__value))
 
         self.callEvent('onChanging', self.__value)
 
@@ -1681,7 +1690,7 @@ class Slider(View):
             self.__setValueFromCursor(event.x, event.y)
                 
             if self.labelFormat:
-                self.label.setText(self.labelFormat % self.__value)
+                self.label.setText(self.labelFormat % self.valueConverter.dataToDisplay(self.__value))
                 
             self.sliding = False
 
@@ -1689,7 +1698,11 @@ class Slider(View):
             
         elif self.labelFormat:
             
-            self.edit.setText(str(self.__value))
+            if isinstance(self.min, int):
+                self.edit.setText("%d" % (self.valueConverter.dataToDisplay(self.__value)))
+            else:
+                self.edit.setText("%.2f" % (self.valueConverter.dataToDisplay(self.__value)))
+            
             self.edit.show()
             self.edit.setFocus()
 

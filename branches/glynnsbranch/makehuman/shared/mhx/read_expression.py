@@ -30,9 +30,8 @@ import fastmath
 import math
 import warp
 import warpmodifier
+import algos3d
 
-
-NMhVerts = 18528
 
 #----------------------------------------------------------
 #   Setup expressions
@@ -163,7 +162,7 @@ def readShape(filename):
     for line in fp:
         words = line.split()
         n = int(words[0])
-        if n < NMhVerts:
+        if n < algos3d.NMHVerts:
             shape[n] = (float(words[1]), float(words[2]), float(words[3]))    
     fp.close()
     print("    %s copied" % filename)
@@ -176,6 +175,7 @@ def readShape(filename):
 def readFaceShapes(human, drivers):
     shapeList = []
     shapes = {}
+    warpmodifier.resetWarpTargets(human)
     for name,value in drivers.items():
         (fname, bone, channel, sign, min, max) = value
         if (name[-2:] in ["_L", "_R"]):
@@ -207,6 +207,7 @@ def readFaceShapes(human, drivers):
 
 def readExpressions(human):
     shapeList = []
+    warpmodifier.resetWarpTargets(human)
     for name in Expressions:
         if warp.numpy:
             shape = warpmodifier.compileWarpTarget(
@@ -222,6 +223,7 @@ def readExpressions(human):
 
 def readExpressionUnits(human):
     shapeList = []
+    warpmodifier.resetWarpTargets(human)
     for name in ExpressionUnits:
         if warp.numpy:
             shape = warpmodifier.compileWarpTarget(
@@ -237,6 +239,7 @@ def readExpressionUnits(human):
 
 def readCorrectives(drivers, human, part):
     shapeList = []
+    warpmodifier.resetWarpTargets(human)
     for (pose, lr, expr, vars) in drivers:
         print "Corrective", part, pose
         if warp.numpy:

@@ -19,10 +19,69 @@
 Abstract
 --------
 
-TO DO
+Warp vertex locations from a source character to a target character.
 
+Let
+
+    x_n             Location of vertex n in source character
+    y_n             Location of vertex n in target character
+    
+    x + dx = f(x)   Morph of source character    
+    y + dy = g(y)   Morph of target character
+    
+Given the sets (x_n) and (y_n) and the function f(x), we want to find g(y). To this
+end, introduce the warp field U(x) and its inverse V(y)
+
+    y = U(x)        Warp source location to target location
+    x = V(y)        Warp target location to source location
+    
+Clearly, g = U o f o V, or
+
+    g(y) = U(f(V(y)))
+    
+We only need the inverse warp field at vertex locations, viz. V(y_n) = x_n.  
+The target morph (dy_n) is thus given by
+
+    y_n + dy_n = U(x_n + dx_n)
+
+The warp field U(x) is needed outside the original vertex set. 
+Pick a set of landmark points (x_i), which is a subset of the vertices of the source 
+character. The landmarks should be denser in interesting detail, and can be chosen 
+differently depending on the morph. The warp function is assumed to be of the form
+
+    U(x) = sum_i w_i h_i(x)
+    
+where (w_i) is a set of weights, and h_i(x) is a basis of RBFs (Radial Basis Function).
+An RBF only depends on the distance from the landmark, i.e.
+
+    h_i(x) = phi(|x - x_i|).
+    
+Our RBFs are Hardy functions,
+
+    h_i(x) = sqrt( |x - x_i|^2 + s_i^2 ),
+    
+where s_i = min_(j != i) |x_j - x_i| is the minimal distance to another landmark.
+To determine the weights w_i, we require that the warp field is exact for the landmarks:
+
+    y_i = y(x_i) = U(x_i)
+    
+    y_i = sum_j H_ij w_j
+    
+    H_ij = h_j(x_i)
+    
+This can be written in matrix form: w = (w_j), y = (y_i), H = (H_ij):
+
+    y = H w
+    
+We solve the equivalent equation, which probably has better numerical properties
+    
+    A w = b, 
+    
+where A = HT H, b = HT b, where HT is the transpose of H.
+    
 """
    
+import math
 import fastmath
 
 #----------------------------------------------------------
@@ -60,10 +119,13 @@ def getModule(modname):
     
 try:    
     numpy = getModule("numpy")  
-    print("Numpy successfully loaded")
 except:
     numpy = None
+if numpy:
+    print("Numpy successfully loaded")
+else:
     print("Failed to load numpy. Warping will not work")
+    print("Continuing happily.")
 
 #----------------------------------------------------------
 #   class CWarp
@@ -96,16 +158,17 @@ class CWarp:
                 self.y[k][i] = yverts[i][k]
 
         for i in range(n):
-            mindist = 1e6
+            mindist2 = 1e12
             vxi = xverts[i]
             for j in range(n):
                 if i != j:
-                    vec = vxi - xverts[j]
-                    if vec.length < mindist:                        
-                        mindist = vec.length
-                        if mindist < 1e-3:
-                            print("  ", mindist, i, j)
-            self.s2[i] = (mindist*mindist)
+                    vec = fastmath.vsub3d(vxi, xverts[j])
+                    dist2 = fastmath.vsqr3d(vec)
+                    if dist2 < mindist2:
+                        mindist2 = dist2
+                        if mindist2 < 1e-6:
+                            print("  ", mindist2, i, j)
+            self.s2[i] = mindist2
 
         self.H = numpy.identity(n, float)
         for i in range(n):
@@ -115,7 +178,7 @@ class CWarp:
         
         self.HT = self.H.transpose()
         self.HTH = numpy.dot(self.HT, self.H)    
-        print("Warp set up: %d points" % n)
+        #print("  Warp field set up: %d points" % n)
 
         self.solve(0)
         self.solve(1)
@@ -124,58 +187,73 @@ class CWarp:
     
     
     def solve(self, index):        
-        A = self.HTH + self.lamb * numpy.identity(self.n, float) 
+        A = self.HTH
         b = numpy.dot(self.HT, self.y[index])
         self.w[index] = numpy.linalg.solve(A, b)
         e = self.y[index] - numpy.dot(self.H, self.w[index])
         ee = numpy.dot(e.transpose(), e)
-        print("Solved for index %d: Error %g" % (index, math.sqrt(ee)))
+        #print("Solved for index %d: Error %g" % (index, math.sqrt(ee)))
         #print(self.w[index])
         return
        
 
     def rbf(self, vn, x):
-        vec = x - self.x[vn]
-        vec2 = vec.dot(vec)
+        vec = fastmath.vsub3d(x, self.x[vn])
+        vec2 = fastmath.vsqr3d(vec)
         return math.sqrt(vec2 + self.s2[vn])
         
         
     def warpLoc(self, x):
-        y = mathutils.Vector((0,0,0))
         f = {}        
         for i in range(self.n):
             f[i] = self.rbf(i, x)
-        for k in range(3):
-            w = self.w[k]
-            for i in range(self.n):
-                y[k] += w[i]*f[i]
-            """                
-            for k in range(3):
-                y[k] += w[self.n+k]*x[k]
-            y[k] += w[self.n+3]
-            """
-        return y    
+
+        y0 = 0
+        w = self.w[0]            
+        for i in range(self.n):
+            y0 += w[i]*f[i]
+
+        y1 = 0
+        w = self.w[1]            
+        for i in range(self.n):
+            y1 += w[i]*f[i]
+
+        y2 = 0
+        w = self.w[2]            
+        for i in range(self.n):
+            y2 += w[i]*f[i]
+            
+        return [y0,y1,y2]
         
         
     def warpTarget(self, morph, source, target, landmarks):
         xverts = {}
         yverts = {}  
-        m = 0
-        for n in landmarks:
-            xverts[m] = source[n]
-            yverts[m] = target[n]
-            m += 1
-
+        for (m,n) in landmarks.items():
+            xverts[m] = list(source[n])
+            yverts[m] = list(target[n])
+    
         self.setup(xverts, yverts)
         self.solve(0)
         self.solve(1)
         self.solve(2)
 
         ymorph = {}
-        for n in morph.verts.keys():
-            xloc = fastmath.vadd3d(morph.verts[n].co, source.verts[n].co)
+        for n in morph.keys():
+            xloc = fastmath.vadd3d(morph[n], source[n])
             yloc = self.warpLoc(xloc)
-            ymorph[n] = fastmath.vsub3d(yloc, target.verts[n].co)
+            ymorph[n] = fastmath.vsub3d(yloc, target[n])
+            
+        """
+            print n
+            print "  X0", source[n]
+            print "  Y0", target[n].co
+            print "  X ", xloc
+            print "  Y ", yloc
+            print "  DX", morph[n]
+            print "  DY", ymorph[n]
+        halt
+        """
         return ymorph        
         
            

@@ -63,7 +63,7 @@ class ExpressionTaskView(gui3d.TaskView):
                 self.modifiers[subname] = modifier
                 slider = box.addView(ExpressionSlider(subname.capitalize(), modifier))
                 self.sliders.append(slider)
-            
+            	modifier.slider = slider
             # Create radiobutton
             radio = self.categoryBox.addView(GroupBoxRadioButton(self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0))
 

@@ -29,6 +29,7 @@ import os
 import humanmodifier
 import hair
 import events3d
+import warp
 
 class HumanEvent(events3d.Event):
 
@@ -45,10 +46,15 @@ class Human(gui3d.Object):
 
         gui3d.Object.__init__(self, [0, 0, 0], mesh, True)
         
+        self.iHaveChanged = True
+        algos3d.theHuman = self
+        
         self.mesh.setCameraProjection(0)
         self.mesh.setShadeless(0)
         self.meshData = self.mesh
-
+        self.shadowVerts = []
+        self.syncShadowVerts()
+        
         self.hairModelling = False #temporary variable for easier integration of makehair, will be cleaned later.
         self.hairObj = hairObj
         self.hairProxy = None
@@ -100,6 +106,11 @@ class Human(gui3d.Object):
         self.baseModifier = humanmodifier.GenderAgeEthnicModifier('data/targets/macrodetails/${ethnic}-${gender}-${age}.target')
         
         self.setTexture("data/textures/texture.png")
+
+
+    def syncShadowVerts(self):
+        self.shadowVerts = [ list(v.co) for v in self.meshData.verts ]
+
 
     # Overriding hide and show to account for both human base and the hairs!
 
@@ -339,6 +350,9 @@ class Human(gui3d.Object):
 
     def getDetail(self, name):
         return self.targetsDetailStack.get(name, 0.0)
+        if value:
+            print "getdetail", name, os.path.basename(value)
+        return value
 
     def setHairFile(self, filename):
         self.hairFile = filename
@@ -359,30 +373,34 @@ class Human(gui3d.Object):
         else:
             return None
     
-    def applyAllTargets(self, progressCallback=None, update=True):
+    def applyAllTargets(self, progressCallback=None, update=True, forceWarpReset=False):
         """
         This method applies all targets, in function of age and sex
 
         **Parameters:** None.
 
-        """
-        
+        """        
         self.muscleWeightModifier.setValue(self, 1.0)
         self.baseModifier.setValue(self, 1.0)
 
         algos3d.resetObj(self.meshData)
+        self.syncShadowVerts()
 
         if progressCallback:
             progressCallback(0.0)
         progressVal = 0.0
         progressIncr = 0.5 / (len(self.targetsDetailStack) + 1)
 
-        for (k, v) in self.targetsDetailStack.iteritems():
-            algos3d.loadTranslationTarget(self.meshData, k, v, None, 0, 0)
+        self.resetAllWarpTargets(forceWarpReset)
+        
+        for (targetPath, morphFactor) in self.targetsDetailStack.iteritems():
+            algos3d.loadTranslationTarget(self.meshData, targetPath, morphFactor, None, 0, 0)
+            
             progressVal += progressIncr
             if progressCallback:
                 progressCallback(progressVal)
-
+                
+        
         # Update all verts
         self.getSeedMesh().update()
         self.updateProxyMesh()
@@ -406,7 +424,41 @@ class Human(gui3d.Object):
             progressCallback(1.0)
             
         self.callEvent('onChanged', HumanEvent(self, 'targets'))
+        
 
+    def resetAllWarpTargets(self, force):
+        if not warp.numpy:
+            return
+            
+        hasChanged = False
+        for (targetPath, morphFactor) in self.targetsDetailStack.iteritems():
+            try:
+                target = algos3d.targetBuffer[targetPath]
+            except KeyError:
+                target = None
+            if target:                
+                if (target.morphFactor != morphFactor) and not hasattr(target, "isWarp"):
+                    hasChanged = True
+            else:
+                print "New target:", os.path.basename(targetPath)
+
+        if not (hasChanged or force):
+            return
+            
+        self.iHaveChanged = True
+        print "Human has changed - resetting warp targets"
+        for target in algos3d.targetBuffer.values():
+            if hasattr(target, "isWarp"):
+                target.isDirty = True
+                target.isObsolete = True
+                self.setDetail(target.name, 0)
+                target.morphFactor = 0
+                target.modifier.setValue(self, 0)
+                target.modifier.slider.update()     
+                #target.apply(self, 0)
+                del algos3d.targetBuffer[target.name]
+                                
+    
     def getPartNameForGroupName(self, groupName):
         for k in self.bodyZones:
             if k in groupName:
@@ -480,7 +532,6 @@ class Human(gui3d.Object):
                     targetSym = targetSym.replace('trans-in', 'trans-out')
                 elif 'trans-out' in targetSym:
                     targetSym = targetSym.replace('trans-out', 'trans-in')
-
                 algos3d.loadTranslationTarget(self.meshData, targetSym, targetSymVal, None, 1, 1)
                 self.targetsDetailStack[targetSym] = targetSymVal
         

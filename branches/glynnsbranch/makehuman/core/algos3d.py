@@ -50,8 +50,10 @@ import os
 import numpy as np
 import traceback
 
-targetBuffer = {}
+NMHVerts = 18528
 
+targetBuffer = {}
+theHuman = None
 
 class Target:
 
@@ -76,8 +78,9 @@ class Target:
         
         
         """
-
+        
         self.name = name
+        self.morphFactor = -1
 
         try:
             self._load(self.name)
@@ -151,7 +154,10 @@ class Target:
         self.data = self.raw['vector']
 
     def apply(self, obj, morphFactor, update=True, calcNormals=True, faceGroupToUpdateName=None, scale=(1.0,1.0,1.0)):
-          
+        global theHuman
+        
+        self.morphFactor = morphFactor                
+
         if len(self.verts):
             
             if morphFactor or calcNormals or update:
@@ -225,10 +231,13 @@ def getTarget(obj, targetPath):
     try:
         target = targetBuffer[targetPath]
     except KeyError:
-        pass
-    else:
-        return target
+        target = None
         
+    if target:
+        if hasattr(target, "isWarp"):
+            target.reinit()
+        return target
+
     target = Target(obj, targetPath)
     targetBuffer[targetPath] = target
     

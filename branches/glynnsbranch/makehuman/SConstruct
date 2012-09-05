@@ -115,6 +115,7 @@ if platform.system() == "Windows" and 'dist' in COMMAND_LINE_TARGETS:
 	Copy("dist","license.txt"),
         Copy("dist/lib","pythonmodules/_socket.pyd"),
         Copy("dist/lib","pythonmodules/linalg_module.pyd"),
+	Copy("dist","mh_export.config"),
     ])
     Execute(['makensis dist/setup.nsi'])
 
