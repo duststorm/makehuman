@@ -83,9 +83,9 @@ class ModifierAction:
 class ModifierSlider(gui3d.Slider):
     
     def __init__(self, value=0.0, min=0.0, max=1.0, label=None,
-        style=gui3d.SliderStyle, thumbStyle=gui3d.SliderThumbStyle, modifier=None, valueConverter=gui3d.ValueConverter()):
+        style=gui3d.SliderStyle, thumbStyle=gui3d.SliderThumbStyle, modifier=None):
         
-        gui3d.Slider.__init__(self, value, min, max, label, style, thumbStyle, valueConverter)
+        gui3d.Slider.__init__(self, value, min, max, label, style, thumbStyle)
         self.modifier = modifier
         self.value = None
         
@@ -154,15 +154,12 @@ class Modifier:
             
     def updateValue(self, human, value, updateNormals=1):
         
-        #if not hasattr(self, "isWarp") or not self.isWarp:
-        #    algos3d.resetAllWarpTargets()
-            
         # Collect vertex and face indices if we didn't yet
         if not (self.verts or self.faces):
             # Collect verts
             self.verts = []
             for target in (self.left, self.right):
-                t = algos3d.getTarget(human, target)
+                t = algos3d.getTarget(human.meshData, target)
                 self.verts.extend(t.verts)
             self.verts = list(set(self.verts))
             
@@ -173,15 +170,15 @@ class Modifier:
             self.faces = list(set(self.faces))
         
         # Remove old targets
-        algos3d.loadTranslationTarget(human, self.left, -human.getDetail(self.left), None, 0, 0)
-        algos3d.loadTranslationTarget(human, self.right, -human.getDetail(self.right), None, 0, 0)
+        algos3d.loadTranslationTarget(human.meshData, self.left, -human.getDetail(self.left), None, 0, 0)
+        algos3d.loadTranslationTarget(human.meshData, self.right, -human.getDetail(self.right), None, 0, 0)
         
         # Update detail state
         self.setValue(human, value)
         
         # Add new targets
-        algos3d.loadTranslationTarget(human, self.left, human.getDetail(self.left), None, 0, 0)
-        algos3d.loadTranslationTarget(human, self.right, human.getDetail(self.right), None, 0, 0)
+        algos3d.loadTranslationTarget(human.meshData, self.left, human.getDetail(self.left), None, 0, 0)
+        algos3d.loadTranslationTarget(human.meshData, self.right, human.getDetail(self.right), None, 0, 0)
             
         # Update vertices
         faces = [human.meshData.faces[i] for i in self.faces]
@@ -198,7 +195,6 @@ class GenericModifier:
         self.targets = self.expandTemplate([(self.template, [])])
         self.verts = None
         self.faces = None
-        self.isWarp = False
         
     def setValue(self, human, value):
     
@@ -214,15 +210,12 @@ class GenericModifier:
         
     def updateValue(self, human, value, updateNormals=1):
         
-        #if not self.isWarp:
-        #    algos3d.resetAllWarpTargets()
-            
         # Collect vertex and face indices if we didn't yet
         if not (self.verts or self.faces):
             # Collect verts
             self.verts = []
             for target in self.targets:
-                t = algos3d.getTarget(human, target[0])
+                t = algos3d.getTarget(human.meshData, target[0])
                 self.verts.extend(t.verts)
             self.verts = list(set(self.verts))
             
@@ -234,14 +227,14 @@ class GenericModifier:
         
         # Remove old targets
         for target in self.targets:
-            algos3d.loadTranslationTarget(human, target[0], -human.getDetail(target[0]), None, 0, 0)
+            algos3d.loadTranslationTarget(human.meshData, target[0], -human.getDetail(target[0]), None, 0, 0)
         
         # Update detail state
         self.setValue(human, value)
         
         # Add new targets
         for target in self.targets:
-            algos3d.loadTranslationTarget(human, target[0], human.getDetail(target[0]), None, 0, 0)
+            algos3d.loadTranslationTarget(human.meshData, target[0], human.getDetail(target[0]), None, 0, 0)
             
         # Update vertices
         faces = [human.meshData.faces[i] for i in self.faces]

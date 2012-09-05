@@ -51,6 +51,7 @@ import os
 NMHVerts = 18528
 
 targetBuffer = {}
+theHuman = None
 
 class Target:
 
@@ -58,15 +59,15 @@ class Target:
     This class is used to store morph targets.
     """
 
-    def __init__(self, human, name):
+    def __init__(self, obj, name):
         """
         This method initializes an instance of the Target class.
             
         Parameters
         ----------
         
-        human:
-            *human*. The base human object (to which a target can be applied).
+        obj:
+            *3d object*. The base object (to which a target can be applied).
             This object is read to determine the number of vertices to
             use when initializing this data structure.
         
@@ -75,10 +76,8 @@ class Target:
         
         
         """
-
-        obj = human.meshData
+        
         self.name = name
-        self.isWarp = False
         self.data = [0, 0, 0] * len(obj.verts)
         self.faces = []
         self.verts = []
@@ -112,16 +111,11 @@ class Target:
 
         fileDescriptor.close()
         
+    def apply(self, obj, morphFactor, update=True, calcNormals=True, faceGroupToUpdateName=None, scale=(1.0,1.0,1.0)):
+        global theHuman
         
-    def __repr__(self):
-        return ("<Target %s>" % os.path.basename(self.name))
-        
-        
-    def apply(self, human, morphFactor, update=True, calcNormals=True, faceGroupToUpdateName=None, scale=(1.0,1.0,1.0)):
-
         self.morphFactor = morphFactor                
 
-        obj = human.meshData        
         if self.verts:
             
             if morphFactor or calcNormals or update:
@@ -158,26 +152,23 @@ class Target:
                     v.co[0] += dv0
                     v.co[1] += dv1
                     v.co[2] += dv2                    
-                    if not self.isWarp:
-                        sv = human.shadowVerts[v.idx]
+                    if not hasattr(self, "isWarp"):
+                        sv = theHuman.shadowVerts[v.idx]
                         sv[0] += dv0
                         sv[1] += dv1
                         sv[2] += dv2     
-                        
-                #print "mv", obj.verts[381].co
-                #print "sv", human.shadowVerts[381]
 
             if calcNormals:
                 obj.calcNormals(1, 1, verticesToUpdate, facesToRecalculate)
             if update:
-                obj.update(verticesToUpdate)                
+                obj.update(verticesToUpdate)
 
             return True
             
         return False
 
 
-def getTarget(human, targetPath):
+def getTarget(obj, targetPath):
     """
     This function retrieves a set of translation vectors from a morphing 
     target file and stores them in a buffer. It is usually only called if 
@@ -199,8 +190,8 @@ def getTarget(human, targetPath):
     Parameters
     ----------
 
-    human:
-        *human*. The target human object to which the translations are to be applied.
+    obj:
+        *3d object*. The target object to which the translations are to be applied.
         This object is read by this function to define a list of the vertices 
         affected by this morph target file.
 
@@ -217,16 +208,16 @@ def getTarget(human, targetPath):
         target = None
         
     if target:
-        if target.isWarp:
-            target.reinit(human)
+        if hasattr(target, "isWarp"):
+            target.reinit()
         return target
-        
-    target = Target(human, targetPath)
-    targetBuffer[targetPath] = target
 
+    target = Target(obj, targetPath)
+    targetBuffer[targetPath] = target
+    
     return target
 
-def loadTranslationTarget(human, targetPath, morphFactor, faceGroupToUpdateName=None, update=1, calcNorm=1, scale=[1.0,1.0,1.0]):
+def loadTranslationTarget(obj, targetPath, morphFactor, faceGroupToUpdateName=None, update=1, calcNorm=1, scale=[1.0,1.0,1.0]):
     """
     This function retrieves a set of translation vectors and applies those 
     translations to the specified vertices of the mesh object. This set of 
@@ -243,9 +234,8 @@ def loadTranslationTarget(human, targetPath, morphFactor, faceGroupToUpdateName=
     Parameters
     ----------
 
-    human:
-        *human*. The target human object to which the translations are to be applied.
-        obj = human.meshData
+    obj:
+        *3d object*. The target object to which the translations are to be applied.
         This object is read and updated by this function.
 
     targetPath:
@@ -279,10 +269,9 @@ def loadTranslationTarget(human, targetPath, morphFactor, faceGroupToUpdateName=
     if not (morphFactor or update):
         return
 
-    target = getTarget(human, targetPath)
-        
-    target.apply(human, morphFactor, update, calcNorm, faceGroupToUpdateName, scale)
+    target = getTarget(obj, targetPath)
 
+    target.apply(obj, morphFactor, update, calcNorm, faceGroupToUpdateName, scale)
 
 
 def calcTargetNormal(obj, targetPath):
@@ -885,7 +874,6 @@ def resetObj(obj, update=None, calcNorm=None):
     if calcNorm:
         obj.calcNormals()
 
-
 #scaleList is a list of tuple like this:  [(set(1,2,3,4),[1.0,1.0,2.0]),....]. First entry of tuple is a set of indices, second entry is a triple list of scale.
 def scaleTarget(obj, index, morphFactor, scaleList):
    targetVect = obj.verts[index]
@@ -896,7 +884,7 @@ def scaleTarget(obj, index, morphFactor, scaleList):
          break
    return [targetVect[0]*scale[0]*morphFactor ,targetVect[1]*scale[1]*morphFactor, targetVect[2]*scale[2]*morphFactor]
 
-def loadTranslationTarget2(obj, shadowVerts, targetPath, morphFactor, scaleList, update=1, calcNorm=1):
+def loadTranslationTarget2(obj, targetPath, morphFactor, scaleList, update=1, calcNorm=1):
 
     #change this thing
     #dictionary of targets we will do this manually no need to pushtarget

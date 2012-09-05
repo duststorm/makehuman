@@ -47,6 +47,7 @@ class Human(gui3d.Object):
         gui3d.Object.__init__(self, [0, 0, 0], mesh, True)
         
         self.iHaveChanged = True
+        algos3d.theHuman = self
         
         self.mesh.setCameraProjection(0)
         self.mesh.setShadeless(0)
@@ -393,7 +394,7 @@ class Human(gui3d.Object):
         self.resetAllWarpTargets(forceWarpReset)
         
         for (targetPath, morphFactor) in self.targetsDetailStack.iteritems():
-            algos3d.loadTranslationTarget(self, targetPath, morphFactor, None, 0, 0)
+            algos3d.loadTranslationTarget(self.meshData, targetPath, morphFactor, None, 0, 0)
             
             progressVal += progressIncr
             if progressCallback:
@@ -436,7 +437,7 @@ class Human(gui3d.Object):
             except KeyError:
                 target = None
             if target:                
-                if (target.morphFactor != morphFactor) and not target.isWarp:
+                if (target.morphFactor != morphFactor) and not hasattr(target, "isWarp"):
                     hasChanged = True
             else:
                 print "New target:", os.path.basename(targetPath)
@@ -447,7 +448,7 @@ class Human(gui3d.Object):
         self.iHaveChanged = True
         print "Human has changed - resetting warp targets"
         for target in algos3d.targetBuffer.values():
-            if target.isWarp:
+            if hasattr(target, "isWarp"):
                 target.isDirty = True
                 target.isObsolete = True
                 self.setDetail(target.name, 0)
@@ -517,7 +518,7 @@ class Human(gui3d.Object):
 
             if targetName[:2] == prefix2:
                 targetVal = self.targetsDetailStack[target]
-                algos3d.loadTranslationTarget(self, target, -targetVal, None, 1, 0)
+                algos3d.loadTranslationTarget(self.meshData, target, -targetVal, None, 1, 0)
                 del self.targetsDetailStack[target]
 
         # Apply symm target. For horiz movement the value must be inverted
@@ -531,8 +532,7 @@ class Human(gui3d.Object):
                     targetSym = targetSym.replace('trans-in', 'trans-out')
                 elif 'trans-out' in targetSym:
                     targetSym = targetSym.replace('trans-out', 'trans-in')
-
-                algos3d.loadTranslationTarget(self, targetSym, targetSymVal, None, 1, 1)
+                algos3d.loadTranslationTarget(self.meshData, targetSym, targetSymVal, None, 1, 1)
                 self.targetsDetailStack[targetSym] = targetSymVal
         
         self.updateProxyMesh()        
@@ -544,7 +544,7 @@ class Human(gui3d.Object):
     def rotateLimb(self, targetPath, morphFactor):
         targetPath1 = targetPath+".target"
         targetPath2 = targetPath+".rot"
-        algos3d.loadTranslationTarget(self, targetPath1, morphFactor, None, 1, 0)
+        algos3d.loadTranslationTarget(self.meshData, targetPath1, morphFactor, None, 1, 0)
         algos3d.loadRotationTarget(self.meshData, targetPath2, morphFactor)
 
 

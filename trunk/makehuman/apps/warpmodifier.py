@@ -43,7 +43,7 @@ class WarpTarget(algos3d.Target):
 
     def __init__(self, modifier, human):
         
-        algos3d.Target.__init__(self, human, modifier.warppath)
+        algos3d.Target.__init__(self, human.meshData, modifier.warppath)
         
         self.human = human
         self.modifier = modifier
@@ -56,7 +56,7 @@ class WarpTarget(algos3d.Target):
         return ( "<WarpTarget %s d:%s o:%s>" % (os.path.basename(self.modifier.warppath), self.isDirty, self.isObsolete) )
         
         
-    def reinit(self, human):
+    def reinit(self):
     
         if self.isObsolete:
             halt
@@ -69,10 +69,10 @@ class WarpTarget(algos3d.Target):
     #print "After reinit", self            
         
 
-    def apply(self, human, morphFactor, update=True, calcNormals=True, faceGroupToUpdateName=None, scale=(1.0,1.0,1.0)):
+    def apply(self, obj, morphFactor, update=True, calcNormals=True, faceGroupToUpdateName=None, scale=(1.0,1.0,1.0)):
     
-        self.reinit(human)
-        algos3d.Target.apply(self, human, morphFactor, update, calcNormals, faceGroupToUpdateName, scale)
+        self.reinit()
+        algos3d.Target.apply(self, obj, morphFactor, update, calcNormals, faceGroupToUpdateName, scale)
 
 
 def saveWarpedTarget(shape, path): 
@@ -126,14 +126,14 @@ class WarpModifier (humanmodifier.SimpleModifier):
         return ("<WarpModifier %s>" % (os.path.basename(self.template)))
             
 
-    def updateValue(self, human, value, updateNormals=1):
+    def updateValue(self, obj, value, updateNormals=1):
         
         if warp.numpy:
-            target = self.getWarpTarget(human)    
-            target.reinit(human)
-            return humanmodifier.SimpleModifier.updateValue(self, human, value, updateNormals)
+            target = self.getWarpTarget(algos3d.theHuman)    
+            target.reinit()
+            return humanmodifier.SimpleModifier.updateValue(self, obj, value, updateNormals)
         else:            
-            return self.fallback.updateValue(human, value, updateNormals)
+            return self.fallback.updateValue(obj, value, updateNormals)
         
 
     # overrides
