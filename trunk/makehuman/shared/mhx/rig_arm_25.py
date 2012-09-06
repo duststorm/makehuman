@@ -189,7 +189,7 @@ ArmArmature = [
     ('Hand_R',             0, 'LoArm_R', F_CON+F_WIR, L_RARMFK+L_REXTRA, NoBB),
     
     # IK arm
-    ('UpArmIK_L',          0, 'UpArmHinge_R', 0, L_HELP, NoBB),
+    ('UpArmIK_L',          0, 'UpArmHinge_L', 0, L_HELP, NoBB),
     ('LoArmIK_L',          0, 'UpArmIK_L', F_CON, L_HELP, NoBB),
     ('HlpLoArm_L',         0, 'UpArm_L', F_NOROT+F_CON+F_WIR, L_HELP, NoBB),
     ('Wrist_L',            0, Master, F_WIR, L_LARMIK, NoBB),
