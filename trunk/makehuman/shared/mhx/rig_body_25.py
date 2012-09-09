@@ -21,7 +21,7 @@ Body bone definitions
 
 import mhx_globals as the
 from mhx_globals import *
-from mhx_rig import addPoseBone, copyDeform
+from mhx_rig import addPoseBone
 
 BodyJoints = [
     ('root-tail',      'o', ('spine3', [0,-1,0])),
@@ -380,7 +380,8 @@ def BodyControlPoses(fp):
     addPoseBone(fp,  'Head', 'MHHead', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
          [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-60*D,40*D, -60*D,60*D, -45*D,45*D), (1,1,1)])])
 
-    copyDeform(fp, 'DfmHead', 'Head', 0, U_ROT, None, [])
+    addPoseBone(fp, 'DfmHead', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
+         [('CopyTrans', 0, 1, ['CopyTrans', 'Head', 0])])
  
     addPoseBone(fp,  'DfmStomach',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'StomachTrg', 1, 1]),

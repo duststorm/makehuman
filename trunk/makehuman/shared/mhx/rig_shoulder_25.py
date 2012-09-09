@@ -21,7 +21,7 @@ Arm bone definitions
 
 import mhx_globals as the
 from mhx_globals import *
-from mhx_rig import addPoseBone, copyDeform
+from mhx_rig import addPoseBone
 
 ShoulderJoints = [
     ('r-clav-head',         'l', ((0.7, 'r-scapula'), (0.3, 'l-scapula'))),
@@ -298,10 +298,6 @@ def ShoulderControlPoses(fp):
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limShoulder_R, (True, True, True)]),
          ('CopyTrans', 0, 0, ['Elbow', 'ELClavicle_R', 0])
         ])
-
-    #copyDeform(fp, 'DfmClavicle_L', 'Clavicle_L', 0, U_LOC+U_ROT, None, [])
-    #copyDeform(fp, 'DfmClavicle_R', 'Clavicle_R', 0, U_LOC+U_ROT, None, [])
-    
 
     # Shoulder
     

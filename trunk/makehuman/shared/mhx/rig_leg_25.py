@@ -21,7 +21,7 @@ Leg bone definitions
 
 import mhx_globals as the
 from mhx_globals import *
-from mhx_rig import addPoseBone, copyDeform, copyDeformPartial
+from mhx_rig import addPoseBone
 
 offs = [0,0.6,0]
 prcLegTrg = 0.2
@@ -512,22 +512,11 @@ def LegControlPoses(fp):
 
     # Lower leg deform
     
-    #copyDeform(fp, 'DfmLoLeg_L', 'LoLeg_L', 0, U_LOC+U_ROT, None,
     addPoseBone(fp, 'DfmLoLeg_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'Foot_L', 0, 1])])
 
-    #copyDeform(fp, 'DfmFoot_L', 'Foot_L', 0, U_LOC+U_ROT, None, [])
-
-    #copyDeform(fp, 'DfmToe_L', 'Toe_L', 0, U_LOC+U_ROT, None, [])
-
-
-    #copyDeform(fp, 'DfmLoLeg_R', 'LoLeg_R', 0, U_LOC+U_ROT, None,
     addPoseBone(fp, 'DfmLoLeg_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'Foot_R', 0, 1])])
-
-    #copyDeform(fp, 'DfmFoot_R', 'Foot_R', 0, U_LOC+U_ROT, None, [])
-
-    #copyDeform(fp, 'DfmToe_R', 'Toe_R', 0, U_LOC+U_ROT, None, [])
 
 
     addPoseBone(fp, 'DfmLegOut_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
