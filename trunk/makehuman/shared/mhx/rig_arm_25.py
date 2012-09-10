@@ -36,7 +36,6 @@ ArmJoints = [
     
     #('r-elbow',             'f', ('r-elbow-raw', 'r-uparm0', 'r-hand', [0,0,-0.1])),
     #('l-elbow',             'f', ('l-elbow-raw', 'l-uparm0', 'l-hand', [0,0,-0.1])),
-    
     ('r-elbow',             'j', 'r-elbow'),
     ('l-elbow',             'j', 'l-elbow'),
     
@@ -381,7 +380,8 @@ def ArmControlPoses(fp):
 
     addPoseBone(fp, 'LoArmIK_L', None, 'IK_L', (1,1,1), (0,0,0), (1,1,1), 
                 ((0,1,1), (0,0,0), 0.05, limLoArm_L), 0, 
-        [('IK', 0, 1, ['ArmIK', 'Wrist_L', 2, (pi-deltaElbow, 'ElbowPT_L'), (True, False,False)]),
+        [('LimitRot', C_OW_LOCAL, 1, ['Hint', (0,0, 0,0, -18*D,-18*D), (0,0,1)]),
+         ('IK', 0, 1, ['ArmIK', 'Wrist_L', 2, (pi-deltaElbow, 'ElbowPT_L'), (True, False,False)]),
          ])
 
     #addPoseBone(fp, 'HlpLoArm_L', 'GZM_Circle025', 'IK_L', (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, 
@@ -400,7 +400,8 @@ def ArmControlPoses(fp):
 
     addPoseBone(fp, 'LoArmIK_R', None, 'IK_R', (1,1,1), (0,0,0), (1,1,1), 
             ((0,1,1), (0,0,0), 0.05, limLoArm_R), 0, 
-        [('IK', 0, 1, ['ArmIK', 'Wrist_R', 2, (deltaElbow, 'ElbowPT_R'), (True, False,False)]),        
+        [('LimitRot', C_OW_LOCAL, 1, ['Hint', (0,0, 0,0, 18*D,18*D), (0,0,1)]),
+         ('IK', 0, 1, ['ArmIK', 'Wrist_R', 2, (deltaElbow, 'ElbowPT_R'), (True, False,False)]),        
         ])
 
     #addPoseBone(fp, 'HlpLoArm_R', 'GZM_Circle025', 'IK_R', (1,1,1), (0,0,0), (1,0,1), (1,1,1), 0, 

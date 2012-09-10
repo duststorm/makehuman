@@ -27,8 +27,10 @@ offs = [0,0.6,0]
 prcLegTrg = 0.2
 
 LegJoints = [
-    ('r-knee',              'f', ('r-knee-raw', 'r-upper-leg', 'r-ankle', [0,0,0.1])),
-    ('l-knee',              'f', ('l-knee-raw', 'l-upper-leg', 'l-ankle', [0,0,0.1])),
+    #('r-knee',              'f', ('r-knee-raw', 'r-upper-leg', 'r-ankle', [0,0,0.1])),
+    #('l-knee',              'f', ('l-knee-raw', 'l-upper-leg', 'l-ankle', [0,0,0.1])),
+    ('r-knee',              'j', 'r-knee'),
+    ('l-knee',              'j', 'l-knee'),
 
     ('r-upleg1',            'l', ((0.75, 'r-upper-leg'), (0.25, 'r-knee'))),
     ('r-upleg2',            'l', ((0.5, 'r-upper-leg'), (0.5, 'r-knee'))),
@@ -431,12 +433,14 @@ def LegControlPoses(fp):
 
     addPoseBone(fp, 'LoLegIK_L', None, 'IK_L', (1,1,1), (0,1,1), (1,0,1), 
                 ((1,0,0), (0,0,0), 0.05, limLoLeg_L), 0, 
-        [('IK', 0, 1, ['LegIK', 'AnkleIK_L', 2, (-90*D+deltaKnee, 'KneePT_L'), (1,0,0)]),
+        [('LimitRot', C_OW_LOCAL, 1, ['Hint', (18*D,18*D, 0,0, 0,0), (1,0,0)]),
+         ('IK', 0, 1, ['LegIK', 'AnkleIK_L', 2, (-90*D+deltaKnee, 'KneePT_L'), (1,0,0)]),
         ])
 
     addPoseBone(fp, 'LoLegIK_R', None, 'IK_R', (1,1,1), (0,1,1), (1,0,1), 
                 ((1,0,0), (0,0,0), 0.05, limLoLeg_R), 0, 
-        [('IK', 0, 1, ['LegIK', 'AnkleIK_R', 2, (-90*D-deltaKnee, 'KneePT_R'), (1,0,0)])
+        [('LimitRot', C_OW_LOCAL, 1, ['Hint', (18*D,18*D, 0,0, 0,0), (1,0,0)]),
+         ('IK', 0, 1, ['LegIK', 'AnkleIK_R', 2, (-90*D-deltaKnee, 'KneePT_R'), (1,0,0)])
         ])
 
     addPoseBone(fp, 'LegIK_L', 'MHFootCtrl_L', 'IK_L', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
