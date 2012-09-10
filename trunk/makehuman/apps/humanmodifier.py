@@ -83,9 +83,9 @@ class ModifierAction:
 class ModifierSlider(gui3d.Slider):
     
     def __init__(self, value=0.0, min=0.0, max=1.0, label=None,
-        style=gui3d.SliderStyle, thumbStyle=gui3d.SliderThumbStyle, modifier=None):
+        style=gui3d.SliderStyle, thumbStyle=gui3d.SliderThumbStyle, modifier=None, valueConverter=None):
         
-        gui3d.Slider.__init__(self, value, min, max, label, style, thumbStyle)
+        gui3d.Slider.__init__(self, value, min, max, label, style, thumbStyle, valueConverter)
         self.modifier = modifier
         self.value = None
         

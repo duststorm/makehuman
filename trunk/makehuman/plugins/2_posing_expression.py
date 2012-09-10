@@ -29,21 +29,13 @@ class ExpressionTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Expression')
         
         expressions = [
-            ('smile1', ['smile', 'hopeful', 'innocent']),
-            ('smile2', ['realsmile', 'tender', 'seductive']),
-            ('smile3', ['grin', 'excited', 'ecstatic']),
-            ('smile4', ['proud', 'pleased', 'amused', 'laughing1', 'laughing2']),
-            ('sadness1', ['so-so', 'blue', 'depressed']),
-            ('sadness2', ['sad', 'distressed', 'crying', 'pain']),
-            ('sadness3', ['disappointed', 'frustrated', 'stressed']),
-            ('sadness4', ['worried', 'scared', 'terrified']),
-            ('sadness5', ['shy', 'guilty', 'embarassed']),
-            ('relaxation1', ['relaxed', 'peaceful', 'refreshed', 'pleasured']),
-            ('relaxation2', ['lazy','tired', 'drained', 'sleepy', 'groggy']),
-            ('surprise', ['curious', 'surprised', 'impressed', 'puzzled', 'shocked']),
-            ('anger1', ['frown', 'upset', 'angry', 'furious', 'enraged']),
-            ('anger2', ['skeptical', 'vindictive', 'pout', 'furious', 'grumpy']),
-            ('anger3', ['arrogant', 'sneering', 'haughty', 'disgusted'])
+            ('eyebrows-left', ['down', 'extern-up', 'inner-up', 'up']),
+            ('eyebrows-right', ['down', 'extern-up', 'inner-up', 'up']),
+            ('eye-left', ['closure', 'opened-up', 'slit']),
+            ('eye-right', ['closure', 'opened-up', 'slit']),
+            ('mouth', ['compression', 'corner-puller', 'depression', 'depression-retraction', 'elevation', 'eversion', 'parling', 'part-later', 'protusion', 'pursing', 'retraction', 'upward-retraction', 'open']),
+            ('nose', ['depression', 'left-dilatation', 'left-elevation', 'right-dilatation', 'right-elevation', 'compression']),
+            ('neck', ['platysma']),
             ]
         
         self.groupBoxes = []
@@ -62,28 +54,28 @@ class ExpressionTaskView(gui3d.TaskView):
             # Create sliders
             for subname in subnames:
                 
-                #modifier = humanmodifier.GenderAgeModifier('data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % subname)
+                #modifier = humanmodifier.GenderAgeModifier('data/targets/expression/units/${gender}_${age}/%s-%s.target' % (name, subname))
+                #modifier = humanmodifier.GenderAgeEthnicModifier2('data/targets/expression/units/${ethnic}/${gender}_${age}/%s-%s.target' % (name, subname))
                 modifier = warpmodifier.WarpModifier(
-                    'data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % subname,
+                    'data/targets/expression/units/${ethnic}/${gender}_${age}/%s-%s.target' % (name, subname),
                     "face",
-                    "GenderAgeModifier")
+                    "GenderAgeEthnicModifier2")
                 self.modifiers[subname] = modifier
                 slider = box.addView(ExpressionSlider(subname.capitalize(), modifier))
-                modifier.slider = slider
                 self.sliders.append(slider)
-            
+            	modifier.slider = slider
             # Create radiobutton
             radio = self.categoryBox.addView(GroupBoxRadioButton(self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0))
 
         self.hideAllBoxes()
         self.groupBoxes[0].show()
-        
+  
     def hideAllBoxes(self):
         
         for box in self.groupBoxes:
             
             box.hide()
-    
+
     def onShow(self, event):
 
         gui3d.TaskView.onShow(self, event)
@@ -98,8 +90,6 @@ class ExpressionTaskView(gui3d.TaskView):
         
         human = event.human
         
-        #print "HC", event
-
         for slider in self.sliders:
             value = slider.modifier.getValue(human)
             if value:
@@ -126,9 +116,9 @@ def load(app):
     category = app.getCategory('Posing')
     taskview = category.addView(ExpressionTaskView(category))
     
-    app.addLoadHandler('expression', taskview.loadHandler)
-    app.addSaveHandler(taskview.saveHandler)
-
+    #app.addLoadHandler('expression', taskview.loadHandler)
+    #app.addSaveHandler(taskview.saveHandler)
+    
     print 'Expression loaded'
 
 # This method is called when the plugin is unloaded from makehuman

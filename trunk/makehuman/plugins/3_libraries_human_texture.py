@@ -51,12 +51,6 @@ class Action:
             self.postAction()
         return True
 
-HumanTextureButtonStyle = gui3d.Style(**{
-    'parent':gui3d.ViewStyle,
-    'width':32,
-    'height':32
-    })
-
 class HumanTextureTaskView(gui3d.TaskView):
 
     def __init__(self, category):
@@ -68,21 +62,15 @@ class HumanTextureTaskView(gui3d.TaskView):
         self.filechooser = self.addView(gui3d.FileChooser([self.systemSkins, self.userSkins], 'tif', 'png'))
         self.update = self.filechooser.sortBox.addView(gui3d.Button('Check for updates'))
         self.mediaSync = None
-        self.currentTexture = gui3d.app.categories['Modelling'].addView(gui3d.Button(style=HumanTextureButtonStyle._replace(left=800-252, top=600-36, zIndex=9.2, normal=gui3d.app.selectedHuman.getTexture())))
 
         @self.filechooser.event
         def onFileSelected(filename):
 
             gui3d.app.do(Action(gui3d.app.selectedHuman,
                 gui3d.app.selectedHuman.getTexture(),
-                os.path.join(mh.getPath(''), 'data', 'skins', filename), self.syncTexture))
+                os.path.join(mh.getPath(''), 'data', 'skins', filename)))
             
             gui3d.app.switchCategory('Modelling')
-            
-        @self.currentTexture.event
-        def onClicked(event):
-            gui3d.app.switchCategory('Library')
-            gui3d.app.switchTask("Human texture")
             
         @self.update.event
         def onClicked(event):
@@ -90,10 +78,6 @@ class HumanTextureTaskView(gui3d.TaskView):
             
         gui3d.app.addLoadHandler('skinTexture', self.loadHandler)
         gui3d.app.addSaveHandler(self.saveHandler)
-            
-    def syncTexture(self):
-        
-        self.currentTexture.setTexture(gui3d.app.selectedHuman.getTexture().replace('tif', 'png'))
 
     def onShow(self, event):
 
@@ -114,7 +98,6 @@ class HumanTextureTaskView(gui3d.TaskView):
         
     def onResized(self, event):
         self.filechooser.onResized(event)
-        self.currentTexture.setPosition([event.width-252, event.height-36, 9.2])
         
     def onHumanChanging(self, event):
 
