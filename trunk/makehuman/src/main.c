@@ -763,7 +763,11 @@ int main(int argc, char *argv[])
       SetCurrentDirectory(exepath);
     }
 #endif
-    if (argc >= 2)
+
+#ifdef __APPLE__
+    strcpy(str, "execfile(\"main.py\")");
+#else
+    if ( argc >= 2 )
     {
         snprintf(str, sizeof(str), "execfile(\"%s\")", argv[1]);
     }
@@ -771,7 +775,8 @@ int main(int argc, char *argv[])
     {
         strcpy(str, "execfile(\"main.py\")");
     }
-
+#endif
+    
     Py_SetProgramName(argv[0]);
     Py_Initialize();
 
