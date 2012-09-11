@@ -26,12 +26,6 @@ from aljabr import in2pts, vadd, vsub, calcBBox
 import mh2proxy
 import export_config
 
-HairButtonStyle = gui3d.Style(**{
-    'parent':gui3d.ViewStyle,
-    'width':32,
-    'height':32
-})
-
 class HairTaskView(gui3d.TaskView):
     
     def __init__(self, category):
@@ -42,8 +36,6 @@ class HairTaskView(gui3d.TaskView):
             os.makedirs(hairDir)
         self.filechooser = self.addView(gui3d.FileChooser([hairDir , 'data/hairstyles'], 'obj', 'png', 'data/hairstyles/notfound.png'))
       
-        self.hairButton = gui3d.app.categories['Modelling'].addView(gui3d.Button(style=HairButtonStyle._replace(left=800-216, top=600-36, zIndex=9.2, normal='data/hairstyles/clear.png')))
-        
         self.oHeadCentroid = [0.0, 7.436, 0.03 + 0.577]
         self.oHeadBBox = [[-0.84,6.409,-0.9862],[0.84,8.463,1.046]]
 
@@ -53,11 +45,6 @@ class HairTaskView(gui3d.TaskView):
             mhclo = filename.replace('.obj', '.mhclo')
             self.setHair(gui3d.app.selectedHuman, filename, mhclo)            
             gui3d.app.switchCategory('Modelling')
-            
-        @self.hairButton.event
-        def onClicked(event):
-            gui3d.app.switchCategory('Library')
-            gui3d.app.switchTask("Hair")
 
     def setHair(self, human, obj, mhclo):
 
@@ -85,8 +72,6 @@ class HairTaskView(gui3d.TaskView):
 
             self.adaptHairToHuman(human)
             human.hairObj.setSubdivided(human.isSubdivided())
-            
-            self.hairButton.setTexture(obj.replace('.obj', '.png'))
 
     def adaptHairToHuman(self, human):
 
@@ -109,7 +94,6 @@ class HairTaskView(gui3d.TaskView):
         gui3d.TaskView.onHide(self, event)
         
     def onResized(self, event):
-        self.hairButton.setPosition([event.width-216, event.height-36, 9.2])
         self.filechooser.onResized(event)
         
     def onHumanChanging(self, event):
@@ -120,7 +104,6 @@ class HairTaskView(gui3d.TaskView):
                 human.hairObj.mesh.clear()
                 human.hairObj = None
                 human.hairProxy = None
-            self.hairButton.setTexture('data/hairstyles/clear.png')
         
     def onHumanChanged(self, event):
         

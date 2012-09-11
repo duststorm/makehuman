@@ -41,7 +41,7 @@ class HeadTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Arms and Legs')
         
         features = [
-            ('right hand', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/head/images/', i[3]) for i in
+            ('right hand', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/armslegs/images/', i[3]) for i in
                 [                     
                     ('r-hand-scale-depth', 'decr', 'incr', 'setRightHandTopCamera'),
                     ('r-hand-scale-horiz', 'decr', 'incr', 'setRightHandFrontCamera'),
@@ -51,7 +51,7 @@ class HeadTaskView(gui3d.TaskView):
                     ('r-hand-trans', 'forward', 'backward', 'setRightHandTopCamera'),                          
                                                       
                 ]]),
-            ('left hand', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/head/images/', i[3]) for i in
+            ('left hand', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/armslegs/images/', i[3]) for i in
                 [                     
                     ('l-hand-scale-depth', 'decr', 'incr', 'setLeftHandTopCamera'),
                     ('l-hand-scale-horiz', 'decr', 'incr', 'setLeftHandFrontCamera'),
@@ -61,7 +61,7 @@ class HeadTaskView(gui3d.TaskView):
                     ('l-hand-trans', 'forward', 'backward', 'setLeftHandTopCamera'),                          
                                                       
                 ]]),
-            ('right foot', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/head/images/', i[3]) for i in
+            ('right foot', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/armslegs/images/', i[3]) for i in
                 [                     
                     ('r-foot-scale-depth', 'decr', 'incr', 'setRightFootRightCamera'),
                     ('r-foot-scale-horiz', 'decr', 'incr', 'setRightFootFrontCamera'),
@@ -71,7 +71,7 @@ class HeadTaskView(gui3d.TaskView):
                     ('r-foot-trans', 'forward', 'backward', 'setRightFootRightCamera'),                          
                                                       
                 ]]),
-            ('left foot', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/head/images/', i[3]) for i in
+            ('left foot', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/armslegs/images/', i[3]) for i in
                 [                     
                     ('l-foot-scale-depth', 'decr', 'incr', 'setLeftFootLeftCamera'),
                     ('l-foot-scale-horiz', 'decr', 'incr', 'setLeftFootFrontCamera'),
@@ -81,7 +81,7 @@ class HeadTaskView(gui3d.TaskView):
                     ('l-foot-trans', 'forward', 'backward', 'setLeftFootLeftCamera'),                          
                                                       
                 ]]), 
-            ('left arm', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/head/images/', i[3]) for i in
+            ('left arm', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/armslegs/images/', i[3]) for i in
                 [                     
                     ('l-lowerarm-scale-depth', 'decr', 'incr', 'setLeftArmTopCamera'),
                     ('l-lowerarm-scale-horiz', 'decr', 'incr', 'setLeftArmFrontCamera'),
@@ -97,7 +97,7 @@ class HeadTaskView(gui3d.TaskView):
                     ('l-upperarm-trans', 'forward', 'backward', 'setLeftArmTopCamera'),                          
                                                       
                 ]]), 
-            ('right arm', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/head/images/', i[3]) for i in
+            ('right arm', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/armslegs/images/', i[3]) for i in
                 [                     
                     ('r-lowerarm-scale-depth', 'decr', 'incr', 'setRightArmTopCamera'),
                     ('r-lowerarm-scale-horiz', 'decr', 'incr', 'setRightArmFrontCamera'),
@@ -113,7 +113,7 @@ class HeadTaskView(gui3d.TaskView):
                     ('r-upperarm-trans', 'forward', 'backward', 'setRightArmTopCamera'),                          
                                                       
                 ]]), 
-            ('left leg', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/head/images/', i[3]) for i in
+            ('left leg', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/armslegs/images/', i[3]) for i in
                 [                     
                     ('l-lowerleg-scale-depth', 'decr', 'incr', 'setLeftLegLeftCamera'),
                     ('l-lowerleg-scale-horiz', 'decr', 'incr', 'setLeftLegFrontCamera'),
@@ -129,7 +129,7 @@ class HeadTaskView(gui3d.TaskView):
                     ('l-upperleg-trans', 'forward', 'backward', 'setLeftLegLeftCamera'),                          
                                                       
                 ]]), 
-            ('right leg', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/head/images/', i[3]) for i in
+            ('right leg', [('data/targets/armslegs/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/armslegs/images/', i[3]) for i in
                 [                     
                     ('r-lowerleg-scale-depth', 'decr', 'incr', 'setRightLegRightCamera'),
                     ('r-lowerleg-scale-horiz', 'decr', 'incr', 'setRightLegFrontCamera'),

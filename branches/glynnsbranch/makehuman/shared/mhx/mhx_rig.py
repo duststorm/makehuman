@@ -348,35 +348,6 @@ def addXSlider(fp, bone, mn, mx, dflt):
         [('LimitLoc', C_OW_LOCAL+C_LTRA, 1, ['Const', (mn,mx, '0','0', mn,mx), (1,1,1,1,1,1)])])
 
 #
-#
-#
-
-def copyDeformPartial(fp, dbone, cbone, channels, flags, copy, customShape, constraints):
-    fp.write("\n  Posebone %s %s \n" % (dbone, True))
-    rotMode = rotationMode(flags)
-    fp.write(
-"  rotation_mode '%s' ;\n" % rotMode +
-"    lock_location Array 1 1 1 ;\n" +
-"    lock_rotation Array 1 1 1 ;\n" +
-"    lock_rotation_w True ;\n" + 
-"    lock_rotations_4d True ;\n" +
-"    lock_scale Array 1 1 1  ; \n")
-    if customShape:
-        fp.write("    custom_shape Refer Object %s ; \n" % customShape)
-    if copy & U_LOC:
-        addCopyLocConstraint(fp, 0, 1, ['Loc', cbone, (1,1,1), (0,0,0), 0, False])
-    if copy & U_ROT:
-        addCopyRotConstraint(fp, 0, 1, ['Rot', cbone, channels, (0,0,0), False])
-    if copy & U_SCALE:
-        addCopyScaleConstraint(fp, 0, 1, ['Scale', cbone, (1,1,1), False])
-    addConstraints(fp, dbone, constraints, (1,1,1), (1,1,1))
-    fp.write("  end Posebone\n")
-    return
-
-def copyDeform(fp, dbone, cbone, flags, copy, customShape, constraints):
-    copyDeformPartial(fp, dbone, cbone, (1,1,1), flags, copy, customShape, constraints)
-
-#
 #    addPoseBone(fp, bone, customShape, boneGroup, locArg, lockRot, lockScale, ik_dof, flags, constraints):
 #
 

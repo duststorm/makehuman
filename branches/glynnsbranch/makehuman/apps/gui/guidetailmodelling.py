@@ -551,27 +551,9 @@ class DetailModelingTaskView(gui3d.TaskView):
         gui3d.app.addSaveHandler(self.saveHandler)
         
         self.sliders = []
-        
-        y = 80
-        genderBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Gender', gui3d.GroupBoxStyle._replace(height=25+36*3+6)));y+=25
-        
-        self.sliders.append(genderBox.addView(DetailSlider(0.0, -1.0, 1.0, "Genitalia", self.modifiers['genitals'])));y+=36
-        self.sliders.append(genderBox.addView(DetailSlider(0.0, -1.0, 1.0, "Breast", self.modifiers['breastSize'])));y+=36
-        self.sliders.append(genderBox.addView(DetailSlider(0.5, 0.0, 1.0, "Breast firmness", self.modifiers['breastFirmness'])));y+=36
-        self.sliders.append(genderBox.addView(humanmodifier.ModifierSlider(0.0, -1.0, 1.0, "Breast position", modifier=self.modifiers['breastPosition'])));y+=36
-        self.sliders.append(genderBox.addView(humanmodifier.ModifierSlider(0.0, -1.0, 1.0, "Breast distance", modifier=self.modifiers['breastDistance'])));y+=36
-        self.sliders.append(genderBox.addView(humanmodifier.ModifierSlider(0.0, -1.0, 1.0, "Breast taper", modifier=self.modifiers['breastPoint'])));y+=36
-        y+=16
-              
-        self.pelvisBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Pelvis', gui3d.GroupBoxStyle._replace(height=25+36*3+6)));y+=25
-        
-        self.sliders.append(self.pelvisBox.addView(DetailSlider(0.0, -1.0, 1.0, "Pelvis tone", self.modifiers['pelvisTone'])));y+=36
-        self.sliders.append(self.pelvisBox.addView(DetailSlider(0.0, -1.0, 1.0, "Stomach", self.modifiers['stomach'])));y+=36
-        self.sliders.append(self.pelvisBox.addView(DetailSlider(0.0, -1.0, 1.0, "Buttocks", self.modifiers['buttocks'])));y+=36
-        y+=16
 
         y = 80
-        self.modifiersBox = self.addView(gui3d.GroupBox([650, y, 9.0], 'Modifiers', gui3d.GroupBoxStyle._replace(height=25+24*3+6)));y+=25
+        self.modifiersBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Modifiers', gui3d.GroupBoxStyle._replace(height=25+24*3+6)));y+=25
         
         modifierStyle = gui3d.ButtonStyle._replace(width=(112-4)/2, height=20)
 
