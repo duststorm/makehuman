@@ -634,10 +634,9 @@ class MHApplication(gui3d.Application):
         # Load plugins not starting with _    
         self.modules = {}
         
-        # self.pluginsToLoad = glob.glob(join("plugins/",'[!_]*.py'))
-        # self.pluginsToLoad.sort()
-        # self.pluginsToLoad.reverse()
-        self.pluginsToLoad = []
+        self.pluginsToLoad = glob.glob(join("plugins/",'[!_]*.py'))
+        self.pluginsToLoad.sort()
+        self.pluginsToLoad.reverse()
         
         if self.pluginsToLoad:
             mh.callAsync(self.loadNextPlugin)
