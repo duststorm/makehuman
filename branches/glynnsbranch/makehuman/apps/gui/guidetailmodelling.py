@@ -606,7 +606,8 @@ class DetailModelingTaskView(gui3d.TaskView):
 
     def onShow(self, event):
         gui3d.app.tool = self.tool
-        self.sliders[0].setFocus()
+        if self.sliders:
+            self.sliders[0].setFocus()
         self.syncSliders()
         gui3d.TaskView.onShow(self, event)
 
