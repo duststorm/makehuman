@@ -574,6 +574,14 @@ def symmetrizeWeights(context, left2right):
             nameStripped = vgrp.name[:-2]
             right[nameStripped] = vgrp
             rightIndex[vgrp.index] = nameStripped
+        elif vgrp.name[-4:].lower() == 'left':
+            nameStripped = vgrp.name[:-4]
+            left[nameStripped] = vgrp
+            leftIndex[vgrp.index] = nameStripped
+        elif vgrp.name[-5:].lower() == 'right':
+            nameStripped = vgrp.name[:-5]
+            right[nameStripped] = vgrp
+            rightIndex[vgrp.index] = nameStripped
         elif vgrp.name[-5:] in ['.L.01', '.l.01']:
             nameStripped = vgrp.name[:-5]
             left01[nameStripped] = vgrp
