@@ -79,7 +79,7 @@ class AsymmTaskView(gui3d.TaskView):
             self.human.updateProxyMesh()
         else:
             self.calcAsymm(value,bodyPartName, realtime)
-            self.human.applyAllTargets(self.human.app.progress)
+            self.human.applyAllTargets(gui3d.app.progress)
             
             after = self.getTargetsAndValues(bodyPartName)
             
