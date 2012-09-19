@@ -133,6 +133,7 @@ class CustomTargetsTaskView(gui3d.TaskView):
     def onResized(self, event):
         
         self.optionsBox.setPosition([event.width - 150, self.optionsBox.getPosition()[1], 9.0])
+        self.folderBox.setPosition([event.width - 150, self.folderBox.getPosition()[1], 9.0])
         
     def onShow(self, event):
 

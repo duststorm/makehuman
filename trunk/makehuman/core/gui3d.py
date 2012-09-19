@@ -949,6 +949,8 @@ class Category(View):
         self.hide()
     
     def onResized(self, event):
+        self.tabs.style.width = event.width
+        self.tabs.layout.rebuild()
         self.tabs.box.mesh.resize(event.width, 32)
 
 # The application
