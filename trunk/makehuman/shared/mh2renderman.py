@@ -35,7 +35,7 @@ import subprocess
 #import hair
 import time
 import math
-
+from sets import Set
 
 
 class MaterialParameter:
@@ -203,13 +203,30 @@ class RMRObject:
         self.materialBump = None
         self.name = name
         self.facesIndices = []
+        self.verts = meshData.verts
         self.meshData = meshData
+        self.translationTable = [0 for vert in meshData.verts]        
+        self.verts = []
 
         if mtl is not None:
             self.facesIndices = [[(vert.idx,face.uv[index]) for index, vert in enumerate(face.verts)] for face in meshData.faces if face.mtl == mtl]
         else:
             self.facesIndices = [[(vert.idx,face.uv[index]) for index, vert in enumerate(face.verts)] for face in meshData.faces]
-        #print("LEN FACEINDICES %s, %i" % (name, len(self.facesIndices)))
+        
+        #Create a translation table, in case of the obj is only a part of a bigger mesh.
+        #Using the translation table, we will create a new vert list for the sub object        
+        processedVerts = Set()
+        idx = 0
+        for f in self.facesIndices:
+            for i in f:
+                vertIndex = i[0]                
+                if vertIndex not in processedVerts:                    
+                    self.translationTable[vertIndex] = idx
+                    idx += 1
+                    processedVerts.add(vertIndex)
+                    self.verts.append(meshData.verts[vertIndex])
+  
+        
 
 
 
@@ -235,13 +252,13 @@ class RMRObject:
         for faceIdx in self.facesIndices:
             faceIdx.reverse()
             if faceIdx[0] == faceIdx[-1]:
-                ribObjFile.write('%i %i %i ' % (faceIdx[0][0], faceIdx[1][0], faceIdx[2][0]))
+                ribObjFile.write('%i %i %i ' % (self.translationTable[faceIdx[0][0]], self.translationTable[faceIdx[1][0]], self.translationTable[faceIdx[2][0]]))
             else:
-                ribObjFile.write('%i %i %i %i ' % (faceIdx[0][0], faceIdx[1][0], faceIdx[2][0], faceIdx[3][0]))
+                ribObjFile.write('%i %i %i %i ' % (self.translationTable[faceIdx[0][0]], self.translationTable[faceIdx[1][0]], self.translationTable[faceIdx[2][0]], self.translationTable[faceIdx[3][0]]))
         ribObjFile.write(']')
 
         ribObjFile.write('''["interpolateboundary"] [0 0] [] []"P" [''')
-        for vert in self.meshData.verts:
+        for vert in self.verts:
             ribObjFile.write('%f %f %f ' % (vert.co[0], vert.co[1], -vert.co[2]))
         ribObjFile.write('] ')
 
