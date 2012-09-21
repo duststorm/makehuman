@@ -299,7 +299,7 @@ class RMRHuman(RMRObject):
         self.skinMat.parameters.append(MaterialParameter("string", "spectexture", self.basetexture+"_ref.png"))
         self.skinMat.parameters.append(MaterialParameter("float", "Ks", 0.1))
         self.skinMat.parameters.append(MaterialParameter("float", "Ksss", 0.4)) #TODO: using a texture
-        self.skinMat.parameters.append(MaterialParameter("string", "ssstexture", "lightmap.texture"))
+        #self.skinMat.parameters.append(MaterialParameter("string", "ssstexture", "lightmap.texture"))
 
         self.skinBump = RMRMaterial("skinbump")
         self.skinBump.type = "Displacement"
@@ -318,11 +318,11 @@ class RMRHuman(RMRObject):
 
 
     def subObjectsInit(self):
-		
-		
-		#Because currently therea re no usemtl part in the wavefront obj, 
-		#we define only a subpart for the whole character
-		
+        
+        
+        #Because currently therea re no usemtl part in the wavefront obj, 
+        #we define only a subpart for the whole character
+        
         self.subObjects = []
         #self.wholebody = RMRObject("wholebody", self.meshData)
         #self.wholebody.material = self.skinMat
@@ -610,7 +610,7 @@ class RMRScene:
         """
         This function creates the frame definition for a Renderman scene.
         """
-        imgFile = str(time.time())+".png"
+        imgFile = str(time.time())+".tif"
 
 
         #Getting global settings
@@ -635,8 +635,7 @@ class RMRScene:
 
 
 
-        pos = self.humanCharacter.getHumanPosition()
-        imgFile = str(time.time())+".png"
+        pos = self.humanCharacter.getHumanPosition()        
         ribfile = file(self.sceneFileName, 'w')
 
         #Write rib header
@@ -792,7 +791,42 @@ class RenderThread(Thread):
         self.filenames = filenames
 
     def run(self):
+        
+        for filename, status in self.filenames:
+            command = '%s "%s"' % ('aqsis -Progress', filename)            
+            renderProc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
 
+            mh.callAsync(lambda:self.app.progress(0.0, status))
+
+            try:
+                while True:
+                    line = renderProc.stdout.readline()
+                    if line == '':
+                        break
+                   
+                    progress = line.split()[1][0:-1]
+                    mh.callAsync(lambda:self.app.progress(float(progress)/100.0))
+            except:
+                pass
+
+            mh.callAsync(lambda:self.app.progress(1.0))
+            
+            
+
+
+        
+        """
+        for filename in self.filenames:
+            command = '%s "%s"' % ('aqsis -progress -progressformat="progress %f %p %s %S" -v 0', filename[0])
+            renderProc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
+            
+            #for line in renderProc.stdout:
+              #pass
+              
+            #print "Rendering finished ", renderProc.stdout
+        """
+            
+        """
         for filename, status in self.filenames:
 
             command = '%s "%s"' % ('aqsis -progress -progressformat="progress %f %p %s %S" -v 0', filename)
@@ -807,3 +841,4 @@ class RenderThread(Thread):
                 mh.callAsync(lambda:self.app.progress(float(progress[2])/100.0))
 
             mh.callAsync(lambda:self.app.progress(1.0))
+        """
