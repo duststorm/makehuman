@@ -35,7 +35,130 @@ import subprocess
 #import hair
 import time
 import math
-from sets import Set
+import gui3d
+
+class Shader(object):
+
+    def __init__(self):
+
+        pass
+
+    def shade(self, x, y, u, v, w):
+
+        return (255, 255, 255, 0)
+        
+class ColorShader(Shader):
+
+    def __init__(self, colors):
+
+        self.colors = colors
+
+    def shade(self, x, y, u, v, w):
+
+        col = [self.colors[0][i] * u + self.colors[1][i] * v + self.colors[2][i] * w for i in xrange(3)]
+        return tuple(map(int, col))
+
+class ImageLight:
+
+    def __init__(self):
+        pass
+        
+    # Not really fast since it checks every pixel in the bounding rectangle
+    # http://www.devmaster.net/codespotlight/show.php?id=17
+    def RasterizeTriangle(self, dst, p0, p1, p2, shader):
+
+        y1 = round(p0[1])
+        y2 = round(p1[1])
+        y3 = round(p2[1])
+
+        x1 = round(p0[0])
+        x2 = round(p1[0])
+        x3 = round(p2[0])
+
+        dx12 = x1 - x2
+        dx23 = x2 - x3
+        dx31 = x3 - x1
+
+        dy12 = y1 - y2
+        dy23 = y2 - y3
+        dy31 = y3 - y1
+
+        minx = min([x1, x2, x3])
+        maxx = max([x1, x2, x3])
+        miny = min([y1, y2, y3])
+        maxy = max([y1, y2, y3])
+
+        c1 = dy12 * x1 - dx12 * y1
+        c2 = dy23 * x2 - dx23 * y2
+        c3 = dy31 * x3 - dx31 * y3
+
+        if (dy12 < 0 or (dy12 == 0 and dx12 > 0)): c1+=1
+        if (dy23 < 0 or (dy23 == 0 and dx23 > 0)): c2+=1
+        if (dy31 < 0 or (dy31 == 0 and dx31 > 0)): c3+=1
+
+        cy1 = c1 + dx12 * miny - dy12 * minx
+        cy2 = c2 + dx23 * miny - dy23 * minx
+        cy3 = c3 + dx31 * miny - dy31 * minx
+
+        for y in xrange(int(miny), int(maxy)):
+
+            cx1 = cy1
+            cx2 = cy2
+            cx3 = cy3
+
+            for x in xrange(int(minx), int(maxx)):
+
+                if cx1 > 0 and cx2 > 0 and cx3 > 0:
+
+                    d = - dy23 * dx31 + dx23 * dy31
+                    u = (dy23 * (x - x3) - dx23 * (y - y3)) / d
+                    v = (dy31 * (x - x3) - dx31 * (y - y3)) / d
+                    w = 1.0 - u - v
+                    dst[x, y] = shader.shade(x, y, u, v, w)
+
+                cx1 -= dy12
+                cx2 -= dy23
+                cx3 -= dy31
+
+            cy1 += dx12
+            cy2 += dx23
+            cy3 += dx31
+            
+    def projectLighting(self):
+
+            mesh = gui3d.app.selectedHuman.mesh
+            #mesh.setShadeless(1)
+
+            dstImg = mh.Image(width=1024, height=1024, bitsPerPixel=24)
+
+            dstW = dstImg.width
+            dstH = dstImg.height
+
+            for v in mesh.verts:
+
+                ld = aljabr.vnorm(aljabr.vsub((-10.99, 20.0, 20.0,), v.co))
+                s = aljabr.vdot(v.no, ld)
+                s = max(0, min(255, int(s*255)))
+                v.setColor([s, s, s, 255])
+
+            for g in mesh.faceGroups:
+
+                if g.name.startswith("joint") or g.name.startswith("helper"):
+                    continue
+
+                for f in g.faces:
+
+                    co = [(mesh.uvValues[i][0]*dstW, dstH-(mesh.uvValues[i][1]*dstH)) for i in f.uv]
+                    c = [v.color for v in f.verts]
+                    self.RasterizeTriangle(dstImg, co[0], co[1], co[2], ColorShader(c[:3]))
+                    self.RasterizeTriangle(dstImg, co[2], co[3], co[0], ColorShader((c[2], c[3], c[0])))
+
+            #dstImg.resize(128, 128);
+
+            dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.tga'))
+            #gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.tga'))
+
+            mesh.setColor([255, 255, 255, 255])
 
 
 class MaterialParameter:
@@ -215,7 +338,7 @@ class RMRObject:
         
         #Create a translation table, in case of the obj is only a part of a bigger mesh.
         #Using the translation table, we will create a new vert list for the sub object        
-        processedVerts = Set()
+        processedVerts = set()
         idx = 0
         for f in self.facesIndices:
             for i in f:
@@ -298,8 +421,8 @@ class RMRHuman(RMRObject):
         self.skinMat.parameters.append(MaterialParameter("string", "colortexture", self.basetexture+".png" ))
         self.skinMat.parameters.append(MaterialParameter("string", "spectexture", self.basetexture+"_ref.png"))
         self.skinMat.parameters.append(MaterialParameter("float", "Ks", 0.1))
-        self.skinMat.parameters.append(MaterialParameter("float", "Ksss", 0.4)) #TODO: using a texture
-        #self.skinMat.parameters.append(MaterialParameter("string", "ssstexture", "lightmap.texture"))
+        self.skinMat.parameters.append(MaterialParameter("float", "Ksss", 0.2)) #TODO: using a texture
+        self.skinMat.parameters.append(MaterialParameter("string", "ssstexture", "lighting.png"))
 
         self.skinBump = RMRMaterial("skinbump")
         self.skinBump.type = "Displacement"
@@ -759,6 +882,9 @@ class RMRScene:
 
 
     def render(self):
+        
+        imgLight = ImageLight()
+        imgLight.projectLighting()
 
         filesTorender = []
         self.loadLighting(self.lightsFolderPath, "default.lights")
