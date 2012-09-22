@@ -86,8 +86,8 @@ class HumanTextureTaskView(gui3d.TaskView):
         gui3d.app.selectedHuman.hide()
         self.filechooser.setFocus()
 	
-	self.numSkin = len([filename for filename in os.listdir(os.path.join(mh.getPath(''), 'data', 'skins')) if filename.lower().endswith('tif')])
-	self.numSkin = self.numSkin + len([filename for filename in os.listdir(os.path.join('data', 'skins')) if filename.lower().endswith('tif')])
+        self.numSkin = len([filename for filename in os.listdir(os.path.join(mh.getPath(''), 'data', 'skins')) if filename.lower().endswith('tif')])
+        #self.numSkin = self.numSkin + len([filename for filename in os.listdir(os.path.join('data', 'skins')) if filename.lower().endswith('tif')])
         
         if self.numSkin < 1:    
             gui3d.app.prompt('No skins found', 'You don\'t seem to have any skins, download them from the makehuman media repository?\nNote: this can take some time depending on your connection speed.', 'Yes', 'No', self.syncMedia)

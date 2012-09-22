@@ -28,11 +28,14 @@ from geometry3d import NineSliceMesh, RectangleMesh, FrameMesh
 defaultFontFamily = 'arial'
 rtl = False;
 
-if os.path.isfile(os.path.join(mh.getPath(''), "settings.ini")):
-    f = open(os.path.join(mh.getPath(''), "settings.ini"), 'r')
-    settings = eval(f.read())
-    defaultFontFamily = settings.get('font', defaultFontFamily)
-    f.close()
+try:
+    if os.path.isfile(os.path.join(mh.getPath(''), "settings.ini")):
+        f = open(os.path.join(mh.getPath(''), "settings.ini"), 'r')
+        settings = eval(f.read())
+        defaultFontFamily = settings.get('font', defaultFontFamily)
+        f.close()
+except:
+    print("Failed to load settings")
 
 class Style(object):
     """
@@ -949,6 +952,8 @@ class Category(View):
         self.hide()
     
     def onResized(self, event):
+        self.tabs.style.width = event.width
+        self.tabs.layout.rebuild()
         self.tabs.box.mesh.resize(event.width, 32)
 
 # The application

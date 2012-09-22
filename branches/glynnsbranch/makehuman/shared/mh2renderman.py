@@ -35,7 +35,130 @@ import subprocess
 #import hair
 import time
 import math
+import gui3d
 
+class Shader(object):
+
+    def __init__(self):
+
+        pass
+
+    def shade(self, x, y, u, v, w):
+
+        return (255, 255, 255, 0)
+        
+class ColorShader(Shader):
+
+    def __init__(self, colors):
+
+        self.colors = colors
+
+    def shade(self, x, y, u, v, w):
+
+        col = [self.colors[0][i] * u + self.colors[1][i] * v + self.colors[2][i] * w for i in xrange(3)]
+        return tuple(map(int, col))
+
+class ImageLight:
+
+    def __init__(self):
+        pass
+        
+    # Not really fast since it checks every pixel in the bounding rectangle
+    # http://www.devmaster.net/codespotlight/show.php?id=17
+    def RasterizeTriangle(self, dst, p0, p1, p2, shader):
+
+        y1 = round(p0[1])
+        y2 = round(p1[1])
+        y3 = round(p2[1])
+
+        x1 = round(p0[0])
+        x2 = round(p1[0])
+        x3 = round(p2[0])
+
+        dx12 = x1 - x2
+        dx23 = x2 - x3
+        dx31 = x3 - x1
+
+        dy12 = y1 - y2
+        dy23 = y2 - y3
+        dy31 = y3 - y1
+
+        minx = min([x1, x2, x3])
+        maxx = max([x1, x2, x3])
+        miny = min([y1, y2, y3])
+        maxy = max([y1, y2, y3])
+
+        c1 = dy12 * x1 - dx12 * y1
+        c2 = dy23 * x2 - dx23 * y2
+        c3 = dy31 * x3 - dx31 * y3
+
+        if (dy12 < 0 or (dy12 == 0 and dx12 > 0)): c1+=1
+        if (dy23 < 0 or (dy23 == 0 and dx23 > 0)): c2+=1
+        if (dy31 < 0 or (dy31 == 0 and dx31 > 0)): c3+=1
+
+        cy1 = c1 + dx12 * miny - dy12 * minx
+        cy2 = c2 + dx23 * miny - dy23 * minx
+        cy3 = c3 + dx31 * miny - dy31 * minx
+
+        for y in xrange(int(miny), int(maxy)):
+
+            cx1 = cy1
+            cx2 = cy2
+            cx3 = cy3
+
+            for x in xrange(int(minx), int(maxx)):
+
+                if cx1 > 0 and cx2 > 0 and cx3 > 0:
+
+                    d = - dy23 * dx31 + dx23 * dy31
+                    u = (dy23 * (x - x3) - dx23 * (y - y3)) / d
+                    v = (dy31 * (x - x3) - dx31 * (y - y3)) / d
+                    w = 1.0 - u - v
+                    dst[x, y] = shader.shade(x, y, u, v, w)
+
+                cx1 -= dy12
+                cx2 -= dy23
+                cx3 -= dy31
+
+            cy1 += dx12
+            cy2 += dx23
+            cy3 += dx31
+            
+    def projectLighting(self):
+
+            mesh = gui3d.app.selectedHuman.mesh
+            #mesh.setShadeless(1)
+
+            dstImg = mh.Image(width=1024, height=1024, bitsPerPixel=24)
+
+            dstW = dstImg.width
+            dstH = dstImg.height
+
+            for v in mesh.verts:
+
+                ld = aljabr.vnorm(aljabr.vsub((-10.99, 20.0, 20.0,), v.co))
+                s = aljabr.vdot(v.no, ld)
+                s = max(0, min(255, int(s*255)))
+                v.setColor([s, s, s, 255])
+
+            for g in mesh.faceGroups:
+
+                if g.name.startswith("joint") or g.name.startswith("helper"):
+                    continue
+
+                for f in g.faces:
+
+                    co = [(mesh.uvValues[i][0]*dstW, dstH-(mesh.uvValues[i][1]*dstH)) for i in f.uv]
+                    c = [v.color for v in f.verts]
+                    self.RasterizeTriangle(dstImg, co[0], co[1], co[2], ColorShader(c[:3]))
+                    self.RasterizeTriangle(dstImg, co[2], co[3], co[0], ColorShader((c[2], c[3], c[0])))
+
+            #dstImg.resize(128, 128);
+
+            dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.tga'))
+            #gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.tga'))
+
+            mesh.setColor([255, 255, 255, 255])
 
 
 class MaterialParameter:
@@ -203,13 +326,30 @@ class RMRObject:
         self.materialBump = None
         self.name = name
         self.facesIndices = []
+        self.verts = meshData.verts
         self.meshData = meshData
+        self.translationTable = [0 for vert in meshData.verts]        
+        self.verts = []
 
         if mtl is not None:
             self.facesIndices = [[(vert.idx,face.uv[index]) for index, vert in enumerate(face.verts)] for face in meshData.faces if face.mtl == mtl]
         else:
             self.facesIndices = [[(vert.idx,face.uv[index]) for index, vert in enumerate(face.verts)] for face in meshData.faces]
-        #print("LEN FACEINDICES %s, %i" % (name, len(self.facesIndices)))
+        
+        #Create a translation table, in case of the obj is only a part of a bigger mesh.
+        #Using the translation table, we will create a new vert list for the sub object        
+        processedVerts = set()
+        idx = 0
+        for f in self.facesIndices:
+            for i in f:
+                vertIndex = i[0]                
+                if vertIndex not in processedVerts:                    
+                    self.translationTable[vertIndex] = idx
+                    idx += 1
+                    processedVerts.add(vertIndex)
+                    self.verts.append(meshData.verts[vertIndex])
+  
+        
 
 
 
@@ -235,13 +375,13 @@ class RMRObject:
         for faceIdx in self.facesIndices:
             faceIdx.reverse()
             if faceIdx[0] == faceIdx[-1]:
-                ribObjFile.write('%i %i %i ' % (faceIdx[0][0], faceIdx[1][0], faceIdx[2][0]))
+                ribObjFile.write('%i %i %i ' % (self.translationTable[faceIdx[0][0]], self.translationTable[faceIdx[1][0]], self.translationTable[faceIdx[2][0]]))
             else:
-                ribObjFile.write('%i %i %i %i ' % (faceIdx[0][0], faceIdx[1][0], faceIdx[2][0], faceIdx[3][0]))
+                ribObjFile.write('%i %i %i %i ' % (self.translationTable[faceIdx[0][0]], self.translationTable[faceIdx[1][0]], self.translationTable[faceIdx[2][0]], self.translationTable[faceIdx[3][0]]))
         ribObjFile.write(']')
 
         ribObjFile.write('''["interpolateboundary"] [0 0] [] []"P" [''')
-        for vert in self.meshData.verts:
+        for vert in self.verts:
             ribObjFile.write('%f %f %f ' % (vert.co[0], vert.co[1], -vert.co[2]))
         ribObjFile.write('] ')
 
@@ -270,7 +410,7 @@ class RMRHuman(RMRObject):
         if self.human.hairObj != None:
             self.hairtexture =  os.path.splitext(os.path.basename(self.human.hairObj.getTexture()))[0]
             self.hairMat = RMRMaterial("hairpoly")
-            self.hairMat.parameters.append(MaterialParameter("string", "colortexture", self.hairtexture+".tif"))
+            self.hairMat.parameters.append(MaterialParameter("string", "colortexture", self.hairtexture+".png"))
             #print "HAIRTEXTURE",  self.hairtexture
         #print "BASETEXTURE",  self.basetexture
         
@@ -278,43 +418,43 @@ class RMRHuman(RMRObject):
         
         
         self.skinMat = RMRMaterial("skin2")
-        self.skinMat.parameters.append(MaterialParameter("string", "colortexture", self.basetexture+".tif" ))
-        self.skinMat.parameters.append(MaterialParameter("string", "spectexture", self.basetexture+"_ref.tif"))
+        self.skinMat.parameters.append(MaterialParameter("string", "colortexture", self.basetexture+".png" ))
+        self.skinMat.parameters.append(MaterialParameter("string", "spectexture", self.basetexture+"_ref.png"))
         self.skinMat.parameters.append(MaterialParameter("float", "Ks", 0.1))
-        self.skinMat.parameters.append(MaterialParameter("float", "Ksss", 0.4)) #TODO: using a texture
-        self.skinMat.parameters.append(MaterialParameter("string", "ssstexture", "lightmap.texture"))
+        self.skinMat.parameters.append(MaterialParameter("float", "Ksss", 0.2)) #TODO: using a texture
+        self.skinMat.parameters.append(MaterialParameter("string", "ssstexture", "lighting.png"))
 
         self.skinBump = RMRMaterial("skinbump")
         self.skinBump.type = "Displacement"
-        self.skinBump.parameters.append(MaterialParameter("string", "bumpTexture", self.basetexture+"_bump.tif"))
+        self.skinBump.parameters.append(MaterialParameter("string", "bumpTexture", self.basetexture+"_bump.png"))
         self.skinBump.parameters.append(MaterialParameter("float", "bumpVal", 0.001))
 
         self.corneaMat = RMRMaterial("cornea")
 
         self.teethMat = RMRMaterial("teeth")
-        self.teethMat.parameters.append(MaterialParameter("string", "colortexture", self.basetexture+".tif"))
+        self.teethMat.parameters.append(MaterialParameter("string", "colortexture", self.basetexture+".png"))
 
         self.eyeBallMat = RMRMaterial("eyeball")
-        self.eyeBallMat.parameters.append(MaterialParameter("string", "colortexture", self.basetexture+".tif"))
+        self.eyeBallMat.parameters.append(MaterialParameter("string", "colortexture", self.basetexture+".png"))
         
         
 
 
     def subObjectsInit(self):
-		
-		
-		#Because currently therea re no usemtl part in the wavefront obj, 
-		#we define only a subpart for the whole character
-		
+        
+        
+        #Because currently therea re no usemtl part in the wavefront obj, 
+        #we define only a subpart for the whole character
+        
         self.subObjects = []
         #self.wholebody = RMRObject("wholebody", self.meshData)
         #self.wholebody.material = self.skinMat
         #self.subObjects.append(self.wholebody)
         
-        self.eyeBall = RMRObject("eye_balls", self.meshData, 'eye')
+        self.eyeBall = RMRObject("eye", self.meshData, 'eye')
         self.eyeBall.material = self.eyeBallMat
         self.subObjects.append(self.eyeBall)
-
+        
         self.cornea = RMRObject("cornea", self.meshData, 'cornea')
         self.cornea.material = self.corneaMat
         self.subObjects.append(self.cornea)
@@ -330,7 +470,7 @@ class RMRHuman(RMRObject):
         self.skin = RMRObject("skin", self.meshData, 'skin')
         self.skin.material = self.skinMat
         self.skin.materialBump = self.skinBump
-        self.subObjects.append(self.skin)
+        self.subObjects.append(self.skin)        
         
         if self.human.hairObj != None:
             self.hair = RMRObject("hair", self.human.hairObj.mesh)
@@ -436,7 +576,8 @@ class RMRHeader:
         if self.displayName:
             ribfile.write('Display "%s" "%s" "%s"\n'%(self.displayName, self.displayType, self.displayColor))
         if self.displayName2:
-            ribfile.write('Display "+%s" "%s" "%s"\n'%(self.displayName2, self.displayType2, self.displayColor2))
+            #ribfile.write('Display "+%s" "%s" "%s"\n'%(self.displayName2, self.displayType2, self.displayColor2))
+            pass
         if (self.cameraX != None) and (self.cameraY != None) and (self.cameraZ != None):
             ribfile.write('\tTranslate %f %f %f\n' % (self.cameraX, self.cameraY, self.cameraZ))
 
@@ -450,25 +591,26 @@ class RMRScene:
         #rendering properties
         self.camera = camera
         self.app = app
-        self.lastUndoItem = None
-        self.lastRotation = [0,0,0]
-        self.lastCameraPosition = [self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ]
-        self.firstTimeRendering = True
+        #self.lastUndoItem = None
+        #self.lastRotation = [0,0,0]
+        #self.lastCameraPosition = [self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ]
+        #self.firstTimeRendering = True
 
-        #resources paths
+        #resource paths
         self.renderPath = os.path.join(mh.getPath('render'), 'renderman_output')
         self.ribsPath = os.path.join(self.renderPath, 'ribFiles')
         self.usrShaderPath = os.path.join(self.ribsPath, 'shaders')
+        
+        #Texture paths
         self.usrTexturePath = os.path.join(self.ribsPath, 'textures')
         self.applicationPath = os.getcwd()  # TODO: this may not always return the app folder
         self.appTexturePath = os.path.join(self.applicationPath, 'data', 'textures')
-        self.appObjectPath = os.path.join(self.applicationPath, 'data', '3dobjs')
-        self.worldFileName = os.path.join(self.ribsPath,"world.rib").replace('\\', '/')
-        self.lightsFolderPath = os.path.join(self.applicationPath, 'data', 'lights', 'aqsis')
         self.hairTexturePath = os.path.join(self.applicationPath, 'data', 'hairstyles')
         self.skinTexturePath = os.path.join(mh.getPath(''), 'data', 'skins')
         
-        #self.texturesFileName = os.path.join(self.ribsPath, "texture.rib")
+        #self.appObjectPath = os.path.join(self.applicationPath, 'data', '3dobjs')
+        self.worldFileName = os.path.join(self.ribsPath,"world.rib").replace('\\', '/')
+        self.lightsFolderPath = os.path.join(self.applicationPath, 'data', 'lights', 'aqsis')       
 
         #mainscenefile
         self.sceneFileName = os.path.join(self.ribsPath, "scene.rib")
@@ -479,19 +621,19 @@ class RMRScene:
         self.humanCharacter.subObjectsInit()
         
         #Rendering options
-        self.calcShadow = False
-        self.calcSSS = False
+        #self.calcShadow = False
+        #self.calcSSS = False
 
-        #Shadow path
-        self.shadowFileName = os.path.join(self.ribsPath,"shadow.rib").replace('\\', '/')
+        ##Shadow path
+        #self.shadowFileName = os.path.join(self.ribsPath,"shadow.rib").replace('\\', '/')
 
-        #SSS path        
-        self.bakeFilename = os.path.join(self.ribsPath,"skinbake.rib").replace('\\', '/')
-        self.lightmapFileName = os.path.join(self.ribsPath,"lightmap.rib").replace('\\', '/')
-        self.bakeTMPTexture = os.path.join(self.usrTexturePath,"bake.bake").replace('\\', '/')
-        self.bakeTexture = os.path.join(self.usrTexturePath,"bake.texture").replace('\\', '/')
-        self.lightmapTMPTexture = os.path.join(self.usrTexturePath,"lightmap.tif").replace('\\', '/')
-        self.lightmapTexture = os.path.join(self.usrTexturePath,"lightmap.texture").replace('\\', '/')
+        ##SSS path        
+        #self.bakeFilename = os.path.join(self.ribsPath,"skinbake.rib").replace('\\', '/')
+        #self.lightmapFileName = os.path.join(self.ribsPath,"lightmap.rib").replace('\\', '/')
+        #self.bakeTMPTexture = os.path.join(self.usrTexturePath,"bake.bake").replace('\\', '/')
+        #self.bakeTexture = os.path.join(self.usrTexturePath,"bake.texture").replace('\\', '/')
+        #self.lightmapTMPTexture = os.path.join(self.usrTexturePath,"lightmap.png").replace('\\', '/')
+        #self.lightmapTexture = os.path.join(self.usrTexturePath,"lightmap.texture").replace('\\', '/')
 
         #Lights list
         self.lights = []
@@ -555,33 +697,33 @@ class RMRScene:
             #print "Warning: AO calculation on 0 objects"
 
         ribfile = file(fName, 'w')
-        if not bakeMode:
+        #if not bakeMode:
             #print "Writing world"
-            for subObj in self.humanCharacter.subObjects:
-                #print "rendering....", subObj.name
-                ribPath = os.path.join(self.ribsPath, subObj.name + '.rib')
-                ribfile.write('\tAttributeBegin\n')
-                subObj.writeRibCode(ribPath)
-                if shadowMode:
-                    ribfile.write('\tSurface "null"\n')
-                else:
-                    if subObj.materialBump:
-                        subObj.materialBump.writeRibCode(ribfile)
-                    if subObj.material:
-                        subObj.material.writeRibCode(ribfile)
-                ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
-                ribfile.write('\tAttributeEnd\n')
+        for subObj in self.humanCharacter.subObjects:
+            #print "rendering....", subObj.name
+            ribPath = os.path.join(self.ribsPath, subObj.name + '.rib')
             ribfile.write('\tAttributeBegin\n')
-            if shadowMode:
-                ribfile.write('\tSurface "null"\n')
-            ribfile.write('\tAttributeEnd\n')
-        else:
-            #print "Writing bake world"
-            ribfile.write('\tAttributeBegin\n')
-            ribfile.write('\tSurface "bakelightmap" "string bakefilename" "%s" "string texturename" "%s"\n'%(self.bakeTMPTexture, self.humanCharacter.basetexture+".tif"))
-            ribPath = os.path.join(self.ribsPath, 'skin.rib')
+            subObj.writeRibCode(ribPath)
+            #if shadowMode:
+                #ribfile.write('\tSurface "null"\n')
+            #else:
+            if subObj.materialBump:
+                subObj.materialBump.writeRibCode(ribfile)
+            if subObj.material:
+                subObj.material.writeRibCode(ribfile)
             ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
             ribfile.write('\tAttributeEnd\n')
+        #ribfile.write('\tAttributeBegin\n')
+        #if shadowMode:
+        #    ribfile.write('\tSurface "null"\n')
+        #ribfile.write('\tAttributeEnd\n')
+        #else:
+            #print "Writing bake world"
+            #ribfile.write('\tAttributeBegin\n')
+            #ribfile.write('\tSurface "bakelightmap" "string bakefilename" "%s" "string texturename" "%s"\n'%(self.bakeTMPTexture, self.humanCharacter.basetexture+".png"))
+            #ribPath = os.path.join(self.ribsPath, 'skin.rib')
+            #ribfile.write('\t\tReadArchive "%s"\n' % ribPath.replace('\\', '/'))
+            #ribfile.write('\tAttributeEnd\n')
 
         ribfile.close()
 
@@ -616,8 +758,7 @@ class RMRScene:
 
 
 
-        pos = self.humanCharacter.getHumanPosition()
-        imgFile = str(time.time())+".tif"
+        pos = self.humanCharacter.getHumanPosition()        
         ribfile = file(self.sceneFileName, 'w')
 
         #Write rib header
@@ -635,125 +776,128 @@ class RMRScene:
         ribfile.close()
 
 
-    def writeSkinBakeFile(self):
-        """
-        This function creates the frame definition for a Renderman scene.
-        """
+    #def writeSkinBakeFile(self):
+        #"""
+        #This function creates the frame definition for a Renderman scene.
+        #"""
 
-        #Getting global settings
-        self.xResolution, self.yResolution = self.app.settings.get('rendering_width', 800), self.app.settings.get('rendering_height', 600)
-        self.pixelSamples = [2,2]
-        self.shadingRate = 0.5
+        ##Getting global settings
+        #self.xResolution, self.yResolution = self.app.settings.get('rendering_width', 800), self.app.settings.get('rendering_height', 600)
+        #self.pixelSamples = [2,2]
+        #self.shadingRate = 0.5
 
-        pos = self.humanCharacter.getHumanPosition()
+        #pos = self.humanCharacter.getHumanPosition()
 
-        ribfile = file(self.bakeFilename, 'w')
-
-
-        ribfile.write('FrameBegin 1\n')
-
-        #Getting global settings
-        ribSceneHeader = RMRHeader()
-        ribSceneHeader.sizeFormat = [self.app.settings.get('rendering_width', 800), self.app.settings.get('rendering_height', 600)]
-        ribSceneHeader.pixelSamples = [self.app.settings.get('rendering_aqsis_samples', 2),self.app.settings.get('rendering_aqsis_samples', 2)]
-        ribSceneHeader.shadingRate = self.app.settings.get('rendering_aqsis_shadingrate', 2)
-        ribSceneHeader.setCameraPosition(self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ)
-        ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
-        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath,self.skinTexturePath])
-        ribSceneHeader.fov = self.camera.fovAngle
-
-        #Write rib header
-        ribSceneHeader.writeRibCode(ribfile)
-
-        #Write rib body
-        ribfile.write('\tTranslate %f %f %f\n' % (pos[0], pos[1], 0.0)) # Model
-        ribfile.write('\tRotate %f 1 0 0\n' % -pos[2])
-        ribfile.write('\tRotate %f 0 1 0\n' % -pos[3])
-        ribfile.write('WorldBegin\n')
-        for l in self.lights:
-            l.writeRibCode(ribfile, l.counter)
-        ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName+"bake.rib"))
-        ribfile.write('WorldEnd\n')
-        ribfile.write('FrameEnd\n')
-        ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%(self.bakeTMPTexture, self.bakeTexture))
-
-        ribfile.write('FrameBegin 2\n')
-
-        #Getting global settings
-        ribSceneHeader = RMRHeader()
-        ribSceneHeader.sizeFormat = [1024,1024]
-        ribSceneHeader.setCameraPosition(0,0,0.02)
-        ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
-        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath,self.skinTexturePath])
-        ribSceneHeader.shadingInterpolation = "smooth"
-        ribSceneHeader.projection = "orthographic"
-        ribSceneHeader.displayType = "file"
-        ribSceneHeader.displayColor = "rgba"
-        ribSceneHeader.displayName = self.lightmapTMPTexture
-
-        #Write rib header
-        ribSceneHeader.writeRibCode(ribfile)
-        ribfile.write('WorldBegin\n')
-        ribfile.write('Color [ 1 1 1 ]\n')
-        ribfile.write('\tSurface "scatteringtexture" "string texturename" "%s"\n'%(self.bakeTexture))
-        #ribfile.write('Translate 0 0 0.02\n')
-        ribfile.write('Polygon "P" [ -1 -1 0   1 -1 0   1 1 0  -1 1 0 ]"st" [ 0 1  1 1  1 0  0 0  ]\n')
-        ribfile.write('WorldEnd\n')
-        ribfile.write('FrameEnd\n')
-        ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%(self.lightmapTMPTexture, self.lightmapTexture))
+        #ribfile = file(self.bakeFilename, 'w')
 
 
+        #ribfile.write('FrameBegin 1\n')
 
-    def writeShadowFile(self):
-        """
-        This function creates the frame definition for a Renderman scene.
-        """
+        ##Getting global settings
+        #ribSceneHeader = RMRHeader()
+        #ribSceneHeader.sizeFormat = [self.app.settings.get('rendering_width', 800), self.app.settings.get('rendering_height', 600)]
+        #ribSceneHeader.pixelSamples = [self.app.settings.get('rendering_aqsis_samples', 2),self.app.settings.get('rendering_aqsis_samples', 2)]
+        #ribSceneHeader.shadingRate = self.app.settings.get('rendering_aqsis_shadingrate', 2)
+        #ribSceneHeader.setCameraPosition(self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ)
+        #ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
+        #ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath,self.skinTexturePath])
+        #ribSceneHeader.fov = self.camera.fovAngle
 
-        ribfile = file(self.shadowFileName, 'w')
-        ribSceneHeader = RMRHeader()
-        ribSceneHeader.sizeFormat = [1024,1024]
-        ribSceneHeader.pixelSamples = [1,1]
-        ribSceneHeader.shadingRate = 2
-        ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
-        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath,self.skinTexturePath])
-        ribSceneHeader.bucketSize = [32,32]
-        ribSceneHeader.eyesplits = 10
-        ribSceneHeader.depthfilter = "midpoint"
-        ribSceneHeader.pixelFilter = "box"
+        ##Write rib header
+        #ribSceneHeader.writeRibCode(ribfile)
 
-        #Write rib header
-        ribSceneHeader.writeRibCode(ribfile)
-        for l in self.lights:
-            if l.type == "shadowspot":
-                ribfile.write('FrameBegin %d\n'%(l.counter))
-                ribfile.write('Display "%s" "zfile" "z"\n'%(l.shadowMapDataFile))
-                l.placeShadowCamera(ribfile)
-                ribfile.write('WorldBegin\n')
-                ribfile.write('\tSurface "null"\n')
-                ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName+"shad.rib"))
-                ribfile.write('WorldEnd\n')
-                ribfile.write('FrameEnd\n')
-                shadowMapDataFileFinal = l.shadowMapDataFile.replace("zfile","shad")
-                ribfile.write('MakeShadow "%s" "%s"\n'%(l.shadowMapDataFile,shadowMapDataFileFinal))
-        ribfile.close()
+        ##Write rib body
+        #ribfile.write('\tTranslate %f %f %f\n' % (pos[0], pos[1], 0.0)) # Model
+        #ribfile.write('\tRotate %f 1 0 0\n' % -pos[2])
+        #ribfile.write('\tRotate %f 0 1 0\n' % -pos[3])
+        #ribfile.write('WorldBegin\n')
+        #for l in self.lights:
+            #l.writeRibCode(ribfile, l.counter)
+        #ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName+"bake.rib"))
+        #ribfile.write('WorldEnd\n')
+        #ribfile.write('FrameEnd\n')
+        #ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%(self.bakeTMPTexture, self.bakeTexture))
+
+        #ribfile.write('FrameBegin 2\n')
+
+        ##Getting global settings
+        #ribSceneHeader = RMRHeader()
+        #ribSceneHeader.sizeFormat = [1024,1024]
+        #ribSceneHeader.setCameraPosition(0,0,0.02)
+        #ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
+        #ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath,self.skinTexturePath])
+        #ribSceneHeader.shadingInterpolation = "smooth"
+        #ribSceneHeader.projection = "orthographic"
+        #ribSceneHeader.displayType = "file"
+        #ribSceneHeader.displayColor = "rgba"
+        #ribSceneHeader.displayName = self.lightmapTMPTexture
+
+        ##Write rib header
+        #ribSceneHeader.writeRibCode(ribfile)
+        #ribfile.write('WorldBegin\n')
+        #ribfile.write('Color [ 1 1 1 ]\n')
+        #ribfile.write('\tSurface "scatteringtexture" "string texturename" "%s"\n'%(self.bakeTexture))
+        ##ribfile.write('Translate 0 0 0.02\n')
+        #ribfile.write('Polygon "P" [ -1 -1 0   1 -1 0   1 1 0  -1 1 0 ]"st" [ 0 1  1 1  1 0  0 0  ]\n')
+        #ribfile.write('WorldEnd\n')
+        #ribfile.write('FrameEnd\n')
+        #ribfile.write('MakeTexture "%s" "%s" "periodic" "periodic" "box" 1 1 "float bake" 1024\n'%(self.lightmapTMPTexture, self.lightmapTexture))
+
+
+
+    #def writeShadowFile(self):
+        #"""
+        #This function creates the frame definition for a Renderman scene.
+        #"""
+
+        #ribfile = file(self.shadowFileName, 'w')
+        #ribSceneHeader = RMRHeader()
+        #ribSceneHeader.sizeFormat = [1024,1024]
+        #ribSceneHeader.pixelSamples = [1,1]
+        #ribSceneHeader.shadingRate = 2
+        #ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
+        #ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath,self.skinTexturePath])
+        #ribSceneHeader.bucketSize = [32,32]
+        #ribSceneHeader.eyesplits = 10
+        #ribSceneHeader.depthfilter = "midpoint"
+        #ribSceneHeader.pixelFilter = "box"
+
+        ##Write rib header
+        #ribSceneHeader.writeRibCode(ribfile)
+        #for l in self.lights:
+            #if l.type == "shadowspot":
+                #ribfile.write('FrameBegin %d\n'%(l.counter))
+                #ribfile.write('Display "%s" "zfile" "z"\n'%(l.shadowMapDataFile))
+                #l.placeShadowCamera(ribfile)
+                #ribfile.write('WorldBegin\n')
+                #ribfile.write('\tSurface "null"\n')
+                #ribfile.write('\tReadArchive "%s"\n'%(self.worldFileName+"shad.rib"))
+                #ribfile.write('WorldEnd\n')
+                #ribfile.write('FrameEnd\n')
+                #shadowMapDataFileFinal = l.shadowMapDataFile.replace("zfile","shad")
+                #ribfile.write('MakeShadow "%s" "%s"\n'%(l.shadowMapDataFile,shadowMapDataFileFinal))
+        #ribfile.close()
 
 
 
 
     def render(self):
+        
+        imgLight = ImageLight()
+        imgLight.projectLighting()
 
         filesTorender = []
         self.loadLighting(self.lightsFolderPath, "default.lights")
         #self.writeTextureFile() #TODO move in the init
 
-        #recalculateAll = 0
-        recalculateSSS = 0
+        ##recalculateAll = 0
+        #recalculateSSS = 0
 
-        recalculateAll = 1
-        if  recalculateAll == 1:
-            self.writeWorldFile(self.worldFileName+"bake.rib", bakeMode = 1)
-            self.writeSkinBakeFile()
-            filesTorender.append((self.bakeFilename, 'Calculating SSS'))
+        #recalculateAll = 1
+        #if  recalculateAll == 1:
+            #self.writeWorldFile(self.worldFileName+"bake.rib", bakeMode = 1)
+            #self.writeSkinBakeFile()
+            #filesTorender.append((self.bakeFilename, 'Calculating SSS'))
 
         self.writeWorldFile(self.worldFileName)
         self.writeSceneFile()
@@ -773,7 +917,42 @@ class RenderThread(Thread):
         self.filenames = filenames
 
     def run(self):
+        
+        for filename, status in self.filenames:
+            command = '%s "%s"' % ('aqsis -Progress', filename)            
+            renderProc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
 
+            mh.callAsync(lambda:self.app.progress(0.0, status))
+
+            try:
+                while True:
+                    line = renderProc.stdout.readline()
+                    if line == '':
+                        break
+                   
+                    progress = line.split()[1][0:-1]
+                    mh.callAsync(lambda:self.app.progress(float(progress)/100.0))
+            except:
+                pass
+
+            mh.callAsync(lambda:self.app.progress(1.0))
+            
+            
+
+
+        
+        """
+        for filename in self.filenames:
+            command = '%s "%s"' % ('aqsis -progress -progressformat="progress %f %p %s %S" -v 0', filename[0])
+            renderProc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
+            
+            #for line in renderProc.stdout:
+              #pass
+              
+            #print "Rendering finished ", renderProc.stdout
+        """
+            
+        """
         for filename, status in self.filenames:
 
             command = '%s "%s"' % ('aqsis -progress -progressformat="progress %f %p %s %S" -v 0', filename)
@@ -788,3 +967,4 @@ class RenderThread(Thread):
                 mh.callAsync(lambda:self.app.progress(float(progress[2])/100.0))
 
             mh.callAsync(lambda:self.app.progress(1.0))
+        """
