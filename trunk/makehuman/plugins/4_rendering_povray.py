@@ -39,10 +39,8 @@ class PovrayTaskView(gui3d.TaskView):
         #------------------------------------------------------------------------------------
         filter = []
         # povman: declare Box
-        filterBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Filters')); y +=25+16 
-        # add option..
-        self.exportEyebrows = filterBox.addView(gui3d.CheckBox('Eye brows', True)); y +=24
-        self.useSSS = filterBox.addView(gui3d.CheckBox('Use SSS', False)); y +=24
+        filterBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Material setting')); y +=25+16 
+        self.useSSS = filterBox.addView(gui3d.CheckBox('Use S.S. Scattering', False)); y +=24
         
         # box
         optionsBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*7+6))); y +=25+16
@@ -84,7 +82,7 @@ class PovrayTaskView(gui3d.TaskView):
                                     'format':'array' if self.arrayButton.selected else 'mesh2',
                                     'action':'export' if self.exportButton.selected else 'render',
                                     'bintype': binarie,
-                                    'filter': True if self.exportEyebrows.selected else False}) 
+                                    'SSS': True if self.useSSS.selected else False}) 
 
     def onShow(self, event):
         self.renderButton.setFocus()

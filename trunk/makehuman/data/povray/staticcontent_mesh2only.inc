@@ -22,7 +22,7 @@
 #ifndef (MakeHuman_Material)
 
     #declare DIFFUSE = pigment { 
-        image_map { tiff "texture.tif"}
+        image_map { png "texture.png"}
     }
 
     #declare NORMAL = normal {

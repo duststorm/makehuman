@@ -34,9 +34,6 @@ import subprocess
 import mh2mitsuba_ini
 import random
 import mh
-# povman
-#import gui3d
-# end
 from os.path import basename
 #
 import sys
@@ -112,7 +109,7 @@ def MitsubaExport(obj, app, settings):
             mitsubaMaterials(filexml)
 
             # add geometry
-            subSurfaceData = '' # mitsubaSSS()
+            subSurfaceData = "" #mitsubaSSS()
             mitsubaGeometry(filexml, fileobj, subSurfaceData)
 
             # closed scene file
@@ -142,8 +139,72 @@ def MitsubaExport(obj, app, settings):
                    'Please, enter a valid path to Mitsuba folder.',
                    'Accept')    
 
-def exportObj(obj, filename):
+def exportObj(obj, filename, exportGroups = True, groupFilter=None):
     """
+    This function exports a mesh object in Wavefront obj format. It is assumed that obj will have at least vertices and
+    faces (exception handling for vertices/faces must be done outside this method).
+    
+    Parameters
+    ----------
+   
+    obj:     
+      *Object3D*.  The object to export.
+    filename:     
+      *string*.  The filename of the file to export the object to.
+    """
+
+    # Write obj file
+
+    f = open(filename, 'w')
+    f.write("ply\n")
+    f.write("format ascii 1.0\n")
+    f.write("comment Mh2Ply; PLY exporter for MakeHuman\n")
+    f.write("element vertex 500 \n")
+    f.write("property float x\n")
+    f.write("property float y\n")
+    f.write("property float z\n")
+    
+    '''
+    for vertex colors?
+    f << "property uchar red\n";
+    f << "property uchar green\n";
+    f << "property uchar blue\n";
+    '''
+    f.write("property float nx\n")
+    f.write("property float ny\n")
+    f.write("property float nz\n")
+   
+    #f.write("property float u\n")
+    #f.write("property float v\n")
+    
+    f.write("element face ""amount faces""\n")
+    f.write("property list uchar uint vertex_indices\n")
+    f.write("end_header\n")
+   
+    uvs =[u for u in obj.uvValues]
+    print uvs[24]
+    
+    for v in obj.verts:
+        # vertex
+        f.write('%f %f %f' % tuple(v.co))
+        
+        # normals
+        f.write(' %f %f %f' % tuple(v.no))
+
+        f.write('\n')
+    
+    faces = [fe for fe in obj.faces 
+             if not 'joint' in fe.group.name 
+             and not 'helper' in fe.group.name]
+    #
+    for fa in faces:
+        f.write('3 %s %s %s' % (fa.verts[0].idx, fa.verts[1].idx, fa.verts[2].idx))
+        f.write('\n')
+    
+    
+""" 
+def exportObj(obj, filename):
+    #
     This function exports a mesh object in Wavefront obj format. 
     It is assumed that obj will have at least vertices and faces,
     (exception handling for vertices/faces must be done outside this method).
@@ -155,7 +216,7 @@ def exportObj(obj, filename):
       *Object3D*.  The object to export.
     filename:
       *string*.  The filename of the file to export the object to.
-    """
+    
     '''
     mh2obj.exportObj(mesh,
                     os.path.join(exportPath, filename + ".obj"),
@@ -183,13 +244,18 @@ def exportObj(obj, filename):
 
     #
     groupFilter = None
-    exportGroups = False
+    exportGroups = True
     # basic filter..
-    faces = [fa for fa in obj.faces if not 'joint-' in fa.group.name and not 'helper' in fa.group.name]
+    faces = [fa for fa in obj.faces
+             if not 'joint-' in fa.group.name
+             and not 'helper' in fa.group.name 
+             and not 'eye-cornea' in fa.group.name]
     
     # filter eyebrown and lash for use an special material with 'alpha' value
     # SSS not work fine, cause: the geometry is not closed solid?
-    faces = [fa for fa in faces if not '-eyebrown' in fa.group.name and not '-lash' in fa.group.name]
+    faces = [fa for fa in faces 
+             if not '-eyebrown' in fa.group.name 
+             and not '-lash' in fa.group.name]
     #
     for face in faces:
         f.write('f')
@@ -202,6 +268,7 @@ def exportObj(obj, filename):
         f.write('\n')  
     #
     f.close()
+"""
 
 def mitsubaXmlFile(filexml):
     #
@@ -394,7 +461,7 @@ def mitsubaGeometry(filexml, fileobj, subSurfaceData):
     '''
     # human mesh
     f.write('\n' +
-            '\t<shape type="obj">\n' +
+            '\t<shape type="ply">\n' + # obj">\n' +
             '\t    <string name="filename" value="%s"/>\n' % fileobj +
             '\t    %s\n' % subSurfaceData +
             '\t    <ref id="humanMat"/>\n' + # use 'instantiate' material declaration (id)

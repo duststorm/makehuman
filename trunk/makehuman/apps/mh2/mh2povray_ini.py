@@ -52,9 +52,12 @@ action = 'export'  # "export" or "render"
 renderscenefile = ''  # Use "" to render the default scene file.
 
 # Configure the type of binarie file. 
-# Single Processor Version :  'win32'     (pvengine.exe)
-# MultiProcessor Version :    'win32sse2' (pvengine-sse2.exe)
-# AMD64 systems :             'win64'     (pvengine64.exe)
+# Single Processor Version :    'win32'     (pvengine.exe)
+# MultiProcessor Version :      'win32sse2' (pvengine-sse2.exe)
+# x64 systems :                 'win64'     (pvengine64.exe)
 
 bintype = 'win32'
+
+# test for filter
+SSS = False
 
