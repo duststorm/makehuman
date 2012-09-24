@@ -369,8 +369,8 @@ class BackgroundTaskView(gui3d.TaskView):
 
         #dstImg.resize(128, 128);
 
-        dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.tga'))
-        gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.tga'))
+        dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.png'))
+        gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.png'))
 
         mesh.setColor([255, 255, 255, 255])
 

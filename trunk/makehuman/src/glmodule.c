@@ -33,6 +33,7 @@
 #include "core.h"
 #include <assert.h>
 #include <structmember.h>
+#include <png.h>
 
 #ifdef __WIN32__
     #include <windows.h>
@@ -672,6 +673,16 @@ static PyObject *Image_load(Image *self, PyObject *path)
     return Py_BuildValue("");
 }
 
+void png_user_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
+{
+	SDL_RWops *file = (SDL_RWops*)png_get_io_ptr(png_ptr);
+	SDL_RWwrite(file, data, (int)length, 1);
+}
+
+void png_user_flush_data(png_structp png_ptr)
+{
+}
+
 static PyObject *Image_save(Image *self, PyObject *path)
 {
 	SDL_RWops *file;
@@ -680,6 +691,8 @@ static PyObject *Image_save(Image *self, PyObject *path)
 	unsigned short h;
 	unsigned char header[18];
 	SDL_Surface *surface = self->surface;
+	Py_ssize_t len;
+	BOOL png = FALSE;
 
 	if (!self->surface)
 	{
@@ -694,6 +707,16 @@ static PyObject *Image_save(Image *self, PyObject *path)
 			PyErr_SetString(PyExc_RuntimeError, SDL_GetError());
             return NULL;
 		}
+		
+		len = PyString_Size(path);
+
+		if (len > 0)
+		{
+			char *str = PyString_AsString(path);
+
+			if (str[len-3] == 'p' && str[len-2] == 'n' && str[len-1] == 'g') // note, PNG doesn't match
+				png = TRUE;
+		}
     }
     else if (PyUnicode_Check(path))
     {
@@ -704,6 +727,17 @@ static PyObject *Image_save(Image *self, PyObject *path)
 			PyErr_SetString(PyExc_RuntimeError, SDL_GetError());
             return NULL;
         }
+
+		len = PyString_Size(path);
+
+		if (len > 0)
+		{
+			char *str = PyString_AsString(path);
+
+			if (str[len-3] == 'p' && str[len-2] == 'n' && str[len-1] == 'g') // note, PNG doesn't match
+				png = TRUE;
+		}
+
         Py_DECREF(path);
     }
     else
@@ -712,77 +746,126 @@ static PyObject *Image_save(Image *self, PyObject *path)
         return NULL;
     }
 
-	w = SDL_SwapLE16(self->surface->w);
-	h = SDL_SwapLE16(self->surface->h);
-
-	header[0] = 0; // Id length
-	header[1] = 0; // Color map type
-	header[2] = 2; // Data type code
-	header[3] = 0; header[4] = 0; // Color map origin
-	header[5] = 0; header[6] = 0; // Color map length
-	header[7] = 0; // Color map depth
-	header[8] = 0; header[9] = 0; // X origin
-	header[10] = 0; header[11] = 0; // Y origin
-	header[12] = w & 0x00FF; header[13] = (w & 0xFF00) >> 8; // Width
-	header[14] = h & 0x00FF; header[15] = (h & 0xFF00) >> 8; // Height
-	header[16] = self->surface->format->BitsPerPixel; // Bits per pixel
-	header[17] = 0; // Image descriptor
-
-	SDL_RWwrite(file, &header, 1, 18);
-
-	if (self->surface->format->Rmask != 0x00FF0000 ||
-		self->surface->format->Gmask != 0x0000FF00 ||
-		self->surface->format->Bmask != 0x000000FF)
+	if (png)
 	{
-		if (self->surface->format->BitsPerPixel == 32)
-		{
-			SDL_PixelFormat format;
-            format.palette = NULL;
-            format.BitsPerPixel = 32;
-            format.BytesPerPixel = 4;
-            format.Rloss = format.Gloss = format.Bloss = format.Aloss = 0;
-            format.Rmask = 0x00FF0000;
-            format.Gmask = 0x0000FF00;
-            format.Bmask = 0x000000FF;
-            format.Amask = 0xFF000000;
-            format.colorkey = 0x00000000;
-            format.alpha = 0xFF;
-            format.Rshift = 16;
-            format.Gshift = 8;
-            format.Bshift = 0;
-            format.Ashift = 24;
+		png_structp png_ptr;
+		png_infop info_ptr;
+		int i, colortype;
+		png_bytep *row_pointers;
 
-			surface = SDL_ConvertSurface(self->surface, &format, SDL_SWSURFACE);
+		png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+		if (png_ptr == NULL) {
+			PyErr_SetString(PyExc_RuntimeError, "png_create_write_struct failed");
+			return NULL;
 		}
-		else if (self->surface->format->BitsPerPixel == 24)
-		{
-			SDL_PixelFormat format;
-            format.palette = NULL;
-            format.BitsPerPixel = 24;
-            format.BytesPerPixel = 3;
-            format.Rloss = format.Gloss = format.Bloss = format.Aloss = 0;
-            format.Rmask = 0x00FF0000;
-            format.Gmask = 0x0000FF00;
-            format.Bmask = 0x000000FF;
-            format.Amask = 0x00000000;
-            format.colorkey = 0x00000000;
-            format.alpha = 0xFF;
-            format.Rshift = 16;
-            format.Gshift = 8;
-            format.Bshift = 0;
-            format.Ashift = 24;
 
-			surface = SDL_ConvertSurface(self->surface, &format, SDL_SWSURFACE);
+		info_ptr = png_create_info_struct(png_ptr);
+		if (info_ptr == NULL) {
+			png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
+			PyErr_SetString(PyExc_RuntimeError, "png_create_info_struct failed");
+			return NULL;
 		}
+
+		if (setjmp(png_jmpbuf(png_ptr))) {
+			png_destroy_write_struct(&png_ptr, &info_ptr);
+			PyErr_SetString(PyExc_RuntimeError, "save to png failed");
+			return NULL;
+		}
+
+		png_set_write_fn(png_ptr, file, png_user_write_data, png_user_flush_data);
+
+		colortype = PNG_COLOR_MASK_COLOR;
+		if (surface->format->Amask)
+			colortype |= PNG_COLOR_MASK_ALPHA;
+		png_set_IHDR(png_ptr, info_ptr, surface->w, surface->h, 8, colortype, PNG_INTERLACE_NONE, 
+			PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+
+		png_write_info(png_ptr, info_ptr);
+		png_set_packing(png_ptr);
+
+		row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * surface->h);
+		for (i = 0; i < surface->h; i++)
+			row_pointers[i] = (png_bytep)(unsigned char*)surface->pixels + i * surface->pitch;
+		png_write_image(png_ptr, row_pointers);
+		png_write_end(png_ptr, info_ptr);
+		free(row_pointers);
+
+		png_destroy_write_struct(&png_ptr, &info_ptr);
 	}
-
-	for (y = surface->h - 1; y >= 0; y--)
+	else
 	{
-		SDL_RWwrite(file, (unsigned char*)surface->pixels + surface->pitch * y, 1, surface->w * surface->format->BytesPerPixel);
+		w = SDL_SwapLE16(self->surface->w);
+		h = SDL_SwapLE16(self->surface->h);
+
+		header[0] = 0; // Id length
+		header[1] = 0; // Color map type
+		header[2] = 2; // Data type code
+		header[3] = 0; header[4] = 0; // Color map origin
+		header[5] = 0; header[6] = 0; // Color map length
+		header[7] = 0; // Color map depth
+		header[8] = 0; header[9] = 0; // X origin
+		header[10] = 0; header[11] = 0; // Y origin
+		header[12] = w & 0x00FF; header[13] = (w & 0xFF00) >> 8; // Width
+		header[14] = h & 0x00FF; header[15] = (h & 0xFF00) >> 8; // Height
+		header[16] = self->surface->format->BitsPerPixel; // Bits per pixel
+		header[17] = 0; // Image descriptor
+
+		SDL_RWwrite(file, &header, 1, 18);
+
+		if (self->surface->format->Rmask != 0x00FF0000 ||
+			self->surface->format->Gmask != 0x0000FF00 ||
+			self->surface->format->Bmask != 0x000000FF)
+		{
+			if (self->surface->format->BitsPerPixel == 32)
+			{
+				SDL_PixelFormat format;
+				format.palette = NULL;
+				format.BitsPerPixel = 32;
+				format.BytesPerPixel = 4;
+				format.Rloss = format.Gloss = format.Bloss = format.Aloss = 0;
+				format.Rmask = 0x00FF0000;
+				format.Gmask = 0x0000FF00;
+				format.Bmask = 0x000000FF;
+				format.Amask = 0xFF000000;
+				format.colorkey = 0x00000000;
+				format.alpha = 0xFF;
+				format.Rshift = 16;
+				format.Gshift = 8;
+				format.Bshift = 0;
+				format.Ashift = 24;
+
+				surface = SDL_ConvertSurface(self->surface, &format, SDL_SWSURFACE);
+			}
+			else if (self->surface->format->BitsPerPixel == 24)
+			{
+				SDL_PixelFormat format;
+				format.palette = NULL;
+				format.BitsPerPixel = 24;
+				format.BytesPerPixel = 3;
+				format.Rloss = format.Gloss = format.Bloss = format.Aloss = 0;
+				format.Rmask = 0x00FF0000;
+				format.Gmask = 0x0000FF00;
+				format.Bmask = 0x000000FF;
+				format.Amask = 0x00000000;
+				format.colorkey = 0x00000000;
+				format.alpha = 0xFF;
+				format.Rshift = 16;
+				format.Gshift = 8;
+				format.Bshift = 0;
+				format.Ashift = 24;
+
+				surface = SDL_ConvertSurface(self->surface, &format, SDL_SWSURFACE);
+			}
+		}
+
+		for (y = surface->h - 1; y >= 0; y--)
+		{
+			SDL_RWwrite(file, (unsigned char*)surface->pixels + surface->pitch * y, 1, surface->w * surface->format->BytesPerPixel);
+		}	
 	}
 
 	if (surface != self->surface)
-		SDL_FreeSurface(surface);
+			SDL_FreeSurface(surface);
 
 	if (SDL_RWclose(file) != 0)
 	{
