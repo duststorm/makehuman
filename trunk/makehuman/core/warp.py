@@ -94,18 +94,18 @@ import sys
 import imp
 import os
 
-def getModule(modname):        
+def getModule(modname, folder):        
     try:
         return sys.modules[modname]
     except KeyError:
         pass
     print("Trying to load %s" % modname)
     
-    if modname not in os.listdir("pythonmodules"):
-        print("%s does not exist in pythonmodules" % modname)
+    if modname not in os.listdir(folder):
+        print("%s does not exist in %s" % (modname, folder))
         return None
         
-    path = os.path.realpath("pythonmodules/%s" % modname)
+    path = os.path.realpath(os.path.join(folder, modname))
     if path not in sys.path:
         sys.path.append(path)
         
@@ -118,7 +118,7 @@ def getModule(modname):
     return sys.modules[modname]
     
 try:    
-    numpy = getModule("numpy")  
+    numpy = getModule("numpy", "lib/site-packages")  
 except:
     numpy = None
 if numpy:
