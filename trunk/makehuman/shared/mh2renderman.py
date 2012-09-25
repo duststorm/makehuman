@@ -134,16 +134,16 @@ class ImageLight:
             dstW = dstImg.width
             dstH = dstImg.height
 
-            pointlights = [(-10.99, 20.0, 20.0)]
+            pointlights = [(-10.99, 20.0, 20.0, 1.0)]
 
             for v in mesh.verts:
 
                 c = 0.0
 
                 for light in pointlights:
-                    ld = aljabr.vnorm(aljabr.vsub(light, v.co))
+                    ld = aljabr.vnorm(aljabr.vsub(light[:-1], v.co))
                     s = aljabr.vdot(v.no, ld)
-                    c += s
+                    c += s * light[-1]
                 
                 c = max(0, min(255, int(c*255)))
                 v.setColor([c, c, c, 255])
