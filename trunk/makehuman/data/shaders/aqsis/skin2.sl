@@ -13,7 +13,8 @@ surface skin2(
             float Ks = 0.001;             		
             float Ka = 1;
             float melanin = 1;
-            float Ksss = 0;	            	
+            float Ksss = 0;	
+            float scattering = 0.005;	            	
 			  ) 
    {	
    
@@ -65,7 +66,7 @@ surface skin2(
         Oi = float texture (colortexture[3], "fill", 1);  
         
     if (ssstexture != ""){
-	    ssslight= color texture (ssstexture)*3;        
+	    ssslight= color texture (ssstexture, "blur", scattering)*Ksss;        
         }
 	
 
@@ -122,7 +123,8 @@ surface skin2(
     final_skin_color += specularity  * Ks*specular(Nn,-normalize(I),0.8)* dark_side2 * 0.01;	
 
     Ci = final_skin_color * (1/(melanin+1))*f3;
-    Ci = mix(Ci,ssslight,Ksss);
+    //Ci = mix(Ci,ssslight,Ksss);
+    Ci = Ci+ssslight;
     
     Ci = Ci + specularity * sweat * specular(Nn,-normalize(I),0.1);
 	
