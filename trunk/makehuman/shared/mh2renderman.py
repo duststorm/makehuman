@@ -155,7 +155,7 @@ class ImageLight:
 
             #dstImg.resize(128, 128);
 
-            dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.tga'))
+            dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.png'))
             #gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.tga'))
 
             mesh.setColor([255, 255, 255, 255])
@@ -595,6 +595,7 @@ class RMRScene:
         #self.lastRotation = [0,0,0]
         #self.lastCameraPosition = [self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ]
         #self.firstTimeRendering = True
+        self.renderResult = ""
 
         #resource paths
         self.renderPath = os.path.join(mh.getPath('render'), 'renderman_output')
@@ -733,7 +734,7 @@ class RMRScene:
         """
         This function creates the frame definition for a Renderman scene.
         """
-        imgFile = str(time.time())+".tif"
+        self.renderResult = str(time.time())+".tif"
 
 
         #Getting global settings
@@ -749,7 +750,7 @@ class RMRScene:
         ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
         ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath,self.skinTexturePath])
         ribSceneHeader.fov = self.camera.fovAngle
-        ribSceneHeader.displayName = os.path.join(self.ribsPath, imgFile).replace('\\', '/')
+        ribSceneHeader.displayName = os.path.join(self.ribsPath, self.renderResult).replace('\\', '/')
         ribSceneHeader.displayType = "file"
         ribSceneHeader.displayColor = "rgba"
         ribSceneHeader.displayName2 = "Final Render"
@@ -904,6 +905,7 @@ class RMRScene:
         filesTorender.append((self.sceneFileName, 'Rendering scene'))
 
         renderThread = RenderThread(self.app, filesTorender)
+        renderThread.renderPath = os.path.join(self.ribsPath, self.renderResult).replace('\\', '/')
         renderThread.start()
 
 from threading import Thread
@@ -915,6 +917,7 @@ class RenderThread(Thread):
         Thread.__init__(self)
         self.app = app
         self.filenames = filenames
+        self.renderPath = ""
 
     def run(self):
         
@@ -936,6 +939,8 @@ class RenderThread(Thread):
                 pass
 
             mh.callAsync(lambda:self.app.progress(1.0))
+            
+        gui3d.app.prompt("Render finished", "The image is saved in {0}".format(self.renderPath), "OK", helpId="'renderFinishedPrompt'")
             
             
 
