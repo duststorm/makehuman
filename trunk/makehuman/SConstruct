@@ -19,15 +19,15 @@ if not env.GetOption('clean'):
     # Append to CPPPATH and LIBPATH if on windows
     if platform.system() == "Windows":
         if 'msvc' in env['TOOLS']:
-            env.Append(CPPPATH = [os.path.join(pydir, 'include'), 'd:/sdl/include', 'd:/glew/include', 'c:/sdl/include', 'c:/glew/include'])
-            env.Append(LIBPATH = [os.path.join(pydir, 'libs'), 'd:/sdl/lib', 'd:/glew/lib', 'c:/sdl/lib', 'c:/glew/lib'])
+            env.Append(CPPPATH = [os.path.join(pydir, 'include'), 'd:/sdl/include', 'd:/glew/include', 'd:/libpng', 'd:/zlib', 'c:/sdl/include', 'c:/glew/include', 'c:/libpng', 'c:/zlib'])
+            env.Append(LIBPATH = [os.path.join(pydir, 'libs'), 'd:/sdl/lib', 'd:/glew/lib', 'd:/libpng/lib', 'd:/zlib/lib', 'c:/sdl/lib', 'c:/glew/lib', 'c:/libpng/lib', 'c:/zlib/lib'])
         else:
             mingwinc = 'c:/mingw/include'
             mingwlib = 'c:/mingw/lib'
             env.Append(CPPPATH = [os.path.join(pydir, 'include'), mingwinc, mingwinc + '/SDL'])
             env.Append(LIBPATH = [os.path.join(pydir, 'libs'), mingwlib, mingwlib + '/SDL'])
     else:
-        env.Append(CPPPATH = ['/usr/include/python' + pyver, '/usr/include/GL', '/usr/include/SDL'])
+        env.Append(CPPPATH = ['/usr/include/python' + pyver, '/usr/include/GL', '/usr/include/SDL', '/usr/include'])
             
     # Check for libs and headers
     if conf.CheckLib('m'):
@@ -46,9 +46,15 @@ if not env.GetOption('clean'):
         if platform.system() == "Windows":
             env.Append(LIBS = ['SDLmain'])
     if not (conf.CheckLib('GLEW') or conf.CheckLib('glew32', 'glewInit')):
-        print "The GLEW must be installed"
+        print "The GLEW development libraries must be installed"
         exit(1)
-        
+    if not ((conf.CheckLib('png') or conf.CheckLib('libpng')) and conf.CheckHeader('png.h')):
+        print "The libpng development libraries must be installed"
+        exit(1)
+    if not ((conf.CheckLib('z') or conf.CheckLib('zlib')) and conf.CheckHeader('zlib.h')):
+        print "The zlib development libraries must be installed"
+        exit(1)
+
     # Add additional libs and set flags
     if platform.system() == "Windows":
         env.Append(LIBS = ['opengl32','glu32','shell32','kernel32','user32','shlwapi'])

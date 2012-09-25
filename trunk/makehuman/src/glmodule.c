@@ -710,11 +710,11 @@ static PyObject *Image_save(Image *self, PyObject *path)
 		
 		len = PyString_Size(path);
 
-		if (len > 0)
+		if (len > 4)
 		{
 			char *str = PyString_AsString(path);
 
-			if (str[len-3] == 'p' && str[len-2] == 'n' && str[len-1] == 'g') // note, PNG doesn't match
+			if (str[len-4] == '.' && str[len-3] == 'p' && str[len-2] == 'n' && str[len-1] == 'g') // note, .PNG doesn't match
 				png = TRUE;
 		}
     }
@@ -730,11 +730,11 @@ static PyObject *Image_save(Image *self, PyObject *path)
 
 		len = PyString_Size(path);
 
-		if (len > 0)
+		if (len > 4)
 		{
 			char *str = PyString_AsString(path);
 
-			if (str[len-3] == 'p' && str[len-2] == 'n' && str[len-1] == 'g') // note, PNG doesn't match
+			if (str[len-4] == '.' && str[len-3] == 'p' && str[len-2] == 'n' && str[len-1] == 'g') // note, PNG doesn't match
 				png = TRUE;
 		}
 
