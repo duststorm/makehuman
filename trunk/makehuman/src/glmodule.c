@@ -29,11 +29,11 @@
 
  */
 
+#include <png.h>
 #include "glmodule.h"
 #include "core.h"
 #include <assert.h>
 #include <structmember.h>
-#include <png.h>
 
 #ifdef __WIN32__
     #include <windows.h>
@@ -692,7 +692,7 @@ static PyObject *Image_save(Image *self, PyObject *path)
 	unsigned char header[18];
 	SDL_Surface *surface = self->surface;
 	Py_ssize_t len;
-	BOOL png = FALSE;
+	int png = 0;
 
 	if (!self->surface)
 	{
@@ -715,7 +715,7 @@ static PyObject *Image_save(Image *self, PyObject *path)
 			char *str = PyString_AsString(path);
 
 			if (str[len-4] == '.' && str[len-3] == 'p' && str[len-2] == 'n' && str[len-1] == 'g') // note, .PNG doesn't match
-				png = TRUE;
+				png = 1;
 		}
     }
     else if (PyUnicode_Check(path))
@@ -735,7 +735,7 @@ static PyObject *Image_save(Image *self, PyObject *path)
 			char *str = PyString_AsString(path);
 
 			if (str[len-4] == '.' && str[len-3] == 'p' && str[len-2] == 'n' && str[len-1] == 'g') // note, PNG doesn't match
-				png = TRUE;
+				png = 1;
 		}
 
         Py_DECREF(path);
