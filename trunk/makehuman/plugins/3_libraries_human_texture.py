@@ -127,6 +127,7 @@ class HumanTextureTaskView(gui3d.TaskView):
     def syncMediaFinished(self):
         
         self.mediaSync = None
+        self.filechooser.refresh()
         
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
