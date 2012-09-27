@@ -59,7 +59,7 @@ class HumanTextureTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Human texture', label='Skin')
         if not os.path.exists(os.path.join(mh.getPath(''), 'data', 'skins')):
             os.makedirs(os.path.join(mh.getPath(''), 'data', 'skins'))
-        self.filechooser = self.addView(gui3d.FileChooser([self.systemSkins, self.userSkins], 'png', 'thumb.png'))
+        self.filechooser = self.addView(gui3d.FileChooser([self.systemSkins, self.userSkins], 'png', 'thumb'))
         self.update = self.filechooser.sortBox.addView(gui3d.Button('Check for updates'))
         self.mediaSync = None
 
