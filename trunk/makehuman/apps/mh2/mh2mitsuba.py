@@ -139,7 +139,7 @@ def MitsubaExport(obj, app, settings):
                    'Please, enter a valid path to Mitsuba folder.',
                    'Accept')    
 
-def exportObj(obj, filename, exportGroups = True, groupFilter=None):
+def exportPly(obj, filename, exportGroups = True, groupFilter=None):
     """
     This function exports a mesh object in Wavefront obj format. It is assumed that obj will have at least vertices and
     faces (exception handling for vertices/faces must be done outside this method).
@@ -202,8 +202,9 @@ def exportObj(obj, filename, exportGroups = True, groupFilter=None):
         f.write('\n')
     
     
-""" 
+
 def exportObj(obj, filename):
+    '''
     #
     This function exports a mesh object in Wavefront obj format. 
     It is assumed that obj will have at least vertices and faces,
@@ -216,12 +217,6 @@ def exportObj(obj, filename):
       *Object3D*.  The object to export.
     filename:
       *string*.  The filename of the file to export the object to.
-    
-    '''
-    mh2obj.exportObj(mesh,
-                    os.path.join(exportPath, filename + ".obj"),
-                    self.exportGroups.selected,
-                    filter)
     '''
 
     # Write obj file
@@ -268,7 +263,6 @@ def exportObj(obj, filename):
         f.write('\n')  
     #
     f.close()
-"""
 
 def mitsubaXmlFile(filexml):
     #
@@ -324,6 +318,7 @@ def mitsubaSampler(sampler):
                       '\t        <integer name="sampleCount" value="16"/>\n' +
                       '\t    </sampler>\n'
                       )
+    #
     return samplerData
     
 def mitsubaCamera(camera, resolution, filexml, samplerData, obj):
@@ -461,7 +456,7 @@ def mitsubaGeometry(filexml, fileobj, subSurfaceData):
     '''
     # human mesh
     f.write('\n' +
-            '\t<shape type="ply">\n' + # obj">\n' +
+            '\t<shape type="obj">\n' + 
             '\t    <string name="filename" value="%s"/>\n' % fileobj +
             '\t    %s\n' % subSurfaceData +
             '\t    <ref id="humanMat"/>\n' + # use 'instantiate' material declaration (id)
