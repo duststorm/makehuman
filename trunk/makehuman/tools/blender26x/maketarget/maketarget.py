@@ -54,6 +54,8 @@ from mh_utils import utils
 from mh_utils import proxy
 from mh_utils import import_obj
 
+import io_anim_bvh
+
 #----------------------------------------------------------
 #   
 #----------------------------------------------------------
@@ -234,7 +236,8 @@ class VIEW3D_OT_NewTargetButton(bpy.types.Operator):
 #   saveTarget(context):
 #----------------------------------------------------------
     
-def doSaveTarget(ob, filepath):    
+def doSaveTarget(context, filepath):    
+    ob = context.object
     if not utils.isTarget(ob):
         raise NameError("%s is not a target")
     bpy.ops.object.mode_set(mode='OBJECT')
@@ -258,7 +261,28 @@ def doSaveTarget(ob, filepath):
             fp.write("%d %.6f %.6f %.6f\n" % (n, vec[0], vec[2], -vec[1]))
     fp.close()    
     ob["FilePath"] = filepath
+    
+    saveBvhFile(context, filepath)
+    
+
+def saveBvhFile(context, filepath):
+    ob = context.object
+    rig = ob.parent
+    scn = context.scene
+    if rig and rig.type == 'ARMATURE':
+        scn.objects.active = rig
+        (pname, ext) = os.path.splitext(filepath)
+        bvhpath = pname + ".bvh"
+        io_anim_bvh.export_bvh.write_armature(context, bvhpath,
+           frame_start = 1,
+           frame_end = 1,
+           global_scale = 1.0,
+           rotate_mode = 'NATIVE',
+           root_transform_only = False
+           )    
+        scn.objects.active = ob
     return
+
 
        
 def evalVertLocations(ob):    
@@ -285,7 +309,7 @@ class VIEW3D_OT_SaveTargetButton(bpy.types.Operator):
         path = ob["FilePath"]
         if the.Confirm:
             the.Confirm = None
-            doSaveTarget(ob, path)
+            doSaveTarget(context, path)
             print("Target saved")
         else:
             the.Confirm = "mh.save_target"
@@ -307,7 +331,7 @@ class VIEW3D_OT_SaveasTargetButton(bpy.types.Operator, ExportHelper):
         maxlen= 1024, default= "")
 
     def execute(self, context):
-        doSaveTarget(context.object, self.properties.filepath)
+        doSaveTarget(context, self.properties.filepath)
         print("Target saved")
         return {'FINISHED'}
 
@@ -360,7 +384,7 @@ def batchFixTargets(context, folder):
             print(file)            
             utils.loadTarget(file, context)        
             fitTarget(context)
-            doSaveTarget(context.object, file)
+            doSaveTarget(context, file)
             discardTarget(context)  
         elif os.path.isdir(file):
             batchFixTargets(context, file)
