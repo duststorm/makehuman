@@ -202,6 +202,34 @@ class VIEW3D_OT_RemoveVertexGroupsButton(bpy.types.Operator):
 #
 #
 
+class VIEW3D_OT_IntegerVertexGroupsButton(bpy.types.Operator):
+    bl_idname = "mhw.integer_vertex_groups"
+    bl_label = "Integer vertex groups"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        ob = context.object
+        for v in ob.data.vertices:
+            wmax = -1
+            best = None
+            for g in v.groups:
+                if g.weight > wmax:
+                    wmax = g.weight
+                    best = g.group
+            if not best:
+                continue
+            for g in v.groups:
+                if g.group == best:
+                    g.weight = 1
+                else:
+                    g.weight = 0
+        print("Integer vertex groups done")
+        return{'FINISHED'}    
+
+#
+#
+#
+
 def copyVertexGroups(scn, src, trg):
     print("Copy vertex groups %s => %s" % (src.name, trg.name))
     scn.objects.active = trg
@@ -988,6 +1016,7 @@ def exportSumGroups(context):
     return
 
 def exportList(context, weights, name, fp):
+    print("EL", name)
     if len(weights) == 0:
         return
     scn = context.scene
@@ -1668,12 +1697,15 @@ class MhxWeightToolsPanel(bpy.types.Panel):
         layout.operator("mhw.print_enums")
         layout.operator("mhw.print_fnums")
         layout.operator("mhw.select_quads")
+        
+        layout.separator()
         layout.operator("mhw.copy_vertex_groups")
         layout.operator("mhw.remove_vertex_groups")
         layout.operator("mhw.unvertex_selected")
         layout.operator("mhw.unvertex_diamonds")
         layout.operator("mhw.delete_diamonds")
         layout.operator("mhw.recover_diamonds")
+        layout.operator("mhw.integer_vertex_groups")
 
         layout.separator()
         layout.prop(scn, 'MhxVertNum')
