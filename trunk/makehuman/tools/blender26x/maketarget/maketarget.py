@@ -54,8 +54,6 @@ from mh_utils import utils
 from mh_utils import proxy
 from mh_utils import import_obj
 
-import io_anim_bvh
-
 #----------------------------------------------------------
 #   
 #----------------------------------------------------------
@@ -262,29 +260,8 @@ def doSaveTarget(context, filepath):
     fp.close()    
     ob["FilePath"] = filepath
     
-    saveBvhFile(context, filepath)
-    
-
-def saveBvhFile(context, filepath):
-    ob = context.object
-    rig = ob.parent
-    scn = context.scene
-    if rig and rig.type == 'ARMATURE':
-        scn.objects.active = rig
-        (pname, ext) = os.path.splitext(filepath)
-        bvhpath = pname + ".bvh"
-        io_anim_bvh.export_bvh.write_armature(context, bvhpath,
-           frame_start = 1,
-           frame_end = 1,
-           global_scale = 1.0,
-           rotate_mode = 'NATIVE',
-           root_transform_only = False
-           )    
-        scn.objects.active = ob
-    return
-
-
-       
+    #saveBvhFile(context, filepath)
+          
 def evalVertLocations(ob):    
     verts = {}
     for v in ob.data.vertices:
@@ -340,7 +317,128 @@ class VIEW3D_OT_SaveasTargetButton(bpy.types.Operator, ExportHelper):
         return {'RUNNING_MODAL'}
 
 #----------------------------------------------------------
-#   Apply targets
+#   saveBvhFile(context, filepath):
+#   loadBvhFile(context, filepath):
+#----------------------------------------------------------
+
+import io_anim_bvh
+from io_anim_bvh import export_bvh, import_bvh
+
+def saveBvhFile(context, filepath):
+    ob = context.object
+    rig = ob.parent
+    scn = context.scene
+    if rig and rig.type == 'ARMATURE':        
+        scn.objects.active = rig
+        (pname, ext) = os.path.splitext(filepath)
+        bvhpath = pname + ".bvh"
+        
+        export_bvh.write_armature(context, bvhpath,
+           frame_start = 1,
+           frame_end = 1,
+           global_scale = 1.0,
+           rotate_mode = 'NATIVE',
+           root_transform_only = False
+           )    
+        scn.objects.active = ob
+        print("Saved %s" % bvhpath)
+        return True
+    else:
+        return False
+
+
+def loadBvhFile(context, filepath):
+    ob = context.object
+    rig = ob.parent
+    scn = context.scene
+    if rig and rig.type == 'ARMATURE':
+        (pname, ext) = os.path.splitext(filepath)
+        bvhpath = pname + ".bvh"
+
+        bvh_nodes = import_bvh.read_bvh(context, bvhpath,
+            rotate_mode='NATIVE',
+            global_scale=1.0)
+
+        frame_orig = context.scene.frame_current
+
+        bvh_name = bpy.path.display_name_from_filepath(bvhpath)
+
+        import_bvh.bvh_node_dict2armature(context, bvh_name, bvh_nodes,
+                               rotate_mode = 'NATIVE',
+                               frame_start = 1,
+                               IMPORT_LOOP = False,
+                               global_matrix = rig.matrix_world,
+                               )
+        context.scene.frame_set(frame_orig)
+
+        tmp = context.object
+        bpy.ops.object.mode_set(mode='POSE')
+        scn.objects.active = rig
+        bpy.ops.object.mode_set(mode='POSE')
+        copyPose(tmp, rig)
+        scn.objects.active = ob
+        scn.objects.unlink(tmp)
+        del tmp
+        print("Loaded %s" % bvhpath)
+        return True
+    else:
+        return False
+
+
+def copyPose(src, trg):
+    for name,srcBone in src.pose.bones.items():
+        trgBone = trg.pose.bones[srcBone.name]
+        s = srcBone.matrix_basis
+        t = trgBone.matrix_basis.copy()
+        for i in range(3):
+            for j in range(3):
+                t[i][j] = s[i][j]
+        trgBone.matrix_basis = t
+        
+
+class VIEW3D_OT_LoadBvhButton(bpy.types.Operator):
+    bl_idname = "mh.load_bvh"
+    bl_label = "Load BVH File"
+    bl_options = {'UNDO'}
+
+    filename_ext = ".bvh"
+    filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})
+    filepath = bpy.props.StringProperty(
+        name="File Path", 
+        description="File path used for bvh file", 
+        maxlen= 1024, default= "")
+
+    def execute(self, context):
+        loadBvhFile(context, self.properties.filepath)
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+
+class VIEW3D_OT_SaveasBvhFileButton(bpy.types.Operator, ExportHelper):
+    bl_idname = "mh.saveas_bvh"
+    bl_label = "Save BVH File"
+    bl_options = {'UNDO'}
+
+    filename_ext = ".bvh"
+    filter_glob = StringProperty(default="*.bvh", options={'HIDDEN'})
+    filepath = bpy.props.StringProperty(
+        name="File Path", 
+        description="File path used for bvh file", 
+        maxlen= 1024, default= "")
+
+    def execute(self, context):
+        saveBvhFile(context, self.properties.filepath)
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+#----------------------------------------------------------
+#   Apply bvhs
 #----------------------------------------------------------
 
 def applyTargets(context):

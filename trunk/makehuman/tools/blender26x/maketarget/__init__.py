@@ -80,6 +80,10 @@ class MakeTargetPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         ob = context.object
+        if ob:
+            rig = ob.parent
+        else:
+            rig = None
         scn = context.scene
         if not utils.drawConfirm(layout, scn):
             return
@@ -96,7 +100,8 @@ class MakeTargetPanel(bpy.types.Panel):
         else:
             layout.operator("mh.import_base_mhclo", text="Import Base Mhclo").delete = False
             layout.operator("mh.import_base_obj", text="Import Base Obj").delete = False
-            layout.operator("mh.make_base_obj")
+            if rig and rig.type == 'ARMATURE':
+                layout.operator("mh.make_base_obj")
         if utils.isBase(ob):
             layout.operator("mh.new_target")
             layout.operator("mh.load_target")            
@@ -143,6 +148,10 @@ class MakeTargetPanel(bpy.types.Panel):
                 layout.operator("mh.save_target")           
             layout.operator("mh.saveas_target")           
 
+        if rig and rig.type == 'ARMATURE':
+            layout.separator()
+            layout.operator("mh.saveas_bvh")
+            layout.operator("mh.load_bvh")
 
 #----------------------------------------------------------
 #   class MhmPanel(bpy.types.Panel):
