@@ -419,6 +419,7 @@ def changeTargetData(rig, anim):
         ("&ElbowFollowsWrist", 0),
         ("&KneeFollowsHip", 0),
         ("&KneeFollowsFoot", 0),
+        ("&ArmHinge", 0),
         ]
 
     for (key, value) in permProps:
