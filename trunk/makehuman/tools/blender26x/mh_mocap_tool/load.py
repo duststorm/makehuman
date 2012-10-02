@@ -242,7 +242,7 @@ def readBvhFile(context, filepath, scn, scan):
 
     fp.close()
     if not rig:
-    	raise MocapError("Bvh file \n%s\n is corrupt: No rig defined" % filepath)
+        raise MocapError("Bvh file \n%s\n is corrupt: No rig defined" % filepath)
     utils.setInterpolation(rig)
     time2 = time.clock()
     print("Bvh file %s loaded in %.3f s" % (filepath, time2-time1))
@@ -382,11 +382,11 @@ def renameBones(srcRig, scn):
         (trgName, twist) = getTargetFromSource(srcName)
         eb = ebones[srcName]
         if trgName:
-            eb.name = trgName
-            trgBones[trgName] = CEditBone(eb)
             if action:
                 grp = action.groups[srcName]
                 grp.name = trgName
+            eb.name = trgName
+            trgBones[trgName] = CEditBone(eb)
             setbones.append((eb, trgName))
         else:
             eb.name = '_' + srcName
