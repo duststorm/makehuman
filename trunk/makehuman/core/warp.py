@@ -105,10 +105,13 @@ def getModule(modname, folder):
         print("%s does not exist in %s" % (modname, folder))
         return None
         
+    path = os.path.realpath(folder)
+    if path not in sys.path:
+        sys.path.append(path)
     path = os.path.realpath(os.path.join(folder, modname))
     if path not in sys.path:
         sys.path.append(path)
-        
+
     fp, pathname, description = imp.find_module(modname)
     try:
         imp.load_module(modname, fp, pathname, description)
@@ -116,7 +119,7 @@ def getModule(modname, folder):
         if fp:
             fp.close()
     return sys.modules[modname]
-    
+
 try:    
     numpy = getModule("numpy", "lib/site-packages")  
 except:

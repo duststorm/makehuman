@@ -1672,7 +1672,27 @@ class VIEW3D_OT_LocalizeFilesButton(bpy.types.Operator):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
 
+#
+#
+#
 
+class VIEW3D_OT_StatisticsButton(bpy.types.Operator):
+    bl_idname = "mhw.statistics"
+    bl_label = "Statistics"
+
+    def execute(self, context):
+        ob = context.object
+        rig = ob.parent
+        if ob.type == 'MESH':
+            print(
+                "# Verts: %d\n" % len(ob.data.vertices) +
+                "# Faces: %d\n" % len(ob.data.polygons)
+                )
+        if rig and rig.type == 'ARMATURE':
+            print(
+                "# Bones: %d\n" % len(rig.data.bones)
+                )
+        return{'FINISHED'}    
 
 #
 #    class MhxWeightToolsPanel(bpy.types.Panel):
@@ -1747,6 +1767,8 @@ class MhxWeightExtraPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         scn = context.scene
+        layout.operator("mhw.statistics")    
+
         layout.prop(scn, '["MhxVG0"]')
         layout.prop(scn, '["MhxVG1"]')
         layout.prop(scn, '["MhxVG2"]')
