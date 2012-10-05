@@ -7,7 +7,7 @@
 # z_scale 8208 8220 2.0186
 # y_scale 8223 6827 1.9414
 # z_depth 50
-# texture jeans_game_texture.png
+# texture jeans_texture.png
 # mask jeans_game_mask.png
 # use_projection 0
 # verts 0
