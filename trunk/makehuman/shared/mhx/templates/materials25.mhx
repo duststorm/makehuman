@@ -1,22 +1,22 @@
 
 # --------------- Images and textures ----------------------------- # 
  
-Image texture.tif
-  *** Filename texture.tif data/textures ;
+Image texture.png
+  *** Filename texture.png data/textures ;
   use_premultiply True ;
 end Image
 
-Image texture_ref.tif
-  *** Filename texture_ref.tif data/textures ;
+Image texture_ref.png
+  *** Filename texture_ref.png data/textures ;
   use_premultiply True ;
 end Image
 
 Texture diffuse IMAGE
-  Image texture.tif ;
+  Image texture.png ;
 end Texture
 
 Texture specularity IMAGE
-  Image texture_ref.tif ;
+  Image texture_ref.png ;
 end Texture
 
 

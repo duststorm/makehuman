@@ -279,7 +279,7 @@ class ExportTaskView(gui3d.TaskView):
         self.exportGroups = self.objOptions.addView(gui3d.CheckBox("Groups", True));y+=24
         self.exportSmooth = self.objOptions.addView(gui3d.CheckBox( "Subdivide", False));y+=24
         self.exportHair = self.objOptions.addView(gui3d.CheckBox("Hair as mesh", selected=True));y+=24
-        self.exportPngTexture = self.objOptions.addView(gui3d.CheckBox("PNG texture", selected=True));y+=24
+        #self.exportPngTexture = self.objOptions.addView(gui3d.CheckBox("PNG texture", selected=True));y+=24
         scales = []
         (y, self.objScales) = self.addScales( self.objOptions, scales, "Obj", True, y)
 
@@ -324,7 +324,7 @@ class ExportTaskView(gui3d.TaskView):
         self.colladaLashes = self.colladaOptions.addView(gui3d.CheckBox("Eyelashes", True));y+=24
         self.colladaHelpers = self.colladaOptions.addView(gui3d.CheckBox("Helper geometry", False));y+=24
         # self.colladaSeparateFolder = self.colladaOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
-        self.colladaPngTexture = self.colladaOptions.addView(gui3d.CheckBox("PNG texture", selected=True));y+=24
+        # self.colladaPngTexture = self.colladaOptions.addView(gui3d.CheckBox("PNG texture", selected=True));y+=24
         scales = []
         (y, self.daeScales) = self.addScales( self.colladaOptions, scales, "Dae", True, y)
         rigs = []
@@ -436,7 +436,7 @@ class ExportTaskView(gui3d.TaskView):
                     "eyebrows" : self.exportEyebrows.selected,
                     "lashes" : self.exportLashes.selected,
                     "scale": self.getScale(self.objScales),
-                    "pngTexture": self.exportPngTexture.selected
+                    "pngTexture": True, #self.exportPngTexture.selected
                 }                    
                 mh2obj_proxy.exportProxyObj(gui3d.app.selectedHuman, os.path.join(exportPath, filename), options)
                 
@@ -495,7 +495,7 @@ class ExportTaskView(gui3d.TaskView):
                     "lashes" : self.colladaLashes.selected,
                     "helpers" : self.colladaHelpers.selected,
                     "scale": self.getScale(self.daeScales),
-                    "pngTexture": self.colladaPngTexture.selected
+                    "pngTexture": True, #self.colladaPngTexture.selected
                 }
                 mh2collada.exportCollada(gui3d.app.selectedHuman, os.path.join(exportPath, filename), options)
             elif self.md5.selected:

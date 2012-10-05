@@ -3,8 +3,8 @@
 # --------------- Textures ----------------------------- # 
  
 texture IMAGE diffuse
-  image texture.tif
-    filename texture.tif ;
+  image texture.png
+    filename texture.png ;
   end image
     animFrames 100 ;
     animOffset 0 ;
@@ -96,8 +96,8 @@ texture CLOUDS normals
 end texture
 
 texture IMAGE specularity
-  image texture_ref.tif
-    filename texture_ref.tif ;
+  image texture_ref.png
+    filename texture_ref.png ;
   end image
     animFrames 100 ;
     animOffset 0 ;

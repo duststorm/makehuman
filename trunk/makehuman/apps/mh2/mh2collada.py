@@ -592,7 +592,7 @@ def writeImages(obj, fp, stuff, human):
         if the.Config.pngTexture:
             textures = [(path, "texture.png")]
         else:
-            textures = [(path, "texture.tif")]
+            textures = [(path, "texture.png")]
     for (folder, texfile) in textures:  
         path = export_config.getOutFileName(texfile, folder, True, human, the.Config)        
         (fname, ext) = os.path.splitext(texfile)  
