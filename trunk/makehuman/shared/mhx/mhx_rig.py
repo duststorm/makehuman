@@ -200,7 +200,8 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 "    parent Refer Bone %s ;\n" % soft +
 "#endif\n")
     elif parent:
-        fp.write("    parent Refer Bone %s ; \n" % (parent))
+        if parent != the.Master or the.hasMasterBone:
+            fp.write("    parent Refer Bone %s ; \n" % (parent))
     fp.write(
 "    roll %.6g ; \n" % (roll)+
 "    use_connect %s ; \n" % (conn) +
@@ -1678,6 +1679,7 @@ def setupRig(obj, proxyData):
     the.VertexWeights = []
     the.CustomShapes = {}
     the.PoseInfo = {}
+    the.hasMasterBone = True
 
     if the.Config.mhxrig == 'mhx':
         the.BoneGroups = [
@@ -1767,6 +1769,7 @@ def setupRig(obj, proxyData):
         the.ArmatureProps = blenrig_rig.BlenrigArmatureProps
 
     elif the.Config.mhxrig == "rigify":
+        the.hasMasterBone = False
         the.BoneGroups = []
         the.RecalcRoll = []              
         the.VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
