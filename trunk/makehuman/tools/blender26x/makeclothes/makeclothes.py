@@ -2245,6 +2245,8 @@ def readDefaultSettings(context):
     scn = context.scene
     for line in fp:
         words = line.split()
+        if len(words) < 3:
+            continue
         prop = words[0]
         type = words[1]        
         if type == "int":
