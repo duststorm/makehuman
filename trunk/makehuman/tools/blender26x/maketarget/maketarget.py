@@ -328,7 +328,10 @@ def saveBvhFile(context, filepath):
     ob = context.object
     rig = ob.parent
     scn = context.scene
-    if rig and rig.type == 'ARMATURE':        
+    if rig and rig.type == 'ARMATURE': 
+        roots = rigRoots(rig)
+        if len(roots) > 1:
+            raise NameError("Armature %s has multiple roots: %s" % (rig.name, roots))
         scn.objects.active = rig
         (pname, ext) = os.path.splitext(filepath)
         bvhpath = pname + ".bvh"
@@ -347,6 +350,14 @@ def saveBvhFile(context, filepath):
         return False
 
 
+def rigRoots(rig):
+    roots = []
+    for bone in rig.data.bones:
+        if not bone.parent:
+            roots.append(bone.name)
+    return roots
+    
+    
 def loadBvhFile(context, filepath):
     ob = context.object
     rig = ob.parent
