@@ -787,17 +787,17 @@ def printStuff(fp, pob, context):
     return  
     
 def writeTextures(fp, name, scn):        
-    fp.write("# texture %s_texture.tif %d\n" % (name, scn.MCTextureLayer))
+    fp.write("# texture %s_texture.png %d\n" % (name, scn.MCTextureLayer))
     if scn.MCUseMask:
         fp.write("# mask %s_mask.png %d\n" % (name, scn.MCMaskLayer))
     if scn.MCUseBump:
-        fp.write("# bump %s_bump.tif %d %.3f\n" % (name, scn.MCTextureLayer, scn.MCBumpStrength))
+        fp.write("# bump %s_bump.png %d %.3f\n" % (name, scn.MCTextureLayer, scn.MCBumpStrength))
     if scn.MCUseNormal:
-        fp.write("# normal %s_normal.tif %d %.3f\n" % (name, scn.MCTextureLayer, scn.MCNormalStrength))
+        fp.write("# normal %s_normal.png %d %.3f\n" % (name, scn.MCTextureLayer, scn.MCNormalStrength))
     if scn.MCUseDisp:
-        fp.write("# displacement %s_disp.tif %d %.3f\n" % (name, scn.MCTextureLayer, scn.MCDispStrength))
+        fp.write("# displacement %s_disp.png %d %.3f\n" % (name, scn.MCTextureLayer, scn.MCDispStrength))
     if scn.MCUseTrans:
-        fp.write("# transparency %s_trans.tif %d\n" % (name, scn.MCTextureLayer))
+        fp.write("# transparency %s_trans.png %d\n" % (name, scn.MCTextureLayer))
     return
     
 #
