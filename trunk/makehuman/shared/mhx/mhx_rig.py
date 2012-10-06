@@ -1771,7 +1771,8 @@ def setupRig(obj, proxyData):
         the.RecalcRoll = []              
         the.VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
                             "./shared/mhx/templates/rigifymesh_weights.mhx"]
-        the.GizmoFiles = ["./shared/mhx/templates/panel_gizmo25.mhx"]
+        the.GizmoFiles = ["./shared/mhx/templates/panel_gizmo25.mhx",
+                          "./shared/mhx/templates/rigify_gizmo25.mhx"]
         the.HeadName = 'head'
         faceArmature = swapParentName(rig_face_25.FaceArmature, 'Head', 'head')
             
