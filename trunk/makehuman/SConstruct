@@ -19,7 +19,7 @@ if not env.GetOption('clean'):
     # Append to CPPPATH and LIBPATH if on windows
     if platform.system() == "Windows":
         if 'msvc' in env['TOOLS']:
-            env.Append(CPPPATH = [os.path.join(pydir, 'include'), 'd:/sdl/include', 'd:/glew/include', 'd:/libpng', 'd:/zlib', 'c:/sdl/include', 'c:/glew/include', 'c:/libpng', 'c:/zlib'])
+            env.Append(CPPPATH = [os.path.join(pydir, 'include'), 'd:/sdl/include', 'd:/glew/include', 'd:/libpng', 'd:/zlib', 'c:/sdl/include', 'c:/glew/include', 'c:/libpng', 'c:/zlib', 'c:/libpng/include', 'c:/zlib/include'])
             env.Append(LIBPATH = [os.path.join(pydir, 'libs'), 'd:/sdl/lib', 'd:/glew/lib', 'd:/libpng/lib', 'd:/zlib/lib', 'c:/sdl/lib', 'c:/glew/lib', 'c:/libpng/lib', 'c:/zlib/lib'])
         else:
             mingwinc = 'c:/mingw/include'
@@ -51,7 +51,7 @@ if not env.GetOption('clean'):
     if not ((conf.CheckLib('png') or conf.CheckLib('libpng')) and conf.CheckHeader('png.h')):
         print "The libpng development libraries must be installed"
         exit(1)
-    if not ((conf.CheckLib('z') or conf.CheckLib('zlib')) and conf.CheckHeader('zlib.h')):
+    if not ((conf.CheckLib('z') or conf.CheckLib('zlib') or conf.CheckLib('zdll')) and conf.CheckHeader('zlib.h')):
         print "The zlib development libraries must be installed"
         exit(1)
 
@@ -103,7 +103,10 @@ if platform.system() == "Windows" and 'dist' in COMMAND_LINE_TARGETS:
 	Copy("dist",r"C:\SDL\lib\libwebp-2.dll"),
 	Copy("dist",r"C:\SDL\lib\SDL.dll"),
 	Copy("dist",r"C:\SDL\lib\SDL_image.dll"),
-	Copy("dist",r"C:\SDL\lib\zlib1.dll"),
+        #Libpng proper
+	Copy("dist",r"C:\libpng\bin\libpng14-14.dll"),
+        #Zlib proper
+	Copy("dist",r"C:\zlib\bin\zlib1.dll"),
         #MakeHuman
         Copy("dist","makehuman.exe"),
         Copy("dist","makehuman.exe.manifest"),
