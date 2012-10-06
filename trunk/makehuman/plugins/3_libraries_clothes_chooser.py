@@ -61,6 +61,9 @@ class ClothesTaskView(gui3d.TaskView):
 
         proxy = mh2proxy.readProxyFile(human.meshData, mhclo, False)
         
+        if not proxy:
+            return
+        
         if proxy.clothings:
             folder = os.path.dirname(mhclo)
             for piece in proxy.clothings:
