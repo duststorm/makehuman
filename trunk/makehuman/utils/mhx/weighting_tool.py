@@ -1684,9 +1684,11 @@ class VIEW3D_OT_StatisticsButton(bpy.types.Operator):
         ob = context.object
         rig = ob.parent
         if ob.type == 'MESH':
+            uvs = ob.data.uv_layers[0]
             print(
                 "# Verts: %d\n" % len(ob.data.vertices) +
-                "# Faces: %d\n" % len(ob.data.polygons)
+                "# Faces: %d\n" % len(ob.data.polygons) +
+                "# UVs: %d %g\n" % (len(uvs.data), len(uvs.data)/2.0)
                 )
         if rig and rig.type == 'ARMATURE':
             print(
