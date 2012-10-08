@@ -147,9 +147,7 @@ def copyMeshFile249(obj, tmpl, fp):
             mainMesh = True
             fp.write("#if useMesh\n")
         elif words[0] == 'vertgroup':
-            mhx_main.copyVertGroups("shared/mhx/templates/vertexgroups-common25.mhx", fp, None)    
-            mhx_main.copyVertGroups("shared/mhx/templates/vertexgroups-classic25.mhx", fp, None)    
-            mhx_main.copyVertGroups("shared/mhx/templates/vertexgroups-toes25.mhx", fp, None)    
+            mhx_main.copyVertGroups("shared/mhx/templates/vertexgroups-24.mhx", fp, None)    
             skipOne = True
             skip = False
         elif words[0] == 'v' and inZone:
@@ -205,9 +203,7 @@ def exportProxy24(obj, plist, fp):
                     fp.write(" %.6g %.6g" %(uv[0], uv[1]))
                 fp.write(" ;\n")
         elif words[0] == 'vertgroup':
-            mhx_main.copyVertGroups("shared/mhx/templates/vertexgroups-common25.mhx", fp, proxy)    
-            mhx_main.copyVertGroups("shared/mhx/templates/vertexgroups-classic25.mhx", fp, proxy)    
-            mhx_main.copyVertGroups("shared/mhx/templates/vertexgroups-toes25.mhx", fp, proxy)    
+            mhx_main.copyVertGroups("shared/mhx/templates/vertexgroups-24.mhx", fp, proxy)    
         elif words[0] == 'shapekey':
             fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
             if mhx_main.BODY_LANGUAGE:
