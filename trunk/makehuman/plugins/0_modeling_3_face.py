@@ -41,6 +41,30 @@ class FaceTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Face')
 
         features = [
+            ('head', [('data/targets/head/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/head/images/', i[3]) for i in
+                [   
+                    ('head-age', 'less', 'more', 'frontView'),
+                    ('head-angle', 'in', 'out', 'rightView'), 
+                    ('head-scale-depth', 'less', 'more', 'rightView'),
+                    ('head-scale-horiz', 'less', 'more', 'frontView'),
+                    ('head-scale-vert', 'more', 'less', 'frontView'),
+                    ('head-trans', 'in', 'out', 'frontView'),
+                    ('head-trans', 'down', 'up', 'frontView'),
+                    ('head-trans', 'forward', 'backward', 'rightView'),
+                          
+                                                      
+                ]]), 
+            ('neck', [('data/targets/neck/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/neck/images/', i[3]) for i in
+                [  
+                    ('neck-scale-depth', 'less', 'more', 'rightView'),
+                    ('neck-scale-horiz', 'less', 'more', 'frontView'),
+                    ('neck-scale-vert', 'more', 'less', 'frontView'),
+                    ('neck-trans', 'in', 'out', 'frontView'),
+                    ('neck-trans', 'down', 'up', 'frontView'),
+                    ('neck-trans', 'forward', 'backward', 'rightView'),
+                          
+                                                      
+                ]]),
             ('right eye', [('data/targets/eyes/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/eyes/images/', i[3]) for i in
                 [
                     ('r-eye-height1', 'min', 'max', 'frontView'),
