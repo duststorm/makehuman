@@ -586,21 +586,6 @@ def writeVertexGroups(fp, proxy):
         for file in the.VertexGroupFiles:
             copyVertGroups(file, fp, proxy)
             
-    if the.Config.mhxrig == 'mhx':            
-        if the.MuscleBones:
-            copyVertGroups("shared/mhx/templates/vertexgroups-muscles25.mhx", fp, proxy)    
-        copyVertGroups("shared/mhx/templates/vertexgroups-tight25.mhx", fp, proxy)    
-        if the.MuscleBones:
-            copyVertGroups("shared/mhx/templates/vertexgroups-tight-muscles25.mhx", fp, proxy)    
-        if the.Config.skirtrig == "own":
-            copyVertGroups("shared/mhx/templates/vertexgroups-skirt-rigged.mhx", fp, proxy)    
-        elif the.Config.skirtrig == "inh":
-            copyVertGroups("shared/mhx/templates/vertexgroups-skirt25.mhx", fp, proxy)    
-            if the.MuscleBones:
-                copyVertGroups("shared/mhx/templates/vertexgroups-skirt-muscles25.mhx", fp, proxy)    
-        if the.Config.breastrig:
-            copyVertGroups("shared/mhx/templates/vertexgroups-breasts25.mhx", fp, proxy)    
-
     for path in the.Config.customvertexgroups:
         print("    %s" % path)
         copyVertGroups(path, fp, proxy)    

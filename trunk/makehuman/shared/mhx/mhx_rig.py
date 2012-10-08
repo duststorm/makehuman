@@ -1703,7 +1703,14 @@ def setupRig(obj, proxyData):
 
         the.VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
                             "./shared/mhx/templates/vertexgroups-bones25.mhx",
-                            "./shared/mhx/templates/vertexgroups-palm25.mhx"]
+                            "./shared/mhx/templates/vertexgroups-palm25.mhx",
+                            "shared/mhx/templates/vertexgroups-tight25.mhx",
+                            ]
+        if the.Config.skirtrig == "own":
+            the.VertexGroupFiles.append("shared/mhx/templates/vertexgroups-skirt-rigged.mhx")    
+        elif the.Config.skirtrig == "inh":
+            the.VertexGroupFiles.append("shared/mhx/templates/vertexgroups-skirt25.mhx")    
+
         if the.Config.malerig:
             the.VertexGroupFiles.append( "./shared/mhx/templates/vertexgroups-male25.mhx" )
                                                         
@@ -1772,8 +1779,7 @@ def setupRig(obj, proxyData):
         the.hasMasterBone = False
         the.BoneGroups = []
         the.RecalcRoll = []              
-        the.VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
-                            "./shared/mhx/templates/rigifymesh_weights.mhx"]
+        the.VertexGroupFiles = ["./shared/mhx/templates/rigifymesh_weights.mhx"]
         the.GizmoFiles = ["./shared/mhx/templates/panel_gizmo25.mhx",
                           "./shared/mhx/templates/rigify_gizmo25.mhx"]
         the.HeadName = 'head'
