@@ -1185,16 +1185,18 @@ def writeShapeKeys(fp, human, name, proxy):
         mhx_rig.writeRotDiffDrivers(fp, rig_leg_25.LegShapeDrivers, proxy)
         #mhx_rig.writeShapePropDrivers(fp, rig_body_25.BodyShapes, proxy, "&")
 
-    if the.Config.mhxrig=="mhx":
-        fp.write("#if toggle&T_ShapeDrivers\n")
-        if (not proxy or proxy.type == 'Proxy'):
-            if the.Config.faceshapes:
-                drivers = rig_panel_25.BodyLanguageShapeDrivers
-                if the.Config.facepanel:
-                    mhx_rig.writeShapeDrivers(fp, drivers, None)
-                else:
-                    mhx_rig.writeShapePropDrivers(fp, drivers.keys(), proxy, "&_")                
+    fp.write("#if toggle&T_ShapeDrivers\n")
+    if (not proxy or proxy.type == 'Proxy'):
+        if the.Config.faceshapes:
+            drivers = rig_panel_25.BodyLanguageShapeDrivers
+            if the.Config.facepanel:
+                mhx_rig.writeShapeDrivers(fp, drivers, None)
+            else:
+                mhx_rig.writeShapePropDrivers(fp, drivers.keys(), proxy, "&_")                
+    fp.write("#endif\n")
 
+    if the.Config.mhxrig != "rigify":
+        fp.write("#if toggle&T_ShapeDrivers\n")
         if not proxy:
             if the.Config.expressions and not proxy:
                 mhx_rig.writeShapePropDrivers(fp, read_expression.Expressions, proxy, "*")

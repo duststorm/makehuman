@@ -1,4 +1,4 @@
-# author Unknown
+# author Duststorm
 # license GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 # homepage http://www.makehuman.org/
 # name Tshirt_shortsleeves_game
@@ -12,6 +12,12 @@
 # objfile_layer 0
 # texture tshirt_shortsleeves_game_texture.png 0
 # mask tshirt_shortsleeves_game_mediumask.png 0
+# material TShirtShortMaterial
+diffuse_color 0 0 1
+diffuse_intensity 0.5
+specular_color 1.0000 1.0000 1.0000
+specular_intensity 0.0
+alpha 1.0
 # use_projection 0
 # verts 0
 18495 17793 17810 0.45850 0.16500 0.37650 0.00706 0.00268 -0.01105
