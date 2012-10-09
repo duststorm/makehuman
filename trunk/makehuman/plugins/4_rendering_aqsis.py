@@ -72,7 +72,7 @@ class AqsisTaskView(gui3d.TaskView):
         def onClicked(event):
             
             if not which("aqsis"):
-                self.app.prompt('Aqsis not found', 'You don\'t seem to have aqsis installed.', 'Download', 'Cancel', self.downloadAqsis)
+                gui3d.app.prompt('Aqsis not found', 'You don\'t seem to have aqsis installed.', 'Download', 'Cancel', self.downloadAqsis)
                 return
             
             if not self.sceneToRender:
