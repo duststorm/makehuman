@@ -18,6 +18,11 @@
 # texture shoes_sport2_texture.png 0
 # mask shoes_sport2_mask.png 0
 # material Shoes_sport2
+diffuse_color 0.0426 0.0557 1
+diffuse_intensity 0.5
+specular_color 1.0000 1.0000 1.0000
+specular_intensity 0.0
+alpha 1.0
 # use_projection 0
 # verts 0
  4915  4697  4924 0.75659 0.10681 0.13660 0.09971 0.18888 0.06892

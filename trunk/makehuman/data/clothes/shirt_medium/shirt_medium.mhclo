@@ -19,7 +19,7 @@
 # normal shirt_normal.png 0 1.000
 # displacement shirt_disp.png 0 0.200
 # material Shirt
-diffuse_color 0.0122 0.0122 0.0122
+diffuse_color 0.6 0.0122 0.0122
 diffuse_intensity 0.8935
 specular_color 1.0000 1.0000 1.0000
 specular_intensity 0.02336
