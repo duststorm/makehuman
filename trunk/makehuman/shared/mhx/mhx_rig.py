@@ -1865,7 +1865,7 @@ def setupRig(obj, proxyData):
         the.RigHead[bone] = findLocation(head)
         the.RigTail[bone] = findLocation(tail)
 
-    if not the.Config.clothesrig:
+    if not (the.Config.mhxrig == 'mhx' and the.Config.clothesrig):
         return
     body = the.RigHead.keys()
     for proxy in proxyData.values():

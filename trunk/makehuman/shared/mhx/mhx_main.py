@@ -1124,9 +1124,9 @@ def writeCorrectives(fp, human, drivers, part, proxy):
 
 def writeShape(fp, pose, lr, shape, min, max, proxy):
     fp.write(
-    	"ShapeKey %s %s True\n" % (pose, lr) +
-    	"  slider_min %.3g ;\n" % min +
-    	"  slider_max %.3g ;\n" % max)
+        "ShapeKey %s %s True\n" % (pose, lr) +
+        "  slider_min %.3g ;\n" % min +
+        "  slider_max %.3g ;\n" % max)
     if proxy:
         pshape = mh2proxy.getProxyShapes([("shape",shape)], proxy)
         for (pv, dr) in pshape[0].items():
@@ -1185,26 +1185,27 @@ def writeShapeKeys(fp, human, name, proxy):
         mhx_rig.writeRotDiffDrivers(fp, rig_leg_25.LegShapeDrivers, proxy)
         #mhx_rig.writeShapePropDrivers(fp, rig_body_25.BodyShapes, proxy, "&")
 
-    fp.write("#if toggle&T_ShapeDrivers\n")
-    if (not proxy or proxy.type == 'Proxy'):
-        if the.Config.faceshapes:
-            drivers = rig_panel_25.BodyLanguageShapeDrivers
-            if the.Config.facepanel:
-                mhx_rig.writeShapeDrivers(fp, drivers, None)
-            else:
-                mhx_rig.writeShapePropDrivers(fp, drivers.keys(), proxy, "&_")                
+    if the.Config.mhxrig=="mhx":
+        fp.write("#if toggle&T_ShapeDrivers\n")
+        if (not proxy or proxy.type == 'Proxy'):
+            if the.Config.faceshapes:
+                drivers = rig_panel_25.BodyLanguageShapeDrivers
+                if the.Config.facepanel:
+                    mhx_rig.writeShapeDrivers(fp, drivers, None)
+                else:
+                    mhx_rig.writeShapePropDrivers(fp, drivers.keys(), proxy, "&_")                
 
-    if not proxy:
-        if the.Config.expressions and not proxy:
-            mhx_rig.writeShapePropDrivers(fp, read_expression.Expressions, proxy, "*")
-        if the.Config.expressionunits and not proxy:
-            mhx_rig.writeShapePropDrivers(fp, read_expression.ExpressionUnits, proxy, "*")
-            
-        skeys = []
-        for (skey, val, string, min, max) in  the.CustomProps:
-            skeys.append(skey)
-        mhx_rig.writeShapePropDrivers(fp, skeys, proxy, "&")    
-    fp.write("#endif\n")
+        if not proxy:
+            if the.Config.expressions and not proxy:
+                mhx_rig.writeShapePropDrivers(fp, read_expression.Expressions, proxy, "*")
+            if the.Config.expressionunits and not proxy:
+                mhx_rig.writeShapePropDrivers(fp, read_expression.ExpressionUnits, proxy, "*")
+                
+            skeys = []
+            for (skey, val, string, min, max) in  the.CustomProps:
+                skeys.append(skey)
+            mhx_rig.writeShapePropDrivers(fp, skeys, proxy, "&")    
+        fp.write("#endif\n")
         
     fp.write(
 "  end AnimationData\n" +
