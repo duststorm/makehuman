@@ -522,6 +522,11 @@ def exportDae(human, name, fp):
 #
 
 def setupStuff(name, obj, amt, rawTargets, cfg):
+    global StuffTextures, StuffTexFiles, StuffMaterials
+
+    StuffTextures = {}
+    StuffTexFiles = {}
+    StuffMaterials = {}
     stuffs = []
     stuff = CStuff(name, None)
     if amt:
@@ -596,7 +601,7 @@ def writeImages(obj, fp, stuff, human):
     for (folder, texfile) in textures:  
         path = export_config.getOutFileName(texfile, folder, True, human, the.Config)        
         (fname, ext) = os.path.splitext(texfile)  
-        name = "%s_tif" % fname
+        name = "%s_png" % fname
         if the.Config.separatefolder:
             texpath = "textures/"+texfile
         else:
@@ -653,8 +658,18 @@ DefaultMaterialSettings = {
 }
 
 def getNamesFromStuff(stuff):
+    global StuffTextures, StuffTexFiles, StuffMaterials
     if not stuff.type:
         return ("SkinShader", None, "SkinShader")
+        
+    try:
+        texname = StuffTextures[stuff.name]
+        texfile = StuffTexFiles[stuff.name]
+        matname = StuffMaterials[stuff.name]
+        return (texname, texfile, matname)
+    except KeyError:
+        pass
+    
     texname = None
     texfile = None
     matname = None
@@ -662,17 +677,36 @@ def getNamesFromStuff(stuff):
         (folder, fname) = stuff.texture
         (texname, ext) = os.path.splitext(fname)
         texfile = ("%s_%s" % (texname, ext[1:]))
+        if texname in StuffTextures.values():
+            texname = nextName(texname)
+        StuffTextures[stuff.name] = texname
+        StuffTexFiles[stuff.name] = texfile
     if stuff.material:
         matname = stuff.material.name
+        if matname in StuffMaterials.values():
+            matname = nextName(matname)
+        StuffMaterials[stuff.name] = matname
     return (texname, texfile, matname)
+    
+    
+def nextName(string):
+    try:
+        n = int(string[:-3])
+    except:
+        n = -1
+    if n > 0:
+        return string[:-3] + str(n+1)
+    else:
+        return string + "_001"
+        
 
 def writeEffects(obj, fp, stuff):
     (texname, texfile, matname) = getNamesFromStuff(stuff)
     if not stuff.type:
-        tex = "texture_tif"
+        tex = "texture_png"
         writeEffectStart(fp, "SkinShader")
         writeSurfaceSampler(fp, tex)
-        writeSurfaceSampler(fp, "texture_ref_tif")
+        writeSurfaceSampler(fp, "texture_ref_png")
         writePhongStart(fp)
         writeTexture(fp, 'diffuse', tex)
         writeTexture(fp, 'transparent', tex)
