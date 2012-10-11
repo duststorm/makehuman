@@ -112,6 +112,12 @@ class CProxy:
             else:
                 vert.co = parent.verts[refVert].co
 
+    def getUuid(self):
+        if self.uuid:
+            return self.uuid
+        else:
+            return self.name
+            
 #
 #    class CMaterial
 #

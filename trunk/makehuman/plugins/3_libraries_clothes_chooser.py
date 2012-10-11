@@ -26,12 +26,26 @@ import files3d
 import mh2proxy
 import export_config
 
+
+KnownTags = [
+    "shoes",
+    "dress",
+    "tshirt",
+    "stockings",
+    "trousers",
+    "shirt",
+    "underwearbottom",
+    "underweartop",
+]
+
 class ClothesTaskView(gui3d.TaskView):
     
     def __init__(self, category):
         
         self.systemClothes = os.path.join('data', 'clothes')
         self.userClothes = os.path.join(mh.getPath(''), 'data', 'clothes')
+
+        self.taggedClothes = {}
         
         gui3d.TaskView.__init__(self, category, 'Clothes')
         if not os.path.exists(self.userClothes):
@@ -63,6 +77,8 @@ class ClothesTaskView(gui3d.TaskView):
         
         if not proxy:
             return
+
+        uuid = proxy.getUuid()
         
         if proxy.clothings:
             folder = os.path.dirname(mhclo)
@@ -76,12 +92,13 @@ class ClothesTaskView(gui3d.TaskView):
         obj = os.path.join(folder, name)
 
         try:
-            clo = human.clothesObjs[proxy.name]
+            clo = human.clothesObjs[uuid]
         except:
             clo = None
         if clo:
             gui3d.app.removeObject(clo)
-            del human.clothesObjs[proxy.name]
+            del human.clothesObjs[uuid]
+            print "Removed clothing", proxy.name, uuid
             return
 
         mesh = files3d.loadMesh(obj)
@@ -98,8 +115,33 @@ class ClothesTaskView(gui3d.TaskView):
         clo.mesh.setSolid(human.mesh.solid)
         clo.mesh.setTransparentPrimitives(len(clo.mesh.faces))
         clo.mesh.originalClothesVerts = [v.co[:] for v in clo.mesh.verts]
-        human.clothesObjs[proxy.name] = clo        
-        human.clothesProxies[proxy.name] = proxy
+        human.clothesObjs[uuid] = clo        
+        human.clothesProxies[uuid] = proxy
+        
+        for tag in proxy.tags:
+            tag = tag.lower()
+            if tag in KnownTags:
+                try:
+                    oldUuids = self.taggedClothes[tag]
+                except KeyError:
+                    oldUuids = []
+                newUuids = []
+                for oldUuid in oldUuids:
+                    if oldUuid == uuid:
+                        pass
+                    elif True:
+                        try:
+                            oldClo = human.clothesObjs[oldUuid]
+                        except KeyError:
+                            continue
+                        print "Removed clothing", oldUuid
+                        gui3d.app.removeObject(oldClo)
+                        del human.clothesObjs[oldUuid]
+                    else:
+                        print "Kept clothing", oldUuid
+                        newUuids.append(oldUuid)
+                newUuids.append(uuid)
+                self.taggedClothes[tag] = newUuids
 
         self.adaptClothesToHuman(human)
         clo.setSubdivided(human.isSubdivided())
@@ -108,10 +150,10 @@ class ClothesTaskView(gui3d.TaskView):
     
     def adaptClothesToHuman(self, human):
 
-        for (name,clo) in human.clothesObjs.items():            
+        for (uuid,clo) in human.clothesObjs.items():            
             if clo:
                 mesh = clo.getSeedMesh()
-                human.clothesProxies[name].update(mesh, human.meshData)
+                human.clothesProxies[uuid].update(mesh, human.meshData)
                 mesh.update()
                 if clo.isSubdivided():
                     clo.getSubdivisionMesh()
@@ -137,11 +179,11 @@ class ClothesTaskView(gui3d.TaskView):
         human = event.human
         if event.change == 'reset':
             print 'deleting clothes'
-            for (name,clo) in human.clothesObjs.items():
+            for (uuid,clo) in human.clothesObjs.items():
                 if clo:
                     gui3d.app.removeObject(clo)
-                del human.clothesObjs[name]
-                del human.clothesProxies[name]
+                del human.clothesObjs[uuid]
+                del human.clothesProxies[uuid]
             # self.clothesButton.setTexture('data/clothes/clear.png')
 
     def onHumanChanged(self, event):
@@ -162,10 +204,7 @@ class ClothesTaskView(gui3d.TaskView):
         for (name,clo) in human.clothesObjs.items():
             if clo:
                 proxy = human.clothesProxies[name]
-                if proxy.uuid:
-                    file.write('clothes %s %s\n' % (os.path.basename(proxy.file), proxy.uuid))
-                else:
-                    file.write('clothes %s\n' % proxy.file)
+                file.write('clothes %s %s\n' % (os.path.basename(proxy.file), proxy.getUuid()))
                 
     def syncMedia(self):
         

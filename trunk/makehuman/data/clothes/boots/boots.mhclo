@@ -1,6 +1,10 @@
 # author Thomas Larsson
 # license GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 # homepage http://www.makehuman.org/
+# uuid 30ddc2fe-4cd9-43b0-b818-a909b81f4ff2
+# basemesh alpha_7
+# tag Shoes
+
 # name Boots
 # obj_file boots.obj
 # z_depth 70

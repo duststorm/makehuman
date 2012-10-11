@@ -1,6 +1,10 @@
 # author Thomas Larsson
 # license GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 # homepage http://www.makehuman.org/
+# uuid 323c8965-547b-4833-948d-10fd98ee8d08
+# basemesh alpha_7
+# tag Gloves
+
 # name Gloves
 # obj_file gloves.obj
 # z_depth 45

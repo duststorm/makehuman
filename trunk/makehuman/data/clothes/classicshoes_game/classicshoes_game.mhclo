@@ -1,13 +1,17 @@
-# author Unknown
+# author Jonas Hauquier
 # license GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 # homepage http://www.makehuman.org/
+# uuid 949eda4a-5f01-4af9-be68-2bf8128d6388
+# basemesh alpha_7
+# tag Shoes
+
 # name ClassicShoes_game
 # obj_file classicshoes_game.obj
 # x_scale 4302 8697 1.3742
 # z_scale 8208 8220 2.0187
 # y_scale 8223 6827 1.9414
 # z_depth 50
-# uvtex_layer 0 UVMap
+# uvtex_layer 0 Texture
 # objfile_layer 0
 # texture classicshoes_texture_black.png 0
 # mask classicshoes_mask.png 0
