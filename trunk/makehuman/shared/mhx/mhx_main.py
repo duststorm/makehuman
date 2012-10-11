@@ -794,6 +794,7 @@ def writeProxyTexture(fp, texture, mat, extra):
     return (tex, texname)
     
 def writeProxyMaterial(fp, mat, proxy, proxyData):
+    alpha = mat.alpha
     tex = None
     bump = None
     normal = None
@@ -831,6 +832,7 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
         writeProxyMaterialSettings(fp, mat.mtexSettings)             
         fp.write("  end MTex\n")
         slot += 1
+        alpha = 0
         
     if bump:
         fp.write(
@@ -881,12 +883,12 @@ def writeProxyMaterial(fp, mat, proxy, proxyData):
 "  end MTex\n")
         slot += 1        
         
-    if nMasks > 0 or mat.alpha < 0.99:
+    if nMasks > 0 or alpha < 0.99:
         fp.write(
 "  use_transparency True ;\n" +
 "  transparency_method 'Z_TRANSPARENCY' ;\n" +
-"  alpha %3.f ;\n" % mat.alpha +
-"  specular_alpha %.3f ;\n" % mat.alpha)
+"  alpha %3.f ;\n" % alpha +
+"  specular_alpha %.3f ;\n" % alpha)
     if mat.mtexSettings == []:
         fp.write(
 "  use_shadows True ;\n" +
