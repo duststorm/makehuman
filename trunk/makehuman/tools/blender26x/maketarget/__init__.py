@@ -25,7 +25,7 @@
 
 bl_info = {
     "name": "Make Target",
-    "author": "Manuel Bastioni, Thomas Larsson",
+    "author": "Thomas Larsson",
     "version": "0.4",
     "blender": (2, 6, 4),
     "location": "View3D > Properties > Make Target",

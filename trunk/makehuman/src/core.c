@@ -9,7 +9,7 @@
  <tr><td>SourceForge Home Page:                          </td>
      <td>http://sourceforge.net/projects/makehuman/      </td></tr>
  <tr><td>Authors:                                        </td>
-     <td>Manuel Bastioni, Paolo Colombo, Simone Re, Hans-Peter Dusel</td></tr>
+     <td>Paolo Colombo, Simone Re, Hans-Peter Dusel</td></tr>
  <tr><td>Copyright(c):                                   </td>
      <td>MakeHuman Team 2001-2010                        </td></tr>
  <tr><td>Licensing:                                      </td>

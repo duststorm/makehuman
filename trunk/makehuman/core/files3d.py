@@ -10,7 +10,7 @@ Modules to handle supported 3D file formats.
 
 **Code Home Page:**    http://code.google.com/p/makehuman/
 
-**Authors:**           Manuel Bastioni, Marc Flerackers
+**Authors:**           Marc Flerackers
 
 **Copyright(c):**      MakeHuman Team 2001-2011
 

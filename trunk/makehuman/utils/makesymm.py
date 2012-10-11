@@ -7,7 +7,7 @@ Project Name:                **MakeHuman**
 Module File Location:        utils/blendersaveobj.py
 Product Home Page:           http://www.makehuman.org/
 SourceForge Home Page:       http://sourceforge.net/projects/makehuman/
-Authors:                     Manuel Bastioni
+Authors:                     
 Copyright(c):                MakeHuman Team 2001-2011
 Licensing:                   GPL3 (see also http://makehuman.wiki.sourceforge.net/Licensing)
 Coding Standards:            See http://makehuman.wiki.sourceforge.net/DG_Coding_Standards

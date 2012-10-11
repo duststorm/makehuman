@@ -10,7 +10,7 @@ B{Product Home Page:} U{http://www.makehuman.org/}
 
 B{Code Home Page:}    U{http://code.google.com/p/makehuman/}
 
-B{Authors:}           Manuel Bastioni
+B{Authors:}           
 
 B{Copyright(c):}      MakeHuman Team 2001-2010
 

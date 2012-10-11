@@ -10,7 +10,7 @@ Export anatomical and pose data as Biovision motion capture data in BVH format.
 
 **Code Home Page:**    http://code.google.com/p/makehuman/
 
-**Authors:**           Manuel Bastioni
+**Authors:**           
 
 **Copyright(c):**      MakeHuman Team 2001-2011
 

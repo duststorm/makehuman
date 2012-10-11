@@ -10,7 +10,7 @@ Export to stereolithography format.
 
 **Code Home Page:**    http://code.google.com/p/makehuman/
 
-**Authors:**           Manuel Bastioni
+**Authors:**           
 
 **Copyright(c):**      MakeHuman Team 2001-2011
 

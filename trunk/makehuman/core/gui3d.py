@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-:Authors:
-    Manuel Bastioni,
+:Authors:    
     Marc Flerackers
 
 :Version: 1.0

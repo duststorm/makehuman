@@ -7,7 +7,7 @@ The shape of old and new objs must be similar. We assume the new mesh is done us
 Project Name:                **MakeHuman**
 Module File Location:        utils/topology_translator/topology_translator.py
 Product Home Page:           http://www.makehuman.org/
-Authors:                     Manuel Bastioni
+Authors:                     
 Copyright(c):                MakeHuman Team 2001-2011
 Licensing:                   GPL3 (see also: http://sites.google.com/site/makehumandocs/licensing)
 Coding Standards:            See http://sites.google.com/site/makehumandocs/developers-guide#TOC-Coding-Style
@@ -44,7 +44,7 @@ def usage():
     print"    --testObj: path; Save a subdivided version of the obj passes as argument"
     print""
     print"AUTHOR:"
-    print"    Manuel Bastioni (info@makehuman.org)"
+    print"     (info@makehuman.org)"
     print""
     print"SEE ALSO:"
     print"    MakeHuman web page:"

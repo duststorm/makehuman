@@ -9,7 +9,7 @@
  <tr><td>SourceForge Home Page:                          </td>
  <td>http://sourceforge.net/projects/makehuman/      </td></tr>
  <tr><td>Authors:                                        </td>
- <td>Manuel Bastioni, Paolo Colombo, Simone Re, Marc Flerackers </td></tr>
+ <td> Paolo Colombo, Simone Re, Marc Flerackers </td></tr>
  <tr><td>Author of this file:                             </td>
  <td>Hans-Peter Dusel &lt;<a href='mailto:hdusel@tangerine-soft.de'>hdusel@tangerine-soft.de</a>&gt;</td></tr>
  <tr><td>Copyright(c):                                   </td>
