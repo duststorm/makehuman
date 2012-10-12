@@ -511,6 +511,12 @@ def addMaskImage(fp, mask):
     return
     
 def addMaskMTex(fp, mask, proxy, blendtype, n):            
+    if proxy:
+        try:
+            uvLayer = proxy.uvtexLayerName[proxy.maskLayer]
+        except KeyError:
+            return n
+            
     (dir, file) = mask
     fp.write(
 "  MTex %d %s UV ALPHA\n" % (n+1, file) +
@@ -524,9 +530,9 @@ def addMaskMTex(fp, mask, proxy, blendtype, n):
 "    use_stencil True ;\n" +
 "    use_rgb_to_intensity True ;\n")
     if proxy:
-        fp.write("    uv_layer '%s' ;\n" %  proxy.uvtexLayerName[proxy.maskLayer])
+        fp.write("    uv_layer '%s' ;\n" %  uvLayer)
     fp.write("  end MTex\n")
-    return
+    return n+1
 
 #
 #   writeSkinStart(fp, proxy, proxyData)
@@ -551,8 +557,7 @@ def writeSkinStart(fp, proxy, proxyData):
     n = 0    
     for prx in prxList:
         if prx.mask:
-            addMaskMTex(fp, prx.mask, proxy, 'MULTIPLY', n)
-            n += 1
+            n = addMaskMTex(fp, prx.mask, proxy, 'MULTIPLY', n)
             
     return nMasks
                
@@ -914,10 +919,9 @@ def addProxyMaskMTexs(fp, mat, proxy, prxList, tex):
     for (zdepth, prx) in prxList:
         m -= 1
         if zdepth > proxy.z_depth:
-            addMaskMTex(fp, prx.mask, proxy, 'MULTIPLY', n)
-            n += 1
+            n = addMaskMTex(fp, prx.mask, proxy, 'MULTIPLY', n)
     if not tex:            
-        addMaskMTex(fp, (None,'solid'), proxy, 'MIX', n)
+        n = addMaskMTex(fp, (None,'solid'), proxy, 'MIX', n)
     return   
     
 def sortedMasks(proxyData):

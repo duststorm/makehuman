@@ -68,7 +68,7 @@ class CProxy:
         self.dispStrength = 0.2
         self.obj_file = None
         self.material_file = None
-        self.maskLayer = 0
+        self.maskLayer = -1
         self.textureLayer = 0
         self.objFileLayer = 0
         self.uvtexLayerName = {0 : "UVTex"}
