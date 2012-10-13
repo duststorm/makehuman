@@ -109,7 +109,7 @@ def MitsubaExport(obj, app, settings):
             mitsubaMaterials(filexml)
 
             # add geometry
-            subSurfaceData = "" #mitsubaSSS()
+            subSurfaceData = mitsubaSSS()
             mitsubaGeometry(filexml, fileobj, subSurfaceData)
 
             # closed scene file
@@ -269,7 +269,7 @@ def mitsubaXmlFile(filexml):
     # declare 'header' of .xml file
     f = open(filexml, 'w')
     f.write('<?xml version="1.0" encoding="utf-8"?>\n' +
-            '<scene version="0.3.0">\n')
+            '<scene version="0.4.0">\n')
     f.close()
 
 def mitsubaIntegrator(filexml, lighting):
@@ -296,8 +296,13 @@ def mitsubaSSS():
     #subSurfaceData = ''
     subSurfaceData = ('\n' +
                       '\t    <subsurface type="dipole">\n' +
-                      '\t        <float name="densityMultiplier" value=".002"/>\n' +
-                      '\t        <string name="material" value="skin2"/>\n' +
+                      '\t        <float name="scale" value=".0002"/>\n' +
+                      '\t        <string name="intIOR" value="water"/>\n' +
+                      '\t        <string name="extIOR" value="air"/>\n' +
+                      '\t        <rgb name="sigmaS" value="87.2, 127.2, 143.2"/>\n' +
+                      '\n        <rgb name="sigmaA" value="1.04, 5.6, 11.6"/>\n' +
+                      '\n        <integer name="irrSamples" value="64"/>\n' +
+                      #'\t        <string name="material" value="skin1"/>\n' +
                       '\t    </subsurface>\n'
                       )
     return subSurfaceData
@@ -326,7 +331,7 @@ def mitsubaCamera(camera, resolution, filexml, samplerData, obj):
     fov = 27
     f = open(filexml, 'a')
     f.write('\n' +
-            '\t<camera type="perspective" id="Camera01-lib">\n' +
+            '\t<sensor type="perspective" id="Camera01">\n' +
             '\t    <float name="fov" value="%f"/>\n' % fov +
             '\t    <float name="nearClip" value="1"/>\n' +
             '\t    <float name="farClip" value="1000"/>\n' +
@@ -341,13 +346,13 @@ def mitsubaCamera(camera, resolution, filexml, samplerData, obj):
             '\t        <rotate z="1" angle="%f"/>\n' % obj.rz +
             '\t        <translate x="%f" y="%f" z="%f"/>\n' % (obj.x, -obj.y, obj.z) +
             '\t    </transform>\n' +
-            '\t    <film type="exrfilm" id="film">\n' +
+            '\t    <film type="hdrfilm" id="film">\n' +
             '\t        <integer name="width" value="%i"/>\n'  % resolution[0] +
             '\t        <integer name="height" value="%i"/>\n' % resolution[1] +
             '\t        <rfilter type="gaussian"/>\n' +
             '\t    </film>\n' +
             '\t    %s\n' % samplerData +
-            '\t</camera>\n')
+            '\t</sensor>\n')
     f.close()
 
 def mitsubaLights(filexml):
@@ -361,7 +366,7 @@ def mitsubaLights(filexml):
     # test for image environment lighting
     if env:
         f.write('\n' +
-                '\t<luminaire type="envmap" id="Area_002-light">\n' +
+                '\t<emitter type="envmap" id="Area_002-light">\n' +
                 '\t    <string name="filename" value="%s"/>\n' % env_path +
                 '\t    <transform name="toWorld">\n' +
                 '\t        <rotate z="1" angle="-90"/>\n' +
@@ -370,21 +375,21 @@ def mitsubaLights(filexml):
                 '\t                       0.000000 1.000000 -0.000001 8.870000\n' +
                 '\t                       0.000000 0.000000 0.000000 1.000000"/>\n' +
                 '\t    </transform>\n' +
-                '\t    <float name="intensityScale" value="3"/>\n' +
-                '\t</luminaire>\n' )
+                '\t    <float name="scale" value="3"/>\n' +
+                '\t</emitter>\n' )
     elif sky:
         f.write('\n'+
-                '\t<luminaire type="sky">\n' +
-                '\t   <float name="intensityScale" value="1"/>\n' +
-                '\t</luminaire>\n')
+                '\t<emitter type="sky">\n' +
+                '\t   <float name="scale" value="1"/>\n' +
+                '\t</emitter>\n')
     else:
         f.write('\n' + # test for sphere light
                 '\t<shape type="sphere">\n' +
                 '\t    <point name="center" x="-1" y="4" z="60"/>\n' +
                 '\t    <float name="radius" value="1"/>\n' +
-                '\t    <luminaire type="area">\n' +
+                '\t    <emitter type="area">\n' +
                 '\t        <blackbody name="intensity" temperature="4500K"/>\n' +
-                '\t    </luminaire>\n' +
+                '\t    </emitter>\n' +
                 '\t</shape>\n')
     f.close()
 
@@ -414,14 +419,14 @@ def mitsubaMaterials(filexml):
     f = open(filexml, 'a')
     # material for human mesh
     f.write('\n' +
-            '\t<bsdf type="plastic" id="humanMat">\n' + #% mat_type +  
+            '\t<bsdf type="roughplastic" id="humanMat">\n' + #% mat_type +  
             '\t    <rgb name="specularReflectance" value="0.35, 0.25, 0.25"/>\n' +
             '\t    <ref name="diffuseReflectance" id="imageh"/>\n' + # aplic texture image to diffuse chanel
-            '\t    <float name="specularSamplingWeight" value="0.50"/>\n' +
+            '\t    <float name="specularSamplingWeight" value="0.1250"/>\n' +
             '\t    <float name="diffuseSamplingWeight" value="1.0"/>\n' +
             '\t    <boolean name="nonlinear" value="false"/>\n' +
-            '\t    <float name="intIOR" value="1.52"/>\n' +
-            '\t    <float name="extIOR" value="1.000277"/>\n' +
+            '\t    <string name="intIOR" value="water"/>\n' +
+            '\t    <string name="extIOR" value="air"/>\n' +
             '\t    <float name="fdrInt" value="0.5"/>\n' +
             '\t    <float name="fdrExt" value="0.5"/>\n' +
             '\t</bsdf>\n'
