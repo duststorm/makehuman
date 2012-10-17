@@ -180,12 +180,13 @@ class ExpressionLoadTaskView(gui3d.TaskView):
 
         self.expressionTaskView = expressionTaskView
 
+        self.globalExpressionPath = os.path.join('data', 'expressions')
         self.expressionPath = os.path.join(mh.getPath(''), 'data', 'expressions')
 
         if not os.path.exists(self.expressionPath):
             os.makedirs(self.expressionPath)
 
-        self.filechooser = self.addView(gui3d.FileChooser(self.expressionPath, 'mhm', 'png'))
+        self.filechooser = self.addView(gui3d.FileChooser([self.globalExpressionPath, self.expressionPath], 'mhm', 'png'))
 
         @self.filechooser.event
         def onFileSelected(filename):
