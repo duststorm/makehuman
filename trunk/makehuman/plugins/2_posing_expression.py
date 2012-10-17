@@ -96,9 +96,7 @@ class ExpressionTaskView(gui3d.TaskView):
         human = event.human
         
         for slider in self.sliders:
-            value = slider.modifier.getValue(human)
-            if value:
-                slider.modifier.setValue(human, value)
+            slider.update()
                 
     def loadHandler(self, human, values):
         
