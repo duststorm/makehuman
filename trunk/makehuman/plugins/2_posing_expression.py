@@ -144,9 +144,6 @@ class ExpressionTaskView(gui3d.TaskView):
 
                         modifier.setValue(human, float(lineData[2]))
 
-        for slider in self.sliders:
-            slider.update()
-
 class Action:
 
     def __init__(self, human, filename, expressionTaskView, postAction=None):
@@ -163,6 +160,8 @@ class Action:
     def do(self):
         self.expressionTaskView.loadExpression(self.filename)
         self.human.applyAllTargets(gui3d.app.progress, True)
+        for slider in self.expressionTaskView.sliders:
+            slider.update()
         if self.postAction:
             self.postAction()
         return True
@@ -171,6 +170,8 @@ class Action:
         for name, value in self.before.iteritems():
             self.expressionTaskView.modifiers[name].setValue(self.human, value)
         self.human.applyAllTargets(gui3d.app.progress, True)
+        for slider in self.expressionTaskView.sliders:
+            slider.update()
         if self.postAction:
             self.postAction()
         return True
