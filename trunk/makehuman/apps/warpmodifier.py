@@ -130,6 +130,8 @@ class WarpModifier (humanmodifier.SimpleModifier):
         
         if warp.numpy:
             target = self.getWarpTarget(algos3d.theHuman)    
+            if not target:
+                return
             target.reinit()
             return humanmodifier.SimpleModifier.updateValue(self, obj, value, updateNormals)
         else:            
@@ -140,18 +142,16 @@ class WarpModifier (humanmodifier.SimpleModifier):
 
     def clampValue(self, value):
         return max(0.0, min(1.0, value))
-        
-        
+
+
     def compileWarpTarget(self, human):
         landmarks = theLandMarks[self.bodypart]
         hasChanged = getRefObject(human)
-        self.getRefTarget(human)
-        warpfield = warp.CWarp()     
+        self.getRefTarget(human)    
         print "Compile", self
-        shape = warpfield.warpTarget(self.refTargetVerts, theRefObjectVerts, human.shadowVerts, landmarks)
+        shape = warp.warp_target(self.refTargetVerts, theRefObjectVerts, human.shadowVerts, landmarks)
         return shape
-    
-    
+
     def getRefTarget(self, human):
         global theRefObjects
         
@@ -229,8 +229,10 @@ class WarpModifier (humanmodifier.SimpleModifier):
             target = None
     
         if target:
-            if not target.isWarp:
-                raise NameError("%s should be warp" % target)
+            if not hasattr(target, "isWarp"):
+                print "Ignored non-warp target:", target.name
+                return None
+                #raise NameError("%s should be warp" % target)
             return target
             
         target = WarpTarget(self, human)
@@ -245,9 +247,7 @@ def getRefObject(human):
         print "Reference character changed"
         human.iHaveChanged = False                        
     
-        theRefObjectVerts = {}
-        for n,v in theBaseObjectVerts.items():
-            theRefObjectVerts[n] = list(v)
+        theRefObjectVerts = [ list(v) for v in theBaseObjectVerts ]
     
         for (char, verts) in theRefObjects.items():
             cval = human.getDetail(char)
@@ -339,24 +339,19 @@ def defineGlobals():
         if ext != ".lmk":
             continue
         path = os.path.join(folder, file)
-        fp = open(path, "r")
-        landmark = {}
-        locs = {}
-        n = 0
-        for line in fp:
-            words = line.split()    
-            if len(words) > 0:
-                m = int(words[0])
-                landmark[n] = m
-                n += 1
-        fp.close()
+        with open(path, "r") as fp:
+            landmark = []
+            for line in fp:
+                words = line.split()    
+                if len(words) > 0:
+                    m = int(words[0])
+                    landmark.append(m)
+
         theLandMarks[name] = landmark
 
     obj = files3d.loadMesh("data/3dobjs/base.obj")
-    theBaseObjectVerts = {}
-    for n,v in enumerate(obj.verts):
-        theBaseObjectVerts[n] = v.co
-        
+    theBaseObjectVerts = [ v.co for v in obj.verts ]
+
     theRefObjects = {}
     for race in ["african", "asian", "neutral"]:
         for gender in ["female", "male"]:

@@ -8,7 +8,7 @@
 
 **Code Home Page:**    http://code.google.com/p/makehuman/
 
-**Authors:**           Thomas Larsson
+**Authors:**           Thomas Larsson, Alexis Mignon
 
 **Copyright(c):**      MakeHuman Team 2001-2012
 
@@ -120,10 +120,13 @@ def getModule(modname, folder):
             fp.close()
     return sys.modules[modname]
 
-try:    
+try:  
     numpy = getModule("numpy", "lib/site-packages")  
-except:
-    numpy = None
+except OSError:
+    try:
+        import numpy
+    except ImportError:
+        numpy = None
 if numpy:
     print("Numpy successfully loaded")
 else:
@@ -134,6 +137,7 @@ else:
 #   class CWarp
 #----------------------------------------------------------
 
+"""
 class CWarp:
     def __init__(self):
         self.n = 0
@@ -178,7 +182,7 @@ class CWarp:
             xi = xverts[i]
             for j in range(n):
                 self.H[i][j] = self.rbf(j, xi)
-        
+          
         self.HT = self.H.transpose()
         self.HTH = numpy.dot(self.HT, self.H)    
         #print("  Warp field set up: %d points" % n)
@@ -193,8 +197,8 @@ class CWarp:
         A = self.HTH
         b = numpy.dot(self.HT, self.y[index])
         self.w[index] = numpy.linalg.solve(A, b)
-        e = self.y[index] - numpy.dot(self.H, self.w[index])
-        ee = numpy.dot(e.transpose(), e)
+        #e = self.y[index] - numpy.dot(self.H, self.w[index])
+        #ee = numpy.dot(e.transpose(), e)
         #print("Solved for index %d: Error %g" % (index, math.sqrt(ee)))
         #print(self.w[index])
         return
@@ -230,16 +234,10 @@ class CWarp:
         
         
     def warpTarget(self, morph, source, target, landmarks):
-        xverts = {}
-        yverts = {}  
-        for (m,n) in landmarks.items():
-            xverts[m] = list(source[n])
-            yverts[m] = list(target[n])
-    
+        xverts = [ list(source[n]) for n in landmarks]
+        yverts = [ list(target[n]) for n in landmarks]
+
         self.setup(xverts, yverts)
-        self.solve(0)
-        self.solve(1)
-        self.solve(2)
 
         ymorph = {}
         for n in morph.keys():
@@ -247,7 +245,7 @@ class CWarp:
             yloc = self.warpLoc(xloc)
             ymorph[n] = fastmath.vsub3d(yloc, target[n])
             
-        """
+        '''
             print n
             print "  X0", source[n]
             print "  Y0", target[n].co
@@ -256,8 +254,101 @@ class CWarp:
             print "  DX", morph[n]
             print "  DY", ymorph[n]
         halt
-        """
+        '''
         return ymorph        
+"""
+#----------------------------------------------------------
+#   class CWarp2
+#----------------------------------------------------------
+
+def compute_distance2(x, y=None):
+    if y is None:
+        gram = numpy.dot(x,x.T)
+        diag = gram.diagonal()
+        return diag[:,numpy.newaxis] + diag[numpy.newaxis] - 2 * gram
+    else:
+        gram = numpy.dot(x, y.T)
+        diagx = (x*x).sum(-1)
+        diagy = (y*y).sum(-1)
+        return diagx[:,numpy.newaxis] + diagy[numpy.newaxis] - 2* gram
+
+
+class CWarp2(object):
+    
+    def __init__(self, source, target, landmarks):
+        self.source = numpy.asarray(source, dtype="float")
+        self.target = numpy.asarray(target, dtype="float")
         
-           
-      
+        self.xverts = self.source[landmarks]
+        self.yverts = self.target[landmarks]
+        H = self.rbf(self.xverts)
+        w = numpy.linalg.lstsq(H,self.yverts)[0]
+        self.w = w
+
+
+    def rbf(self, x, y=None):
+        dists2 = compute_distance2(x, y)
+
+        if y is None:
+            dmax = dists2.max()
+            dtmp = dists2 + dmax * numpy.identity(x.shape[0])
+            self.s2 = dtmp.min(0)
+
+        return numpy.sqrt(dists2 + self.s2)
+        #~ return numpy.exp(- 0.003 * dists2 / dists2.max())
+
+
+    def warpTarget(self, morph):
+        idx = morph.keys()
+        disp = numpy.asarray(morph.values(), dtype="float")
+        xmorph = self.source[idx] + disp
+        H = self.rbf(xmorph, self.xverts)
+        ymorph = numpy.dot(H, self.w) - self.target[idx]
+        return dict(zip(idx, ymorph))
+
+
+#----------------------------------------------------------
+#   External interface
+#----------------------------------------------------------
+
+def warp_target1(morph, source, target, landmarks):
+    return CWarp().warpTarget(morph, source, target, landmarks)
+
+def warp_target(morph, source, target, landmarks):
+    return CWarp2(source, target, landmarks).warpTarget(morph)
+
+
+#----------------------------------------------------------
+#   Testing
+#----------------------------------------------------------
+
+def test_warp():
+    import time
+    numpy.random.seed(5643)
+    
+    n = 1000
+    angle = 2*numpy.pi * numpy.random.rand(n)
+    z = numpy.random.rand(n)
+    x = numpy.cos(angle)
+    y = numpy.sin(angle)
+    points = numpy.vstack([x,y,z]).T
+    
+    morph = dict([ (i+n/2, 0.1 * numpy.random.rand(3)) for i in range(n/2) ])
+    landmarks = range(n/2)
+    
+    t0 = time.time()
+    ymorph = warp_target1(morph, points, points * (1,3,1), landmarks )
+    t1 = time.time()
+    ymorph2 = warp_target2(morph, points, points * (1,3,1), landmarks )
+    t2 = time.time()
+    
+    print "time warp 1", t1 - t0
+    print "time warp 2", t2 - t1
+    print "t1/t2", (t1 - t0)/(t2 - t1)
+        
+    print "difference morph1/morph2", numpy.abs(numpy.array(ymorph.values()) - numpy.array(ymorph2.values())).mean()
+    print "morph error 1", numpy.abs(numpy.array(morph.values()) * (1,3,1) - numpy.array(ymorph.values())).mean()
+    print "morph error 2", numpy.abs(numpy.array(morph.values()) * (1,3,1) - numpy.array(ymorph2.values())).mean()
+
+if __name__ == '__main__':
+    test_warp() 
