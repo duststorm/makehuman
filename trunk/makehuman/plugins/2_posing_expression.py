@@ -144,6 +144,9 @@ class ExpressionTaskView(gui3d.TaskView):
 
                         modifier.setValue(human, float(lineData[2]))
 
+        for slider in self.sliders:
+            slider.update()
+
 class Action:
 
     def __init__(self, human, filename, expressionTaskView, postAction=None):
