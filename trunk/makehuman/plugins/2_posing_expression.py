@@ -63,7 +63,7 @@ class ExpressionTaskView(gui3d.TaskView):
                         "GenderAgeEthnicModifier2")
                 else:
                     modifier = humanmodifier.GenderAgeEthnicModifier2('data/targets/expression/units/${ethnic}/${gender}_${age}/%s-%s.target' % (name, subname))
-                self.modifiers[subname] = modifier
+                self.modifiers[name + '-' + subname] = modifier
                 slider = box.addView(ExpressionSlider(subname.capitalize(), modifier))
                 self.sliders.append(slider)
                 modifier.slider = slider
@@ -108,8 +108,15 @@ class ExpressionTaskView(gui3d.TaskView):
         
         for name, modifier in self.modifiers.iteritems():
             value = modifier.getValue(human)
+            print name, value
             if value:
+                print name, value
                 file.write('expression %s %f\n' % (name, value))
+
+    def reset(self):
+
+        for name, modifier in self.modifiers.iteritems():
+            modifier.setValue(0.0)
 
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
@@ -119,8 +126,8 @@ def load(app):
     category = app.getCategory('Posing')
     taskview = category.addView(ExpressionTaskView(category))
     
-    #app.addLoadHandler('expression', taskview.loadHandler)
-    #app.addSaveHandler(taskview.saveHandler)
+    app.addLoadHandler('expression', taskview.loadHandler)
+    app.addSaveHandler(taskview.saveHandler)
     
     print 'Expression loaded'
 

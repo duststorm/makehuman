@@ -162,8 +162,8 @@ class FaceTaskView(gui3d.TaskView):
                     ('r-ear-rot', 'backward', 'forward', 'rightView'),
                     ('r-ear', 'square', 'round', 'rightView'),
                     ('r-ear-width', 'max', 'min', 'rightView'),
-                    ('r-ear', 'wing-out', 'wing-in', 'frontView'),
-                    ('r-ear', 'flap-out', 'flap-in', 'frontView'),
+                    ('r-ear-wing', 'out', 'in', 'frontView'),
+                    ('r-ear-flap', 'out', 'in', 'frontView'),
                 ]]),
             ('left ear', [('data/targets/ears/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/ears/images/', i[3]) for i in
                 [
@@ -176,8 +176,8 @@ class FaceTaskView(gui3d.TaskView):
                     ('l-ear-rot', 'backward', 'forward', 'leftView'),
                     ('l-ear', 'square', 'round', 'leftView'),
                     ('l-ear-width', 'max', 'min', 'leftView'),
-                    ('l-ear', 'wing-out', 'wing-in', 'frontView'),
-                    ('l-ear', 'flap-out', 'flap-in', 'frontView'),       
+                    ('l-ear-wing', 'out', 'in', 'frontView'),
+                    ('l-ear-flap', 'out', 'in', 'frontView'),       
                 ]]),
             ('chin', [('data/targets/chin/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/chin/images/', i[3]) for i in
                 [
@@ -191,9 +191,9 @@ class FaceTaskView(gui3d.TaskView):
             ('cheek', [('data/targets/cheek/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/cheek/images/', i[3]) for i in
                 [
                     ('l-cheek', 'in', 'out', 'frontView'),
-                    ('l-cheek', 'bones', 'nobones', 'frontView'),
+                    ('l-cheek-bones', 'out', 'in', 'frontView'),
                     ('r-cheek', 'in', 'out', 'frontView'),
-                    ('r-cheek', 'bones', 'nobones', 'frontView'),
+                    ('r-cheek-bones', 'out', 'in', 'frontView'),
 
                 ]])
             ]
