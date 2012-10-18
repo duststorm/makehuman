@@ -149,10 +149,23 @@ class WarpModifier (humanmodifier.SimpleModifier):
         hasChanged = getRefObject(human)
         self.getRefTarget(human)    
         print "Compile", self
+        #print len(list(self.refTargetVerts)), len(list(theRefObjectVerts)), len(list(human.shadowVerts))
         shape = warp.warp_target(self.refTargetVerts, theRefObjectVerts, human.shadowVerts, landmarks)
         return shape
 
-    def getRefTarget(self, human):
+    def getRefTarget(self, human):       
+        targetChanged = self.getBases(human)
+        if targetChanged:
+            print "Reference target changed"
+            if not self.makeRefTarget():
+                print "Updating character"
+                human.applyAllTargets()
+                self.getBases(human)
+                if not self.makeRefTarget():
+                    raise NameError("Character is empty")
+
+    
+    def getBases(self, human):
         global theRefObjects
         
         targetChanged = False
@@ -169,22 +182,25 @@ class WarpModifier (humanmodifier.SimpleModifier):
                 #print "Target changed", os.path.basename(char), cval0, cval1
                 self.bases[key] = target,char,cval1
                 targetChanged = True
-            
-        if targetChanged:
-            print "Reference target changed"
-    
-            self.refTargetVerts = {}
-            for key in self.bases.keys():
-                target,char,cval = self.bases[key]
-                if cval:
-                    #print "ch", target, cval
-                    verts = self.getTargetInsist(target)
-                    for n,v in verts.items():
-                        dr = fastmath.vmul3d(v, cval)
-                        try:
-                            self.refTargetVerts[n] = fastmath.vadd3d(self.refTargetVerts[n], dr)
-                        except KeyError:
-                            self.refTargetVerts[n] = dr
+        return targetChanged
+        
+
+    def makeRefTarget(self):
+        self.refTargetVerts = {}
+        madeRefTarget = False
+        for key in self.bases.keys():
+            target,char,cval = self.bases[key]
+            if cval:
+                #print "ch", target, cval
+                madeRefTarget = True
+                verts = self.getTargetInsist(target)
+                for n,v in verts.items():
+                    dr = fastmath.vmul3d(v, cval)
+                    try:
+                        self.refTargetVerts[n] = fastmath.vadd3d(self.refTargetVerts[n], dr)
+                    except KeyError:
+                        self.refTargetVerts[n] = dr
+        return madeRefTarget                            
                             
 
     def getTargetInsist(self, target):
@@ -230,7 +246,8 @@ class WarpModifier (humanmodifier.SimpleModifier):
     
         if target:
             if not hasattr(target, "isWarp"):
-                print "Ignored non-warp target:", target.name
+                print "Found non-warp target:", target.name, ". Deleted"
+                del algos3d.targetBuffer[self.warppath]
                 return None
                 #raise NameError("%s should be warp" % target)
             return target

@@ -119,6 +119,7 @@ class ExpressionTaskView(gui3d.TaskView):
 
         for name, modifier in self.modifiers.iteritems():
             modifier.setValue(human, 0.0)
+            #modifier.updateValue(human, 0.0)  # Force recompilation
 
     def loadExpression(self, filename):
 
