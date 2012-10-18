@@ -102,15 +102,15 @@ class ExpressionTaskView(gui3d.TaskView):
         
         modifier = self.modifiers.get(values[1], None)
         if modifier:
-            modifier.setValue(human, float(values[2]))
+            value = float(values[2])
+            modifier.setValue(human, value)
+            modifier.updateValue(human, value)  # Force recompilation
        
     def saveHandler(self, human, file):
         
         for name, modifier in self.modifiers.iteritems():
             value = modifier.getValue(human)
-            print name, value
             if value:
-                print name, value
                 file.write('expression %s %f\n' % (name, value))
 
     def resetExpressions(self):
@@ -135,12 +135,14 @@ class ExpressionTaskView(gui3d.TaskView):
             if len(lineData) > 0 and not lineData[0] == '#':
 
                 if lineData[0] == 'expression':
-
+                    
                     modifier = self.modifiers.get(lineData[1], None)
                     
                     if modifier:
 
-                        modifier.setValue(human, float(lineData[2]))
+                        value = float(lineData[2])
+                        modifier.setValue(human, value)
+                        modifier.updateValue(human, value)  # Force recompilation
 
 class Action:
 

@@ -126,16 +126,16 @@ class WarpModifier (humanmodifier.SimpleModifier):
         return ("<WarpModifier %s>" % (os.path.basename(self.template)))
             
 
-    def updateValue(self, obj, value, updateNormals=1):
+    def updateValue(self, human, value, updateNormals=1):
         
         if warp.numpy:
             target = self.getWarpTarget(algos3d.theHuman)    
             if not target:
                 return
             target.reinit()
-            return humanmodifier.SimpleModifier.updateValue(self, obj, value, updateNormals)
+            return humanmodifier.SimpleModifier.updateValue(self, human, value, updateNormals)
         else:            
-            return self.fallback.updateValue(obj, value, updateNormals)
+            return self.fallback.updateValue(human, value, updateNormals)
         
 
     # overrides
