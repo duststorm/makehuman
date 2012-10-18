@@ -4,8 +4,75 @@
 
 import gui3d
 import humanmodifier
+from string import Template
+import re
 
 print 'Arms and leg imported'
+
+class AsymmetricDetailModifier(humanmodifier.GenderAgeAsymmetricModifier):
+    
+    def __init__(self, template, parameterName, left, right, always=True):
+    
+        humanmodifier.GenderAgeAsymmetricModifier.__init__(self, template, parameterName, left, right, always)
+        
+    def getValue(self, human):
+        
+        return getattr(human, self.parameterName)
+        
+    def setValue(self, human, value):
+        
+        setattr(human, self.parameterName, value)
+        humanmodifier.GenderAgeAsymmetricModifier.setValue(self, human, value)
+
+class StomachModifier(AsymmetricDetailModifier):
+    # This needs a custom modifier because tone and weight also need to be included
+    
+    def __init__(self):
+    
+        AsymmetricDetailModifier.__init__(self, 'data/targets/details/${gender}-${age}-${tone}-${weight}-stomach${stomach}.target', 'stomach', '1', '2', False)
+        
+    def expandTemplate(self, targets):
+        
+        # Build target list of (targetname, [factors])
+        targets = [(Template(target[0]).safe_substitute(gender=value), target[1] + [value]) for target in targets for value in ['female', 'male']]
+        targets = [(Template(target[0]).safe_substitute(age=value), target[1] + [value]) for target in targets for value in ['child', 'young', 'old']]
+        targets = [(Template(target[0]).safe_substitute(tone=value), target[1] + [value or 'averageTone']) for target in targets for value in ['flaccid', '', 'muscle']]
+        targets = [(Template(target[0]).safe_substitute(weight=value), target[1] + [value or 'averageWeight']) for target in targets for value in ['light', '', 'heavy']]
+        targets = [(Template(target[0]).safe_substitute({self.parameterName:value}), target[1] + [value]) for target in targets for value in [self.left, self.right]]
+
+        # Cleanup multiple hyphens and remove a possible hyphen before a dot.
+        doubleHyphen = re.compile(r'-+')
+        hyphenDot = re.compile(r'-\.')
+        
+        targets = [(re.sub(hyphenDot, '.', re.sub(doubleHyphen, '-', target[0])), target[1]) for target in targets]
+        
+        return targets
+        
+    def getFactors(self, human, value):
+        
+        factors = {
+            'female': human.femaleVal,
+            'male': human.maleVal,
+            'child': human.childVal,
+            'young': human.youngVal,
+            'old': human.oldVal,
+            'flaccid':human.flaccidVal,
+            'muscle':human.muscleVal,
+            'averageTone':1.0 - (human.flaccidVal + human.muscleVal),
+            'light':human.underweightVal,
+            'heavy':human.overweightVal,
+            'averageWeight':1.0 - (human.underweightVal + human.overweightVal),
+            self.left: -min(value, 0.0),
+            self.right: max(0.0, value)
+        }
+        
+        return factors
+
+class DetailSlider(humanmodifier.ModifierSlider):
+    
+    def __init__(self, value, min, max, label, modifier):
+        
+        humanmodifier.ModifierSlider.__init__(self, value, min, max, label, modifier=modifier)
 
 class GroupBoxRadioButton(gui3d.RadioButton):
     def __init__(self, group, label, groupBox, selected=False):
@@ -102,6 +169,22 @@ class TorsoTaskView(gui3d.TaskView):
                 
         y += 16
 
+        self.specialModifiers = {}
+
+        self.specialModifiers['pelvisTone'] = AsymmetricDetailModifier('data/targets/details/${gender}-${age}-pelvis-tone${pelvisTone}.target', 'pelvisTone', '1', '2', False)
+        self.specialModifiers['buttocks'] = AsymmetricDetailModifier('data/targets/details/${gender}-${age}-nates${buttocks}.target', 'buttocks', '1', '2', False)
+        self.specialModifiers['stomach'] = StomachModifier()
+        
+        slider = DetailSlider(0.0, -1.0, 1.0, "Pelvis tone", self.specialModifiers['pelvisTone']);
+        self.sliders.append(slider)
+        self.categoryBox.addView(slider);
+        slider = DetailSlider(0.0, -1.0, 1.0, "Stomach", self.specialModifiers['stomach']);
+        self.sliders.append(slider)
+        self.categoryBox.addView(slider);
+        slider = DetailSlider(0.0, -1.0, 1.0, "Buttocks", self.specialModifiers['buttocks']);
+        self.sliders.append(slider)
+        self.categoryBox.addView(slider);
+
         self.hideAllBoxes()
         self.groupBoxes[0].show()
         
@@ -133,7 +216,7 @@ class TorsoTaskView(gui3d.TaskView):
 
     def loadHandler(self, human, values):
         
-        if values[0] == 'armslegs':
+        if values[0] == 'torso':
             modifier = self.modifiers.get(values[1].replace("-", " "), None)
             if modifier:
                 modifier.setValue(human, float(values[2]))
@@ -143,16 +226,16 @@ class TorsoTaskView(gui3d.TaskView):
         for name, modifier in self.modifiers.iteritems():
             value = modifier.getValue(human)
             if value:
-                file.write('armslegs %s %f\n' % (name.replace(" ", "-"), value))
+                file.write('torso %s %f\n' % (name.replace(" ", "-"), value))
     
 def load(app):
     category = app.getCategory('Modelling')
     taskview = category.addView(TorsoTaskView(category))
     
-    app.addLoadHandler('armslegs', taskview.loadHandler)
+    app.addLoadHandler('torso', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)
 
-    print 'Armslegs loaded'
+    print 'Torso loaded'
 
 def unload(app):
     pass
