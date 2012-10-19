@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0FA04125162C2C8E004E3893 /* libpng.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0FA04124162C2C8E004E3893 /* libpng.framework */; };
+		0FA04127162C2CBB004E3893 /* libpng.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 0FA04124162C2C8E004E3893 /* libpng.framework */; };
 		6806287A0FC136C9006C372E /* data in Resources */ = {isa = PBXBuildFile; fileRef = 68061C9B0FC136AB006C372E /* data */; };
 		680EA9CF11A432B000DDEFEB /* glew.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 680EA9CE11A432B000DDEFEB /* glew.framework */; };
 		680EAADA11A4394300DDEFEB /* glew.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 680EA9CE11A432B000DDEFEB /* glew.framework */; };
@@ -113,6 +115,7 @@
 				68E6C07A103B1E3500BAA9F5 /* SDL.framework in Copy Frameworks */,
 				6869C0E710322A4200DF62C3 /* Sparkle.framework in Copy Frameworks */,
 				6894C50E0FA1893900A52097 /* SDL_image.framework in Copy Frameworks */,
+				0FA04127162C2CBB004E3893 /* libpng.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -120,6 +123,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0FA04124162C2C8E004E3893 /* libpng.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libpng.framework; path = frameworks/libpng.framework; sourceTree = SOURCE_ROOT; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
@@ -241,6 +245,7 @@
 				6894C4E20FA188D000A52097 /* SDL_image.framework in Frameworks */,
 				6869C0DE10322A0400DF62C3 /* Sparkle.framework in Frameworks */,
 				68E6C077103B1E2500BAA9F5 /* SDL.framework in Frameworks */,
+				0FA04125162C2C8E004E3893 /* libpng.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -275,6 +280,7 @@
 		1058C7A2FEA54F0111CA2CBB /* Other Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0FA04124162C2C8E004E3893 /* libpng.framework */,
 				680EA9CE11A432B000DDEFEB /* glew.framework */,
 				6869C0DD10322A0400DF62C3 /* Sparkle.framework */,
 				68E6C076103B1E2500BAA9F5 /* SDL.framework */,
@@ -755,6 +761,7 @@
 					./include/,
 					./include/pythonwrapper/,
 					./include/sdlwrapper/,
+					./include/png/,
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
@@ -1066,6 +1073,7 @@
 					./include/,
 					./include/pythonwrapper/,
 					./include/sdlwrapper/,
+					./include/png/,
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
@@ -1186,6 +1194,7 @@
 					./include/,
 					./include/pythonwrapper/,
 					./include/sdlwrapper/,
+					./include/png/,
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
@@ -1321,6 +1330,7 @@
 					./include/,
 					./include/pythonwrapper/,
 					./include/sdlwrapper/,
+					./include/png/,
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
@@ -1455,6 +1465,7 @@
 					./include/,
 					./include/pythonwrapper/,
 					./include/sdlwrapper/,
+					./include/png/,
 				);
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
@@ -1643,6 +1654,7 @@
 					./include/,
 					./include/pythonwrapper/,
 					./include/sdlwrapper/,
+					./include/png/,
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
@@ -1674,6 +1686,7 @@
 					./include/,
 					./include/pythonwrapper/,
 					./include/sdlwrapper/,
+					./include/png/,
 				);
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
