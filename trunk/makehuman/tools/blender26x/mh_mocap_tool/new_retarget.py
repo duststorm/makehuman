@@ -37,6 +37,7 @@ from . import globvar as the
 from .utils import MocapError
 
 Deg2Rad = math.pi/180
+D = 180/math.pi
     
 #
 #   class CBoneData:
@@ -142,6 +143,8 @@ def retargetFkBone(boneData, frame):
         bakeMat = parInv * bakeMat
 
         if parent.rollMat:
+            #roll = utils.getRollMat(parent.rollMat)
+            #print("ParRoll", name, parent.name, roll*D)
             bakeRot = parent.rollInv * bakeMat
             setRotation(bakeMat, bakeRot)
         elif parent.rotOffsInv:
@@ -167,8 +170,8 @@ def retargetFkBone(boneData, frame):
     trgMat = boneData.trgRestInv * bakeMat
 
     if boneData.rollMat:
-        #print(name)
-        #utils.printMat4(" Trg1", trgMat, "  ")
+        #roll = utils.getRollMat(boneData.rollMat)
+        #print("SelfRoll", name, roll*D)
         trgRot = trgMat * boneData.rollMat
         setRotation(trgMat, trgRot)
         #utils.printMat4(" Trg2", trgMat, "  ")
