@@ -85,7 +85,7 @@ class HumanTextureTaskView(gui3d.TaskView):
         gui3d.TaskView.onShow(self, event)
         gui3d.app.selectedHuman.hide()
         self.filechooser.setFocus()
-	
+    
         self.numSkin = len([filename for filename in os.listdir(os.path.join(mh.getPath(''), 'data', 'skins')) if filename.lower().endswith('png')])
         #self.numSkin = self.numSkin + len([filename for filename in os.listdir(os.path.join('data', 'skins')) if filename.lower().endswith('png')])
         
@@ -108,7 +108,12 @@ class HumanTextureTaskView(gui3d.TaskView):
         if values[0] == 'skinTexture':
             (fname, ext) = os.path.splitext(values[1])
             if fname != "texture":
-                human.setTexture(os.path.join(os.path.join(mh.getPath(''), 'data', 'skins', values[1])))
+                path = os.path.join(os.path.join(mh.getPath(''), 'data', 'skins', values[1]))
+                if os.path.isfile(path):                    
+                    human.setTexture(path)
+                elif ext == ".tif":
+                    path = path.replace(".tif", ".png")
+                    human.setTexture(path)
        
     def saveHandler(self, human, file):
         
