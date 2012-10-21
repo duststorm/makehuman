@@ -253,17 +253,19 @@ class LoadPanel(bpy.types.Panel):
         row = layout.row()
         row.prop(scn, 'McpGuessSourceRig')
         row.prop(scn, 'McpGuessTargetRig')
-        layout.prop(scn, "McpRetargetIK")
         layout.prop(scn, "McpDoSimplify")
-        layout.prop(scn, "McpDefaultSS")
         row = layout.row()
         row.prop(scn, "McpUseSpineOffset")
         row.prop(scn, "McpUseClavOffset")
+        
         layout.separator()
         layout.operator("mcp.load_and_retarget")
-
         layout.separator()
-        layout.label("Load BVH File")
+        layout.prop(scn, "McpAdvanced")        
+        if not scn.McpAdvanced:
+            return
+
+        layout.label("Debugging")
         layout.prop(scn, "McpRot90Anim")
         layout.operator("mcp.load_bvh")
         layout.operator("mcp.rename_bvh")
@@ -274,12 +276,13 @@ class LoadPanel(bpy.types.Panel):
 
         layout.separator()
         layout.label("IK retargeting")
+        layout.prop(scn, "McpRetargetIK")
         layout.operator("mcp.retarget_ik")
 
-
+        layout.separator()
+        layout.label("SubSample")
+        layout.prop(scn, "McpDefaultSS")
         if not scn.McpDefaultSS:
-            layout.separator()
-            layout.label("SubSample")
             row = layout.row()
             row.prop(scn, "McpSubsample")
             row.prop(scn, "McpSSFactor")
@@ -325,7 +328,7 @@ class EditPanel(bpy.types.Panel):
     bl_label = "MH Mocap: Edit Actions"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    #bl_options = {'DEFAULT_CLOSED'}
+    bl_options = {'DEFAULT_CLOSED'}
     
     @classmethod
     def poll(cls, context):

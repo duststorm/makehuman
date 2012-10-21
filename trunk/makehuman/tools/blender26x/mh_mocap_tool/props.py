@@ -33,6 +33,11 @@ def initInterface(context):
 
     # Load and retarget
     
+    bpy.types.Scene.McpAdvanced = BoolProperty(
+        name="Advanced options", 
+        description="Show advanced options", 
+        default=False)
+    
     bpy.types.Scene.McpBvhScale = FloatProperty(
         name="Scale", 
         description="Scale the BVH by this value", 
@@ -76,7 +81,7 @@ def initInterface(context):
         default=True)        
         
     bpy.types.Scene.McpRetargetIK = BoolProperty(
-        name="Retarget IK", 
+        name="Retarget IK Automatically", 
         description="Include IK bones in retargeting",
         default=False)        
 
