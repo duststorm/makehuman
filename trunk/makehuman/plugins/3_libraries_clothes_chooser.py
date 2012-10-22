@@ -46,6 +46,7 @@ class ClothesTaskView(gui3d.TaskView):
         self.userClothes = os.path.join(mh.getPath(''), 'data', 'clothes')
 
         self.taggedClothes = {}
+        self.clothesList = []
         
         gui3d.TaskView.__init__(self, category, 'Clothes')
         if not os.path.exists(self.userClothes):
@@ -71,6 +72,7 @@ class ClothesTaskView(gui3d.TaskView):
             for name,clo in human.clothesObjs.items():
                 gui3d.app.removeObject(clo)
                 del human.clothesObjs[name]
+            self.clothesList = []
             return
 
         proxy = mh2proxy.readProxyFile(human.meshData, mhclo, False)
@@ -98,6 +100,7 @@ class ClothesTaskView(gui3d.TaskView):
         if clo:
             gui3d.app.removeObject(clo)
             del human.clothesObjs[uuid]
+            self.clothesList.remove(uuid)
             print "Removed clothing", proxy.name, uuid
             return
 
@@ -117,6 +120,7 @@ class ClothesTaskView(gui3d.TaskView):
         clo.mesh.originalClothesVerts = [v.co[:] for v in clo.mesh.verts]
         human.clothesObjs[uuid] = clo        
         human.clothesProxies[uuid] = proxy
+        self.clothesList.append(uuid)
         
         for tag in proxy.tags:
             tag = tag.lower()
@@ -137,6 +141,7 @@ class ClothesTaskView(gui3d.TaskView):
                         print "Removed clothing", oldUuid
                         gui3d.app.removeObject(oldClo)
                         del human.clothesObjs[oldUuid]
+                        self.clothesList.remove(oldUuid)
                     else:
                         print "Kept clothing", oldUuid
                         newUuids.append(oldUuid)
@@ -184,6 +189,7 @@ class ClothesTaskView(gui3d.TaskView):
                     gui3d.app.removeObject(clo)
                 del human.clothesObjs[uuid]
                 del human.clothesProxies[uuid]
+            self.clothesList = []
             # self.clothesButton.setTexture('data/clothes/clear.png')
 
     def onHumanChanged(self, event):
@@ -201,7 +207,8 @@ class ClothesTaskView(gui3d.TaskView):
         
     def saveHandler(self, human, file):
         
-        for (name,clo) in human.clothesObjs.items():
+        for name in self.clothesList:
+            clo = human.clothesObjs[name]
             if clo:
                 proxy = human.clothesProxies[name]
                 file.write('clothes %s %s\n' % (os.path.basename(proxy.file), proxy.getUuid()))
