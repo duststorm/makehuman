@@ -28,8 +28,7 @@ BODY_LANGUAGE = True
 
 import module3d
 import aljabr
-import mh
-import mh2bvh
+import gui3d
 import os
 import time
 
@@ -83,7 +82,15 @@ def exportMhx(human, filename, options):
 #    exportMhx_25(human, fp):
 #
 
+def progress(t):
+    gui3d.app.progress(t, text="Exporting MHX")
+    if t > 1.0:
+        halt
+    
+    
 def exportMhx_25(human, fp):
+    progress(0.0)
+
     fp.write(
 "# MakeHuman exported MHX\n" +
 "# www.makehuman.org\n" +
@@ -128,8 +135,10 @@ def exportMhx_25(human, fp):
             mhx_rig.setupCube(fp, "MHCube05", 0.5, 0)
             copyFile25(human, "shared/mhx/templates/panel_gizmo25.mhx", fp, None, proxyData)    
             
+    progress(0.1)                        
     copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", fp, None, proxyData)    
     fp.write("#endif\n")
+    progress(0.15)
     
     fp.write("\nNoScale False ;\n\n")
 
@@ -139,22 +148,27 @@ def exportMhx_25(human, fp):
         writeMultiMaterials(uvset, human, fp)
     else:
         copyFile25(human, "shared/mhx/templates/materials25.mhx", fp, None, proxyData)    
+    progress(0.2)
 
     if the.Config.cage:
-        proxyCopy('Cage', human, proxyData, fp)
+        proxyCopy('Cage', human, proxyData, fp, 0.25, 0.3)
+    progress(0.25)
     
     if the.Config.mainmesh:
         fp.write("#if toggle&T_Mesh\n")
         copyFile25(human, "shared/mhx/templates/meshes25.mhx", fp, None, proxyData)    
         fp.write("#endif\n")
+    progress(0.4)
 
-    proxyCopy('Proxy', human, proxyData, fp)
-    proxyCopy('Clothes', human, proxyData, fp)
+    proxyCopy('Proxy', human, proxyData, fp, 0.4, 0.45)
+    proxyCopy('Clothes', human, proxyData, fp, 0.45, 0.6)
 
     copyFile25(human, "shared/mhx/templates/rig-poses25.mhx", fp, None, proxyData) 
 
     if the.Config.mhxrig == 'rigify':
         fp.write("Rigify %s ;\n" % the.Human)
+
+    progress(1.0)
     return
 
 #
@@ -173,12 +187,23 @@ def scanProxies(obj, proxyData):
 #    proxyCopy(name, human, proxyData, fp)
 #
 
-def proxyCopy(name, human, proxyData, fp):
+def proxyCopy(name, human, proxyData, fp, t0, t1):
+    n = 0
+    for proxy in proxyData.values():
+        if proxy.type == name:
+            n += 1
+    if n == 0:
+        return
+        
+    dt = (t1-t0)/n
+    t = t0
     for proxy in proxyData.values():
         if proxy.type == name:
             fp.write("#if toggle&T_%s\n" % proxy.type)
             copyFile25(human, "shared/mhx/templates/proxy25.mhx", fp, proxy, proxyData)    
             fp.write("#endif\n")
+            progress(t)
+            t += dt
         
 #
 #    copyFile25(human, tmplName, fp, proxy, proxyData):
@@ -1152,18 +1177,18 @@ def writeShapeKeys(fp, human, name, proxy):
 "  end ShapeKey\n")
 
     if (not proxy or proxy.type == 'Proxy'):
-        if the.Config.faceshapes:
-            shapeList = read_expression.readFaceShapes(human, rig_panel_25.BodyLanguageShapeDrivers)
+        if the.Config.faceshapes:            
+            shapeList = read_expression.readFaceShapes(human, rig_panel_25.BodyLanguageShapeDrivers, 0.6, 0.7)
             for (pose, shape, lr, min, max) in shapeList:
                 writeShape(fp, pose, lr, shape, min, max, proxy)
 
     if not proxy:
         if the.Config.expressions:
-            shapeList = read_expression.readExpressions(human)
+            shapeList = read_expression.readExpressions(human, 0.7, 0.9)
             for (pose, shape) in shapeList:
                 writeShape(fp, pose, "Sym", shape, 0, 1, proxy)
         if the.Config.expressionunits:
-            shapeList = read_expression.readExpressionUnits(human)
+            shapeList = read_expression.readExpressionUnits(human, 0.7, 0.9)
             for (pose, shape) in shapeList:
                 writeShape(fp, pose, "Sym", shape, 0, 1, proxy)
         
