@@ -81,15 +81,9 @@ def exportMhx(human, filename, options):
 #
 #    exportMhx_25(human, fp):
 #
-
-def progress(t):
-    gui3d.app.progress(t, text="Exporting MHX")
-    if t > 1.0:
-        halt
-    
     
 def exportMhx_25(human, fp):
-    progress(0.0)
+    gui3d.app.progress(0, text="Exporting MHX")
 
     fp.write(
 "# MakeHuman exported MHX\n" +
@@ -135,11 +129,11 @@ def exportMhx_25(human, fp):
             mhx_rig.setupCube(fp, "MHCube05", 0.5, 0)
             copyFile25(human, "shared/mhx/templates/panel_gizmo25.mhx", fp, None, proxyData)    
             
-    progress(0.1)                        
+    gui3d.app.progress(0.1, text="Exporting armature")
     copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", fp, None, proxyData)    
     fp.write("#endif\n")
-    progress(0.15)
-    
+
+    gui3d.app.progress(0.15, text="Exporting materials")    
     fp.write("\nNoScale False ;\n\n")
 
     if human.uvsetFile:
@@ -148,17 +142,16 @@ def exportMhx_25(human, fp):
         writeMultiMaterials(uvset, human, fp)
     else:
         copyFile25(human, "shared/mhx/templates/materials25.mhx", fp, None, proxyData)    
-    progress(0.2)
 
+    gui3d.app.progress(0.2, text="Exporting cage")
     if the.Config.cage:
         proxyCopy('Cage', human, proxyData, fp, 0.25, 0.3)
-    progress(0.25)
-    
+
+    gui3d.app.progress(0.25, text="Exporting main mesh")    
     if the.Config.mainmesh:
         fp.write("#if toggle&T_Mesh\n")
         copyFile25(human, "shared/mhx/templates/meshes25.mhx", fp, None, proxyData)    
         fp.write("#endif\n")
-    progress(0.4)
 
     proxyCopy('Proxy', human, proxyData, fp, 0.4, 0.45)
     proxyCopy('Clothes', human, proxyData, fp, 0.45, 0.6)
@@ -168,7 +161,7 @@ def exportMhx_25(human, fp):
     if the.Config.mhxrig == 'rigify':
         fp.write("Rigify %s ;\n" % the.Human)
 
-    progress(1.0)
+    gui3d.app.progress(1.0)
     return
 
 #
@@ -199,10 +192,10 @@ def proxyCopy(name, human, proxyData, fp, t0, t1):
     t = t0
     for proxy in proxyData.values():
         if proxy.type == name:
+            gui3d.app.progress(t, text="Exporting %s" % name)
             fp.write("#if toggle&T_%s\n" % proxy.type)
             copyFile25(human, "shared/mhx/templates/proxy25.mhx", fp, proxy, proxyData)    
             fp.write("#endif\n")
-            progress(t)
             t += dt
         
 #
