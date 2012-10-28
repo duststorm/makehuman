@@ -82,12 +82,44 @@ class Target:
         self.faces = []
         self.verts = []
         self.morphFactor = -1
+        fileDescriptor = None
 
-        try:
-            fileDescriptor = open(name)
-        except:
-            print 'Unable to open %s'%(name)
-            return
+        while fileDescriptor == None:
+            try:
+                fileDescriptor = open(name)
+            except:
+                if "caucasian" in name:
+                    if not "female_young" in name:
+                        print 'Unable to open %s'%(name)
+                        if "female_child" in name:
+                            name = name.replace("female_child", "female_young")
+                        elif "female_old" in name:
+                            name = name.replace("female_old", "female_young")
+                        elif "male_child" in name:
+                            name = name.replace("male_child", "female_young")
+                        elif "male_young" in name:
+                            name = name.replace("male_young", "female_young")
+                        elif "male_old" in name:
+                            name = name.replace("male_old", "female_young")
+                        else:
+                            print 'Unable to open %s'%(name)
+                            return
+                        print 'Trying %s instead'%(name)
+                    else:
+                        print 'Unable to open %s'%(name)
+                        return
+                else:
+                    if "asian" in name:
+                        print 'Unable to open %s'%(name)
+                        name = name.replace("asian", "caucasian")
+                        print 'Trying %s instead'%(name)
+                    elif "african" in name:
+                        print 'Unable to open %s'%(name)
+                        name = name.replace("african", "caucasian")
+                        print 'Trying %s instead'%(name)
+                    else:
+                        print 'Unable to open %s'%(name)
+                        return
 
         facesToRecalculate = set()  # Indices of faces affected by the target, to put in buffer
         verticesToRecalculate = []  # Indices of vertices affected by the targets, to put in buffer
