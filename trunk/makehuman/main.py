@@ -761,7 +761,7 @@ class MHApplication(gui3d.Application):
         self.dialog.blocker.mesh.setColor([0, 0, 0, 128])
         self.progressBar.blocker.mesh.setColor([0, 0, 0, 128])
         self.splash.hide()
-        self.progressBar.blocker.show()
+        #self.progressBar.blocker.show()
         mh.setCaption("MakeHuman - [Untitled]")
         
         #printtree(self)
