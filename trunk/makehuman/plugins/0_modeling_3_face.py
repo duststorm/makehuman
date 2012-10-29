@@ -217,9 +217,15 @@ class FaceTaskView(gui3d.TaskView):
             ]
             
         features2 = [
-            ('head2', [('data/targets/head/${ethnic}/${gender}_${age}/%s.target' % (i[0]), i[0], 'data/targets/head/images/', i[1]) for i in
+            ('head shape', [('data/targets/head/${ethnic}/${gender}_${age}/%s.target' % (i[0]), i[0], 'data/targets/head/images/', i[1]) for i in
                 [   
                     ('head-oval', 'frontView'),    
+                    ('head-round', 'frontView'), 
+                    ('head-rectangular', 'frontView'), 
+                    ('head-square', 'frontView'), 
+                    ('head-triangular', 'frontView'), 
+                    ('head-invertedtriangular', 'frontView'), 
+                    ('head-diamond', 'frontView'), 
                     
                        
                           
