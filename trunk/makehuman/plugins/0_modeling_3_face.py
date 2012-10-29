@@ -261,7 +261,7 @@ class FaceTaskView(gui3d.TaskView):
                 modifier = humanmodifier.GenderAgeEthnicModifier2(template[0])
                 self.modifiers['%s%d' % (name, index + 1)] = modifier
 
-                slider = box.addView( (FaceSlider2(modifier, '%s.png' % (template[2]), template[3])))
+                slider = box.addView( (FaceSlider2(modifier, '%s%s.png' % (template[2], template[1]), template[3])))
                  
                 self.sliders.append(slider)
 
