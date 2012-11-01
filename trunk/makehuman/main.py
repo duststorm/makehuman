@@ -1272,6 +1272,7 @@ class MHApplication(gui3d.Application):
         for shortcut, m in self.shortcuts.iteritems():
             if m == method:
                 return shortcut
+        return (0, 0)
                 
     # Mouse actions
     def setMouseAction(self, modifier, key, method):
