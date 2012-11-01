@@ -99,6 +99,8 @@ class AqsisTaskView(gui3d.TaskView):
         
         gui3d.TaskView.onShow(self, event)
         self.renderButton.setFocus()
+        gui3d.app.prompt('Warning', 'The rendering is still an experimental feature since posing is not yet implemented.',
+            'OK', helpId='alphaRenderWarning')
 
     def downloadAqsis(self):
     
