@@ -198,7 +198,7 @@ class TorsoTaskView(gui3d.TaskView):
 
         gui3d.TaskView.onShow(self, event)
         
-        gui3d.app.setFaceCamera()
+        gui3d.app.setGlobalCamera()
         
         for slider in self.sliders:
             slider.update()
