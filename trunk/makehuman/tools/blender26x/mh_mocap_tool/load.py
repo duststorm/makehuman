@@ -157,6 +157,7 @@ def readBvhFile(context, filepath, scn, scan):
         key = words[0].upper()
         if key == 'HIERARCHY':
             status = Hierarchy
+            ended = False
         elif key == 'MOTION':
             if level != 0:
                 raise MocapError("Tokenizer out of kilter %d" % level)    
@@ -182,6 +183,7 @@ def readBvhFile(context, filepath, scn, scan):
             elif key == 'JOINT':
                 node = CNode(words, node)
                 nodes.append(node)
+                ended = False
             elif key == 'OFFSET':
                 (x,y,z) = (float(words[1]), float(words[2]), float(words[3]))
                 if rot90:                    
@@ -190,6 +192,7 @@ def readBvhFile(context, filepath, scn, scan):
                     node.offset = scale*Vector((x,y,z))
             elif key == 'END':
                 node = CNode(words, node)
+                ended = True
             elif key == 'CHANNELS':
                 oldmode = None
                 for word in words[2:]:
@@ -205,6 +208,14 @@ def readBvhFile(context, filepath, scn, scan):
             elif key == '{':
                 level += 1
             elif key == '}':
+                if not ended:
+                    node = CNode(["End", "Site"], node)
+                    if rot90:                    
+                        node.offset = scale*Vector((0,0,1))
+                    else:
+                        node.offset = scale*Vector((0,1,0))
+                    node = node.parent
+                    ended = True
                 level -= 1
                 node = node.parent
             else:
