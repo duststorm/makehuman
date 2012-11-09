@@ -65,6 +65,11 @@ def initInterface(context):
         description="Rotate 90 degress so Z points up",
         default=True)
 
+    bpy.types.Scene.McpFlipYAxis = BoolProperty(
+        name="Flix Y Axis", 
+        description="Rotate 180 degress so Y points down (for Ni-Mate)",
+        default=False)
+
     bpy.types.Scene.McpDoSimplify = BoolProperty(
         name="Simplify FCurves", 
         description="Simplify FCurves",

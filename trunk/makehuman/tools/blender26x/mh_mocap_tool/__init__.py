@@ -266,7 +266,8 @@ class LoadPanel(bpy.types.Panel):
             return
 
         layout.label("Debugging")
-        layout.prop(scn, "McpRot90Anim")
+        #layout.prop(scn, "McpRot90Anim")
+        layout.prop(scn, "McpFlipYAxis")
         layout.operator("mcp.load_bvh")
         layout.operator("mcp.rename_bvh")
         layout.operator("mcp.load_and_rename_bvh")
