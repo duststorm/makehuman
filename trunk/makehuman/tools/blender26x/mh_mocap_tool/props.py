@@ -33,6 +33,11 @@ def initInterface(context):
 
     # Load and retarget
     
+    bpy.types.Scene.McpAdvanced = BoolProperty(
+        name="Advanced options", 
+        description="Show advanced options", 
+        default=False)
+    
     bpy.types.Scene.McpBvhScale = FloatProperty(
         name="Scale", 
         description="Scale the BVH by this value", 
@@ -60,6 +65,11 @@ def initInterface(context):
         description="Rotate 90 degress so Z points up",
         default=True)
 
+    bpy.types.Scene.McpFlipYAxis = BoolProperty(
+        name="Flix Y Axis", 
+        description="Rotate 180 degress so Y points down (for Ni-Mate)",
+        default=False)
+
     bpy.types.Scene.McpDoSimplify = BoolProperty(
         name="Simplify FCurves", 
         description="Simplify FCurves",
@@ -76,7 +86,7 @@ def initInterface(context):
         default=True)        
         
     bpy.types.Scene.McpRetargetIK = BoolProperty(
-        name="Retarget IK", 
+        name="Retarget IK Automatically", 
         description="Include IK bones in retargeting",
         default=False)        
 

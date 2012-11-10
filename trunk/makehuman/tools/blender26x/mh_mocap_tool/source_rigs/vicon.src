@@ -18,12 +18,14 @@ Armature:
 	l_elbow		LoArm_L		0
 	l_wrist		Hand_L		0 
 	l_thumb		Finger-1_L	0
+	l_wrist_end	Finger-2_L	0
 
 	r_collar	Clavicle_R	0
 	r_humerus	UpArm_R		0 
 	r_elbow		LoArm_R		0
 	r_wrist		Hand_R		0
 	r_thumb		Finger-1_R	0
+	r_wrist_end	Finger-2_R	0
 
 	l_femur		UpLeg_L		0 
 	l_tibia		LoLeg_L		0 

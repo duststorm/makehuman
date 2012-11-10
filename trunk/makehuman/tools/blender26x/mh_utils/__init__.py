@@ -23,6 +23,19 @@
 # Script copyright (C) MakeHuman Team 2001-2011
 # Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
 
+bl_info = {
+    "name": "MakeHuman Utilities",
+    "author": "Thomas Larsson",
+    "version": "0.2",
+    "blender": (2, 6, 1),
+    "api": 40000,
+    "location": "None",
+    "description": "Utility package for MakeHuman scripts. Don't enable this addon - it is visible only to kill some annoying error messages in the console.",
+    "warning": "",
+    'wiki_url': "",
+    "category": "MakeHuman"}
+
+
 if "bpy" in locals():
     print("Reloading mh_utils")
     import imp

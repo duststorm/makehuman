@@ -39,5 +39,5 @@ Renames:
     DfmNeck 		Neck
     DfmHips 		Hips
     DfmSpine3 		Spine3
-    Shoulder_L 	 	Clavicle_L
-    Shoulder_R 	 	Clavicle_R
+    UpArmHinge_L  	Clavicle_L
+    UpArmHinge_R 	Clavicle_R
