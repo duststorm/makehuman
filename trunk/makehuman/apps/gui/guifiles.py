@@ -279,7 +279,7 @@ class ExportTaskView(gui3d.TaskView):
         self.exportGroups = self.objOptions.addView(gui3d.CheckBox("Groups", True));y+=24
         self.exportSmooth = self.objOptions.addView(gui3d.CheckBox( "Subdivide", False));y+=24
         self.exportHair = self.objOptions.addView(gui3d.CheckBox("Hair as mesh", selected=True));y+=24
-        self.exportPngTexture = self.objOptions.addView(gui3d.CheckBox("PNG texture", selected=True));y+=24
+        #self.exportPngTexture = self.objOptions.addView(gui3d.CheckBox("PNG texture", selected=True));y+=24
         scales = []
         (y, self.objScales) = self.addScales( self.objOptions, scales, "Obj", True, y)
 
@@ -292,7 +292,8 @@ class ExportTaskView(gui3d.TaskView):
         self.mhxOptionsSource.hide()
         y+=16
         
-        self.mhxOptions = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*14+6)));y+=25
+        y = 80
+        self.mhxOptions = self.addView(gui3d.GroupBox([660, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*14+6)));y+=25
         self.version24 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.4", False));y+=24
         self.version25 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.5", True));y+=24
         self.exportSeparateFolder = self.mhxOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
@@ -316,15 +317,15 @@ class ExportTaskView(gui3d.TaskView):
         self.mhxOptions.hide()
         
         # Collada options
-        y = yy
-        self.colladaOptions = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*8+6)));y+=25
+        y = 80
+        self.colladaOptions = self.addView(gui3d.GroupBox([660, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*8+6)));y+=25
         self.colladaRot90X = self.colladaOptions.addView(gui3d.CheckBox("Rotate 90 X", False));y+=24
         self.colladaRot90Z = self.colladaOptions.addView(gui3d.CheckBox("Rotate 90 Z", False));y+=24
         self.colladaEyebrows = self.colladaOptions.addView(gui3d.CheckBox("Eyebrows", True));y+=24
         self.colladaLashes = self.colladaOptions.addView(gui3d.CheckBox("Eyelashes", True));y+=24
         self.colladaHelpers = self.colladaOptions.addView(gui3d.CheckBox("Helper geometry", False));y+=24
         # self.colladaSeparateFolder = self.colladaOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
-        self.colladaPngTexture = self.colladaOptions.addView(gui3d.CheckBox("PNG texture", selected=True));y+=24
+        # self.colladaPngTexture = self.colladaOptions.addView(gui3d.CheckBox("PNG texture", selected=True));y+=24
         scales = []
         (y, self.daeScales) = self.addScales( self.colladaOptions, scales, "Dae", True, y)
         rigs = []
@@ -436,7 +437,7 @@ class ExportTaskView(gui3d.TaskView):
                     "eyebrows" : self.exportEyebrows.selected,
                     "lashes" : self.exportLashes.selected,
                     "scale": self.getScale(self.objScales),
-                    "pngTexture": self.exportPngTexture.selected
+                    "pngTexture": True, #self.exportPngTexture.selected
                 }                    
                 mh2obj_proxy.exportProxyObj(gui3d.app.selectedHuman, os.path.join(exportPath, filename), options)
                 
@@ -495,7 +496,7 @@ class ExportTaskView(gui3d.TaskView):
                     "lashes" : self.colladaLashes.selected,
                     "helpers" : self.colladaHelpers.selected,
                     "scale": self.getScale(self.daeScales),
-                    "pngTexture": self.colladaPngTexture.selected
+                    "pngTexture": True, #self.colladaPngTexture.selected
                 }
                 mh2collada.exportCollada(gui3d.app.selectedHuman, os.path.join(exportPath, filename), options)
             elif self.md5.selected:

@@ -200,7 +200,8 @@ def addBone25(bone, cond, roll, parent, flags, layers, bbone, fp):
 "    parent Refer Bone %s ;\n" % soft +
 "#endif\n")
     elif parent:
-        fp.write("    parent Refer Bone %s ; \n" % (parent))
+        if parent != the.Master or the.hasMasterBone:
+            fp.write("    parent Refer Bone %s ; \n" % (parent))
     fp.write(
 "    roll %.6g ; \n" % (roll)+
 "    use_connect %s ; \n" % (conn) +
@@ -1678,6 +1679,7 @@ def setupRig(obj, proxyData):
     the.VertexWeights = []
     the.CustomShapes = {}
     the.PoseInfo = {}
+    the.hasMasterBone = True
 
     if the.Config.mhxrig == 'mhx':
         the.BoneGroups = [
@@ -1701,7 +1703,14 @@ def setupRig(obj, proxyData):
 
         the.VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
                             "./shared/mhx/templates/vertexgroups-bones25.mhx",
-                            "./shared/mhx/templates/vertexgroups-palm25.mhx"]
+                            "./shared/mhx/templates/vertexgroups-palm25.mhx",
+                            "shared/mhx/templates/vertexgroups-tight25.mhx",
+                            ]
+        if the.Config.skirtrig == "own":
+            the.VertexGroupFiles.append("shared/mhx/templates/vertexgroups-skirt-rigged.mhx")    
+        elif the.Config.skirtrig == "inh":
+            the.VertexGroupFiles.append("shared/mhx/templates/vertexgroups-skirt25.mhx")    
+
         if the.Config.malerig:
             the.VertexGroupFiles.append( "./shared/mhx/templates/vertexgroups-male25.mhx" )
                                                         
@@ -1767,11 +1776,12 @@ def setupRig(obj, proxyData):
         the.ArmatureProps = blenrig_rig.BlenrigArmatureProps
 
     elif the.Config.mhxrig == "rigify":
+        the.hasMasterBone = False
         the.BoneGroups = []
         the.RecalcRoll = []              
-        the.VertexGroupFiles = ["./shared/mhx/templates/vertexgroups-head25.mhx",
-                            "./shared/mhx/templates/rigifymesh_weights.mhx"]
-        the.GizmoFiles = ["./shared/mhx/templates/panel_gizmo25.mhx"]
+        the.VertexGroupFiles = ["./shared/mhx/templates/rigifymesh_weights.mhx"]
+        the.GizmoFiles = ["./shared/mhx/templates/panel_gizmo25.mhx",
+                          "./shared/mhx/templates/rigify_gizmo25.mhx"]
         the.HeadName = 'head'
         faceArmature = swapParentName(rig_face_25.FaceArmature, 'Head', 'head')
             
@@ -1855,7 +1865,7 @@ def setupRig(obj, proxyData):
         the.RigHead[bone] = findLocation(head)
         the.RigTail[bone] = findLocation(tail)
 
-    if not the.Config.clothesrig:
+    if not (the.Config.mhxrig == 'mhx' and the.Config.clothesrig):
         return
     body = the.RigHead.keys()
     for proxy in proxyData.values():

@@ -129,9 +129,9 @@ def copyMeshFile249(obj, tmpl, fp):
                 fp.write("#endif\n")
             elif words[1] == 'mesh' and mainMesh:
                 fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
-                mhx_main.copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, None, False)    
-                mhx_main.copyShapeKeys("shared/mhx/templates/shapekeys-extra24.mhx", fp, None, False)    
-                mhx_main.copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, None, False)    
+                copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, None, False)    
+                copyShapeKeys("shared/mhx/templates/shapekeys-extra24.mhx", fp, None, False)    
+                copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, None, False)    
                 writeIpo(fp)
                 fp.write(line)
                 skipOne = True
@@ -147,9 +147,7 @@ def copyMeshFile249(obj, tmpl, fp):
             mainMesh = True
             fp.write("#if useMesh\n")
         elif words[0] == 'vertgroup':
-            mhx_main.copyVertGroups("shared/mhx/templates/vertexgroups-common25.mhx", fp, None)    
-            mhx_main.copyVertGroups("shared/mhx/templates/vertexgroups-classic25.mhx", fp, None)    
-            mhx_main.copyVertGroups("shared/mhx/templates/vertexgroups-toes25.mhx", fp, None)    
+            mhx_main.copyVertGroups("shared/mhx/templates/vertexgroups-24.mhx", fp, None)    
             skipOne = True
             skip = False
         elif words[0] == 'v' and inZone:
@@ -172,7 +170,7 @@ def copyMeshFile249(obj, tmpl, fp):
 def exportProxy24(obj, plist, fp):
     proxy = mh2proxy.readProxyFile(obj, plist, True)
     if not proxy:
-    	return
+        return
     faces = mhx_main.loadFacesIndices(obj)
     tmpl = open("shared/mhx/templates/proxy24.mhx", "rU")
     for line in tmpl:
@@ -205,17 +203,15 @@ def exportProxy24(obj, plist, fp):
                     fp.write(" %.6g %.6g" %(uv[0], uv[1]))
                 fp.write(" ;\n")
         elif words[0] == 'vertgroup':
-            mhx_main.copyVertGroups("shared/mhx/templates/vertexgroups-common25.mhx", fp, proxy)    
-            mhx_main.copyVertGroups("shared/mhx/templates/vertexgroups-classic25.mhx", fp, proxy)    
-            mhx_main.copyVertGroups("shared/mhx/templates/vertexgroups-toes25.mhx", fp, proxy)    
+            mhx_main.copyVertGroups("shared/mhx/templates/vertexgroups-24.mhx", fp, proxy)    
         elif words[0] == 'shapekey':
             fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
             if mhx_main.BODY_LANGUAGE:
-                mhx_main.copyShapeKeys("shared/mhx/templates/shapekeys-bodylanguage25.mhx", fp, proxy, False)    
+                copyShapeKeys("shared/mhx/templates/shapekeys-bodylanguage25.mhx", fp, proxy, False)    
             else:
-                mhx_main.copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy, False)    
-            mhx_main.copyShapeKeys("shared/mhx/templates/shapekeys-extra24.mhx", fp, proxy, False)    
-            mhx_main.copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, False)    
+                copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy, False)    
+            copyShapeKeys("shared/mhx/templates/shapekeys-extra24.mhx", fp, proxy, False)    
+            copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, False)    
             writeIpo(fp)
         else:
             fp.write(line)
@@ -225,18 +221,20 @@ def exportProxy24(obj, plist, fp):
 #
 #    exportRawData(obj, fp):    
 #
+
 def exportRawData(obj, fp):    
     # Ugly klugdy fix of extra vert
-    x1 = aljabr.vadd(obj.verts[11137].co, obj.verts[11140].co)
-    x2 = aljabr.vadd(obj.verts[11162].co, obj.verts[11178].co)
-    x = aljabr.vadd(x1,x2)
-    obj.verts[14637].co = aljabr.vmul(x, 0.25)
+    #x1 = aljabr.vadd(obj.verts[11137].co, obj.verts[11140].co)
+    #x2 = aljabr.vadd(obj.verts[11162].co, obj.verts[11178].co)
+    #x = aljabr.vadd(x1,x2)
+    #obj.verts[14637].co = aljabr.vmul(x, 0.25)
     # end ugly kludgy
     for v in obj.verts:
         fp.write("v %.6g %.6g %.6g ;\n" %(v.co[0], v.co[1], v.co[2]))
         
     for uv in obj.uvValues:
         fp.write("vt %.6g %.6g ;\n" %(uv[0], uv[1]))
+        
     faces = mhx_main.loadFacesIndices(obj)
     for f in faces:
         fp.write("f")
@@ -464,5 +462,119 @@ def writeIpo(fp):
 
     return
 
+#
+#    copyShapeKeys(tmplName, fp, proxy, doScale):
+#
 
-    
+def copyShapeKeys(tmplName, fp, proxy, doScale):
+    tmpl = open(tmplName)
+    shapes = []
+    vgroups = []
+    scale = 1.0
+
+    if tmpl == None:
+        print("*** Cannot open "+tmplName)
+        return
+    if not proxy:
+        for line in tmpl:
+            words = line.split()
+            if len(words) == 0:
+                fp.write(line)
+            elif words[0] == 'sv':
+                v = int(words[1])
+                dx = float(words[2])*scale
+                dy = float(words[3])*scale
+                dz = float(words[4])*scale
+                fp.write("    sv %d %.4f %.4f %.4f ;\n" % (v, dx, dy, dz))
+            elif words[0] == 'ShapeKey':
+                if doScale:
+                    scale = setShapeScale(words)
+                fp.write(line)
+            else:
+                fp.write(line)
+    else:
+        ignore = False
+        for line in tmpl:
+            words= line.split()
+            if len(words) == 0:
+                fp.write(line)
+            elif words[0] == 'ShapeKey':
+                if doScale:
+                    scale = setShapeScale(words)
+                if mhx_main.useThisShape(words[1], proxy):
+                    fp.write(line)
+                    ignore = False
+                else:
+                    ignore = True
+            elif ignore:
+                pass
+            elif words[0] == 'sv':
+                v = int(words[1])
+                dx = float(words[2])*scale
+                dy = float(words[3])*scale
+                dz = float(words[4])*scale
+                try:
+                    vlist = proxy.verts[v]
+                except:
+                    vlist = []
+                for (pv, w) in vlist:
+                    shapes.append((pv, w*dx, w*dy, w*dz))
+            elif shapes:
+                printProxyShape(fp, shapes)
+                shapes = []
+                fp.write(line)
+            else:    
+                fp.write(line)
+    print("    %s copied" % tmplName)
+    tmpl.close()
+    return
+
+
+#    setShapeScale(words):    
+#
+
+def setShapeScale(words):
+    key = words[1]
+    scales = None
+    try:
+        scales = rig_panel_25.FaceShapeKeyScale[key]
+    except:
+        pass
+    try:
+        scales = rig_body_25.BodyShapeKeyScale[key]
+    except:
+        pass
+    if not scales:
+        raise NameError("No scale for %s" % key)
+    (p1, p2, length0) = scales
+    x1 = the.Locations[p1]
+    x2 = the.Locations[p2]
+    dist = aljabr.vsub(x1, x2)
+    length = aljabr.vlen(dist)
+    scale = length/length0
+    #print("Scale %s %f %f" % (key, length, scale))
+    return scale
+                
+#
+#    printProxyShape(fp, shapes)
+#
+
+def printProxyShape(fp, shapes):
+    shapes.sort()
+    pv = -1
+    while shapes:
+        (pv0, dx0, dy0, dz0) = shapes.pop()
+        if pv0 == pv:
+            dx += dx0
+            dy += dy0
+            dz += dz0
+        else:
+            if (pv >= 0 and aljabr.vlen([dx,dy,dz]) > 0):
+                fp.write("    sv %d %.4f %.4f %.4f ;\n" % (pv, dx, dy, dz))
+            (pv, dx, dy, dz) = (pv0, dx0, dy0, dz0)        
+    if (pv >= 0 and aljabr.vlen([dx,dy,dz]) > 0):
+        fp.write("    sv %d %.4f %.4f %.4f ;\n" % (pv, dx, dy, dz))
+    return
+
+ 
+ 

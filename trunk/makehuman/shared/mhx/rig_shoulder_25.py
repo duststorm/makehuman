@@ -306,12 +306,12 @@ def ShoulderControlPoses(fp):
     addPoseBone(fp, 'Shoulder_R', 'MHBall025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
     addPoseBone(fp, 'UpArmSocket_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('CopyLoc', 0, 1, ['CopyLoc', 'Shoulder_L', (1,1,1), (0,0,0), 0, False]),
-         ('CopyTrans', 0, 0, ['Shoulder', 'Shoulder_L', 0])])
+        [('CopyLoc', 0, 0, ['Hinge', 'Shoulder_L', (1,1,1), (0,0,0), 0, False]),
+         ('CopyTrans', 0, 1, ['Shoulder', 'Shoulder_L', 0])])
 
     addPoseBone(fp, 'UpArmSocket_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('CopyLoc', 0, 1, ['CopyLoc', 'Shoulder_R', (1,1,1), (0,0,0), 0, False]),
-         ('CopyTrans', 0, 0, ['Shoulder', 'Shoulder_R', 0])])
+        [('CopyLoc', 0, 0, ['Hinge', 'Shoulder_R', (1,1,1), (0,0,0), 0, False]),
+         ('CopyTrans', 0, 1, ['Shoulder', 'Shoulder_R', 0])])
 
     addPoseBone(fp, 'UpArmHinge_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
 

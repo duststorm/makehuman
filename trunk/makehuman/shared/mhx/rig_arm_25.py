@@ -555,6 +555,7 @@ ArmPropLRDrivers = [
 ]
 
 SoftArmPropLRDrivers = [
+    ('UpArmSocket', 'Hinge', ['ArmHinge'], 'x1'),
     ('UpArmSocket', 'Shoulder', ['ArmHinge'], '1-x1'),
     #('ElbowPT', 'Hand', ['ElbowFollowsWrist'], 'x1'),
     #('ElbowPT', 'Shoulder', ['ElbowFollowsWrist'], '(1-x1)'),

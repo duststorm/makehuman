@@ -61,7 +61,7 @@ FaceArmature = [
     ('TongueBase',       0, 'Jaw', F_DEF, L_HEAD, NoBB),
     ('TongueMid',        0, 'TongueBase', F_DEF, L_HEAD, NoBB),
     ('TongueTip',        0, 'TongueMid', F_DEF, L_HEAD, NoBB),
-    ('GazeParent',       0, 'MasterFloor', 0, L_HELP, NoBB),
+    ('GazeParent',       0, Master, 0, L_HELP, NoBB),
     ('Gaze',             pi, 'GazeParent', 0, L_HEAD, NoBB),
     ('EyeParent_R',      0, 'Head', 0, L_HELP, NoBB),
     ('EyeParent_L',      0, 'Head', 0, L_HELP, NoBB),
