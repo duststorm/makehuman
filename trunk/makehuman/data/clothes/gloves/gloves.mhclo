@@ -1,12 +1,15 @@
 # author Thomas Larsson
 # license GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 # homepage http://www.makehuman.org/
+# uuid 323c8965-547b-4833-948d-10fd98ee8d08
+# basemesh alpha_7
+# tag Gloves
+
 # name Gloves
 # obj_file gloves.obj
 # z_depth 45
 # subsurf 1 2
-# shapekey Breathe
-# texture gloves_texture.tif
+# texture gloves_texture.png
 # mask gloves_mask.png
 # x_scale 14058 14158 4.5797
 # z_scale 4550 4555 0.7497

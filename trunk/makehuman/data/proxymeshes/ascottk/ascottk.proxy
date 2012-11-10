@@ -4,7 +4,7 @@
 # name ascottk
 # obj_file ascottk.obj
 # material Skin
-texture ./data/textures/texture.tif
+texture ./data/textures/texture.png
 diffuse_color 0.8 0.54 0.35
 diffuse_shader LAMBERT
 diffuse_intensity 0.7

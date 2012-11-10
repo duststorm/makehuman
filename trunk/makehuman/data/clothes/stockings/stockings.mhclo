@@ -1,13 +1,15 @@
 # author Thomas Larsson
 # license GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 # homepage http://www.makehuman.org/
+# uuid 27ac014d-7ce1-47d2-b320-10eeae13db55
+# basemesh alpha_7
+# tag Stockings
+
 # name Stockings
 # obj_file stockings.obj
 # z_depth 20
 # subsurf 1 2
-# shrinkwrap 0.030
-# shapekey Breathe
-# texture stockings_texture.tif
+# texture stockings_texture.png
 # mask stockings_mask.png
 # x_scale 3936 3972 1.4342
 # z_scale 3840 3957 1.5772
