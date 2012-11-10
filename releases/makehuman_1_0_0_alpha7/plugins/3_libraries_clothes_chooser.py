@@ -101,7 +101,7 @@ class ClothesTaskView(gui3d.TaskView):
             gui3d.app.removeObject(clo)
             del human.clothesObjs[uuid]
             self.clothesList.remove(uuid)
-            print "Removed clothing", proxy.name, uuid
+            print "Removed clothing 1", proxy.name, uuid
             return
 
         mesh = files3d.loadMesh(obj)
@@ -138,10 +138,10 @@ class ClothesTaskView(gui3d.TaskView):
                             oldClo = human.clothesObjs[oldUuid]
                         except KeyError:
                             continue
-                        print "Removed clothing", oldUuid
-                        gui3d.app.removeObject(oldClo)
-                        del human.clothesObjs[oldUuid]
-                        self.clothesList.remove(oldUuid)
+                        print "OVERRIDE: do not remove clothing 2", oldUuid
+                        #gui3d.app.removeObject(oldClo)
+                        #del human.clothesObjs[oldUuid]
+                        #self.clothesList.remove(oldUuid)
                     else:
                         print "Kept clothing", oldUuid
                         newUuids.append(oldUuid)
