@@ -34,8 +34,8 @@ import os, time
 import shutil
 import mh2proxy
 import export_config
-import mhx_globals as the
-import read_rig
+import mhx
+from mhx import the, read_rig
 
 #
 #    Size of end bones = 1 mm

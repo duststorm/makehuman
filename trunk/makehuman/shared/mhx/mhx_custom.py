@@ -22,7 +22,7 @@ Abstract
 """
 
 import sys
-import mhx_globals as the
+from . import the
 
 def setupCustomRig(): 
     joints = []

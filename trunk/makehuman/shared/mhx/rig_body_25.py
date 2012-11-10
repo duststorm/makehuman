@@ -19,9 +19,10 @@ Body bone definitions
 
 """
 
-import mhx_globals as the
-from mhx_globals import *
-from mhx_rig import addPoseBone
+from . import the
+from the import *
+from . import posebone
+from posebone import addPoseBone
 
 BodyJoints = [
     ('root-tail',      'o', ('spine3', [0,-1,0])),
@@ -73,7 +74,6 @@ BodyHeadsTails = [
 
     ('Root',           'root-tail', 'spine3'),
     ('Shoulders',      'neck', ('neck', [0,-1,0])),
-    ('BendRoot',       'spine3', ('spine3', the.yunit)),
 
     # Up spine
     ('Pelvis',         'root-tail', 'spine3'),
@@ -149,7 +149,6 @@ BodyArmature1 = [
 
     ('Root',               0, Master, F_WIR, L_MAIN+L_UPSPN+L_DNSPNIK, NoBB),
     ('Shoulders',          0, Master, F_WIR, L_UPSPNIK+L_DNSPN, NoBB),
-    ('BendRoot',           0, 'Root', 0, L_HELP, NoBB),
 
     # Up spine
     ('Hips',               0, 'Root', F_WIR, L_UPSPN, NoBB),
@@ -162,20 +161,20 @@ BodyArmature1 = [
 
 BodyArmature2Simple = [
     ('DfmPelvis',          0, 'Pelvis', 0, L_HELP, NoBB),
-    ('DfmHips',            0, 'Hips', F_DEF, L_DMAIN, NoBB),
+    ('DfmHips',            0, 'Hips', F_DEF, L_DEF, NoBB),
 ]
 
 BodyArmature2Advanced = [
     ('DfmPelvis',          0, None, 0, L_HELP, NoBB),
-    ('DfmHips',            0, 'DfmPelvis', F_DEF, L_DMAIN, NoBB),
+    ('DfmHips',            0, 'DfmPelvis', F_DEF, L_DEF, NoBB),
 ]
 
 BodyArmature3 = [
     # Deform spine    
-    ('DfmSpine1',          0, 'DfmPelvis', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
-    ('DfmSpine2',          0, 'DfmSpine1', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
-    ('DfmSpine3',          0, 'DfmSpine2', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
-    ('DfmNeck',            0, 'DfmSpine3', F_DEF+F_CON, L_DMAIN, (1,1,3) ),
+    ('DfmSpine1',          0, 'DfmPelvis', F_DEF+F_CON, L_DEF, (1,1,3) ),
+    ('DfmSpine2',          0, 'DfmSpine1', F_DEF+F_CON, L_DEF, (1,1,3) ),
+    ('DfmSpine3',          0, 'DfmSpine2', F_DEF+F_CON, L_DEF, (1,1,3) ),
+    ('DfmNeck',            0, 'DfmSpine3', F_DEF+F_CON, L_DEF, (1,1,3) ),
 ]
 
 BodyArmature4Simple = [
@@ -199,21 +198,21 @@ BodyArmature4Advanced = [
     ('DownSpine1',         0, 'DownSpine2', F_WIR, L_DNSPNFK, NoBB),
     ('DownHips',           0, 'DownSpine1', F_WIR, L_DNSPN, NoBB),
     
-    ('DownPT1',            0, 'DownSpine1', 0, L_HELP, NoBB),
-    ('DownPT2',            0, 'DownSpine2', 0, L_HELP, NoBB),
-    ('DownPT3',            0, 'DownSpine3', 0, L_HELP, NoBB),
+    ('DownPT1',            0, 'DownSpine1', 0, L_HELP2, NoBB),
+    ('DownPT2',            0, 'DownSpine2', 0, L_HELP2, NoBB),
+    ('DownPT3',            0, 'DownSpine3', 0, L_HELP2, NoBB),
 
     #('DownSpinePT'   ,     0, 'Root', F_WIR, L_DNSPNIK, NoBB),
     #('DownSpineLinkPT',    0, 'DownSpine2', F_RES, L_DNSPNIK, NoBB),
 ]
  
 BodyArmature5 = [
-    ('DfmHead',            0, 'DfmNeck', F_DEF+F_CON, L_DMAIN, NoBB),
+    ('DfmHead',            0, 'DfmNeck', F_DEF+F_CON, L_DEF, NoBB),
 
     # Stomach    
-    ('DfmRib',             0, 'DfmSpine3', F_DEF, L_DMAIN, (1,1,5) ),
-    ('DfmStomach',         0, 'DfmRib', F_DEF+F_CON, L_DMAIN, NoBB ),
+    ('DfmRib',             0, 'DfmSpine3', F_DEF, L_DEF, (1,1,5) ),
     ('StomachTrg',         0, 'DfmHips', 0, L_HELP, NoBB),
+    ('DfmStomach',         0, 'DfmRib', F_DEF+F_CON, L_DEF, NoBB ),
     
     # Breast
     ('Breast_L',           -45*D, 'DfmSpine3', F_DEF+F_WIR, L_TWEAK, NoBB),
@@ -224,11 +223,11 @@ BodyArmature5 = [
 if MuscleBones:
     BodyArmature += [
     # Deform torso
-    ('DfmRib',             0, 'DfmSpine3', F_DEF, L_DMAIN, NoBB),
+    ('DfmRib',             0, 'DfmSpine3', F_DEF, L_DEF, NoBB),
     ('StomachPar',         0, 'DfmRib', 0, L_HELP, NoBB),
-    ('DfmStomach1',        0, 'DfmRib', F_DEF+F_CON, L_DMAIN, (1,1,5) ),
+    ('DfmStomach1',        0, 'DfmRib', F_DEF+F_CON, L_DEF, (1,1,5) ),
     ('Stomach',            0, 'StomachPar', F_WIR, L_TWEAK, NoBB),
-    ('DfmStomach2',        0, 'DfmStomach1', F_DEF+F_CON, L_DMAIN, (1,1,4) ),
+    ('DfmStomach2',        0, 'DfmStomach1', F_DEF+F_CON, L_DEF, (1,1,4) ),
     ('StomachTrg',         0, 'DfmHips', 0, L_HELP, NoBB),
 
     ('DfmWaist_L',         0, 'DfmRib', F_DEF, L_MSCL, NoBB),
@@ -261,10 +260,11 @@ def BodyControlPoses(fp):
     addPoseBone(fp,  'Root', 'MHCrown', 'Master', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
         [('LimitRot', C_OW_LOCAL, 0, ['LimitRot', (0,0, -45*D,45*D, 0,0), (1,1,1)]) ])
 
-    addPoseBone(fp,  'Shoulders', 'MHCrown', 'Master', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
-        [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (0,0, -45*D,45*D, 0,0), (1,1,1)]),
-         #('LimitDist', 0, 1, ['LimitDist', 'Root', 'LIMITDIST_INSIDE'])
-        ])
+    if the.Config.exporting:
+        addPoseBone(fp,  'Shoulders', 'MHCrown', 'Master', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+            [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (0,0, -45*D,45*D, 0,0), (1,1,1)]),
+             #('LimitDist', 0, 1, ['LimitDist', 'Root', 'LIMITDIST_INSIDE'])
+            ])
 
     # Up spine
 
@@ -291,7 +291,7 @@ def BodyControlPoses(fp):
          [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limNeck, (1,1,1)])])
          
 
-    if the.Config.advancedspine:
+    if the.Config.exporting and the.Config.advancedspine:
         # Spine IK
         addPoseBone(fp, 'SpinePT', 'MHCube025', 'Spine', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 

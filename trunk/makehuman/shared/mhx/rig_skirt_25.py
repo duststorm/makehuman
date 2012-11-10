@@ -19,9 +19,10 @@ Clothes bone definitions
 
 """
 
-import mhx_globals as the
-from mhx_globals import *
-from mhx_rig import addPoseBone
+from . import the
+from the import *
+from . import posebone
+from posebone import addPoseBone
 
 s = 0.8
 a = 0.8*s

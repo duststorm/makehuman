@@ -19,9 +19,10 @@ Face bone definitions
 
 """
 
-import mhx_globals as the
-from mhx_globals import *
-from mhx_rig import addPoseBone, writeDrivers
+from . import the
+from the import *
+from . import posebone
+from posebone import addPoseBone
 
 FaceJoints = [
     ('head-end',        'l', ((2.0, 'head'), (-1.0, 'neck'))),
@@ -61,13 +62,13 @@ FaceArmature = [
     ('TongueBase',       0, 'Jaw', F_DEF, L_HEAD, NoBB),
     ('TongueMid',        0, 'TongueBase', F_DEF, L_HEAD, NoBB),
     ('TongueTip',        0, 'TongueMid', F_DEF, L_HEAD, NoBB),
-    ('GazeParent',       0, Master, 0, L_HELP, NoBB),
+    ('GazeParent',       0, 'MasterFloor', 0, L_HELP, NoBB),
     ('Gaze',             pi, 'GazeParent', 0, L_HEAD, NoBB),
+    ('Eyes',             0, 'Head', 0, L_HELP, NoBB),
     ('EyeParent_R',      0, 'Head', 0, L_HELP, NoBB),
     ('EyeParent_L',      0, 'Head', 0, L_HELP, NoBB),
     ('Eye_R',            0, 'EyeParent_R', F_DEF, L_HEAD+L_DEF, NoBB),
     ('Eye_L',            0, 'EyeParent_L', F_DEF, L_HEAD+L_DEF, NoBB),
-    ('Eyes',             0, 'Head', 0, L_HELP, NoBB),
     ('DfmUpLid_R',       0.279253, 'Head', F_DEF, L_DEF, NoBB),
     ('DfmLoLid_R',       0, 'Head', F_DEF, L_DEF, NoBB),
     ('DfmUpLid_L',       -0.279253, 'Head', F_DEF, L_DEF, NoBB),
@@ -133,8 +134,7 @@ def FaceDeformDrivers(fp):
     for (driven, driver, coeff) in lidBones:
         drivers.append(    (driven, 'ROTQ', 'AVERAGE', None, 1, coeff,
          [("var", 'TRANSFORMS', [('OBJECT', the.Human, driver, 'LOC_Z', C_LOC)])]) )
-    writeDrivers(fp, True, drivers)
-    return
+    return drivers
 
 #
 #   FacePropDrivers

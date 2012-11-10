@@ -23,7 +23,8 @@ import os
 import export_config
 import mh2proxy
 import mh2collada
-import mhx_globals as the
+import mhx
+from mhx import the
 
 #
 #    exportProxyObj(human, filename):    

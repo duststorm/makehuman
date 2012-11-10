@@ -1,9 +1,11 @@
 #
 #  Bone definitions for Rigify rig
 #
-import mhx_globals as the
-from mhx_globals import *
-from mhx_rig import addPoseBone
+
+from . import the
+from the import *
+from . import posebone
+from posebone import addPoseBone
 
 RigifyJoints = [
 	('hips_head',				'vo', [7186, 0.000000, -0.144970, 0.144290]),

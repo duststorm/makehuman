@@ -24,14 +24,9 @@ Redirect to new MHX location
 
 import sys
 import os
-
-mhxPath = os.path.realpath('./shared/mhx')
-if mhxPath not in sys.path:
-    sys.path.append(mhxPath)
-    
-import mhx_main    
+import mhx
 
 def exportMhx(human, filename, options=None):    
-    mhx_main.exportMhx(human, filename, options)
+    mhx.mhx_main.exportMhx(human, filename, options)
 
 

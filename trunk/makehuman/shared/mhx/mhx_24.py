@@ -32,9 +32,7 @@ import sys
 import time
 
 import mh2proxy
-import mhx_globals as the
-import mhxbones 
-import mhx_main
+from . import the, mhxbones
 
 splitLeftRight = True
 

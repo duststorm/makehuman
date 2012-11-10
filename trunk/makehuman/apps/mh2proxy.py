@@ -25,8 +25,8 @@ import module3d, aljabr
 import os
 from aljabr import *
 import export_config
-import mhx_globals as the
-import read_rig, mhx_rig, mhx_main
+
+from mhx import the
 
 #
 #    class CProxy

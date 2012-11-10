@@ -19,9 +19,10 @@ Arm bone definitions
 
 """
 
-import mhx_globals as the
-from mhx_globals import *
-from mhx_rig import addPoseBone
+from . import the
+from the import *
+from . import posebone
+from posebone import addPoseBone
 
 ShoulderJoints = [
     ('r-clav-head',         'l', ((0.7, 'r-scapula'), (0.3, 'l-scapula'))),
@@ -190,30 +191,30 @@ ShoulderArmature1Simple = [
 ]
 
 ShoulderArmature2 = [
-    # Clavicle
-    ('DfmClavicle_L',      0, 'Clavicle_L', F_DEF, L_DMAIN, NoBB),
-    ('DfmClavicle_R',      0, 'Clavicle_R', F_DEF, L_DMAIN, NoBB),
-    ('DfmDeltoid_L',       0, 'DfmClavicle_L', F_DEF, L_MSCL, NoBB ),
-    ('DfmDeltoid_R',       0, 'DfmClavicle_R', F_DEF, L_MSCL, NoBB ),
-    
     # Shoulder    
+    ('DfmClavicle_L',      0, 'Clavicle_L', F_DEF, L_DEF, NoBB),
+    ('DfmClavicle_R',      0, 'Clavicle_R', F_DEF, L_DEF, NoBB),
     ('Shoulder_L',         0, 'Clavicle_L', F_WIR, L_TWEAK, NoBB),
     ('Shoulder_R',         0, 'Clavicle_R', F_WIR, L_TWEAK, NoBB),
     ('UpArmSocket_L',      0, 'Root', 0, L_HELP, NoBB),
     ('UpArmSocket_R',      0, 'Root', 0, L_HELP, NoBB),
     ('UpArmHinge_L',       0, 'UpArmSocket_L', 0, L_HELP, NoBB),
     ('UpArmHinge_R',       0, 'UpArmSocket_R', 0, L_HELP, NoBB),
+    ('UpArm_L',            0, 'UpArmHinge_L', F_WIR, L_LARMFK, NoBB),
+    ('UpArm_R',            0, 'UpArmHinge_R', F_WIR, L_RARMFK, NoBB),
+    ('DfmDeltoid_L',       0, 'DfmClavicle_L', F_DEF, L_MSCL, NoBB ),
+    ('DfmDeltoid_R',       0, 'DfmClavicle_R', F_DEF, L_MSCL, NoBB ),
     
     # Elbow lock        
     ('Elbow_L',            0, Master, F_WIR, L_LEXTRA, NoBB),
-    ('ELClavicle_L',       0, 'DfmSpine3', 0, L_HELP, NoBB),
-    ('ELUpArm_L',          0, 'ELClavicle_L', F_CON, L_HELP, NoBB),
+    ('ELClavicle_L',       0, 'DfmSpine3', 0, L_HELP2, NoBB),
+    ('ELUpArm_L',          0, 'ELClavicle_L', F_CON, L_HELP2, NoBB),
     ('ELClavPT_L',         0, 'DfmSpine3', F_WIR, L_LEXTRA, NoBB),
     ('ELClavLinkPT_L',     0, 'Clavicle_L', F_RES, L_LEXTRA, NoBB),
 
     ('Elbow_R',            0, Master, F_WIR, L_REXTRA, NoBB),
-    ('ELClavicle_R',       0, 'DfmSpine3', 0, L_HELP, NoBB),
-    ('ELUpArm_R',          0, 'ELClavicle_R', F_CON, L_HELP, NoBB),
+    ('ELClavicle_R',       0, 'DfmSpine3', 0, L_HELP2, NoBB),
+    ('ELUpArm_R',          0, 'ELClavicle_R', F_CON, L_HELP2, NoBB),
     ('ELClavPT_R',         0, 'DfmSpine3', F_WIR, L_REXTRA, NoBB),
     ('ELClavLinkPT_R',     0, 'Clavicle_R', F_RES, L_REXTRA, NoBB),
 
@@ -249,8 +250,8 @@ if MuscleBones:
     ('ShoulderUp_R',       0, 'ShoulderPivot_R', 0, L_HELP, NoBB),
     ('ShoulderAim_R',      0, 'ShoulderPivot_R', 0, L_HELP, NoBB),
 
-    ('DfmScapula_L',       0, 'ShoulderAim_L', F_DEF1, L_DMAIN, NoBB),
-    ('DfmScapula_R',       0, 'ShoulderAim_R', F_DEF1, L_DMAIN, NoBB),
+    ('DfmScapula_L',       0, 'ShoulderAim_L', F_DEF1, L_DEF, NoBB),
+    ('DfmScapula_R',       0, 'ShoulderAim_R', F_DEF1, L_DEF, NoBB),
 
     # Muscles
     ('DfmPect1_L',         0, 'DfmRib', F_DEF1, L_MSCL, NoBB ),
@@ -320,40 +321,41 @@ def ShoulderControlPoses(fp):
 
     # Elbow lock
     
-    addPoseBone(fp, 'Elbow_L', 'MHBall025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-        [
-        #('LimitDist', 0, 0, ['DistSternum', 'Sternum', 'LIMITDIST_INSIDE']),
-        ])
+    if the.Config.exporting:
+        addPoseBone(fp, 'Elbow_L', 'MHBall025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
+            [
+            #('LimitDist', 0, 0, ['DistSternum', 'Sternum', 'LIMITDIST_INSIDE']),
+            ])
         
-    addPoseBone(fp, 'ELClavicle_L', None, None, (1,1,1), (0,0,0), (1,1,1), 
-                ((1,0,1), (0.6,1,0.6), 0.0, None), 0, [])
+        addPoseBone(fp, 'ELClavicle_L', None, None, (1,1,1), (0,0,0), (1,1,1), 
+                    ((1,0,1), (0.6,1,0.6), 0.0, None), 0, [])
 
-    addPoseBone(fp, 'ELUpArm_L', None, None, (1,1,1), (0,0,0), (1,1,1), 
-                ((1,1,1), (0.2,0.6,0.2), 0.05, None), 0,     
-        [('IK', 0, 1, ['IK', 'Elbow_L', 2, (90*D, 'ELClavPT_L'), (True, False,True)])])
+        addPoseBone(fp, 'ELUpArm_L', None, None, (1,1,1), (0,0,0), (1,1,1), 
+                    ((1,1,1), (0.2,0.6,0.2), 0.05, None), 0,     
+            [('IK', 0, 1, ['IK', 'Elbow_L', 2, (90*D, 'ELClavPT_L'), (True, False,True)])])
 
-    addPoseBone(fp, 'ELClavPT_L', 'MHCube025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+        addPoseBone(fp, 'ELClavPT_L', 'MHCube025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-    addPoseBone(fp, 'ELClavLinkPT_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'ELClavPT_L', 0, 1])])
+        addPoseBone(fp, 'ELClavLinkPT_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+            [('StretchTo', 0, 1, ['Stretch', 'ELClavPT_L', 0, 1])])
         
 
-    addPoseBone(fp, 'Elbow_R', 'MHBall025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
-        [
-        #('LimitDist', 0, 0, ['DistSternum', 'Sternum', 'LIMITDIST_INSIDE']),
-        ])
+        addPoseBone(fp, 'Elbow_R', 'MHBall025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, 
+            [
+            #('LimitDist', 0, 0, ['DistSternum', 'Sternum', 'LIMITDIST_INSIDE']),
+            ])
         
-    addPoseBone(fp, 'ELClavicle_R', None, None, (1,1,1), (0,0,0), (1,1,1), 
-                ((1,0,1), (0.6,1,0.6), 0.0, None), 0, [])
+        addPoseBone(fp, 'ELClavicle_R', None, None, (1,1,1), (0,0,0), (1,1,1), 
+                    ((1,0,1), (0.6,1,0.6), 0.0, None), 0, [])
 
-    addPoseBone(fp, 'ELUpArm_R', None, None, (1,1,1), (0,0,0), (1,1,1), 
-                ((1,1,1), (0.2,0.6,0.2), 0.05, None), 0,     
-        [('IK', 0, 1, ['IK', 'Elbow_R', 2, (90*D, 'ELClavPT_R'), (True, False,True)])])
+        addPoseBone(fp, 'ELUpArm_R', None, None, (1,1,1), (0,0,0), (1,1,1), 
+                    ((1,1,1), (0.2,0.6,0.2), 0.05, None), 0,     
+            [('IK', 0, 1, ['IK', 'Elbow_R', 2, (90*D, 'ELClavPT_R'), (True, False,True)])])
 
-    addPoseBone(fp, 'ELClavPT_R', 'MHCube025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+        addPoseBone(fp, 'ELClavPT_R', 'MHCube025', None, (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-    addPoseBone(fp, 'ELClavLinkPT_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'ELClavPT_R', 0, 1])])
+        addPoseBone(fp, 'ELClavLinkPT_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+            [('StretchTo', 0, 1, ['Stretch', 'ELClavPT_R', 0, 1])])
 
 
     addPoseBone(fp, 'DfmDeltoid_L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0,

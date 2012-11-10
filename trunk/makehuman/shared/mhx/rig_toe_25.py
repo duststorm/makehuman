@@ -2,9 +2,10 @@
 #	Toe bone definitions
 #
 
-import mhx_globals as the
-from mhx_globals import *
-from mhx_rig import addPoseBone
+from . import the
+from the import *
+from . import posebone
+from posebone import addPoseBone
 
 ToeJoints = [
 	('l-toe-1-end',			'l', ((2.0, 'l-toe-1-2'), (-1.0, 'l-toe-1-1'))),

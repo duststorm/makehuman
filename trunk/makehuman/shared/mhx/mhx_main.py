@@ -28,22 +28,25 @@ BODY_LANGUAGE = True
 
 import module3d
 import aljabr
-import gui3d
+import mh
+import mh2bvh
 import os
 import time
 
 import mh2proxy
 import export_config
-import mhx_globals as the
-import mhx_24
-import mhx_rig
-import rig_panel_25
-import rig_shoulder_25
-import rig_arm_25
-import rig_leg_25
-import rig_body_25
-import read_expression
-import read_rig
+import armature
+
+from . import the
+from . import mhx_rig
+from . import mhx_24
+from . import rig_panel_25
+from . import rig_shoulder_25
+from . import rig_arm_25
+from . import rig_leg_25
+from . import rig_body_25
+from . import read_expression
+
 
 
 the.Human = 'Human'
@@ -81,10 +84,9 @@ def exportMhx(human, filename, options):
 #
 #    exportMhx_25(human, fp):
 #
-    
-def exportMhx_25(human, fp):
-    gui3d.app.progress(0, text="Exporting MHX")
 
+def exportMhx_25(human, fp):
+    
     fp.write(
 "# MakeHuman exported MHX\n" +
 "# www.makehuman.org\n" +
@@ -110,7 +112,6 @@ def exportMhx_25(human, fp):
 "  layers Array 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1  ;\n" +
 "end Object\n\n")
 
-    fp.write("#if toggle&T_Armature\n")
     if the.Config.mhxrig in ['mhx', 'rigify', 'blenrig']:
         for fname in the.GizmoFiles:
             copyFile25(human, fname, fp, None, proxyData)    
@@ -129,11 +130,8 @@ def exportMhx_25(human, fp):
             mhx_rig.setupCube(fp, "MHCube05", 0.5, 0)
             copyFile25(human, "shared/mhx/templates/panel_gizmo25.mhx", fp, None, proxyData)    
             
-    gui3d.app.progress(0.1, text="Exporting armature")
     copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", fp, None, proxyData)    
-    fp.write("#endif\n")
-
-    gui3d.app.progress(0.15, text="Exporting materials")    
+    
     fp.write("\nNoScale False ;\n\n")
 
     if human.uvsetFile:
@@ -143,25 +141,21 @@ def exportMhx_25(human, fp):
     else:
         copyFile25(human, "shared/mhx/templates/materials25.mhx", fp, None, proxyData)    
 
-    gui3d.app.progress(0.2, text="Exporting cage")
     if the.Config.cage:
-        proxyCopy('Cage', human, proxyData, fp, 0.25, 0.3)
-
-    gui3d.app.progress(0.25, text="Exporting main mesh")    
+        proxyCopy('Cage', human, proxyData, fp)
+    
     if the.Config.mainmesh:
         fp.write("#if toggle&T_Mesh\n")
         copyFile25(human, "shared/mhx/templates/meshes25.mhx", fp, None, proxyData)    
         fp.write("#endif\n")
 
-    proxyCopy('Proxy', human, proxyData, fp, 0.4, 0.45)
-    proxyCopy('Clothes', human, proxyData, fp, 0.45, 0.6)
+    proxyCopy('Proxy', human, proxyData, fp)
+    proxyCopy('Clothes', human, proxyData, fp)
 
     copyFile25(human, "shared/mhx/templates/rig-poses25.mhx", fp, None, proxyData) 
 
     if the.Config.mhxrig == 'rigify':
         fp.write("Rigify %s ;\n" % the.Human)
-
-    gui3d.app.progress(1.0)
     return
 
 #
@@ -180,23 +174,12 @@ def scanProxies(obj, proxyData):
 #    proxyCopy(name, human, proxyData, fp)
 #
 
-def proxyCopy(name, human, proxyData, fp, t0, t1):
-    n = 0
+def proxyCopy(name, human, proxyData, fp):
     for proxy in proxyData.values():
         if proxy.type == name:
-            n += 1
-    if n == 0:
-        return
-        
-    dt = (t1-t0)/n
-    t = t0
-    for proxy in proxyData.values():
-        if proxy.type == name:
-            gui3d.app.progress(t, text="Exporting %s" % name)
             fp.write("#if toggle&T_%s\n" % proxy.type)
             copyFile25(human, "shared/mhx/templates/proxy25.mhx", fp, proxy, proxyData)    
             fp.write("#endif\n")
-            t += dt
         
 #
 #    copyFile25(human, tmplName, fp, proxy, proxyData):
@@ -404,7 +387,7 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
                     fp.write(" 1")
                 fp.write(" ;\n")
                 fp.write("  AnimationData %sMesh True\n" % the.Human)
-                #mhx_rig.writeTextureDrivers(fp, rig_panel_25.BodyLanguageTextureDrivers)
+                #armature.drivers.writeTextureDrivers(fp, rig_panel_25.BodyLanguageTextureDrivers)
                 writeMaskDrivers(fp, proxyData)
                 fp.write("  end AnimationData\n")
             elif key == 'Filename':
@@ -534,7 +517,7 @@ def addMaskMTex(fp, mask, proxy, blendtype, n):
             uvLayer = proxy.uvtexLayerName[proxy.maskLayer]
         except KeyError:
             return n
-            
+
     (dir, file) = mask
     fp.write(
 "  MTex %d %s UV ALPHA\n" % (n+1, file) +
@@ -585,7 +568,7 @@ def writeMaskDrivers(fp, proxyData):
     for prx in proxyData.values():
         if prx.type == 'Clothes' and prx.mask:
             (dir, file) = prx.mask
-            mhx_rig.writePropDriver(fp, ["Hide%s" % prx.name], "1-x1", 'use_textures', n+1)
+            armature.drivers.writePropDriver(fp, ["Hide%s" % prx.name], "1-x1", 'use_textures', n+1)
             n += 1            
     fp.write("#endif\n")
     return
@@ -596,31 +579,31 @@ def writeMaskDrivers(fp, proxyData):
 
 def writeVertexGroups(fp, proxy):                
     if proxy and proxy.weights:
-        mh2proxy.writeRigWeights(fp, proxy.weights)
+        writeRigWeights(fp, proxy.weights)
         return
-    fp.write("#if toggle&T_Armature\n")
+
     if the.VertexWeights:
         if proxy:
             weights = mh2proxy.getProxyWeights(the.VertexWeights, proxy)
         else:
             weights = the.VertexWeights                    
-        mh2proxy.writeRigWeights(fp, weights)
+        writeRigWeights(fp, weights)
     else:
         for file in the.VertexGroupFiles:
-            copyVertGroups(file, fp, proxy)
+            copyVertexGroups(file, fp, proxy)
             
     for path in the.Config.customvertexgroups:
         print("    %s" % path)
-        copyVertGroups(path, fp, proxy)    
+        copyVertexGroups(path, fp, proxy)    
 
     if the.Config.cage and not (proxy and proxy.cage):
         fp.write("#if toggle&T_Cage\n")
-        copyVertGroups("shared/mhx/templates/vertexgroups-cage25.mhx", fp, proxy)    
+        copyVertexGroups("cage", fp, proxy)    
         fp.write("#endif\n")
-    fp.write("#endif\n")
-    copyVertGroups("shared/mhx/templates/vertexgroups-leftright25.mhx", fp, proxy)    
-    copyVertGroups("shared/mhx/templates/vertexgroups-tight-leftright25.mhx", fp, proxy)    
-    copyVertGroups("shared/mhx/templates/vertexgroups-skirt-leftright25.mhx", fp, proxy)    
+
+    copyVertexGroups("leftright", fp, proxy)    
+    copyVertexGroups("tight-leftright", fp, proxy)    
+    copyVertexGroups("skirt-leftright", fp, proxy)    
     return
     
 #
@@ -645,9 +628,7 @@ def writeGroups(fp, proxyData):
 "PostProcess %sMesh %s 0000003f 00080000 0068056b 0000c000 ;\n" % (the.Human, the.Human) + 
 "Group %s\n"  % the.Human +
 "  Objects\n" +
-"#if toggle&T_Armature\n" +
 "    ob %s ;\n" % the.Human +
-"#endif\n" +
 "#if toggle&T_Mesh\n" +
 "    ob %sMesh ;\n" % the.Human +
 "#endif\n")
@@ -693,11 +674,9 @@ def writeProxyObject(fp, proxy):
     name = the.Human + proxy.name
     fp.write(
     "Object %sMesh MESH %sMesh \n" % (name, name) +
-    "#if toggle&T_Armature\n" +
     "  parent Refer Object %s ;\n" % the.Human +
     "  hide False ;\n" +
-    "  hide_render False ;\n" +
-    "#endif\n")
+    "  hide_render False ;\n")
     if proxy.wire:
         fp.write("  draw_type 'WIRE' ;\n")    
     return
@@ -745,8 +724,8 @@ def writeHideProp(fp, name):
 
 def writeHideAnimationData(fp, prefix, name):
     fp.write("AnimationData %s%sMesh True\n" % (prefix, name))
-    mhx_rig.writePropDriver(fp, ["Hide%s" % name], "x1", "hide", -1)
-    mhx_rig.writePropDriver(fp, ["Hide%s" % name], "x1", "hide_render", -1)
+    armature.drivers.writePropDriver(fp, ["Hide%s" % name], "x1", "hide", -1)
+    armature.drivers.writePropDriver(fp, ["Hide%s" % name], "x1", "hide_render", -1)
     fp.write("end AnimationData\n")
     return    
        
@@ -958,28 +937,43 @@ def countMasks(proxy, prxList):
     return n            
 
 #
-#    copyVertGroups(tmplName, fp, proxy):
+#    copyVertexGroups(name, fp, proxy):
 #
 
-def copyVertGroups(tmplName, fp, proxy):
-    tmpl = open(tmplName)
-    shapes = []
-    vgroups = []
+def getVertexGroups(name, vgroups):
+    file = os.path.join("shared/mhx/vertexgroups", name + ".vgrp")
+    fp = open(file, "rU")
+    vgroupList = []
+    for line in fp:
+        words = line.split()
+        if len(words) < 2:
+            continue
+        elif words[1] == "weights":
+            name = words[2]
+            try:
+                vgroup = vgroups[name]
+            except KeyError:
+                vgroup = []
+                vgroups[name] = vgroup 
+            vgroupList.append((name, vgroup))
+        else:
+            vgroup.append((int(words[0]), float(words[1])))
+    fp.close()            
+    return vgroupList            
 
-    if tmpl == None:
-        print("*** Cannot open "+tmplName)
-        return
+
+def copyVertexGroups(name, fp, proxy):
+    vgroupList = getVertexGroups(name, {})
     if not proxy:
-        for line in tmpl:
-            fp.write(line)
+        for (name, weights) in vgroupList:
+            fp.write("  VertexGroup %s\n" % name)
+            for (v,wt) in weights:
+                fp.write("    wv %d %.4g ;\n" % (v,wt))
+            fp.write("  end VertexGroup\n\n")
     else:
-        for line in tmpl:
-            words= line.split()
-            if len(words) == 0:
-                fp.write(line)
-            elif words[0] == 'wv':
-                v = int(words[1])
-                wt = float(words[2])
+        for (name, weights) in vgroupList:
+            pgroup = []
+            for (v,wt) in weights:
                 try:
                     vlist = proxy.verts[v]
                 except:
@@ -987,22 +981,12 @@ def copyVertGroups(tmplName, fp, proxy):
                 for (pv, w) in vlist:
                     pw = w*wt
                     if pw > 1e-4:
-                        vgroups.append((pv, pw))
-            elif words[0] == 'VertexGroup':
-                gname = words[1]
-                vgroups = []
-            elif words[0] == 'end':
-                if vgroups:
-                    fp.write("  VertexGroup %s\n" % gname)
-                    printProxyVGroup(fp, vgroups)
-                    vgroups = []
-                    fp.write(line)
-            else:    
-                fp.write(line)
-    print("    %s copied" % tmplName)
-    tmpl.close()
-    return
-
+                        pgroup.append((pv, pw))
+            if pgroup:
+                fp.write("  VertexGroup %s\n" % name)
+                printProxyVGroup(fp, pgroup)
+                fp.write("  end VertexGroup\n\n")
+    
 #
 #    printProxyVGroup(fp, vgroups):
 #
@@ -1022,120 +1006,7 @@ def printProxyVGroup(fp, vgroups):
         fp.write("    wv %d %.4f ;\n" % (pv, wt))
     return
 
-#
-#    copyShapeKeys(tmplName, fp, proxy, doScale):
-#
-"""
-def copyShapeKeys(tmplName, fp, proxy, doScale):
-    tmpl = open(tmplName)
-    shapes = []
-    vgroups = []
-    scale = 1.0
 
-    if tmpl == None:
-        print("*** Cannot open "+tmplName)
-        return
-    if not proxy:
-        for line in tmpl:
-            words = line.split()
-            if len(words) == 0:
-                fp.write(line)
-            elif words[0] == 'sv':
-                v = int(words[1])
-                dx = float(words[2])*scale
-                dy = float(words[3])*scale
-                dz = float(words[4])*scale
-                fp.write("    sv %d %.4f %.4f %.4f ;\n" % (v, dx, dy, dz))
-            elif words[0] == 'ShapeKey':
-                if doScale:
-                    scale = setShapeScale(words)
-                fp.write(line)
-            else:
-                fp.write(line)
-    else:
-        ignore = False
-        for line in tmpl:
-            words= line.split()
-            if len(words) == 0:
-                fp.write(line)
-            elif words[0] == 'ShapeKey':
-                if doScale:
-                    scale = setShapeScale(words)
-                if useThisShape(words[1], proxy):
-                    fp.write(line)
-                    ignore = False
-                else:
-                    ignore = True
-            elif ignore:
-                pass
-            elif words[0] == 'sv':
-                v = int(words[1])
-                dx = float(words[2])*scale
-                dy = float(words[3])*scale
-                dz = float(words[4])*scale
-                try:
-                    vlist = proxy.verts[v]
-                except:
-                    vlist = []
-                for (pv, w) in vlist:
-                    shapes.append((pv, w*dx, w*dy, w*dz))
-            elif shapes:
-                printProxyShape(fp, shapes)
-                shapes = []
-                fp.write(line)
-            else:    
-                fp.write(line)
-    print("    %s copied" % tmplName)
-    tmpl.close()
-    return
-
-
-#    setShapeScale(words):    
-#
-
-def setShapeScale(words):
-    key = words[1]
-    scales = None
-    try:
-        scales = rig_panel_25.FaceShapeKeyScale[key]
-    except:
-        pass
-    try:
-        scales = rig_body_25.BodyShapeKeyScale[key]
-    except:
-        pass
-    if not scales:
-        raise NameError("No scale for %s" % key)
-    (p1, p2, length0) = scales
-    x1 = the.Locations[p1]
-    x2 = the.Locations[p2]
-    dist = aljabr.vsub(x1, x2)
-    length = aljabr.vlen(dist)
-    scale = length/length0
-    #print("Scale %s %f %f" % (key, length, scale))
-    return scale
-                
-#
-#    printProxyShape(fp, shapes)
-#
-
-def printProxyShape(fp, shapes):
-    shapes.sort()
-    pv = -1
-    while shapes:
-        (pv0, dx0, dy0, dz0) = shapes.pop()
-        if pv0 == pv:
-            dx += dx0
-            dy += dy0
-            dz += dz0
-        else:
-            if (pv >= 0 and aljabr.vlen([dx,dy,dz]) > 0):
-                fp.write("    sv %d %.4f %.4f %.4f ;\n" % (pv, dx, dy, dz))
-            (pv, dx, dy, dz) = (pv0, dx0, dy0, dz0)        
-    if (pv >= 0 and aljabr.vlen([dx,dy,dz]) > 0):
-        fp.write("    sv %d %.4f %.4f %.4f ;\n" % (pv, dx, dy, dz))
-    return
-"""
 #
 #    writeShapeKeys(fp, human, name, proxy):
 #
@@ -1170,18 +1041,18 @@ def writeShapeKeys(fp, human, name, proxy):
 "  end ShapeKey\n")
 
     if (not proxy or proxy.type == 'Proxy'):
-        if the.Config.faceshapes:            
-            shapeList = read_expression.readFaceShapes(human, rig_panel_25.BodyLanguageShapeDrivers, 0.6, 0.7)
+        if the.Config.faceshapes:
+            shapeList = read_expression.readFaceShapes(human, rig_panel_25.BodyLanguageShapeDrivers)
             for (pose, shape, lr, min, max) in shapeList:
                 writeShape(fp, pose, lr, shape, min, max, proxy)
 
     if not proxy:
         if the.Config.expressions:
-            shapeList = read_expression.readExpressions(human, 0.7, 0.9)
+            shapeList = read_expression.readExpressions(human)
             for (pose, shape) in shapeList:
                 writeShape(fp, pose, "Sym", shape, 0, 1, proxy)
         if the.Config.expressionunits:
-            shapeList = read_expression.readExpressionUnits(human, 0.7, 0.9)
+            shapeList = read_expression.readExpressionUnits(human)
             for (pose, shape) in shapeList:
                 writeShape(fp, pose, "Sym", shape, 0, 1, proxy)
         
@@ -1190,7 +1061,7 @@ def writeShapeKeys(fp, human, name, proxy):
         writeCorrectives(fp, human, rig_leg_25.HipTargetDrivers, "hips", proxy)                
         writeCorrectives(fp, human, rig_arm_25.ElbowTargetDrivers, "elbow", proxy)                
         writeCorrectives(fp, human, rig_leg_25.KneeTargetDrivers, "knee", proxy)                
-        #copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, True)
+        #copyShapeKeys("shared/mhx/templates/shapekeys-body", fp, proxy, True)
 
     for path in the.Config.customshapes:
         print("    %s" % path)
@@ -1200,56 +1071,41 @@ def writeShapeKeys(fp, human, name, proxy):
 "  AnimationData None (toggle&T_Symm==0)\n")
         
     if the.Config.bodyshapes and the.Config.mhxrig=="mhx":
-        mhx_rig.writeTargetDrivers(fp, rig_shoulder_25.ShoulderTargetDrivers, the.Human)
-        mhx_rig.writeTargetDrivers(fp, rig_leg_25.HipTargetDrivers, the.Human)
-        mhx_rig.writeTargetDrivers(fp, rig_arm_25.ElbowTargetDrivers, the.Human)
-        mhx_rig.writeTargetDrivers(fp, rig_leg_25.KneeTargetDrivers, the.Human)
+        armature.drivers.writeTargetDrivers(fp, rig_shoulder_25.ShoulderTargetDrivers, the.Human)
+        armature.drivers.writeTargetDrivers(fp, rig_leg_25.HipTargetDrivers, the.Human)
+        armature.drivers.writeTargetDrivers(fp, rig_arm_25.ElbowTargetDrivers, the.Human)
+        armature.drivers.writeTargetDrivers(fp, rig_leg_25.KneeTargetDrivers, the.Human)
 
-        mhx_rig.writeRotDiffDrivers(fp, rig_arm_25.ArmShapeDrivers, proxy)
-        mhx_rig.writeRotDiffDrivers(fp, rig_leg_25.LegShapeDrivers, proxy)
-        #mhx_rig.writeShapePropDrivers(fp, rig_body_25.BodyShapes, proxy, "&")
+        armature.drivers.writeRotDiffDrivers(fp, rig_arm_25.ArmShapeDrivers, proxy)
+        armature.drivers.writeRotDiffDrivers(fp, rig_leg_25.LegShapeDrivers, proxy)
+        #armature.drivers.writeShapePropDrivers(fp, rig_body_25.BodyShapes, proxy, "&")
 
     fp.write("#if toggle&T_ShapeDrivers\n")
     if (not proxy or proxy.type == 'Proxy'):
         if the.Config.faceshapes:
             drivers = rig_panel_25.BodyLanguageShapeDrivers
             if the.Config.facepanel:
-                mhx_rig.writeShapeDrivers(fp, drivers, None)
+                armature.drivers.writeShapeDrivers(fp, drivers, None)
             else:
-                mhx_rig.writeShapePropDrivers(fp, drivers.keys(), proxy, "&_")                
-    fp.write("#endif\n")
+                armature.drivers.writeShapePropDrivers(fp, drivers.keys(), proxy, "&_")                
 
-    if the.Config.mhxrig != "rigify":
-        fp.write("#if toggle&T_ShapeDrivers\n")
-        if not proxy:
-            if the.Config.expressions and not proxy:
-                mhx_rig.writeShapePropDrivers(fp, read_expression.Expressions, proxy, "*")
-            if the.Config.expressionunits and not proxy:
-                mhx_rig.writeShapePropDrivers(fp, read_expression.ExpressionUnits, proxy, "*")
-                
-            skeys = []
-            for (skey, val, string, min, max) in  the.CustomProps:
-                skeys.append(skey)
-            mhx_rig.writeShapePropDrivers(fp, skeys, proxy, "&")    
-        fp.write("#endif\n")
+    if not proxy:
+        if the.Config.expressions and not proxy:
+            armature.drivers.writeShapePropDrivers(fp, read_expression.Expressions, proxy, "*")
+        if the.Config.expressionunits and not proxy:
+            armature.drivers.writeShapePropDrivers(fp, read_expression.ExpressionUnits, proxy, "*")
+            
+        skeys = []
+        for (skey, val, string, min, max) in  the.CustomProps:
+            skeys.append(skey)
+        armature.drivers.writeShapePropDrivers(fp, skeys, proxy, "&")    
+    fp.write("#endif\n")
         
     fp.write(
 "  end AnimationData\n" +
 "end ShapeKeys\n" +
 "#endif\n")
     return    
-
-
-def useThisShape(name, proxy):
-    if not proxy:
-        return True
-    if proxy.type == 'Proxy':
-        return True
-    if name in proxy.shapekeys:
-        return True
-    if name[:-2] in proxy.shapekeys:
-        return True
-    return False
 
 
 def proxyShapes(typ, human, proxyData, fp):
@@ -1389,6 +1245,132 @@ def writeMultiMaterials(uvset, human, fp):
             n += 1
         fp.write("end Material\n\n")
     
+
+#
+#    getLoc(joint, obj):
+#
+
+import mhxbones
+
+def getJoint(joint, obj, locations):
+    try:
+        loc = locations[joint]
+    except:
+        loc = mhxbones.calcJointPos(obj, joint)
+        locations[joint] = loc
+    return loc
+
+#
+#    writeRigBones(fp, bones):
+#    writeRigPose(fp, name, bones):
+#    writeRigWeights(fp, weights):
+#
+
+"""
+def writeRigBones(fp, bones):
+    ox = the.Origin[0]
+    oy = the.Origin[1]
+    oz = the.Origin[2]
+    for (bone, head, tail, roll, parent, options) in bones:
+        fp.write("\n  Bone %s True\n" % bone)
+        (x, y, z) = head
+        fp.write("    head  %.4f %.4f %.4f  ;\n" % (x-ox,-z+oz,y-oy))
+        (x, y, z) = tail
+        fp.write("    tail %.4f %.4f %.4f  ;\n" % (x-ox,-z+oz,y-oy))
+        if parent and parent != '-':
+            fp.write("    parent Refer Bone %s ;\n" % parent)
+        fp.write(
+    "    roll %.4f ; \n" % (roll)+
+    "    use_connect False ; \n")
+        if ('-circ' in options.keys() or '-box' in options.keys()):
+            fp.write("    show_wire True ;\n")
+        try:
+            options['-nd']
+            fp.write("    use_deform False ; \n")
+        except:
+            fp.write("    use_deform True ; \n")
+        fp.write("  end Bone \n")
+    return
+
+def getRadius(key, options):
+    try:
+        val = options[key]
+        return int(val[0])
+    except:
+        return None
+
+def writeRigPose(fp, name, bones):
+    circles = []
+    cubes = []
+    for (bone, head, tail, roll, parent, options) in bones:
+        r = getRadius('-circ', options)
+        if r and not (r in circles):
+            mhx_rig.setupCircle(fp, "RigCircle%02d" % r, 0.1*r)
+            circles.append(r)
+        r = getRadius('-box', options)
+        if r and not (r in cubes):
+            mhx_rig.setupCube(fp, "RigCube%02d" % r, 0.1*r, 0)
+            cubes.append(r)
+
+    fp.write("\nPose %s\n" % name)
+    for (bone, head, tail, roll, parent, options) in bones:
+        fp.write("  Posebone %s True \n" % bone)
+
+        # IK constraint
+        try:
+            val = options['-ik']
+        except:
+            val = None
+        if val:
+            (subtar, chainlen, inf) = val
+            fp.write(
+"    Constraint IK IK True\n")
+            if subtar:
+                fp.write(
+"      target Refer Object %s ;\n" % name +
+"      subtarget '%s' ;\n" % subtar +
+"      use_tail True ;\n" +
+"      use_target True ;\n")
+            else:
+                fp.write(
+"      use_tail False ;\n" +
+"      use_target True ;\n")
+            fp.write(
+"      chain_count %s ;\n" % chainlen +
+"      influence %s ;\n" % inf +
+"    end Constraint\n")
+
+        # Not connected
+        try:
+            options['-nc']
+        except:
+            fp.write(
+"    lock_location Array 1 1 1 ;\n" +
+"    lock_scale Array 1 1 1  ; \n")
+
+        # Circle custom shape
+        r = getRadius('-circ', options)
+        if r:
+            fp.write(
+"    custom_shape Refer Object RigCircle%02d ; \n" % r)
+
+        # Box custom shape
+        r = getRadius('-box', options)
+        if r:
+            fp.write(
+"    custom_shape Refer Object RigCube%02d ; \n" % r)
+
+        fp.write("  end Posebone\n")
+    fp.write("end Pose\n\n")
+"""
+
+def writeRigWeights(fp, weights):
+    for grp in weights.keys():
+        fp.write("\n  VertexGroup %s\n" % grp)
+        for (v,w) in weights[grp]:
+            fp.write("    wv %d %.4f ;\n" % (v,w))
+        fp.write("  end VertexGroup\n")
+    return
     
 
 

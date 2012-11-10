@@ -19,9 +19,10 @@ Finger bone definitions
 
 """
 
-import mhx_globals as the
-from mhx_globals import *
-from mhx_rig import addPoseBone
+from . import the
+from the import *
+from . import posebone
+from posebone import addPoseBone
 
 FingerJoints = [
     #('l-hand-2',       'j', 'l-hand-2'),
@@ -120,8 +121,23 @@ FingerArmature = [
     ('Palm-4_R',        0.0, 'Wrist-2_R', F_DEF, L_RPALM, NoBB),
     ('Palm-5_R',        0.0, 'Wrist-2_R', F_DEF, L_RPALM, NoBB),
 
-    # Fingers
     ('Finger-1-1_L',        ThumbRoll, 'Palm-1_L', F_DEF, L_LHANDFK+L_LHANDIK, NoBB),
+    ('Finger-1-1_R',        -ThumbRoll, 'Palm-1_R', F_DEF, L_RHANDFK+L_RHANDIK, NoBB),
+
+    # Finger controls
+    ('Finger-1_L',      ThumbRoll, 'Finger-1-1_L', F_WIR, L_LHANDIK, NoBB),
+    ('Finger-2_L',      0.0, 'Palm-2_L', F_WIR, L_LHANDIK, NoBB),
+    ('Finger-3_L',      0.0, 'Palm-3_L', F_WIR, L_LHANDIK, NoBB),
+    ('Finger-4_L',      0.0, 'Palm-4_L', F_WIR, L_LHANDIK, NoBB),
+    ('Finger-5_L',      0.0, 'Palm-5_L', F_WIR, L_LHANDIK, NoBB),
+    
+    ('Finger-1_R',      -ThumbRoll, 'Finger-1-1_R', F_WIR, L_RHANDIK, NoBB),
+    ('Finger-2_R',      0.0, 'Palm-2_R', F_WIR, L_RHANDIK, NoBB),
+    ('Finger-3_R',      0.0, 'Palm-3_R', F_WIR, L_RHANDIK, NoBB),
+    ('Finger-4_R',      0.0, 'Palm-4_R', F_WIR, L_RHANDIK, NoBB),
+    ('Finger-5_R',      0.0, 'Palm-5_R', F_WIR, L_RHANDIK, NoBB),
+
+    # Fingers
     ('Finger-1-2_L',        ThumbRoll, 'Finger-1-1_L', F_DEF, L_LHANDFK, NoBB),
     ('Finger-1-3_L',        ThumbRoll, 'Finger-1-2_L', F_DEF, L_LHANDFK, NoBB),
     ('Finger-2-1_L',        0.0, 'Palm-2_L', F_DEF, L_LHANDFK, NoBB),
@@ -137,7 +153,6 @@ FingerArmature = [
     ('Finger-5-2_L',        0.0, 'Finger-5-1_L', F_DEF, L_LHANDFK, NoBB),
     ('Finger-5-3_L',        0.0, 'Finger-5-2_L', F_DEF, L_LHANDFK, NoBB),
 
-    ('Finger-1-1_R',        -ThumbRoll, 'Palm-1_R', F_DEF, L_RHANDFK+L_RHANDIK, NoBB),
     ('Finger-1-2_R',        -ThumbRoll, 'Finger-1-1_R', F_DEF, L_RHANDFK, NoBB),
     ('Finger-1-3_R',        -ThumbRoll, 'Finger-1-2_R', F_DEF, L_RHANDFK, NoBB),
     ('Finger-2-1_R',        0.0, 'Palm-2_R', F_DEF, L_RHANDFK, NoBB),
@@ -152,19 +167,6 @@ FingerArmature = [
     ('Finger-5-1_R',        0.0, 'Palm-5_R', F_DEF, L_RHANDFK, NoBB),
     ('Finger-5-2_R',        0.0, 'Finger-5-1_R', F_DEF, L_RHANDFK, NoBB),
     ('Finger-5-3_R',        0.0, 'Finger-5-2_R', F_DEF, L_RHANDFK, NoBB),
-
-    # Finger controls
-    ('Finger-1_L',      ThumbRoll, 'Finger-1-1_L', F_WIR, L_LHANDIK, NoBB),
-    ('Finger-2_L',      0.0, 'Palm-2_L', F_WIR, L_LHANDIK, NoBB),
-    ('Finger-3_L',      0.0, 'Palm-3_L', F_WIR, L_LHANDIK, NoBB),
-    ('Finger-4_L',      0.0, 'Palm-4_L', F_WIR, L_LHANDIK, NoBB),
-    ('Finger-5_L',      0.0, 'Palm-5_L', F_WIR, L_LHANDIK, NoBB),
-    
-    ('Finger-1_R',      -ThumbRoll, 'Finger-1-1_R', F_WIR, L_RHANDIK, NoBB),
-    ('Finger-2_R',      0.0, 'Palm-2_R', F_WIR, L_RHANDIK, NoBB),
-    ('Finger-3_R',      0.0, 'Palm-3_R', F_WIR, L_RHANDIK, NoBB),
-    ('Finger-4_R',      0.0, 'Palm-4_R', F_WIR, L_RHANDIK, NoBB),
-    ('Finger-5_R',      0.0, 'Palm-5_R', F_WIR, L_RHANDIK, NoBB),
 ]
 
 #

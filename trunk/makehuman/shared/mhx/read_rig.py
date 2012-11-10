@@ -26,8 +26,11 @@ TO DO
 
 import aljabr
 from aljabr import *
-import mhxbones
 import os
+
+from . import the
+from the import *
+from . import mhxbones
 
 #
 #   setupRigJoint (words, obj, verts, locations):
