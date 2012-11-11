@@ -100,7 +100,8 @@ class CProxy:
         yScale = getScale(self.yScaleData, parent.verts, 1)
         zScale = getScale(self.zScaleData, parent.verts, 2)
 
-        for n,vert in enumerate(mesh.verts):
+	verts = []
+        for n in range(mlen):
             refVert = self.refVerts[n]
             if type(refVert) == tuple:
                 (rv0, rv1, rv2, w0, w1, w2, d0, d1, d2) = refVert
@@ -110,9 +111,10 @@ class CProxy:
                 nv0 = w0*v0.co[0] + w1*v1.co[0] + w2*v2.co[0] + d0*xScale
                 nv1 = w0*v0.co[1] + w1*v1.co[1] + w2*v2.co[1] + d1*yScale
                 nv2 = w0*v0.co[2] + w1*v1.co[2] + w2*v2.co[2] + d2*zScale
-                vert.co = (nv0, nv1, nv2)
+                verts.append( (nv0, nv1, nv2) )
             else:
                 vert.co = parent.verts[refVert].co
+	mesh.setCoords(verts)                
 
 #
 #    class CMaterial
