@@ -26,6 +26,7 @@ import os
 from aljabr import *
 import export_config
 
+import mhx
 from mhx import the
 
 #
@@ -841,7 +842,7 @@ def getMeshInfo(obj, proxy, rawWeights, rawShapes, rigname):
         verts = [tuple(v) for v in obj.coord]
         vnormals = [tuple(n) for n in obj.vnorm]
         texcoords = [tuple(t) for t in obj.texco]
-        faces = mhx_main.loadFacesIndices(obj)
+        faces = mhx.mhx_main.loadFacesIndices(obj)
         return (verts, vnormals, texcoords, faces, rawWeights, rawShapes)
 
 #

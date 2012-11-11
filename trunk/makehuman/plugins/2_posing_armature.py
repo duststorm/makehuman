@@ -409,14 +409,14 @@ class PoseMhxTaskView(gui3d.TaskView):
         if self.armature:
             self.cube.show()
         self.activeBone = None
-        self.status.setText("")
+        #self.status.setText("")
         gui3d.TaskView.onShow(self, event)
         
      
     def onHide(self, event):
         self.cube.hide()
         self.activeBone = None
-        self.status.setText("")
+        #self.status.setText("")
         gui3d.TaskView.onHide(self, event)
         
      
@@ -750,6 +750,7 @@ taskview = None
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
 def load(app):
+    return
     category = app.getCategory('Posing')
     taskview = category.addView(PoseMhxTaskView(category))
     print 'pose loaded'
