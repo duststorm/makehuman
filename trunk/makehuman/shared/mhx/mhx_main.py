@@ -28,8 +28,7 @@ BODY_LANGUAGE = True
 
 import module3d
 import aljabr
-import mh
-import mh2bvh
+import gui3d
 import os
 import time
 
@@ -86,6 +85,7 @@ def exportMhx(human, filename, options):
 #
 
 def exportMhx_25(human, fp):
+    gui3d.app.progress(0, text="Exporting MHX")
     
     fp.write(
 "# MakeHuman exported MHX\n" +
@@ -130,10 +130,11 @@ def exportMhx_25(human, fp):
             mhx_rig.setupCube(fp, "MHCube05", 0.5, 0)
             copyFile25(human, "shared/mhx/templates/panel_gizmo25.mhx", fp, None, proxyData)    
             
+    gui3d.app.progress(0.1, text="Exporting armature")
     copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", fp, None, proxyData)    
     
+    gui3d.app.progress(0.15, text="Exporting materials")    
     fp.write("\nNoScale False ;\n\n")
-
     if human.uvsetFile:
         uvset = mh2proxy.readUvset(human.uvsetFile)
         proxyData["__uvset__"] = uvset
@@ -142,20 +143,23 @@ def exportMhx_25(human, fp):
         copyFile25(human, "shared/mhx/templates/materials25.mhx", fp, None, proxyData)    
 
     if the.Config.cage:
-        proxyCopy('Cage', human, proxyData, fp)
+        proxyCopy('Cage', human, proxyData, fp, 0.2, 0.25)
     
+    gui3d.app.progress(0.25, text="Exporting main mesh")    
     if the.Config.mainmesh:
         fp.write("#if toggle&T_Mesh\n")
         copyFile25(human, "shared/mhx/templates/meshes25.mhx", fp, None, proxyData)    
         fp.write("#endif\n")
 
-    proxyCopy('Proxy', human, proxyData, fp)
-    proxyCopy('Clothes', human, proxyData, fp)
+    proxyCopy('Proxy', human, proxyData, fp, 0.35, 0.4)
+    proxyCopy('Clothes', human, proxyData, fp, 0.4, 0.6)
 
     copyFile25(human, "shared/mhx/templates/rig-poses25.mhx", fp, None, proxyData) 
 
     if the.Config.mhxrig == 'rigify':
         fp.write("Rigify %s ;\n" % the.Human)
+
+    gui3d.app.progress(1.0)
     return
 
 #
@@ -171,15 +175,26 @@ def scanProxies(obj, proxyData):
     return
     
 #
-#    proxyCopy(name, human, proxyData, fp)
+#    proxyCopy(name, human, proxyData, fp, t0, t1)
 #
 
-def proxyCopy(name, human, proxyData, fp):
+def proxyCopy(name, human, proxyData, fp, t0, t1):
+    n = 0
     for proxy in proxyData.values():
         if proxy.type == name:
+            n += 1
+    if n == 0:
+        return
+        
+    dt = (t1-t0)/n
+    t = t0
+    for proxy in proxyData.values():
+        if proxy.type == name:
+            gui3d.app.progress(t, text="Exporting %s" % name)
             fp.write("#if toggle&T_%s\n" % proxy.type)
             copyFile25(human, "shared/mhx/templates/proxy25.mhx", fp, proxy, proxyData)    
             fp.write("#endif\n")
+            t += dt
         
 #
 #    copyFile25(human, tmplName, fp, proxy, proxyData):
@@ -1008,11 +1023,11 @@ def printProxyVGroup(fp, vgroups):
 
 
 #
-#    writeShapeKeys(fp, human, name, proxy):
+#    writeShapeKeys(fp, human, name, proxy, t0, t1):
 #
 
-def writeCorrectives(fp, human, drivers, part, proxy):    
-    shapeList = read_expression.readCorrectives(drivers, human, part)
+def writeCorrectives(fp, human, drivers, part, proxy, t0, t1):    
+    shapeList = read_expression.readCorrectives(drivers, human, part, t0, t1)
     for (shape, pose, lr) in shapeList:
         writeShape(fp, pose, lr, shape, 0, 1, proxy)
     
@@ -1042,25 +1057,25 @@ def writeShapeKeys(fp, human, name, proxy):
 
     if (not proxy or proxy.type == 'Proxy'):
         if the.Config.faceshapes:
-            shapeList = read_expression.readFaceShapes(human, rig_panel_25.BodyLanguageShapeDrivers)
+            shapeList = read_expression.readFaceShapes(human, rig_panel_25.BodyLanguageShapeDrivers, 0.6, 0.7)
             for (pose, shape, lr, min, max) in shapeList:
                 writeShape(fp, pose, lr, shape, min, max, proxy)
 
     if not proxy:
         if the.Config.expressions:
-            shapeList = read_expression.readExpressions(human)
+            shapeList = read_expression.readExpressions(human, 0.7, 0.9)
             for (pose, shape) in shapeList:
                 writeShape(fp, pose, "Sym", shape, 0, 1, proxy)
         if the.Config.expressionunits:
-            shapeList = read_expression.readExpressionUnits(human)
+            shapeList = read_expression.readExpressionUnits(human, 0.7, 0.9)
             for (pose, shape) in shapeList:
                 writeShape(fp, pose, "Sym", shape, 0, 1, proxy)
         
     if the.Config.bodyshapes and the.Config.mhxrig=="mhx":
-        writeCorrectives(fp, human, rig_shoulder_25.ShoulderTargetDrivers, "shoulder", proxy)                
-        writeCorrectives(fp, human, rig_leg_25.HipTargetDrivers, "hips", proxy)                
-        writeCorrectives(fp, human, rig_arm_25.ElbowTargetDrivers, "elbow", proxy)                
-        writeCorrectives(fp, human, rig_leg_25.KneeTargetDrivers, "knee", proxy)                
+        writeCorrectives(fp, human, rig_shoulder_25.ShoulderTargetDrivers, "shoulder", proxy, 0.88, 0.90)                
+        writeCorrectives(fp, human, rig_leg_25.HipTargetDrivers, "hips", proxy, 0.90, 0.92)                
+        writeCorrectives(fp, human, rig_arm_25.ElbowTargetDrivers, "elbow", proxy, 0.92, 0.94)                
+        writeCorrectives(fp, human, rig_leg_25.KneeTargetDrivers, "knee", proxy, 0.94, 0.96)                
         #copyShapeKeys("shared/mhx/templates/shapekeys-body", fp, proxy, True)
 
     for path in the.Config.customshapes:

@@ -23,6 +23,7 @@ TO DO
 
 """
 
+import numpy as np
 import algos3d
 import gui3d
 import os
@@ -52,8 +53,8 @@ class Human(gui3d.Object):
         self.mesh.setCameraProjection(0)
         self.mesh.setShadeless(0)
         self.meshData = self.mesh
-        self.shadowVerts = []
-        self.syncShadowVerts()
+        self.shadowCoords = None
+        self.syncShadowCoords()
         
         self.hairModelling = False #temporary variable for easier integration of makehair, will be cleaned later.
         self.hairObj = hairObj
@@ -108,8 +109,9 @@ class Human(gui3d.Object):
         self.setTexture("data/textures/texture.png")
 
 
-    def syncShadowVerts(self):
-        self.shadowVerts = [ list(v.co) for v in self.meshData.verts ]
+    def syncShadowCoords(self):
+        coords = [ list(v.co) for v in self.meshData.verts ]
+        self.shadowCoords = np.asarray(coords, dtype=np.float32)
 
 
     # Overriding hide and show to account for both human base and the hairs!
@@ -384,7 +386,7 @@ class Human(gui3d.Object):
         self.baseModifier.setValue(self, 1.0)
 
         algos3d.resetObj(self.meshData)
-        self.syncShadowVerts()
+        self.syncShadowCoords()
 
         if progressCallback:
             progressCallback(0.0)
@@ -557,8 +559,9 @@ class Human(gui3d.Object):
             self.meshStoredNormals.append((v.no[0],v.no[1],v.no[2]))
 
     def restoreMesh(self):
+        self.meshData.setCoords(self.meshStored)
         for i,v in enumerate(self.meshData.verts):
-            v.co = self.meshStored[i]
+            #v.co = self.meshStored[i]
             v.no = self.meshStoredNormals[i]
             """
             v.co[0] = self.meshStored[i][0]

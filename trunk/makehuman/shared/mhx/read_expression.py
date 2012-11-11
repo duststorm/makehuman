@@ -27,6 +27,7 @@ TO DO
 import os
 import fastmath
 import math
+import gui3d
 import warp
 import warpmodifier
 import algos3d
@@ -174,10 +175,12 @@ def readShape(filename):
 #   
 #----------------------------------------------------------
 
-def readFaceShapes(human, drivers):
+def readFaceShapes(human, drivers, t0, t1):
     shapeList = []
     shapes = {}
     warpmodifier.resetWarpTargets(human)
+    t,dt = initTimes(drivers.keys(), t0, t1)
+
     for name,value in drivers.items():
         (fname, bone, channel, sign, min, max) = value
         if (name[-2:] in ["_L", "_R"]):
@@ -193,6 +196,7 @@ def readFaceShapes(human, drivers):
         except:
             doLoad = True
         if doLoad:
+            gui3d.app.progress(t, text="Reading face shape %s" % fname)
             if warp.numpy:
                 shape = warpmodifier.compileWarpTarget(
                     'shared/mhx/targets/body_language/${gender}-${age}/%s.target' % fname, 
@@ -203,14 +207,18 @@ def readFaceShapes(human, drivers):
                 shape = readShape('shared/mhx/targets/body_language/female-young/%s.target' % fname)  
             shapes[fname] = shape                
             shapeList.append((sname, shape, lr, min, max))
+            t += dt
     shapeList.sort()
     return shapeList
         
 
-def readExpressions(human):
+def readExpressions(human, t0, t1):
     shapeList = []
     warpmodifier.resetWarpTargets(human)
+    t,dt = initTimes(Expressions, t0, t1)
+
     for name in Expressions:
+        gui3d.app.progress(t, text="Reading expression %s" % name)
         if warp.numpy:
             shape = warpmodifier.compileWarpTarget(
                 'data/targets/expression/${gender}_${age}/neutral_${gender}_${age}_%s.target' % name,
@@ -220,13 +228,17 @@ def readExpressions(human):
         else:
             shape = loopGendersAges(name, human, "Expressions")
         shapeList.append((name, shape))
+        t += dt
     return shapeList
 
 
-def readExpressionUnits(human):
+def readExpressionUnits(human, t0, t1):
     shapeList = []
     warpmodifier.resetWarpTargets(human)
+    t,dt = initTimes(ExpressionUnits, t0, t1)
+    
     for name in ExpressionUnits:
+        gui3d.app.progress(t, text="Reading expression %s" % name)
         if warp.numpy:
             shape = warpmodifier.compileWarpTarget(
                 'data/targets/expression/units/${ethnic}/${gender}_${age}/%s.target' % name,
@@ -236,14 +248,17 @@ def readExpressionUnits(human):
         else:
             shape = loopGendersAges(name, human, "ExpressionUnits")
         shapeList.append((name, shape))
+        t += dt
     return shapeList
 
 
-def readCorrectives(drivers, human, part):
+def readCorrectives(drivers, human, part, t0, t1):
     shapeList = []
     warpmodifier.resetWarpTargets(human)
+    t,dt = initTimes(drivers, t0, t1)
+    
     for (pose, lr, expr, vars) in drivers:
-        print "Corrective", part, pose
+        gui3d.app.progress(t, text="Reading corrective %s %s" % (part, pose))
         if warp.numpy:
             shape = warpmodifier.compileWarpTarget(
                 "shared/mhx/targets/correctives/%s/${ethnic}/${gender}-${age}/%s.target" % (part, pose),
@@ -252,14 +267,23 @@ def readCorrectives(drivers, human, part):
                 part)
         else:
             shape = loopGendersAges((part, pose), human, "Corrective")
-
         shapeList.append((shape, pose, lr))
+        t += dt
     return shapeList        
 
 def readCorrective(human, part, pose):
     #for e in list(shape.items())[:10]:
     #    print e
     return shape
+
+
+def initTimes(flist, t0, t1):    
+    dt = t1-t0
+    n = len(flist)
+    if n > 0:
+        dt /= n
+    return t0,dt
+    
 
             
 

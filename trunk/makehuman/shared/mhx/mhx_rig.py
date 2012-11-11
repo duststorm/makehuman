@@ -629,8 +629,8 @@ def setupRig(obj, proxyData):
         the.RigHead[bone] = findLocation(head)
         the.RigTail[bone] = findLocation(tail)
         
-    print "H1", the.RigHead["UpLeg_L"]
-    print "T1", the.RigTail["UpLeg_L"]
+    #print "H1", the.RigHead["UpLeg_L"]
+    #print "T1", the.RigTail["UpLeg_L"]
 
     if not the.Config.clothesrig:
         return

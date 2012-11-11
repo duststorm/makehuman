@@ -113,7 +113,7 @@ class CProxy:
                 nv2 = w0*v0.co[2] + w1*v1.co[2] + w2*v2.co[2] + d2*zScale
                 verts.append( (nv0, nv1, nv2) )
             else:
-                vert.co = parent.verts[refVert].co
+                vert.append( parent.verts[refVert].co )
 	mesh.setCoords(verts)                
 
 #

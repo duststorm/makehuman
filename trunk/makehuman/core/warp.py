@@ -276,8 +276,8 @@ def compute_distance2(x, y=None):
 class CWarp2(object):
     
     def __init__(self, source, target, landmarks):
-        self.source = numpy.asarray(source, dtype="float")
-        self.target = numpy.asarray(target, dtype="float")
+        self.source = numpy.asarray(source, dtype="float32")
+        self.target = numpy.asarray(target, dtype="float32")
         
         self.xverts = self.source[landmarks]
         self.yverts = self.target[landmarks]

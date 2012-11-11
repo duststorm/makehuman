@@ -367,7 +367,7 @@ def filterMesh(mesh1, obj, deleteGroups, deleteVerts):
             ((not the.Options["lashes"]) and 
              ("lash" in fg.name)) or
              mh2proxy.deleteGroup(fg.name, deleteGroups)):
-            print("  kill %s" % fg.name) 
+            #print("  kill %s" % fg.name) 
             for f in fg.faces:            
                 killFaces[f.idx] = True
                 for v in f.verts:
