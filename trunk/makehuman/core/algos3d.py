@@ -929,9 +929,13 @@ def loadTranslationTarget2(obj, targetPath, morphFactor, scaleList, update=1, ca
         # Adding the translation vector
         for v in verticesToUpdate:
             targetVect = scaleTarget(target.data, v.idx) #jcapco changed
-            v.co[0] += targetVect[0] * morphFactor
-            v.co[1] += targetVect[1] * morphFactor
-            v.co[2] += targetVect[2] * morphFactor
+            v0 = v.co[0] + targetVect[0] * morphFactor
+            v1 = v.co[1] + targetVect[1] * morphFactor
+            v2 = v.co[2] + targetVect[2] * morphFactor
+            v.co = (v0,v1,v2)
+            #v.co[0] += targetVect[0] * morphFactor
+            #v.co[1] += targetVect[1] * morphFactor
+            #v.co[2] += targetVect[2] * morphFactor
 
         if calcNorm == 1:
             obj.calcNormals(1, 1, verticesToUpdate, facesToRecalculate)

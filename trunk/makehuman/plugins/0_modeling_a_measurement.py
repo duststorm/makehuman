@@ -269,8 +269,9 @@ class MeasureTaskView(gui3d.TaskView):
                 #
                 # self.measureMesh.verts[i].co = gui3d.app.modelCamera.convertToScreen(*human.mesh.verts[j].co, obj=human.mesh.object3d)
                 #
-                self.measureMesh.verts[i].co = gui3d.app.modelCamera.convertToScreen(human.mesh.verts[j].co[0], human.mesh.verts[j].co[1], human.mesh.verts[j].co[2], obj=human.mesh.object3d)
-                self.measureMesh.verts[i].co[2] = 0.0
+                co = gui3d.app.modelCamera.convertToScreen(human.mesh.verts[j].co[0], human.mesh.verts[j].co[1], human.mesh.verts[j].co[2], obj=human.mesh.object3d)
+                co[2] = 0.0
+                self.measureMesh.verts[i] = co
             for i in xrange(len(vertidx), len(self.measureMesh.verts)):
                 self.measureMesh.verts[i].co = self.measureMesh.verts[len(vertidx)-1].co[:]
 

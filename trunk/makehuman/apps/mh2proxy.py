@@ -107,9 +107,10 @@ class CProxy:
                 v0 = parent.verts[rv0]
                 v1 = parent.verts[rv1]
                 v2 = parent.verts[rv2]
-                vert.co[0] = w0*v0.co[0] + w1*v1.co[0] + w2*v2.co[0] + d0*xScale
-                vert.co[1] = w0*v0.co[1] + w1*v1.co[1] + w2*v2.co[1] + d1*yScale
-                vert.co[2] = w0*v0.co[2] + w1*v1.co[2] + w2*v2.co[2] + d2*zScale
+                nv0 = w0*v0.co[0] + w1*v1.co[0] + w2*v2.co[0] + d0*xScale
+                nv1 = w0*v0.co[1] + w1*v1.co[1] + w2*v2.co[1] + d1*yScale
+                nv2 = w0*v0.co[2] + w1*v1.co[2] + w2*v2.co[2] + d2*zScale
+                vert.co = (nv0, nv1, nv2)
             else:
                 vert.co = parent.verts[refVert].co
 

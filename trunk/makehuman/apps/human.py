@@ -558,12 +558,16 @@ class Human(gui3d.Object):
 
     def restoreMesh(self):
         for i,v in enumerate(self.meshData.verts):
+            v.co = self.meshStored[i]
+            v.no = self.meshStoredNormals[i]
+            """
             v.co[0] = self.meshStored[i][0]
             v.co[1] = self.meshStored[i][1]
             v.co[2] = self.meshStored[i][2]
             v.no[0] = self.meshStoredNormals[i][0]
             v.no[1] = self.meshStoredNormals[i][1]
             v.no[2] = self.meshStoredNormals[i][2]
+            """
 
     def resetMeshValues(self):
         self.childVal = 0.0
