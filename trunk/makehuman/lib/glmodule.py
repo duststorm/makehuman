@@ -72,11 +72,12 @@ pickingBuffer = None
 def updatePickingBuffer():
     width = G.windowWidth
     height = G.windowHeight
+    rwidth = (width + 3) / 4 * 4
 
     # Resize the buffer in case the window size has changed
     global pickingBuffer
-    if pickingBuffer is None or pickingBuffer.shape != (height, width, 3):
-        pickingBuffer = np.empty((height, width, 3), dtype = np.uint8)
+    if pickingBuffer is None or pickingBuffer.shape != (height, rwidth, 3):
+        pickingBuffer = np.empty((height, rwidth, 3), dtype = np.uint8)
 
     # Turn off lighting
     glDisable(GL_LIGHTING)
@@ -97,7 +98,7 @@ def updatePickingBuffer():
     glPixelStorei(GL_PACK_ALIGNMENT, 1)
     #glFlush()
     #glFinish()
-    glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pickingBuffer)
+    glReadPixels(0, 0, rwidth, height, GL_RGB, GL_UNSIGNED_BYTE, pickingBuffer)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     # Turn on antialiasing
