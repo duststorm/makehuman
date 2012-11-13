@@ -1,15 +1,15 @@
-import os.path
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # We need this for gui controls
 
+import os
+import math
+import numpy as np
 import gui3d
 import module3d
-import os
 import humanmodifier
 import aljabr
 import mh
-import math
 
 class MeasurementValueConverter(gui3d.ValueConverter):
 
@@ -91,17 +91,13 @@ class MeasureTaskView(gui3d.TaskView):
         self.ruler = Ruler()
 
         self.measureMesh = module3d.Object3D('measure', 2)
-        self.measureMesh.uvValues = []
-        self.measureMesh.indexBuffer = []
-
         fg = self.measureMesh.createFaceGroup('measure')
 
         count = max([len(vertIdx) for vertIdx in self.ruler.Measures.values()])
 
-        v = [self.measureMesh.createVertex([0.0, 0.0, 0.0]) for i in xrange(count)]
-
-        for i in xrange(count-1):
-            fg.createFace((v[i], v[i+1]))
+        self.measureMesh.setCoords(np.zeros((count, 3), dtype=np.float32))
+        self.measureMesh.setUVs(np.zeros((1, 2), dtype=np.float32))
+        self.measureMesh.setFaces(np.arange(count).reshape((-1,2)))
 
         self.measureMesh.setCameraProjection(1)
         self.measureMesh.setShadeless(1)
@@ -271,7 +267,7 @@ class MeasureTaskView(gui3d.TaskView):
                 #
                 co = gui3d.app.modelCamera.convertToScreen(human.mesh.verts[j].co[0], human.mesh.verts[j].co[1], human.mesh.verts[j].co[2], obj=human.mesh.object3d)
                 co[2] = 0.0
-                self.measureMesh.verts[i] = co
+                self.measureMesh.verts[i].co = co
             for i in xrange(len(vertidx), len(self.measureMesh.verts)):
                 self.measureMesh.verts[i].co = self.measureMesh.verts[len(vertidx)-1].co[:]
 
