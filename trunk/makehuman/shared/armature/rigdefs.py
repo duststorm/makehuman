@@ -146,12 +146,11 @@ class CArmature:
         
         
     def updateObj(self, obj):
-        vertices = []            
-        for v in obj.verts:
+        coords = numpy.zeros((len(obj.verts), 3), float)
+        for n,v in enumerate(obj.verts):
             vert = self.vertices[v.idx]
+            coords[n] = vert.co[:3]
             if vert.groups:
-                vertices.append(v)
-
                 if self.quatSkinning:
                     if v.idx == 3902:
                         print "Knee"
@@ -170,16 +169,20 @@ class CArmature:
                     for bone,w in vert.groups:
                         mat += w*bone.matrixVerts
                 
-                v.co = dot(mat,vert.co)[:3] 
+                coords[n] = dot(mat,vert.co)[:3] 
                 #if v.co[1] > 15:
                 #    halt
 
+        obj.setCoords(coords)
+        obj.calcNormals()
+        obj.update()
+        """
         updateNormals = False     
         if updateNormals:
             faces = obj.faces
             obj.calcNormals(1, 1, vertices, faces)
         obj.update(vertices, updateNormals)
-                                        
+        """                                        
 
     def build(self, human):
         if the.Config.exporting:

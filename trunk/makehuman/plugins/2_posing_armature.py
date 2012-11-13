@@ -452,9 +452,10 @@ class PoseMhxTaskView(gui3d.TaskView):
 
         human = gui3d.app.selectedHuman
         human.show()
-        amt = self.getArmature()
-        if amt:
-            amt.hide()
+        if self.armature:
+            amt = self.getArmature()
+            if amt:
+                amt.hide()
         #human.restoreMesh()
         human.meshData.calcNormals()
         human.meshData.update()
@@ -500,8 +501,10 @@ class CArmatureObject:
         
         
     def setColor(self, bone, value):
+        print bone.name, value
         for layer in self.layers.values():
-            layer.setColor(bone, value)
+            if layer:
+                layer.setColor(bone, value)
         
         
     def build(self, human):
@@ -571,6 +574,7 @@ class CLayerObject:
         self.prisms = {}
         self.prismType = prismType
         self.nVerts = 0
+        self.coords = None
         self._data = []
 
         self.mesh = module3d.Object3D(name)
@@ -612,7 +616,9 @@ class CLayerObject:
             group.append(np.zeros(len(f), dtype=np.uint16) + fg.idx)
         del self._data
 
-        self.mesh.setCoords(np.vstack(coord))
+        self.coords = np.vstack(coord)
+        print "fb", len(coord), len(self.coords)
+        self.mesh.setCoords(self.coords)
         self.mesh.setUVs(np.zeros((1, 2), dtype=np.float32))
         self.mesh.setFaces(np.vstack(faces), None, np.hstack(group))
 
@@ -655,7 +661,7 @@ class CLayerObject:
         self.prisms['Cube'] = (p, 0)
         self.nVerts = n       
             
-
+            
     def update(self, change):
         if 0 and change:
             print "Armature has changed"
@@ -665,8 +671,10 @@ class CLayerObject:
             self.mesh = None
             self.getArmature()
         else:
+            self.mesh.setCoords(self.coords)
             self.mesh.calcNormals()
             self.mesh.update()
+
         
     def updateBoneMesh(self, bone):
         try:
@@ -680,16 +688,14 @@ class CLayerObject:
     def addPrism(self, name, points, faces):
         p = np.asarray(points, dtype=np.float32)
         f = np.asarray(faces, dtype=np.uint32)
-        self._data.append((name, p, f))
+        self._data.append((name, p, f + self.nVerts))
         return points[0], len(points)
             
        
     def updatePrism(self, bone, index):            
         points, faces = bone.prismPoints(self.prismType)
         for n,p in enumerate(points):
-            #print "  a", mesh.verts[index+n].co
-            #print "  b", p
-            self.mesh.verts[index+n].co = p
+            self.coords[index+n] = p
             
             
 
@@ -747,6 +753,13 @@ def writeMat(fp, string, mat):
     for n in range(4):
         row = mat[n]
         fp.write( "( %.4f, %.4f, %.4f, %.4f)\n" % (row[0], row[1], row[2], row[3]) )
+        
+
+def printArray(array):
+    print "["
+    for row in array:
+        print " ", row
+    print "]"
 
 #
 #   Loading
