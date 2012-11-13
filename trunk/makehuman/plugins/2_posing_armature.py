@@ -1,14 +1,14 @@
-print 'importing Pose armature plugin'
-
-import os.path
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # We need this for gui controls
 
+print 'importing Pose armature plugin'
+
+import os
+import numpy as np
 import gui3d
 import module3d
 import mh
-import math
 import aljabr
 
 import armature
@@ -571,10 +571,9 @@ class CLayerObject:
         self.prisms = {}
         self.prismType = prismType
         self.nVerts = 0
+        self._data = []
 
-        self.mesh = module3d.Object3D(name)        
-        self.mesh.uvValues = []
-        self.mesh.indexBuffer = []
+        self.mesh = module3d.Object3D(name)
 
         """
         dummy = module3d.Object3D('Dummy%2d' % self.index)
@@ -603,6 +602,20 @@ class CLayerObject:
 
     
     def finishBuild(self, location):
+        coord = []
+        faces = []
+        group = []
+        for name, p, f in self._data:
+            fg = self.mesh.createFaceGroup(name)
+            coord.append(p)
+            faces.append(f)
+            group.append(np.zeros(len(f), dtype=np.uint16) + fg.idx)
+        del self._data
+
+        self.mesh.setCoords(np.vstack(coord))
+        self.mesh.setUVs(np.zeros((1, 2), dtype=np.float32))
+        self.mesh.setFaces(np.vstack(faces), None, np.hstack(group))
+
         self.mesh.setCameraProjection(0)
         self.mesh.setShadeless(0)
         self.mesh.setSolid(0)
@@ -664,15 +677,10 @@ class CLayerObject:
         return False
 
 
-    def addPrism(self, name, points, faces):            
-        fg = self.mesh.createFaceGroup(name)
-        v = []
-        for p in points:
-            v.append(self.mesh.createVertex(p))
-
-        for f in faces:
-            fg.createFace((v[f[0]], v[f[1]], v[f[2]], v[f[3]]))
-
+    def addPrism(self, name, points, faces):
+        p = np.asarray(points, dtype=np.float32)
+        f = np.asarray(faces, dtype=np.uint32)
+        self._data.append((name, p, f))
         return points[0], len(points)
             
        
