@@ -85,6 +85,7 @@ class PoseMhxTaskView(gui3d.TaskView):
         self.cube.hide()
 
         self.status = self.addView(gui3d.TextView(style=gui3d.TextViewStyle._replace(left=10, top=585, zIndex=9.1)))
+        print "Status", self.status
 
         # Main box
         self.mainBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Rotation', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6)))
@@ -750,7 +751,6 @@ taskview = None
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
 def load(app):
-    return
     category = app.getCategory('Posing')
     taskview = category.addView(PoseMhxTaskView(category))
     print 'pose loaded'
