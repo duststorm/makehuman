@@ -825,7 +825,7 @@ class PoseLoadTaskView(gui3d.TaskView):
         if not os.path.exists(self.poseArmaturePath):
             os.makedirs(self.poseArmaturePath)
 
-        self.filechooser = self.addView(gui3d.FileChooser([self.globalPoseArmaturePath, self.poseArmaturePath], 'bvh', 'png'))
+        self.filechooser = self.addView(gui3d.FileChooser([self.globalPoseArmaturePath, self.poseArmaturePath], 'bvh', 'png', 'data/poses/notfound.png'))
 
         @self.filechooser.event
         def onFileSelected(filename):
