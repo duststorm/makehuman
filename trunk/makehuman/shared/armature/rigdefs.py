@@ -22,11 +22,11 @@ Abstract
 import math
 import aljabr
 import warp
-from warp import numpy
-if numpy:
-    from numpy import dot
-    from numpy.linalg import inv
-    import transformations as tm
+import numpy
+
+from numpy import dot
+from numpy.linalg import inv
+import transformations as tm
 
 import export_config
     
@@ -80,6 +80,7 @@ class CArmature:
         self.rigtype = rigtype
         self.quatSkinning = quatSkinning
         self.restPosition = False
+        self.frames = []
         self.bones = {}
         self.boneList = []
         self.roots = []
@@ -269,6 +270,8 @@ class CArmature:
                     bone = self.bones[joint]
                 except KeyError:
                     bone = None
+                if not bone:
+                    raise NameError("Missing bone: %s" % joint)
                 data = (bone, offset, channels, isRoot)
                 bones.append(data)
                 joint = words[1]
@@ -292,7 +295,9 @@ class CArmature:
         fp.close()
 
         frame = frames[0]
+        print bones
         for bone, offset, channels, isRoot in bones:
+            print bone, offset, channels, isRoot                      
             order = "s"
             angles = []
             for channel in channels:
@@ -319,18 +324,18 @@ class CArmature:
             if bone:
                 ai,aj,ak = angles                
                 bone.matrixPose = tm.euler_matrix(ai, aj, ak, order) 
-                if isRoot:
+                if isRoot and False:
                     bone.matrixPose[0,3] = rx
                     bone.matrixPose[1,3] = ry
                     bone.matrixPose[2,3] = rz
-            """
+
             if bone.name in ["Root", "Spine1", "UpLeg_L"]:
                 print bone.name
                 print channels
                 print (ax,ay,az)
                 print "   ", bone.matrixPose
                 print "Rel", bone.matrixRelative
-            """    
+
         self.update(human)                    
 
                 

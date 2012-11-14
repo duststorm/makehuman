@@ -66,7 +66,7 @@ class LayerCheckBox(gui3d.CheckBox):
 #   Pose Window
 #
 
-class PoseMhxTaskView(gui3d.TaskView):
+class PoseArmatureTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Posing')            
@@ -108,8 +108,8 @@ class PoseMhxTaskView(gui3d.TaskView):
         self.rotY = self.mainBox.addView(gui3d.RadioButton(rots, "Y", False)) 
         self.rotZ = self.mainBox.addView(gui3d.RadioButton(rots, "Z", False)) 
         
-        self.showMesh = self.mainBox.addView(gui3d.CheckBox("Show Mesh", False))
-        self.showRig = self.mainBox.addView(gui3d.CheckBox("Show Rig", True))
+        self.showMesh = self.mainBox.addView(gui3d.CheckBox("Show Mesh", True))
+        self.showRig = self.mainBox.addView(gui3d.CheckBox("Show Rig", False))
         self.restPosition = self.mainBox.addView(gui3d.CheckBox("Rest Position", False))
         self.quatSkinning = self.mainBox.addView(gui3d.CheckBox("Quaternion skinning", False))
         
@@ -164,54 +164,24 @@ class PoseMhxTaskView(gui3d.TaskView):
         self.layerBox = self.addView(gui3d.GroupBox([750, 80, 9.0], 'Layers', gui3d.GroupBoxStyle._replace(height=25+24*14+6)))
         self.layerButtons = {}
         self.layerBox.hide()
-
+        
          
         @self.selectRigButton.event
-        def onClicked(event):            
+        def onClicked(event):     
             for name,button in self.prismButtons.items():
                 if button.selected:
-                    self.prismType = name
-
+                    prismType = name
             for name,button in self.rigButtons.items():
                 if button.selected:
-                    self.rigtype = name
-            if not self.rigtype:
-                return
-                
-            self.armature = armature.rigdefs.createRig(gui3d.app.selectedHuman, self.rigtype, self.quatSkinning.selected)
-            self.armatureObject = None
-            
-            self.mainBox.show()
-            self.quatBox.show()
-            self.eulerBox.show()
-            
-            first = True
-            radio = []
-            self.boneButtons = {}
-            for bone in self.armature.controls:
-                print bone.name
-                button = BoneRadioButton(radio, bone.name, first, self)
-                self.boneButtons[bone.name] = self.boneBox.addView(button)
-                first = False    
-                
-            self.boneBox.show()
-            
-            if self.rigtype == "mhx":
-                self.layerButtons = []
-                for bit,lname in armature.rigdefs.LayerNames:
-                    check = LayerCheckBox(lname, self.armature.visible & bit, self)
-                    self.layerButtons.append(self.layerBox.addView(check))
-                self.layerBox.show()
-            else:
-                self.layerBox.hide()
-                
-            self.rigBox.hide()
-            self.cube.show()
-            self.updateAll()
-        
+                    rigtype = name
+            if rigtype:
+                self.selectRig(prismType, rigtype)                   
             
         @self.testButton.event
         def onClicked(event):
+            self.loadBvhFile("data/poses/walk.bvh")
+            return
+            
             listBones = doTest1(self.armature.bones)
             self.updateAll()
             doTest2(listBones)
@@ -358,6 +328,40 @@ class PoseMhxTaskView(gui3d.TaskView):
             if self.showRig.selected:
                 self.getArmature().show()
         
+    def selectRig(self, prismType, rigtype):     
+        self.prismType = prismType
+        self.rigtype = rigtype
+        self.armature = armature.rigdefs.createRig(gui3d.app.selectedHuman, self.rigtype, self.quatSkinning.selected)
+        self.armatureObject = None
+        
+        self.mainBox.show()
+        self.quatBox.show()
+        self.eulerBox.show()
+        
+        first = True
+        radio = []
+        self.boneButtons = {}
+        for bone in self.armature.controls:
+            print bone.name
+            button = BoneRadioButton(radio, bone.name, first, self)
+            self.boneButtons[bone.name] = self.boneBox.addView(button)
+            first = False    
+            
+        self.boneBox.show()
+        
+        if self.rigtype == "mhx":
+            self.layerButtons = []
+            for bit,lname in armature.rigdefs.LayerNames:
+                check = LayerCheckBox(lname, self.armature.visible & bit, self)
+                self.layerButtons.append(self.layerBox.addView(check))
+            self.layerBox.show()
+        else:
+            self.layerBox.hide()
+            
+        self.rigBox.hide()
+        self.cube.show()
+        self.updateAll()
+ 
  
     def updateSliders(self, bone):
         angles = bone.getRotation()
@@ -374,7 +378,7 @@ class PoseMhxTaskView(gui3d.TaskView):
         self.QWslider.setValue(qw)
         self.QXslider.setValue(qx)
         self.QYslider.setValue(qy)
-        self.QZslider.setValue(qz)            
+        self.QZslider.setValue(qz)
         self.EXslider.setValue(ax)
         self.EYslider.setValue(ay)
         self.EZslider.setValue(az)            
@@ -407,6 +411,8 @@ class PoseMhxTaskView(gui3d.TaskView):
 
 
     def onShow(self, event):
+        if not self.rigtype:
+            self.selectRig("Prism", "rigid")       
         if self.armature:
             self.cube.show()
         self.activeBone = None
@@ -476,6 +482,24 @@ class PoseMhxTaskView(gui3d.TaskView):
             self.armatureObject.setRotation(human.getRotation())        
         return self.armatureObject
         
+        
+    def loadBvhFile(self, filepath): 
+        if not self.rigtype:
+            self.selectRig("Prism", "rigid")           
+        self.armature.readBvhFile(filepath, gui3d.app.selectedHuman)
+        self.updateAll()        
+     
+     
+    def loadHandler(self, human, values):
+        print "loadHandler", values
+        filepath = values[1]
+        self.loadBvhFile(filepath)
+       
+
+    def saveHandler(self, human, file):
+        return
+
+     
         
 #
 #   Armature Object
@@ -762,18 +786,86 @@ def printArray(array):
     print "]"
 
 #
+#   Pose library
+#
+
+class Action:
+
+    def __init__(self, human, filename, poseArmatureTaskView, postAction=None):
+        self.name = 'Load pose'
+        self.human = human
+        self.filename = filename
+        self.poseArmatureTaskView = poseArmatureTaskView
+        self.postAction = postAction
+        self.before = {}
+
+        #for name, modifier in self.poseArmatureTaskView.modifiers.iteritems():
+        #    self.before[name] = modifier.getValue(self.human)
+
+    def do(self):
+        self.poseArmatureTaskView.loadBvhFile(self.filename)
+        return True
+
+    def undo(self):
+        if self.postAction:
+            self.postAction()
+        return True
+
+class PoseLoadTaskView(gui3d.TaskView):
+
+    def __init__(self, category, poseArmatureTaskView):
+
+        gui3d.TaskView.__init__(self, category, 'poses', label='Poses')
+
+        self.poseArmatureTaskView = poseArmatureTaskView
+
+        self.globalPoseArmaturePath = os.path.join('data', 'poses')
+        self.poseArmaturePath = os.path.join(mh.getPath(''), 'data', 'poses')
+
+        if not os.path.exists(self.poseArmaturePath):
+            os.makedirs(self.poseArmaturePath)
+
+        self.filechooser = self.addView(gui3d.FileChooser([self.globalPoseArmaturePath, self.poseArmaturePath], 'bvh', 'png'))
+
+        @self.filechooser.event
+        def onFileSelected(filename):
+
+            gui3d.app.do(Action(gui3d.app.selectedHuman, filename, self.poseArmatureTaskView))
+            
+            gui3d.app.switchCategory('Modelling')
+
+    def onShow(self, event):
+
+        # When the task gets shown, set the focus to the file chooser
+        gui3d.TaskView.onShow(self, event)
+        gui3d.app.selectedHuman.hide()
+        self.filechooser.setFocus()
+
+    def onHide(self, event):
+        gui3d.app.selectedHuman.show()
+        gui3d.TaskView.onHide(self, event)
+        
+    def onResized(self, event):
+        self.filechooser.onResized(event)
+
+#
 #   Loading
 #
 
 category = None
 taskview = None
 
-
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
 def load(app):
     category = app.getCategory('Posing')
-    taskview = category.addView(PoseMhxTaskView(category))
+    taskview = category.addView(PoseArmatureTaskView(category))
+
+    app.addLoadHandler('poses', taskview.loadHandler)
+    app.addSaveHandler(taskview.saveHandler)
+
+    category = app.getCategory('Library')
+    category.addView(PoseLoadTaskView(category, taskview))
     print 'pose loaded'
             
     @taskview.event

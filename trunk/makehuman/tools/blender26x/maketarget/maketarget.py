@@ -341,7 +341,7 @@ def saveBvhFile(context, filepath):
            frame_end = 1,
            global_scale = 1.0,
            rotate_mode = 'NATIVE',
-           root_transform_only = False
+           root_transform_only = True
            )    
         scn.objects.active = ob
         print("Saved %s" % bvhpath)

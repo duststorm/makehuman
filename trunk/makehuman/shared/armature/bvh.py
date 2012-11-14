@@ -8,9 +8,9 @@
 
 **Code Home Page:**    http://code.google.com/p/makehuman/
 
-**Authors:**           Marc Flerackers
+**Authors:**           Marc Flerackers, Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2011
+**Copyright(c):**      MakeHuman Team 2001-2012
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -22,12 +22,14 @@ Abstract
 BVH importer
 """
 
+import numpy
+
 from aljabr import vadd, makeUnit, degree2rad, makeTranslation, mmul, euler2matrix
 from skeleton import Joint
 
-class bvhJoint(Joint):
-  def __init__(self, name):
-    Joint.__init__(self,name, [])
+class BvhArmature(CArmature):
+    def __init__(self, rigtype, quatSkinning)
+    CArmature.__init__(self, rigtype, quatSkinning)
     self.channels = None
     self.frames = []
 
