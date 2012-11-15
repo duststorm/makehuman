@@ -295,9 +295,7 @@ class CArmature:
         fp.close()
 
         frame = frames[0]
-        print bones
         for bone, offset, channels, isRoot in bones:
-            print bone, offset, channels, isRoot                      
             order = "s"
             angles = []
             for channel in channels:
@@ -313,28 +311,33 @@ class CArmature:
                     order += "x"
                     angles.append(ax)
                 elif channel == "Yrotation":
-                    ay = value*D
-                    order += "y"
+                    ay = -value*D
+                    order += "z"
                     angles.append(ay)
                 elif channel == "Zrotation":
                     az = value*D
-                    order += "z"
+                    order += "y"
                     angles.append(az)
                 frame = frame[1:]
             if bone:
                 ai,aj,ak = angles                
-                bone.matrixPose = tm.euler_matrix(ai, aj, ak, order) 
+                mat1 = tm.euler_matrix(ai, aj, ak, axes=order) 
+                mat2 = dot(dot(inv(bone.matrixRest), mat1), bone.matrixRest)
+                bone.matrixPose[:3,:3] = mat2[:3,:3]
                 if isRoot and False:
                     bone.matrixPose[0,3] = rx
                     bone.matrixPose[1,3] = ry
                     bone.matrixPose[2,3] = rz
 
-            if bone.name in ["Root", "Spine1", "UpLeg_L"]:
-                print bone.name
+            if bone.name in []:
+                print bone.name, order
                 print channels
-                print (ax,ay,az)
-                print "   ", bone.matrixPose
-                print "Rel", bone.matrixRelative
+                print (ax/D,ay/D,az/D)
+                print "R ", bone.matrixRest
+                print "M1", mat1
+                print "M2", mat2
+                print "P ", bone.matrixPose
+                print "G ", bone.matrixGlobal
 
         self.update(human)                    
 

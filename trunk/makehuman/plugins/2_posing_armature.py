@@ -179,8 +179,8 @@ class PoseArmatureTaskView(gui3d.TaskView):
             
         @self.testButton.event
         def onClicked(event):
-            self.loadBvhFile("data/poses/walk.bvh")
-            return
+            #self.loadBvhFile("data/poses/walk.bvh")
+            #return
             
             listBones = doTest1(self.armature.bones)
             self.updateAll()
