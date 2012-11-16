@@ -150,7 +150,10 @@ class WarpModifier (humanmodifier.SimpleModifier):
         self.getRefTarget(human)    
         print "Compile", self
         print len(list(self.refTargetVerts)), len(list(theRefObjectVerts)), len(list(human.shadowCoords))
-        shape = warp.warp_target(self.refTargetVerts, theRefObjectVerts, human.shadowCoords, landmarks)
+        if self.refTargetVerts:
+            shape = warp.warp_target(self.refTargetVerts, theRefObjectVerts, human.shadowCoords, landmarks)
+        else:
+            shape = {}
         return shape
 
     def getRefTarget(self, human):       

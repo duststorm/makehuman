@@ -456,7 +456,8 @@ class Human(gui3d.Object):
                 self.setDetail(target.name, 0)
                 target.morphFactor = 0
                 target.modifier.setValue(self, 0)
-                target.modifier.slider.update()     
+                if target.modifier.slider:
+                    target.modifier.slider.update()     
                 #target.apply(self, 0)
                 del algos3d.targetBuffer[target.name]
                                 

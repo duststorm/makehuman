@@ -12,6 +12,7 @@ import mh
 import aljabr
 
 import armature
+import warpmodifier
 
 
 #
@@ -77,6 +78,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
         self.armatureObject = None
         self.objects = []
         self.activeBone = None
+        self.poseModifier = None
         
         cubeLayer = CLayerObject("Cube", 'CUBE')
         cubeLayer.buildCube((-8,8,0), 1.0)
@@ -485,10 +487,25 @@ class PoseArmatureTaskView(gui3d.TaskView):
         
     def loadBvhFile(self, filepath): 
         if not self.rigtype:
-            self.selectRig("Prism", "rigid")           
-        self.armature.readBvhFile(filepath, gui3d.app.selectedHuman)
-        self.updateAll()        
+            self.selectRig("Prism", "rigid")  
+        human = gui3d.app.selectedHuman
+        
+        self.armature.readBvhFile(filepath, human)
+        #self.updateAll()        
+        #return
+        
+        folder = os.path.dirname(filepath)
+        (fname, ext) = os.path.splitext(os.path.basename(filepath))
+        modpath = '%s/${ethnic}-${gender}-${age}-%s.target' % (folder, fname)
+        print filepath, modpath
+        modifier = warpmodifier.WarpModifier(modpath, "body", "GenderAgeEthnicModifier2")
+        if self.poseModifier:
+            self.poseModifier.updateValue(human, 0.0)
+        modifier.updateValue(human, 1.0)
+        self.poseModifier = modifier        
      
+        self.updateAll()        
+
      
     def loadHandler(self, human, values):
         print "loadHandler", values
