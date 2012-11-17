@@ -118,6 +118,7 @@ class Object3D(object):
         self.scale = np.ones(3)
         self._faceGroups = []
         self._groups_rev = {}
+        self.materials = {}	# TL: used by mhx export
         self.cameraMode = 1
         self.visibility = 1
         self.pickable = 1

@@ -77,7 +77,6 @@ def loadMesh(path, locX=0, locY=0, locZ=0, loadColors=1):
     locZ:
       *float* Z location of loaded obj, default = 0
     """
-    
     name = os.path.basename(path)
     obj = module3d.Object3D(name)
 
@@ -101,6 +100,7 @@ def loadMesh(path, locX=0, locY=0, locZ=0, loadColors=1):
     fuvs = []
     groups = []
     has_uv = False
+    mtls = []
 
     for objData in objFile:
 
@@ -144,6 +144,8 @@ def loadMesh(path, locX=0, locY=0, locZ=0, loadColors=1):
                 fuvs.append(tuple(uvIndices))
 
                 groups.append(fg.idx)
+                
+                mtls.append(mtl)
 
             elif command == 'g':
                 
@@ -165,6 +167,11 @@ def loadMesh(path, locX=0, locY=0, locZ=0, loadColors=1):
 
     obj.updateIndexBuffer()
     obj.calcNormals()
+    
+    # Used by mhx export
+    obj.materials = {}
+    for fn,mtl in enumerate(mtls):
+    	obj.materials[fn] = mtl
 
     objFile.close()
 

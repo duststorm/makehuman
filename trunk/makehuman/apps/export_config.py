@@ -82,6 +82,7 @@ class CExportConfig:
         self.mhxrig = 'mhx'
         self.daerig = 'game'
         self.mhxversion = ['25']
+        self.exporting = True
         self.separatefolder = False
         self.feetonground = True
         self.outFolder = None

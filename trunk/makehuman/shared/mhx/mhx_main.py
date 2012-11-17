@@ -208,7 +208,7 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
 
     obj = human.meshData
     bone = None
-    faces = loadFacesIndices(obj)
+    #faces = loadFacesIndices(obj)
     ignoreLine = False
     for line in tmpl:
         words= line.split()
@@ -310,18 +310,19 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
                 else:
                     fp.write("    ftall 0 1 ;\n")
             elif key == 'Faces':
-                for f in faces:
-                    fp.write("    f")
-                    for v in f:
-                        fp.write(" %d" % v[0])
-                    fp.write(" ;\n")
+                for f in obj.faces:
+                    fv = f.verts
+                    if isTriangle(f):
+                        fp.write("    f %d %d %d ;\n" % (fv[0].idx, fv[1].idx, fv[2].idx))
+                    else:
+                        fp.write("    f %d %d %d %d ;\n" % (fv[0].idx, fv[1].idx, fv[2].idx, fv[3].idx))
                 fp.write("#if False\n")
             elif key == 'EndFaces':
                 writeFaceNumbers(fp, human, proxyData)
             elif key == 'FTTriangles':
-                for (fn,f) in enumerate(faces):
-                    if len(f) < 4:
-                        fp.write("    mn %d 1 ;\n" % fn)
+                for f in obj.faces:
+                    if isTriangle(f):
+                        fp.write("    mn %d 1 ;\n" % f.idx)
             elif key == 'ProxyUVCoords':
                 layers = list(proxy.uvtexLayerName.keys())
                 layers.sort()
@@ -350,12 +351,15 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
                             fp.write(" %.4g %.4g" %(uv[0], uv[1]))
                         fp.write(" ;\n")
                 else:
-                    for f in faces:
-                        fp.write("    vt")
-                        for v in f:
-                            uv = obj.uvValues[v[1]]
-                            fp.write(" %.4g %.4g" %(uv[0], uv[1]))
-                        fp.write(" ;\n")
+                    for f in obj.faces:
+                        uv0 = obj.texco[f.uv[0]]
+                        uv1 = obj.texco[f.uv[1]]
+                        uv2 = obj.texco[f.uv[2]]
+                        if isTriangle(f):
+                            fp.write("    vt %.4g %.4g %.4g %.4g %.4g %.4g ;\n" % (uv0[0], uv0[1], uv1[0], uv1[1], uv2[0], uv2[1]))
+                        else:
+                            uv3 = obj.texco[f.uv[3]]
+                            fp.write("    vt %.4g %.4g %.4g %.4g %.4g %.4g %.4g %.4g ;\n" % (uv0[0], uv0[1], uv1[0], uv1[1], uv2[0], uv2[1], uv3[0], uv3[1]))
             elif key == 'Material':
                 fp.write("Material %s%s\n" % (the.Human, words[2]))
             elif key == 'Materials':
@@ -418,6 +422,9 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
 
     return
 
+def isTriangle(f):
+    return (f.verts[0].idx == f.verts[3].idx)
+    
 #
 #   writeFaceNumbers(fp, human, proxyData):
 #
@@ -444,8 +451,8 @@ def writeFaceNumbers(fp, human, proxyData):
     else:            
         obj = human.meshData
         fmats = {}
-        for f in obj.faces:
-            fmats[f.idx] = MaterialNumbers[f.mtl[0:3]]
+        for fn,mtl in obj.materials.items():
+            fmats[fn] = MaterialNumbers[mtl[0:3]]
         deleteGroups = []
         deleteVerts = None
         for proxy in proxyData.values():
