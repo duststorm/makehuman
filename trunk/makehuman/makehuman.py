@@ -22,7 +22,10 @@ if __name__ == '__main__':
     else:
         mfile = './main.py'
 
-    DebugDump()
+    try:
+        DebugDump()
+    except Exception as e:
+        print "Could not create debug dump -- " + format(str(e))
 
     if sys.platform == 'win32':
         home = os.path.expanduser('~')
