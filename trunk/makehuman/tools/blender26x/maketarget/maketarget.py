@@ -337,10 +337,10 @@ def saveBvhFile(context, filepath):
         bvhpath = pname + ".bvh"
         
         export_bvh.write_armature(context, bvhpath,
-           frame_start = 1,
-           frame_end = 1,
+           frame_start = scn.frame_current,
+           frame_end = scn.frame_current,
            global_scale = 1.0,
-           rotate_mode = 'NATIVE',
+           rotate_mode = scn.MhExportRotateMode,
            root_transform_only = True
            )    
         scn.objects.active = ob
@@ -367,7 +367,7 @@ def loadBvhFile(context, filepath):
         bvhpath = pname + ".bvh"
 
         bvh_nodes = import_bvh.read_bvh(context, bvhpath,
-            rotate_mode='NATIVE',
+            rotate_mode=scn.MhImportRotateMode,
             global_scale=1.0)
 
         frame_orig = context.scene.frame_current
@@ -375,8 +375,8 @@ def loadBvhFile(context, filepath):
         bvh_name = bpy.path.display_name_from_filepath(bvhpath)
 
         import_bvh.bvh_node_dict2armature(context, bvh_name, bvh_nodes,
-                               rotate_mode = 'NATIVE',
-                               frame_start = 1,
+                               rotate_mode = scn.MhImportRotateMode,
+                               frame_start = scn.frame_current,
                                IMPORT_LOOP = False,
                                global_matrix = rig.matrix_world,
                                )
@@ -797,6 +797,39 @@ class VIEW3D_OT_SkipButton(bpy.types.Operator):
 def init():
     bpy.types.Scene.MhRelax = FloatProperty(default = 0.5)
     bpy.types.Scene.MhUnlock = BoolProperty(default = False)
+    
+    bpy.types.Scene.MhImportRotateMode = EnumProperty(
+            name="Rotation",
+            description="Rotation conversion",
+            items=(('QUATERNION', "Quaternion",
+                    "Convert rotations to quaternions"),
+                   ('NATIVE', "Euler (Native)", ("Use the rotation order "
+                                                 "defined in the BVH file")),
+                   ('XYZ', "Euler (XYZ)", "Convert rotations to euler XYZ"),
+                   ('XZY', "Euler (XZY)", "Convert rotations to euler XZY"),
+                   ('YXZ', "Euler (YXZ)", "Convert rotations to euler YXZ"),
+                   ('YZX', "Euler (YZX)", "Convert rotations to euler YZX"),
+                   ('ZXY', "Euler (ZXY)", "Convert rotations to euler ZXY"),
+                   ('ZYX', "Euler (ZYX)", "Convert rotations to euler ZYX"),
+                   ),
+            default='NATIVE',
+            )
+
+    bpy.types.Scene.MhExportRotateMode = EnumProperty(
+            name="Rotation",
+            description="Rotation conversion",
+            items=(('NATIVE', "Euler (Native)",
+                    "Use the rotation order defined in the BVH file"),
+                   ('XYZ', "Euler (XYZ)", "Convert rotations to euler XYZ"),
+                   ('XZY', "Euler (XZY)", "Convert rotations to euler XZY"),
+                   ('YXZ', "Euler (YXZ)", "Convert rotations to euler YXZ"),
+                   ('YZX', "Euler (YZX)", "Convert rotations to euler YZX"),
+                   ('ZXY', "Euler (ZXY)", "Convert rotations to euler ZXY"),
+                   ('ZYX', "Euler (ZYX)", "Convert rotations to euler ZYX"),
+                   ),
+            default='ZYX',
+            )
+    
     return
 
 

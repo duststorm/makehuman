@@ -670,8 +670,10 @@ def appendRigBones(armature, obj, prefix, layer, body):
             for (key, value) in options.items():
                 if key == "-nc":
                     flags &= ~F_CON
-                elif key == "-nc":
+                elif key == "-nd":
                     flags &= ~F_DEF
+                elif key == "-res":
+                    flags |= F_RES
                 elif key == "-circ":
                     name = "Circ"+value[0]
                     the.CustomShapes[name] = (key, int(value[0]))
