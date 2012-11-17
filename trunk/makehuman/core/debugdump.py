@@ -31,6 +31,7 @@ class DebugDump:
 
         debug = open(debugpath, "w")
 
+        debug.write("SVN REVISION: " + os.environ['SVNREVISION'] + "\n")
         debug.write("HOME LOCATION: " + home + "\n");
         version = re.sub(r"[\r\n]"," ", sys.version)
         debug.write("SYS.VERSION: " + version + "\n")
