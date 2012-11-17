@@ -17,6 +17,8 @@ import os
 import re
 import platform
 import string
+import OpenGL
+import numpy
 
 class DebugDump:
     """
@@ -48,6 +50,9 @@ class DebugDump:
             
         if sys.platform == 'win32':
             debug.write("PLATFORM.WIN32_VER: " + string.join(platform.win32_ver()," ") + "\n");
+
+        debug.write("PYOPENGL.VERSION: " + OpenGL.__version__ + "\n");
+        debug.write("NUMPY.VERSION: " + numpy.__version__ + "\n");
 
         debug.close()
 
