@@ -77,7 +77,7 @@ class SaveTaskView(gui3d.TaskView):
             human = gui3d.app.selectedHuman
             human.save(os.path.join(modelPath, filename + '.mhm'), tags)
             
-            gui3d.app.setCaption("MakeHuman - [%s]" % filename)
+            gui3d.app.setCaption("MakeHuman r" + os.environ['SVNREVISION'] + " - [" + filename + "]")
 
             gui3d.app.switchCategory('Modelling')
 
@@ -223,7 +223,7 @@ class LoadTaskView(gui3d.TaskView):
             self.parent.tasksByName['Save'].fileentry.text = name
             self.parent.tasksByName['Save'].fileentry.edit.setText(name)
             
-            gui3d.app.setCaption("MakeHuman - [%s]" % name)
+            gui3d.app.setCaption("MakeHuman r" + os.environ['SVNREVISION'] + " - [" + name + "]")
 
             gui3d.app.switchCategory('Modelling')
 
