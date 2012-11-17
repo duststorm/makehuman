@@ -25,6 +25,7 @@ if __name__ == '__main__':
     DebugDump()
 
     if sys.platform == 'win32':
+        home = os.path.expanduser('~')
         fo = open(os.path.join(home, "python_out.txt"), "w")
         sys.stdout = fo
         fe = open(os.path.join(home, "python_err.txt"), "w")
