@@ -3,7 +3,8 @@
 
 import sys
 import os
-import str
+import string
+import re
 
 sys.path.append('core')
 
@@ -11,8 +12,9 @@ from debugdump import DebugDump
 
 # print os.getcwd()
 
-__version__ = filter(str.isdigit, "$Revision$")
-print __version__
+pattern = re.compile(r'[^0-9]')
+os.environ['SVNREVISION'] = pattern.sub("", "$Revision$")
+print os.environ['SVNREVISION']
 
 if __name__ == '__main__':
     if len(sys.argv) >= 2:
