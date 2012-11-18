@@ -175,7 +175,7 @@ class CArmature:
                 #if v.co[1] > 15:
                 #    halt
 
-        obj.setCoords(coords)
+        obj.changeCoords(coords)
         obj.calcNormals()
         obj.update()
         """
