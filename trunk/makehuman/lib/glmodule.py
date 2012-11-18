@@ -13,6 +13,7 @@ from OpenGL.GLU import *
 from core import *
 import image_base as img
 import matrix
+from debugdump import DebugDump
 
 g_primitiveMap = [GL_POINTS, GL_LINES, GL_TRIANGLES, GL_QUADS]
 
@@ -152,6 +153,13 @@ def drawEnd():
 def OnInit():
     def A(*args):
         return np.array(list(args), dtype=np.float32)
+
+    # Start with writing relevant info to the debug dump in case stuff goes
+    # wrong at a later time
+    debugdump = DebugDump()
+    debugdump.appendMessage("GL.VENDOR: " + glGetString(GL_VENDOR))
+    debugdump.appendMessage("GL.RENDERER: " + glGetString(GL_RENDERER))
+    debugdump.appendMessage("GL.VERSION: " + glGetString(GL_VERSION))
 
     # Lights and materials
     lightPos = A( -10.99, 20.0, 20.0, 1.0)  # Light - Position
