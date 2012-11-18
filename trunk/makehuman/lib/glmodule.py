@@ -154,12 +154,15 @@ def OnInit():
     def A(*args):
         return np.array(list(args), dtype=np.float32)
 
-    # Start with writing relevant info to the debug dump in case stuff goes
-    # wrong at a later time
-    debugdump = DebugDump()
-    debugdump.appendMessage("GL.VENDOR: " + glGetString(GL_VENDOR))
-    debugdump.appendMessage("GL.RENDERER: " + glGetString(GL_RENDERER))
-    debugdump.appendMessage("GL.VERSION: " + glGetString(GL_VERSION))
+    try:
+        # Start with writing relevant info to the debug dump in case stuff goes
+        # wrong at a later time
+        debugdump = DebugDump()
+        debugdump.appendMessage("GL.VENDOR: " + glGetString(GL_VENDOR))
+        debugdump.appendMessage("GL.RENDERER: " + glGetString(GL_RENDERER))
+        debugdump.appendMessage("GL.VERSION: " + glGetString(GL_VERSION))
+    except Exception as e:
+        print "Failed to GL debug info to debug dump: " + format(str(e))
 
     # Lights and materials
     lightPos = A( -10.99, 20.0, 20.0, 1.0)  # Light - Position
