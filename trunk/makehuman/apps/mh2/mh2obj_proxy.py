@@ -25,7 +25,7 @@ import mh2proxy
 import object_collection
 
 #
-#    exportProxyObj(human, filename, options):    
+#    exportProxyObj(human, name, options):    
 #
 
 def exportProxyObj(human, name, options):
@@ -34,7 +34,7 @@ def exportProxyObj(human, name, options):
     cfg.separatefolder = True
 
     (mainStuff, stuffs, rawTargets) = object_collection.setupObjects(
-        name, obj, None, cfg.proxyList, 
+        name, human, None, 
         helpers=options["helpers"], 
         eyebrows=options["eyebrows"], 
         lashes=options["lashes"])

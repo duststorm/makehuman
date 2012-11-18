@@ -299,7 +299,7 @@ def exportDae(human, name, fp):
     amt = getArmatureFromRigFile(rigfile, obj)
     #rawTargets = loadShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx")
     (mainStuff, stuffs, rawTargets) = object_collection.setupObjects(
-        name, obj, amt, cfg.proxyList, 
+        name, human, amt, 
         helpers=the.Options["helpers"], 
         eyebrows=the.Options["eyebrows"], 
         lashes=the.Options["lashes"])

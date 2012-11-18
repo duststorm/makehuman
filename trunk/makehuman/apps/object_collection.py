@@ -182,12 +182,14 @@ def filterMesh(mesh1, obj, deleteGroups, deleteVerts, helpers, eyebrows, lashes)
     return (verts2, vnormals2, uvValues2, faces2, weights2, targets2)
 
 #
-#   setupObjects(name, obj, amt, proxyList):
+#   setupObjects(name, human, amt):
 #
 
-def setupObjects(name, obj, amt, proxyList, helpers=False, eyebrows=True, lashes=True):
+def setupObjects(name, human, amt, helpers=False, eyebrows=True, lashes=True):
     global theStuff, theTextures, theTexFiles, theMaterials
     
+    cfg = export_config.exportConfig(human, True)
+    obj = human.meshData
     theTextures = {}
     theTexFiles = {}
     theMaterials = {}
@@ -199,8 +201,8 @@ def setupObjects(name, obj, amt, proxyList, helpers=False, eyebrows=True, lashes
     theStuff = stuff
     deleteGroups = []
     deleteVerts = []
-    foundProxy = setupProxies('Proxy', name, obj, stuffs, amt, rawTargets, proxyList, deleteGroups, deleteVerts)
-    setupProxies('Clothes', None, obj, stuffs, amt, rawTargets, proxyList, deleteGroups, deleteVerts)
+    foundProxy = setupProxies('Proxy', name, obj, stuffs, amt, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
+    setupProxies('Clothes', None, obj, stuffs, amt, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
     if not foundProxy:
         mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
         if (helpers and eyebrows and lashes and 

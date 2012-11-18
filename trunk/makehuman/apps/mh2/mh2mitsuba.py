@@ -40,10 +40,12 @@ import mh
 from os.path import basename
 #
 import sys
+import object_collection
 
 
-def MitsubaExport(obj, app, settings):
+def MitsubaExport(human, app, settings):
 
+    obj = human.meshData
     print 'Mitsuba Export object: ', obj.name
 
     # Read settings from an ini file. This reload enables the settings to be changed dynamically 
@@ -83,7 +85,7 @@ def MitsubaExport(obj, app, settings):
             filename = out_path + fileobj
         
             #
-            exportObj(obj, filename)
+            exportObj(human, filename)
 
             # create name for Mitsuba xml scene file
             # this name is different to the name use for command line?
@@ -142,7 +144,7 @@ def MitsubaExport(obj, app, settings):
                    'Please, enter a valid path to Mitsuba folder.',
                    'Accept')    
 
-def exportObj(obj, filename):
+def exportObj(human, filename):
     """
     This function exports a mesh object in Wavefront obj format. 
     It is assumed that obj will have at least vertices and faces,
@@ -167,47 +169,32 @@ def exportObj(obj, filename):
     # not is need mtl file. The material is created into Mitsuba .xml file
     # file_mtl = str(filename).replace('.obj','.mtl')
 
+    (mainStuff, stuffs, rawTargets) = object_collection.setupObjects(
+        "Mitsuba", human, None, helpers=False, eyebrows=False, lashes=False)
+
     f = open(filename, 'w')
     f.write('# MakeHuman exported OBJ for Mitsuba\n')
     f.write('# www.makehuman.org\n')
     # 
-    for v in obj.verts:
-        f.write('v %f %f %f\n' % tuple(v.co))
 
-    if obj.has_uv:
-        for uv in obj.texco:
-            f.write('vt %f %f\n' % tuple(uv))
+    for stuff in stuffs:
+        for v in stuff.verts:
+            f.write("v %.4f %.4f %.4f\n" % tuple(v))
 
-    for v in obj.verts:
-        f.write('vn %f %f %f\n' % tuple(v.no))
+    for stuff in stuffs:
+        for uv in stuff.uvValues:
+            f.write("vt %.4f %.4f\n" % tuple(uv))
 
-    #
-    groupFilter = None
-    exportGroups = False
-    
-    # basic filter..
-    # filter eyebrown and lash for use an special material with 'alpha' value
-    # SSS not work fine, cause: the geometry is not closed solid?
-    fgroups = []
-    for fg in obj.faceGroups:
-        if not ('joint-' in fg.name or
-                'helper-' in fg.name or
-                '-eyebrown' in fg.name or
-                '-lash' in fg.name):
-            fgroups.append(fg.name)
-    
-    faces = obj.getFacesForGroups(fgroups)
-    fv = obj.getFaceVerts(faces)
-    ft = obj.getFaceUVs(faces)
-    for fi in xrange(len(faces)):
-        f.write('f')
-        if not obj.has_uv:
-            for i, v in enumerate(fv[fi]):
-                f.write(' %i//%i' % (v + 1, v + 1))
-        else:
-            for i, (v, t) in enumerate(zip(fv[fi], ft[fi])):
-                f.write(' %i/%i/%i' % (v + 1, t + 1, v + 1))
-        f.write('\n')
+    nVerts = 1
+    nUvVerts = 1
+    for stuff in stuffs:
+        for fc in stuff.faces:
+            f.write('f ')
+            for vs in fc:
+                f.write("%d/%d " % (vs[0]+nVerts, vs[1]+nUvVerts))
+            f.write('\n')
+        nVerts += len(stuff.verts)
+        nUvVerts += len(stuff.uvValues)
     
     """
     # basic filter..
