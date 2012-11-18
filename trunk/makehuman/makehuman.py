@@ -69,7 +69,8 @@ if __name__ == '__main__':
         mfile = './main.py'
 
     try:
-        DebugDump()
+        debugdump = DebugDump()
+        debugdump.reset()
     except Exception as e:
         print "Could not create debug dump -- " + format(str(e))
 
@@ -79,7 +80,6 @@ if __name__ == '__main__':
         sys.stdout = fo
         fe = open(os.path.join(home, "python_err.txt"), "w")
         sys.stderr = fe
-
 
     execfile(mfile)
 

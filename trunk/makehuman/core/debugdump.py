@@ -21,20 +21,22 @@ import OpenGL
 import numpy
 
 class DebugDump:
+
     """
     A class that dumps relevant information to a text file in the user's home directory
     """
-    def __init__(self):
-        home = os.path.expanduser('~')
-        debugpath = home
+    def __init__(this):
+        this.home = os.path.expanduser('~')
+        this.debugpath = this.home
         if sys.platform == 'win32':
-            debugpath = os.path.join(home, "Documents")
-        debugpath = os.path.join(debugpath, "makehuman-debug.txt")
+            this.debugpath = os.path.join(this.home, "Documents")
+        this.debugpath = os.path.join(this.debugpath, "makehuman-debug.txt")
 
-        debug = open(debugpath, "w")
+    def reset(this):
+        debug = open(this.debugpath, "w")
 
         debug.write("SVN REVISION: " + os.environ['SVNREVISION'] + "\n")
-        debug.write("HOME LOCATION: " + home + "\n");
+        debug.write("HOME LOCATION: " + this.home + "\n");
         version = re.sub(r"[\r\n]"," ", sys.version)
         debug.write("SYS.VERSION: " + version + "\n")
         debug.write("SYS.PLATFORM: " + sys.platform + "\n");
@@ -53,8 +55,10 @@ class DebugDump:
 
         debug.write("PYOPENGL.VERSION: " + OpenGL.__version__ + "\n");
         debug.write("NUMPY.VERSION: " + numpy.__version__ + "\n");
-
         debug.close()
 
-
+    def appendMessage(this,message):
+        debug = open(this.debugpath, "a")
+        debug.write(message + "\n");
+        debug.close()
 
