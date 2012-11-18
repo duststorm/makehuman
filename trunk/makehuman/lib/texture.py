@@ -19,7 +19,10 @@ class Texture(object):
             self.loadTexture(image, self.textureId, self)
 
     def __del__(self):
-        glDeleteTextures(self.textureId)
+        try:
+            glDeleteTextures(self.textureId)
+        except StandardError:
+            pass
 
     def loadImage(self, image):
         self.loadTexture(image, self.textureId, self)
