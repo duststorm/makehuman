@@ -20,6 +20,7 @@ Abstract
 """
 
 import math
+from math import pi
 import aljabr
 import warp
 import numpy
@@ -36,7 +37,7 @@ from the import *
 
 from . import dual_quaternions
 
-D = math.pi/180
+D = pi/180
 
 #
 #
@@ -296,7 +297,7 @@ class CArmature:
 
         frame = frames[0]
         for bone, offset, channels, isRoot in bones:
-            order = "s"
+            order = ""
             angles = []
             for channel in channels:
                 value = frame[0]
@@ -308,19 +309,20 @@ class CArmature:
                     rz = value
                 elif channel == "Xrotation":
                     ax = value*D
-                    order += "x"
+                    order = "x" + order
                     angles.append(ax)
                 elif channel == "Yrotation":
                     ay = -value*D
-                    order += "z"
+                    order = "z" + order
                     angles.append(ay)
                 elif channel == "Zrotation":
                     az = value*D
-                    order += "y"
+                    order = "y" + order
                     angles.append(az)
                 frame = frame[1:]
             if bone:
-                ai,aj,ak = angles                
+                ak,aj,ai = angles     
+                order = "s" + order
                 mat1 = tm.euler_matrix(ai, aj, ak, axes=order) 
                 mat2 = dot(dot(inv(bone.matrixRest), mat1), bone.matrixRest)
                 bone.matrixPose[:3,:3] = mat2[:3,:3]
@@ -453,7 +455,7 @@ class CBone:
         qw = R[0,0] + R[1,1] + R[2,2] + 1;
 
         if qw < 1e-4:
-            roll = math.pi
+            roll = pi
         else:
             roll = 2*math.atan2(qy, qw);
         return roll
@@ -742,7 +744,7 @@ def getMatrix(head, tail, roll):
         angle = 0
     elif yproj < -1+1e-6:
         axis = YUnit
-        angle = math.pi
+        angle = pi
     else:
         axis = numpy.cross(YUnit, vector)
         axis = axis / math.sqrt(dot(axis,axis))

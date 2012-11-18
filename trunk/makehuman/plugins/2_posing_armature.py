@@ -12,6 +12,7 @@ import mh
 import aljabr
 
 import armature
+from armature import transformations as tm
 import warpmodifier
 
 
@@ -784,7 +785,12 @@ def doTest2(listBones):
         fp.write("\n%s %.4f\n" % (bone.name, bone.roll)) 
         writeMat(fp, "Rest", bone.matrixRest)
         writeMat(fp, "Global", bone.matrixGlobal)
-        writeMat(fp, "Pose", bone.getPoseFromGlobal())
+        pose = bone.getPoseFromGlobal()
+        writeMat(fp, "Pose", pose)
+        xyz = tm.euler_from_matrix(pose, axes='sxyz')
+        fp.write("XYZ %.4g %.4g %.4g\n" % tuple(xyz))
+        zyx = tm.euler_from_matrix(pose, axes='szyx')
+        fp.write("ZYX %.4g %.4g %.4g\n" % tuple(zyx))
         #writeMat(fp, "Pose0", bone.matrixPose)
     fp.close()
     
