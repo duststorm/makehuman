@@ -23,16 +23,40 @@ svnrev = pattern.sub("", "$Revision$")
 output = ""
 try:
     output = subprocess.Popen(["svnversion","."], stdout=subprocess.PIPE).communicate()[0]
-    output = pattern.sub("", output)
-    svnrev = output
+    output = output.split(":")[0]
+    svnrev = pattern.sub("", output)
 except Exception as e:
     print "Failed to get svn version number from command line: " + format(str(e))
 
-# If output is still empty at this point, the above approaches failed and
-# we need to do something else about it
 if output == "":
-    print "have to use some other approach"
-    # Some other smart way to detect svn revision
+    # First fallback: try to parse the entries file manually
+    try:
+        scriptdir = os.path.dirname(os.path.abspath(__file__))
+        svndir = os.path.join(scriptdir,'.svn')
+        entriesfile = os.path.join(svndir,'entries')
+        entries = open(entriesfile, 'r').read()
+        result = re.search(r'dir\n(\d+)\n',entries)
+        output = result.group(1)
+        svnrev = output
+    except Exception as e:
+        print "Failed to get svn version from file: " + format(str(e))
+
+if output == "":
+    # The following only works if pysvn is installed. We'd prefer not to use this since it's very slow.
+    # It was taken from this stackoverflow post: http://stackoverflow.com/questions/242295/how-does-one-add-a-svn-repository-build-number-to-python-code
+    try:
+        import pysvn
+        repo = "."
+        rev = pysvn.Revision( pysvn.opt_revision_kind.working )
+        client = pysvn.Client()
+        info = client.info2(repo,revision=rev,recurse=False)
+        output = format(str(info[0][1].rev.number))
+        svnrev = output
+    except Exception as e:
+        print "Failed to get svn version number using pysvn: " + format(str(e))
+
+if output == "":
+    print "Using SVN rev from file stamp. This is likely outdated."
 
 # Set SVN rev in environment so it can be used elsewhere
 print "Detected SVN revision: " + svnrev    
