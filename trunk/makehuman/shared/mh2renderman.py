@@ -326,13 +326,13 @@ class RMRObject:
         self.materialBump = None
         self.name = name
         self.facesIndices = []
-        self.verts = meshData.verts
         self.meshData = meshData
+        self.verts = meshData.verts
         self.translationTable = [0 for vert in meshData.verts]        
         self.verts = []
 
         if mtl is not None:
-            self.facesIndices = [[(vert.idx,face.uv[index]) for index, vert in enumerate(face.verts)] for face in meshData.faces if face.mtl == mtl]
+            self.facesIndices = [[(vert.idx,face.uv[index]) for index, vert in enumerate(face.verts)] for face in meshData.faces if meshData.materials[face.idx] == mtl]
         else:
             self.facesIndices = [[(vert.idx,face.uv[index]) for index, vert in enumerate(face.verts)] for face in meshData.faces]
         

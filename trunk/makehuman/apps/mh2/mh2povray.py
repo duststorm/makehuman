@@ -203,7 +203,7 @@ def povrayExportArray(obj, camera, resolution, path):
     staticFile = 'data/povray/staticcontent.inc'
     sceneFile = 'data/povray/makehuman.pov'
     groupingsFile = 'data/povray/makehuman_groupings.inc'
-    pigmentMap = 'data/textures/texture.tif'
+    pigmentMap = 'data/textures/texture.png'
 
   # Define some additional file related strings
 
@@ -469,7 +469,7 @@ def povrayExportMesh2(obj, camera, resolution, path):
     headerFile = 'data/povray/headercontent_mesh2only.inc'
     staticFile = 'data/povray/staticcontent_mesh2only.inc'
     sceneFile = 'data/povray/makehuman_mesh2only.pov'
-    pigmentMap = 'data/textures/texture.tif'
+    pigmentMap = 'data/textures/texture.png'
 
   # Define some additional file locations
 
@@ -559,8 +559,15 @@ def povrayExportMesh2(obj, camera, resolution, path):
 
 ''')
 
-    faces = [f for f in obj.faces if not 'joint-' in f.group.name]
+    #faces = [f for f in obj.faces if not 'joint-' in f.group.name]
 
+    fgroups = []
+    for fg in obj.faceGroups:
+        if not ('joint-' in fg.name or
+                'helper-' in fg.name):
+            fgroups.append(fg.name)    
+    faces = obj.getFacesForGroups(fgroups)    
+ 
   # UV Vectors - Write a POV-Ray array to the output stream
 
     outputFileDescriptor.write('  uv_vectors {\n  ')
@@ -578,7 +585,9 @@ def povrayExportMesh2(obj, camera, resolution, path):
 
     outputFileDescriptor.write('  face_indices {\n  ')
     outputFileDescriptor.write('    %s\n  ' % (len(faces) * 2))
-    for f in faces:
+
+    for fn in faces:
+        f = obj.faces[fn]    
         outputFileDescriptor.write('<%s,%s,%s>' % (f.verts[0].idx, f.verts[1].idx, f.verts[2].idx))
         outputFileDescriptor.write('<%s,%s,%s>' % (f.verts[2].idx, f.verts[3].idx, f.verts[0].idx))
     outputFileDescriptor.write('''
@@ -590,7 +599,8 @@ def povrayExportMesh2(obj, camera, resolution, path):
 
     outputFileDescriptor.write('  uv_indices {\n  ')
     outputFileDescriptor.write('    %s\n  ' % (len(faces) * 2))
-    for f in faces:
+    for fn in faces:
+        f = obj.faces[fn]
         outputFileDescriptor.write('<%s,%s,%s>' % (f.uv[0], f.uv[1], f.uv[2]))
         outputFileDescriptor.write('<%s,%s,%s>' % (f.uv[2], f.uv[3], f.uv[0]))
     outputFileDescriptor.write('''
