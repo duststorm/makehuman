@@ -47,6 +47,7 @@ class ProxyTaskView(gui3d.TaskView):
 
         proxy = mh2proxy.readProxyFile(human.getSeedMesh(), filename, False)        
         human.setProxy(proxy)
+        human.updateProxyMesh()
 
     def onShow(self, event):
         # When the task gets shown, set the focus to the file chooser
