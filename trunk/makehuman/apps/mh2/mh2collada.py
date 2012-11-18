@@ -34,6 +34,7 @@ import os, time
 import shutil
 import mh2proxy
 import export_config
+import object_collection
 import mhx
 from mhx import the, read_rig
 
@@ -287,152 +288,6 @@ def addInvBones(hier, heads, tails):
     return newHier
 
 #
-#    class CStuff
-#
-
-class CStuff:
-    def __init__(self, name, proxy):
-        self.name = os.path.basename(name)
-        self.type = None
-        self.bones = None
-        self.rawWeights = None
-        self.verts  = None
-        self.vnormals = None
-        self.uvValues = None
-        self.faces = None
-        self.weights = None
-        self.targets = None
-        self.vertexWeights = None
-        self.skinWeights = None
-        self.material = None
-        self.texture = None
-        if proxy:
-            self.type = proxy.type
-            self.material = proxy.material
-            self.texture = proxy.texture
-            
-    def __repr__(self):
-        return "<CStuff %s %s mat %s tex %s>" % (self.name, self.type, self.material, self.texture)
-
-    def setBones(self, amt):
-        (rigHead, rigTail, rigHier, bones, rawWeights) = amt
-        self.rigHead = rigHead
-        self.rigTail = rigTail
-        self.rigHier = rigHier
-        self.bones = bones
-        self.rawWeights = rawWeights
-
-    def copyBones(self, rig):
-        self.rigHead = rig.rigHead
-        self.rigTail = rig.rigTail
-        self.rigHier = rig.rigHier
-        self.bones = rig.bones
-        self.rawWeights = rig.rawWeights
-
-    def setMesh(self, mesh):
-        (verts, vnormals, uvValues, faces, weights, targets) = mesh
-        self.verts = verts
-        self.vnormals = vnormals
-        self.uvValues = uvValues
-        self.faces = faces
-        self.weights = weights
-        self.targets = targets
-        return
-
-#
-#    filterMesh(mesh1, obj, groups, deleteVerts):
-#
-
-def filterMesh(mesh1, obj, deleteGroups, deleteVerts):
-    (verts1, vnormals1, uvValues1, faces1, weights1, targets1) = mesh1
-    
-    killVerts = {}
-    killUvs = {}
-    killFaces = {}    
-    for v in obj.verts:
-        killVerts[v.idx] = False
-    for f in obj.faces:
-        killFaces[f.idx] = False        
-        for vt in f.uv:
-            killUvs[vt] = False
-            
-    for vn in deleteVerts:
-        killVerts[vn] = True
-    
-    for fg in obj.faceGroups:
-        if (((not the.Options["helpers"]) and 
-             (("joint" in fg.name) or ("helper" in fg.name))) or
-            ((not the.Options["eyebrows"]) and 
-             (("eyebrown" in fg.name) or ("cornea" in fg.name))) or
-            ((not the.Options["lashes"]) and 
-             ("lash" in fg.name)) or
-             mh2proxy.deleteGroup(fg.name, deleteGroups)):
-            #print("  kill %s" % fg.name) 
-            for f in fg.faces:            
-                killFaces[f.idx] = True
-                for v in f.verts:
-                    killVerts[v.idx] = True
-                for vt in f.uv:                    
-                    killUvs[vt] = True
-    
-    n = 0
-    nv = {}
-    verts2 = []
-    for m,v in enumerate(verts1):
-        if not killVerts[m]:
-            verts2.append(v)
-            nv[m] = n
-            n += 1
-
-    vnormals2 = []
-    for m,vn in enumerate(vnormals1):
-        if not killVerts[m]:
-            vnormals2.append(vn)
-
-    n = 0
-    uvValues2 = []
-    nuv = {}
-    for m,uv in enumerate(uvValues1):
-        if not killUvs[m]:
-            uvValues2.append(uv)
-            nuv[m] = n
-            n += 1    
-
-    faces2 = []
-    for fn,f in enumerate(faces1):
-        if not killFaces[fn]:
-            f2 = []
-            for c in f:
-                v2 = nv[c[0]]
-                uv2 = nuv[c[1]]
-                f2.append([v2, uv2])
-            faces2.append(f2)
-
-    if weights1:
-        weights2 = {}
-        for (b, wts1) in weights1.items():
-            wts2 = []
-            for (v1,w) in wts1:
-                if not killVerts[v1]:
-                    wts2.append((nv[v1],w))
-            weights2[b] = wts2
-    else:
-        weights2 = weights1
-
-    if targets1:
-        targets2 = []
-        for (name, morphs1) in targets1:
-            morphs2 = []
-            for (v1,dx) in morphs1:
-                if not killVerts[v1]:
-                    morphs2.append((nv[v1],dx))
-            targets2.append(name, morphs2)
-    else:
-        targets2 = targets1
-
-    return (verts2, vnormals2, uvValues2, faces2, weights2, targets2)
-
-#
 #    exportDae(human, name, fp):
 #
 
@@ -443,8 +298,11 @@ def exportDae(human, name, fp):
     print("Using rig file %s" % rigfile)
     amt = getArmatureFromRigFile(rigfile, obj)
     #rawTargets = loadShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx")
-    rawTargets = []
-    (the.Stuff, stuffs) = setupStuff(name, obj, amt, rawTargets, cfg)
+    (mainStuff, stuffs, rawTargets) = object_collection.setupObjects(
+        name, obj, amt, cfg.proxyList, 
+        helpers=the.Options["helpers"], 
+        eyebrows=the.Options["eyebrows"], 
+        lashes=the.Options["lashes"])
 
     date = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime())
     if the.Rotate90X:
@@ -502,8 +360,8 @@ def exportDae(human, name, fp):
 '  <library_visual_scenes>\n' +
 '    <visual_scene id="Scene" name="Scene">\n' +
 '      <node id="Scene_root">\n')
-    for root in the.Stuff.rigHier:
-        writeBone(fp, root, [0,0,0], 'layer="L1"', '  ', the.Stuff)
+    for root in mainStuff.rigHier:
+        writeBone(fp, root, [0,0,0], 'layer="L1"', '  ', mainStuff)
     for stuff in stuffs:
         writeNode(obj, fp, "        ", stuff)
 
@@ -516,70 +374,6 @@ def exportDae(human, name, fp):
 '  </scene>\n' +
 '</COLLADA>\n')
     return
-
-#
-#   setupStuff(name, obj, amt, rawTargets, cfg):
-#
-
-def setupStuff(name, obj, amt, rawTargets, cfg):
-    global StuffTextures, StuffTexFiles, StuffMaterials
-
-    StuffTextures = {}
-    StuffTexFiles = {}
-    StuffMaterials = {}
-    stuffs = []
-    stuff = CStuff(name, None)
-    if amt:
-        stuff.setBones(amt)
-    the.Stuff = stuff
-    deleteGroups = []
-    deleteVerts = []
-    foundProxy = setupProxies('Proxy', name, obj, stuffs, amt, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
-    setupProxies('Clothes', None, obj, stuffs, amt, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
-    if not foundProxy:
-        mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
-        if (the.Options["helpers"] and 
-            the.Options["eyebrows"] and  
-            the.Options["lashes"] and 
-            deleteGroups == [] and
-            deleteVerts == []):
-            mesh2 = mesh1
-        else:
-            mesh2 = filterMesh(mesh1, obj, deleteGroups, deleteVerts)
-        stuff.setMesh(mesh2)
-        stuffs = [stuff] + stuffs
-    return (stuff, stuffs)
-
-#
-#    setupProxies(typename, name, obj, stuffs, amt, rawTargets, proxyList, deleteGroups, deleteVerts):
-#
-
-def setupProxies(typename, name, obj, stuffs, amt, rawTargets, proxyList, deleteGroups, deleteVerts):
-    foundProxy = False    
-    for pfile in proxyList:
-        if pfile.useDae and pfile.type == typename and pfile.file:
-            proxy = mh2proxy.readProxyFile(obj, pfile, True)
-            if proxy and proxy.name and proxy.texVerts:
-                foundProxy = True
-                deleteGroups += proxy.deleteGroups
-                deleteVerts = mh2proxy.multiplyDeleteVerts(proxy, deleteVerts)
-                if name:
-                    stuff = CStuff(name, proxy)
-                else:
-                    stuff = CStuff(proxy.name, proxy)
-                if amt:
-                    stuff.setBones(amt)
-                if stuff:
-                    if pfile.type == 'Proxy':
-                        the.Stuff = stuff
-                    if the.Stuff:
-                        stuffname = the.Stuff.name
-                    else:
-                        stuffname = None
-                    mesh = mh2proxy.getMeshInfo(obj, proxy, stuff.rawWeights, rawTargets, stuffname)
-                    stuff.setMesh(mesh)
-                    stuffs.append(stuff)
-    return foundProxy
 
 #
 #    writeImages(obj, fp, stuff, human):
@@ -656,51 +450,8 @@ DefaultMaterialSettings = {
     'shininess' : 10,
 }
 
-def getNamesFromStuff(stuff):
-    global StuffTextures, StuffTexFiles, StuffMaterials
-    if not stuff.type:
-        return ("SkinShader", None, "SkinShader")
-        
-    try:
-        texname = StuffTextures[stuff.name]
-        texfile = StuffTexFiles[stuff.name]
-        matname = StuffMaterials[stuff.name]
-        return (texname, texfile, matname)
-    except KeyError:
-        pass
-    
-    texname = None
-    texfile = None
-    matname = None
-    if stuff.texture:        
-        (folder, fname) = stuff.texture
-        (texname, ext) = os.path.splitext(fname)
-        texfile = ("%s_%s" % (texname, ext[1:]))
-        while texname in StuffTextures.values():
-            texname = nextName(texname)
-        StuffTextures[stuff.name] = texname
-        StuffTexFiles[stuff.name] = texfile
-    if stuff.material:
-        matname = stuff.material.name
-        while matname in StuffMaterials.values():
-            matname = nextName(matname)
-        StuffMaterials[stuff.name] = matname
-    return (texname, texfile, matname)
-    
-    
-def nextName(string):
-    try:
-        n = int(string[-3:])
-    except:
-        n = -1
-    if n >= 0:
-        return "%s%03d" % (string[:-3], n+1)
-    else:
-        return string + "_001"
-        
-
 def writeEffects(obj, fp, stuff):
-    (texname, texfile, matname) = getNamesFromStuff(stuff)
+    (texname, texfile, matname) = object_collection.getTextureNames(stuff)
     if not stuff.type:
         tex = "texture_png"
         writeEffectStart(fp, "SkinShader")
@@ -804,7 +555,7 @@ def writeSurfaceSampler(fp, tex):
 #
 
 def writeMaterials(obj, fp, stuff):
-    (texname, texfile, matname) = getNamesFromStuff(stuff)
+    (texname, texfile, matname) = object_collection.getTextureNames(stuff)
     if matname:
         matname = matname.replace(" ", "_")
         fp.write(
@@ -1186,7 +937,7 @@ def writeNode(obj, fp, pad, stuff):
 '%s  <instance_controller url="#%s-skin">\n' % (pad, stuff.name) +
 '%s    <skeleton>#%s</skeleton>\n' % (pad, the.Root))
 
-    (texname, texfile, matname) = getNamesFromStuff(stuff)    
+    (texname, texfile, matname) = object_collection.getTextureNames(stuff)    
     if matname:
         matname = matname.replace(" ", "_")    
         fp.write(

@@ -22,24 +22,26 @@ Exports proxy mesh to obj
 import os
 import export_config
 import mh2proxy
-import mh2collada
-import mhx
-from mhx import the
+import object_collection
 
 #
-#    exportProxyObj(human, filename):    
+#    exportProxyObj(human, filename, options):    
 #
 
 def exportProxyObj(human, name, options):
     obj = human.meshData
-    the.Config = export_config.exportConfig(human, True)
-    the.Options = options
-    the.Config.separatefolder = True
-    print(options.items())
-    (the.Stuff, stuffs) = mh2collada.setupStuff(name, obj, {}, [], the.Config)
+    cfg = export_config.exportConfig(human, True)
+    cfg.separatefolder = True
+
+    (mainStuff, stuffs, rawTargets) = object_collection.setupObjects(
+        name, obj, None, cfg.proxyList, 
+        helpers=options["helpers"], 
+        eyebrows=options["eyebrows"], 
+        lashes=options["lashes"])
+    
     (scale, unit) = options["scale"]   
     #name = export_config.goodName(name)
-    outfile = export_config.getOutFileFolder(name+".obj", the.Config)   
+    outfile = export_config.getOutFileFolder(name+".obj", cfg)   
     (path, ext) = os.path.splitext(outfile)
 
     filename = "%s_clothed.obj" % path
@@ -58,7 +60,7 @@ def exportProxyObj(human, name, options):
 '# MakeHuman exported MTL with clothes\n' +
 '# www.makehuman.org\n\n')
     for stuff in stuffs:
-        writeMaterial(fp, stuff, human)
+        writeMaterial(fp, stuff, human, cfg)
     fp.close()
     return
 
@@ -87,10 +89,10 @@ def writeGeometry(obj, fp, stuff, scale):
     return        
 
 #
-#   writeMaterial(fp, stuff, human):
+#   writeMaterial(fp, stuff, human, cfg):
 #
 
-def writeMaterial(fp, stuff, human):
+def writeMaterial(fp, stuff, human, cfg):
     fp.write("newmtl %s\n" % stuff.name)
     diffuse = (0.8, 0.8, 0.8)
     spec = (1, 1, 1)
@@ -111,13 +113,13 @@ def writeMaterial(fp, stuff, human):
             return
     else:
         path = "data/textures"
-        file = export_config.getOutFileName("texture.png", path, True, human, the.Config)
+        file = export_config.getOutFileName("texture.png", path, True, human, cfg)
         textures = [(path, os.path.basename(file))]
     for (folder, texfile) in textures:  
-        path = export_config.getOutFileName(texfile, folder, True, human, the.Config)        
+        path = export_config.getOutFileName(texfile, folder, True, human, cfg)        
         (fname, ext) = os.path.splitext(texfile)  
         name = "%s_%s" % (fname, ext[1:])
-        if the.Config.separatefolder:
+        if cfg.separatefolder:
             texpath = "textures/"+texfile
         else:
             texpath = texfile
