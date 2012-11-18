@@ -19,6 +19,8 @@ import platform
 import string
 import OpenGL
 import numpy
+if sys.platform == 'win32':
+    import _winreg
 
 class DebugDump:
 
@@ -29,7 +31,15 @@ class DebugDump:
         this.home = os.path.expanduser('~')
         this.debugpath = this.home
         if sys.platform == 'win32':
-            this.debugpath = os.path.join(this.home, "Documents")
+            try:
+                k = _winreg.HKEY_CURRENT_USER
+                for x in ['Software', 'Microsoft', 'Windows', 'CurrentVersion', 'Explorer', 'Shell Folders']:
+                    k = _winreg.OpenKey(k, x)
+                name, type = _winreg.QueryValueEx(k, 'Personal')
+                if type == 1:
+                    this.debugpath = name
+            except StandardError:
+                pass
         this.debugpath = os.path.join(this.debugpath, "makehuman-debug.txt")
 
     def reset(this):
