@@ -76,7 +76,7 @@ def exportObj(obj, filename, exportGroups = True, groupFilter=None):
             ft = obj.getFaceUVs(faces)
             for fi in xrange(len(faces)):
                 f.write('f')
-                if not has_uv:
+                if not obj.has_uv:
                     for i, v in enumerate(fv[fi]):
                         f.write(' %i//%i' % (v + 1, v + 1))
                 else:

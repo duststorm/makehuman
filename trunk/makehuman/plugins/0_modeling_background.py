@@ -330,7 +330,7 @@ class BackgroundTaskView(gui3d.TaskView):
                         for i, v in enumerate(f.verts):
                             src[i][2] = max(0.0, vdot(v.no, camera))
 
-                        co = [(mesh.uvValues[i][0]*dstW, dstH-(mesh.uvValues[i][1]*dstH)) for i in f.uv]
+                        co = [(mesh.texco[i][0]*dstW, dstH-(mesh.texco[i][1]*dstH)) for i in f.uv]
                         uva = [((v[0]-leftTop[0])/(rightBottom[0] - leftTop[0]), (v[1]-leftTop[1])/(rightBottom[1] - leftTop[1]), v[2]) for v in src]
                         RasterizeTriangle(dstImg, co[0], co[1], co[2], UvAlphaShader(dstImg, srcImg, (uva[:3])))
                         RasterizeTriangle(dstImg, co[2], co[3], co[0], UvAlphaShader(dstImg, srcImg, ((uva[2], uva[3], uva[0]))))
@@ -362,7 +362,7 @@ class BackgroundTaskView(gui3d.TaskView):
 
             for f in g.faces:
 
-                co = [(mesh.uvValues[i][0]*dstW, dstH-(mesh.uvValues[i][1]*dstH)) for i in f.uv]
+                co = [(mesh.texco[i][0]*dstW, dstH-(mesh.texco[i][1]*dstH)) for i in f.uv]
                 c = [v.color for v in f.verts]
                 RasterizeTriangle(dstImg, co[0], co[1], co[2], ColorShader(c[:3]))
                 RasterizeTriangle(dstImg, co[2], co[3], co[0], ColorShader((c[2], c[3], c[0])))

@@ -148,7 +148,7 @@ class ImageLight:
 
                 for f in g.faces:
 
-                    co = [(mesh.uvValues[i][0]*dstW, dstH-(mesh.uvValues[i][1]*dstH)) for i in f.uv]
+                    co = [(mesh.texco[i][0]*dstW, dstH-(mesh.texco[i][1]*dstH)) for i in f.uv]
                     c = [v.color for v in f.verts]
                     self.RasterizeTriangle(dstImg, co[0], co[1], co[2], ColorShader(c[:3]))
                     self.RasterizeTriangle(dstImg, co[2], co[3], co[0], ColorShader((c[2], c[3], c[0])))
@@ -358,7 +358,7 @@ class RMRObject:
     def writeRibCode(self, ribPath ):
 
         #print "ribPath = ", ribPath
-        facesUVvalues = self.meshData.uvValues #TODO usa direttamente self.
+        facesUVvalues = self.meshData.texco #TODO usa direttamente self.
 
         ribObjFile = file(ribPath, 'w')
         ribObjFile.write('Declare "st" "facevarying float[2]"\n')

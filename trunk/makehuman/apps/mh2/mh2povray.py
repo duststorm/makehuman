@@ -290,8 +290,8 @@ def povrayExportArray(obj, camera, resolution, path):
 
   # UV Vectors - Write a POV-Ray array to the output stream
 
-    outputFileDescriptor.write('#declare MakeHuman_UVArray = array[%s] {\n  ' % len(obj.uvValues))
-    for uv in obj.uvValues:
+    outputFileDescriptor.write('#declare MakeHuman_UVArray = array[%s] {\n  ' % len(obj.texco))
+    for uv in obj.texco:
         
         outputFileDescriptor.write('<%s,%s>' % (uv[0], uv[1]))
 
@@ -564,8 +564,8 @@ def povrayExportMesh2(obj, camera, resolution, path):
   # UV Vectors - Write a POV-Ray array to the output stream
 
     outputFileDescriptor.write('  uv_vectors {\n  ')
-    outputFileDescriptor.write('    %s\n  ' % len(obj.uvValues))
-    for uv in obj.uvValues:
+    outputFileDescriptor.write('    %s\n  ' % len(obj.texco))
+    for uv in obj.texco:
         
         outputFileDescriptor.write('<%s,%s>' % (uv[0], uv[1]))
         

@@ -54,7 +54,7 @@ class TextureToolTaskView(gui3d.TaskView):
     
         for f in self.mesh.faces:
             for i, v in enumerate(f.verts):
-                uv = self.mesh.uvValues[f.uv[i]]
+                uv = self.mesh.texco[f.uv[i]]
                 v.co = [uv[0] * 20 - 10, uv[1] * 20 - 10, 0.0]
         self.mesh.update()
             
@@ -69,7 +69,8 @@ class TextureToolTaskView(gui3d.TaskView):
         
             self.mesh = module3d.Object3D('texture_tool')
         
-            self.mesh.uvValues = []
+            # TL: should be replaced by .texco
+            #self.mesh.uvValues = []
             self.mesh.indexBuffer = []
             
             # create group
@@ -78,7 +79,7 @@ class TextureToolTaskView(gui3d.TaskView):
             self.mesh.area = 0.0
             for f in human.mesh.faces:
                 verts = [self.mesh.createVertex(v.co) for v in f.verts]
-                uv = [human.mesh.uvValues[i] for i in f.uv]
+                uv = [human.mesh.texco[i] for i in f.uv]
                 face = fg.createFace(verts, uv)
                 face.area = vlen(vcross(vsub(verts[2].co, verts[0].co), vsub(verts[3].co, verts[1].co))) / 2.0
                 face.uvArea = vlen(vcross(vsub(uv[2] + [0.0], uv[0] + [0.0]), vsub(uv[3] + [0.0], uv[1] + [0.0]))) / 2.0

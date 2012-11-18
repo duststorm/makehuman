@@ -174,8 +174,8 @@ def exportObj(obj, filename):
     for v in obj.verts:
         f.write('v %f %f %f\n' % tuple(v.co))
 
-    if not (obj.uvValues==None):
-        for uv in obj.uvValues:
+    if obj.has_uv:
+        for uv in obj.texco:
             f.write('vt %f %f\n' % tuple(uv))
 
     for v in obj.verts:
@@ -184,6 +184,32 @@ def exportObj(obj, filename):
     #
     groupFilter = None
     exportGroups = False
+    
+    # basic filter..
+    # filter eyebrown and lash for use an special material with 'alpha' value
+    # SSS not work fine, cause: the geometry is not closed solid?
+    fgroups = []
+    for fg in obj.faceGroups:
+        if not ('joint-' in fg.name or
+                'helper-' in fg.name or
+                '-eyebrown' in fg.name or
+                '-lash' in fg.name):
+            fgroups.append(fg.name)
+    
+    faces = obj.getFacesForGroups(fgroups)
+    fv = obj.getFaceVerts(faces)
+    ft = obj.getFaceUVs(faces)
+    for fi in xrange(len(faces)):
+        f.write('f')
+        if not obj.has_uv:
+            for i, v in enumerate(fv[fi]):
+                f.write(' %i//%i' % (v + 1, v + 1))
+        else:
+            for i, (v, t) in enumerate(zip(fv[fi], ft[fi])):
+                f.write(' %i/%i/%i' % (v + 1, t + 1, v + 1))
+        f.write('\n')
+    
+    """
     # basic filter..
     faces = [fa for fa in obj.faces if not 'joint-' in fa.group.name and not 'helper' in fa.group.name]
     
@@ -194,13 +220,15 @@ def exportObj(obj, filename):
     for face in faces:
         f.write('f')
         for i, v in enumerate(face.verts):
-            if (obj.uvValues == None):
+            if not obj.has_uv:
                 f.write(' %i//%i ' % (v.idx + 1, v.idx + 1))
             else:
                 f.write(' %i/%i/%i ' % (v.idx + 1, face.uv[i] + 1, v.idx + 1))
         #
         f.write('\n')  
     #
+    """
+    
     f.close()
 
 def mitsubaXmlFile(filexml):
