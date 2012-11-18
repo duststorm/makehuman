@@ -59,7 +59,7 @@ def newSetupJoints (obj, joints):
     for (key, typ, data) in joints:
         #print(key)
         if typ == 'j':
-            loc = mhxbones.calcJointPos(obj, data)
+            loc = mh2proxy.calcJointPos(obj, data)
             the.Locations[key] = loc
             the.Locations[data] = loc
         elif typ == 'v':

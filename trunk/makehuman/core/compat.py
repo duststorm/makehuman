@@ -323,6 +323,9 @@ class FaceProxy(object):
 
     group = property(get_group)
 
+    def isTriangle(self):
+        return (self.verts[0].idx == self.verts[3].idx)
+ 
     def setColor(self, color):
         """
         Sets the color for this face.

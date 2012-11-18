@@ -100,7 +100,7 @@ class CProxy:
         yScale = getScale(self.yScaleData, parent.verts, 1)
         zScale = getScale(self.zScaleData, parent.verts, 2)
 
-	verts = []
+        verts = []
         for n in range(mlen):
             refVert = self.refVerts[n]
             if type(refVert) == tuple:
@@ -114,7 +114,7 @@ class CProxy:
                 verts.append( (nv0, nv1, nv2) )
             else:
                 vert.append( parent.verts[refVert].co )
-	mesh.setCoords(verts)                
+        mesh.setCoords(verts)                
 
 #
 #    class CMaterial
@@ -630,15 +630,26 @@ def readUvset(filename):
 #    getLoc(joint, obj):
 #
 
-import mhxbones
-
 def getJoint(joint, obj, locations):
     try:
         loc = locations[joint]
     except:
-        loc = mhxbones.calcJointPos(obj, joint)
+        loc = calcJointPos(obj, joint)
         locations[joint] = loc
     return loc
+    
+#
+#   calcJointPos(obj, joint):
+#
+
+def calcJointPos(obj, joint):
+    g = obj.getFaceGroup("joint-"+joint)
+    verts = []
+    for f in g.faces:
+        for v in f.verts:
+            verts.append(v.co)
+    return centroid(verts)
+    
 
 #
 #    writeRigBones(fp, bones):
@@ -684,11 +695,11 @@ def writeRigPose(fp, name, bones):
     for (bone, head, tail, roll, parent, options) in bones:
         r = getRadius('-circ', options)
         if r and not (r in circles):
-            mhx_rig.setupCircle(fp, "RigCircle%02d" % r, 0.1*r)
+            mhx.mhx_rig.setupCircle(fp, "RigCircle%02d" % r, 0.1*r)
             circles.append(r)
         r = getRadius('-box', options)
         if r and not (r in cubes):
-            mhx_rig.setupCube(fp, "RigCube%02d" % r, 0.1*r, 0)
+            mhx.mhx_rig.setupCube(fp, "RigCube%02d" % r, 0.1*r, 0)
             cubes.append(r)
 
     fp.write("\nPose %s\n" % name)
@@ -845,8 +856,21 @@ def getMeshInfo(obj, proxy, rawWeights, rawShapes, rigname):
         verts = [tuple(v) for v in obj.coord]
         vnormals = [tuple(n) for n in obj.vnorm]
         texcoords = [tuple(t) for t in obj.texco]
-        faces = mhx.mhx_main.loadFacesIndices(obj)
+        faces = oldStyleFaces(obj)
         return (verts, vnormals, texcoords, faces, rawWeights, rawShapes)
+        
+        
+def oldStyleFaces(obj):
+    faces = []
+    for f in obj.faces:
+        if f.isTriangle():
+            n = 3
+        else:
+            n = 4
+        face = [tuple((f.verts[i].idx, f.uv[i])) for i in range(n)]
+        faces.append(face)
+    return faces
+    
 
 #
 #    getProxyWeights(rawWeights, proxy):

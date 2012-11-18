@@ -73,7 +73,7 @@ def exportMhx_24(obj, fp):
  "  error This file can not be opened in Blender 2.5x. Try the -25 file instead. ;\n "+
  "#endif\n")
  
-     mhx_main.copyMaterialFile("shared/mhx/templates/materials24.mhx", fp)    
+     copyMaterialFile("shared/mhx/templates/materials24.mhx", fp)    
      exportArmature(obj, fp)
      tmpl = open("shared/mhx/templates/meshes24.mhx")
      if tmpl:
@@ -145,7 +145,7 @@ def copyMeshFile249(obj, tmpl, fp):
             mainMesh = True
             fp.write("#if useMesh\n")
         elif words[0] == 'vertgroup':
-            mhx_main.copyVertGroups("shared/mhx/templates/vertexgroups-24.mhx", fp, None)    
+            copyVertGroups("shared/mhx/templates/vertexgroups-24.mhx", fp, None)    
             skipOne = True
             skip = False
         elif words[0] == 'v' and inZone:
@@ -162,6 +162,90 @@ def copyMeshFile249(obj, tmpl, fp):
     return
 
 #
+#    copyVertGroups(tmplName, fp, proxy):
+#
+
+def copyVertGroups(tmplName, fp, proxy):
+    tmpl = open(tmplName)
+    shapes = []
+    vgroups = []
+
+    if tmpl == None:
+        print("*** Cannot open "+tmplName)
+        return
+    if not proxy:
+        for line in tmpl:
+            fp.write(line)
+    else:
+        for line in tmpl:
+            words= line.split()
+            if len(words) == 0:
+                fp.write(line)
+            elif words[0] == 'wv':
+                v = int(words[1])
+                wt = float(words[2])
+                try:
+                    vlist = proxy.verts[v]
+                except:
+                    vlist = []
+                for (pv, w) in vlist:
+                    pw = w*wt
+                    if pw > 1e-4:
+                        vgroups.append((pv, pw))
+            elif words[0] == 'VertexGroup':
+                gname = words[1]
+                vgroups = []
+            elif words[0] == 'end':
+                if vgroups:
+                    fp.write("  VertexGroup %s\n" % gname)
+                    printProxyVGroup(fp, vgroups)
+                    vgroups = []
+                    fp.write(line)
+            else:    
+                fp.write(line)
+    print("    %s copied" % tmplName)
+    tmpl.close()
+    return
+
+#
+#    printProxyVGroup(fp, vgroups):
+#
+
+def printProxyVGroup(fp, vgroups):
+    vgroups.sort()
+    pv = -1
+    while vgroups:
+        (pv0, wt0) = vgroups.pop()
+        if pv0 == pv:
+            wt += wt0
+        else:
+            if pv >= 0 and wt > 1e-4:
+                fp.write("    wv %d %.4f ;\n" % (pv, wt))
+            (pv, wt) = (pv0, wt0)
+    if pv >= 0 and wt > 1e-4:
+        fp.write("    wv %d %.4f ;\n" % (pv, wt))
+    return
+
+#
+#    copyMaterialFile(infile, fp):
+#
+
+def copyMaterialFile(infile, fp):
+    tmpl = open(infile, "rU")
+    for line in tmpl:
+        words= line.split()
+        if len(words) == 0:
+            fp.write(line)
+        elif words[0] == 'filename':
+            path1 = os.path.expanduser("./data/textures/")
+            (path, filename) = os.path.split(words[1])
+            file1 = os.path.realpath(path1+filename)
+            fp.write("  filename %s ;\n" % file1)
+        else:
+            fp.write(line)
+    tmpl.close()
+
+#
 #    exportProxy24(obj, plist, fp):
 #
 
@@ -169,7 +253,7 @@ def exportProxy24(obj, plist, fp):
     proxy = mh2proxy.readProxyFile(obj, plist, True)
     if not proxy:
         return
-    faces = mhx_main.loadFacesIndices(obj)
+    faces = mh2proxy.oldStyleFaces(obj)
     tmpl = open("shared/mhx/templates/proxy24.mhx", "rU")
     for line in tmpl:
         words= line.split()
@@ -182,7 +266,7 @@ def exportProxy24(obj, plist, fp):
         elif words[0] == 'v':
             for bary in proxy.realVerts:
                 (x,y,z) = mh2proxy.proxyCoord(bary)
-                fp.write("v %.6g %.6g %.6g ;\n" % (x, -z, y))
+                fp.write("v %.4g %.4g %.4g ;\n" % (x, -z, y))
         elif words[0] == 'f':
             for (f,g) in proxy.faces:
                 fp.write("    f")
@@ -198,16 +282,13 @@ def exportProxy24(obj, plist, fp):
                 fp.write("    vt")
                 for v in f:
                     uv = proxy.texVerts[v]
-                    fp.write(" %.6g %.6g" %(uv[0], uv[1]))
+                    fp.write(" %.4g %.4g" %(uv[0], uv[1]))
                 fp.write(" ;\n")
         elif words[0] == 'vertgroup':
-            mhx_main.copyVertGroups("shared/mhx/templates/vertexgroups-24.mhx", fp, proxy)    
+            copyVertGroups("shared/mhx/templates/vertexgroups-24.mhx", fp, proxy)    
         elif words[0] == 'shapekey':
             fp.write("  ShapeKey Basis Sym\n  end ShapeKey\n")
-            if mhx_main.BODY_LANGUAGE:
-                copyShapeKeys("shared/mhx/templates/shapekeys-bodylanguage25.mhx", fp, proxy, False)    
-            else:
-                copyShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx", fp, proxy, False)    
+            copyShapeKeys("shared/mhx/templates/shapekeys-bodylanguage25.mhx", fp, proxy, False)    
             copyShapeKeys("shared/mhx/templates/shapekeys-extra24.mhx", fp, proxy, False)    
             copyShapeKeys("shared/mhx/templates/shapekeys-body25.mhx", fp, proxy, False)    
             writeIpo(fp)
@@ -221,19 +302,13 @@ def exportProxy24(obj, plist, fp):
 #
 
 def exportRawData(obj, fp):    
-    # Ugly klugdy fix of extra vert
-    #x1 = aljabr.vadd(obj.verts[11137].co, obj.verts[11140].co)
-    #x2 = aljabr.vadd(obj.verts[11162].co, obj.verts[11178].co)
-    #x = aljabr.vadd(x1,x2)
-    #obj.verts[14637].co = aljabr.vmul(x, 0.25)
-    # end ugly kludgy
     for v in obj.verts:
-        fp.write("v %.6g %.6g %.6g ;\n" %(v.co[0], v.co[1], v.co[2]))
+        fp.write("v %.4g %.4g %.4g ;\n" %(v.co[0], v.co[1], v.co[2]))
         
-    for uv in obj.uvValues:
-        fp.write("vt %.6g %.6g ;\n" %(uv[0], uv[1]))
+    for uv in obj.texco:
+        fp.write("vt %.4g %.4g ;\n" %(uv[0], uv[1]))
         
-    faces = mhx_main.loadFacesIndices(obj)
+    faces = mh2proxy.oldStyleFaces(obj)
     for f in faces:
         fp.write("f")
         #print(f)
@@ -460,6 +535,18 @@ def writeIpo(fp):
 
     return
 
+
+def useThisShape(name, proxy):
+    if not proxy:
+        return True
+    if proxy.type == 'Proxy':
+        return True
+    if name in proxy.shapekeys:
+        return True
+    if name[:-2] in proxy.shapekeys:
+        return True
+    return False
+
 #
 #    copyShapeKeys(tmplName, fp, proxy, doScale):
 #
@@ -499,7 +586,7 @@ def copyShapeKeys(tmplName, fp, proxy, doScale):
             elif words[0] == 'ShapeKey':
                 if doScale:
                     scale = setShapeScale(words)
-                if mhx_main.useThisShape(words[1], proxy):
+                if useThisShape(words[1], proxy):
                     fp.write(line)
                     ignore = False
                 else:

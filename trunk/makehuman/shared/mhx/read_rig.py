@@ -27,10 +27,10 @@ TO DO
 import aljabr
 from aljabr import *
 import os
+import mh2proxy
 
 from . import the
 from the import *
-from . import mhxbones
 
 #
 #   setupRigJoint (words, obj, verts, locations):
@@ -39,7 +39,7 @@ def setupRigJoint (words, obj, verts, locations):
     key = words[0]
     typ = words[1]
     if typ == 'joint':
-        loc = mhxbones.calcJointPos(obj, words[2])
+        loc = mh2proxy.calcJointPos(obj, words[2])
         locations[key] = loc
     elif typ == 'vertex':
         v = int(words[2])

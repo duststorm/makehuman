@@ -25,6 +25,7 @@ __docformat__ = 'restructuredtext'
 
 import aljabr
 from aljabr import *
+import mh2proxy
 
 #
 #	Flags
@@ -794,25 +795,13 @@ constraints = [
 ]	
 
 #
-#	calcJointPos(obj, joint):
-#
-
-def calcJointPos(obj, joint):
-	g = obj.getFaceGroup("joint-"+joint)
-	verts = []
-	for f in g.faces:
-		for v in f.verts:
-			verts.append(v.co)
-	return centroid(verts)
-
-#
 #	setupLocations (obj):
 #
 def setupLocations (obj):
 	global locations
 	locations = {}
 	for j in joints:
-		loc = calcJointPos(obj, j)
+		loc = mh2proxy.calcJointPos(obj, j)
 		locations[j] = loc
 	for (j, v) in vertLocations:
 		locations[j] = obj.verts[v].co

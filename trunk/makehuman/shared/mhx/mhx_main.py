@@ -312,7 +312,7 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
             elif key == 'Faces':
                 for f in obj.faces:
                     fv = f.verts
-                    if isTriangle(f):
+                    if f.isTriangle():
                         fp.write("    f %d %d %d ;\n" % (fv[0].idx, fv[1].idx, fv[2].idx))
                     else:
                         fp.write("    f %d %d %d %d ;\n" % (fv[0].idx, fv[1].idx, fv[2].idx, fv[3].idx))
@@ -321,7 +321,7 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
                 writeFaceNumbers(fp, human, proxyData)
             elif key == 'FTTriangles':
                 for f in obj.faces:
-                    if isTriangle(f):
+                    if f.isTriangle():
                         fp.write("    mn %d 1 ;\n" % f.idx)
             elif key == 'ProxyUVCoords':
                 layers = list(proxy.uvtexLayerName.keys())
@@ -355,7 +355,7 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
                         uv0 = obj.texco[f.uv[0]]
                         uv1 = obj.texco[f.uv[1]]
                         uv2 = obj.texco[f.uv[2]]
-                        if isTriangle(f):
+                        if f.isTriangle():
                             fp.write("    vt %.4g %.4g %.4g %.4g %.4g %.4g ;\n" % (uv0[0], uv0[1], uv1[0], uv1[1], uv2[0], uv2[1]))
                         else:
                             uv3 = obj.texco[f.uv[3]]
@@ -422,9 +422,6 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
 
     return
 
-def isTriangle(f):
-    return (f.verts[0].idx == f.verts[3].idx)
-    
 #
 #   writeFaceNumbers(fp, human, proxyData):
 #
@@ -1138,54 +1135,6 @@ def proxyShapes(typ, human, proxyData, fp):
     fp.write("#endif\n")
         
 #
-#    copyMaterialFile(infile, fp):
-#
-
-def copyMaterialFile(infile, fp):
-    tmpl = open(infile, "rU")
-    for line in tmpl:
-        words= line.split()
-        if len(words) == 0:
-            fp.write(line)
-        elif words[0] == 'filename':
-            path1 = os.path.expanduser("./data/textures/")
-            (path, filename) = os.path.split(words[1])
-            file1 = os.path.realpath(path1+filename)
-            fp.write("  filename %s ;\n" % file1)
-        else:
-            fp.write(line)
-    tmpl.close()
-
-#
-#   loadFacesIndices(obj):
-#   Copied old loadFacesIndices from files3d.
-#
-
-def loadFacesIndices(obj):
-    path = "data/3dobjs/base.obj"
-    try:
-        fileDescriptor = open(path)
-    except:
-        print 'Error opening %s file' % path
-        return
-    vertsIdxs = []
-    for data in fileDescriptor:
-        dataList = data.split()
-        if dataList[0] == 'f':
-            vIndices = []
-            for faceData in dataList[1:]:
-                vInfo = faceData.split('/')
-                vIdx = int(vInfo[0]) - 1  # -1 because obj is 1 based list
-                if len(vInfo) > 1 and vInfo[1] != '':
-                    uvIdx = int(vInfo[1]) - 1  # -1 because obj is 1 based list
-                    vIndices.append([vIdx, uvIdx])
-                else:
-                    vIndices.append([vIdx, 0])
-            vertsIdxs.append(vIndices)
-    fileDescriptor.close()
-    return vertsIdxs
-
-#
 #   writeMultiMaterials(uvset, human, fp):
 #
       
@@ -1267,124 +1216,9 @@ def writeMultiMaterials(uvset, human, fp):
             n += 1
         fp.write("end Material\n\n")
     
-
 #
-#    getLoc(joint, obj):
-#
-
-import mhxbones
-
-def getJoint(joint, obj, locations):
-    try:
-        loc = locations[joint]
-    except:
-        loc = mhxbones.calcJointPos(obj, joint)
-        locations[joint] = loc
-    return loc
-
-#
-#    writeRigBones(fp, bones):
-#    writeRigPose(fp, name, bones):
 #    writeRigWeights(fp, weights):
 #
-
-"""
-def writeRigBones(fp, bones):
-    ox = the.Origin[0]
-    oy = the.Origin[1]
-    oz = the.Origin[2]
-    for (bone, head, tail, roll, parent, options) in bones:
-        fp.write("\n  Bone %s True\n" % bone)
-        (x, y, z) = head
-        fp.write("    head  %.4f %.4f %.4f  ;\n" % (x-ox,-z+oz,y-oy))
-        (x, y, z) = tail
-        fp.write("    tail %.4f %.4f %.4f  ;\n" % (x-ox,-z+oz,y-oy))
-        if parent and parent != '-':
-            fp.write("    parent Refer Bone %s ;\n" % parent)
-        fp.write(
-    "    roll %.4f ; \n" % (roll)+
-    "    use_connect False ; \n")
-        if ('-circ' in options.keys() or '-box' in options.keys()):
-            fp.write("    show_wire True ;\n")
-        try:
-            options['-nd']
-            fp.write("    use_deform False ; \n")
-        except:
-            fp.write("    use_deform True ; \n")
-        fp.write("  end Bone \n")
-    return
-
-def getRadius(key, options):
-    try:
-        val = options[key]
-        return int(val[0])
-    except:
-        return None
-
-def writeRigPose(fp, name, bones):
-    circles = []
-    cubes = []
-    for (bone, head, tail, roll, parent, options) in bones:
-        r = getRadius('-circ', options)
-        if r and not (r in circles):
-            mhx_rig.setupCircle(fp, "RigCircle%02d" % r, 0.1*r)
-            circles.append(r)
-        r = getRadius('-box', options)
-        if r and not (r in cubes):
-            mhx_rig.setupCube(fp, "RigCube%02d" % r, 0.1*r, 0)
-            cubes.append(r)
-
-    fp.write("\nPose %s\n" % name)
-    for (bone, head, tail, roll, parent, options) in bones:
-        fp.write("  Posebone %s True \n" % bone)
-
-        # IK constraint
-        try:
-            val = options['-ik']
-        except:
-            val = None
-        if val:
-            (subtar, chainlen, inf) = val
-            fp.write(
-"    Constraint IK IK True\n")
-            if subtar:
-                fp.write(
-"      target Refer Object %s ;\n" % name +
-"      subtarget '%s' ;\n" % subtar +
-"      use_tail True ;\n" +
-"      use_target True ;\n")
-            else:
-                fp.write(
-"      use_tail False ;\n" +
-"      use_target True ;\n")
-            fp.write(
-"      chain_count %s ;\n" % chainlen +
-"      influence %s ;\n" % inf +
-"    end Constraint\n")
-
-        # Not connected
-        try:
-            options['-nc']
-        except:
-            fp.write(
-"    lock_location Array 1 1 1 ;\n" +
-"    lock_scale Array 1 1 1  ; \n")
-
-        # Circle custom shape
-        r = getRadius('-circ', options)
-        if r:
-            fp.write(
-"    custom_shape Refer Object RigCircle%02d ; \n" % r)
-
-        # Box custom shape
-        r = getRadius('-box', options)
-        if r:
-            fp.write(
-"    custom_shape Refer Object RigCube%02d ; \n" % r)
-
-        fp.write("  end Posebone\n")
-    fp.write("end Pose\n\n")
-"""
 
 def writeRigWeights(fp, weights):
     for grp in weights.keys():
