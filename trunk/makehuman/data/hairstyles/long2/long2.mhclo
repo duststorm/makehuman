@@ -4,7 +4,7 @@
 # name HairLong2
 # subsurf 1 1
 # rig long2.rig
-# texture long2_texture.tif
+# texture long2_texture.png
 # material long2
 diffuse_intensity 0.8
 specular_intensity 0.0

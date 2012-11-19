@@ -58,8 +58,15 @@ class HairTaskView(gui3d.TaskView):
             
         mesh = files3d.loadMesh(obj)
         if mesh:
-            tex = obj.replace('.obj', '_texture.png')        
-            mesh.setTexture(tex)        
+            human.hairProxy = mh2proxy.readProxyFile(human.meshData, mhclo, False)
+            if human.hairProxy.texture:
+                (folder, name) = human.hairProxy.texture
+                tex = os.path.join(folder, name)
+                mesh.setTexture(tex)
+            else:
+                tex = obj.replace('.obj', '_texture.png')
+                mesh.setTexture(tex)
+
             human.hairObj = gui3d.app.addObject(gui3d.Object(human.getPosition(), mesh))
             human.hairObj.setRotation(human.getRotation())
             human.hairObj.mesh.setCameraProjection(0)
@@ -68,7 +75,6 @@ class HairTaskView(gui3d.TaskView):
             human.hairObj.mesh.originalHairVerts = [v.co[:] for v in human.hairObj.mesh.verts]
                 
             hairName = human.hairObj.mesh.name.split('.')[0]
-            human.hairProxy = mh2proxy.readProxyFile(human.meshData, mhclo, False)
 
             self.adaptHairToHuman(human)
             human.hairObj.setSubdivided(human.isSubdivided())
