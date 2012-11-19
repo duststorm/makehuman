@@ -14,7 +14,7 @@
 // 
 
 #include "xxLowercaseFileNamexx.inc"
-#if (file_exists("makehuman_hair.inc")) #include "makehuman_hair.inc" #end  
+// #if (file_exists("makehuman_hair.inc")) #include "makehuman_hair.inc" #end  
 
 camera {MakeHuman_Camera}
 light_source {MakeHuman_LightSource}

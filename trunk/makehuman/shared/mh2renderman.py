@@ -141,6 +141,12 @@ class ImageLight:
                 s = max(0, min(255, int(s*255)))
                 v.setColor([s, s, s, 255])
 
+            
+            progress = 0
+            gui3d.app.progress(progress)
+            fnmax = int(0.1*len(mesh.faces))
+            fn = 0            
+            
             for g in mesh.faceGroups:
 
                 if g.name.startswith("joint") or g.name.startswith("helper"):
@@ -153,12 +159,22 @@ class ImageLight:
                     self.RasterizeTriangle(dstImg, co[0], co[1], co[2], ColorShader(c[:3]))
                     self.RasterizeTriangle(dstImg, co[2], co[3], co[0], ColorShader((c[2], c[3], c[0])))
 
+                    fn += 1
+                    if fn % fnmax == 0:
+                        progress += 0.1
+                        gui3d.app.progress(progress)
+                        fn = 0
+
+            gui3d.app.progress(1.0)
+
             #dstImg.resize(128, 128);
 
-            dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.tga'))
+            filepath = os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.tga')
+            print "Save to", filepath
+            dstImg.save(filepath)
             #gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.tga'))
 
-            mesh.setColor([255, 255, 255, 255])
+            #mesh.setColor([255, 255, 255, 255])
 
 
 class MaterialParameter:
@@ -407,11 +423,21 @@ class RMRHuman(RMRObject):
             
     def materialInit(self):
         self.basetexture =  os.path.splitext(os.path.basename(self.human.getTexture()))[0]
+
         if self.human.hairObj != None:
             self.hairtexture =  os.path.splitext(os.path.basename(self.human.hairObj.getTexture()))[0]
             self.hairMat = RMRMaterial("hairpoly")
             self.hairMat.parameters.append(MaterialParameter("string", "colortexture", self.hairtexture+".png"))
             #print "HAIRTEXTURE",  self.hairtexture
+
+        self.cloMaterials = []
+        for clo in self.human.clothesObjs:
+            tex = os.path.splitext(os.path.basename(co.getTexture()))[0]
+            mat = RMRMaterial(clo.name)
+            self.cloMaterials.append(mat)
+            mat.parameters.append(MaterialParameter("string", "colortexture", tex+".png"))
+            print "CLOTEXTURE", tex
+            
         #print "BASETEXTURE",  self.basetexture
         
         
@@ -471,11 +497,19 @@ class RMRHuman(RMRObject):
         self.skin.material = self.skinMat
         self.skin.materialBump = self.skinBump
         self.subObjects.append(self.skin)        
-        
+                
         if self.human.hairObj != None:
             self.hair = RMRObject("hair", self.human.hairObj.mesh)
             self.hair.material = self.hairMat            
             self.subObjects.append(self.hair)
+            
+        self.clothes = []
+        for n,clo in enumerate(self.human.clothesObjs):
+            rmrObj = RMRObject(clo.name, clo.meshData)
+            self.clothes.append(rmrObj)
+            rmrObj.material = self.cloMaterials[n]
+            self.subObjects.append(clo)
+        
         
 
     def getSubObject(self, name):
@@ -606,6 +640,7 @@ class RMRScene:
         self.applicationPath = os.getcwd()  # TODO: this may not always return the app folder
         self.appTexturePath = os.path.join(self.applicationPath, 'data', 'textures')
         self.hairTexturePath = os.path.join(self.applicationPath, 'data', 'hairstyles')
+        self.clothesTexturePath = os.path.join(self.applicationPath, 'data', 'clothes')
         self.skinTexturePath = os.path.join(mh.getPath(''), 'data', 'skins')
         
         #self.appObjectPath = os.path.join(self.applicationPath, 'data', '3dobjs')
@@ -747,7 +782,7 @@ class RMRScene:
         ribSceneHeader.shadingRate = self.app.settings.get('rendering_aqsis_shadingrate', 2)
         ribSceneHeader.setCameraPosition(self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ)
         ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
-        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath,self.skinTexturePath])
+        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath,self.clothesTexturePath,self.skinTexturePath])
         ribSceneHeader.fov = self.camera.fovAngle
         ribSceneHeader.displayName = os.path.join(self.ribsPath, imgFile).replace('\\', '/')
         ribSceneHeader.displayType = "file"

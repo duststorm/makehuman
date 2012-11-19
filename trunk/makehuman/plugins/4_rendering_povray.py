@@ -79,7 +79,7 @@ class PovrayTaskView(gui3d.TaskView):
             if sys.platform == 'linux2':
                 binarie = 'linux'
             #
-            mh2povray.povrayExport(gui3d.app.selectedHuman.mesh, gui3d.app,
+            mh2povray.povrayExport(gui3d.app.selectedHuman, gui3d.app,
                                    {'source':'ini' if self.iniButton.selected else 'gui',
                                     'format':'array' if self.arrayButton.selected else 'mesh2',
                                     'action':'export' if self.exportButton.selected else 'render',

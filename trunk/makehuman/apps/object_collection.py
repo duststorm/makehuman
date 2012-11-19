@@ -63,8 +63,8 @@ class CStuff:
     def __repr__(self):
         return "<CStuff %s %s mat %s tex %s>" % (self.name, self.type, self.material, self.texture)
 
-    def setBones(self, amt):
-        (rigHead, rigTail, rigHier, bones, rawWeights) = amt
+    def setBones(self, armature):
+        (rigHead, rigTail, rigHier, bones, rawWeights) = armature
         self.rigHead = rigHead
         self.rigTail = rigTail
         self.rigHier = rigHier
@@ -182,10 +182,10 @@ def filterMesh(mesh1, obj, deleteGroups, deleteVerts, helpers, eyebrows, lashes)
     return (verts2, vnormals2, uvValues2, faces2, weights2, targets2)
 
 #
-#   setupObjects(name, human, amt):
+#   setupObjects(name, human, armature):
 #
 
-def setupObjects(name, human, amt, helpers=False, eyebrows=True, lashes=True):
+def setupObjects(name, human, armature=None, helpers=False, eyebrows=True, lashes=True):
     global theStuff, theTextures, theTexFiles, theMaterials
     
     cfg = export_config.exportConfig(human, True)
@@ -196,13 +196,13 @@ def setupObjects(name, human, amt, helpers=False, eyebrows=True, lashes=True):
     rawTargets = []
     stuffs = []
     stuff = CStuff(name, None)
-    if amt:
-        stuff.setBones(amt)
+    if armature:
+        stuff.setBones(armature)
     theStuff = stuff
     deleteGroups = []
     deleteVerts = []
-    foundProxy = setupProxies('Proxy', name, obj, stuffs, amt, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
-    setupProxies('Clothes', None, obj, stuffs, amt, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
+    setupProxies('Clothes', None, obj, stuffs, armature, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
+    foundProxy = setupProxies('Proxy', name, obj, stuffs, armature, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
     if not foundProxy:
         mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
         if (helpers and eyebrows and lashes and 
@@ -213,18 +213,18 @@ def setupObjects(name, human, amt, helpers=False, eyebrows=True, lashes=True):
             mesh2 = filterMesh(mesh1, obj, deleteGroups, deleteVerts, helpers, eyebrows, lashes)
         stuff.setMesh(mesh2)
         stuffs = [stuff] + stuffs
-    return (stuff, stuffs, rawTargets)
+    return stuffs
 
 #
-#    setupProxies(typename, name, obj, stuffs, amt, rawTargets, proxyList, deleteGroups, deleteVerts):
+#    setupProxies(typename, name, obj, stuffs, armature, rawTargets, proxyList, deleteGroups, deleteVerts):
 #
 
-def setupProxies(typename, name, obj, stuffs, amt, rawTargets, proxyList, deleteGroups, deleteVerts):
+def setupProxies(typename, name, obj, stuffs, armature, rawTargets, proxyList, deleteGroups, deleteVerts):
     global theStuff
     
     foundProxy = False    
     for pfile in proxyList:
-        if pfile.useDae and pfile.type == typename and pfile.file:
+        if pfile.type == typename and pfile.file:
             proxy = mh2proxy.readProxyFile(obj, pfile, True)
             if proxy and proxy.name and proxy.texVerts:
                 foundProxy = True
@@ -234,8 +234,8 @@ def setupProxies(typename, name, obj, stuffs, amt, rawTargets, proxyList, delete
                     stuff = CStuff(name, proxy)
                 else:
                     stuff = CStuff(proxy.name, proxy)
-                if amt:
-                    stuff.setBones(amt)
+                if armature:
+                    stuff.setBones(armature)
                 if stuff:
                     if pfile.type == 'Proxy':
                         theStuff = stuff

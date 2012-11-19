@@ -46,6 +46,7 @@ import subprocess
 import mh2povray_ini
 import random
 import mh
+import object_collection
 
 def downloadPovRay():
     
@@ -54,7 +55,7 @@ def downloadPovRay():
 
 # Create an instance of the Hairgenerator class with a global context.
 
-def povrayExport(obj, app, settings):
+def povrayExport(human, app, settings):
     """
   This function exports data in a format that can be used to reconstruct the humanoid 
   object in POV-Ray. It supports a range of options that can be specified in the Python 
@@ -72,7 +73,7 @@ def povrayExport(obj, app, settings):
       *Camera object*. The camera to render from 
   
   """
-
+    obj = human.meshData
     print 'POV-Ray Export of object: ', obj.name
 
     # Read settings from an ini file. This reload enables the settings to be
@@ -93,9 +94,9 @@ def povrayExport(obj, app, settings):
     # or the more flexible but slower array and macro combo is to be generated.
 
     if format == 'array':
-        povrayExportArray(obj, camera, resolution, path)
+        povrayExportArray(human, camera, resolution, path)
     if format == 'mesh2':
-        povrayExportMesh2(obj, camera, resolution, path)
+        povrayExportMesh2(human, camera, resolution, path)
 
     outputDirectory = os.path.dirname(path)
     #
@@ -167,7 +168,7 @@ def povrayExport(obj, app, settings):
                        downloadPovRay )
             return
 
-def povrayExportArray(obj, camera, resolution, path):
+def povrayExportArray(human, camera, resolution, path):
     """
   This function exports data in the form of arrays of data the can be used to 
   reconstruct a humanoid object using some very simple POV-Ray macros. These macros 
@@ -196,6 +197,8 @@ def povrayExportArray(obj, camera, resolution, path):
       *string*. The file system path to the output files that need to be generated. 
   """
 
+    obj = human.meshData
+    
   # Certain files and blocks of SDL are mostly static and can be copied directly
   # from reference files into the generated output directories or files.
 
@@ -266,11 +269,20 @@ def povrayExportArray(obj, camera, resolution, path):
 
     povraySizeData(obj, outputFileDescriptor)
 
+  # Load all stuff to be rendered - mesh, clothes, polygon hair
+  
+    stuffs = object_collection.setupObjects("PowRay", human, helpers=False, eyebrows=False, lashes=False)
+    
   # Vertices - Write a POV-Ray array to the output stream
 
-    outputFileDescriptor.write('#declare MakeHuman_VertexArray = array[%s] {\n  ' % len(obj.verts))
-    for v in obj.verts:
-        outputFileDescriptor.write('<%s,%s,%s>' % (v.co[0], v.co[1], v.co[2]))
+    nVerts = 0
+    for stuff in stuffs:
+        nVerts += len(stuff.verts)
+        
+    outputFileDescriptor.write('#declare MakeHuman_VertexArray = array[%s] {\n  ' % nVerts)
+    for stuff in stuffs:
+        for v in stuff.verts:
+            outputFileDescriptor.write('<%s,%s,%s>' % tuple(v))
     outputFileDescriptor.write('''
 }
 
@@ -278,22 +290,28 @@ def povrayExportArray(obj, camera, resolution, path):
 
   # Normals - Write a POV-Ray array to the output stream
 
-    outputFileDescriptor.write('#declare MakeHuman_NormalArray = array[%s] {\n  ' % len(obj.verts))
-    for v in obj.verts:
-        outputFileDescriptor.write('<%s,%s,%s>' % (v.no[0], v.no[1], v.no[2]))
+    outputFileDescriptor.write('#declare MakeHuman_NormalArray = array[%s] {\n  ' % nVerts)
+    for stuff in stuffs:
+        for vno in stuff.vnormals:
+            outputFileDescriptor.write('<%s,%s,%s>' % tuple(vno))
     outputFileDescriptor.write('''
 }
 
 ''')
 
-    faces = [f for f in obj.faces if not 'joint-' in f.group.name]
+    #faces = [f for f in obj.faces if not 'joint-' in f.group.name]
 
   # UV Vectors - Write a POV-Ray array to the output stream
 
-    outputFileDescriptor.write('#declare MakeHuman_UVArray = array[%s] {\n  ' % len(obj.texco))
-    for uv in obj.texco:
+    nUvVerts = 0
+    for stuff in stuffs:
+        nUvVerts += len(stuff.uvValues)
         
-        outputFileDescriptor.write('<%s,%s>' % (uv[0], uv[1]))
+    outputFileDescriptor.write('#declare MakeHuman_UVArray = array[%s] {\n  ' % nUvVerts)
+
+    for stuff in stuffs:
+        for uv in stuff.uvValues:
+            outputFileDescriptor.write('<%s,%s>' % tuple(uv))
 
     # outputFileDescriptor.write("\n")
 
@@ -304,15 +322,32 @@ def povrayExportArray(obj, camera, resolution, path):
 
   # Faces - Write a POV-Ray array of arrays to the output stream
 
-    outputFileDescriptor.write('#declare MakeHuman_FaceArray = array[%s][3] {\n  ' % (len(faces) * 2))
-    for f in faces:
-        outputFileDescriptor.write('{%s,%s,%s}' % (f.verts[0].idx, f.verts[1].idx, f.verts[2].idx))
-        outputFileDescriptor.write('{%s,%s,%s}' % (f.verts[2].idx, f.verts[3].idx, f.verts[0].idx))
+    nTriangles = 0
+    for stuff in stuffs:
+        for f in stuff.faces:
+            nTriangles += len(f)-2
+        
+    outputFileDescriptor.write('#declare MakeHuman_FaceArray = array[%s][3] {\n  ' % nTriangles)
+    
+    nVerts = 0
+    for stuff in stuffs:
+        for f in stuff.faces:
+            verts = []
+            for v,vt in f:
+                verts.append(v+nVerts)
+            outputFileDescriptor.write('{%s,%s,%s}' % (verts[0], verts[1], verts[2]))
+            if len(verts) == 4:
+                outputFileDescriptor.write('{%s,%s,%s}' % (verts[2], verts[3], verts[0]))
+        nVerts += len(stuff.verts)
+        
     outputFileDescriptor.write('''
 }
 
 ''')
 
+    """ 
+    Ignore facegroups
+    
   # FaceGroups - Write a POV-Ray array to the output stream and build a list of indices
   # that can be used to cross-reference faces to the Face Groups that they're part of.
 
@@ -336,18 +371,31 @@ def povrayExportArray(obj, camera, resolution, path):
 }
 
 ''')
+    """
 
   # UV Indices for each face - Write a POV-Ray array to the output stream
 
-    outputFileDescriptor.write('#declare MakeHuman_UVIndexArray = array[%s][3] {\n  ' % (len(faces) * 2))
-    for f in faces:
-        outputFileDescriptor.write('{%s,%s,%s}' % (f.uv[0], f.uv[1], f.uv[2]))
-        outputFileDescriptor.write('{%s,%s,%s}' % (f.uv[2], f.uv[3], f.uv[0]))
+    outputFileDescriptor.write('#declare MakeHuman_UVIndexArray = array[%s][3] {\n  ' % nTriangles)
+
+    nTexVerts = 0
+    for stuff in stuffs:
+        for f in stuff.faces:
+            vts = []
+            for v,vt in f:
+                vts.append(vt+nTexVerts)        
+            outputFileDescriptor.write('{%s,%s,%s}' % (vts[0], vts[1], vts[2]))
+            if len(vts) == 4:
+                outputFileDescriptor.write('{%s,%s,%s}' % (vts[2], vts[3], vts[0]))
+        nTexVerts += len(stuff.uvValues)                
+
     outputFileDescriptor.write('''
 }
 
 ''')
 
+    """
+    Ignore joints
+    
   # Joint Positions - Write a set of POV-Ray variables to the output stream
 
     faceGroupExtents = {}
@@ -387,7 +435,8 @@ def povrayExportArray(obj, camera, resolution, path):
     outputFileDescriptor.write('''
 
 ''')
-
+    """
+    
   # Copy macro and texture definitions straight across to the output file.
 
     try:
@@ -444,7 +493,7 @@ def povrayExportArray(obj, camera, resolution, path):
     print 'Sample POV-Ray scene file generated.'
 
 
-def povrayExportMesh2(obj, camera, resolution, path):
+def povrayExportMesh2(human, camera, resolution, path):
     """
   This function exports data in the form of a mesh2 humanoid object. The POV-Ray 
   file generated is fairly inflexible, but is highly efficient. 
@@ -463,6 +512,8 @@ def povrayExportMesh2(obj, camera, resolution, path):
       *string*. The file system path to the output files that need to be generated. 
   """
 
+    obj = human.meshData
+    
   # Certain blocks of SDL are mostly static and can be copied directly from reference
   # files into the output files.
 
@@ -532,6 +583,8 @@ def povrayExportMesh2(obj, camera, resolution, path):
 
     povraySizeData(obj, outputFileDescriptor)
 
+    stuffs = object_collection.setupObjects("PowRay", human, helpers=False, eyebrows=False, lashes=False)
+
   # Mesh2 Object - Write the initial part of the mesh2 object declaration
 
     outputFileDescriptor.write('// Humanoid mesh2 definition\n')
@@ -540,9 +593,15 @@ def povrayExportMesh2(obj, camera, resolution, path):
   # Vertices - Write a POV-Ray array to the output stream
 
     outputFileDescriptor.write('  vertex_vectors {\n  ')
-    outputFileDescriptor.write('    %s\n  ' % len(obj.verts))
-    for v in obj.verts:
-        outputFileDescriptor.write('<%s,%s,%s>' % (v.co[0], v.co[1], v.co[2]))
+    
+    nVerts = 0
+    for stuff in stuffs:
+        nVerts += len(stuff.verts)    
+    outputFileDescriptor.write('    %s\n  ' % nVerts)
+    
+    for stuff in stuffs:
+        for v in stuff.verts:
+            outputFileDescriptor.write('<%s,%s,%s>' % tuple(v))
     outputFileDescriptor.write('''
   }
 
@@ -551,15 +610,17 @@ def povrayExportMesh2(obj, camera, resolution, path):
   # Normals - Write a POV-Ray array to the output stream
 
     outputFileDescriptor.write('  normal_vectors {\n  ')
-    outputFileDescriptor.write('    %s\n  ' % len(obj.verts))
-    for v in obj.verts:
-        outputFileDescriptor.write('<%s,%s,%s>' % (v.no[0], v.no[1], v.no[2]))
+    outputFileDescriptor.write('    %s\n  ' % nVerts)
+    for stuff in stuffs:
+        for vno in stuff.vnormals:
+            outputFileDescriptor.write('<%s,%s,%s>' % tuple(vno))
     outputFileDescriptor.write('''
   }
 
 ''')
 
-    #faces = [f for f in obj.faces if not 'joint-' in f.group.name]
+    """
+    faces = [f for f in obj.faces if not 'joint-' in f.group.name]
 
     fgroups = []
     for fg in obj.faceGroups:
@@ -567,15 +628,21 @@ def povrayExportMesh2(obj, camera, resolution, path):
                 'helper-' in fg.name):
             fgroups.append(fg.name)    
     faces = obj.getFacesForGroups(fgroups)    
- 
+    """
+    
   # UV Vectors - Write a POV-Ray array to the output stream
 
+
+    nUvVerts = 0
+    for stuff in stuffs:
+        nUvVerts += len(stuff.uvValues)
+
     outputFileDescriptor.write('  uv_vectors {\n  ')
-    outputFileDescriptor.write('    %s\n  ' % len(obj.texco))
-    for uv in obj.texco:
-        
-        outputFileDescriptor.write('<%s,%s>' % (uv[0], uv[1]))
-        
+    outputFileDescriptor.write('    %s\n  ' % nUvVerts)
+
+    for stuff in stuffs:
+        for uv in stuff.uvValues:
+            outputFileDescriptor.write('<%s,%s>' % tuple(uv))        
     outputFileDescriptor.write('''
   }
 
@@ -583,26 +650,47 @@ def povrayExportMesh2(obj, camera, resolution, path):
 
   # Faces - Write a POV-Ray array of arrays to the output stream
 
-    outputFileDescriptor.write('  face_indices {\n  ')
-    outputFileDescriptor.write('    %s\n  ' % (len(faces) * 2))
+    nTriangles = 0
+    for stuff in stuffs:
+        for f in stuff.faces:
+            nTriangles += len(f)-2
 
-    for fn in faces:
-        f = obj.faces[fn]    
-        outputFileDescriptor.write('<%s,%s,%s>' % (f.verts[0].idx, f.verts[1].idx, f.verts[2].idx))
-        outputFileDescriptor.write('<%s,%s,%s>' % (f.verts[2].idx, f.verts[3].idx, f.verts[0].idx))
+    outputFileDescriptor.write('  face_indices {\n  ')
+    outputFileDescriptor.write('    %s\n  ' % nTriangles)
+
+    nVerts = 0
+    for stuff in stuffs:
+        for f in stuff.faces:
+            verts = []
+            for v,vt in f:
+                verts.append(v+nVerts)
+            outputFileDescriptor.write('<%s,%s,%s>' % (verts[0], verts[1], verts[2]))
+            if len(verts) == 4:
+                outputFileDescriptor.write('<%s,%s,%s>' % (verts[2], verts[3], verts[0]))
+        nVerts += len(stuff.verts)
+
     outputFileDescriptor.write('''
   }
 
 ''')
 
+
   # UV Indices for each face - Write a POV-Ray array to the output stream
 
     outputFileDescriptor.write('  uv_indices {\n  ')
-    outputFileDescriptor.write('    %s\n  ' % (len(faces) * 2))
-    for fn in faces:
-        f = obj.faces[fn]
-        outputFileDescriptor.write('<%s,%s,%s>' % (f.uv[0], f.uv[1], f.uv[2]))
-        outputFileDescriptor.write('<%s,%s,%s>' % (f.uv[2], f.uv[3], f.uv[0]))
+    outputFileDescriptor.write('    %s\n  ' % nTriangles)
+
+    nTexVerts = 0
+    for stuff in stuffs:
+        for f in stuff.faces:
+            vts = []
+            for v,vt in f:
+                vts.append(vt+nTexVerts)        
+            outputFileDescriptor.write('<%s,%s,%s>' % (vts[0], vts[1], vts[2]))
+            if len(vts) == 4:
+                outputFileDescriptor.write('<%s,%s,%s>' % (vts[2], vts[3], vts[0]))
+        nTexVerts += len(stuff.uvValues)                
+
     outputFileDescriptor.write('''
   }
 ''')

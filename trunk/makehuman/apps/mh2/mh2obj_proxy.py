@@ -33,8 +33,7 @@ def exportProxyObj(human, name, options):
     cfg = export_config.exportConfig(human, True)
     cfg.separatefolder = True
 
-    (mainStuff, stuffs, rawTargets) = object_collection.setupObjects(
-        name, human, None, 
+    stuffs = object_collection.setupObjects(name, human,
         helpers=options["helpers"], 
         eyebrows=options["eyebrows"], 
         lashes=options["lashes"])

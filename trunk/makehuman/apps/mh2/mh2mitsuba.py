@@ -165,12 +165,12 @@ def exportObj(human, filename):
                     filter)
     '''
 
+    # Load all stuff to be rendered - mesh, clothes, polygon hair
+    stuffs = object_collection.setupObjects("Mitsuba", human, helpers=False, eyebrows=False, lashes=False)
+
     # Write obj file
     # not is need mtl file. The material is created into Mitsuba .xml file
     # file_mtl = str(filename).replace('.obj','.mtl')
-
-    (mainStuff, stuffs, rawTargets) = object_collection.setupObjects(
-        "Mitsuba", human, None, helpers=False, eyebrows=False, lashes=False)
 
     f = open(filename, 'w')
     f.write('# MakeHuman exported OBJ for Mitsuba\n')

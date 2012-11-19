@@ -297,12 +297,13 @@ def exportDae(human, name, fp):
     rigfile = "data/rigs/%s.rig" % the.Options["daerig"]
     print("Using rig file %s" % rigfile)
     amt = getArmatureFromRigFile(rigfile, obj)
-    #rawTargets = loadShapeKeys("shared/mhx/templates/shapekeys-facial25.mhx")
-    (mainStuff, stuffs, rawTargets) = object_collection.setupObjects(
+
+    stuffs = object_collection.setupObjects(
         name, human, amt, 
         helpers=the.Options["helpers"], 
         eyebrows=the.Options["eyebrows"], 
         lashes=the.Options["lashes"])
+    mainStuff = stuffs[0]        
 
     date = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime())
     if the.Rotate90X:
