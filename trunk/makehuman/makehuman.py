@@ -18,7 +18,7 @@ import subprocess
 pattern = re.compile(r'[^0-9]')
 svnrev = pattern.sub("", "$Revision$")
 
-os.environ['SVNREVISION_SOURCE'] = "file stamp"
+os.environ['SVNREVISION_SOURCE'] = "approximated from file stamp"
 
 # Try getting svn revision by calling svnversion (will only work in linux) 
 # and windows where sliksvn is installed
@@ -29,7 +29,7 @@ try:
     svnrev = pattern.sub("", output)
     os.environ['SVNREVISION_SOURCE'] = "shell command"
 except Exception as e:
-    print "Failed to get svn version number from command line: " + format(str(e))
+    print "NOTICE: Failed to get svn version number from command line: " + format(str(e)) + " (This is just a head's up, not a critical error)"
 
 if output == "":
     # First fallback: try to parse the entries file manually
@@ -43,7 +43,7 @@ if output == "":
         svnrev = output
         os.environ['SVNREVISION_SOURCE'] = "entries file"
     except Exception as e:
-        print "Failed to get svn version from file: " + format(str(e))
+        print "NOTICE: Failed to get svn version from file: " + format(str(e)) + " (This is just a head's up, not a critical error)"
 
 if output == "":
     # The following only works if pysvn is installed. We'd prefer not to use this since it's very slow.
@@ -58,10 +58,10 @@ if output == "":
         svnrev = output
         os.environ['SVNREVISION_SOURCE'] = "pysvn"
     except Exception as e:
-        print "Failed to get svn version number using pysvn: " + format(str(e))
+        print "NOTICE: Failed to get svn version number using pysvn: " + format(str(e)) + " (This is just a head's up, not a critical error)"
 
 if output == "":
-    print "Using SVN rev from file stamp. This is likely outdated."
+    print "NOTICE: Using SVN rev from file stamp. This is likely outdated, so the number in the title bar might be off by a few commits."
 
 # Set SVN rev in environment so it can be used elsewhere
 print "Detected SVN revision: " + svnrev    
