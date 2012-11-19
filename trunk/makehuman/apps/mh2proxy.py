@@ -310,21 +310,21 @@ def readProxyFile(obj, file, evalOnLoad):
                 if len(words) > 3:
                     proxy.maskLayer = int(words[3])
             elif key == 'bump':
-                proxy.bump = getFileName(folder, words[2], ".tif")
+                proxy.bump = getFileName(folder, words[2], ".png")
                 if len(words) > 4:
                     proxy.bumpStrength = float(words[4])
             elif key == 'normal':
-                proxy.normal = getFileName(folder, words[2], ".tif")
+                proxy.normal = getFileName(folder, words[2], ".png")
                 if len(words) > 4:
                     proxy.normalStrength = float(words[4])
             elif key == 'transparency':
-                proxy.transparency = getFileName(folder, words[2], ".tif")
+                proxy.transparency = getFileName(folder, words[2], ".png")
             elif key == 'displacement':
-                proxy.displacement = getFileName(folder, words[2], ".tif")
+                proxy.displacement = getFileName(folder, words[2], ".png")
                 if len(words) > 4:
                     proxy.dispStrength = float(words[4])
             elif key == 'texture':
-                proxy.texture = getFileName(folder, words[2], ".tif")
+                proxy.texture = getFileName(folder, words[2], ".png")
                 if len(words) > 3:
                     proxy.textureLayer = int(words[3])
             elif key == 'objfile_layer':

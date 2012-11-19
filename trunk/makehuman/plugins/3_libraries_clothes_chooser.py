@@ -107,8 +107,8 @@ class ClothesTaskView(gui3d.TaskView):
         mesh = files3d.loadMesh(obj)
         if proxy.texture:
             (dir, name) = proxy.texture
-            tif = os.path.join(folder, name)
-            mesh.setTexture(tif)
+            tex = os.path.join(folder, name)
+            mesh.setTexture(tex)
         else:
             pass
         

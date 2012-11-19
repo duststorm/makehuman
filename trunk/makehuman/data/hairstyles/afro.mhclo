@@ -3,7 +3,7 @@
 # homepage http://www.makehuman.org/
 # name afro
 # subsurf 1 1
-# texture afro_texture.tif
+# texture afro_texture.png
 # material afro
 diffuse_intensity 0.8
 specular_intensity 0.0

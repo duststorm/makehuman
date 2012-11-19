@@ -58,8 +58,8 @@ class HairTaskView(gui3d.TaskView):
             
         mesh = files3d.loadMesh(obj)
         if mesh:
-            tif = obj.replace('.obj', '_texture.tif')        
-            mesh.setTexture(tif)        
+            tex = obj.replace('.obj', '_texture.png')        
+            mesh.setTexture(tex)        
             human.hairObj = gui3d.app.addObject(gui3d.Object(human.getPosition(), mesh))
             human.hairObj.setRotation(human.getRotation())
             human.hairObj.mesh.setCameraProjection(0)

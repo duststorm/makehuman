@@ -3,7 +3,7 @@
 # homepage http://www.makehuman.org/
 # name superafro
 # subsurf 1 1
-# texture superafro_texture.tif
+# texture superafro_texture.png
 # material superafro
 diffuse_intensity 0.8
 specular_intensity 0.0

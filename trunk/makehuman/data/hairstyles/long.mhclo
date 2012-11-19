@@ -3,7 +3,7 @@
 # homepage http://www.makehuman.org/
 # name long
 # subsurf 1 1
-# texture long_texture.tif
+# texture long_texture.png
 # material long
 diffuse_intensity 0.8
 specular_intensity 0.0
