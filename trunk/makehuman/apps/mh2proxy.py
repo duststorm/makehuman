@@ -115,9 +115,9 @@ class CProxy:
             else:
                 verts.append( parent.verts[refVert].co )
                 
-        obj.setCoords(verts)                
-        obj.updateIndexBuffer()
-        obj.calcNormals()
+        obj.changeCoords(verts)                
+        #obj.updateIndexBuffer()
+        #obj.calcNormals()
         
 
     def getUuid(self):
