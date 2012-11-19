@@ -15,7 +15,7 @@ def _read_data(png_ptr, data, length):
 def load(path):
     base, ext = os.path.splitext(path)
     ext = ext.lower()
-    if ext != '.png':
+    if ext != '.png' and ext != '.thumb':
         raise NotImplementedError('Invalid image format: %s' % ext)
 
     global _version

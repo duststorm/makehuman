@@ -2498,7 +2498,7 @@ class FileChooser(View):
         
         View.__init__(self, style, None)
         
-        self.path = path if isinstance(path, str) or isinstance(path, unicode) else path[0]
+        self.path = path if isinstance(path, basestring) else path[0]
         self.paths = path if isinstance(path, list) else [path]
         self.extension = extension
         self.previewExtension = previewExtension
