@@ -59,7 +59,7 @@ class HumanTextureTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Human texture', label='Skin')
         if not os.path.exists(os.path.join(mh.getPath(''), 'data', 'skins')):
             os.makedirs(os.path.join(mh.getPath(''), 'data', 'skins'))
-        self.filechooser = self.addView(gui3d.FileChooser([self.systemSkins, self.userSkins], 'tif', 'png'))
+        self.filechooser = self.addView(gui3d.FileChooser([self.systemSkins, self.userSkins], 'png', 'thumb'))
         self.update = self.filechooser.sortBox.addView(gui3d.Button('Check for updates'))
         self.mediaSync = None
 
@@ -85,9 +85,9 @@ class HumanTextureTaskView(gui3d.TaskView):
         gui3d.TaskView.onShow(self, event)
         gui3d.app.selectedHuman.hide()
         self.filechooser.setFocus()
-	
-        self.numSkin = len([filename for filename in os.listdir(os.path.join(mh.getPath(''), 'data', 'skins')) if filename.lower().endswith('tif')])
-        #self.numSkin = self.numSkin + len([filename for filename in os.listdir(os.path.join('data', 'skins')) if filename.lower().endswith('tif')])
+    
+        self.numSkin = len([filename for filename in os.listdir(os.path.join(mh.getPath(''), 'data', 'skins')) if filename.lower().endswith('png')])
+        #self.numSkin = self.numSkin + len([filename for filename in os.listdir(os.path.join('data', 'skins')) if filename.lower().endswith('png')])
         
         if self.numSkin < 1:    
             gui3d.app.prompt('No skins found', 'You don\'t seem to have any skins, download them from the makehuman media repository?\nNote: this can take some time depending on your connection speed.', 'Yes', 'No', self.syncMedia)
@@ -108,7 +108,12 @@ class HumanTextureTaskView(gui3d.TaskView):
         if values[0] == 'skinTexture':
             (fname, ext) = os.path.splitext(values[1])
             if fname != "texture":
-                human.setTexture(os.path.join(os.path.join(mh.getPath(''), 'data', 'skins', values[1])))
+                path = os.path.join(os.path.join(mh.getPath(''), 'data', 'skins', values[1]))
+                if os.path.isfile(path):                    
+                    human.setTexture(path)
+                elif ext == ".tif":
+                    path = path.replace(".tif", ".png")
+                    human.setTexture(path)
        
     def saveHandler(self, human, file):
         
@@ -127,6 +132,7 @@ class HumanTextureTaskView(gui3d.TaskView):
     def syncMediaFinished(self):
         
         self.mediaSync = None
+        self.filechooser.refresh()
         
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
