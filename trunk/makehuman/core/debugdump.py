@@ -45,7 +45,7 @@ class DebugDump:
     def reset(this):
         debug = open(this.debugpath, "w")
 
-        debug.write("SVN REVISION: " + os.environ['SVNREVISION'] + "\n")
+        debug.write("SVN REVISION: " + os.environ['SVNREVISION'] + " [" + os.environ['SVNREVISION_SOURCE'] + "]\n")
         debug.write("HOME LOCATION: " + this.home + "\n");
         version = re.sub(r"[\r\n]"," ", sys.version)
         debug.write("SYS.VERSION: " + version + "\n")

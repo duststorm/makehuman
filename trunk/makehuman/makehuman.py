@@ -18,6 +18,8 @@ import subprocess
 pattern = re.compile(r'[^0-9]')
 svnrev = pattern.sub("", "$Revision$")
 
+os.environ['SVNREVISION_SOURCE'] = "file stamp"
+
 # Try getting svn revision by calling svnversion (will only work in linux) 
 # and windows where sliksvn is installed
 output = ""
@@ -25,6 +27,7 @@ try:
     output = subprocess.Popen(["svnversion","."], stdout=subprocess.PIPE).communicate()[0]
     output = output.split(":")[0]
     svnrev = pattern.sub("", output)
+    os.environ['SVNREVISION_SOURCE'] = "shell command"
 except Exception as e:
     print "Failed to get svn version number from command line: " + format(str(e))
 
@@ -38,6 +41,7 @@ if output == "":
         result = re.search(r'dir\n(\d+)\n',entries)
         output = result.group(1)
         svnrev = output
+        os.environ['SVNREVISION_SOURCE'] = "entries file"
     except Exception as e:
         print "Failed to get svn version from file: " + format(str(e))
 
@@ -52,6 +56,7 @@ if output == "":
         info = client.info2(repo,revision=rev,recurse=False)
         output = format(str(info[0][1].rev.number))
         svnrev = output
+        os.environ['SVNREVISION_SOURCE'] = "pysvn"
     except Exception as e:
         print "Failed to get svn version number using pysvn: " + format(str(e))
 
