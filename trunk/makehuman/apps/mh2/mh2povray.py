@@ -472,7 +472,7 @@ def povrayExportArray(human, camera, resolution, path):
     sceneLines = string.replace(sceneLines, 'xxLowercaseFileNamexx', nameOnly.lower())
     outputSceneFileDescriptor.write(sceneLines)
 
-  # Copy the textures.tif file into the output directory
+  # Copy the textures.pgn file into the output directory
 
     try:
         shutil.copy(pigmentMap, outputDirectory)
@@ -583,93 +583,68 @@ def povrayExportMesh2(human, camera, resolution, path):
 
     povraySizeData(obj, outputFileDescriptor)
 
-    stuffs = object_collection.setupObjects("PowRay", human, helpers=False, eyebrows=False, lashes=False)
+    stuffs = object_collection.setupObjects("MakeHuman", human, helpers=False, eyebrows=False, lashes=False)
 
   # Mesh2 Object - Write the initial part of the mesh2 object declaration
+  
+    for stuff in stuffs:
 
-    outputFileDescriptor.write('// Humanoid mesh2 definition\n')
-    outputFileDescriptor.write('#declare MakeHuman_Mesh2Object = mesh2 {\n')
+        outputFileDescriptor.write('// Humanoid mesh2 definition\n')
+        outputFileDescriptor.write('#declare %s_Mesh2Object = mesh2 {\n' % stuff.name)
 
   # Vertices - Write a POV-Ray array to the output stream
 
-    outputFileDescriptor.write('  vertex_vectors {\n  ')
-    
-    nVerts = 0
-    for stuff in stuffs:
-        nVerts += len(stuff.verts)    
-    outputFileDescriptor.write('    %s\n  ' % nVerts)
-    
-    for stuff in stuffs:
+        outputFileDescriptor.write('  vertex_vectors {\n  ')
+        outputFileDescriptor.write('    %s\n  ' % len(stuff.verts))
         for v in stuff.verts:
             outputFileDescriptor.write('<%s,%s,%s>' % tuple(v))
-    outputFileDescriptor.write('''
+        outputFileDescriptor.write('''
   }
 
 ''')
 
   # Normals - Write a POV-Ray array to the output stream
 
-    outputFileDescriptor.write('  normal_vectors {\n  ')
-    outputFileDescriptor.write('    %s\n  ' % nVerts)
-    for stuff in stuffs:
+        outputFileDescriptor.write('  normal_vectors {\n  ')
+        outputFileDescriptor.write('    %s\n  ' % len(stuff.verts))
         for vno in stuff.vnormals:
             outputFileDescriptor.write('<%s,%s,%s>' % tuple(vno))
-    outputFileDescriptor.write('''
+
+        outputFileDescriptor.write('''
   }
 
 ''')
-
-    """
-    faces = [f for f in obj.faces if not 'joint-' in f.group.name]
-
-    fgroups = []
-    for fg in obj.faceGroups:
-        if not ('joint-' in fg.name or
-                'helper-' in fg.name):
-            fgroups.append(fg.name)    
-    faces = obj.getFacesForGroups(fgroups)    
-    """
     
   # UV Vectors - Write a POV-Ray array to the output stream
 
-
-    nUvVerts = 0
-    for stuff in stuffs:
-        nUvVerts += len(stuff.uvValues)
-
-    outputFileDescriptor.write('  uv_vectors {\n  ')
-    outputFileDescriptor.write('    %s\n  ' % nUvVerts)
-
-    for stuff in stuffs:
+        outputFileDescriptor.write('  uv_vectors {\n  ')
+        outputFileDescriptor.write('    %s\n  ' % len(stuff.uvValues))
         for uv in stuff.uvValues:
             outputFileDescriptor.write('<%s,%s>' % tuple(uv))        
-    outputFileDescriptor.write('''
+
+        outputFileDescriptor.write('''
   }
 
 ''')
 
   # Faces - Write a POV-Ray array of arrays to the output stream
 
-    nTriangles = 0
-    for stuff in stuffs:
+        nTriangles = 0
         for f in stuff.faces:
             nTriangles += len(f)-2
 
-    outputFileDescriptor.write('  face_indices {\n  ')
-    outputFileDescriptor.write('    %s\n  ' % nTriangles)
+        outputFileDescriptor.write('  face_indices {\n  ')
+        outputFileDescriptor.write('    %s\n  ' % nTriangles)
 
-    nVerts = 0
-    for stuff in stuffs:
         for f in stuff.faces:
             verts = []
             for v,vt in f:
-                verts.append(v+nVerts)
+                verts.append(v)
             outputFileDescriptor.write('<%s,%s,%s>' % (verts[0], verts[1], verts[2]))
             if len(verts) == 4:
                 outputFileDescriptor.write('<%s,%s,%s>' % (verts[2], verts[3], verts[0]))
-        nVerts += len(stuff.verts)
 
-    outputFileDescriptor.write('''
+        outputFileDescriptor.write('''
   }
 
 ''')
@@ -677,30 +652,27 @@ def povrayExportMesh2(human, camera, resolution, path):
 
   # UV Indices for each face - Write a POV-Ray array to the output stream
 
-    outputFileDescriptor.write('  uv_indices {\n  ')
-    outputFileDescriptor.write('    %s\n  ' % nTriangles)
+        outputFileDescriptor.write('  uv_indices {\n  ')
+        outputFileDescriptor.write('    %s\n  ' % nTriangles)
 
-    nTexVerts = 0
-    for stuff in stuffs:
         for f in stuff.faces:
             vts = []
             for v,vt in f:
-                vts.append(vt+nTexVerts)        
+                vts.append(vt)        
             outputFileDescriptor.write('<%s,%s,%s>' % (vts[0], vts[1], vts[2]))
             if len(vts) == 4:
                 outputFileDescriptor.write('<%s,%s,%s>' % (vts[2], vts[3], vts[0]))
-        nTexVerts += len(stuff.uvValues)                
 
-    outputFileDescriptor.write('''
+        outputFileDescriptor.write('''
   }
 ''')
 
   # Mesh2 Object - Write the end squiggly bracket for the mesh2 object declaration
 
-    outputFileDescriptor.write('''
-  uv_mapping
+        outputFileDescriptor.write('''
+      uv_mapping
 ''')
-    outputFileDescriptor.write('''}
+        outputFileDescriptor.write('''}
 
 ''')
 
@@ -715,7 +687,39 @@ def povrayExportMesh2(human, camera, resolution, path):
     outputFileDescriptor.write(staticContentLines)
     outputFileDescriptor.write('\n')
     staticContentFileDescriptor.close()
-
+    
+  # Write clothes materials
+  
+    for stuff in stuffs[1:]:
+        if stuff.texture:
+            (folder, file) = stuff.texture
+            (fname, ext) = os.path.splitext(file)
+            if ext == ".tif":
+                ext = ".tiff"
+            outputFileDescriptor.write(
+                "#ifndef (%s_Material)\n" % stuff.name +
+                "    #declare DIFFUSE_%s = pigment { \n" % stuff.name +
+                '       image_map { %s "%s"} \n' % (ext[1:], file) +
+                "    } \n" +
+                "     \n" +
+                "    #declare FINISH_%s = finish {  \n" % stuff.name +
+                "        specular 0  \n" +
+                "        phong 0 phong_size 0 \n" +
+                "     \n" +
+                "        ambient 0.1 \n" +
+                "        diffuse 0.8 \n" +
+                "        reflection{0 } conserve_energy \n" +
+                "    } \n" +
+                "     \n" +
+                "    #declare %s_Material = material { \n" % stuff.name +
+                "        texture { uv_mapping \n" +
+                "                pigment { DIFFUSE_%s } \n" % stuff.name +
+                "                finish  { FINISH_%s } \n" % stuff.name +
+                "       } \n" +
+                "       interior{ior 1.33} \n" +
+                "    } \n" +
+                "#end\n")
+             
   # The POV-Ray include file is complete
 
     outputFileDescriptor.close()
@@ -738,18 +742,32 @@ def povrayExportMesh2(human, camera, resolution, path):
     sceneLines = string.replace(sceneLines, 'xxUnderScoresxx', underScores)
     sceneLines = string.replace(sceneLines, 'xxLowercaseFileNamexx', nameOnly.lower())
     outputSceneFileDescriptor.write(sceneLines)
-
-  # Copy the textures.tif file into the output directory
-
-    try:
-        shutil.copy(pigmentMap, outputDirectory)
-    except (IOError, os.error), why:
-        print "Can't copy %s" % str(why)
+    
+    for stuff in stuffs:
+        outputSceneFileDescriptor.write(
+            "object { \n" +
+            "   %s_Mesh2Object \n" % stuff.name +
+            "   translate <MakeHuman_TranslateX, MakeHuman_TranslateY, MakeHuman_TranslateZ> \n" +
+            "   rotate <MakeHuman_RotateX, MakeHuman_RotateY, MakeHuman_RotateZ> \n" +
+            "   material {%s_Material} \n" % stuff.name +
+            "}  \n")
 
   # Job done
 
     outputSceneFileDescriptor.close()
     sceneFileDescriptor.close()
+
+  # Copy the texture files into the output directory
+
+    for stuff in stuffs[1:]:
+        if stuff.texture:
+            (folder, file) = stuff.texture
+            print "Copy", stuff.texture            
+            try:
+                shutil.copy(os.path.join(folder, file), outputDirectory)
+            except (IOError, os.error), why:
+                print "Can't copy %s" % str(why)
+
     print 'Sample POV-Ray scene file generated'
 
 

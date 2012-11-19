@@ -18,9 +18,3 @@
 
 camera {MakeHuman_Camera}
 light_source {MakeHuman_LightSource}
-object {
-  MakeHuman_Mesh2Object
-  translate <MakeHuman_TranslateX, MakeHuman_TranslateY, MakeHuman_TranslateZ>
-  rotate <MakeHuman_RotateX, MakeHuman_RotateY, MakeHuman_RotateZ>
-  material {MakeHuman_Material}
-} 
