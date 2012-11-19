@@ -122,6 +122,11 @@ read_end = _png.png_read_end
 read_end.argtypes = [c_void_p, c_void_p]
 read_end.restype = None
 
+# void png_read_image(png_structp png_ptr, png_bytepp image)
+read_image = _png.png_read_image
+read_image.argtypes = [c_void_p, POINTER(c_void_p)]
+read_image.restype = None
+
 # void png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr, png_infopp end_info_ptr_ptr)
 destroy_read_struct = _png.png_destroy_read_struct
 destroy_read_struct.argtypes = [POINTER(c_void_p), POINTER(c_void_p), POINTER(c_void_p)]

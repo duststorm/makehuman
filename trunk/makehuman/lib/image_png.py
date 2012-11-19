@@ -88,9 +88,10 @@ def load(path):
 
     pixels = np.empty((h, w, depth), dtype = np.uint8)
 
+    row_ptrs = (c_void_p * h)()
     for y in xrange(h):
-        ptr = c_void_p(pixels[y].__array_interface__['data'][0])
-        png.read_row(png_ptr, ptr, None)
+        row_ptrs[y] = c_void_p(pixels[y].__array_interface__['data'][0])
+    png.read_image(png_ptr, row_ptrs)
 
     png.read_end(png_ptr, None)
 
