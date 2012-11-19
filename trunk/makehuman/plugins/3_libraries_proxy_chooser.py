@@ -5,7 +5,7 @@ B{Product Home Page:} U{http://www.makehuman.org/}
 
 B{Code Home Page:}    U{http://code.google.com/p/makehuman/}
 
-B{Authors:}           Manuel Bastioni, Marc Flerackers
+B{Authors:}           Marc Flerackers
 
 B{Copyright(c):}      MakeHuman Team 2001-2011
 
@@ -47,7 +47,6 @@ class ProxyTaskView(gui3d.TaskView):
 
         proxy = mh2proxy.readProxyFile(human.getSeedMesh(), filename, False)        
         human.setProxy(proxy)
-        human.updateProxyMesh()
 
     def onShow(self, event):
         # When the task gets shown, set the focus to the file chooser

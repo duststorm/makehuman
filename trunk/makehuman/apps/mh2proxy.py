@@ -87,9 +87,9 @@ class CProxy:
         self.clothings = []
         return
         
-    def update(self, mesh, parent):
+    def update(self, obj, parent):
         rlen = len(self.refVerts)
-        mlen = len(mesh.verts)
+        mlen = len(obj.verts)
         if rlen != mlen:
             file = os.path.basename(self.file)
             (fname, ext) = os.path.splitext(file)
@@ -114,7 +114,17 @@ class CProxy:
                 verts.append( (nv0, nv1, nv2) )
             else:
                 verts.append( parent.verts[refVert].co )
-        mesh.setCoords(verts)                
+                
+        obj.setCoords(verts)                
+        obj.updateIndexBuffer()
+        obj.calcNormals()
+        
+
+    def getUuid(self):
+        if self.uuid:
+            return self.uuid
+        else:
+            return self.name        
 
 #
 #    class CMaterial

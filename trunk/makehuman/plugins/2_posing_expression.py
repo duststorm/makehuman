@@ -57,15 +57,18 @@ class ExpressionTaskView(gui3d.TaskView):
             # Create sliders
             for subname in subnames:
                 
-                #modifier = humanmodifier.GenderAgeEthnicModifier2('data/targets/expression/units/${ethnic}/${gender}_${age}/%s-%s.target' % (name, subname))
-                modifier = warpmodifier.WarpModifier(
-                    'data/targets/expression/units/${ethnic}/${gender}_${age}/%s-%s.target' % (name, subname),
-                    "face",
-                    "GenderAgeEthnicModifier2")
+                #modifier = humanmodifier.GenderAgeModifier('data/targets/expression/units/${gender}_${age}/%s-%s.target' % (name, subname))
+                if warp.numpy:
+                    modifier = warpmodifier.WarpModifier(
+                        'data/targets/expression/units/${ethnic}/${gender}_${age}/%s-%s.target' % (name, subname),
+                        "face",
+                        "GenderAgeEthnicModifier2")
+                else:
+                    modifier = humanmodifier.GenderAgeEthnicModifier2('data/targets/expression/units/${ethnic}/${gender}_${age}/%s-%s.target' % (name, subname))
                 self.modifiers[name + '-' + subname] = modifier
                 slider = box.addView(ExpressionSlider(subname.capitalize(), modifier))
                 self.sliders.append(slider)
-            	modifier.slider = slider
+                modifier.slider = slider
             # Create radiobutton
             radio = self.categoryBox.addView(GroupBoxRadioButton(self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0))
 
@@ -224,7 +227,7 @@ def load(app):
 
     category = app.getCategory('Library')
     category.addView(ExpressionLoadTaskView(category, taskview))
-        
+    
     print 'Expression loaded'
 
 # This method is called when the plugin is unloaded from makehuman

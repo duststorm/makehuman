@@ -27,7 +27,7 @@ class RandomTaskView(gui3d.TaskView):
                 
             if self.height.selected:
                 modifier = humanmodifier.Modifier('data/targets/macrodetails/universal-stature-dwarf.target',
-                                                  'data/targets/macrodetails/universal-stature-giant.target')
+                    'data/targets/macrodetails/universal-stature-giant.target')
                 modifier.setValue(human, random.random() * 2 - 1, 0)
             
             human.applyAllTargets(gui3d.app.progress)
@@ -44,7 +44,7 @@ class RandomTaskView(gui3d.TaskView):
                 
             if self.height.selected:
                 modifier = humanmodifier.Modifier('data/targets/macrodetails/universal-stature-dwarf.target',
-                                                  'data/targets/macrodetails/universal-stature-giant.target')
+                    'data/targets/macrodetails/universal-stature-giant.target')
                 modifier.setValue(human, modifier.getValue(human) + random.random() - 0.5, 0)
                 
             human.applyAllTargets(gui3d.app.progress)

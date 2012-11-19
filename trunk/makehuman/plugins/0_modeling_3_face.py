@@ -34,6 +34,24 @@ class FaceSlider(humanmodifier.ModifierSlider):
         humanmodifier.ModifierSlider.setPosition(self, position)
         self.thumb.setPosition([position[0], position[1] + self.style.height / 2 - self.thumbStyle.height / 2, position[2] + 0.01])
         self.setValue(self.getValue())
+        
+class FaceSlider2(humanmodifier.ModifierSlider):
+    def __init__(self, modifier, image, view):
+
+        humanmodifier.ModifierSlider.__init__(self, min=0.0, max=1.0, modifier=modifier, style=gui3d.SliderStyle._replace(height=56, normal=image), thumbStyle=gui3d.SliderThumbStyle._replace(width = 32, height = 32, normal="slider2.png", focused="slider2_focused.png"))
+
+        self.view = getattr(gui3d.app, view)
+
+    def onFocus(self, event):
+
+        humanmodifier.ModifierSlider.onFocus(self, event)
+        self.view()
+
+    def setPosition(self, position):
+
+        humanmodifier.ModifierSlider.setPosition(self, position)
+        self.thumb.setPosition([position[0], position[1] + self.style.height / 2 - self.thumbStyle.height / 2, position[2] + 0.01])
+        self.setValue(self.getValue())
 
 class FaceTaskView(gui3d.TaskView):
 
@@ -41,6 +59,30 @@ class FaceTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Face')
 
         features = [
+            ('head', [('data/targets/head/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/head/images/', i[3]) for i in
+                [   
+                    ('head-age', 'less', 'more', 'frontView'),
+                    ('head-angle', 'in', 'out', 'rightView'), 
+                    ('head-scale-depth', 'less', 'more', 'rightView'),
+                    ('head-scale-horiz', 'less', 'more', 'frontView'),
+                    ('head-scale-vert', 'more', 'less', 'frontView'),
+                    ('head-trans', 'in', 'out', 'frontView'),
+                    ('head-trans', 'down', 'up', 'frontView'),
+                    ('head-trans', 'forward', 'backward', 'rightView'),
+                          
+                                                      
+                ]]), 
+            ('neck', [('data/targets/neck/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/neck/images/', i[3]) for i in
+                [  
+                    ('neck-scale-depth', 'less', 'more', 'rightView'),
+                    ('neck-scale-horiz', 'less', 'more', 'frontView'),
+                    ('neck-scale-vert', 'more', 'less', 'frontView'),
+                    ('neck-trans', 'in', 'out', 'frontView'),
+                    ('neck-trans', 'down', 'up', 'frontView'),
+                    ('neck-trans', 'forward', 'backward', 'rightView'),
+                          
+                                                      
+                ]]),
             ('right eye', [('data/targets/eyes/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/eyes/images/', i[3]) for i in
                 [
                     ('r-eye-height1', 'min', 'max', 'frontView'),
@@ -138,8 +180,8 @@ class FaceTaskView(gui3d.TaskView):
                     ('r-ear-rot', 'backward', 'forward', 'rightView'),
                     ('r-ear', 'square', 'round', 'rightView'),
                     ('r-ear-width', 'max', 'min', 'rightView'),
-                    ('r-ear', 'wing', 'nowing', 'frontView'),
-                    ('r-ear', 'flap', 'unflap', 'frontView'),
+                    ('r-ear-wing', 'out', 'in', 'frontView'),
+                    ('r-ear-flap', 'out', 'in', 'frontView'),
                 ]]),
             ('left ear', [('data/targets/ears/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/ears/images/', i[3]) for i in
                 [
@@ -152,8 +194,8 @@ class FaceTaskView(gui3d.TaskView):
                     ('l-ear-rot', 'backward', 'forward', 'leftView'),
                     ('l-ear', 'square', 'round', 'leftView'),
                     ('l-ear-width', 'max', 'min', 'leftView'),
-                    ('l-ear', 'wing', 'nowing', 'frontView'),
-                    ('l-ear', 'flap', 'unflap', 'frontView'),       
+                    ('l-ear-wing', 'out', 'in', 'frontView'),
+                    ('l-ear-flap', 'out', 'in', 'frontView'),       
                 ]]),
             ('chin', [('data/targets/chin/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/chin/images/', i[3]) for i in
                 [
@@ -167,11 +209,28 @@ class FaceTaskView(gui3d.TaskView):
             ('cheek', [('data/targets/cheek/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/cheek/images/', i[3]) for i in
                 [
                     ('l-cheek', 'in', 'out', 'frontView'),
-                    ('l-cheek', 'bones', 'nobones', 'frontView'),
+                    ('l-cheek-bones', 'out', 'in', 'frontView'),
                     ('r-cheek', 'in', 'out', 'frontView'),
-                    ('r-cheek', 'bones', 'nobones', 'frontView'),
+                    ('r-cheek-bones', 'out', 'in', 'frontView'),
 
                 ]])
+            ]
+            
+        features2 = [
+            ('head shape', [('data/targets/head/${ethnic}/${gender}_${age}/%s.target' % (i[0]), i[0], 'data/targets/head/images/', i[1]) for i in
+                [   
+                    ('head-oval', 'frontView'),    
+                    ('head-round', 'frontView'), 
+                    ('head-rectangular', 'frontView'), 
+                    ('head-square', 'frontView'), 
+                    ('head-triangular', 'frontView'), 
+                    ('head-invertedtriangular', 'frontView'), 
+                    ('head-diamond', 'frontView'), 
+                    
+                       
+                          
+                                                      
+                ]])            
             ]
 
         y = 80
@@ -184,8 +243,35 @@ class FaceTaskView(gui3d.TaskView):
 
         self.categoryBox = self.addView(gui3d.GroupBox([650, y, 9.0], 'Category'))
         y += 25
+        
+        for name, templates in features2:
 
-        for name, templates in features:
+            for index, template in enumerate(templates):
+
+                if index % 12 == 0:
+
+                    if len(templates) <= 12:
+                        title = name.capitalize()
+                    else:
+                        title = '%s %d' % (name.capitalize(), index / 12 + 1)
+
+                    # Create box
+                    box = self.addView(gui3d.GroupBox([10, 80, 9.0], title, gui3d.GroupBoxStyle._replace(width=128+112+4)))
+                    self.groupBoxes.append(box)
+
+                    # Create radiobutton
+                    radio = self.categoryBox.addView(GroupBoxRadioButton(self.radioButtons, title, box, selected=len(self.radioButtons) == 0))
+                    y += 24
+
+                # Create sliders
+                modifier = humanmodifier.GenderAgeEthnicModifier2(template[0])
+                self.modifiers['%s%d' % (name, index + 1)] = modifier
+
+                slider = box.addView( (FaceSlider2(modifier, '%s%s.png' % (template[2], template[1]), template[3])))
+                 
+                self.sliders.append(slider)
+
+        for name, templates in features:            
 
             for index, template in enumerate(templates):
 
