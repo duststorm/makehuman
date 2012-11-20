@@ -53,7 +53,7 @@ class MitsubaTaskView(gui3d.TaskView):
         def onClicked(event):            
             
             reload(mh2mitsuba)  # Avoid having to close and reopen MH for every coding change (can be removed once testing is complete)
-            mh2mitsuba.MitsubaExport(gui3d.app.selectedHuman, gui3d.app,
+            mh2mitsuba.MitsubaExport(gui3d.app.selectedHuman.mesh, gui3d.app,
                 {'source':'console' if self.consoleButton.selected else 'gui' if self.guiButton.selected else 'xml',
                  'lighting':'dl' if self.dlButton.selected else 'pt' if self.ptButton.selected else 'pm',
                  'sampler':'low' if self.lowdButton.selected else 'ind'})

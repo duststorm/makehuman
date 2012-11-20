@@ -37,7 +37,7 @@
         ambient 0.01 // rgb <0.00,0.00,0.00>
         diffuse 0.6
         reflection{0 } conserve_energy
-        subsurface {translucency 0.6} //0.8}
+        // subsurface {translucency 0.6} //0.8}
     }
 
 //material{

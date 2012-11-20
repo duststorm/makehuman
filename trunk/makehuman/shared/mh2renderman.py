@@ -10,7 +10,7 @@ B{Product Home Page:} U{http://www.makehuman.org/}
 
 B{Code Home Page:}    U{http://code.google.com/p/makehuman/}
 
-B{Authors:}           Manuel Bastioni, Marc Flerackers
+B{Authors:}           Marc Flerackers
 
 B{Copyright(c):}      MakeHuman Team 2001-2011
 
@@ -134,19 +134,20 @@ class ImageLight:
             dstW = dstImg.width
             dstH = dstImg.height
 
+            pointlights = [(-10.99, 20.0, 20.0, 1.0)]
+
             for v in mesh.verts:
 
-                ld = aljabr.vnorm(aljabr.vsub((-10.99, 20.0, 20.0,), v.co))
-                s = aljabr.vdot(v.no, ld)
-                s = max(0, min(255, int(s*255)))
-                v.setColor([s, s, s, 255])
+                c = 0.0
 
-            
-            progress = 0
-            gui3d.app.progress(progress)
-            fnmax = int(0.1*len(mesh.faces))
-            fn = 0            
-            
+                for light in pointlights:
+                    ld = aljabr.vnorm(aljabr.vsub(light[:-1], v.co))
+                    s = aljabr.vdot(v.no, ld)
+                    c += s * light[-1]
+                
+                c = max(0, min(255, int(c*255)))
+                v.setColor([c, c, c, 255])
+
             for g in mesh.faceGroups:
 
                 if g.name.startswith("joint") or g.name.startswith("helper"):
@@ -159,22 +160,12 @@ class ImageLight:
                     self.RasterizeTriangle(dstImg, co[0], co[1], co[2], ColorShader(c[:3]))
                     self.RasterizeTriangle(dstImg, co[2], co[3], co[0], ColorShader((c[2], c[3], c[0])))
 
-                    fn += 1
-                    if fn % fnmax == 0:
-                        progress += 0.1
-                        gui3d.app.progress(progress)
-                        fn = 0
-
-            gui3d.app.progress(1.0)
-
             #dstImg.resize(128, 128);
 
-            filepath = os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.tga')
-            print "Save to", filepath
-            dstImg.save(filepath)
+            dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.png'))
             #gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.tga'))
 
-            #mesh.setColor([255, 255, 255, 255])
+            mesh.setColor([255, 255, 255, 255])
 
 
 class MaterialParameter:
@@ -342,13 +333,14 @@ class RMRObject:
         self.materialBump = None
         self.name = name
         self.facesIndices = []
-        self.meshData = meshData
         self.verts = meshData.verts
+        self.meshData = meshData
         self.translationTable = [0 for vert in meshData.verts]        
         self.verts = []
 
         if mtl is not None:
             self.facesIndices = [[(vert.idx,face.uv[index]) for index, vert in enumerate(face.verts)] for face in meshData.faces if meshData.materials[face.idx] == mtl]
+            #self.facesIndices = [[(vert.idx,face.uv[index]) for index, vert in enumerate(face.verts)] for face in meshData.faces if face.mtl == mtl]
         else:
             self.facesIndices = [[(vert.idx,face.uv[index]) for index, vert in enumerate(face.verts)] for face in meshData.faces]
         
@@ -423,21 +415,11 @@ class RMRHuman(RMRObject):
             
     def materialInit(self):
         self.basetexture =  os.path.splitext(os.path.basename(self.human.getTexture()))[0]
-
         if self.human.hairObj != None:
             self.hairtexture =  os.path.splitext(os.path.basename(self.human.hairObj.getTexture()))[0]
             self.hairMat = RMRMaterial("hairpoly")
             self.hairMat.parameters.append(MaterialParameter("string", "colortexture", self.hairtexture+".png"))
             #print "HAIRTEXTURE",  self.hairtexture
-
-        self.cloMaterials = []
-        for clo in self.human.clothesObjs:
-            tex = os.path.splitext(os.path.basename(co.getTexture()))[0]
-            mat = RMRMaterial(clo.name)
-            self.cloMaterials.append(mat)
-            mat.parameters.append(MaterialParameter("string", "colortexture", tex+".png"))
-            print "CLOTEXTURE", tex
-            
         #print "BASETEXTURE",  self.basetexture
         
         
@@ -497,19 +479,11 @@ class RMRHuman(RMRObject):
         self.skin.material = self.skinMat
         self.skin.materialBump = self.skinBump
         self.subObjects.append(self.skin)        
-                
+        
         if self.human.hairObj != None:
             self.hair = RMRObject("hair", self.human.hairObj.mesh)
             self.hair.material = self.hairMat            
             self.subObjects.append(self.hair)
-            
-        self.clothes = []
-        for n,clo in enumerate(self.human.clothesObjs):
-            rmrObj = RMRObject(clo.name, clo.meshData)
-            self.clothes.append(rmrObj)
-            rmrObj.material = self.cloMaterials[n]
-            self.subObjects.append(clo)
-        
         
 
     def getSubObject(self, name):
@@ -629,6 +603,7 @@ class RMRScene:
         #self.lastRotation = [0,0,0]
         #self.lastCameraPosition = [self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ]
         #self.firstTimeRendering = True
+        self.renderResult = ""
 
         #resource paths
         self.renderPath = os.path.join(mh.getPath('render'), 'renderman_output')
@@ -640,7 +615,6 @@ class RMRScene:
         self.applicationPath = os.getcwd()  # TODO: this may not always return the app folder
         self.appTexturePath = os.path.join(self.applicationPath, 'data', 'textures')
         self.hairTexturePath = os.path.join(self.applicationPath, 'data', 'hairstyles')
-        self.clothesTexturePath = os.path.join(self.applicationPath, 'data', 'clothes')
         self.skinTexturePath = os.path.join(mh.getPath(''), 'data', 'skins')
         
         #self.appObjectPath = os.path.join(self.applicationPath, 'data', '3dobjs')
@@ -768,7 +742,7 @@ class RMRScene:
         """
         This function creates the frame definition for a Renderman scene.
         """
-        imgFile = str(time.time())+".tif"
+        self.renderResult = str(time.time())+".tif"
 
 
         #Getting global settings
@@ -782,9 +756,9 @@ class RMRScene:
         ribSceneHeader.shadingRate = self.app.settings.get('rendering_aqsis_shadingrate', 2)
         ribSceneHeader.setCameraPosition(self.camera.eyeX, -self.camera.eyeY, self.camera.eyeZ)
         ribSceneHeader.setSearchShaderPath([self.usrShaderPath])
-        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath,self.clothesTexturePath,self.skinTexturePath])
+        ribSceneHeader.setSearchTexturePath([self.appTexturePath,self.usrTexturePath,self.hairTexturePath,self.skinTexturePath])
         ribSceneHeader.fov = self.camera.fovAngle
-        ribSceneHeader.displayName = os.path.join(self.ribsPath, imgFile).replace('\\', '/')
+        ribSceneHeader.displayName = os.path.join(self.ribsPath, self.renderResult).replace('\\', '/')
         ribSceneHeader.displayType = "file"
         ribSceneHeader.displayColor = "rgba"
         ribSceneHeader.displayName2 = "Final Render"
@@ -939,6 +913,7 @@ class RMRScene:
         filesTorender.append((self.sceneFileName, 'Rendering scene'))
 
         renderThread = RenderThread(self.app, filesTorender)
+        renderThread.renderPath = os.path.join(self.ribsPath, self.renderResult).replace('\\', '/')
         renderThread.start()
 
 from threading import Thread
@@ -950,6 +925,7 @@ class RenderThread(Thread):
         Thread.__init__(self)
         self.app = app
         self.filenames = filenames
+        self.renderPath = ""
 
     def run(self):
         
@@ -971,6 +947,8 @@ class RenderThread(Thread):
                 pass
 
             mh.callAsync(lambda:self.app.progress(1.0))
+            
+        gui3d.app.prompt("Render finished", "The image is saved in {0}".format(self.renderPath), "OK", helpId="'renderFinishedPrompt'")
             
             
 

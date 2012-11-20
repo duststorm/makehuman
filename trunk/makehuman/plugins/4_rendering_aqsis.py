@@ -5,11 +5,39 @@
 import gui3d
 import os
 import sys
-#if 'nt' in sys.builtin_module_names:
-#    sys.path.append('./pythonmodules')
+if 'nt' in sys.builtin_module_names:
+    sys.path.append('./pythonmodules')
 import subprocess
-import which
 import mh2renderman
+
+def which(program):
+    """
+    Checks whether a program exists, similar to http://en.wikipedia.org/wiki/Which_(Unix)
+    """
+
+    import os
+    import sys
+    
+    if sys.platform == "win32" and not program.endswith(".exe"):
+        program += ".exe"
+        
+    print "looking for", program
+        
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            exe_file = os.path.join(path, program)
+            print exe_file
+            if is_exe(exe_file):
+                return exe_file
+
+    return None
 
 class AqsisTaskView(gui3d.TaskView):
 
@@ -43,8 +71,8 @@ class AqsisTaskView(gui3d.TaskView):
         @self.renderButton.event
         def onClicked(event):
             
-            if not which.which("aqsis"):
-                self.app.prompt('Aqsis not found', 'You don\'t seem to have aqsis installed.', 'Download', 'Cancel', self.downloadAqsis)
+            if not which("aqsis"):
+                gui3d.app.prompt('Aqsis not found', 'You don\'t seem to have aqsis installed.', 'Download', 'Cancel', self.downloadAqsis)
                 return
             
             if not self.sceneToRender:
@@ -71,6 +99,8 @@ class AqsisTaskView(gui3d.TaskView):
         
         gui3d.TaskView.onShow(self, event)
         self.renderButton.setFocus()
+        gui3d.app.prompt('Warning', 'The rendering is still an experimental feature since posing is not yet implemented.',
+            'OK', helpId='alphaRenderWarning')
 
     def downloadAqsis(self):
     
