@@ -85,6 +85,7 @@ if __name__ == '__main__':
         sys.stdout = fo
         fe = open(os.path.join(home, "python_err.txt"), "w")
         sys.stderr = fe
+        os.environ['PATH'] += os.pathsep + os.path.join('.','bin','win')
 
     execfile(mfile)
 
