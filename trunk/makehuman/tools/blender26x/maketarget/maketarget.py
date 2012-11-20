@@ -719,10 +719,10 @@ class VIEW3D_OT_DiscardAllTargetsButton(bpy.types.Operator):
         return{'FINISHED'}                
 
 #----------------------------------------------------------
-# symmetrizeTarget(context, left2right):
+# symmetrizeTarget(context, left2right, mirror):
 #----------------------------------------------------------
 
-def symmetrizeTarget(context, left2right):
+def symmetrizeTarget(context, left2right, mirror):
     utils.setupVertexPairs(context, False)
     ob = context.object
     scn = context.scene
@@ -730,34 +730,63 @@ def symmetrizeTarget(context, left2right):
         return
     bpy.ops.object.mode_set(mode='OBJECT')
     verts = ob.active_shape_key.data
-    bverts = ob.data.vertices
+    
     for vn in the.Mid.keys():
         v = verts[vn]
         v.co[0] = 0
+        
     for (lvn,rvn) in the.Left.items():
         lv = verts[lvn].co
         rv = verts[rvn].co
-        if left2right:
+        if mirror:
+            tv = rv.copy()
+            verts[rvn].co = (-lv[0], lv[1], lv[2])
+            verts[lvn].co = (-tv[0], tv[1], tv[2])
+        elif left2right:
             rv[0] = -lv[0]
             rv[1] = lv[1]
             rv[2] = lv[2]
-            bverts[rvn].select = bverts[lvn].select
         else:
             lv[0] = -rv[0]
             lv[1] = rv[1]
             lv[2] = rv[2]
-            bverts[lvn].select = bverts[rvn].select
+
+    bverts = ob.data.vertices    
+    selected = {}
+    for v in bverts:
+        selected[v.index] = v.select
+
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='DESELECT')
+    bpy.ops.object.mode_set(mode='OBJECT')
+        
+    for vn in the.Mid.keys():
+        bverts[vn].select = selected[vn]
+
+    for (lvn,rvn) in the.Left.items():
+        if mirror:
+            bverts[lvn].select = selected[rvn]
+            bverts[rvn].select = selected[lvn]
+        elif left2right:
+            bverts[lvn].select = selected[lvn]
+            bverts[rvn].select = selected[lvn]
+        else:
+            bverts[lvn].select = selected[rvn]
+            bverts[rvn].select = selected[rvn]
+
     print("Target symmetrized")
     return
+
 
 class VIEW3D_OT_SymmetrizeTargetButton(bpy.types.Operator):
     bl_idname = "mh.symmetrize_target"
     bl_label = "Symmetrize"
     bl_options = {'UNDO'}
-    left2right = BoolProperty()
+    action = StringProperty()
 
     def execute(self, context):
-        symmetrizeTarget(context, self.left2right)
+        
+        symmetrizeTarget(context, (self.action=="Right"), (self.action=="Mirror"))
         return{'FINISHED'}                
                         
 #----------------------------------------------------------

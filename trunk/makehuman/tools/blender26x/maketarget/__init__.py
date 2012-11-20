@@ -132,8 +132,10 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.operator("mh.load_target", text="Load Secondary From File")            
             layout.operator("mh.load_target_from_mesh", text="Load Secondary From Mesh")                        
             layout.operator("mh.fit_target")
-            layout.operator("mh.symmetrize_target", text="Symm Left->Right").left2right = False
-            layout.operator("mh.symmetrize_target", text="Symm Right->Left").left2right = True
+            layout.separator()
+            layout.operator("mh.symmetrize_target", text="Symm Left->Right").action = "Left"
+            layout.operator("mh.symmetrize_target", text="Symm Right->Left").action = "Right"
+            layout.operator("mh.symmetrize_target", text="Mirror Target").action = "Mirror"
             #layout.separator()
             #layout.prop(scn, '["Relax"]')
             #layout.operator("mh.relax_target")
