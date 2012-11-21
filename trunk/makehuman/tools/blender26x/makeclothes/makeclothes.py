@@ -593,6 +593,7 @@ def printClothes(context, bob, pob, data):
             fp.write("%5d %5d %5d %.5f %.5f %.5f %.5f %.5f %.5f\n" % (
                 verts[0], verts[1], verts[2], wts[0], wts[1], wts[2], diff[0], diff[2], -diff[1]))
     fp.write('\n')
+    printDeleteVerts(fp, bob)
     printMhcloUvLayers(fp, pob, scn, True)
     fp.close()
     print("%s done" % outfile)    
@@ -656,7 +657,7 @@ def printMhcloUvLayers(fp, pob, scn, hasObj):
                 fp.write("\n")
     return
 
-    
+
 def reexportMhclo(context):
     pob = getClothing(context)
     scn = context.scene
@@ -697,7 +698,42 @@ def reexportMhclo(context):
     print("%s written" % outfile)    
     return
     
-      
+     
+def exportDeleteVerts(context):
+    bob = getHuman(context)
+    path = os.path.realpath(os.path.expanduser("~/killverts.txt"))
+    fp = open(path, "w")
+    printDeleteVerts(fp, bob)
+    fp.close()
+    print("Delete verts written to %s" % path)
+    
+
+def printDeleteVerts(fp, bob):
+    kill = None
+    for g in bob.vertex_groups:
+        if g.name == "Delete":
+            kill = g
+            break
+    if not kill:
+        return
+        
+    killList = []        
+    for v in bob.data.vertices:
+        for vg in v.groups:
+            if vg.group == kill.index:
+                killList.append(v.index)    
+    if not killList:
+        return
+
+    fp.write("# delete_verts\n")
+    n = 0
+    for vn in killList:
+        fp.write("%d " % vn)
+        n += 1
+        if n % 10 == 0:
+            fp.write("\n")            
+    fp.write("\n")
+                
 #
 #   printStuff(fp, pob, context): 
 #   From z_depth to use_projection
@@ -2150,6 +2186,7 @@ def autoVertexGroups(context):
     mid = ob.vertex_groups.new("Mid")
     left = ob.vertex_groups.new("Left")
     right = ob.vertex_groups.new("Right")
+    ob.vertex_groups.new("Delete")
     if isSelfClothed(context):
         nOldVerts = LastVertices[scn.MCSelfClothed]
     else:

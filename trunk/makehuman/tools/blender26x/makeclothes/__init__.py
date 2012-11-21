@@ -164,6 +164,8 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.operator("mhclo.set_seams")
         layout.operator("mhclo.project_uvs")
         layout.operator("mhclo.reexport_mhclo")        
+        layout.separator()
+        layout.operator("mhclo.export_delete_verts")
         
         layout.separator()
         layout.label("Shapekeys")
@@ -255,7 +257,7 @@ class MakeUVsPanel(bpy.types.Panel):
         layout.operator("mhclo.recover_seams")
         layout.operator("mhclo.set_seams")
 
-        layout.separator()
+        layout.separator()        
         layout.operator("mhclo.export_uvs")
        
         layout.separator()
@@ -410,6 +412,22 @@ class OBJECT_OT_CopyVertLocsButton(bpy.types.Operator):
         return{'FINISHED'}    
 
         
+#
+#   class OBJECT_OT_ExportDeleteVertsButton(bpy.types.Operator):
+#
+
+class OBJECT_OT_ExportDeleteVertsButton(bpy.types.Operator):
+    bl_idname = "mhclo.export_delete_verts"
+    bl_label = "Export Delete Verts"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        try:
+            makeclothes.exportDeleteVerts(context)
+        except error.MhcloError:
+            error.handleError(context)
+        return{'FINISHED'}    
+
 #
 #   class OBJECT_OT_ExportObjFileButton(bpy.types.Operator):
 #

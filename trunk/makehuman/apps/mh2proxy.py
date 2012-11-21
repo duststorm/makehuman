@@ -23,6 +23,7 @@ TO DO
 
 import module3d, aljabr
 import os
+import numpy
 from aljabr import *
 import export_config
 
@@ -77,7 +78,7 @@ class CProxy:
         self.constraints = []
         self.neighbors = {}
         self.deleteGroups = []
-        self.deleteVerts = {}
+        self.deleteVerts = None
         self.wire = False
         self.cage = False
         self.modifiers = []
@@ -186,6 +187,7 @@ doWeights = 6
 doRefVerts = 7
 doFaceNumbers = 8
 doTexFaces = 9    
+doDeleteVerts = 10
 
 def readProxyFile(obj, file, evalOnLoad):
     if not file:
@@ -212,6 +214,7 @@ def readProxyFile(obj, file, evalOnLoad):
     locations = {}
     tails = {}
     proxy = CProxy(pfile.file, pfile.type, pfile.layer)
+    proxy.deleteVerts = numpy.zeros(len(verts), bool)
     proxy.name = "MyProxy"
 
     useProjection = True
@@ -273,7 +276,7 @@ def readProxyFile(obj, file, evalOnLoad):
                 proxy.texVerts = []
                 proxy.texFaces = []
                 proxy.texVertsLayers[0] = proxy.texVerts
-                proxy.texFacesLayers[0] = proxy.texFaces                
+                proxy.texFacesLayers[0] = proxy.texFaces     
             elif key == 'name':
                 proxy.name = stringFromWords(words[2:])
             elif key == 'uuid':
@@ -303,6 +306,8 @@ def readProxyFile(obj, file, evalOnLoad):
                 proxy.deleteGroups.append(words[2])
             elif key == 'delete_connected':
                 selectConnected(proxy, obj, int(words[2]))
+            elif key == "delete_verts":
+                status = doDeleteVerts
             elif key == 'rig':
                 proxy.rig = getFileName(folder, words[2], ".rig")
             elif key == 'mask':
@@ -432,6 +437,9 @@ def readProxyFile(obj, file, evalOnLoad):
             v = int(words[0])
             w = float(words[1])
             weights.append((v,w))
+        elif status == doDeleteVerts:
+            for v in words:            
+                proxy.deleteVerts[int(v)] = True
             
     if evalOnLoad and proxy.obj_file:
         if not copyObjFile(proxy):
@@ -444,12 +452,10 @@ def readProxyFile(obj, file, evalOnLoad):
 #
 #   selectConnected(proxy, obj, vn):
 #
-
+    
 def selectConnected(proxy, obj, vn):
-    nVerts = len(obj.verts)
-    if not proxy.deleteVerts:
+    if not proxy.neighbors:
         for n in range(nVerts):    
-            proxy.deleteVerts[n] = False
             proxy.neighbors[n] = []
         for f in obj.faces:
             for v1 in f.verts:            
@@ -461,7 +467,7 @@ def selectConnected(proxy, obj, vn):
     
     
 def walkTree(proxy, vn):    
-    proxy.deleteVerts[vn] = True                        
+    proxy.deleteVerts[vn] = True
     for vk in proxy.neighbors[vn]:
         if not proxy.deleteVerts[vk]:
             walkTree(proxy, vk)
@@ -475,15 +481,6 @@ def deleteGroup(name, groups):
     return False
        
 
-def multiplyDeleteVerts(proxy, deleteVerts):
-    if proxy.deleteVerts:
-        if not deleteVerts:
-            return proxy.deleteVerts
-        else:
-            for (key,value) in proxy.deleteVerts.items():
-                deleteVerts[key] &= value       
-    return deleteVerts
-    
 #
 #
 #
