@@ -98,7 +98,7 @@ def exportMhx_25(human, fp):
     obj = human.meshData
     proxyData = {}
     scanProxies(obj, proxyData)
-    mhx_rig.setupRig(obj, proxyData)
+    mhx_rig.setupRig(obj, the.Config.mhxrig, proxyData)
     
     if not the.Config.cage:
         fp.write(
@@ -238,11 +238,11 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
                     "  Property MhxVersion %d ;\n" % MINOR_VERSION)
             elif key == 'rig-poses':
                 fp.write("Pose %s\n" % the.Human)
-                mhx_rig.writeControlPoses(fp)
+                mhx_rig.writeControlPoses(fp, the.Config.mhxrig)
                 fp.write("  ik_solver 'LEGACY' ;\nend Pose\n")
             elif key == 'rig-actions':
                 fp.write("Pose %s\nend Pose\n" % the.Human)
-                mhx_rig.writeAllActions(fp)
+                mhx_rig.writeAllActions(fp, the.Config.mhxrig)
             elif key == 'if-true':
                 value = eval(words[2])
                 print "if", words[2], value
@@ -250,7 +250,7 @@ def copyFile25(human, tmplName, fp, proxy, proxyData):
             elif key == 'rig-drivers':
                 if the.Config.mhxrig=="mhx":
                     fp.write("AnimationData %s True\n" % the.Human)
-                    mhx_rig.writeAllDrivers(fp)
+                    mhx_rig.writeAllDrivers(fp, the.Config.mhxrig)
                     rigDriversEnd(fp)
             elif key == 'rig-correct':
                 fp.write("CorrectRig %s ;\n" % the.Human)

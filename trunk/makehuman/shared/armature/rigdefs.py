@@ -119,6 +119,27 @@ class CArmature:
                 bone.drivers.append(drv)     
                 
 
+    def clear(self, human):
+        for bone in self.boneList:
+            bone.matrixPose = tm.identity_matrix()
+        self.update(human)            
+
+
+    def rebuild(self, human):        
+        proxyData = {}
+        mhx.mhx_rig.setupRig(human.meshData, self.rigtype, proxyData)
+        for bone in self.boneList:
+            bone.rebuild()
+            if bone.name in []:
+                print bone.name, bone.head, bone.tail
+                print "R", bone.matrixRest
+                #print "P", bone.matrixPose
+                #print "G", bone.matrixGlobal
+        for v in human.meshData.verts:
+            self.vertices[v.idx].co[:3] = v.co
+        self.update(human)            
+        
+            
     def update(self, human):
         print "Update", self.name
         for bone in self.boneList:
@@ -170,7 +191,7 @@ class CArmature:
                     mat = numpy.zeros((4,4), float)
                     for bone,w in vert.groups:
                         mat += w*bone.matrixVerts
-                
+
                 coords[n] = dot(mat,vert.co)[:3] 
                 #if v.co[1] > 15:
                 #    halt
@@ -178,13 +199,7 @@ class CArmature:
         obj.changeCoords(coords)
         obj.calcNormals()
         obj.update()
-        """
-        updateNormals = False     
-        if updateNormals:
-            faces = obj.faces
-            obj.calcNormals(1, 1, vertices, faces)
-        obj.update(vertices, updateNormals)
-        """                                        
+
 
     def build(self, human):
         if the.Config.exporting:
@@ -421,6 +436,15 @@ class CBone:
         
 
     def build(self):
+        self.matrixPose = tm.identity_matrix()
+        self.build0()
+                
+    def rebuild(self):
+        self.head = the.RigHead[self.name]
+        self.tail = the.RigTail[self.name]
+        self.build0()
+
+    def build0(self):
         x,y,z = self.head
         self.head3 = numpy.array(self.head)
         self.head4 = numpy.array((x,y,z,1.0))
@@ -430,7 +454,6 @@ class CBone:
         self.length, self.matrixRest = getMatrix(self.head3, self.tail3, self.roll)
         self.vector4 = self.tail4 - self.head4
         self.yvector4 = numpy.array((0, self.length, 0, 1))
-        self.matrixPose = tm.identity_matrix()
 
         if self.parent:
             self.matrixRelative = dot(inv(self.parent.matrixRest), self.matrixRest)
@@ -785,7 +808,7 @@ def createRig(human, rigtype, quatSkinning):
     the.Mhx25 = True
     obj = human.meshData
     proxyData = {}
-    mhx.mhx_rig.setupRig(obj, proxyData)
+    mhx.mhx_rig.setupRig(obj, rigtype, proxyData)
 
     amt = CArmature(rigtype, quatSkinning)
     the.createdArmature = amt

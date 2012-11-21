@@ -1,6 +1,29 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# We need this for gui controls
+
+""" 
+**Project Name:**      MakeHuman
+
+**Product Home Page:** http://www.makehuman.org/
+
+**Code Home Page:**    http://code.google.com/p/makehuman/
+
+**Authors:**           Thomas Larsson
+
+**Copyright(c):**      MakeHuman Team 2001-2011
+
+**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+
+**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+
+Abstract
+--------
+MakeHuman to Collada (MakeHuman eXchange format) exporter. Collada files can be loaded into
+Blender by collada_import.py.
+
+TO DO
+
+"""
 
 print 'importing Pose armature plugin'
 
@@ -182,9 +205,6 @@ class PoseArmatureTaskView(gui3d.TaskView):
             
         @self.testButton.event
         def onClicked(event):
-            #self.loadBvhFile("data/poses/walk.bvh")
-            #return
-            
             listBones = doTest1(self.armature.bones)
             self.updateAll()
             doTest2(listBones)
@@ -485,28 +505,6 @@ class PoseArmatureTaskView(gui3d.TaskView):
             self.armatureObject.setRotation(human.getRotation())        
         return self.armatureObject
         
-        
-    def loadBvhFile(self, filepath): 
-        if not self.rigtype:
-            self.selectRig("Prism", "rigid")  
-        human = gui3d.app.selectedHuman
-        
-        self.armature.readBvhFile(filepath, human)
-        #self.updateAll()        
-        #return
-        
-        folder = os.path.dirname(filepath)
-        (fname, ext) = os.path.splitext(os.path.basename(filepath))
-        modpath = '%s/${ethnic}-${gender}-${age}-%s.target' % (folder, fname)
-        print filepath, modpath
-        modifier = warpmodifier.WarpModifier(modpath, "body", "GenderAgeEthnicModifier2")
-        if self.poseModifier:
-            self.poseModifier.updateValue(human, 0.0)
-        modifier.updateValue(human, 1.0)
-        self.poseModifier = modifier        
-     
-        self.updateAll()        
-
      
     def loadHandler(self, human, values):
         print "loadHandler", values
@@ -809,69 +807,6 @@ def printArray(array):
     print "]"
 
 #
-#   Pose library
-#
-
-class Action:
-
-    def __init__(self, human, filename, poseArmatureTaskView, postAction=None):
-        self.name = 'Load pose'
-        self.human = human
-        self.filename = filename
-        self.poseArmatureTaskView = poseArmatureTaskView
-        self.postAction = postAction
-        self.before = {}
-
-        #for name, modifier in self.poseArmatureTaskView.modifiers.iteritems():
-        #    self.before[name] = modifier.getValue(self.human)
-
-    def do(self):
-        self.poseArmatureTaskView.loadBvhFile(self.filename)
-        return True
-
-    def undo(self):
-        if self.postAction:
-            self.postAction()
-        return True
-
-class PoseLoadTaskView(gui3d.TaskView):
-
-    def __init__(self, category, poseArmatureTaskView):
-
-        gui3d.TaskView.__init__(self, category, 'poses', label='Poses')
-
-        self.poseArmatureTaskView = poseArmatureTaskView
-
-        self.globalPoseArmaturePath = os.path.join('data', 'poses')
-        self.poseArmaturePath = os.path.join(mh.getPath(''), 'data', 'poses')
-
-        if not os.path.exists(self.poseArmaturePath):
-            os.makedirs(self.poseArmaturePath)
-
-        self.filechooser = self.addView(gui3d.FileChooser([self.globalPoseArmaturePath, self.poseArmaturePath], 'bvh', 'png', 'data/poses/notfound.png'))
-
-        @self.filechooser.event
-        def onFileSelected(filename):
-
-            gui3d.app.do(Action(gui3d.app.selectedHuman, filename, self.poseArmatureTaskView))
-            
-            gui3d.app.switchCategory('Modelling')
-
-    def onShow(self, event):
-
-        # When the task gets shown, set the focus to the file chooser
-        gui3d.TaskView.onShow(self, event)
-        gui3d.app.selectedHuman.hide()
-        self.filechooser.setFocus()
-
-    def onHide(self, event):
-        gui3d.app.selectedHuman.show()
-        gui3d.TaskView.onHide(self, event)
-        
-    def onResized(self, event):
-        self.filechooser.onResized(event)
-
-#
 #   Loading
 #
 
@@ -881,15 +816,13 @@ taskview = None
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
 def load(app):
+    return
+    
     category = app.getCategory('Posing')
     taskview = category.addView(PoseArmatureTaskView(category))
 
     app.addLoadHandler('poses', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)
-
-    category = app.getCategory('Library')
-    category.addView(PoseLoadTaskView(category, taskview))
-    print 'pose loaded'
             
     @taskview.event
     def onMouseDown(event):

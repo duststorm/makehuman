@@ -452,21 +452,21 @@ def setupCircles(fp):
     return
 
 #
-#    setupRig(obj, proxyData):
-#    writeAllArmatures(fp)    
-#    writeAllPoses(fp)    
-#    writeAllActions(fp)    
-#    writeAllDrivers(fp)    
+#    setupRig(obj, rigtype, proxyData):
+#    writeAllArmatures(fp, rigtype)    
+#    writeAllPoses(fp, rigtype)    
+#    writeAllActions(fp, rigtype)    
+#    writeAllDrivers(fp, rigtype)    
 #
 
-def setupRig(obj, proxyData):
+def setupRig(obj, rigtype, proxyData):
     the.RigHead = {}
     the.RigTail = {}
     the.VertexWeights = []
     the.CustomShapes = {}
     the.PoseInfo = {}
 
-    if the.Config.mhxrig == 'mhx':
+    if rigtype == 'mhx':
         the.BoneGroups = [
             ('Master', 'THEME13'),
             ('Spine', 'THEME05'),
@@ -540,7 +540,7 @@ def setupRig(obj, proxyData):
             rig_face_25.FaceArmature
         )
 
-    elif the.Config.mhxrig == "rigify":
+    elif rigtype == "rigify":
         the.BoneGroups = []
         the.RecalcRoll = []              
         the.VertexGroupFiles = ["head", "rigifymesh_weights"]
@@ -571,7 +571,7 @@ def setupRig(obj, proxyData):
         the.ArmatureProps = rigify_rig.RigifyArmatureProps
 
     else:
-        rigfile = "data/rigs/%s.rig" % the.Config.mhxrig
+        rigfile = "data/rigs/%s.rig" % rigtype
         (locations, armature, the.VertexWeights) = read_rig.readRigFile(rigfile, obj)        
         joints = (
             rig_joints_25.DeformJoints +
@@ -596,10 +596,10 @@ def setupRig(obj, proxyData):
         the.VertexGroupFiles = []
         the.GizmoFiles = []
         the.HeadName = 'Head'
-        the.ObjectProps = [("MhxRig", '"%s"' % the.Config.mhxrig)]
+        the.ObjectProps = [("MhxRig", '"%s"' % rigtype)]
         the.ArmatureProps = []
         the.CustomProps = []
-        print("Default rig %s" % the.Config.mhxrig)
+        print("Default rig %s" % rigtype)
         return
         
     if the.Config.facepanel:            
@@ -607,7 +607,7 @@ def setupRig(obj, proxyData):
         headsTails += rig_panel_25.PanelHeadsTails
         the.Armature += rig_panel_25.PanelArmature
 
-    if the.Config.mhxrig == 'mhx':
+    if rigtype == 'mhx':
         if the.Config.skirtrig == "own":
             joints += rig_skirt_25.SkirtJoints
             headsTails += rig_skirt_25.SkirtHeadsTails
@@ -623,7 +623,7 @@ def setupRig(obj, proxyData):
     newSetupJoints(obj, joints)
     moveOriginToFloor()    
 
-    if the.Config.mhxrig == 'mhx':
+    if rigtype == 'mhx':
         rig_body_25.BodyDynamicLocations()
     for (bone, head, tail) in headsTails:
         the.RigHead[bone] = findLocation(head)
@@ -716,9 +716,9 @@ def swapParentName(bones, old, new):
             nbones.append(bone)
     return nbones
 
-def writeControlPoses(fp):
+def writeControlPoses(fp, rigtype):
     writeBoneGroups(fp)
-    if the.Config.mhxrig == 'mhx':            
+    if rigtype == 'mhx':            
         rig_body_25.BodyControlPoses(fp)
         rig_shoulder_25.ShoulderControlPoses(fp)
         rig_arm_25.ArmControlPoses(fp)
@@ -730,9 +730,9 @@ def writeControlPoses(fp):
             rig_body_25.MaleControlPoses(fp)
         if the.Config.skirtrig == "own":
             rig_skirt_25.SkirtControlPoses(fp)
-    elif the.Config.mhxrig == 'blenrig':
+    elif rigtype == 'blenrig':
         blenrig_rig.BlenrigWritePoses(fp)
-    elif the.Config.mhxrig == 'rigify':
+    elif rigtype == 'rigify':
         rigify_rig.RigifyWritePoses(fp)
         rig_face_25.FaceControlPoses(fp)
         
@@ -764,15 +764,15 @@ def writeControlPoses(fp):
 
     return
 
-def writeAllActions(fp):
+def writeAllActions(fp, rigtype):
     #rig_arm_25.ArmWriteActions(fp)
     #rig_leg_25.LegWriteActions(fp)
     #rig_finger_25.FingerWriteActions(fp)
     return
 
 
-def writeAllDrivers(fp):
-    if the.Config.mhxrig == 'mhx':      
+def writeAllDrivers(fp, rigtype):
+    if rigtype == 'mhx':      
         driverList = (
             armature.drivers.writePropDrivers(fp, rig_arm_25.ArmPropDrivers, "", "&") +
             armature.drivers.writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_L", "&") +
@@ -805,10 +805,10 @@ def writeAllDrivers(fp):
         faceDrivers = rig_face_25.FaceDeformDrivers(fp)
         driverList += armature.drivers.writeDrivers(fp, True, faceDrivers)
         return driverList
-    elif the.Config.mhxrig == 'blenrig':            
+    elif rigtype == 'blenrig':            
         drivers = blenrig_rig.getBlenrigDrivers()
         armature.drivers.writeDrivers(fp, True, drivers)
-    elif the.Config.mhxrig == 'rigify':            
+    elif rigtype == 'rigify':            
         rig_face_25.FaceDeformDrivers(fp)        
         armature.drivers.writePropDrivers(fp, rig_face_25.FacePropDrivers, "", "&")
         armature.drivers.writePropDrivers(fp, rig_face_25.SoftFacePropDrivers, "", "&")
