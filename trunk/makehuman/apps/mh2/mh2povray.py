@@ -905,6 +905,7 @@ def povrayWriteHairs(outputDirectory, mesh):
 #--------------------------------------------------------------------------
 
 import gui3d
+import mh2proxy
 import object_collection
 
 def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
@@ -1009,7 +1010,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
         outputFileDescriptor.write('  vertex_vectors {\n  ')
         outputFileDescriptor.write('    %s\n  ' % len(stuff.verts))
         for v in stuff.verts:
-            outputFileDescriptor.write('<%s,%s,%s>' % tuple(v))
+            outputFileDescriptor.write('<%s,%s,%s>' % (-v[0],v[1],v[2]))
         outputFileDescriptor.write('''
   }
 
@@ -1020,7 +1021,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
         outputFileDescriptor.write('  normal_vectors {\n  ')
         outputFileDescriptor.write('    %s\n  ' % len(stuff.verts))
         for vno in stuff.vnormals:
-            outputFileDescriptor.write('<%s,%s,%s>' % tuple(vno))
+            outputFileDescriptor.write('<%s,%s,%s>' % (-vno[0],vno[1],vno[2]))
 
         outputFileDescriptor.write('''
   }
@@ -1102,35 +1103,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
     
   # Write clothes materials
   
-    for stuff in stuffs[1:]:
-        if stuff.texture:
-            (folder, file) = stuff.texture
-            (fname, ext) = os.path.splitext(file)
-            if ext == ".tif":
-                ext = ".tiff"
-            outputFileDescriptor.write(
-                "#ifndef (%s_Material)\n" % stuff.name +
-                "    #declare DIFFUSE_%s = pigment { \n" % stuff.name +
-                '       image_map { %s "%s"} \n' % (ext[1:], file) +
-                "    } \n" +
-                "     \n" +
-                "    #declare FINISH_%s = finish {  \n" % stuff.name +
-                "        specular 0  \n" +
-                "        phong 0 phong_size 0 \n" +
-                "     \n" +
-                "        ambient 0.1 \n" +
-                "        diffuse 0.8 \n" +
-                "        reflection{0 } conserve_energy \n" +
-                "    } \n" +
-                "     \n" +
-                "    #declare %s_Material = material { \n" % stuff.name +
-                "        texture { uv_mapping \n" +
-                "                pigment { DIFFUSE_%s } \n" % stuff.name +
-                "                finish  { FINISH_%s } \n" % stuff.name +
-                "       } \n" +
-                "       interior{ior 1.33} \n" +
-                "    } \n" +
-                "#end\n")
+    writeClothesMaterials(outputFileDescriptor, stuffs)
              
   # The POV-Ray include file is complete
 
@@ -1171,16 +1144,131 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
 
   # Copy the texture files into the output directory
 
+    copyFile(pigmentMap, outputDirectory)
+
     for stuff in stuffs[1:]:
-        if stuff.texture:
-            (folder, file) = stuff.texture
-            print "Copy", stuff.texture            
-            try:
-                shutil.copy(os.path.join(folder, file), outputDirectory)
-            except (IOError, os.error), why:
-                print "Can't copy %s" % str(why)
+        proxy = stuff.proxy
+        if proxy.texture:
+            copyFile(proxy.texture, outputDirectory)
+        """
+        if proxy.normal:
+            copyFile(proxy.normal, outputDirectory)
+        if proxy.bump:
+            copyFile(proxy.bump, outputDirectory)
+        if proxy.displacement:
+            copyFile(proxy.displacement, outputDirectory)
+        if proxy.transparency:
+            copyFile(proxy.transparency, outputDirectory)
+        """
 
     print 'Sample POV-Ray scene file generated'
+
+
+def writeClothesMaterials(outputFileDescriptor, stuffs):
+    for stuff in stuffs[1:]:
+        proxy = stuff.proxy
+        texdata = getChannelData(proxy.texture)                        
+        if texdata:                
+            outputFileDescriptor.write(
+                "#ifndef (%s_Material)\n" % stuff.name)
+            writeChannel(outputFileDescriptor, "DIFFUSE", "pigment", stuff, texdata)
+
+            """
+            # Ick! Povray doesn't support image maps except for pigment???
+            
+            normaldata = getChannelData(proxy.normal)                
+            if normaldata:
+                writeChannel(outputFileDescriptor, "NORMAL", "normal", stuff, normaldata)
+                
+            bumpdata = getChannelData(proxy.bump)                
+            if bumpdata:
+                writeChannel(outputFileDescriptor, "BUMP", "normal", stuff, bumpdata)
+                
+            dispdata = None # getChannelData(proxy.displacement)              
+            if dispdata:
+                writeChannel(outputFileDescriptor, "DISPLACEMENT", "displacement", stuff, dispdata)
+                
+            transdata = None # getChannelData(proxy.transparency)                
+            if transdata:
+                writeChannel(outputFileDescriptor, "TRANSPARENCY", "transparency", stuff, transdata)
+            """
+            
+            outputFileDescriptor.write(
+                "    #declare FINISH_%s = finish {  \n" % stuff.name +
+                "        specular 0  \n" +
+                "        phong 0 phong_size 0 \n" +
+                "     \n" +
+                "        ambient 0.3 \n" +
+                "        diffuse 2.0 \n" +
+                "        reflection{0 } conserve_energy \n" +
+                "    } \n" +
+                "     \n" +
+                "    #declare %s_Material = material { \n" % stuff.name +
+                "        texture { uv_mapping \n" +
+                "                pigment { DIFFUSE_%s } \n" % stuff.name)
+
+            """                
+            if normaldata:
+                outputFileDescriptor.write(
+                "                normal { NORMAL_%s } \n" % stuff.name)
+                
+            if bumpdata:
+                outputFileDescriptor.write(
+                "                normal { bumps BUMP_%s }} \n" % stuff.name)
+                
+            if dispdata:
+                outputFileDescriptor.write(
+                "                displacement { DISPLACEMENT_%s } \n" % stuff.name)
+                
+            if transdata:
+                outputFileDescriptor.write(
+                "                transparency { TRANSPARENCY_%s } \n" % stuff.name)
+            """
+            
+            outputFileDescriptor.write(    
+                "                finish  { FINISH_%s } \n" % stuff.name +
+                "       } \n" +
+                "       interior{ior 1.33} \n" +
+                "    } \n" +
+                "#end\n")
+
+
+def writeChannel(outputFileDescriptor, var, channel, stuff, data):
+    (path, type) = data
+    outputFileDescriptor.write(
+            "    #declare %s_%s = %s { \n" % (var, stuff.name, channel) +
+            '       image_map { %s "%s"} \n' % (type, path) +
+            "    } \n" +
+            "     \n")            
+
+
+def getChannelData(value):
+    if value:
+        (folder, file) = value
+        (fname, ext) = os.path.splitext(file)
+        ext = ext.lower()
+        if ext == ".tif":
+            type = "tiff"
+        elif ext == ".jpg":
+            type = "jpeg"
+        else:
+            type = ext[1:]
+        return file,type
+    else:
+        return None
+                
+
+def copyFile(path, outputDirectory):
+    if isinstance(path, tuple):
+        (folder, file) = path
+        path = os.path.join(folder, file)
+    if path:
+        path = os.path.realpath(os.path.expanduser(path))
+        print("Copy %s to %s" % (path, outputDirectory))
+        try:
+            shutil.copy(path, outputDirectory)
+        except (IOError, os.error), why:
+            print("Can't copy %s" % str(why))
 
 #--------------------------------------------------------------------------
 #   End TL modications

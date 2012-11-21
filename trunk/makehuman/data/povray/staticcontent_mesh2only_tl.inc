@@ -11,7 +11,8 @@
 }
 
 // Create a standard light definition based on MakeHuman settings.
-#declare MakeHuman_LightSource = light_source {<10,10,40>, rgb 1
+#declare MakeHuman_LightSource = light_source {<100,100,400>, rgb 1
+  spotlight radius 1000
   translate < MakeHuman_LightX, -MakeHuman_LightY, MakeHuman_LightZ>
   rotate <0, 0, 0>
 }
@@ -34,8 +35,8 @@
         roughness 0.02203444  // surface roughness: 0.0005 -> 1
         phong 0 phong_size 0  // Phong specular disabled
 
-        ambient 0.01 // rgb <0.00,0.00,0.00>
-        diffuse 0.6
+        ambient 0.3 // rgb <0.00,0.00,0.00>
+        diffuse 2.0
         reflection{0 } conserve_energy
         // subsurface {translucency 0.6} //0.8}
     }

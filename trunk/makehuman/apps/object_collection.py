@@ -55,7 +55,9 @@ class CStuff:
         self.skinWeights = None
         self.material = None
         self.texture = None
+        self.proxy = None
         if proxy:
+            self.proxy = proxy
             self.type = proxy.type
             self.material = proxy.material
             self.texture = proxy.texture
