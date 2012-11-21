@@ -83,55 +83,10 @@ where A = HT H, b = HT b, where HT is the transpose of H.
    
 import math
 import fastmath
-
-#----------------------------------------------------------
-#   Try to load numpy.
-#   Will only work if it is installed and for 32 bits.
-#----------------------------------------------------------
-
-#import numpy
+import numpy
 import sys
 import imp
 import os
-
-def getModule(modname, folder):        
-    try:
-        return sys.modules[modname]
-    except KeyError:
-        pass
-    print("Trying to load %s" % modname)
-    
-    if modname not in os.listdir(folder):
-        print("%s does not exist in %s" % (modname, folder))
-        return None
-        
-    path = os.path.realpath(folder)
-    if path not in sys.path:
-        sys.path.append(path)
-    path = os.path.realpath(os.path.join(folder, modname))
-    if path not in sys.path:
-        sys.path.append(path)
-
-    fp, pathname, description = imp.find_module(modname)
-    try:
-        imp.load_module(modname, fp, pathname, description)
-    finally:
-        if fp:
-            fp.close()
-    return sys.modules[modname]
-
-try:  
-    numpy = getModule("numpy", "lib/site-packages")  
-except OSError:
-    try:
-        import numpy
-    except ImportError:
-        numpy = None
-if numpy:
-    print("Numpy successfully loaded")
-else:
-    print("Failed to load numpy. Warping will not work")
-    print("Continuing happily.")
 
 #----------------------------------------------------------
 #   class CWarp

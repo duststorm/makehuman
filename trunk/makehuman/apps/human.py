@@ -429,9 +429,6 @@ class Human(gui3d.Object):
         
 
     def resetAllWarpTargets(self, force):
-        if not warp.numpy:
-            return
-            
         hasChanged = False
         for (targetPath, morphFactor) in self.targetsDetailStack.iteritems():
             try:

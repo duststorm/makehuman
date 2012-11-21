@@ -45,10 +45,8 @@ Dual quaternions
 
 
 import math
-import warp
-from warp import numpy
-if numpy:
-    import transformations as tm
+import numpy
+import transformations as tm
 
 
 class DualQuaternion:

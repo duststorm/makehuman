@@ -20,12 +20,10 @@ Constraints
 """
 
 import math
-import warp
-from warp import numpy
-if numpy:
-    from numpy import dot
-    from numpy.linalg import inv
-    import transformations as tm
+import numpy
+from numpy import dot
+from numpy.linalg import inv
+import transformations as tm
 
 import mhx
 from mhx import the
