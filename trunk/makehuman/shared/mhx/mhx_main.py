@@ -453,7 +453,7 @@ def writeFaceNumbers(fp, human, proxyData):
             fmats[fn] = MaterialNumbers[mtl[0:3]]
             
         if the.Config.hidden:
-            deleteVerts = []
+            deleteVerts = None
             deleteGroups = []
         else:
             deleteGroups = []

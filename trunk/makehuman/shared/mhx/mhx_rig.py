@@ -256,6 +256,7 @@ def addBone24(bone, cond, roll, parent, flags, layers, bbone, fp):
 #
 
 def writeBoneGroups(fp):
+    print "BG", the.BoneGroups
     if not fp:
         return
     for (name, the.me) in the.BoneGroups:
