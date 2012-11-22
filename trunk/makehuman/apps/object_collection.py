@@ -93,30 +93,33 @@ class CStuff:
         return
 
 #
-#    filterMesh(mesh1, obj, groups, deleteVerts, helpers, eyebrows, lashes):
+#    filterMesh(mesh1, obj, groups, deleteVerts, eyebrows, lashes):
 #
 
-def filterMesh(mesh1, obj, deleteGroups, deleteVerts, helpers, eyebrows, lashes):
+def filterMesh(mesh1, obj, deleteGroups, deleteVerts, eyebrows, lashes):
     (verts1, vnormals1, uvValues1, faces1, weights1, targets1) = mesh1
     
-    killVerts = deleteVerts
     killUvs = numpy.zeros(len(obj.texco), bool)
     killFaces = numpy.zeros(len(obj.faces), bool)
     
-    for f in obj.faces:
-        for v in f.verts:
-            if killVerts[v.idx]:
-                killFaces[f.idx] = True             
+    if deleteVerts != None:
+        killVerts = deleteVerts
+        for f in obj.faces:
+            for v in f.verts:
+                if killVerts[v.idx]:
+                    killFaces[f.idx] = True             
+    else:
+        killVerts = numpy.zeros(len(obj.verts), bool)
     
     for fg in obj.faceGroups:
-        if (((not helpers) and 
-             (("joint" in fg.name) or ("helper" in fg.name))) or
+        if (("joint" in fg.name) or 
+            ("helper" in fg.name) or
             ((not eyebrows) and 
              (("eyebrown" in fg.name) or ("cornea" in fg.name))) or
             ((not lashes) and 
              ("lash" in fg.name)) or
              mh2proxy.deleteGroup(fg.name, deleteGroups)):
-            #print("  kill %s" % fg.name) 
+
             for f in fg.faces:            
                 killFaces[f.idx] = True
                 for v in f.verts:
@@ -185,7 +188,7 @@ def filterMesh(mesh1, obj, deleteGroups, deleteVerts, helpers, eyebrows, lashes)
 #   setupObjects(name, human, armature):
 #
 
-def setupObjects(name, human, armature=None, helpers=False, eyebrows=True, lashes=True):
+def setupObjects(name, human, armature=None, helpers=False, hidden=True, eyebrows=True, lashes=True):
     global theStuff, theTextures, theTexFiles, theMaterials
     
     cfg = export_config.exportConfig(human, True)
@@ -200,15 +203,18 @@ def setupObjects(name, human, armature=None, helpers=False, eyebrows=True, lashe
         stuff.setBones(armature)
     theStuff = stuff
     deleteGroups = []
-    deleteVerts = numpy.zeros(len(obj.verts), bool)
+    if hidden:
+        deleteVerts = None
+    else:
+        deleteVerts = numpy.zeros(len(obj.verts), bool)
     foundProxy,deleteVerts = setupProxies('Clothes', None, obj, stuffs, armature, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
     foundProxy,deleteVerts = setupProxies('Proxy', name, obj, stuffs, armature, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
     if not foundProxy:
         mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
-        if (helpers and eyebrows and lashes and (not deleteGroups) and (not deleteVerts)):
+        if helpers:     # helpers override everything
             mesh2 = mesh1
         else:
-            mesh2 = filterMesh(mesh1, obj, deleteGroups, deleteVerts, helpers, eyebrows, lashes)
+            mesh2 = filterMesh(mesh1, obj, deleteGroups, deleteVerts, eyebrows, lashes)
         stuff.setMesh(mesh2)
         stuffs = [stuff] + stuffs
     return stuffs
@@ -227,7 +233,8 @@ def setupProxies(typename, name, obj, stuffs, armature, rawTargets, proxyList, d
             if proxy and proxy.name and proxy.texVerts:
                 foundProxy = True
                 deleteGroups += proxy.deleteGroups
-                deleteVerts = deleteVerts | proxy.deleteVerts
+                if deleteVerts != None:
+                    deleteVerts = deleteVerts | proxy.deleteVerts
                 if name:
                     stuff = CStuff(name, proxy)
                 else:

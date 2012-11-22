@@ -996,7 +996,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
 
     povraySizeData(obj, outputFileDescriptor)
 
-    stuffs = object_collection.setupObjects("MakeHuman", gui3d.app.selectedHuman, helpers=False, eyebrows=False, lashes=False)
+    stuffs = object_collection.setupObjects("MakeHuman", gui3d.app.selectedHuman, helpers=False, hidden=False, eyebrows=False, lashes=False)
 
   # Mesh2 Object - Write the initial part of the mesh2 object declaration
   

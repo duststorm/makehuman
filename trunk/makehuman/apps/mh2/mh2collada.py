@@ -53,7 +53,6 @@ def exportCollada(human, filename, options):
     the.Config.separatefolder = True
     the.Rotate90X = options["rotate90X"]
     the.Rotate90Z = options["rotate90Z"]
-    the.Config.pngTexture = options["pngTexture"]
     the.Options = options
     outfile = export_config.getOutFileFolder(filename+".dae", the.Config)        
     try:
@@ -301,6 +300,7 @@ def exportDae(human, name, fp):
     stuffs = object_collection.setupObjects(
         name, human, amt, 
         helpers=the.Options["helpers"], 
+        hidden=the.Options["hidden"], 
         eyebrows=the.Options["eyebrows"], 
         lashes=the.Options["lashes"])
     mainStuff = stuffs[0]        

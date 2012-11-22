@@ -31,6 +31,7 @@ import aljabr
 import gui3d
 import os
 import time
+import numpy
 
 import mh2proxy
 import export_config
@@ -450,11 +451,16 @@ def writeFaceNumbers(fp, human, proxyData):
         fmats = {}
         for fn,mtl in obj.materials.items():
             fmats[fn] = MaterialNumbers[mtl[0:3]]
-        deleteGroups = []
-        deleteVerts = None
-        for proxy in proxyData.values():
-            deleteGroups += proxy.deleteGroups
-            deleteVerts = mh2proxy.multiplyDeleteVerts(proxy, deleteVerts)
+            
+        if the.Config.hidden:
+            deleteVerts = []
+            deleteGroups = []
+        else:
+            deleteGroups = []
+            deleteVerts = numpy.zeros(len(obj.verts), bool)
+            for proxy in proxyData.values():
+                deleteGroups += proxy.deleteGroups
+                deleteVerts = deleteVerts | proxy.deleteVerts
                     
         for fg in obj.faceGroups: 
             if mh2proxy.deleteGroup(fg.name, deleteGroups):
@@ -476,7 +482,7 @@ def writeFaceNumbers(fp, human, proxyData):
                 for f in fg.faces:
                     fmats[f.idx] = 3   
                     
-        if deleteVerts:
+        if deleteVerts != None:
             for f in obj.faces:
                 v = f.verts[0]
                 if deleteVerts[v.idx]:

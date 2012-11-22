@@ -274,12 +274,12 @@ class ExportTaskView(gui3d.TaskView):
         self.objOptions = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*10+6)));y+=25
         self.exportEyebrows = self.objOptions.addView(gui3d.CheckBox("Eyebrows", True));y+=24
         self.exportLashes = self.objOptions.addView(gui3d.CheckBox("Eyelashes", True));y+=24
-        self.exportDiamonds = self.objOptions.addView(gui3d.CheckBox("Diamonds", False));y+=24
+        self.exportHelpers = self.objOptions.addView(gui3d.CheckBox("Helper geometry", False));y+=24
+        self.exportHidden = self.objOptions.addView(gui3d.CheckBox("Hidden faces", True));y+=24
         self.exportSkeleton = self.objOptions.addView(gui3d.CheckBox("Skeleton", True));y+=24
         self.exportGroups = self.objOptions.addView(gui3d.CheckBox("Groups", True));y+=24
         self.exportSmooth = self.objOptions.addView(gui3d.CheckBox( "Subdivide", False));y+=24
         self.exportHair = self.objOptions.addView(gui3d.CheckBox("Hair as mesh", selected=True));y+=24
-        #self.exportPngTexture = self.objOptions.addView(gui3d.CheckBox("PNG texture", selected=True));y+=24
         scales = []
         (y, self.objScales) = self.addScales( self.objOptions, scales, "Obj", True, y)
 
@@ -296,19 +296,19 @@ class ExportTaskView(gui3d.TaskView):
         self.mhxOptions = self.addView(gui3d.GroupBox([660, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*14+6)));y+=25
         self.version24 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.4", False));y+=24
         self.version25 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.5", True));y+=24
-        self.exportSeparateFolder = self.mhxOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
-        self.exportFeetOnGround = self.mhxOptions.addView(gui3d.CheckBox("Feet on ground", True));y+=24
-        #self.exportExpressions = self.mhxOptions.addView(gui3d.CheckBox("Expressions (old)", False));y+=24
-        self.exportExpressionUnits = self.mhxOptions.addView(gui3d.CheckBox("Expressions", False));y+=24
-        self.exportFaceShapes = self.mhxOptions.addView(gui3d.CheckBox("Face shapes", True));y+=24
-        self.exportBodyShapes = self.mhxOptions.addView(gui3d.CheckBox("Body shapes", True));y+=24
-        self.exportFacePanel = self.mhxOptions.addView(gui3d.CheckBox("Face panel", True));y+=24
-        self.exportClothes = self.mhxOptions.addView(gui3d.CheckBox("Clothes", True));y+=24
-        self.exportClothesRig = self.mhxOptions.addView(gui3d.CheckBox("Clothes rig", True));y+=24
-        self.exportCage = self.mhxOptions.addView(gui3d.CheckBox("Cage", False));y+=24
-        self.exportAdvancedSpine = self.mhxOptions.addView(gui3d.CheckBox("Advanced spine", False));y+=24
-        self.exportMaleRig = self.mhxOptions.addView(gui3d.CheckBox("Male rig", False));y+=24
-        #self.exportSkirtRig = self.mhxOptions.addView(gui3d.CheckBox("Skirt rig", False));y+=24
+        self.mhxSeparateFolder = self.mhxOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
+        self.mhxFeetOnGround = self.mhxOptions.addView(gui3d.CheckBox("Feet on ground", True));y+=24
+        self.mhxHidden = self.mhxOptions.addView(gui3d.CheckBox("Hidden faces", True));y+=24
+        self.mhxExpressionUnits = self.mhxOptions.addView(gui3d.CheckBox("Expressions", False));y+=24
+        self.mhxFaceShapes = self.mhxOptions.addView(gui3d.CheckBox("Face shapes", True));y+=24
+        self.mhxBodyShapes = self.mhxOptions.addView(gui3d.CheckBox("Body shapes", True));y+=24
+        self.mhxFacePanel = self.mhxOptions.addView(gui3d.CheckBox("Face panel", True));y+=24
+        self.mhxClothes = self.mhxOptions.addView(gui3d.CheckBox("Clothes", True));y+=24
+        self.mhxClothesRig = self.mhxOptions.addView(gui3d.CheckBox("Clothes rig", True));y+=24
+        self.mhxCage = self.mhxOptions.addView(gui3d.CheckBox("Cage", False));y+=24
+        self.mhxAdvancedSpine = self.mhxOptions.addView(gui3d.CheckBox("Advanced spine", False));y+=24
+        self.mhxMaleRig = self.mhxOptions.addView(gui3d.CheckBox("Male rig", False));y+=24
+        #self.mhxSkirtRig = self.mhxOptions.addView(gui3d.CheckBox("Skirt rig", False));y+=24
         rigs = []
         self.mhxMhx = self.mhxOptions.addView(gui3d.RadioButton(rigs, "Use mhx rig", True));y+=24
         self.rigifyMhx = self.mhxOptions.addView(gui3d.RadioButton(rigs, "Use rigify rig", False));y+=24
@@ -324,6 +324,7 @@ class ExportTaskView(gui3d.TaskView):
         self.colladaEyebrows = self.colladaOptions.addView(gui3d.CheckBox("Eyebrows", True));y+=24
         self.colladaLashes = self.colladaOptions.addView(gui3d.CheckBox("Eyelashes", True));y+=24
         self.colladaHelpers = self.colladaOptions.addView(gui3d.CheckBox("Helper geometry", False));y+=24
+        self.colladaHidden = self.colladaOptions.addView(gui3d.CheckBox("Hidden faces", False));y+=24
         # self.colladaSeparateFolder = self.colladaOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
         # self.colladaPngTexture = self.colladaOptions.addView(gui3d.CheckBox("PNG texture", selected=True));y+=24
         scales = []
@@ -414,11 +415,11 @@ class ExportTaskView(gui3d.TaskView):
 
             if self.wavefrontObj.selected:
                 
-                if self.exportEyebrows.selected and self.exportDiamonds.selected:
+                if self.exportEyebrows.selected and self.exportHelpers.selected:
                     filter = None
                 elif self.exportEyebrows.selected:
                     filter = lambda fg: not ('joint' in fg.name or 'helper' in fg.name)
-                elif self.exportDiamonds.selected:
+                elif self.exportHelpers.selected:
                     filter = lambda fg: not 'eyebrown' in fg.name
                 else:
                     filter = lambda fg: not ('joint' in fg.name or 'helper' in fg.name or 'eyebrown' in fg.name)
@@ -433,11 +434,11 @@ class ExportTaskView(gui3d.TaskView):
                     filter)
                     
                 options = {
-                    "helpers" : self.exportDiamonds.selected,
+                    "helpers" : self.exportHelpers.selected,
+                    "hidden" : self.exportHidden.selected,
                     "eyebrows" : self.exportEyebrows.selected,
                     "lashes" : self.exportLashes.selected,
                     "scale": self.getScale(self.objScales),
-                    "pngTexture": True, #self.exportPngTexture.selected
                 }                    
                 mh2obj_proxy.exportProxyObj(gui3d.app.selectedHuman, os.path.join(exportPath, filename), options)
                 
@@ -467,19 +468,20 @@ class ExportTaskView(gui3d.TaskView):
                             break
                     options = {
                         'mhxversion':mhxversion,
-                        'expressions':False,    #self.exportExpressions.selected,
-                        'expressionunits':self.exportExpressionUnits.selected,
-                        'faceshapes':self.exportFaceShapes.selected,
-                        'bodyshapes':self.exportBodyShapes.selected,
-                        'facepanel':self.exportFacePanel.selected,
-                        'clothes':self.exportClothes.selected,
-                        'cage':self.exportCage.selected,
-                        'separatefolder':self.exportSeparateFolder.selected,
-                        'feetonground':self.exportFeetOnGround.selected,
-                        'advancedspine':self.exportAdvancedSpine.selected,
-                        'malerig':self.exportMaleRig.selected,
-                        'skirtrig':False, #self.exportSkirtRig.selected,
-                        'clothesrig':self.exportClothesRig.selected,
+                        'hidden':self.mhxHidden.selected,
+                        'expressions':False,    #self.mhxExpressions.selected,
+                        'expressionunits':self.mhxExpressionUnits.selected,
+                        'faceshapes':self.mhxFaceShapes.selected,
+                        'bodyshapes':self.mhxBodyShapes.selected,
+                        'facepanel':self.mhxFacePanel.selected,
+                        'clothes':self.mhxClothes.selected,
+                        'cage':self.mhxCage.selected,
+                        'separatefolder':self.mhxSeparateFolder.selected,
+                        'feetonground':self.mhxFeetOnGround.selected,
+                        'advancedspine':self.mhxAdvancedSpine.selected,
+                        'malerig':self.mhxMaleRig.selected,
+                        'skirtrig':False, #self.mhxSkirtRig.selected,
+                        'clothesrig':self.mhxClothesRig.selected,
                         'mhxrig': rig,
                     }
 
@@ -495,8 +497,8 @@ class ExportTaskView(gui3d.TaskView):
                     "eyebrows" : self.colladaEyebrows.selected,
                     "lashes" : self.colladaLashes.selected,
                     "helpers" : self.colladaHelpers.selected,
+                    "hidden" : self.colladaHidden.selected,
                     "scale": self.getScale(self.daeScales),
-                    "pngTexture": True, #self.colladaPngTexture.selected
                 }
                 mh2collada.exportCollada(gui3d.app.selectedHuman, os.path.join(exportPath, filename), options)
             elif self.md5.selected:

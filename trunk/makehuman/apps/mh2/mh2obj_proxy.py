@@ -35,6 +35,7 @@ def exportProxyObj(human, name, options):
 
     stuffs = object_collection.setupObjects(name, human,
         helpers=options["helpers"], 
+        hidden=options["hidden"], 
         eyebrows=options["eyebrows"], 
         lashes=options["lashes"])
     
