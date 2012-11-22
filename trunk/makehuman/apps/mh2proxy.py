@@ -438,8 +438,20 @@ def readProxyFile(obj, file, evalOnLoad):
             w = float(words[1])
             weights.append((v,w))
         elif status == doDeleteVerts:
+            sequence = False
             for v in words:            
-                proxy.deleteVerts[int(v)] = True
+                if v == "-":
+                    sequence = True
+                else:
+                    v1 = int(v)
+                    if sequence:
+                        for vn in range(v0,v1+1):
+                            proxy.deleteVerts[vn] = True
+                        sequence = False                            
+                    else:
+                        proxy.deleteVerts[v1] = True
+                    v0 = v1
+                        
             
     if evalOnLoad and proxy.obj_file:
         if not copyObjFile(proxy):

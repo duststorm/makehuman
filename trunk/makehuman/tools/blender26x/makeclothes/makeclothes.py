@@ -727,11 +727,24 @@ def printDeleteVerts(fp, bob):
 
     fp.write("# delete_verts\n")
     n = 0
+    vn0 = -100
+    sequence = False
     for vn in killList:
-        fp.write("%d " % vn)
-        n += 1
-        if n % 10 == 0:
-            fp.write("\n")            
+        if vn != vn0+1:
+            if sequence:
+                fp.write("- %d " % vn0)
+            n += 1
+            if n % 10 == 0:
+                fp.write("\n")  
+            sequence = False
+            fp.write("%d " % vn)
+        else:
+            if vn0 < 0:
+                fp.write("%d " % vn)
+            sequence = True
+        vn0 = vn
+    if sequence:
+        fp.write(" - %d" % vn)
     fp.write("\n")
                 
 #
