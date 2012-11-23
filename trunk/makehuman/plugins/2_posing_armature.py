@@ -456,7 +456,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
         self.armature.restPosition = self.restPosition.selected
         self.armature.quatSkinning = self.quatSkinning.selected
         human = gui3d.app.selectedHuman
-        self.armature.update(human)
+        self.armature.update()
         amt = self.getArmature()
 
         if self.showMesh.selected:
@@ -493,7 +493,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
     def getArmature(self):
         
         human = gui3d.app.selectedHuman
-        #self.armature.update(human)
+        #self.armature.update()
         
         if not self.armatureObject:            
             self.armatureObject = CArmatureObject(self.armature, self)

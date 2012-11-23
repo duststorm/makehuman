@@ -76,9 +76,11 @@ LayerNames = [
 
 
 class CArmature:
-    def __init__(self, rigtype, quatSkinning):
+    def __init__(self, human, rigtype, quatSkinning):
         self.name = "Armature"
         self.rigtype = rigtype
+        self.human = human
+        self.modifier = None
         self.quatSkinning = quatSkinning
         self.restPosition = False
         self.frames = []
@@ -101,9 +103,11 @@ class CArmature:
         elif rigtype == "mhx":
             self.vertexgroups = {}
             for name in ["head", "bones", "palm"]:
-                mhx.mhx_main.getVertexGroups(name, self.vertexgroups)
-                    
+                mhx.mhx_main.getVertexGroups(name, self.vertexgroups)                    
 
+    def __repr__(self):
+        return ("  <CArmature %s>" % self.name)
+        
     def display(self):
         print "<CArmature %s" % self.name
         for bone in self.boneList:
@@ -119,15 +123,16 @@ class CArmature:
                 bone.drivers.append(drv)     
                 
 
-    def clear(self, human):
+    def clear(self):
         for bone in self.boneList:
             bone.matrixPose = tm.identity_matrix()
-        self.update(human)            
+        self.update()            
 
 
-    def rebuild(self, human):        
+    def rebuild(self, update=True):      
+        obj = self.human.meshData
         proxyData = {}
-        mhx.mhx_rig.setupRig(human.meshData, self.rigtype, proxyData)
+        mhx.mhx_rig.setupRig(obj, self.rigtype, proxyData)
         for bone in self.boneList:
             bone.rebuild()
             if bone.name in []:
@@ -135,19 +140,47 @@ class CArmature:
                 print "R", bone.matrixRest
                 #print "P", bone.matrixPose
                 #print "G", bone.matrixGlobal
-        for v in human.meshData.verts:
+        for v in obj.verts:
             self.vertices[v.idx].co[:3] = v.co
-        self.update(human)            
+        if update:
+            self.update()            
         
+
+    def removeModifier(self):
+        if self.modifier:
+            self.modifier.updateValue(self.human, 0.0)
+            self.modifier = None
+        
+    def setModifier(self, modifier):
+        self.removeModifier()
+        self.modifier = modifier
+        self.update()           
+
+    def printLocs(self):
+        verts = self.human.meshData.verts
+        for vn in [3825]:
+            print "  ", vn, verts[vn].co
             
-    def update(self, human):
-        print "Update", self.name
+    def update(self):
+        human = self.human
+        obj = human.meshData
+        self.printLocs()
+
+        if self.modifier:
+            print "Update", self.modifier
+            self.modifier.updateValue(human, 1.0)
+            self.printLocs()
+            #self.rebuild(update=False)
+
+        print "Update", self
         for bone in self.boneList:
             bone.updateBone()
             bone.updateConstraints()
+        self.printLocs()            
 
         print "Update", human
-        self.updateObj(human.meshData)
+        self.updateObj()
+        self.printLocs()
 
         if human.proxy:
             human.updateProxyMesh()
@@ -168,7 +201,8 @@ class CArmature:
                     clo.getSubdivisionMesh()
         
         
-    def updateObj(self, obj):
+    def updateObj(self):
+        obj = self.human.meshData
         coords = numpy.zeros((len(obj.verts), 3), float)
         for n,v in enumerate(obj.verts):
             vert = self.vertices[v.idx]
@@ -201,7 +235,7 @@ class CArmature:
         obj.update()
 
 
-    def build(self, human):
+    def build(self):
         if the.Config.exporting:
             return
         self.controls = []
@@ -215,8 +249,10 @@ class CArmature:
             if bone.layers & self.visible:
                 self.controls.append(bone)
             
+        obj = self.human.meshData
+
         if not self.vertices:
-            for v in human.meshData.verts:
+            for v in obj.verts:
                 self.vertices[v.idx] = CVertex(v)
             for bname,vgroup in self.vertexgroups.items():
                 bone = self.bones[bname]
@@ -232,7 +268,7 @@ class CArmature:
                     vgroup.append((bone,w/wtot))
                 vert.groups = vgroup       
         else:
-            for v in human.meshData.verts:
+            for v in obj.verts:
                 v.co = self.vertices[v.idx].co[:3]   
                 
                 
@@ -263,7 +299,7 @@ class CArmature:
             raise NameError("Dirty bones encountered") 
             
             
-    def readBvhFile(self, filepath, human):
+    def readBvhFile(self, filepath):
         print "Bvh", filepath
         fp = open(filepath, "rU")
         bones = []
@@ -356,7 +392,7 @@ class CArmature:
                 print "P ", bone.matrixPose
                 print "G ", bone.matrixGlobal
 
-        self.update(human)                    
+        self.update()                    
 
                 
 class CVertex:
@@ -810,7 +846,7 @@ def createRig(human, rigtype, quatSkinning):
     proxyData = {}
     mhx.mhx_rig.setupRig(obj, rigtype, proxyData)
 
-    amt = CArmature(rigtype, quatSkinning)
+    amt = CArmature(human, rigtype, quatSkinning)
     the.createdArmature = amt
     for (bname, roll, parent, flags, layers, bbone) in the.Armature:
         if the.Config.exporting or layers & ACTIVE_LAYERS:
@@ -821,7 +857,7 @@ def createRig(human, rigtype, quatSkinning):
             pass
             #print "Ignore %s L %x A %x" % (bname, layers, ACTIVE_LAYERS)
 
-    amt.build(human)        
+    amt.build()        
     
     if rigtype != "mhx":
         return amt

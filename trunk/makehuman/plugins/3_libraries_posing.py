@@ -37,6 +37,7 @@ import aljabr
 import armature
 from armature import transformations as tm
 import warpmodifier
+import humanmodifier
 
 #
 #   Pose library
@@ -81,15 +82,15 @@ class PoseLoadTaskView(gui3d.TaskView):
         
         if self.modifier:
             print "Clear", self.modifier
-            self.modifier.updateValue(self.human, 0.0)
+            self.armature.removeModifier()      
             self.modifier = None
 
         if os.path.basename(filepath) == "clear.bvh":
-            self.armature.clear(self.human)
-            self.armature.update(self.human)
+            self.armature.clear()
+            self.armature.update()
             return
     
-        self.armature.readBvhFile(filepath, self.human)
+        self.armature.readBvhFile(filepath)
 
         folder = os.path.dirname(filepath)
         (fname, ext) = os.path.splitext(os.path.basename(filepath))
@@ -101,11 +102,11 @@ class PoseLoadTaskView(gui3d.TaskView):
         except KeyError:
             self.modifier = None
         if not self.modifier:
-            self.modifier = warpmodifier.WarpModifier(modpath, "body", "GenderAgeEthnicModifier2")
+            #self.modifier = warpmodifier.WarpModifier(modpath, "body", "GenderAgeEthnicModifier2")
+            self.modifier = humanmodifier.GenderAgeEthnicModifier2(modpath)
             self.modifiers[filepath] = self.modifier
-        self.modifier.updateValue(self.human, 1.0)
-
-        self.armature.update(self.human)
+            
+        self.armature.setModifier(self.modifier)      
 
  
     def onShow(self, event):
@@ -127,14 +128,11 @@ class PoseLoadTaskView(gui3d.TaskView):
     def onHumanChanged(self, event):
         if self.armature:
             print "Rebuild", self.armature
-            self.armature.rebuild(self.human)            
-            if self.modifier:
-                print "Update", self.modifier
-                self.modifier.updateValue(self.human, 1.0)
+            self.armature.rebuild()            
 
         elif self.modifier:
             print "Remove", self.modifier
-            self.modifier.updateValue(self.human, 0.0)
+            self.modifier.updateValue(0.0)
             self.modifier = None
 
 
