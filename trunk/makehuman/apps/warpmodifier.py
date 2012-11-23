@@ -255,6 +255,14 @@ class WarpModifier (humanmodifier.SimpleModifier):
         algos3d.targetBuffer[self.warppath] = target
         return target    
         
+        
+    def removeTarget(self):
+        try:
+            target = algos3d.targetBuffer[self.warppath]
+        except KeyError:
+            return        
+        del algos3d.targetBuffer[self.warppath]
+        
 
 def getRefObject(human):
     global theRefObjects, theRefObjectVerts, theBaseObjectVerts

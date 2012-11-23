@@ -52,9 +52,7 @@ class PoseLoadTaskView(gui3d.TaskView):
 
         self.human = gui3d.app.selectedHuman
         self.armature = None
-        self.modifier = None
         self.dirty = False
-        self.modifiers = {}
         
         gui3d.TaskView.__init__(self, category, 'Poses')
         if not os.path.exists(self.userPoses):
@@ -74,39 +72,45 @@ class PoseLoadTaskView(gui3d.TaskView):
         def onClicked(event):
             self.syncMedia()
  
- 
+
+    def printLocs(self):
+        verts = self.human.meshData.verts
+        for vn in [3825]:
+            x = verts[vn].co
+            print("   %d (%.4f %.4f %.4f) " % (vn, x[0], x[1], x[2]))
+
+
     def loadBvhFile(self, filepath): 
     
-        if not self.armature:
-            self.armature = armature.rigdefs.createRig(self.human, "Rigid", False)
-        
-        if self.modifier:
-            print "Clear", self.modifier
-            self.armature.removeModifier()      
-            self.modifier = None
+        print "LoadBVH", filepath
 
-        if os.path.basename(filepath) == "clear.bvh":
+        if self.armature:
+            self.armature.printLocs()
+            print "Clear", self.armature
             self.armature.clear()
-            self.armature.update()
+            self.armature.printLocs()
+        else:
+            self.printLocs()
+        
+        if os.path.basename(filepath) == "clear.bvh":
             return
-    
-        self.armature.readBvhFile(filepath)
 
         folder = os.path.dirname(filepath)
         (fname, ext) = os.path.splitext(os.path.basename(filepath))
         modpath = '%s/${ethnic}-${gender}-${age}-%s.target' % (folder, fname)
         print filepath, modpath
+
+        modifier = warpmodifier.WarpModifier(modpath, "body", "GenderAgeEthnicModifier2")            
+        modifier.updateValue(self.human, 1.0)
+        print "Mod", modifier
+        self.printLocs()
         
-        try:
-            self.modifier = self.modifiers[filepath]
-        except KeyError:
-            self.modifier = None
-        if not self.modifier:
-            #self.modifier = warpmodifier.WarpModifier(modpath, "body", "GenderAgeEthnicModifier2")
-            self.modifier = humanmodifier.GenderAgeEthnicModifier2(modpath)
-            self.modifiers[filepath] = self.modifier
+        if not self.armature:
+            self.armature = armature.rigdefs.createRig(self.human, "Rigid", False)
             
-        self.armature.setModifier(self.modifier)      
+        self.armature.setModifier(modifier)
+
+        self.armature.readBvhFile(filepath)
 
  
     def onShow(self, event):
@@ -121,19 +125,29 @@ class PoseLoadTaskView(gui3d.TaskView):
         gui3d.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
                 
+
     def onResized(self, event):
         self.filechooser.onResized(event)
 
+
+    def onHumanChanging(self, event):
+        print "Human Changing", event.change
+        
+        human = event.human
+        if event.change == 'reset':
+            print "Clear", self.armature
+            if self.armature:
+                self.armature.clear()
+                self.armature = None
+
                 
     def onHumanChanged(self, event):
+        print "Human Changed", event.change
         if self.armature:
             print "Rebuild", self.armature
             self.armature.rebuild()            
 
-        elif self.modifier:
-            print "Remove", self.modifier
-            self.modifier.updateValue(0.0)
-            self.modifier = None
+        #self.deleteModifier()
 
 
     def loadHandler(self, human, values):

@@ -24,6 +24,7 @@ from math import pi
 import aljabr
 import warp
 import numpy
+import gui3d
 
 from numpy import dot
 from numpy.linalg import inv
@@ -73,8 +74,7 @@ LayerNames = [
     (L_MSCL, "Muscles"),
     (L_DEF, "Deform")
 ]
-
-
+        
 class CArmature:
     def __init__(self, human, rigtype, quatSkinning):
         self.name = "Armature"
@@ -97,7 +97,7 @@ class CArmature:
             self.last = 1
 
         self.matrixGlobal = tm.identity_matrix()
-        self.vertices = {}
+        self.restVerts = {}
         if the.VertexWeights:
             self.vertexgroups = the.VertexWeights
         elif rigtype == "mhx":
@@ -115,6 +115,14 @@ class CArmature:
         print ">"
         
 
+    def printLocs(self):
+        verts = self.human.meshData.verts
+        for vn in [3825]:
+            x = verts[vn].co
+            y = self.restVerts[vn].co
+            print("   %d (%.4f %.4f %.4f) (%.4f %.4f %.4f)" % (vn, x[0], x[1], x[2], y[0], y[1], y[2]))
+
+
     def assignDrivers(self, drivers):
         for drv in drivers:
             words = drv.channel.split('"')
@@ -126,10 +134,11 @@ class CArmature:
     def clear(self):
         for bone in self.boneList:
             bone.matrixPose = tm.identity_matrix()
-        self.update()            
+        self.update()     
+        self.removeModifier()
 
 
-    def rebuild(self, update=True):      
+    def rebuild(self, update=True):   
         obj = self.human.meshData
         proxyData = {}
         mhx.mhx_rig.setupRig(obj, self.rigtype, proxyData)
@@ -140,37 +149,52 @@ class CArmature:
                 print "R", bone.matrixRest
                 #print "P", bone.matrixPose
                 #print "G", bone.matrixGlobal
-        for v in obj.verts:
-            self.vertices[v.idx].co[:3] = v.co
+        if self.modifier:
+            self.modifier.updateValue(self.human, 1.0)
+        self.syncRestVerts()                
         if update:
             self.update()            
-        
+
+
+    def syncRestVerts(self):
+        print "Synching"
+        obj = self.human.meshData
+        for v in obj.verts:
+            self.restVerts[v.idx].co[:3] = v.co
+    
 
     def removeModifier(self):
         if self.modifier:
+            print "Remove", self.modifier
             self.modifier.updateValue(self.human, 0.0)
             self.modifier = None
+            self.human.meshData.update()
+            self.syncRestVerts()                
+            self.printLocs()
+
+        
+    def updateModifier(self):
+        if self.modifier:
+            print "Update", self.modifier
+            self.modifier.updateValue(self.human, 1.0)
+            self.human.meshData.update()
+            self.syncRestVerts()                
+            self.printLocs()
+
         
     def setModifier(self, modifier):
         self.removeModifier()
         self.modifier = modifier
-        self.update()           
+        self.modifier.updateValue(self.human, 1.0)
+        self.syncRestVerts()
+        print "Set", self.modifier
+        self.printLocs()
 
-    def printLocs(self):
-        verts = self.human.meshData.verts
-        for vn in [3825]:
-            print "  ", vn, verts[vn].co
-            
+
     def update(self):
         human = self.human
         obj = human.meshData
         self.printLocs()
-
-        if self.modifier:
-            print "Update", self.modifier
-            self.modifier.updateValue(human, 1.0)
-            self.printLocs()
-            #self.rebuild(update=False)
 
         print "Update", self
         for bone in self.boneList:
@@ -205,7 +229,7 @@ class CArmature:
         obj = self.human.meshData
         coords = numpy.zeros((len(obj.verts), 3), float)
         for n,v in enumerate(obj.verts):
-            vert = self.vertices[v.idx]
+            vert = self.restVerts[v.idx]
             coords[n] = vert.co[:3]
             if vert.groups:
                 if self.quatSkinning:
@@ -251,15 +275,15 @@ class CArmature:
             
         obj = self.human.meshData
 
-        if not self.vertices:
+        if not self.restVerts:
             for v in obj.verts:
-                self.vertices[v.idx] = CVertex(v)
+                self.restVerts[v.idx] = CVertex(v)
             for bname,vgroup in self.vertexgroups.items():
                 bone = self.bones[bname]
                 for vn,w in vgroup:
-                    vert = self.vertices[vn]
+                    vert = self.restVerts[vn]
                     vert.groups.append((bone,w))
-            for vn,vert in self.vertices.items():
+            for vn,vert in self.restVerts.items():
                 wtot = 0
                 for bone,w in vert.groups:
                     wtot += w
@@ -268,8 +292,7 @@ class CArmature:
                     vgroup.append((bone,w/wtot))
                 vert.groups = vgroup       
         else:
-            for v in obj.verts:
-                v.co = self.vertices[v.idx].co[:3]   
+            self.syncRestVerts()
                 
                 
     def checkDirty(self):                
