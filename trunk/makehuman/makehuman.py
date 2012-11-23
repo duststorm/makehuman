@@ -11,6 +11,12 @@ sys.path.append('core')
 from debugdump import DebugDump
 import subprocess 
 
+# For mac, use GLUT since SDL is broken on 10.8
+if sys.platform == "darwin":
+   sys.path.append('lib')
+   from core import G
+   G.use_glut = True
+
 # print os.getcwd()
 
 # Default fallback to use if we can't figure out SVN revision in any other

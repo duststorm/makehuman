@@ -239,7 +239,6 @@ def handleMouse():
         mouseMotion(g_mouse_state, x, y, xrel, yrel)
 
 def mouseMotionFunc(s, x, y):
-    getModifiers()
     if G.mouse_pos is None:
         G.mouse_pos = x, y
     global g_mouse_pos
@@ -272,7 +271,7 @@ def idleFunc():
 
 def createWindow(useTimer = None):
     glutInit(sys.argv)
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH)
+    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE)
     # glutInitDisplayString("rgb=8 samples")
     glutInitWindowSize(G.windowWidth, G.windowHeight)
 
@@ -283,7 +282,7 @@ def createWindow(useTimer = None):
     # image = SDL_LoadBMP("mh_icon.bmp");
 
     glutCreateWindow("MakeHuman")
-    glutSetKeyRepeat(GLUT_KEY_REPEAT_DEFAULT)
+    #glutSetKeyRepeat(GLUT_KEY_REPEAT_DEFAULT)
 
     glutKeyboardFunc(keyDownFunc)
     glutKeyboardUpFunc(keyUpFunc)

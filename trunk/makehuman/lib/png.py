@@ -4,7 +4,7 @@ from ctypes import *
 if sys.platform == 'win32':
     _png = CDLL('bin/win/libpng12.dll')
 elif sys.platform == 'darwin':
-    _png = CDLL('/opt/local/lib/libpng.dylib')
+    _png = CDLL('bin/osx/libpng.dylib')
 else:
     _png = CDLL('libpng.so')
 
