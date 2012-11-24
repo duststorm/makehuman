@@ -245,7 +245,7 @@ MaleArmature = [
 ]
 
 #
-#    BodyControlPoses(fp):
+#    BodyControlPoses(fp, config):
 #
 
 limHips = (-50*D,40*D, -45*D,45*D, -16*D,16*D)
@@ -254,102 +254,102 @@ limSpine2 = (-90*D,70*D, -20*D,20*D, -50*D,50*D)
 limSpine3 = (-20*D,20*D, 0,0, -20*D,20*D)
 limNeck = (-60*D,40*D, -45*D,45*D, -60*D,60*D)
 
-def BodyControlPoses(fp):
-    addPoseBone(fp,  'MasterFloor', 'GZM_Root', 'Master', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
+def BodyControlPoses(fp, config):
+    addPoseBone(fp, config,  'MasterFloor', 'GZM_Root', 'Master', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-    addPoseBone(fp,  'Root', 'MHCrown', 'Master', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
+    addPoseBone(fp, config,  'Root', 'MHCrown', 'Master', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, 
         [('LimitRot', C_OW_LOCAL, 0, ['LimitRot', (0,0, -45*D,45*D, 0,0), (1,1,1)]) ])
 
-    if the.Config.exporting:
-        addPoseBone(fp,  'Shoulders', 'MHCrown', 'Master', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
+    if config.exporting:
+        addPoseBone(fp, config,  'Shoulders', 'MHCrown', 'Master', (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0,
             [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (0,0, -45*D,45*D, 0,0), (1,1,1)]),
              #('LimitDist', 0, 1, ['LimitDist', 'Root', 'LIMITDIST_INSIDE'])
             ])
 
     # Up spine
 
-    addPoseBone(fp,  'Hips', 'GZM_CircleHips', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+    addPoseBone(fp, config,  'Hips', 'GZM_CircleHips', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
          [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limHips, (1,1,1)])])
 
-    addPoseBone(fp,  'Pelvis', 'MHCircle15', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+    addPoseBone(fp, config,  'Pelvis', 'MHCircle15', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-    addPoseBone(fp,  'Spine1', 'GZM_CircleSpine', 'Spine', (1,1,1), (0,0,0), (1,1,1), 
+    addPoseBone(fp, config,  'Spine1', 'GZM_CircleSpine', 'Spine', (1,1,1), (0,0,0), (1,1,1), 
         ((1,1,1), (0.2,0.2,0.2), 0.05, None), 0, 
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limSpine1, (1,1,1)])])
 
-    addPoseBone(fp,  'Spine2', 'GZM_CircleSpine', 'Spine', (1,1,1), (0,0,0), (1,1,1), 
+    addPoseBone(fp, config,  'Spine2', 'GZM_CircleSpine', 'Spine', (1,1,1), (0,0,0), (1,1,1), 
         ((1,1,1), (0.2,0.2,0.2), 0.05, None), 0,
         [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limSpine2, (1,1,1)])])
 
-    addPoseBone(fp,  'Spine3', 'GZM_CircleChest', 'Spine', (1,1,1), (0,0,0), (1,1,1), 
+    addPoseBone(fp, config,  'Spine3', 'GZM_CircleChest', 'Spine', (1,1,1), (0,0,0), (1,1,1), 
         ((1,1,1), (0.96,0.96,0.96), 0.01, None), 0,
          [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limSpine3, (1,1,1)]),
           ('IK', 0, 0, ['IK', 'Shoulders', 3, (-90*D, 'SpinePT'), (1,0,1)]),
          ])
          
-    addPoseBone(fp,  'Neck', 'MHNeck', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+    addPoseBone(fp, config,  'Neck', 'MHNeck', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
          [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limNeck, (1,1,1)])])
          
 
-    if the.Config.exporting and the.Config.advancedspine:
+    if config.exporting and config.advancedspine:
         # Spine IK
-        addPoseBone(fp, 'SpinePT', 'MHCube025', 'Spine', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
+        addPoseBone(fp, config, 'SpinePT', 'MHCube025', 'Spine', (0,0,0), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-        addPoseBone(fp, 'SpineLinkPT', None, 'Spine', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        addPoseBone(fp, config, 'SpineLinkPT', None, 'Spine', (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
             [('StretchTo', 0, 1, ['Stretch', 'SpinePT', 0, 1])])
 
         # Down spine
 
-        addPoseBone(fp,  'DownHips', 'GZM_CircleHips', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+        addPoseBone(fp, config,  'DownHips', 'GZM_CircleHips', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
              [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limSpine1, (1,1,1)])])
 
-        addPoseBone(fp,  'DownSpine1', 'GZM_CircleInvSpine', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
+        addPoseBone(fp, config,  'DownSpine1', 'GZM_CircleInvSpine', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
             [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limSpine2, (1,1,1)])])
 
-        addPoseBone(fp,  'DownSpine2', 'GZM_CircleInvSpine', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
+        addPoseBone(fp, config,  'DownSpine2', 'GZM_CircleInvSpine', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
             [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limSpine3, (1,1,1)])])
 
-        addPoseBone(fp,  'DownSpine3', 'GZM_CircleInvChest', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
+        addPoseBone(fp, config,  'DownSpine3', 'GZM_CircleInvChest', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, 
             [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limNeck, (1,1,1)]),
             ])
          
-        addPoseBone(fp,  'DownNeck', 'MHNeck', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+        addPoseBone(fp, config,  'DownNeck', 'MHNeck', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
             [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', limNeck, (1,1,1)])])
     
    
         # Deform spine    
-        addPoseBone(fp, 'DfmPelvis', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
+        addPoseBone(fp, config, 'DfmPelvis', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
           [('CopyLoc', 0, 1, ['UpLoc', 'Pelvis', (1,1,1), (0,0,0), False, False]),
            ('CopyRot', 0, 1, ['UpRot', 'Pelvis', (1,1,1), (0,0,0), False]),
            ('CopyLoc', 0, 0, ['DownLoc', 'DownHips', (1,1,1), (0,0,0), 1, False]),
            ('IK', 0, 0, ['DownIK', 'DownHips', 0, (-90*D, 'DownPT1'), (True, False,True)])
            ])
        
-        addPoseBone(fp, 'DfmHips', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
+        addPoseBone(fp, config, 'DfmHips', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
           [('CopyLoc', 0, 1, ['UpLoc', 'Hips', (1,1,1), (0,0,0), False, False]),
            ('CopyRot', 0, 1, ['UpRot', 'Hips', (1,1,1), (0,0,0), False]),
            ('CopyLoc', 0, 0, ['DownLoc', 'DownHips', (1,1,1), (0,0,0), 0, False]),
            ('CopyRot', 0, 0, ['DownRot', 'DownHips', (1,1,1), (0,0,0), False]) ])
        
-        addPoseBone(fp, 'DfmSpine1', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
+        addPoseBone(fp, config, 'DfmSpine1', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
           [('CopyLoc', 0, 1, ['UpLoc', 'Spine1', (1,1,1), (0,0,0), False, False]),
            ('CopyRot', 0, 1, ['UpRot', 'Spine1', (1,1,1), (0,0,0), False]),
            ('CopyLoc', 0, 0, ['DownLoc', 'DownSpine1', (1,1,1), (0,0,0), 1, False]),
            ('IK', 0, 0, ['DownIK', 'DownSpine1', 1, (-90*D, 'DownPT1'), (True, False,True)]),
            ('StretchTo', 0, 1, ['Stretch', 'Spine2', 0, 1]) ])
 
-        addPoseBone(fp, 'DfmSpine2', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
+        addPoseBone(fp, config, 'DfmSpine2', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
           [('CopyRot', 0, 1, ['UpRot', 'Spine2', (1,1,1), (0,0,0), False]),
            ('CopyLoc', 0, 0, ['DownLoc', 'DownSpine2', (1,1,1), (0,0,0), 1, False]),
            ('IK', 0, 0, ['DownIK', 'DownSpine2', 1, (-90*D, 'DownPT2'), (True, False,True)]),
            ('StretchTo', 0, 1, ['Stretch', 'Spine3', 0, 1]) ])
 
-        addPoseBone(fp, 'DfmSpine3', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
+        addPoseBone(fp, config, 'DfmSpine3', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
           [('CopyRot', 0, 1, ['UpRot', 'Spine3', (1,1,1), (0,0,0), False]),
            ('CopyLoc', 0, 0, ['DownLoc', 'DownSpine3', (1,1,1), (0,0,0), 1, False]),
            ('IK', 0, 0, ['DownIK', 'DownSpine3', 1, (-90*D, 'DownPT3'), (True, False,True)]) ])
         
-        addPoseBone(fp, 'DfmNeck', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
+        addPoseBone(fp, config, 'DfmNeck', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
           [('CopyLoc', 0, 1, ['UpLoc', 'Neck', (1,1,1), (0,0,0), False, False]),
            ('CopyRot', 0, 1, ['UpRot', 'Neck', (1,1,1), (0,0,0), False]),
            ('CopyLoc', 0, 0, ['DownLoc', 'DownNeck', (1,1,1), (0,0,0), 0, False]),
@@ -357,74 +357,74 @@ def BodyControlPoses(fp):
            
     else:           
         # Deform spine    
-        addPoseBone(fp, 'DfmPelvis', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
+        addPoseBone(fp, config, 'DfmPelvis', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
           [('CopyTrans', 0, 1, ['CopyTrans', 'Pelvis', 0])])
        
-        addPoseBone(fp, 'DfmHips', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
+        addPoseBone(fp, config, 'DfmHips', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
           [('CopyTrans', 0, 1, ['CopyTrans', 'Hips', 0])])
        
-        addPoseBone(fp, 'DfmSpine1', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
+        addPoseBone(fp, config, 'DfmSpine1', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
           [('CopyTrans', 0, 1, ['CopyTrans', 'Spine1', 0])])
 
-        addPoseBone(fp, 'DfmSpine2', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
+        addPoseBone(fp, config, 'DfmSpine2', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
           [('CopyTrans', 0, 1, ['CopyTrans', 'Spine2', 0])])
 
-        addPoseBone(fp, 'DfmSpine3', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
+        addPoseBone(fp, config, 'DfmSpine3', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
           [('CopyTrans', 0, 1, ['CopyTrans', 'Spine3', 0])])           
         
-        addPoseBone(fp, 'DfmNeck', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
+        addPoseBone(fp, config, 'DfmNeck', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
           [('CopyTrans', 0, 1, ['CopyTrans', 'Neck', 0])])
            
 
     # Head
-    addPoseBone(fp,  'Head', 'MHHead', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
+    addPoseBone(fp, config,  'Head', 'MHHead', 'Spine', (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0,
          [('LimitRot', C_OW_LOCAL, 1, ['LimitRot', (-60*D,40*D, -60*D,60*D, -45*D,45*D), (1,1,1)])])
 
-    addPoseBone(fp, 'DfmHead', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
+    addPoseBone(fp, config, 'DfmHead', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, 
          [('CopyTrans', 0, 1, ['CopyTrans', 'Head', 0])])
  
-    addPoseBone(fp,  'DfmStomach',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+    addPoseBone(fp, config,  'DfmStomach',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'StomachTrg', 1, 1]),
         ])
 
     limBreastRot = (-45*D,45*D, -10*D,10*D, -20*D,20*D)
     limBreastScale =  (0.5,1.5, 0.2,2.0, 0.5,1.5)
 
-    addPoseBone(fp,  'Breast_L', 'MHEndCube01', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, [])
+    addPoseBone(fp, config,  'Breast_L', 'MHEndCube01', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, [])
 
-    addPoseBone(fp,  'Breast_R', 'MHEndCube01', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, [])
+    addPoseBone(fp, config,  'Breast_R', 'MHEndCube01', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, [])
 
     if not MuscleBones:
         return
 
     # Stomach
-    addPoseBone(fp,  'Stomach', 'MHBall025', None, (0,0,0), (1,1,1), (0,0,0), (1,1,1), 0, [])
+    addPoseBone(fp, config,  'Stomach', 'MHBall025', None, (0,0,0), (1,1,1), (0,0,0), (1,1,1), 0, [])
 
-    addPoseBone(fp,  'DfmStomach1',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+    addPoseBone(fp, config,  'DfmStomach1',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'Stomach', 0, 1]),
         ])
 
-    addPoseBone(fp,  'DfmStomach2',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+    addPoseBone(fp, config,  'DfmStomach2',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'StomachTrg', 1, 1]),
         ])
 
-    addPoseBone(fp,  'StomachPar',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+    addPoseBone(fp, config,  'StomachPar',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 0.5, ['Stretch', 'StomachTrg', 1, 1])])
 
 
-    addPoseBone(fp,  'DfmWaist_L',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+    addPoseBone(fp, config,  'DfmWaist_L',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'WaistTrg_L', 0, 1])])
 
-    addPoseBone(fp,  'DfmWaist_R',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+    addPoseBone(fp, config,  'DfmWaist_R',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'WaistTrg_R', 0, 1])])
 
     # Pubis
     
-    addPoseBone(fp,  'Pubis_R',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+    addPoseBone(fp, config,  'Pubis_R',None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'Pubis_L', 0, 1]),
         ])
     #print(the.Locations.keys())
-    addPoseBone(fp,  'Pubis', 'MHBall025', None, (0,0,0), (1,1,1), (0,0,0), (1,1,1), 0, 
+    addPoseBone(fp, config,  'Pubis', 'MHBall025', None, (0,0,0), (1,1,1), (0,0,0), (1,1,1), 0, 
         [('CopyLoc', 0, 1, ['MidPoint', 'Pubis_R', (1,1,1), (0,0,0), 0.5, False]),
         ])
 
@@ -450,15 +450,15 @@ def BodyDynamicLocations():
     return
 
 #
-#   MaleControlPoses(fp):
+#   MaleControlPoses(fp, config):
 #
 
-def MaleControlPoses(fp):
-    addPoseBone(fp,  'Penis1', 'MHCircle05', None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, [])
+def MaleControlPoses(fp, config):
+    addPoseBone(fp, config,  'Penis1', 'MHCircle05', None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, [])
 
-    addPoseBone(fp,  'Penis2', 'MHCircle05', None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, [])
+    addPoseBone(fp, config,  'Penis2', 'MHCircle05', None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, [])
 
-    addPoseBone(fp,  'Scrotum', 'MHCircle05' , None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, [])
+    addPoseBone(fp, config,  'Scrotum', 'MHCircle05' , None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, [])
 
     return
 

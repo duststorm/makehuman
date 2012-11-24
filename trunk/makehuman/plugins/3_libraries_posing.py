@@ -73,13 +73,6 @@ class PoseLoadTaskView(gui3d.TaskView):
             self.syncMedia()
  
 
-    def printLocs(self):
-        verts = self.human.meshData.verts
-        for vn in [3825]:
-            x = verts[vn].co
-            print("   %d (%.4f %.4f %.4f) " % (vn, x[0], x[1], x[2]))
-
-
     def loadBvhFile(self, filepath): 
     
         print "LoadBVH", filepath
@@ -89,8 +82,6 @@ class PoseLoadTaskView(gui3d.TaskView):
             print "Clear", self.armature
             self.armature.clear()
             self.armature.printLocs()
-        else:
-            self.printLocs()
         
         if os.path.basename(filepath) == "clear.bvh":
             return
@@ -102,8 +93,6 @@ class PoseLoadTaskView(gui3d.TaskView):
 
         modifier = warpmodifier.WarpModifier(modpath, "body", "GenderAgeEthnicModifier2")            
         modifier.updateValue(self.human, 1.0)
-        print "Mod", modifier
-        self.printLocs()
         
         if not self.armature:
             self.armature = armature.rigdefs.createRig(self.human, "Rigid", False)

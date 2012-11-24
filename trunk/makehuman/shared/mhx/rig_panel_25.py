@@ -105,7 +105,7 @@ PanelArmature = [
 ]
 
 #
-#   PanelControlPoses(fp):
+#   PanelControlPoses(fp, config):
 #
 
 #MX = 0.25
@@ -117,34 +117,34 @@ neg = ('0', '-4.0')
 
 FMX = 0.7
 
-def PanelControlPoses(fp):
-    if the.Config.exporting:
-        addPoseBone(fp, 'PFace', 'MHCube05', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, [])
+def PanelControlPoses(fp, config):
+    if config.exporting:
+        addPoseBone(fp, config, 'PFace', 'MHCube05', None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), 0, [])
             #[('ChildOf', C_CHILDOF, 1, ['Body', 'Root', (1,1,1), (1,1,1), (1,1,1)]) ])
 
-        addPoseBone(fp, 'PFaceDisp', 'MHFace', None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
+        addPoseBone(fp, config, 'PFaceDisp', 'MHFace', None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0, [])
 
-        addYSlider(fp, 'PBrow_L', MX)
-        addYSlider(fp, 'PBrow_R', MX)
-        addCSlider(fp, 'PBrows', MX)
-        addYSlider(fp, 'PUpLid_L', MX)
-        addYSlider(fp, 'PUpLid_R', MX)
-        addYSlider(fp, 'PLoLid_L', MX)
-        addYSlider(fp, 'PLoLid_R', MX)
-        addCSlider(fp, 'PCheek_L', MX)
-        addCSlider(fp, 'PCheek_R', MX)
-        addCSlider(fp, 'PNose', MX)
-        addCSlider(fp, 'PUpLipMid', MX)
-        addCSlider(fp, 'PLoLipMid', MX)
-        addYSlider(fp, 'PUpLip_L', MX)
-        addYSlider(fp, 'PUpLip_R', MX)
-        addYSlider(fp, 'PLoLip_L', MX)
-        addYSlider(fp, 'PLoLip_R', MX)
-        addCSlider(fp, 'PMouthMid', MX)
-        addCSlider(fp, 'PMouth_L', MX)
-        addCSlider(fp, 'PMouth_R', MX)
-        addCSlider(fp, 'PTongue', MX)
-        addYSlider(fp, 'PJaw', MX)
+        addYSlider(fp, config, 'PBrow_L', MX)
+        addYSlider(fp, config, 'PBrow_R', MX)
+        addCSlider(fp, config, 'PBrows', MX)
+        addYSlider(fp, config, 'PUpLid_L', MX)
+        addYSlider(fp, config, 'PUpLid_R', MX)
+        addYSlider(fp, config, 'PLoLid_L', MX)
+        addYSlider(fp, config, 'PLoLid_R', MX)
+        addCSlider(fp, config, 'PCheek_L', MX)
+        addCSlider(fp, config, 'PCheek_R', MX)
+        addCSlider(fp, config, 'PNose', MX)
+        addCSlider(fp, config, 'PUpLipMid', MX)
+        addCSlider(fp, config, 'PLoLipMid', MX)
+        addYSlider(fp, config, 'PUpLip_L', MX)
+        addYSlider(fp, config, 'PUpLip_R', MX)
+        addYSlider(fp, config, 'PLoLip_L', MX)
+        addYSlider(fp, config, 'PLoLip_R', MX)
+        addCSlider(fp, config, 'PMouthMid', MX)
+        addCSlider(fp, config, 'PMouth_L', MX)
+        addCSlider(fp, config, 'PMouth_R', MX)
+        addCSlider(fp, config, 'PTongue', MX)
+        addYSlider(fp, config, 'PJaw', MX)
 
 
 #

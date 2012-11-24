@@ -37,10 +37,10 @@ from . import the, mhxbones
 splitLeftRight = True
 
 #
-#    exportMhx(human, filename, options):
+#    exportMhx(human, filename, options, config):
 #
 
-def exportMhx(human, filename, options):    
+def exportMhx(human, filename, options, config):    
     (name, ext) = os.path.splitext(filename)
     the.Human = 'Human'
     time1 = time.clock()
@@ -52,17 +52,17 @@ def exportMhx(human, filename, options):
         print("Unable to open file for writing", filename)
         fp = 0
     if fp:
-        exportMhx_24(human.meshData, fp)
+        exportMhx_24(human.meshData, config, fp)
         fp.close()
         time2 = time.clock()
         print("Wrote MHX 2.4x file in %g s:" % (time2-time1), filename)
     return
  
  #
- #    exportMhx_24(obj, fp):
+ #    exportMhx_24(obj, config, fp):
  #
  
-def exportMhx_24(obj, fp):
+def exportMhx_24(obj, config, fp):
      fp.write(
  "# MakeHuman exported MHX\n" +
  "# www.makehuman.org\n" +
@@ -77,7 +77,7 @@ def exportMhx_24(obj, fp):
      exportArmature(obj, fp)
      tmpl = open("shared/mhx/templates/meshes24.mhx")
      if tmpl:
-         copyMeshFile249(obj, tmpl, fp)    
+         copyMeshFile249(obj, tmpl, config, fp)    
          tmpl.close()
      return
  
@@ -100,10 +100,10 @@ def exportRawMhx(obj, fp):
     return       
 
 #
-#    copyMeshFile249(obj, tmpl, fp):
+#    copyMeshFile249(obj, tmpl, config, fp):
 #
 
-def copyMeshFile249(obj, tmpl, fp):
+def copyMeshFile249(obj, tmpl, config, fp):
     inZone = False
     skip = False
     mainMesh = False
@@ -121,7 +121,7 @@ def copyMeshFile249(obj, tmpl, fp):
                 fp.write("#endif\n")
                 mainMesh = False
                 fp.write("#if useProxy\n")
-                for plist in the.Config.proxyList:
+                for plist in config.proxyList:
                     if plist.useMhx:
                         exportProxy24(obj, plist, fp)
                 fp.write("#endif\n")
@@ -382,7 +382,7 @@ def newExportArmature24(obj, fp):
 "end armature\n")
 
     fp.write("\npose Human\n")
-    classic_bones.ClassicWritePoses(fp)
+    classic_bones.ClassicWritePoses(fp, config)
     fp.write("end pose\n")
         
     fp.write(

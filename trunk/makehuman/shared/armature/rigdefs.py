@@ -76,9 +76,9 @@ LayerNames = [
 ]
         
 class CArmature:
-    def __init__(self, human, rigtype, quatSkinning):
+    def __init__(self, human, config, quatSkinning):
         self.name = "Armature"
-        self.rigtype = rigtype
+        self.config = config
         self.human = human
         self.modifier = None
         self.quatSkinning = quatSkinning
@@ -89,7 +89,7 @@ class CArmature:
         self.roots = []
         self.controls = []
         self.deforms = []
-        if rigtype == 'mhx':
+        if config.rigtype == 'mhx':
             self.visible = VISIBLE_LAYERS
             self.last = 32
         else:
@@ -98,9 +98,9 @@ class CArmature:
 
         self.matrixGlobal = tm.identity_matrix()
         self.restVerts = {}
-        if the.VertexWeights:
-            self.vertexgroups = the.VertexWeights
-        elif rigtype == "mhx":
+        if config.vertexWeights:
+            self.vertexgroups = config.vertexWeights
+        elif config.rigtype == "mhx":
             self.vertexgroups = {}
             for name in ["head", "bones", "palm"]:
                 mhx.mhx_main.getVertexGroups(name, self.vertexgroups)                    
@@ -141,7 +141,7 @@ class CArmature:
     def rebuild(self, update=True):   
         obj = self.human.meshData
         proxyData = {}
-        mhx.mhx_rig.setupRig(obj, self.rigtype, proxyData)
+        mhx.mhx_rig.setupRig(obj, self.config, proxyData)
         for bone in self.boneList:
             bone.rebuild()
             if bone.name in []:
@@ -260,7 +260,7 @@ class CArmature:
 
 
     def build(self):
-        if the.Config.exporting:
+        if self.config.exporting:
             return
         self.controls = []
         self.deforms = []
@@ -857,22 +857,22 @@ def checkPoints(vec1, vec2):
     
 
 def createRig(human, rigtype, quatSkinning):
-    the.Config = export_config.exportConfig(human, True)
-    the.Config.exporting = False
-    the.Config.feetonground = False
-    the.Config.mhxrig = rigtype
-    the.Config.facepanel = False
+    config = export_config.exportConfig(human, True)
+    config.exporting = False
+    config.feetonground = False
+    config.rigtype = rigtype
+    config.facepanel = False
 
     fp = None
     the.Mhx25 = True
     obj = human.meshData
     proxyData = {}
-    mhx.mhx_rig.setupRig(obj, rigtype, proxyData)
+    mhx.mhx_rig.setupRig(obj, config, proxyData)
 
-    amt = CArmature(human, rigtype, quatSkinning)
+    amt = CArmature(human, config, quatSkinning)
     the.createdArmature = amt
-    for (bname, roll, parent, flags, layers, bbone) in the.Armature:
-        if the.Config.exporting or layers & ACTIVE_LAYERS:
+    for (bname, roll, parent, flags, layers, bbone) in config.armatureBones:
+        if config.exporting or layers & ACTIVE_LAYERS:
             bone = CBone(amt, bname, roll, parent, flags, layers, bbone)
             amt.boneList.append(bone)        
             amt.bones[bname] = bone
@@ -887,13 +887,13 @@ def createRig(human, rigtype, quatSkinning):
 
     #setupCircles(fp)
 
-    mhx.mhx_rig.writeControlPoses(fp)
+    mhx.mhx_rig.writeControlPoses(fp, config)
     amt.checkDirty()
     return amt
 
-    mhx.mhx_rig.writeAllActions(fp)
+    mhx.mhx_rig.writeAllActions(fp, config)
 
-    drivers = mhx.mhx_rig.writeAllDrivers(fp)
+    drivers = mhx.mhx_rig.writeAllDrivers(fp, config)
     amt.assignDrivers(drivers)
     
     #amt.display()

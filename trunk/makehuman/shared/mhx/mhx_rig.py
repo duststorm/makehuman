@@ -121,8 +121,8 @@ def newSetupJoints (obj, joints):
             raise NameError("Unknown %s" % typ)
     return
 
-def moveOriginToFloor():
-    if the.Config.feetonground:
+def moveOriginToFloor(config):
+    if config.feetonground:
         the.Origin = the.Locations['floor']
         for key in the.Locations.keys():
             the.Locations[key] = aljabr.vsub(the.Locations[key], the.Origin)
@@ -149,18 +149,18 @@ def findLocation(joint):
         return the.Locations[joint]
 
 #
-#    writeArmature(fp, armature, mhx25):
+#    writeArmature(fp, boneList, mhx25):
 #    addBone25(bone, roll, parent, flags, layers, bbone, fp):
 #    addBone24(bone, roll, parent, flags, layers, bbone, fp):
 #
 
-def writeArmature(fp, armature, mhx25):
+def writeArmature(fp, boneList, mhx25):
     the.Mhx25 = mhx25
     if the.Mhx25:
-        for (bone, roll, parent, flags, layers, bbone) in armature:
+        for (bone, roll, parent, flags, layers, bbone) in boneList:
             addBone25(bone, True, roll, parent, flags, layers, bbone, fp)
     else:
-        for (bone, roll, parent, flags, layers, bbone) in armature:
+        for (bone, roll, parent, flags, layers, bbone) in boneList:
             addBone24(bone, True, roll, parent, flags, layers, bbone, fp)
     return
 
@@ -252,14 +252,14 @@ def addBone24(bone, cond, roll, parent, flags, layers, bbone, fp):
     return
 
 #
-#    writeBoneGroups(fp):
+#    writeBoneGroups(fp, config):
 #
 
-def writeBoneGroups(fp):
-    print "BG", the.BoneGroups
+def writeBoneGroups(fp, config):
+    print "BG", config.boneGroups
     if not fp:
         return
-    for (name, the.me) in the.BoneGroups:
+    for (name, the.me) in config.boneGroups:
         fp.write(
 "    BoneGroup %s\n" % name +
 "      name '%s' ;\n" % name +
@@ -453,22 +453,23 @@ def setupCircles(fp):
     return
 
 #
-#    setupRig(obj, rigtype, proxyData):
-#    writeAllArmatures(fp, rigtype)    
-#    writeAllPoses(fp, rigtype)    
-#    writeAllActions(fp, rigtype)    
-#    writeAllDrivers(fp, rigtype)    
+#    setupRig(obj, config, proxyData):
+#    writeAllArmatures(fp, config)    
+#    writeAllPoses(fp, config)    
+#    writeAllActions(fp, config)    
+#    writeAllDrivers(fp, config)    
 #
 
-def setupRig(obj, rigtype, proxyData):
+def setupRig(obj, config, proxyData):
     the.RigHead = {}
     the.RigTail = {}
-    the.VertexWeights = []
-    the.CustomShapes = {}
-    the.PoseInfo = {}
+    config.vertexWeights = []
+    config.customShapes = {}
+    config.poseInfo = {}
 
-    if rigtype == 'mhx':
-        the.BoneGroups = [
+    print "setupRig", config.rigtype
+    if config.rigtype == 'mhx':
+        config.boneGroups = [
             ('Master', 'THEME13'),
             ('Spine', 'THEME05'),
             ('FK_L', 'THEME09'),
@@ -476,24 +477,24 @@ def setupRig(obj, rigtype, proxyData):
             ('IK_L', 'THEME03'),
             ('IK_R', 'THEME04'),
         ]
-        the.RecalcRoll = "['Foot_L','Toe_L','Foot_R','Toe_R','DfmFoot_L','DfmToe_L','DfmFoot_R','DfmToe_R']"
-        #the.RecalcRoll = []
-        the.GizmoFiles = ["./shared/mhx/templates/custom-shapes25.mhx", 
+        config.recalcRoll = "['Foot_L','Toe_L','Foot_R','Toe_R','DfmFoot_L','DfmToe_L','DfmFoot_R','DfmToe_R']"
+        #config.recalcRoll = []
+        config.gizmoFiles = ["./shared/mhx/templates/custom-shapes25.mhx", 
                       "./shared/mhx/templates/panel_gizmo25.mhx",
                       "./shared/mhx/templates/gizmos25.mhx"]
 
-        the.ObjectProps = [("MhxRig", '"MHX"')]
-        the.ArmatureProps = []
-        the.HeadName = 'Head'
+        config.objectProps = [("MhxRig", '"MHX"')]
+        config.armatureProps = []
+        config.headName = 'Head'
         
-        the.VertexGroupFiles = ["head", "bones", "palm", "tight"]
-        if the.Config.skirtrig == "own":
-            the.VertexGroupFiles.append("skirt-rigged")    
-        elif the.Config.skirtrig == "inh":
-            the.VertexGroupFiles.append("skirt")    
+        config.vertexGroupFiles = ["head", "bones", "palm", "tight"]
+        if config.skirtrig == "own":
+            config.vertexGroupFiles.append("skirt-rigged")    
+        elif config.skirtrig == "inh":
+            config.vertexGroupFiles.append("skirt")    
 
-        if the.Config.malerig:
-            the.VertexGroupFiles.append( "male" )
+        if config.malerig:
+            config.vertexGroupFiles.append( "male" )
                                                         
         joints = (
             rig_joints_25.DeformJoints +
@@ -517,22 +518,22 @@ def setupRig(obj, rigtype, proxyData):
             rig_face_25.FaceHeadsTails
         )
 
-        the.Armature = list(rig_body_25.BodyArmature1)
-        if the.Config.advancedspine:
-            the.Armature += rig_body_25.BodyArmature2Advanced
+        config.armatureBones = list(rig_body_25.BodyArmature1)
+        if config.advancedspine:
+            config.armatureBones += rig_body_25.BodyArmature2Advanced
         else:
-            the.Armature += rig_body_25.BodyArmature2Simple
-        the.Armature += rig_body_25.BodyArmature3
-        if the.Config.advancedspine:
-            the.Armature += rig_body_25.BodyArmature4Advanced
+            config.armatureBones += rig_body_25.BodyArmature2Simple
+        config.armatureBones += rig_body_25.BodyArmature3
+        if config.advancedspine:
+            config.armatureBones += rig_body_25.BodyArmature4Advanced
         else:
-            the.Armature += rig_body_25.BodyArmature4Simple
-        the.Armature += rig_body_25.BodyArmature5
-        if the.Config.advancedspine:
-            the.Armature += rig_shoulder_25.ShoulderArmature1Advanced
+            config.armatureBones += rig_body_25.BodyArmature4Simple
+        config.armatureBones += rig_body_25.BodyArmature5
+        if config.advancedspine:
+            config.armatureBones += rig_shoulder_25.ShoulderArmature1Advanced
         else:
-            the.Armature += rig_shoulder_25.ShoulderArmature1Simple
-        the.Armature += (
+            config.armatureBones += rig_shoulder_25.ShoulderArmature1Simple
+        config.armatureBones += (
             rig_shoulder_25.ShoulderArmature2 +
             rig_arm_25.ArmArmature +            
             rig_finger_25.FingerArmature +
@@ -541,13 +542,13 @@ def setupRig(obj, rigtype, proxyData):
             rig_face_25.FaceArmature
         )
 
-    elif rigtype == "rigify":
-        the.BoneGroups = []
-        the.RecalcRoll = []              
-        the.VertexGroupFiles = ["head", "rigifymesh_weights"]
-        the.GizmoFiles = ["./shared/mhx/templates/panel_gizmo25.mhx",
+    elif config.rigtype == "rigify":
+        config.boneGroups = []
+        config.recalcRoll = []              
+        config.vertexGroupFiles = ["head", "rigifymesh_weights"]
+        config.gizmoFiles = ["./shared/mhx/templates/panel_gizmo25.mhx",
                           "./shared/mhx/templates/rigify_gizmo25.mhx"]
-        the.HeadName = 'head'
+        config.headName = 'head'
         faceArmature = swapParentName(rig_face_25.FaceArmature, 'Head', 'head')
             
         joints = (
@@ -563,68 +564,68 @@ def setupRig(obj, rigtype, proxyData):
             rig_face_25.FaceHeadsTails
         )
 
-        the.Armature = (
+        config.armatureBones = (
             rigify_rig.RigifyArmature +
             faceArmature
         )
 
-        the.ObjectProps = rigify_rig.RigifyObjectProps + [("MhxRig", '"Rigify"')]
-        the.ArmatureProps = rigify_rig.RigifyArmatureProps
+        config.objectProps = rigify_rig.RigifyObjectProps + [("MhxRig", '"Rigify"')]
+        config.armatureProps = rigify_rig.RigifyArmatureProps
 
     else:
-        rigfile = "data/rigs/%s.rig" % rigtype
-        (locations, armature, the.VertexWeights) = read_rig.readRigFile(rigfile, obj)        
+        rigfile = "data/rigs/%s.rig" % config.rigtype
+        (locations, boneList, config.vertexWeights) = read_rig.readRigFile(rigfile, obj)        
         joints = (
             rig_joints_25.DeformJoints +
             rig_body_25.FloorJoints +
             rig_face_25.FaceJoints
         )
         headsTails = []
-        the.Armature = []
-        if the.Config.facepanel:            
+        config.armatureBones = []
+        if config.facepanel:            
             joints += rig_panel_25.PanelJoints
             headsTails += rig_panel_25.PanelHeadsTails
-            the.Armature += rig_panel_25.PanelArmature
+            config.armatureBones += rig_panel_25.PanelArmature
         newSetupJoints(obj, joints)        
-        moveOriginToFloor()
+        moveOriginToFloor(config)
         for (bone, head, tail) in headsTails:
             the.RigHead[bone] = findLocation(head)
             the.RigTail[bone] = findLocation(tail)
 
-        appendRigBones(armature, obj, "", L_MAIN, [])
-        the.BoneGroups = []
-        the.RecalcRoll = []              
-        the.VertexGroupFiles = []
-        the.GizmoFiles = []
-        the.HeadName = 'Head'
-        the.ObjectProps = [("MhxRig", '"%s"' % rigtype)]
-        the.ArmatureProps = []
-        the.CustomProps = []
-        print("Default rig %s" % rigtype)
+        appendRigBones(boneList, obj, "", L_MAIN, [], config)
+        config.boneGroups = []
+        config.recalcRoll = []              
+        config.vertexGroupFiles = []
+        config.gizmoFiles = []
+        config.headName = 'Head'
+        config.objectProps = [("MhxRig", '"%s"' % config.rigtype)]
+        config.armatureProps = []
+        config.customProps = []
+        print("Default rig %s" % config.rigtype)
         return
         
-    if the.Config.facepanel:            
+    if config.facepanel:            
         joints += rig_panel_25.PanelJoints
         headsTails += rig_panel_25.PanelHeadsTails
-        the.Armature += rig_panel_25.PanelArmature
+        config.armatureBones += rig_panel_25.PanelArmature
 
-    if rigtype == 'mhx':
-        if the.Config.skirtrig == "own":
+    if config.rigtype == 'mhx':
+        if config.skirtrig == "own":
             joints += rig_skirt_25.SkirtJoints
             headsTails += rig_skirt_25.SkirtHeadsTails
-            the.Armature += rig_skirt_25.SkirtArmature        
-        if the.Config.malerig:
-            the.Armature += rig_body_25.MaleArmature        
+            config.armatureBones += rig_skirt_25.SkirtArmature        
+        if config.malerig:
+            config.armatureBones += rig_body_25.MaleArmature        
 
-    (custJoints, custHeadsTails, custArmature, the.CustomProps) = mhx_custom.setupCustomRig()
+    (custJoints, custHeadsTails, custArmature, config.customProps) = mhx_custom.setupCustomRig(config)
     joints += custJoints
     headsTails += custHeadsTails
-    the.Armature += custArmature
+    config.armatureBones += custArmature
     
     newSetupJoints(obj, joints)
-    moveOriginToFloor()    
+    moveOriginToFloor(config)    
 
-    if rigtype == 'mhx':
+    if config.rigtype == 'mhx':
         rig_body_25.BodyDynamicLocations()
     for (bone, head, tail) in headsTails:
         the.RigHead[bone] = findLocation(head)
@@ -633,7 +634,7 @@ def setupRig(obj, rigtype, proxyData):
     #print "H1", the.RigHead["UpLeg_L"]
     #print "T1", the.RigTail["UpLeg_L"]
 
-    if not the.Config.clothesrig:
+    if not config.clothesrig:
         return
     body = the.RigHead.keys()
     for proxy in proxyData.values():
@@ -641,9 +642,9 @@ def setupRig(obj, rigtype, proxyData):
             verts = []
             for bary in proxy.realVerts:
                 verts.append(mh2proxy.proxyCoord(bary))
-            (locations, armature, weights) = read_rig.readRigFile(proxy.rig, obj, verts=verts) 
+            (locations, boneList, weights) = read_rig.readRigFile(proxy.rig, obj, verts=verts) 
             proxy.weights = prefixWeights(weights, proxy.name, body)
-            appendRigBones(armature, obj, proxy.name, L_CLO, body)
+            appendRigBones(boneList, obj, proxy.name, L_CLO, body, config)
     return
 
 def prefixWeights(weights, prefix, body):
@@ -655,8 +656,8 @@ def prefixWeights(weights, prefix, body):
             pweights[prefix+name] = weights[name]
     return pweights
 
-def appendRigBones(armature, obj, prefix, layer, body):        
-        for data in armature:
+def appendRigBones(boneList, obj, prefix, layer, body, config):        
+        for data in boneList:
             (bone0, head, tail, roll, parent0, options) = data
             if bone0 in body:
                 continue
@@ -677,12 +678,12 @@ def appendRigBones(armature, obj, prefix, layer, body):
                     flags |= F_RES
                 elif key == "-circ":
                     name = "Circ"+value[0]
-                    the.CustomShapes[name] = (key, int(value[0]))
+                    config.customShapes[name] = (key, int(value[0]))
                     addPoseInfo(bone, ("CS", name))
                     flags |= F_WIR
                 elif key == "-box":
                     name = "Box" + value[0]
-                    the.CustomShapes[name] = (key, int(value[0]))
+                    config.customShapes[name] = (key, int(value[0]))
                     addPoseInfo(bone, ("CS", name))
                     flags |= F_WIR
                 elif key == "-ik":
@@ -695,16 +696,16 @@ def appendRigBones(armature, obj, prefix, layer, body):
                     addPoseInfo(bone, ("IK", value))
                 elif key == "-ik":
                     pass
-            the.Armature.append((bone, roll, parent, flags, layer, NoBB))
+            config.armatureBones.append((bone, roll, parent, flags, layer, NoBB))
             the.RigHead[bone] = aljabr.vsub(head, the.Origin)
             the.RigTail[bone] = aljabr.vsub(tail, the.Origin)
             
 def addPoseInfo(bone, info):
     try:
-        the.PoseInfo[bone]
+        config.poseInfo[bone]
     except:
-        the.PoseInfo[bone] = []
-    the.PoseInfo[bone].append(info)
+        config.poseInfo[bone] = []
+    config.poseInfo[bone].append(info)
     return        
         
 def swapParentName(bones, old, new):
@@ -717,30 +718,30 @@ def swapParentName(bones, old, new):
             nbones.append(bone)
     return nbones
 
-def writeControlPoses(fp, rigtype):
-    writeBoneGroups(fp)
-    if rigtype == 'mhx':            
-        rig_body_25.BodyControlPoses(fp)
-        rig_shoulder_25.ShoulderControlPoses(fp)
-        rig_arm_25.ArmControlPoses(fp)
-        rig_finger_25.FingerControlPoses(fp)
-        rig_leg_25.LegControlPoses(fp)
-        #rig_toe_25.ToeControlPoses(fp)
-        rig_face_25.FaceControlPoses(fp)
-        if the.Config.malerig:
-            rig_body_25.MaleControlPoses(fp)
-        if the.Config.skirtrig == "own":
-            rig_skirt_25.SkirtControlPoses(fp)
-    elif rigtype == 'blenrig':
-        blenrig_rig.BlenrigWritePoses(fp)
-    elif rigtype == 'rigify':
-        rigify_rig.RigifyWritePoses(fp)
-        rig_face_25.FaceControlPoses(fp)
+def writeControlPoses(fp, config):
+    writeBoneGroups(fp, config)
+    if config.rigtype == 'mhx':            
+        rig_body_25.BodyControlPoses(fp, config)
+        rig_shoulder_25.ShoulderControlPoses(fp, config)
+        rig_arm_25.ArmControlPoses(fp, config)
+        rig_finger_25.FingerControlPoses(fp, config)
+        rig_leg_25.LegControlPoses(fp, config)
+        #rig_toe_25.ToeControlPoses(fp, config)
+        rig_face_25.FaceControlPoses(fp, config)
+        if config.malerig:
+            rig_body_25.MaleControlPoses(fp, config)
+        if config.skirtrig == "own":
+            rig_skirt_25.SkirtControlPoses(fp, config)
+    elif config.rigtype == 'blenrig':
+        blenrig_rig.BlenrigWritePoses(fp, config)
+    elif config.rigtype == 'rigify':
+        rigify_rig.RigifyWritePoses(fp, config)
+        rig_face_25.FaceControlPoses(fp, config)
         
-    if the.Config.facepanel:
-        rig_panel_25.PanelControlPoses(fp)
+    if config.facepanel:
+        rig_panel_25.PanelControlPoses(fp, config)
         
-    for (bone, info) in the.PoseInfo.items():
+    for (bone, info) in config.poseInfo.items():
         cs = None
         constraints = []
         for (key, value) in info:
@@ -757,23 +758,23 @@ def writeControlPoses(fp, rigtype):
                     poleAngle = float(pt[1])
                     pt = (poleAngle, subtar)
                 constraints =  [('IK', 0, inf, ['IK', goal, n, pt, (True,False,True)])]
-        addPoseBone(fp, bone, cs, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, constraints)       
+        addPoseBone(fp, config, bone, cs, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, constraints)       
         
-    for (path, modname) in the.Config.customrigs:
+    for (path, modname) in config.customrigs:
         mod = sys.modules[modname]                
-        mod.ControlPoses(fp)
+        mod.ControlPoses(fp, config)
 
     return
 
-def writeAllActions(fp, rigtype):
+def writeAllActions(fp, config):
     #rig_arm_25.ArmWriteActions(fp)
     #rig_leg_25.LegWriteActions(fp)
     #rig_finger_25.FingerWriteActions(fp)
     return
 
 
-def writeAllDrivers(fp, rigtype):
-    if rigtype == 'mhx':      
+def writeAllDrivers(fp, config):
+    if config.rigtype == 'mhx':      
         driverList = (
             armature.drivers.writePropDrivers(fp, rig_arm_25.ArmPropDrivers, "", "&") +
             armature.drivers.writePropDrivers(fp, rig_arm_25.ArmPropLRDrivers, "_L", "&") +
@@ -788,7 +789,7 @@ def writeAllDrivers(fp, rigtype):
             armature.drivers.writePropDrivers(fp, rig_leg_25.SoftLegPropLRDrivers, "_R", "&") +
             armature.drivers.writePropDrivers(fp, rig_body_25.BodyPropDrivers, "", "&")
         )
-        if the.Config.advancedspine:
+        if config.advancedspine:
             driverList += armature.drivers.writePropDrivers(fp, rig_body_25.BodyPropDriversAdvanced, "", "&") 
         driverList += (
             armature.drivers.writePropDrivers(fp, rig_face_25.FacePropDrivers, "", "&") +
@@ -806,7 +807,7 @@ def writeAllDrivers(fp, rigtype):
         faceDrivers = rig_face_25.FaceDeformDrivers(fp)
         driverList += armature.drivers.writeDrivers(fp, True, faceDrivers)
         return driverList
-    elif rigtype == 'blenrig':            
+    elif config.rigtype == 'blenrig':            
         drivers = blenrig_rig.getBlenrigDrivers()
         armature.drivers.writeDrivers(fp, True, drivers)
     elif rigtype == 'rigify':            
@@ -816,17 +817,17 @@ def writeAllDrivers(fp, rigtype):
     return []
     
 
-def writeAllProperties(fp, typ):
+def writeAllProperties(fp, typ, config):
     if typ != 'Object':
         return
-    for (key, val) in the.ObjectProps:
+    for (key, val) in config.objectProps:
         fp.write("  Property %s %s ;\n" % (key, val))
-    for (key, val, string, min, max) in the.CustomProps:
+    for (key, val, string, min, max) in config.customProps:
         fp.write(
 '  Property &%s %.2f %s ;\n' % (key, val, string) +
 '  PropKeys &%s "min":-%.2f,"max":%.2f, ;\n\n' % (key, min, max) ) 
 
-    if (the.Config.faceshapes and not the.Config.facepanel):
+    if (config.faceshapes and not config.facepanel):
         fp.write("#if toggle&T_Shapekeys\n")
         for skey in rig_panel_25.BodyLanguageShapeDrivers.keys():
             fp.write(
@@ -834,7 +835,7 @@ def writeAllProperties(fp, typ):
 "  PropKeys &_%s \"min\":-1.0,\"max\":2.0, ;\n" % skey)
         fp.write("#endif\n")
         
-    if the.Config.expressions:
+    if config.expressions:
         fp.write("#if toggle&T_Shapekeys\n")
         for skey in read_expression.Expressions:
             fp.write(
@@ -842,7 +843,7 @@ def writeAllProperties(fp, typ):
 "  PropKeys *%s \"min\":-1.0,\"max\":2.0, ;\n" % skey)
         fp.write("#endif\n")
 
-    if the.Config.expressionunits:
+    if config.expressionunits:
         fp.write("#if toggle&T_Shapekeys\n")
         for skey in read_expression.ExpressionUnits:
             fp.write(

@@ -200,13 +200,13 @@ def defineFingerConstraints():
 fconstraints = defineFingerConstraints()    
 
 #
-#   FingerControlPoses(fp):
+#   FingerControlPoses(fp, config):
 #
 
 customShape = 'MHCircle05'
 customShape = None
         
-def FingerControlPoses(fp):
+def FingerControlPoses(fp, config):
     for suffix in ['_L', '_R']:
         for fnum in range(1,6):
             fing = 'Finger-%d%s' % (fnum, suffix)
@@ -214,7 +214,7 @@ def FingerControlPoses(fp):
                 lim = limitRotThumb
             else:
                 lim = limitRotFingers
-            addPoseBone(fp, fing, 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [lim])
+            addPoseBone(fp, config, fing, 'MHKnuckle', None, (1,1,1), (0,1,0), (1,0,1), (1,1,1), 0, [lim])
             
             for lnum in range(1,4):
                 if (fnum == 1 and lnum <= 2) or (fnum >= 2 and lnum == 1):
@@ -224,14 +224,14 @@ def FingerControlPoses(fp):
                     rot = (0,1,1)
                     ik = (0,0,1)                
                 fing = 'Finger-%d-%d%s' % (fnum, lnum, suffix)
-                addPoseBone(fp, fing, customShape, None, (1,1,1), rot, (1,1,1), ik, 0, 
+                addPoseBone(fp, config, fing, customShape, None, (1,1,1), rot, (1,1,1), ik, 0, 
                     fconstraints["%d-%d%s" % (fnum, lnum, suffix)])             
 
             palm = 'Palm-%d%s' % (fnum, suffix)
-            addPoseBone(fp, palm, None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+            addPoseBone(fp, config, palm, None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
 
-        addPoseBone(fp, 'Wrist-1%s' % suffix, None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
-        addPoseBone(fp, 'Wrist-2%s' % suffix, None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+        addPoseBone(fp, config, 'Wrist-1%s' % suffix, None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
+        addPoseBone(fp, config, 'Wrist-2%s' % suffix, None, None, (1,1,1), (0,0,0), (1,1,1), (1,1,1), 0, [])
     return  
 
 #

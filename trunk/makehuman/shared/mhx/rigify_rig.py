@@ -356,235 +356,235 @@ RigifyArmature = [
 	('DEF-hip.L',			0.0, 'hips', F_DEF, 0x1, (1,1,1) ),
 ]
 
-def RigifyWritePoses(fp):
+def RigifyWritePoses(fp, config):
 	global boneGroups
 	boneGroups = {}
 
-	addPoseBone(fp, 'hips', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'hips', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'spine', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'spine', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'ribs', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'ribs', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'neck', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'neck', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'head', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'head', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'shoulder.L', None, None, (1,1,1), (0,1,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'shoulder.L', None, None, (1,1,1), (0,1,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'upper_arm.L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'upper_arm.L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'forearm.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'forearm.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'hand.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'hand.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'palm.01.L', None, None, (1,1,1), (0,1,1), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'palm.01.L', None, None, (1,1,1), (0,1,1), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_index.01.L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_index.01.L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_index.02.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_index.02.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_index.03.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_index.03.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'UP-index.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'UP-index.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'thumb.01.L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'thumb.01.L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'thumb.02.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'thumb.02.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'thumb.03.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'thumb.03.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'UP-thumb.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'UP-thumb.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'palm.02.L', None, None, (1,1,1), (0,1,1), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'palm.02.L', None, None, (1,1,1), (0,1,1), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_middle.01.L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_middle.01.L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_middle.02.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_middle.02.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_middle.03.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_middle.03.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'UP-middle.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'UP-middle.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'palm.03.L', None, None, (1,1,1), (0,1,1), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'palm.03.L', None, None, (1,1,1), (0,1,1), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_ring.01.L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_ring.01.L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_ring.02.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_ring.02.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_ring.03.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_ring.03.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'UP-ring.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'UP-ring.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'palm.04.L', None, None, (1,1,1), (0,1,1), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'palm.04.L', None, None, (1,1,1), (0,1,1), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_pinky.01.L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_pinky.01.L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_pinky.02.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_pinky.02.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_pinky.03.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_pinky.03.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'UP-pinky.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'UP-pinky.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'DEF-elbow-fan.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-elbow-fan.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('CopyRot', 0, 0.5, ['Copy_Rotation', 'forearm.L', (1,1,1), (0,0,0), False])])
 
-	addPoseBone(fp, 'UP-arm.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'UP-arm.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'MCH-deltoid_target.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'MCH-deltoid_target.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'shoulder.R', None, None, (1,1,1), (0,1,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'shoulder.R', None, None, (1,1,1), (0,1,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'upper_arm.R', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'upper_arm.R', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'forearm.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'forearm.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'hand.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'hand.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'palm.01.R', None, None, (0,0,0), (0,1,1), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'palm.01.R', None, None, (0,0,0), (0,1,1), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_index.01.R', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_index.01.R', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_index.02.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_index.02.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_index.03.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_index.03.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'UP-index.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'UP-index.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'thumb.01.R', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'thumb.01.R', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'thumb.02.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'thumb.02.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'thumb.03.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'thumb.03.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'UP-thumb.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'UP-thumb.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'palm.02.R', None, None, (0,0,0), (0,1,1), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'palm.02.R', None, None, (0,0,0), (0,1,1), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_middle.01.R', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_middle.01.R', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_middle.02.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_middle.02.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_middle.03.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_middle.03.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'UP-middle.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'UP-middle.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'palm.03.R', None, None, (0,0,0), (0,1,1), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'palm.03.R', None, None, (0,0,0), (0,1,1), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_ring.01.R', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_ring.01.R', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_ring.02.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_ring.02.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_ring.03.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_ring.03.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'UP-ring.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'UP-ring.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'palm.04.R', None, None, (0,0,0), (0,1,1), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'palm.04.R', None, None, (0,0,0), (0,1,1), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_pinky.01.R', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_pinky.01.R', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_pinky.02.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_pinky.02.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'finger_pinky.03.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'finger_pinky.03.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'UP-pinky.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'UP-pinky.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'DEF-elbow-fan.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-elbow-fan.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('CopyRot', 0, 0.5, ['Copy_Rotation', 'forearm.R', (1,1,1), (0,0,0), False])])
 
-	addPoseBone(fp, 'UP-arm.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'UP-arm.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'MCH-deltoid_target.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'MCH-deltoid_target.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'DEF-pect1.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-pect1.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.L', 0, 1])])
 
-	addPoseBone(fp, 'DEF-pect2.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-pect2.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.L', 0, 1])])
 
-	addPoseBone(fp, 'DEF-pect1.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-pect1.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.R', 0, 1])])
 
-	addPoseBone(fp, 'DEF-pect2.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-pect2.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.R', 0, 1])])
 
-	addPoseBone(fp, 'DEF-lat.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-lat.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.L', 0, 1])])
 
-	addPoseBone(fp, 'DEF-lat.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-lat.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.R', 0, 1])])
 
-	addPoseBone(fp, 'DEF-trap.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-trap.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.L', 0, 1])])
 
-	addPoseBone(fp, 'DEF-trap.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-trap.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('StretchTo', 0, 1, ['Stretch_To', 'upper_arm.R', 0, 1])])
 
-	addPoseBone(fp, 'DEF-deltoid.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-deltoid.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('StretchTo', 0, 1, ['Stretch_To', 'MCH-deltoid_target.L', 1, 1])])
 
-	addPoseBone(fp, 'DEF-deltoid.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-deltoid.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('StretchTo', 0, 1, ['Stretch_To', 'MCH-deltoid_target.R', 1, 1])])
 
-	addPoseBone(fp, 'MCH-breast_target', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'MCH-breast_target', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('CopyRot', 0+C_OW_LOCAL+C_TG_LOCAL, 0.5, ['Copy_Rotation', 'ribs', (1,1,1), (0,0,0), False])])
 
-	addPoseBone(fp, 'DEF-breast', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-breast', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('StretchTo', 0, 1, ['Stretch_To', 'MCH-breast_target', 1, 1])])
 
-	addPoseBone(fp, 'thigh.L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'thigh.L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'shin.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'shin.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'foot.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'foot.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'toe.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'toe.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'heel.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'heel.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'heel.02.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'heel.02.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'DEF-knee-fan.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-knee-fan.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('CopyRot', 0, 0.5, ['Copy_Rotation', 'shin.L', (1,1,1), (0,0,0), False])])
 
-	addPoseBone(fp, 'UP-leg.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'UP-leg.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'thigh.R', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'thigh.R', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'shin.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'shin.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'foot.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'foot.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'toe.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'toe.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'heel.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'heel.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'heel.02.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'heel.02.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'DEF-knee-fan.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-knee-fan.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('CopyRot', 0, 0.5, ['Copy_Rotation', 'shin.R', (1,1,1), (0,0,0), False])])
 
-	addPoseBone(fp, 'UP-leg.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'UP-leg.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'penis', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'penis', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'scrotum', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'scrotum', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'MCH-stomach_target', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
+	addPoseBone(fp, config, 'MCH-stomach_target', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4, [])
 
-	addPoseBone(fp, 'DEF-stomach', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-stomach', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('StretchTo', 0, 1, ['Stretch_To', 'MCH-stomach_target', 1, 1])])
 
-	addPoseBone(fp, 'DEF-butt.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-butt.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('StretchTo', 0, 1, ['Stretch_To', 'thigh.R', 0, 1])])
 
-	addPoseBone(fp, 'DEF-hip.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-hip.R', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('StretchTo', 0, 1, ['Stretch_To', 'thigh.R', 0, 1])])
 
-	addPoseBone(fp, 'DEF-butt.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-butt.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('StretchTo', 0, 1, ['Stretch_To', 'thigh.L', 0, 1])])
 
-	addPoseBone(fp, 'DEF-hip.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
+	addPoseBone(fp, config, 'DEF-hip.L', None, None, (0,0,0), (0,0,0), (0,0,0), (1,1,1), P_LKROT4,
 		[('StretchTo', 0, 1, ['Stretch_To', 'thigh.L', 0, 1])])
 
 	return

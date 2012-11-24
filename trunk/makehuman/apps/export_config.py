@@ -79,7 +79,7 @@ def proxyFilePtr(name):
 class CExportConfig:
     def __init__(self):
         self.mainmesh = ['obj', 'mhx', 'dae']
-        self.mhxrig = 'mhx'
+        self.rigtype = 'mhx'
         self.daerig = 'game'
         self.mhxversion = ['25']
         self.exporting = True
@@ -107,9 +107,23 @@ class CExportConfig:
         self.copiedFiles = {}
         self.warpField = {}
         
+        # Used by mhx exporter
+        self.vertexWeights = []
+        self.customShapes = {}
+        self.poseInfo = {}
+        self.boneGroups = []
+        self.recalcRoll = []              
+        self.vertexGroupFiles = []
+        self.gizmoFiles = []
+        self.headName = "Head"
+        self.objectProps = []
+        self.armatureProps = []
+        self.customProps = []
+        
+
     def __repr__(self):
         return (
-"<CExportConfig use:%s mhx:%s daz:%s version%s\n" % (self.mainmesh, self.mhxrig, self.daerig, self.mhxversion) +
+"<CExportConfig use:%s mhx:%s daz:%s version%s\n" % (self.mainmesh, self.rigtype, self.daerig, self.mhxversion) +
 "  expr:%s face:%s body:%s cage:%s\n" % (self.expressions, self.faceshapes, self.bodyshapes, self.cage) +
 "  breastrig:%s gen:%s vis:%s>" % (self.breastrig, self.malerig, self.clothesvisibilitydrivers))
 
@@ -226,7 +240,7 @@ def exportConfig(human, useHair, options=None):
             cfg.skirtrig = "own"
         else:
             cfg.skirtrig = "inh"
-        cfg.mhxrig = options['mhxrig']
+        cfg.rigtype = options['mhxrig']
         fp = 0
     else:    
         fp = proxyFilePtr('mh_export.config')
@@ -295,7 +309,7 @@ def exportConfig(human, useHair, options=None):
                 status = key
             elif key == 'mhxrig':
                 try:
-                    cfg.mhxrig = words[2].lower()
+                    cfg.rigtype = words[2].lower()
                 except:
                     pass
             elif key == 'daerig':

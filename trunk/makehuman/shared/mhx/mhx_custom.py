@@ -24,13 +24,13 @@ Abstract
 import sys
 from . import the
 
-def setupCustomRig(): 
+def setupCustomRig(config): 
     joints = []
     headsTails = []
     armature = []
     props = []
     
-    for (path, modname) in the.Config.customrigs:
+    for (path, modname) in config.customrigs:
         print("Custom rig %s %s" % (path, modname))
         if path not in sys.path:
             sys.path.append(path)
