@@ -275,7 +275,7 @@ class ExportTaskView(gui3d.TaskView):
         self.exportEyebrows = self.objOptions.addView(gui3d.CheckBox("Eyebrows", True));y+=24
         self.exportLashes = self.objOptions.addView(gui3d.CheckBox("Eyelashes", True));y+=24
         self.exportHelpers = self.objOptions.addView(gui3d.CheckBox("Helper geometry", False));y+=24
-        self.exportHidden = self.objOptions.addView(gui3d.CheckBox("Hidden faces", True));y+=24
+        self.exportHidden = self.objOptions.addView(gui3d.CheckBox("Keep hidden faces", True));y+=24
         self.exportSkeleton = self.objOptions.addView(gui3d.CheckBox("Skeleton", True));y+=24
         self.exportGroups = self.objOptions.addView(gui3d.CheckBox("Groups", True));y+=24
         self.exportSmooth = self.objOptions.addView(gui3d.CheckBox( "Subdivide", False));y+=24
@@ -298,7 +298,7 @@ class ExportTaskView(gui3d.TaskView):
         self.version25 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.5", True));y+=24
         self.mhxSeparateFolder = self.mhxOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
         self.mhxFeetOnGround = self.mhxOptions.addView(gui3d.CheckBox("Feet on ground", True));y+=24
-        self.mhxHidden = self.mhxOptions.addView(gui3d.CheckBox("Hidden faces", True));y+=24
+        self.mhxHidden = self.mhxOptions.addView(gui3d.CheckBox("Keep hidden faces", True));y+=24
         self.mhxExpressionUnits = self.mhxOptions.addView(gui3d.CheckBox("Expressions", False));y+=24
         self.mhxFaceShapes = self.mhxOptions.addView(gui3d.CheckBox("Face shapes", True));y+=24
         self.mhxBodyShapes = self.mhxOptions.addView(gui3d.CheckBox("Body shapes", True));y+=24
@@ -324,7 +324,7 @@ class ExportTaskView(gui3d.TaskView):
         self.colladaEyebrows = self.colladaOptions.addView(gui3d.CheckBox("Eyebrows", True));y+=24
         self.colladaLashes = self.colladaOptions.addView(gui3d.CheckBox("Eyelashes", True));y+=24
         self.colladaHelpers = self.colladaOptions.addView(gui3d.CheckBox("Helper geometry", False));y+=24
-        self.colladaHidden = self.colladaOptions.addView(gui3d.CheckBox("Hidden faces", False));y+=24
+        self.colladaHidden = self.colladaOptions.addView(gui3d.CheckBox("Keep hidden faces", True));y+=24
         # self.colladaSeparateFolder = self.colladaOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
         # self.colladaPngTexture = self.colladaOptions.addView(gui3d.CheckBox("PNG texture", selected=True));y+=24
         scales = []

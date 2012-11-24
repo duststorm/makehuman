@@ -544,11 +544,12 @@ def setupRig(obj, config, proxyData):
     elif config.rigtype == "rigify":
         config.boneGroups = []
         config.recalcRoll = []              
-        config.vertexGroupFiles = ["head", "rigifymesh_weights"]
+        config.vertexGroupFiles = ["head", "rigify"]
         config.gizmoFiles = ["./shared/mhx/templates/panel_gizmo25.mhx",
                           "./shared/mhx/templates/rigify_gizmo25.mhx"]
         config.headName = 'head'
-        faceArmature = swapParentName(rig_face_25.FaceArmature, 'Head', 'head')
+        faceArmature = swapParentNames(rig_face_25.FaceArmature, 
+                           {'Head' : 'head', 'MasterFloor' : None} )
             
         joints = (
             rig_joints_25.DeformJoints +
@@ -707,13 +708,13 @@ def addPoseInfo(bone, info):
     config.poseInfo[bone].append(info)
     return        
         
-def swapParentName(bones, old, new):
+def swapParentNames(bones, changes):
     nbones = []
     for bone in bones:
         (name, roll, par, flags, level, bb) = bone
-        if par == old:
-            nbones.append( (name, roll, new, flags, level, bb) )
-        else:
+        try:
+            nbones.append( (name, roll, changes[par], flags, level, bb) )
+        except KeyError:
             nbones.append(bone)
     return nbones
 
