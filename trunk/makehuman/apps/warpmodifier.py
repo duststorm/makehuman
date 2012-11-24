@@ -145,7 +145,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
         hasChanged = getRefObject(human)
         self.getRefTarget(human)    
         print "Compile", self
-        print len(list(self.refTargetVerts)), len(list(theRefObjectVerts)), len(list(human.shadowCoords))
+        #print len(list(self.refTargetVerts)), len(list(theRefObjectVerts)), len(list(human.shadowCoords))
         if self.refTargetVerts:
             shape = warp.warp_target(self.refTargetVerts, theRefObjectVerts, human.shadowCoords, landmarks)
         else:
@@ -155,7 +155,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
     def getRefTarget(self, human):       
         targetChanged = self.getBases(human)
         if targetChanged:
-            print "Reference target changed"
+            #print "Reference target changed"
             if not self.makeRefTarget():
                 print "Updating character"
                 human.applyAllTargets()

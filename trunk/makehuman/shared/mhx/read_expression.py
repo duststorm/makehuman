@@ -178,7 +178,6 @@ def readShape(filename):
 def readFaceShapes(human, drivers, t0, t1):
     shapeList = []
     shapes = {}
-    warpmodifier.resetWarpTargets(human)
     t,dt = initTimes(drivers.keys(), t0, t1)
 
     for name,value in drivers.items():
@@ -213,7 +212,6 @@ def readFaceShapes(human, drivers, t0, t1):
 
 def readExpressions(human, t0, t1):
     shapeList = []
-    warpmodifier.resetWarpTargets(human)
     t,dt = initTimes(Expressions, t0, t1)
 
     for name in Expressions:
@@ -232,7 +230,6 @@ def readExpressions(human, t0, t1):
 
 def readExpressionUnits(human, t0, t1):
     shapeList = []
-    warpmodifier.resetWarpTargets(human)
     t,dt = initTimes(ExpressionUnits, t0, t1)
     
     for name in ExpressionUnits:
@@ -251,7 +248,6 @@ def readExpressionUnits(human, t0, t1):
 
 def readCorrectives(drivers, human, part, t0, t1):
     shapeList = []
-    warpmodifier.resetWarpTargets(human)
     t,dt = initTimes(drivers, t0, t1)
     
     for (pose, lr, expr, vars) in drivers:

@@ -36,6 +36,7 @@ import numpy
 import mh2proxy
 import export_config
 import armature
+import warpmodifier
 
 from . import the
 from . import mhx_rig
@@ -149,6 +150,7 @@ def exportMhx_25(human, config, fp):
         proxyCopy('Cage', human, config, proxyData, fp, 0.2, 0.25)
     
     gui3d.app.progress(0.25, text="Exporting main mesh")    
+    warpmodifier.resetWarpTargets(human)        
     if config.mainmesh:
         fp.write("#if toggle&T_Mesh\n")
         copyFile25(human, "shared/mhx/templates/meshes25.mhx", fp, None, config, proxyData)    
@@ -1067,7 +1069,7 @@ def writeShapeKeys(fp, human, name, config, proxy):
 "  ShapeKey Basis Sym True\n" +
 "  end ShapeKey\n")
 
-    if (not proxy or proxy.type == 'Proxy'):
+    if (not proxy or proxy.type == 'Proxy'):        
         if config.faceshapes:
             shapeList = read_expression.readFaceShapes(human, rig_panel_25.BodyLanguageShapeDrivers, 0.6, 0.7)
             for (pose, shape, lr, min, max) in shapeList:
@@ -1117,9 +1119,9 @@ def writeShapeKeys(fp, human, name, config, proxy):
                 armature.drivers.writeShapePropDrivers(fp, drivers.keys(), proxy, "&_")                
 
     if not proxy:
-        if config.expressions and not proxy:
+        if config.expressions:
             armature.drivers.writeShapePropDrivers(fp, read_expression.Expressions, proxy, "*")
-        if config.expressionunits and not proxy:
+        if config.expressionunits:
             armature.drivers.writeShapePropDrivers(fp, read_expression.ExpressionUnits, proxy, "*")
             
         skeys = []
