@@ -661,10 +661,10 @@ class CFloorConstraint(CConstraint):
         CConstraint.write25(self, fp)
 
 #
-#    writeConstraints(fp, bname, constraints, lockLoc, lockRot)
+#    writeConstraints(fp, config, bname, constraints, lockLoc, lockRot)
 #
 
-def writeConstraints(fp, bname, constraints, lockLoc, lockRot):
+def writeConstraints(fp, config, bname, constraints, lockLoc, lockRot):
     uses = (0,0,0)
     mins = (-pi, -pi, -pi)
     maxs = (pi, pi, pi)
@@ -677,7 +677,7 @@ def writeConstraints(fp, bname, constraints, lockLoc, lockRot):
 
         if typ == 'IK':
             cns = CIkConstraint(flags, inf, data, lockLoc, lockRot)
-            if the.Mhx25:
+            if config.mhx25:
                 cns.write25(fp)
             else:
                 fp.write(
@@ -691,7 +691,7 @@ def writeConstraints(fp, bname, constraints, lockLoc, lockRot):
             cns.write25(fp)
         elif typ == 'CopyRot':
             cns = CCopyRotConstraint(flags, inf, data)
-            if the.Mhx25:
+            if config.mhx25:
                 cns.write25(fp)
             else:
                 copy = cns.usex + 2*cns.usey + 4*cns.usez
@@ -703,7 +703,7 @@ def writeConstraints(fp, bname, constraints, lockLoc, lockRot):
                     "\t\tend constraint\n")
         elif typ == 'CopyLoc':
             cns = CCopyLocConstraint(flags, inf, data)
-            if the.Mhx25:
+            if config.mhx25:
                 cns.write25(fp)
             else:
                 fp.write(
@@ -719,7 +719,7 @@ def writeConstraints(fp, bname, constraints, lockLoc, lockRot):
             cns.write25(fp)
         elif typ == 'LimitRot':
             cns = CLimitRotConstraint(flags, inf, data)
-            if the.Mhx25:
+            if config.mhx25:
                 cns.write25(fp)
             else:
                 limit = usex + 2*usey + 4*usez
@@ -738,7 +738,7 @@ def writeConstraints(fp, bname, constraints, lockLoc, lockRot):
             maxs = (cns.xmax, cns.ymax, cns.zmax)
         elif typ == 'LimitLoc':
             cns = CLimitLocConstraint(flags, inf, data)
-            if the.Mhx25:
+            if config.mhx25:
                 cns.write25(fp)
             else:
                 limit = cns.useminx + 2*cns.useminy + 4*cns.useminz + 8*cns.usemaxx + 16*cns.usemaxy + 32*cns.usemaxz
@@ -767,7 +767,7 @@ def writeConstraints(fp, bname, constraints, lockLoc, lockRot):
             cns.write25(fp)
         elif typ == 'StretchTo':
             cns = CStretchToConstraint(flags, inf, data)
-            if the.Mhx25:
+            if config.mhx25:
                 cns.write25(fp)
             else:
                 fp.write(
@@ -781,7 +781,7 @@ def writeConstraints(fp, bname, constraints, lockLoc, lockRot):
             cns.write25(fp)
         elif typ == 'LimitDist':
             cns = CLimitDistConstraint(flags, inf, data)
-            if the.Mhx25:
+            if config.mhx25:
                 cns.write25(fp)
             else:
                 fp.write(

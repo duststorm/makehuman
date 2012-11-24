@@ -864,7 +864,7 @@ def createRig(human, rigtype, quatSkinning):
     config.facepanel = False
 
     fp = None
-    the.Mhx25 = True
+    config.mhx25 = True
     obj = human.meshData
     proxyData = {}
     mhx.mhx_rig.setupRig(obj, config, proxyData)

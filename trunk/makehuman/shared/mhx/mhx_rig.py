@@ -149,14 +149,13 @@ def findLocation(joint):
         return the.Locations[joint]
 
 #
-#    writeArmature(fp, boneList, mhx25):
+#    writeArmature(fp, config, boneList):
 #    addBone25(bone, roll, parent, flags, layers, bbone, fp):
 #    addBone24(bone, roll, parent, flags, layers, bbone, fp):
 #
 
-def writeArmature(fp, boneList, mhx25):
-    the.Mhx25 = mhx25
-    if the.Mhx25:
+def writeArmature(fp, config, boneList):
+    if config.mhx25:
         for (bone, roll, parent, flags, layers, bbone) in boneList:
             addBone25(bone, True, roll, parent, flags, layers, bbone, fp)
     else:

@@ -106,7 +106,7 @@ def addPoseBone(fp, config, bone, customShape, boneGroup, locArg, lockRot, lockS
         the.createdArmature.bones[bone].constraints = armature.constraints.getConstraints(bone, constraints, lockLoc, lockRot)
         return
     
-    if the.Mhx25:
+    if config.mhx25:
         fp.write("\n  Posebone %s %s \n" % (bone, True))
     else:
         # limitX = flags & 1
@@ -124,9 +124,9 @@ def addPoseBone(fp, config, bone, customShape, boneGroup, locArg, lockRot, lockS
         index = boneGroupIndex(boneGroup, config)
         fp.write("    bone_group Refer BoneGroup %s ;\n" % boneGroup)
 
-    (uses, mins, maxs) = armature.constraints.writeConstraints(fp, bone, constraints, lockLoc, lockRot)
+    (uses, mins, maxs) = armature.constraints.writeConstraints(fp, config, bone, constraints, lockLoc, lockRot)
 
-    if not the.Mhx25:
+    if not config.mhx25:
         fp.write("\tend posebone\n")
         return
     

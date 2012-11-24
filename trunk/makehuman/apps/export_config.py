@@ -108,6 +108,7 @@ class CExportConfig:
         self.warpField = {}
         
         # Used by mhx exporter
+        self.mhx25 = True
         self.vertexWeights = []
         self.customShapes = {}
         self.poseInfo = {}

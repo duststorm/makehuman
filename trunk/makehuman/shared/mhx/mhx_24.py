@@ -74,7 +74,7 @@ def exportMhx_24(obj, config, fp):
  "#endif\n")
  
      copyMaterialFile("shared/mhx/templates/materials24.mhx", fp)    
-     exportArmature(obj, fp)
+     exportArmature(obj, config, fp)
      tmpl = open("shared/mhx/templates/meshes24.mhx")
      if tmpl:
          copyMeshFile249(obj, tmpl, config, fp)    
@@ -82,11 +82,11 @@ def exportMhx_24(obj, config, fp):
      return
  
  #
- #    exportRawMhx(obj, fp)
+ #    exportRawMhx(obj, config, fp)
  #
  
-def exportRawMhx(obj, fp):
-    exportArmature(obj, fp)
+def exportRawMhx(obj, config, fp):
+    exportArmature(obj, config, fp)
     fp.write(
 "#if useMesh \n" +
 "mesh HumanMesh HumanMesh \n")
@@ -318,15 +318,15 @@ def exportRawData(obj, fp):
     
 
 #
-#    exportArmature(obj, fp):
+#    exportArmature(obj, config, fp):
 #
 
-def exportArmature(obj, fp):
-    oldExportArmature24(obj, fp)
-    #newExportArmature24(obj, fp)
+def exportArmature(obj, config, fp):
+    oldExportArmature24(obj, config, fp)
+    #newExportArmature24(obj, config, fp)
     return
 
-def oldExportArmature24(obj, fp):
+def oldExportArmature24(obj, config, fp):
     mhxbones.writeJoints(obj, fp)
 
     fp.write(
@@ -359,16 +359,16 @@ def oldExportArmature24(obj, fp):
     return 
 
 #
-#    newExportArmature4(obj, fp):
+#    newExportArmature4(obj, config, fp):
 #
-def newExportArmature24(obj, fp):
+def newExportArmature24(obj, config, fp):
     mhx_rig.newSetupJoints(obj, classic_bones.ClassicJoints)
     mhx_rig.setupHeadsTails(classic_bones.ClassicHeadsTails)
     
     fp.write(
 "\n#if useArmature\n" +
 "armature Human Human\n")
-    mhx_rig.writeArmature(fp, classic_bones.ClassicArmature + classic_bones.PanelArmature, False)
+    mhx_rig.writeArmature(fp, config, classic_bones.ClassicArmature + classic_bones.PanelArmature)
     fp.write(
 "\tlayerMask 0x515 ;\n" +
 "\tautoIK false ;\n" +

@@ -87,6 +87,7 @@ def exportMhx(human, filename, options):
 
 def exportMhx_25(human, config, fp):
     gui3d.app.progress(0, text="Exporting MHX")
+    config.mhx25 = True
     print "Export MHX"
     
     fp.write(
@@ -226,7 +227,7 @@ def copyFile25(human, tmplName, fp, proxy, config, proxyData):
                 fp.write("    %s Refer Object %s%s ;\n" % (words[2], the.Human, suffix))
             elif key == 'rig-bones':
                 fp.write("Armature %s %s   Normal \n" % (the.Human, the.Human))
-                mhx_rig.writeArmature(fp, config.armatureBones, True)
+                mhx_rig.writeArmature(fp, config, config.armatureBones)
             elif key == 'human-object':
                 if words[2] == 'Mesh':
                     fp.write(
