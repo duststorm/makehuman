@@ -1131,9 +1131,19 @@ def writeShapeKeys(fp, human, name, config, proxy):
     fp.write("#endif\n")
         
     fp.write(
-"  end AnimationData\n" +
-"end ShapeKeys\n" +
-"#endif\n")
+"  end AnimationData\n\n")
+
+    if config.expressionunits and not proxy:
+        exprList = read_expression.readExpressionMhm()
+        for (name, units) in exprList:
+            fp.write("  Expression %s\n" % name)
+            for (unit, value) in units:
+                fp.write("    %s %s ;\n" % (unit, value))
+            fp.write("  end\n")
+            
+    fp.write(
+        "  end ShapeKeys\n" +
+        "#endif\n")
     return    
 
 

@@ -277,7 +277,25 @@ def initTimes(flist, t0, t1):
     return t0,dt
     
 
-            
+def readExpressionMhm():
+    folder = "data/expressions"
+    exprList = []
+    for file in os.listdir(folder):
+        (fname, ext) = os.path.splitext(file)
+        if ext == ".mhm":
+            path = os.path.join(folder, file)
+            fp = open(path, "rU")
+            units = []
+            for line in fp:
+                words = line.split()
+                if len(words) < 3:
+                    pass
+                elif words[0] == "expression":
+                    units.append(words[1:3])
+            fp.close()
+            exprList.append((fname,units))
+    return exprList                    
+    
 
 
 
