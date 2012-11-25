@@ -93,6 +93,13 @@ if __name__ == '__main__':
         sys.stderr = fe
         os.environ['PATH'] += os.pathsep + os.path.join('.','bin','win')
 
+    if sys.platform.startswith("darwin"):
+        home = os.path.join(os.path.expanduser('~'),"Documents")
+        fo = open(os.path.join(home, "makehuman-output.txt"), "w")
+        sys.stdout = fo
+        fe = open(os.path.join(home, "makehuman-error.txt"), "w")
+        sys.stderr = fe
+
     execfile(mfile)
 
     if sys.platform == 'win32':

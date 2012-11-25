@@ -40,6 +40,10 @@ class DebugDump:
                     this.debugpath = name
             except StandardError:
                 pass
+        
+        if sys.platform.startswith("darwin"):
+            this.debugpath = os.path.join(this.debugpath,"Documents")
+            
         this.debugpath = os.path.join(this.debugpath, "makehuman-debug.txt")
 
     def reset(this):
