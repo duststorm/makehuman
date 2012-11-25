@@ -88,10 +88,11 @@ class PoseLoadTaskView(gui3d.TaskView):
 
         folder = os.path.dirname(filepath)
         (fname, ext) = os.path.splitext(os.path.basename(filepath))
-        modpath = '%s/${ethnic}-${gender}-${age}-%s.target' % (folder, fname)
+        modpath = '%s/${gender}-${age}-${tone}-${weight}-%s.target' % (folder, fname)
         print filepath, modpath
 
-        modifier = warpmodifier.WarpModifier(modpath, "body", "GenderAgeEthnicModifier2")            
+        #modifier = warpmodifier.WarpModifier(modpath, "body", "GenderAgeMuscleWeightModifier")            
+        modifier = humanmodifier.GenderAgeMuscleWeightModifier(modpath)
         modifier.updateValue(self.human, 1.0)
         
         if not self.armature:
