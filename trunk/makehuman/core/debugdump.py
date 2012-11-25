@@ -43,6 +43,7 @@ class DebugDump:
         
         if sys.platform.startswith("darwin"):
             this.debugpath = os.path.join(this.debugpath,"Documents")
+            this.debugpath = os.path.join(this.debugpath,"MakeHuman")
             
         this.debugpath = os.path.join(this.debugpath, "makehuman-debug.txt")
 

@@ -95,6 +95,9 @@ if __name__ == '__main__':
 
     if sys.platform.startswith("darwin"):
         home = os.path.join(os.path.expanduser('~'),"Documents")
+        home = os.path.join(home,"MakeHuman")
+        if not os.path.exists(home):
+            os.path.makedirs(home)            
         fo = open(os.path.join(home, "makehuman-output.txt"), "w")
         sys.stdout = fo
         fe = open(os.path.join(home, "makehuman-error.txt"), "w")
