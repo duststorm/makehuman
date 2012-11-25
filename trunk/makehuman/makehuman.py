@@ -105,3 +105,8 @@ if __name__ == '__main__':
     if sys.platform == 'win32':
         fo.close()
         fe.close()
+
+    if sys.platform.startswith("darwin"):
+        fo.close()
+        fe.close()
+
