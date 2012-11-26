@@ -107,7 +107,7 @@ class PoseLoadTaskView(gui3d.TaskView):
         modifier.updateValue(self.human, 1.0)
         
         if not self.armature:
-            self.armature = armature.rigdefs.createRig(self.human, "Rigid", False)
+            self.armature = armature.rigdefs.createRig(self.human, "rigid", False)
             
         self.armature.setModifier(modifier)
 
