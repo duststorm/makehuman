@@ -277,9 +277,7 @@ class ExportTaskView(gui3d.TaskView):
         self.exportHelpers = self.objOptions.addView(gui3d.CheckBox("Helper geometry", False));y+=24
         self.exportHidden = self.objOptions.addView(gui3d.CheckBox("Keep hidden faces", True));y+=24
         self.exportSkeleton = self.objOptions.addView(gui3d.CheckBox("Skeleton", True));y+=24
-        self.exportGroups = self.objOptions.addView(gui3d.CheckBox("Groups", True));y+=24
         self.exportSmooth = self.objOptions.addView(gui3d.CheckBox( "Subdivide", False));y+=24
-        self.exportHair = self.objOptions.addView(gui3d.CheckBox("Hair as mesh", selected=True));y+=24
         scales = []
         (y, self.objScales) = self.addScales( self.objOptions, scales, "Obj", True, y)
 
@@ -415,24 +413,8 @@ class ExportTaskView(gui3d.TaskView):
 
             if self.wavefrontObj.selected:
                 
-                if self.exportEyebrows.selected and self.exportHelpers.selected:
-                    filter = None
-                elif self.exportEyebrows.selected:
-                    filter = lambda fg: not ('joint' in fg.name or 'helper' in fg.name)
-                elif self.exportHelpers.selected:
-                    filter = lambda fg: not 'eyebrown' in fg.name
-                else:
-                    filter = lambda fg: not ('joint' in fg.name or 'helper' in fg.name or 'eyebrown' in fg.name)
-                    
                 human = gui3d.app.selectedHuman
-                    
-                mesh = human.getSubdivisionMesh() if self.exportSmooth.selected else human.getSeedMesh()
-                
-                mh2obj.exportObj(mesh,
-                    os.path.join(exportPath, filename + ".obj"),
-                    self.exportGroups.selected,
-                    filter)
-                    
+
                 options = {
                     "helpers" : self.exportHelpers.selected,
                     "hidden" : self.exportHidden.selected,
@@ -440,22 +422,11 @@ class ExportTaskView(gui3d.TaskView):
                     "lashes" : self.exportLashes.selected,
                     "scale": self.getScale(self.objScales),
                 }                    
-                mh2obj_proxy.exportProxyObj(gui3d.app.selectedHuman, os.path.join(exportPath, filename), options)
+                mh2obj_proxy.exportProxyObj(human, os.path.join(exportPath, filename), options)
                 
                 if self.exportSkeleton.selected:
-                    mh2bvh.exportSkeleton(human.meshData, os.path.join(exportPath, filename + ".bvh"))
+                    mh2bvh.exportSkeleton(human.meshData, os.path.join(os.path.join(exportPath, filename), filename + ".bvh"))
                     
-                if self.exportHair.selected and human.hairObj and human.hairObj.mesh and human.hairObj.mesh.verts:
-                    mesh = human.hairObj.getSubdivisionMesh() if self.exportSmooth.selected else human.hairObj.getSeedMesh()
-                    mh2obj.exportObj(mesh, os.path.join(exportPath, "hair_" + filename+".obj"))
-                    texturePath = os.path.join(exportPath, basename(mesh.texture))
-                    if not os.path.isfile(texturePath):
-                        copyfile(mesh.texture, texturePath)
-                        
-                texturePath = os.path.join(exportPath, basename(mesh.texture))
-                if not os.path.isfile(texturePath):
-                    copyfile(mesh.texture, texturePath)
-                  
             elif self.mhx.selected:
                 if self.mhxConfig.selected:
                     options = None
