@@ -23,7 +23,7 @@ MakeHuman to MHX (MakeHuman eXchange format) exporter. MHX files can be loaded i
 """
 
 MAJOR_VERSION = 1
-MINOR_VERSION = 13
+MINOR_VERSION = 14
 BODY_LANGUAGE = True
 
 import module3d
@@ -597,7 +597,7 @@ def writeMaskDrivers(fp, proxyData):
     for prx in proxyData.values():
         if prx.type == 'Clothes' and prx.mask:
             (dir, file) = prx.mask
-            armature.drivers.writePropDriver(fp, ["Hide%s" % prx.name], "1-x1", 'use_textures', n+1)
+            armature.drivers.writePropDriver(fp, ["Mhh%s" % prx.name], "1-x1", 'use_textures', n+1)
             n += 1            
     fp.write("#endif\n")
     return
@@ -746,15 +746,13 @@ def writeProxyModifiers(fp, proxy):
 #
 
 def writeHideProp(fp, name):                
-    fp.write(
-"  Property Hide%s False Control_%s_visibility ;\n" % (name, name) +
-"  PropKeys Hide%s \"type\":'BOOLEAN',\"min\":0,\"max\":1, ;\n" % name)
+    fp.write("  DefProp Bool Mhh%s False Control_%s_visibility ;\n" % (name, name))
     return
 
 def writeHideAnimationData(fp, prefix, name):
     fp.write("AnimationData %s%sMesh True\n" % (prefix, name))
-    armature.drivers.writePropDriver(fp, ["Hide%s" % name], "x1", "hide", -1)
-    armature.drivers.writePropDriver(fp, ["Hide%s" % name], "x1", "hide_render", -1)
+    armature.drivers.writePropDriver(fp, ["Mhh%s" % name], "x1", "hide", -1)
+    armature.drivers.writePropDriver(fp, ["Mhh%s" % name], "x1", "hide_render", -1)
     fp.write("end AnimationData\n")
     return    
        
@@ -1107,7 +1105,7 @@ def writeShapeKeys(fp, human, name, config, proxy):
 
         armature.drivers.writeRotDiffDrivers(fp, rig_arm_25.ArmShapeDrivers, proxy)
         armature.drivers.writeRotDiffDrivers(fp, rig_leg_25.LegShapeDrivers, proxy)
-        #armature.drivers.writeShapePropDrivers(fp, rig_body_25.BodyShapes, proxy, "&")
+        #armature.drivers.writeShapePropDrivers(fp, rig_body_25.BodyShapes, proxy, "Mha")
 
     fp.write("#if toggle&T_ShapeDrivers\n")
     if (not proxy or proxy.type == 'Proxy'):
@@ -1116,18 +1114,18 @@ def writeShapeKeys(fp, human, name, config, proxy):
             if config.facepanel:
                 armature.drivers.writeShapeDrivers(fp, drivers, None)
             else:
-                armature.drivers.writeShapePropDrivers(fp, drivers.keys(), proxy, "&_")                
+                armature.drivers.writeShapePropDrivers(fp, drivers.keys(), proxy, "Mhf")                
 
     if not proxy:
         if config.expressions:
-            armature.drivers.writeShapePropDrivers(fp, read_expression.Expressions, proxy, "*")
+            armature.drivers.writeShapePropDrivers(fp, read_expression.Expressions, proxy, "Mhs")
         if config.expressionunits:
-            armature.drivers.writeShapePropDrivers(fp, read_expression.ExpressionUnits, proxy, "*")
+            armature.drivers.writeShapePropDrivers(fp, read_expression.ExpressionUnits, proxy, "Mhs")
             
         skeys = []
         for (skey, val, string, min, max) in  config.customProps:
             skeys.append(skey)
-        armature.drivers.writeShapePropDrivers(fp, skeys, proxy, "&")    
+        armature.drivers.writeShapePropDrivers(fp, skeys, proxy, "Mha")    
     fp.write("#endif\n")
         
     fp.write(

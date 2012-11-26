@@ -823,32 +823,24 @@ def writeAllProperties(fp, typ, config):
     for (key, val) in config.objectProps:
         fp.write("  Property %s %s ;\n" % (key, val))
     for (key, val, string, min, max) in config.customProps:
-        fp.write(
-'  Property &%s %.2f %s ;\n' % (key, val, string) +
-'  PropKeys &%s "min":-%.2f,"max":%.2f, ;\n\n' % (key, min, max) ) 
+        fp.write('  DefProp Float Mha%s %.2f %s min=-%.2f,max=%.2f ;\n' % (key, val, string, min, max) )
 
     if (config.faceshapes and not config.facepanel):
         fp.write("#if toggle&T_Shapekeys\n")
         for skey in rig_panel_25.BodyLanguageShapeDrivers.keys():
-            fp.write(
-"  Property &_%s 0.0 %s ;\n" % (skey, skey) +
-"  PropKeys &_%s \"min\":-1.0,\"max\":2.0, ;\n" % skey)
+            fp.write("  DefProp Float Mhf%s 0.0 %s min=-1.0,max=2.0 ;\n" % (skey, skey))
         fp.write("#endif\n")
         
     if config.expressions:
         fp.write("#if toggle&T_Shapekeys\n")
         for skey in read_expression.Expressions:
-            fp.write(
-"  Property *%s 0.0 %s ;\n" % (skey, skey) +
-"  PropKeys *%s \"min\":-1.0,\"max\":2.0, ;\n" % skey)
+            fp.write("  DefProp Float Mhs%s 0.0 %s min=-1.0,max=2.0 ;\n" % (skey, skey))
         fp.write("#endif\n")
 
     if config.expressionunits:
         fp.write("#if toggle&T_Shapekeys\n")
         for skey in read_expression.ExpressionUnits:
-            fp.write(
-"  Property *%s 0.0 %s ;\n" % (skey, skey) +
-"  PropKeys *%s \"min\":-1.0,\"max\":2.0, ;\n" % skey)
+            fp.write("  DefProp Float Mhs%s 0.0 %s min=-1.0,max=2.0 ;\n" % (skey, skey))
         fp.write("#endif\n")
     return
 
