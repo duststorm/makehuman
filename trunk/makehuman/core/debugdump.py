@@ -44,6 +44,8 @@ class DebugDump:
         if sys.platform.startswith("darwin"):
             this.debugpath = os.path.join(this.debugpath,"Documents")
             this.debugpath = os.path.join(this.debugpath,"MakeHuman")
+            if not os.path.exists(this.debugpath):
+                os.makedirs(this.debugpath)
             
         this.debugpath = os.path.join(this.debugpath, "makehuman-debug.txt")
 
