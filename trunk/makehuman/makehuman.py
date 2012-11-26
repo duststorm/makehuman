@@ -103,6 +103,7 @@ if __name__ == '__main__':
         fe = open(os.path.join(home, "makehuman-error.txt"), "w")
         sys.stderr = fe
 
+    os.environ["STARTEDCORRECTLY"] = "1"
     execfile(mfile)
 
     if sys.platform == 'win32':

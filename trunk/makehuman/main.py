@@ -52,6 +52,12 @@ import sys
 sys.path.append("./pythonmodules")
 import os
 
+if not 'STARTEDCORRECTLY' in os.environ:
+    print "\nERROR ERROR ERROR"
+    print "You should not run main.py directly. Please run makehuman.py instead."
+    print "ERROR ERROR ERROR\n"
+    sys.exit()
+
 def printleaf(object, indent=0):
 
     print "%s%s %s" % (' ' * indent, object, object._Object__view)
