@@ -398,15 +398,15 @@ def retargetMhxRig(context, srcRig, trgRig, doFK, doIK):
     
 def changeTargetData(rig, anim):    
     tempProps = [
-        ("&RotationLimits", 0.0),
-        ("&ArmIk_L", 0.0),
-        ("&ArmIk_R", 0.0),
-        ("&LegIk_L", 0.0),
-        ("&LegIk_R", 0.0),
-        ("&SpineIk", 0),
-        ("&SpineInvert", 0),
-        ("&ElbowPlant_L", 0),
-        ("&ElbowPlant_R", 0),
+        ("MhaRotationLimits", 0.0),
+        ("MhaArmIk_L", 0.0),
+        ("MhaArmIk_R", 0.0),
+        ("MhaLegIk_L", 0.0),
+        ("MhaLegIk_R", 0.0),
+        ("MhaSpineIk", 0),
+        ("MhaSpineInvert", 0),
+        ("MhaElbowPlant_L", 0),
+        ("MhaElbowPlant_R", 0),
         ]
 
     props = []
@@ -418,11 +418,11 @@ def changeTargetData(rig, anim):
             pass
 
     permProps = [
-        ("&ElbowFollowsShoulder", 0),
-        ("&ElbowFollowsWrist", 0),
-        ("&KneeFollowsHip", 0),
-        ("&KneeFollowsFoot", 0),
-        ("&ArmHinge", 0),
+        ("MhaElbowFollowsShoulder", 0),
+        ("MhaElbowFollowsWrist", 0),
+        ("MhaKneeFollowsHip", 0),
+        ("MhaKneeFollowsFoot", 0),
+        ("MhaArmHinge", 0),
         ]
 
     for (key, value) in permProps:
@@ -634,8 +634,8 @@ def retargetIkBones(rig, frame, first):
 
         ik2fkArm(rig, lArmIkBones, lArmFkBones, "_L", frame)
         ik2fkArm(rig, rArmIkBones, rArmFkBones, "_R", frame)
-        ik2fkLeg(rig, lLegIkBones, lLegFkBones, rig["&LegIkToAnkle_L"], "_L", frame, first)
-        ik2fkLeg(rig, rLegIkBones, rLegFkBones, rig["&LegIkToAnkle_R"], "_R", frame, first)
+        ik2fkLeg(rig, lLegIkBones, lLegFkBones, rig["MhaLegIkToAnkle_L"], "_L", frame, first)
+        ik2fkLeg(rig, rLegIkBones, rLegFkBones, rig["MhaLegIkToAnkle_R"], "_R", frame, first)
     else:
         for (ik,fk) in the.IkBones:
             ikPb = rig.pose.bones[ik]
