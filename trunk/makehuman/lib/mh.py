@@ -142,7 +142,10 @@ def getPath(type):
         else:
             raise ValueError("Unknown value '%s' for getPath()!" % typeStr)
     else:
-        path = os.environ["HOME"]
+        path = os.path.expanduser('~')
+        if sys.platform.startswith("darwin"): 
+            path = os.path.join(path,"Documents")
+            path = os.path.join(path,"MakeHuman")
 
         if typeStr == "exports":
             path += "/makehuman/exports/"
