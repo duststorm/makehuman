@@ -43,6 +43,19 @@ import humanmodifier
 #   Pose library
 #
 
+
+class PoseModifier(humanmodifier.GenderAgeMuscleWeightModifier):
+    def __init__(self, template):        
+        humanmodifier.GenderAgeMuscleWeightModifier.__init__(self, template)
+        self.isPose = True
+
+"""        
+class PoseModifier(warpmodifier.WarpModifier):
+    def __init__(self, template):
+	warpmodifier.WarpModifier.__init__(self, template, "body", "GenderAgeMuscleWeightModifier") 
+	self.isPose = True
+"""
+
 class PoseLoadTaskView(gui3d.TaskView):
 
     def __init__(self, category):
@@ -90,9 +103,7 @@ class PoseLoadTaskView(gui3d.TaskView):
         (fname, ext) = os.path.splitext(os.path.basename(filepath))
         modpath = '%s/${gender}-${age}-${tone}-${weight}-%s.target' % (folder, fname)
         print filepath, modpath
-
-        #modifier = warpmodifier.WarpModifier(modpath, "body", "GenderAgeMuscleWeightModifier")            
-        modifier = humanmodifier.GenderAgeMuscleWeightModifier(modpath)
+        modifier = PoseModifier(modpath)
         modifier.updateValue(self.human, 1.0)
         
         if not self.armature:

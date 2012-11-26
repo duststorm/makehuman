@@ -184,7 +184,7 @@ class Target:
                 scale = np.array(scale) * morphFactor
                 obj.coord[dstVerts] += self.data[srcVerts] * scale[None,:]
                 obj.markCoords(dstVerts, coor=True)
-                if not hasattr(self, "isWarp"):
+                if not hasattr(self, "isPose"):
                     theHuman.shadowCoords[dstVerts] += self.data[srcVerts] * scale[None,:]               
 
             if calcNormals:

@@ -48,6 +48,7 @@ class WarpTarget(algos3d.Target):
         self.human = human
         self.modifier = modifier
         self.isWarp = True
+        self.isPose = True
         self.isDirty = True
         self.isObsolete = False
         

@@ -108,12 +108,10 @@ class CIkConstraint(CConstraint):
             fp.write(
             "      target Refer Object %s ;\n" % (the.Human) +
             "      subtarget '%s' ;\n" % self.subtar +
-            "      use_tail True ;\n" +
-            "      use_target True ;\n")
+            "      use_tail True ;\n")
         else:
             fp.write(
-            "      use_tail False ;\n" +
-            "      use_target True ;\n")
+            "      use_tail False ;\n")
 
         fp.write(
             "      pos_lock Array 1 1 1  ;\n" +

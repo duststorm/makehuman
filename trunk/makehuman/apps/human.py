@@ -436,7 +436,7 @@ class Human(gui3d.Object):
             except KeyError:
                 target = None
             if target:                
-                if (target.morphFactor != morphFactor) and not hasattr(target, "isWarp"):
+                if (target.morphFactor != morphFactor) and not hasattr(target, "isPose"):
                     hasChanged = True
             else:
                 print "New target:", os.path.basename(targetPath)

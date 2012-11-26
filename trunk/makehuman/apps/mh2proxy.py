@@ -736,12 +736,10 @@ def writeRigPose(fp, name, bones):
                 fp.write(
 "      target Refer Object %s ;\n" % name +
 "      subtarget '%s' ;\n" % subtar +
-"      use_tail True ;\n" +
-"      use_target True ;\n")
+"      use_tail True ;\n")
             else:
                 fp.write(
-"      use_tail False ;\n" +
-"      use_target True ;\n")
+"      use_tail False ;\n")
             fp.write(
 "      chain_count %s ;\n" % chainlen +
 "      influence %s ;\n" % inf +
