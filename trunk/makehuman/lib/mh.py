@@ -146,17 +146,19 @@ def getPath(type):
         if sys.platform.startswith("darwin"): 
             path = os.path.join(path,"Documents")
             path = os.path.join(path,"MakeHuman")
+        else:
+            path = os.path.join(path,"makehuman")
 
         if typeStr == "exports":
-            path += "/makehuman/exports/"
+            path += "/exports/"
         elif typeStr == "models":
-            path += "/makehuman/models/"
+            path += "/models/"
         elif typeStr == "grab":
-            path += "/makehuman/grab/"
+            path += "/grab/"
         elif typeStr == "render":
-            path += "/makehuman/render/"
+            path += "/render/"
         elif typeStr == "":
-            path += "/makehuman/"
+            path += "/"
         else:
             raise ValueError("Unknown property '%s' for getPath()!" % typeStr);
 
