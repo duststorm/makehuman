@@ -32,6 +32,7 @@ import armature
 from . import the
 from the import *
 from . import mhxbones
+from . import posebone
 from . import read_expression
 from . import mhx_custom
 from . import read_rig
@@ -681,12 +682,12 @@ def appendRigBones(boneList, obj, prefix, layer, body, config):
                 elif key == "-circ":
                     name = "Circ"+value[0]
                     config.customShapes[name] = (key, int(value[0]))
-                    addPoseInfo(bone, ("CS", name))
+                    addPoseInfo(bone, ("CS", name), config)
                     flags |= F_WIR
                 elif key == "-box":
                     name = "Box" + value[0]
                     config.customShapes[name] = (key, int(value[0]))
-                    addPoseInfo(bone, ("CS", name))
+                    addPoseInfo(bone, ("CS", name), config)
                     flags |= F_WIR
                 elif key == "-ik":
                     try:
@@ -695,14 +696,14 @@ def appendRigBones(boneList, obj, prefix, layer, body, config):
                         pt = None
                     print(value, pt)
                     value.append(pt)
-                    addPoseInfo(bone, ("IK", value))
+                    addPoseInfo(bone, ("IK", value), config)
                 elif key == "-ik":
                     pass
             config.armatureBones.append((bone, roll, parent, flags, layer, NoBB))
             the.RigHead[bone] = aljabr.vsub(head, the.Origin)
             the.RigTail[bone] = aljabr.vsub(tail, the.Origin)
             
-def addPoseInfo(bone, info):
+def addPoseInfo(bone, info, config):
     try:
         config.poseInfo[bone]
     except:
@@ -760,7 +761,7 @@ def writeControlPoses(fp, config):
                     poleAngle = float(pt[1])
                     pt = (poleAngle, subtar)
                 constraints =  [('IK', 0, inf, ['IK', goal, n, pt, (True,False,True)])]
-        addPoseBone(fp, config, bone, cs, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, constraints)       
+        posebone.addPoseBone(fp, config, bone, cs, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, constraints)       
         
     for (path, modname) in config.customrigs:
         mod = sys.modules[modname]                
