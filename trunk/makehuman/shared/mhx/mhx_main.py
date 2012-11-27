@@ -1081,7 +1081,7 @@ def writeShapeKeys(fp, human, name, config, proxy):
         if config.expressionunits:
             shapeList = read_expression.readExpressionUnits(human, 0.7, 0.9)
             for (pose, shape) in shapeList:
-                writeShape(fp, pose, "Sym", shape, 0, 1, proxy)
+                writeShape(fp, pose, "Sym", shape, -1, 2, proxy)
         
     if config.bodyshapes and config.rigtype == "mhx":
         writeCorrectives(fp, human, rig_shoulder_25.ShoulderTargetDrivers, "shoulder", proxy, 0.88, 0.90)                
