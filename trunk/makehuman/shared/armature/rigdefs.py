@@ -861,7 +861,6 @@ def createRig(human, rigtype, quatSkinning):
     config.exporting = False
     config.feetonground = False
     config.rigtype = rigtype
-    config.facepanel = False
 
     fp = None
     config.mhx25 = True

@@ -298,9 +298,9 @@ class ExportTaskView(gui3d.TaskView):
         self.mhxFeetOnGround = self.mhxOptions.addView(gui3d.CheckBox("Feet on ground", True));y+=24
         self.mhxHidden = self.mhxOptions.addView(gui3d.CheckBox("Keep hidden faces", True));y+=24
         self.mhxExpressionUnits = self.mhxOptions.addView(gui3d.CheckBox("Expressions", False));y+=24
-        self.mhxFaceShapes = self.mhxOptions.addView(gui3d.CheckBox("Face shapes", True));y+=24
+        #self.mhxFaceShapes = self.mhxOptions.addView(gui3d.CheckBox("Face shapes", True));y+=24
         self.mhxBodyShapes = self.mhxOptions.addView(gui3d.CheckBox("Body shapes", True));y+=24
-        self.mhxFacePanel = self.mhxOptions.addView(gui3d.CheckBox("Face panel", True));y+=24
+        #self.mhxFacePanel = self.mhxOptions.addView(gui3d.CheckBox("Face panel", True));y+=24
         self.mhxClothes = self.mhxOptions.addView(gui3d.CheckBox("Clothes", True));y+=24
         self.mhxClothesRig = self.mhxOptions.addView(gui3d.CheckBox("Clothes rig", True));y+=24
         self.mhxCage = self.mhxOptions.addView(gui3d.CheckBox("Cage", False));y+=24
@@ -440,11 +440,11 @@ class ExportTaskView(gui3d.TaskView):
                     options = {
                         'mhxversion':mhxversion,
                         'hidden':self.mhxHidden.selected,
-                        'expressions':False,    #self.mhxExpressions.selected,
+                        #'expressions':False,    #self.mhxExpressions.selected,
                         'expressionunits':self.mhxExpressionUnits.selected,
-                        'faceshapes':self.mhxFaceShapes.selected,
+                        #'faceshapes':self.mhxFaceShapes.selected,
                         'bodyshapes':self.mhxBodyShapes.selected,
-                        'facepanel':self.mhxFacePanel.selected,
+                        #'facepanel':self.mhxFacePanel.selected,
                         'clothes':self.mhxClothes.selected,
                         'cage':self.mhxCage.selected,
                         'separatefolder':self.mhxSeparateFolder.selected,

@@ -582,10 +582,10 @@ def setupRig(obj, config, proxyData):
         )
         headsTails = []
         config.armatureBones = []
-        if config.facepanel:            
-            joints += rig_panel_25.PanelJoints
-            headsTails += rig_panel_25.PanelHeadsTails
-            config.armatureBones += rig_panel_25.PanelArmature
+        #if config.facepanel:            
+        #    joints += rig_panel_25.PanelJoints
+        #    headsTails += rig_panel_25.PanelHeadsTails
+        #    config.armatureBones += rig_panel_25.PanelArmature
         newSetupJoints(obj, joints)        
         moveOriginToFloor(config)
         for (bone, head, tail) in headsTails:
@@ -603,12 +603,14 @@ def setupRig(obj, config, proxyData):
         config.customProps = []
         print("Default rig %s" % config.rigtype)
         return
-        
+
+    """        
     if config.facepanel:            
         joints += rig_panel_25.PanelJoints
         headsTails += rig_panel_25.PanelHeadsTails
         config.armatureBones += rig_panel_25.PanelArmature
-
+    """
+    
     if config.rigtype == 'mhx':
         if config.skirtrig == "own":
             joints += rig_skirt_25.SkirtJoints
@@ -738,8 +740,8 @@ def writeControlPoses(fp, config):
         rigify_rig.RigifyWritePoses(fp, config)
         rig_face_25.FaceControlPoses(fp, config)
         
-    if config.facepanel:
-        rig_panel_25.PanelControlPoses(fp, config)
+    #if config.facepanel:
+    #    rig_panel_25.PanelControlPoses(fp, config)
         
     for (bone, info) in config.poseInfo.items():
         cs = None
@@ -825,18 +827,14 @@ def writeAllProperties(fp, typ, config):
     for (key, val, string, min, max) in config.customProps:
         fp.write('  DefProp Float Mha%s %.2f %s min=-%.2f,max=%.2f ;\n' % (key, val, string, min, max) )
 
+    """
     if (config.faceshapes and not config.facepanel):
         fp.write("#if toggle&T_Shapekeys\n")
         for skey in rig_panel_25.BodyLanguageShapeDrivers.keys():
             fp.write("  DefProp Float Mhf%s 0.0 %s min=-1.0,max=2.0 ;\n" % (skey, skey))
         fp.write("#endif\n")
-        
-    if config.expressions:
-        fp.write("#if toggle&T_Shapekeys\n")
-        for skey in read_expression.Expressions:
-            fp.write("  DefProp Float Mhs%s 0.0 %s min=-1.0,max=2.0 ;\n" % (skey, skey))
-        fp.write("#endif\n")
-
+    """
+    
     if config.expressionunits:
         fp.write("#if toggle&T_Shapekeys\n")
         for skey in read_expression.ExpressionUnits:

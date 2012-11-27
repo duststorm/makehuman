@@ -277,8 +277,7 @@ def initTimes(flist, t0, t1):
     return t0,dt
     
 
-def readExpressionMhm():
-    folder = "data/expressions"
+def readExpressionMhm(folder):
     exprList = []
     for file in os.listdir(folder):
         (fname, ext) = os.path.splitext(file)

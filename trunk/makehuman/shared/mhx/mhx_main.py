@@ -129,11 +129,13 @@ def exportMhx_25(human, config, fp):
                 mhx_rig.setupCube(fp, name, 0.1*r, (0,0,0))
             else:
                 halt
+        """                
         if config.facepanel:
             mhx_rig.setupCube(fp, "MHCube025", 0.25, 0)
             mhx_rig.setupCube(fp, "MHCube05", 0.5, 0)
             copyFile25(human, "shared/mhx/templates/panel_gizmo25.mhx", fp, None, config, proxyData)    
-            
+        """            
+        
     gui3d.app.progress(0.1, text="Exporting armature")
     copyFile25(human, "shared/mhx/templates/rig-armature25.mhx", fp, None, config, proxyData)    
     
@@ -1067,17 +1069,15 @@ def writeShapeKeys(fp, human, name, config, proxy):
 "  ShapeKey Basis Sym True\n" +
 "  end ShapeKey\n")
 
+    """
     if (not proxy or proxy.type == 'Proxy'):        
         if config.faceshapes:
             shapeList = read_expression.readFaceShapes(human, rig_panel_25.BodyLanguageShapeDrivers, 0.6, 0.7)
             for (pose, shape, lr, min, max) in shapeList:
                 writeShape(fp, pose, lr, shape, min, max, proxy)
-
+    """
+    
     if not proxy:
-        if config.expressions:
-            shapeList = read_expression.readExpressions(human, 0.7, 0.9)
-            for (pose, shape) in shapeList:
-                writeShape(fp, pose, "Sym", shape, 0, 1, proxy)
         if config.expressionunits:
             shapeList = read_expression.readExpressionUnits(human, 0.7, 0.9)
             for (pose, shape) in shapeList:
@@ -1108,6 +1108,7 @@ def writeShapeKeys(fp, human, name, config, proxy):
         #armature.drivers.writeShapePropDrivers(fp, rig_body_25.BodyShapes, proxy, "Mha")
 
     fp.write("#if toggle&T_ShapeDrivers\n")
+    """
     if (not proxy or proxy.type == 'Proxy'):
         if config.faceshapes:
             drivers = rig_panel_25.BodyLanguageShapeDrivers
@@ -1115,10 +1116,8 @@ def writeShapeKeys(fp, human, name, config, proxy):
                 armature.drivers.writeShapeDrivers(fp, drivers, None)
             else:
                 armature.drivers.writeShapePropDrivers(fp, drivers.keys(), proxy, "Mhf")                
-
+    """
     if not proxy:
-        if config.expressions:
-            armature.drivers.writeShapePropDrivers(fp, read_expression.Expressions, proxy, "Mhs")
         if config.expressionunits:
             armature.drivers.writeShapePropDrivers(fp, read_expression.ExpressionUnits, proxy, "Mhs")
             
@@ -1132,17 +1131,24 @@ def writeShapeKeys(fp, human, name, config, proxy):
 "  end AnimationData\n\n")
 
     if config.expressionunits and not proxy:
-        exprList = read_expression.readExpressionMhm()
-        for (name, units) in exprList:
-            fp.write("  Expression %s\n" % name)
-            for (unit, value) in units:
-                fp.write("    %s %s ;\n" % (unit, value))
-            fp.write("  end\n")
-            
+        exprList = read_expression.readExpressionMhm("data/expressions")
+        writeExpressions(fp, exprList, "Expression")        
+        visemeList = read_expression.readExpressionMhm("data/visemes")
+        writeExpressions(fp, visemeList, "Viseme")        
+
     fp.write(
         "  end ShapeKeys\n" +
         "#endif\n")
     return    
+
+
+def writeExpressions(fp, exprList, label):
+    for (name, units) in exprList:
+        fp.write("  %s %s\n" % (label, name))
+        for (unit, value) in units:
+            fp.write("    %s %s ;\n" % (unit, value))
+        fp.write("  end\n")
+            
 
 
 def proxyShapes(typ, human, config, proxyData, fp):

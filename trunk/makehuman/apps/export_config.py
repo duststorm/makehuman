@@ -89,11 +89,11 @@ class CExportConfig:
         self.texFolder = None
         self.proxyList = []
         self.hidden = True
-        self.expressions = False
+        #self.expressions = False
         self.expressionunits = False
-        self.faceshapes = True
+        #self.faceshapes = True
         self.bodyshapes = True
-        self.facepanel = True
+        #self.facepanel = True
         self.cage = False
         self.advancedspine = False
         self.breastrig = False
@@ -125,7 +125,7 @@ class CExportConfig:
     def __repr__(self):
         return (
 "<CExportConfig use:%s mhx:%s daz:%s version%s\n" % (self.mainmesh, self.rigtype, self.daerig, self.mhxversion) +
-"  expr:%s face:%s body:%s cage:%s\n" % (self.expressions, self.faceshapes, self.bodyshapes, self.cage) +
+"  expr:%s body:%s cage:%s\n" % (self.expressionunits, self.bodyshapes, self.cage) +
 "  breastrig:%s gen:%s vis:%s>" % (self.breastrig, self.malerig, self.clothesvisibilitydrivers))
 
 #
@@ -226,11 +226,11 @@ def exportConfig(human, useHair, options=None):
         print(options)
         cfg.mhxversion = options['mhxversion']
         cfg.hidden = options['hidden']
-        cfg.expressions = options['expressions']
+        #cfg.expressions = options['expressions']
         cfg.expressionunits = options['expressionunits']
-        cfg.faceshapes = options['faceshapes']
+        #cfg.faceshapes = options['faceshapes']
         cfg.bodyshapes = options['bodyshapes']
-        cfg.facepanel = options['facepanel']
+        #cfg.facepanel = options['facepanel']
         cfg.separatefolder = options['separatefolder']
         cfg.feetonground = options['feetonground']
         cfg.cage = options['cage']
@@ -295,7 +295,8 @@ def exportConfig(human, useHair, options=None):
                     pass
             elif key in [
                 'separatefolder', 'feetonground', "hidden",
-                'expressions', 'expressionunits', 'faceshapes', 'bodyshapes', 'facepanel',
+                #'expressions', 'faceshapes', 
+                'expressionunits', 'bodyshapes', 'facepanel',
                 'advancedspine', 'malerig', 
                 'clothesrig', 'clothesvisibilitydrivers'
                 ]:
