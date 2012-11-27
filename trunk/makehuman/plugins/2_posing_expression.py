@@ -31,7 +31,7 @@ class ExpressionTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Expression')
         
-        expressions = [
+        self.expressions = [
             ('eyebrows-left', ['down', 'extern-up', 'inner-up', 'up']),
             ('eyebrows-right', ['down', 'extern-up', 'inner-up', 'up']),
             ('eye-left', ['closure', 'opened-up', 'slit']),
@@ -40,6 +40,8 @@ class ExpressionTaskView(gui3d.TaskView):
             ('nose', ['depression', 'left-dilatation', 'left-elevation', 'right-dilatation', 'right-elevation', 'compression']),
             ('neck', ['platysma']),
             ]
+
+        self.include = "All"
         
         self.groupBoxes = []
         self.radioButtons = []
@@ -49,7 +51,7 @@ class ExpressionTaskView(gui3d.TaskView):
         
         self.categoryBox = self.addView(gui3d.GroupBox([650, 80, 9.0], 'Category'))
         
-        for name, subnames in expressions:
+        for name, subnames in self.expressions:
             # Create box
             box = self.addView(gui3d.GroupBox([10, 80, 9.0], name.capitalize()))
             self.groupBoxes.append(box)
@@ -112,19 +114,29 @@ class ExpressionTaskView(gui3d.TaskView):
             if value:
                 file.write('expression %s %f\n' % (name, value))
 
-    def resetExpressions(self):
+
+    def resetExpressions(self, include):
+
+        human = gui3d.app.selectedHuman
+        
+        print "Reset", include
+
+        if include == "All":
+            for name, modifier in self.modifiers.iteritems():
+                modifier.setValue(human, 0.0)
+                #modifier.updateValue(human, 0.0)  # Force recompilation
+        else:
+            for name, modifier in self.modifiers.iteritems():
+                print " R", name
+                if name in include:
+                    modifier.setValue(human, 0.0)
+                    
+
+    def loadExpression(self, filename, include):
 
         human = gui3d.app.selectedHuman
 
-        for name, modifier in self.modifiers.iteritems():
-            modifier.setValue(human, 0.0)
-            #modifier.updateValue(human, 0.0)  # Force recompilation
-
-    def loadExpression(self, filename):
-
-        human = gui3d.app.selectedHuman
-
-        self.resetExpressions()
+        self.resetExpressions(include)
 
         f = open(filename, 'r')
 
@@ -146,21 +158,22 @@ class ExpressionTaskView(gui3d.TaskView):
 
 class Action:
 
-    def __init__(self, human, filename, expressionTaskView, postAction=None):
+    def __init__(self, human, filename, taskView, include, postAction=None):
         self.name = 'Load expression'
         self.human = human
         self.filename = filename
-        self.expressionTaskView = expressionTaskView
+        self.taskView = taskView
+        self.include = include
         self.postAction = postAction
         self.before = {}
 
-        for name, modifier in self.expressionTaskView.modifiers.iteritems():
+        for name, modifier in self.taskView.modifiers.iteritems():
             self.before[name] = modifier.getValue(self.human)
 
     def do(self):
-        self.expressionTaskView.loadExpression(self.filename)
+        self.taskView.loadExpression(self.filename, self.include)
         self.human.applyAllTargets(gui3d.app.progress, True)
-        for slider in self.expressionTaskView.sliders:
+        for slider in self.taskView.sliders:
             slider.update()
         if self.postAction:
             self.postAction()
@@ -168,34 +181,35 @@ class Action:
 
     def undo(self):
         for name, value in self.before.iteritems():
-            self.expressionTaskView.modifiers[name].setValue(self.human, value)
+            self.taskView.modifiers[name].setValue(self.human, value)
         self.human.applyAllTargets(gui3d.app.progress, True)
-        for slider in self.expressionTaskView.sliders:
+        for slider in self.taskView.sliders:
             slider.update()
         if self.postAction:
             self.postAction()
         return True
 
-class ExpressionLoadTaskView(gui3d.TaskView):
+class MhmLoadTaskView(gui3d.TaskView):
 
-    def __init__(self, category, expressionTaskView):
+    def __init__(self, category, mhmTaskView, mhmLabel, folder):
 
-        gui3d.TaskView.__init__(self, category, 'Expression', label='Expression')
+        gui3d.TaskView.__init__(self, category, mhmLabel, label=mhmLabel)
 
-        self.expressionTaskView = expressionTaskView
+        self.mhmTaskView = mhmTaskView
+        self.include = "All"
 
-        self.globalExpressionPath = os.path.join('data', 'expressions')
-        self.expressionPath = os.path.join(mh.getPath(''), 'data', 'expressions')
+        self.globalMhmPath = os.path.join('data', folder)
+        self.mhmPath = os.path.join(mh.getPath(''), 'data', folder)
 
-        if not os.path.exists(self.expressionPath):
-            os.makedirs(self.expressionPath)
+        if not os.path.exists(self.mhmPath):
+            os.makedirs(self.mhmPath)
 
-        self.filechooser = self.addView(gui3d.FileChooser([self.globalExpressionPath, self.expressionPath], 'mhm', 'png'))
+        self.filechooser = self.addView(gui3d.FileChooser([self.globalMhmPath, self.mhmPath], 'mhm', 'png'))
 
         @self.filechooser.event
         def onFileSelected(filename):
 
-            gui3d.app.do(Action(gui3d.app.selectedHuman, filename, self.expressionTaskView))
+            gui3d.app.do(Action(gui3d.app.selectedHuman, filename, self.mhmTaskView, self.include))
             
             gui3d.app.switchCategory('Modelling')
 
@@ -213,6 +227,29 @@ class ExpressionLoadTaskView(gui3d.TaskView):
     def onResized(self, event):
         self.filechooser.onResized(event)
 
+
+class ExpressionLoadTaskView(MhmLoadTaskView):
+
+    def __init__(self, category, expressionTaskView):
+    
+        MhmLoadTaskView.__init__(self, category, expressionTaskView, 'Expression', 'expressions')
+
+
+class VisemeLoadTaskView(MhmLoadTaskView):
+
+    def __init__(self, category, visemeTaskView):
+    
+        MhmLoadTaskView.__init__(self, category, visemeTaskView, 'Visemes', 'visemes')
+        
+        self.include = []
+        for (cat, names) in visemeTaskView.expressions:
+            if cat == "mouth":
+                for name in names:
+                    self.include.append("mouth-" + name)
+                break
+                        
+        
+
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
 
@@ -226,6 +263,7 @@ def load(app):
 
     category = app.getCategory('Library')
     category.addView(ExpressionLoadTaskView(category, taskview))
+    category.addView(VisemeLoadTaskView(category, taskview))
     
     print 'Expression loaded'
 
