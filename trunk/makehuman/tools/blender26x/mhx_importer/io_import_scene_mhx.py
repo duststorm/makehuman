@@ -2164,7 +2164,7 @@ def propNames(string):
         string = "Mhh"+string[4:]
         alpha7 = True
     
-    if string.startswith(("Mha", "Mhf", "Mhs", "Mhh", "Mhv")):
+    if string.startswith(("Mha", "Mhf", "Mhs", "Mhh", "Mhv", "Mhc")):
         name = string.replace("-","_")
         return name, name
     elif string[0] == "_":
@@ -3735,16 +3735,20 @@ class VIEW3D_OT_MhxPinExpressionButton(bpy.types.Operator):
     bl_idname = "mhx.pose_pin_expression"
     bl_label = "Pin"
     bl_options = {'UNDO'}
-    expression = StringProperty()
+    data = StringProperty()
 
     def execute(self, context):
         rig,mesh = getMhxRigMesh(context.object)
-        props = getProps(rig, "Mhs")
+        words = self.data.split(";")
+        prefix = words[0]
+        expression = words[1]
+        
+        props = getProps(rig, prefix)
         if context.tool_settings.use_keyframe_insert_auto:
             frame = context.scene.frame_current
             for prop in props:
                 old = rig[prop]
-                if prop == self.expression:
+                if prop == expression:
                     rig[prop] = 1.0
                 else:
                     rig[prop] = 0.0
@@ -3752,7 +3756,7 @@ class VIEW3D_OT_MhxPinExpressionButton(bpy.types.Operator):
                     rig.keyframe_insert(prop, frame=frame)
         else:                    
             for prop in props:
-                if prop == self.expression:
+                if prop == expression:
                     rig[prop] = 1.0
                 else:
                     rig[prop] = 0.0
@@ -3864,6 +3868,33 @@ class MhxExpressionsPanel(bpy.types.Panel):
             layout.operator("mhx.pose_mhm", text=prop[3:]).data="Mhs;"+rig[prop]
 
 
+def drawShapePanel(self, context, prefix, name):
+    layout = self.layout
+    rig,mesh = getMhxRigMesh(context.object)
+    if not rig:
+        print("No MHX rig found")
+        return
+    if not rig.MhxShapekeyDrivers:
+        layout.label("No shapekey drivers.")
+        layout.label("Set %s values in mesh context instead" % name)
+        return
+    props = getProps(rig, prefix)
+    if not props:
+        layout.label("No %ss found" % name)
+        return
+        
+    layout.operator("mhx.pose_reset_expressions", text="Reset %ss" % name).prefix=prefix
+    layout.operator("mhx.pose_key_expressions", text="Reset %ss" % name).prefix=prefix
+    #layout.operator("mhx.update")
+
+    layout.separator()
+    for prop in props:
+        row = layout.split(0.85)
+        row.prop(rig, prop, text=prop[3:])
+        row.operator("mhx.pose_pin_expression", text="", icon='UNPINNED').data = (prefix + ";" + prop)
+    return
+
+
 class MhxExpressionUnitsPanel(bpy.types.Panel):
     bl_label = "MHX Expression Units"
     bl_space_type = "VIEW_3D"
@@ -3875,29 +3906,22 @@ class MhxExpressionUnitsPanel(bpy.types.Panel):
         return pollMhx(context.object)
 
     def draw(self, context):
-        layout = self.layout
-        rig,mesh = getMhxRigMesh(context.object)
-        if not rig:
-            print("No MHX rig found")
-            return
-        if not rig.MhxShapekeyDrivers:
-            layout.label("No shapekey drivers.")
-            layout.label("Set expression values in mesh context instead")
-            return
-        props = getProps(rig, "Mhs")
-        if not props:
-            return
-            
-        layout.operator("mhx.pose_reset_expressions").prefix="Mhs"
-        layout.operator("mhx.pose_key_expressions").prefix="Mhs"
-        #layout.operator("mhx.update")
+        drawShapePanel(self, context, "Mhs", "expression")
 
-        layout.separator()
-        for prop in props:
-            row = layout.split(0.85)
-            row.prop(rig, prop, text=prop[3:])
-            row.operator("mhx.pose_pin_expression", text="", icon='UNPINNED').expression = prop
-        return
+
+class MhxCustomShapePanel(bpy.types.Panel):
+    bl_label = "MHX Custom Shapes"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_options = {'DEFAULT_CLOSED'}
+    
+    @classmethod
+    def poll(cls, context):
+        return pollMhx(context.object)
+
+    def draw(self, context):
+        drawShapePanel(self, context, "Mhc", "custom shape")
+
 
 #########################################
 #

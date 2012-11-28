@@ -448,7 +448,7 @@ def copyFile25(human, tmplName, fp, proxy, config, proxyData):
                         (fname, ext) = os.path.splitext(file)
                         if ext == ".target":
                             path = os.path.join(folder, file)
-                            name = "Mhs" + fname.capitalize().replace(" ","_").replace("-","_")
+                            name = "Mhc" + fname.capitalize().replace(" ","_").replace("-","_")
                             config.customShapeFiles.append((path, name))
                             
                 for path,name in config.customShapeFiles:
