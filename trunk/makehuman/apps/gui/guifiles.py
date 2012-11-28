@@ -282,6 +282,7 @@ class ExportTaskView(gui3d.TaskView):
         (y, self.objScales) = self.addScales( self.objOptions, scales, "Obj", True, y)
 
         # MHX options
+        """
         y = yy
         self.mhxOptionsSource = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options source', gui3d.GroupBoxStyle._replace(height=25+24*2+6)));y+=25
         source = []
@@ -289,17 +290,20 @@ class ExportTaskView(gui3d.TaskView):
         self.mhxGui = self.mhxOptionsSource.addView(gui3d.RadioButton(source, "Use gui options", True));y+=24
         self.mhxOptionsSource.hide()
         y+=16
+        """
         
         y = 80
         self.mhxOptions = self.addView(gui3d.GroupBox([660, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*14+6)));y+=25
-        self.version24 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.4", False));y+=24
-        self.version25 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.5", True));y+=24
+        #self.version24 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.4", False));y+=24
+        #self.version25 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.5", True));y+=24
         self.mhxSeparateFolder = self.mhxOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
         self.mhxFeetOnGround = self.mhxOptions.addView(gui3d.CheckBox("Feet on ground", True));y+=24
         self.mhxHidden = self.mhxOptions.addView(gui3d.CheckBox("Keep hidden faces", True));y+=24
         self.mhxExpressionUnits = self.mhxOptions.addView(gui3d.CheckBox("Expressions", False));y+=24
         #self.mhxFaceShapes = self.mhxOptions.addView(gui3d.CheckBox("Face shapes", True));y+=24
         self.mhxBodyShapes = self.mhxOptions.addView(gui3d.CheckBox("Body shapes", True));y+=24
+        self.mhxCustomShapes = self.mhxOptions.addView(gui3d.CheckBox("Custom shapes", False));y+=24
+        #self.mhxCustomRigs = self.mhxOptions.addView(gui3d.CheckBox("Custom rigs", False));y+=24
         #self.mhxFacePanel = self.mhxOptions.addView(gui3d.CheckBox("Face panel", True));y+=24
         self.mhxClothes = self.mhxOptions.addView(gui3d.CheckBox("Clothes", True));y+=24
         self.mhxClothesRig = self.mhxOptions.addView(gui3d.CheckBox("Clothes rig", True));y+=24
@@ -339,19 +343,8 @@ class ExportTaskView(gui3d.TaskView):
         self.stlBinary = self.stlOptions.addView(gui3d.RadioButton(stlOptions, "Binary"));y+=24
         self.stlSmooth = self.stlOptions.addView(gui3d.CheckBox("Subdivide", False));y+=24
         self.stlOptions.hide()
-        
-        @self.mhxConfig.event
-        def onClicked(event):
-            
-            gui3d.RadioButton.onClicked(self.mhxConfig, event)
-            self.mhxOptions.hide()
-            
-        @self.mhxGui.event
-        def onClicked(event):
-            
-            gui3d.RadioButton.onClicked(self.mhxGui, event)
-            self.mhxOptions.show()
-            
+
+        """                    
         @self.version24.event
         def onClicked(event):
             
@@ -367,6 +360,7 @@ class ExportTaskView(gui3d.TaskView):
                 self.version25.setSelected(False)
             else:
                 self.version25.setSelected(True)
+        """
         
         @self.wavefrontObj.event
         def onClicked(event):
@@ -428,33 +422,32 @@ class ExportTaskView(gui3d.TaskView):
                     mh2bvh.exportSkeleton(human.meshData, os.path.join(os.path.join(exportPath, filename), filename + ".bvh"))
                     
             elif self.mhx.selected:
-                if self.mhxConfig.selected:
-                    options = None
-                else:
-                    mhxversion = []
-                    if self.version24.selected: mhxversion.append('24')
-                    if self.version25.selected: mhxversion.append('25')
-                    for (button, rig) in self.mhxRigs:
-                        if button.selected:
-                            break
-                    options = {
-                        'mhxversion':mhxversion,
-                        'hidden':self.mhxHidden.selected,
-                        #'expressions':False,    #self.mhxExpressions.selected,
-                        'expressionunits':self.mhxExpressionUnits.selected,
-                        #'faceshapes':self.mhxFaceShapes.selected,
-                        'bodyshapes':self.mhxBodyShapes.selected,
-                        #'facepanel':self.mhxFacePanel.selected,
-                        'clothes':self.mhxClothes.selected,
-                        'cage':self.mhxCage.selected,
-                        'separatefolder':self.mhxSeparateFolder.selected,
-                        'feetonground':self.mhxFeetOnGround.selected,
-                        'advancedspine':self.mhxAdvancedSpine.selected,
-                        'malerig':self.mhxMaleRig.selected,
-                        'skirtrig':False, #self.mhxSkirtRig.selected,
-                        'clothesrig':self.mhxClothesRig.selected,
-                        'mhxrig': rig,
-                    }
+                #mhxversion = []
+                #if self.version24.selected: mhxversion.append('24')
+                #if self.version25.selected: mhxversion.append('25')
+                for (button, rig) in self.mhxRigs:
+                    if button.selected:
+                        break
+                options = {
+                    'mhxversion': ["25"],  #mhxversion,
+                    'hidden':self.mhxHidden.selected,
+                    #'expressions':False,    #self.mhxExpressions.selected,
+                    'expressionunits':self.mhxExpressionUnits.selected,
+                    #'faceshapes':self.mhxFaceShapes.selected,
+                    'bodyshapes':self.mhxBodyShapes.selected,
+                    'customshapes':self.mhxCustomShapes.selected,
+                    'customrigs':False, #self.mhxCustomRigs.selected,
+                    #'facepanel':self.mhxFacePanel.selected,
+                    'clothes':self.mhxClothes.selected,
+                    'cage':self.mhxCage.selected,
+                    'separatefolder':self.mhxSeparateFolder.selected,
+                    'feetonground':self.mhxFeetOnGround.selected,
+                    'advancedspine':self.mhxAdvancedSpine.selected,
+                    'malerig':self.mhxMaleRig.selected,
+                    'skirtrig':False, #self.mhxSkirtRig.selected,
+                    'clothesrig':self.mhxClothesRig.selected,
+                    'mhxrig': rig,
+                }
 
                 mh2mhx.exportMhx(gui3d.app.selectedHuman, os.path.join(exportPath, filename + ".mhx"), options)
             elif self.collada.selected:
@@ -501,11 +494,8 @@ class ExportTaskView(gui3d.TaskView):
             self.colladaOptions.hide()
             
         if self.mhx.selected:
-            self.mhxOptionsSource.show()
-            if self.mhxGui.selected:
-                self.mhxOptions.show()
+            self.mhxOptions.show()
         else:
-            self.mhxOptionsSource.hide()
             self.mhxOptions.hide()
             
         if self.stl.selected:

@@ -25,6 +25,8 @@ import sys
 from . import the
 
 def setupCustomRig(config): 
+    return [],[],[],[]
+    
     joints = []
     headsTails = []
     armature = []

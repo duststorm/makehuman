@@ -101,9 +101,8 @@ class CExportConfig:
         self.skirtrig = "inh"
         self.clothesrig = True
         self.clothesvisibilitydrivers = True
-        self.customrigs = []
-        self.customshapes = []
-        self.customvertexgroups = []
+        self.customrigs = False
+        self.customshapes = False
         self.copiedFiles = {}
         self.warpField = {}
         
@@ -120,6 +119,7 @@ class CExportConfig:
         self.objectProps = []
         self.armatureProps = []
         self.customProps = []
+        self.customShapeFiles = []
         
 
     def __repr__(self):
@@ -230,6 +230,8 @@ def exportConfig(human, useHair, options=None):
         cfg.expressionunits = options['expressionunits']
         #cfg.faceshapes = options['faceshapes']
         cfg.bodyshapes = options['bodyshapes']
+        cfg.customshapes = options['customshapes']
+        cfg.customrigs = options['customrigs']
         #cfg.facepanel = options['facepanel']
         cfg.separatefolder = options['separatefolder']
         cfg.feetonground = options['feetonground']
@@ -296,7 +298,7 @@ def exportConfig(human, useHair, options=None):
             elif key in [
                 'separatefolder', 'feetonground', "hidden",
                 #'expressions', 'faceshapes', 
-                'expressionunits', 'bodyshapes', 'facepanel',
+                'expressionunits', 'bodyshapes', 'customshapes', 'customrigs', 'facepanel',
                 'advancedspine', 'malerig', 
                 'clothesrig', 'clothesvisibilitydrivers'
                 ]:
@@ -307,8 +309,6 @@ def exportConfig(human, useHair, options=None):
             elif key in ['skirtrig']:   
                 value = words[2][0:3].lower()
                 exec("cfg.%s = value" % key)
-            elif key in ['customrigs', 'customshapes', 'customvertexgroups']:
-                status = key
             elif key == 'mhxrig':
                 try:
                     cfg.rigtype = words[2].lower()
@@ -345,23 +345,6 @@ def exportConfig(human, useHair, options=None):
                 layer = int(words[2])
             else:
                 print('Ignored unrecognized command %s in mh_export.config' % words[1])
-        elif status:
-            if status == 'customrigs':
-                path = os.path.realpath(os.path.expanduser(words[0]))
-                print path
-                (dirname,fname) = os.path.split(path)
-                print fname
-                (modname,ext) = os.path.splitext(fname)
-                print modname, ext
-                if ext != ".py":
-                    raise NameError("@CustomRig must be a .py file, not %s" % words[0])
-                cfg.customrigs.append((dirname, modname))
-            elif status == 'customshapes':
-                path = os.path.realpath(os.path.expanduser(words[0]))
-                cfg.customshapes.append(path)
-            elif status == 'customvertexgroups':
-                path = os.path.realpath(os.path.expanduser(words[0]))
-                cfg.customvertexgroups.append(path)
         elif typ == 'Cage':
             if len(words) > 0:
                 name = words[0]

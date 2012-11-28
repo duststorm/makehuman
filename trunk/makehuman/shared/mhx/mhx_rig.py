@@ -763,9 +763,9 @@ def writeControlPoses(fp, config):
                 constraints =  [('IK', 0, inf, ['IK', goal, n, pt, (True,False,True)])]
         posebone.addPoseBone(fp, config, bone, cs, None, (0,0,0), (0,0,0), (1,1,1), (1,1,1), 0, constraints)       
         
-    for (path, modname) in config.customrigs:
-        mod = sys.modules[modname]                
-        mod.ControlPoses(fp, config)
+    #for (path, modname) in config.customrigs:
+    #    mod = sys.modules[modname]                
+    #    mod.ControlPoses(fp, config)
 
     return
 
