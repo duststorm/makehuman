@@ -74,11 +74,11 @@ def writeGeometry(obj, fp, stuff, scale):
     fp.write("usemtl %s\n" % stuff.name)
     fp.write("g %s\n" % stuff.name)    
     for v in stuff.verts:
-        fp.write("v %.4f %.4f %.4f\n" % (scale*v[0], scale*v[1], scale*v[2]))
+        fp.write("v %.4g %.4g %.4g\n" % (scale*v[0], scale*v[1], scale*v[2]))
     #for no in stuff.vnormals:
-    #    fp.write("vn %.4f %.4f %.4f\n" % (no[0], no[1], no[2]))
+    #    fp.write("vn %.4g %.4g %.4g\n" % (no[0], no[1], no[2]))
     for uv in stuff.uvValues:
-        fp.write("vt %.4f %.4f\n" %(uv[0], uv[1]))
+        fp.write("vt %.4g %.4g\n" %(uv[0], uv[1]))
     for fc in stuff.faces:
         fp.write('f ')
         for vs in fc:
@@ -93,38 +93,53 @@ def writeGeometry(obj, fp, stuff, scale):
 #
 
 def writeMaterial(fp, stuff, human, cfg):
-    fp.write("newmtl %s\n" % stuff.name)
-    diffuse = (0.8, 0.8, 0.8)
+    fp.write("\nnewmtl %s\n" % stuff.name)
+    diffuse = (1, 1, 1)
     spec = (1, 1, 1)
+    diffScale = 0.8
+    specScale = 0.02
+    alpha = 1
     if stuff.material:
         for (key, value) in stuff.material.settings:
             if key == "diffuse_color":
                 diffuse = value
             elif key == "specular_color":
                 spec = value
+            elif key == "diffuse_intensity":
+                diffScale = value
+            elif key == "specular_intensity":
+                specScale = value
+            elif key == "alpha":
+                alpha = value
+                
     fp.write(
-    "Kd %.4f %.4f %.4f\n" % (diffuse[0], diffuse[1], diffuse[2]) +
-    "Ks %.4f %.4f %.4f\n" % (spec[0], spec[1], spec[2])
+    "Kd %.4g %.4g %.4g\n" % (diffScale*diffuse[0], diffScale*diffuse[1], diffScale*diffuse[2]) +
+    "Ks %.4g %.4g %.4g\n" % (specScale*spec[0], specScale*spec[1], specScale*spec[2]) +
+    "d %.4g\n" % alpha
     )
-    if stuff.type:
-        if stuff.texture:
-            textures = [stuff.texture]
-        else:
-            return
+    
+    if stuff.proxy:
+        writeTexture(fp, "map_Kd", stuff.proxy.texture, human, cfg)
+        #writeTexture(fp, "map_Tr", stuff.proxy.translucency, human, cfg)
+        writeTexture(fp, "map_Disp", stuff.proxy.normal, human, cfg)
+        writeTexture(fp, "map_Disp", stuff.proxy.displacement, human, cfg)
+    else:        
+        writeTexture(fp, "map_Kd", ("data/textures", "texture.png"), human, cfg)
+
+
+def writeTexture(fp, key, texture, human, cfg):
+    if not texture:
+        return
+    (folder, texfile) = texture
+    path = export_config.getOutFileName(texfile, folder, True, human, cfg)        
+    (fname, ext) = os.path.splitext(texfile)  
+    name = "%s_%s" % (fname, ext[1:])
+    if cfg.separatefolder:
+        texpath = "textures/"+texfile
     else:
-        path = "data/textures"
-        file = export_config.getOutFileName("texture.png", path, True, human, cfg)
-        textures = [(path, os.path.basename(file))]
-    for (folder, texfile) in textures:  
-        path = export_config.getOutFileName(texfile, folder, True, human, cfg)        
-        (fname, ext) = os.path.splitext(texfile)  
-        name = "%s_%s" % (fname, ext[1:])
-        if cfg.separatefolder:
-            texpath = "textures/"+texfile
-        else:
-            texpath = texfile
-        fp.write("map_Kd %s\n" % texpath)
-    return
+        texpath = texfile
+    fp.write("%s %s\n" % (key, texpath))
+    
 
 """    
 Ka 1.0 1.0 1.0

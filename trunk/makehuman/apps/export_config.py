@@ -15,7 +15,6 @@
 
 Abstract
 --------
-Configure export options by reading mh_export.config.
 
 """
 
@@ -101,7 +100,6 @@ class CExportConfig:
         self.skirtrig = "inh"
         self.clothesrig = True
         self.clothesvisibilitydrivers = True
-        self.customrigs = False
         self.customshapes = False
         self.copiedFiles = {}
         self.warpField = {}
@@ -231,7 +229,6 @@ def exportConfig(human, useHair, options=None):
         #cfg.faceshapes = options['faceshapes']
         cfg.bodyshapes = options['bodyshapes']
         cfg.customshapes = options['customshapes']
-        cfg.customrigs = options['customrigs']
         #cfg.facepanel = options['facepanel']
         cfg.separatefolder = options['separatefolder']
         cfg.feetonground = options['feetonground']
@@ -244,9 +241,6 @@ def exportConfig(human, useHair, options=None):
         else:
             cfg.skirtrig = "inh"
         cfg.rigtype = options['mhxrig']
-        fp = 0
-    else:    
-        fp = proxyFilePtr('mh_export.config')
 
     if useHair and human.hairProxy:
         words = human.hairObj.mesh.name.split('.')
@@ -279,9 +273,9 @@ def exportConfig(human, useHair, options=None):
         pfile = getCageFile("./data/cages/cage/cage.mhclo", 4, useMhx, useObj, useDae)
         cfg.proxyList.append(pfile)    
         
-    if not fp: 
-        return cfg
+    return cfg
 
+    """
     status = None
     for line in fp:
         words = line.split()
@@ -298,7 +292,7 @@ def exportConfig(human, useHair, options=None):
             elif key in [
                 'separatefolder', 'feetonground', "hidden",
                 #'expressions', 'faceshapes', 
-                'expressionunits', 'bodyshapes', 'customshapes', 'customrigs', 'facepanel',
+                'expressionunits', 'bodyshapes', 'customshapes', 'facepanel',
                 'advancedspine', 'malerig', 
                 'clothesrig', 'clothesvisibilitydrivers'
                 ]:
@@ -358,7 +352,9 @@ def exportConfig(human, useHair, options=None):
     for elt in cfg.proxyList:
         print "  ", elt
     return cfg
-
+    """
+    
+    
 def getCageFile(name, layer, useMhx, useObj, useDae):
     pfile = CProxyFile()
     pfile.set('Cage', layer, useMhx, useObj, useDae)
@@ -385,6 +381,7 @@ def getOutFileFolder(filename, config):
         outfile = filename
     return outfile
 
+
 def getSubFolder(path, name):
     folder = os.path.join(path, name)
     #print "Using folder", folder
@@ -399,6 +396,7 @@ def getSubFolder(path, name):
             return None
     return folder        
     
+
 def getOutFileName(filePath, fromDir, isTexture, human, config):
     srcDir = os.path.realpath(os.path.expanduser(fromDir))
     filename = os.path.basename(filePath)

@@ -303,7 +303,6 @@ class ExportTaskView(gui3d.TaskView):
         #self.mhxFaceShapes = self.mhxOptions.addView(gui3d.CheckBox("Face shapes", True));y+=24
         self.mhxBodyShapes = self.mhxOptions.addView(gui3d.CheckBox("Body shapes", True));y+=24
         self.mhxCustomShapes = self.mhxOptions.addView(gui3d.CheckBox("Custom shapes", False));y+=24
-        #self.mhxCustomRigs = self.mhxOptions.addView(gui3d.CheckBox("Custom rigs", False));y+=24
         #self.mhxFacePanel = self.mhxOptions.addView(gui3d.CheckBox("Face panel", True));y+=24
         self.mhxClothes = self.mhxOptions.addView(gui3d.CheckBox("Clothes", True));y+=24
         self.mhxClothesRig = self.mhxOptions.addView(gui3d.CheckBox("Clothes rig", True));y+=24
@@ -436,7 +435,6 @@ class ExportTaskView(gui3d.TaskView):
                     #'faceshapes':self.mhxFaceShapes.selected,
                     'bodyshapes':self.mhxBodyShapes.selected,
                     'customshapes':self.mhxCustomShapes.selected,
-                    'customrigs':False, #self.mhxCustomRigs.selected,
                     #'facepanel':self.mhxFacePanel.selected,
                     'clothes':self.mhxClothes.selected,
                     'cage':self.mhxCage.selected,

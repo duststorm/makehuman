@@ -23,6 +23,8 @@ TO DO
 import gui3d, mh, os
 import files3d
 import export_config
+import mh2proxy
+
 
 class UvTaskView(gui3d.TaskView):
     
@@ -45,7 +47,11 @@ class UvTaskView(gui3d.TaskView):
         
     def setUv(self, human, filename):
 
-        human.uvsetFile = filename
+        if filename is None:
+            human.uvset = None
+        else:
+            human.uvset = mh2proxy.CUvSet(filename)
+            human.uvset.read(human, filename)
 
     def onShow(self, event):
         # When the task gets shown, set the focus to the file chooser
@@ -72,7 +78,7 @@ class UvTaskView(gui3d.TaskView):
 
     def loadHandler(self, human, values):
 
-	mhuv = values[1]
+        mhuv = values[1]
         if not os.path.exists(os.path.realpath(mhuv)):
             print mhuv, "does not exist. Skipping."
             return
@@ -80,8 +86,8 @@ class UvTaskView(gui3d.TaskView):
         
     def saveHandler(self, human, file):
 
-        if human.uvsetFile:
-            file.write('uvset %s\n' % human.uvsetFile)
+        if human.uvset:
+            file.write('uvset %s\n' % human.uvset.filename)
 
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements

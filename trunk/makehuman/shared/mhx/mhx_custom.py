@@ -22,7 +22,46 @@ Abstract
 """
 
 import sys
+import os
+import mh
 from . import the
+
+
+def listCustomFiles(config):                    
+    config.customShapeFiles = []
+    if config.customshapes: 
+        folder = os.path.join(mh.getPath(''), 'custom')
+        readCustomFolder(folder, config)
+        
+        
+def readCustomFolder(folder, config):        
+    for file in os.listdir(folder):            
+        path = os.path.join(folder, file)
+        if os.path.isdir(path):
+            readCustomFolder(path, config)
+        else:
+            (fname, ext) = os.path.splitext(file)
+            if ext == ".target":
+                path = os.path.join(folder, file)
+                name = "Mhc" + fname.capitalize().replace(" ","_").replace("-","_")
+                config.customShapeFiles.append((path, name))
+
+
+def readCustomTarget(path):
+    try:
+        fp = open(path, "rU")
+    except:
+        return []
+    shape = {}
+    for line in fp:
+        words = line.split()
+        try:
+            shape[int(words[0])] = (float(words[1]), float(words[2]), float(words[3]))
+        except:
+            return {}
+    fp.close()
+    return shape
+        
 
 def setupCustomRig(config): 
     return [],[],[],[]

@@ -593,55 +593,77 @@ def readMaterial(line, mat, proxy, multiTex):
         mat.use_transparency = True
 
 #
-#   readUvset(filename):
+#   class CUvSet:
 #
 
 class CUvSet:
     def __init__(self, name):
         self.name = name
         self.type = "UvSet"
+        self.filename = None
+        self.faceMaterials = None
         self.materials = []
         self.faceNumbers = []
         self.texVerts = []
         self.texFaces = []
 
 
-def readUvset(filename):
-    try:
-        fp = open(filename, "r")
-    except:
-        raise NameError("Cannot open %s" % filename)
-        
-    status = 0
-    for line in fp:
-        words = line.split()
-        if words == []:
-            continue
-        elif words[0] == '#':
-            if words[1] == "name":
-                uvset = CUvSet(words[2])
-            elif words[1] == "material":
-                mat = CMaterial()
-                mat.name = words[2]
-                uvset.materials.append(mat)
-                status = doMaterial
-            elif words[1] == "faceNumbers":
-                status = doFaceNumbers
-            elif words[1] == "texVerts":
-                status = doTexVerts
-            elif words[1] == "texFaces":
-                status = doTexFaces
-        elif status == doMaterial:
-            readMaterial(line, mat, uvset, True)
-        elif status == doFaceNumbers:
-            uvset.faceNumbers.append(line)
-        elif status == doTexVerts:
-            uvset.texVerts.append([float(words[0]), float(words[1])])
-        elif status == doTexFaces:
-            newTexFace(words, uvset)
-    fp.close()            
-    return uvset      
+    def read(self, human, filename):
+        try:
+            fp = open(filename, "r")
+        except:
+            raise NameError("Cannot open %s" % filename)
+                
+        status = 0
+        for line in fp:
+            words = line.split()
+            if words == []:
+                continue
+            elif words[0] == '#':
+                if words[1] == "name":
+                    self.name = words[2]
+                elif words[1] == "material":
+                    mat = CMaterial()
+                    mat.name = words[2]
+                    self.materials.append(mat)
+                    status = doMaterial
+                elif words[1] == "faceNumbers":
+                    status = doFaceNumbers
+                elif words[1] == "texVerts":
+                    status = doTexVerts
+                elif words[1] == "texFaces":
+                    status = doTexFaces
+            elif status == doMaterial:
+                readMaterial(line, mat, self, True)
+            elif status == doFaceNumbers:
+                self.faceNumbers.append(line)
+            elif status == doTexVerts:
+                self.texVerts.append([float(words[0]), float(words[1])])
+            elif status == doTexFaces:
+                newTexFace(words, self)
+        fp.close()   
+        self.filename = filename
             
+        nFaces = len(human.meshData.faces)                
+        self.faceMaterials = numpy.zeros(nFaces, int)
+        fn = 0
+        for line in self.faceNumbers:
+            words = line.split()
+            if len(words) < 2:
+                print line
+                halt
+            elif words[0] == "ft":        
+                self.faceMaterials[fn] = int(words[1])
+                fn += 1
+            elif words[0] == "ftn":
+                nfaces = int(words[1])
+                mn = int(words[2])
+                for n in range(nfaces):
+                    self.faceMaterials[fn] = mn
+                    fn += 1
+        while fn < nFaces:
+            self.faceMaterials[fn] = mn
+            fn += 1
 
 #
 #    getLoc(joint, obj):

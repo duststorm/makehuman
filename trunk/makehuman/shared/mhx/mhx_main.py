@@ -29,7 +29,6 @@ BODY_LANGUAGE = True
 import module3d
 import aljabr
 import gui3d
-import mh
 import os
 import time
 import numpy
@@ -41,6 +40,7 @@ import warpmodifier
 
 from . import the
 from . import mhx_rig
+from . import mhx_custom
 from . import mhx_24
 from . import rig_panel_25
 from . import rig_shoulder_25
@@ -142,10 +142,8 @@ def exportMhx_25(human, config, fp):
     
     gui3d.app.progress(0.15, text="Exporting materials")    
     fp.write("\nNoScale False ;\n\n")
-    if human.uvsetFile:
-        uvset = mh2proxy.readUvset(human.uvsetFile)
-        proxyData["__uvset__"] = uvset
-        writeMultiMaterials(uvset, human, config, fp)
+    if human.uvset:
+        writeMultiMaterials(human.uvset, human, config, fp)
     else:
         copyFile25(human, "shared/mhx/templates/materials25.mhx", fp, None, config, proxyData)    
 
@@ -372,12 +370,11 @@ def copyFile25(human, tmplName, fp, proxy, config, proxyData):
                         '  end MeshTextureFaceLayer\n')
 
             elif key == 'TexVerts':
-                if human.uvsetFile:
-                    uvset = proxyData["__uvset__"]
-                    for ft in uvset.texFaces:
+                if human.uvset:
+                    for ft in human.uvset.texFaces:
                         fp.write("    vt")
                         for vt in ft:
-                            uv = uvset.texVerts[vt]
+                            uv = human.uvset.texVerts[vt]
                             fp.write(" %.4g %.4g" %(uv[0], uv[1]))
                         fp.write(" ;\n")
                 else:
@@ -440,17 +437,8 @@ def copyFile25(human, tmplName, fp, proxy, config, proxyData):
                 writeHideProp(fp, the.Human)
                 for proxy in proxyData.values():
                     writeHideProp(fp, proxy.name)
-                    
-                config.customShapeFiles = []
                 if config.customshapes: 
-                    folder = os.path.join(mh.getPath(''), 'custom')
-                    for file in os.listdir(folder):
-                        (fname, ext) = os.path.splitext(file)
-                        if ext == ".target":
-                            path = os.path.join(folder, file)
-                            name = "Mhc" + fname.capitalize().replace(" ","_").replace("-","_")
-                            config.customShapeFiles.append((path, name))
-                            
+                    mhx_custom.listCustomFiles(config)                            
                 for path,name in config.customShapeFiles:
                     fp.write("  DefProp Float %s 0 %s  min=-1.0,max=2.0 ;\n" % (name, name[3:]))
 
@@ -499,9 +487,8 @@ MaterialNumbers = {
     
 def writeFaceNumbers(fp, human, config, proxyData):
     fp.write("#else\n")
-    if human.uvsetFile:
-        uvset = proxyData["__uvset__"]
-        for ftn in uvset.faceNumbers:
+    if human.uvset:
+        for ftn in human.uvset.faceNumbers:
             fp.write(ftn)
     else:            
         obj = human.meshData
@@ -564,9 +551,8 @@ def writeFaceNumbers(fp, human, config, proxyData):
 #
 
 def writeBaseMaterials(fp, human, config, proxyData):      
-    if human.uvsetFile:
-        uvset = proxyData["__uvset__"]
-        for mat in uvset.materials:
+    if human.uvset:
+        for mat in human.uvset.materials:
             fp.write("  Material %s_%s ;\n" % (the.Human, mat.name))
     else:
         fp.write(
@@ -1144,7 +1130,7 @@ def writeShapeKeys(fp, human, name, config, proxy):
     if not proxy:
         for path,name in config.customShapeFiles:
             print("    %s" % path)
-            shape = readTarget(path)
+            shape = mhx_custom.readCustomTarget(path)
             writeShape(fp, name, "Sym", shape, -1, 2, proxy)                        
 
     fp.write(
@@ -1191,22 +1177,6 @@ def writeShapeKeys(fp, human, name, config, proxy):
     return    
 
 
-def readTarget(path):
-    try:
-        fp = open(path, "rU")
-    except:
-        return []
-    shape = {}
-    for line in fp:
-        words = line.split()
-        try:
-            shape[int(words[0])] = (float(words[1]), float(words[2]), float(words[3]))
-        except:
-            return {}
-    fp.close()
-    return shape
-        
-
 def writeExpressions(fp, exprList, label):
     for (name, units) in exprList:
         fp.write("  %s %s\n" % (label, name))
@@ -1239,7 +1209,7 @@ TexInfo = {
 }    
 
 def writeMultiMaterials(uvset, human, config, fp):
-    folder = os.path.dirname(human.uvsetFile)
+    folder = os.path.dirname(human.uvset.filename)
     print("Folder", folder)
     for mat in uvset.materials:
         for tex in mat.textures:
