@@ -182,7 +182,7 @@ def handleMouse():
         buttons = 0
         if mouse_state & QtCore.Qt.LeftButton:
             buttons |= SDL_BUTTON_LEFT_MASK
-        if mouse_state & QtCore.Qt.MiddleButton:
+        if mouse_state & QtCore.Qt.MidButton:
             buttons |= SDL_BUTTON_MIDDLE_MASK
         if mouse_state & QtCore.Qt.RightButton:
             buttons |= SDL_BUTTON_RIGHT_MASK
