@@ -2,7 +2,9 @@ import os
 import numpy as np
 
 from core import G
-if G.use_wximage:
+if G.use_qtimage:
+    import image_qt
+elif G.use_wximage:
     import image_wx
 elif G.use_pil:
     import image_pil
@@ -20,6 +22,8 @@ def new(mode, size):
     return Image(mode, size)
 
 def open(path):
+    if G.use_qtimage:
+        return load_qt(path)
     if G.use_wximage:
         return load_wx(path)
     if G.use_sdlimage:
@@ -56,7 +60,9 @@ class Image(object):
         return {1: 'L', 2: 'LA', 3: 'RGB', 4: 'RGBA'}[c]
 
     def save(self, path):
-        if G.use_wximage:
+        if G.use_qtimage:
+            image_qt.save(path, self._data)
+        elif G.use_wximage:
             image_wx.save(path, self._data)
         elif G.use_pil:
             image_pil.save(path, self._data)
@@ -138,4 +144,7 @@ def load_wx(path):
 
 def load_pil(path):
     return Image(data = image_pil.load(path))
+
+def load_qt(path):
+    return Image(data = image_qt.load(path))
 
