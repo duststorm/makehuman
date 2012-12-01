@@ -79,6 +79,7 @@ class CExportConfig:
     def __init__(self):
         self.mainmesh = ['obj', 'mhx', 'dae']
         self.rigtype = 'mhx'
+        self.preservevolume = False
         self.daerig = 'game'
         self.mhxversion = ['25']
         self.exporting = True

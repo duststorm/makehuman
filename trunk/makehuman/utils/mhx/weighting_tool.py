@@ -922,7 +922,7 @@ def recoverDiamonds(context):
             break
         
     context.scene.objects.active = dob
-    return
+
     bpy.ops.object.vertex_group_remove(all=True)
 
     for grp in ob.vertex_groups:
@@ -1212,7 +1212,7 @@ class VIEW3D_OT_JoinMeshesButton(bpy.types.Operator):
 #   fixBaseFile():
 #
 
-the3dobjFolder = "C:/home/svn/makehuman/data/3dobjs"
+the3dobjFolder = "C:/home/svn/data/3dobjs"
 
 def baseFileGroups():    
     fp = open(os.path.join(the3dobjFolder, "base0.obj"), "rU")

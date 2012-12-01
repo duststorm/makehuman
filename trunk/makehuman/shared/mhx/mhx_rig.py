@@ -486,6 +486,7 @@ def setupRig(obj, config, proxyData):
         config.objectProps = [("MhxRig", '"MHX"')]
         config.armatureProps = []
         config.headName = 'Head'
+        config.preservevolume = True
         
         config.vertexGroupFiles = ["head", "bones", "palm", "tight"]
         if config.skirtrig == "own":
@@ -529,11 +530,9 @@ def setupRig(obj, config, proxyData):
         else:
             config.armatureBones += rig_body_25.BodyArmature4Simple
         config.armatureBones += rig_body_25.BodyArmature5
-        if config.advancedspine:
-            config.armatureBones += rig_shoulder_25.ShoulderArmature1Advanced
-        else:
-            config.armatureBones += rig_shoulder_25.ShoulderArmature1Simple
+
         config.armatureBones += (
+            rig_shoulder_25.ShoulderArmature1 +
             rig_shoulder_25.ShoulderArmature2 +
             rig_arm_25.ArmArmature +            
             rig_finger_25.FingerArmature +
@@ -549,6 +548,7 @@ def setupRig(obj, config, proxyData):
         config.gizmoFiles = ["./shared/mhx/templates/panel_gizmo25.mhx",
                           "./shared/mhx/templates/rigify_gizmo25.mhx"]
         config.headName = 'head'
+        config.preservevolume = True
         faceArmature = swapParentNames(rig_face_25.FaceArmature, 
                            {'Head' : 'head', 'MasterFloor' : None} )
             

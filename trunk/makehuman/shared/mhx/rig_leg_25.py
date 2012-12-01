@@ -193,15 +193,10 @@ LegHeadsTails = [
     ('DfmKneeFan_L',      'r-knee', 'r-loleg1'),
     ('DfmKneeFan_R',      'l-knee', 'l-loleg1'),
 
-    ('DfmKneeBack_L',   'r-knee-stretch1', 'r-knee-stretch2'),
-    ('DfmKneeBack_R',   'l-knee-stretch1', 'l-knee-stretch2'),
-    ('KneeBackTrg_L',   'r-ankle', 'r-knee-stretch2'),
-    ('KneeBackTrg_R',   'l-ankle', 'l-knee-stretch2'),
-
-    #('DfmKneeBack_L',   ('r-upper-leg', (0,0,-1)), ('r-ankle', (0,0,-1))),
-    #('DfmKneeBack_R',   ('l-upper-leg', (0,0,-1)), ('l-ankle', (0,0,-1))),
-    #('KneeBackTrg_L',  'r-ankle', ('r-ankle', (0,0,-1))),
-    #('KneeBackTrg_R',  'l-ankle', ('l-ankle', (0,0,-1))),
+    #('DfmKneeBack_L',   'r-knee-stretch1', 'r-knee-stretch2'),
+    #('DfmKneeBack_R',   'l-knee-stretch1', 'l-knee-stretch2'),
+    #('KneeBackTrg_L',   'r-ankle', 'r-knee-stretch2'),
+    #('KneeBackTrg_R',   'l-ankle', 'l-knee-stretch2'),
 
     # Directions    
     ('DirUpLegFwd_L',     'r-upper-leg', ('r-upper-leg', (0,0,1))),
@@ -267,14 +262,14 @@ LegArmature = [
     ('DfmUpLeg1_L',      0, 'Hip_L', F_DEF, L_DEF, NoBB),
     ('DfmUpLeg2_L',      0, 'UpLeg_L', F_DEF, L_DEF, NoBB),
     ('DfmLoLeg_L',      0, 'LoLeg_L', F_DEF, L_DEF, NoBB),
-    ('DfmLoLegFan_L',   0, 'UpLeg_L', F_DEF, L_DEF, NoBB),
+    #('DfmLoLegFan_L',   0, 'UpLeg_L', F_DEF, L_DEF, NoBB),
     ('DfmFoot_L',       footRoll, 'Foot_L', F_DEF, L_DEF, NoBB),
     ('DfmToe_L',        toeRoll, 'Toe_L', F_DEF, L_DEF, NoBB),
 
     ('DfmUpLeg1_R',      0, 'Hip_R', F_DEF, L_DEF, NoBB),
     ('DfmUpLeg2_R',      0, 'UpLeg_R', F_DEF, L_DEF, NoBB),
     ('DfmLoLeg_R',      -0, 'LoLeg_R', F_DEF, L_DEF, NoBB),
-    ('DfmLoLegFan_R',   -0, 'UpLeg_R', F_DEF, L_DEF, NoBB),
+    #('DfmLoLegFan_R',   -0, 'UpLeg_R', F_DEF, L_DEF, NoBB),
     ('DfmFoot_R',       -footRoll, 'Foot_R', F_DEF, L_DEF, NoBB),
     ('DfmToe_R',        -toeRoll, 'Toe_R', F_DEF, L_DEF, NoBB),
 
@@ -311,10 +306,10 @@ LegArmature = [
     ('DfmKneeFan_L',   0, 'DfmUpLeg2_L', F_DEF, L_MSCL, NoBB),
     ('DfmKneeFan_R',   0, 'DfmUpLeg2_R', F_DEF, L_MSCL, NoBB),
 
-    ('KneeBackTrg_L',   0, 'DfmLoLeg_L', 0, L_HELP, NoBB),
-    ('KneeBackTrg_R',   0, 'DfmLoLeg_R', 0, L_HELP, NoBB),
-    ('DfmKneeBack_L',   0, 'DfmUpLeg2_L', F_DEF, L_MSCL, NoBB),
-    ('DfmKneeBack_R',   0, 'DfmUpLeg2_R', F_DEF, L_MSCL, NoBB),
+    #('KneeBackTrg_L',   0, 'DfmLoLeg_L', 0, L_HELP, NoBB),
+    #('KneeBackTrg_R',   0, 'DfmLoLeg_R', 0, L_HELP, NoBB),
+    #('DfmKneeBack_L',   0, 'DfmUpLeg2_L', F_DEF, L_MSCL, NoBB),
+    #('DfmKneeBack_R',   0, 'DfmUpLeg2_R', F_DEF, L_MSCL, NoBB),
 
     # Directions
     ('DirUpLegFwd_L',       180*D, 'Hip_L', 0, L_HELP, NoBB),
@@ -529,13 +524,13 @@ def LegControlPoses(fp, config):
     #addPoseBone(fp, config, 'DfmLegFront_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
     #    [('StretchTo', 0, 1, ['Stretch', 'LegFrontTrg_R', 1, 1])])
 
-    addPoseBone(fp, config, 'DfmKneeBack_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'KneeBackTrg_L', 1, 1])])
+    #addPoseBone(fp, config, 'DfmKneeBack_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+    #    [('StretchTo', 0, 1, ['Stretch', 'KneeBackTrg_L', 1, 1])])
 
-    addPoseBone(fp, config, 'DfmKneeBack_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'KneeBackTrg_R', 1, 1])])
+    #addPoseBone(fp, config, 'DfmKneeBack_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+    #    [('StretchTo', 0, 1, ['Stretch', 'KneeBackTrg_R', 1, 1])])
 
-
+        
     # Fan bones
     
     addPoseBone(fp, config, 'DfmHipFan_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
@@ -544,15 +539,17 @@ def LegControlPoses(fp, config):
     addPoseBone(fp, config, 'DfmHipFan_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('CopyRot', C_LOCAL, 0.5, ['Rot', 'DfmUpLeg1_R', (1,1,1), (0,0,0), False])])
 
+
     addPoseBone(fp, config, 'DfmKneeFan_L', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
         [('CopyRot', C_LOCAL, 0.5, ['Rot', 'LoLeg_L', (1,0,1), (0,0,0), False])])
 
     addPoseBone(fp, config, 'DfmKneeFan_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
         [('CopyRot', C_LOCAL, 0.5, ['Rot', 'LoLeg_R', (1,0,1), (0,0,0), False])])
 
+
     if not MuscleBones:
         return
-        
+
     # Tweak
     """
     addPoseBone(fp, config, 'DfmButt_L', None, None, (1,1,1), (0,0,0), (0,0,0), (1,1,1), 0, 
@@ -567,17 +564,17 @@ def LegControlPoses(fp, config):
     """
     # Muscles
 
-    addPoseBone(fp, config, 'DfmLegback_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'LegbackTrg_L', 1, 1])])
-
-    addPoseBone(fp, config, 'DfmLegback_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
-        [('StretchTo', 0, 1, ['Stretch', 'LegbackTrg_R', 1, 1])])
-
     addPoseBone(fp, config, 'DfmLegIn_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'LegInTrg_L', 1, 1])])
 
     addPoseBone(fp, config, 'DfmLegIn_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', 0, 1, ['Stretch', 'LegInTrg_R', 1, 1])])
+
+    addPoseBone(fp, config, 'DfmLegback_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('StretchTo', 0, 1, ['Stretch', 'LegbackTrg_L', 1, 1])])
+
+    addPoseBone(fp, config, 'DfmLegback_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
+        [('StretchTo', 0, 1, ['Stretch', 'LegbackTrg_R', 1, 1])])
 
     return
 

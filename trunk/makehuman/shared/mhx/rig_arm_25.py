@@ -29,13 +29,9 @@ offs = (0,0.6,0)
 ArmJoints = [
     ('r-shoulder-in',       'v', 14160),
     ('l-shoulder-in',       'v', 14382),
-    #('r-uparm0',            'l', ((4.0, 'r-shoulder-in'), (-3.0, 'r-shoulder'))),
-    #('l-uparm0',            'l', ((4.0, 'l-shoulder-in'), (-3.0, 'l-shoulder'))),
     ('r-uparm0',            'j', 'r-shoulder'),
     ('l-uparm0',            'j', 'l-shoulder'),
     
-    #('r-elbow',             'f', ('r-elbow-raw', 'r-uparm0', 'r-hand', [0,0,-0.1])),
-    #('l-elbow',             'f', ('l-elbow-raw', 'l-uparm0', 'l-hand', [0,0,-0.1])),
     ('r-elbow',             'j', 'r-elbow'),
     ('l-elbow',             'j', 'l-elbow'),
     
@@ -60,16 +56,14 @@ ArmJoints = [
     ('r-triceps-head',       'vl', ((0.2, 2956), (0.8, 3354))),
     ('l-triceps-head',       'vl', ((0.2, 10769), (0.8, 10399))),
 
-    #('r-armtrg',            'l', ((1-prcUpArmVec, 'r-uparm0'), (prcUpArmVec, 'r-elbow'))),
-    #('l-armtrg',            'l', ((1-prcUpArmVec, 'l-uparm0'), (prcUpArmVec, 'l-elbow'))),
     ('r-armtrg',            'o', ('r-uparm0', [1,0,0])),
     ('l-armtrg',            'o', ('l-uparm0', [-1,0,0])),
-    
-    #('r-uparmrot',          'l', ((1-2*prcUpArmVec, 'r-uparm0'), (2*prcUpArmVec, 'r-elbow'))),
-    #('l-uparmrot',          'l', ((1-2*prcUpArmVec, 'l-uparm0'), (2*prcUpArmVec, 'l-elbow'))),
 
     ('r-elbow-pt',          'o', ('r-elbow', [0,0,-3])),
     ('l-elbow-pt',          'o', ('l-elbow', [0,0,-3])),
+
+    ('r-elbow-fan',         'l', ((0.25, 'r-hand'), (0.75, 'r-elbow'))),
+    ('l-elbow-fan',         'l', ((0.25, 'l-hand'), (0.75, 'l-elbow'))),
 
     ('r-elbow-head',        'v', 2987),
     ('r-elbow-tail',        'v', 4569),
@@ -81,8 +75,6 @@ ArmJoints = [
 """
 if MuscleBones:
     ArmJoints += [    
-    ('r-loarm-fan',         'l', ((0.25, 'r-hand'), (0.75, 'r-elbow'))),
-    ('l-loarm-fan',         'l', ((0.25, 'l-hand'), (0.75, 'l-elbow'))),
 
     ('r-elbow-compress1',     'l', ((0.5, 'r-elbow'), (0.5, 'r-uparm0'))),
     ('r-elbow-compress2',     'l', ((0.5, 'r-elbow'), (0.5, 'r-hand'))),
@@ -143,11 +135,14 @@ ArmHeadsTails = [
 
     # Muscle
     
-    ('DfmElbowFwd_L',       'r-uparm2', 'r-loarm1'),
-    ('DfmElbowFwd_R',       'l-uparm2', 'l-loarm1'),
+    #('DfmElbowFwd_L',       'r-uparm2', 'r-loarm1'),
+    #('DfmElbowFwd_R',       'l-uparm2', 'l-loarm1'),
     
     ('DfmBiceps_L',          'r-biceps-head', 'r-biceps-tail'),
     ('DfmBiceps_R',          'l-biceps-head', 'l-biceps-tail'),
+
+    ('DfmElbowFan_L',       'r-elbow', 'r-elbow-fan'),
+    ('DfmElbowFan_R',       'l-elbow', 'l-elbow-fan'),
 
     
    # Pole Targets
@@ -191,14 +186,10 @@ if MuscleBones:
     ('DfmElbowBend_R',     'l-elbow-head', 'l-elbow-tail'),
     ('ElbowBendTrg_R',     'l-elbow-tail', ('l-elbow-tail', the.yunit)),
 
-    # Elbow deform
-    ('DfmLoArmFan_L',       'r-elbow', 'r-loarm-fan'),
-    ('DfmLoArmFan_R',       'l-elbow', 'l-loarm-fan'),
-
-    ('DfmElbowCompress_L', 'r-elbow-compress1', 'r-elbow-compress2'),
-    ('ElbowCompressTrg_L', 'r-elbow-compress2', ('r-elbow-compress2', the.yunit)),
-    ('DfmElbowCompress_R', 'l-elbow-compress1', 'l-elbow-compress2'),
-    ('ElbowCompressTrg_R', 'l-elbow-compress2', ('l-elbow-compress2', the.yunit)),
+    #('DfmElbowCompress_L', 'r-elbow-compress1', 'r-elbow-compress2'),
+    #('ElbowCompressTrg_L', 'r-elbow-compress2', ('r-elbow-compress2', the.yunit)),
+    #('DfmElbowCompress_R', 'l-elbow-compress1', 'l-elbow-compress2'),
+    #('ElbowCompressTrg_R', 'l-elbow-compress2', ('l-elbow-compress2', the.yunit)),
 ]
 
 ArmArmature = [
@@ -271,8 +262,11 @@ ArmArmature = [
     ('DfmHand_R',         0, 'Hand_R', F_DEF, L_DEF, NoBB),
     
     # Muscles
-    ('DfmElbowFwd_L',     0, 'UpArm_L', F_DEF, L_MSCL, NoBB),
-    ('DfmElbowFwd_R',     0, 'UpArm_R', F_DEF, L_MSCL, NoBB),
+    #('DfmElbowFwd_L',     0, 'UpArm_L', F_DEF, L_MSCL, NoBB),
+    #('DfmElbowFwd_R',     0, 'UpArm_R', F_DEF, L_MSCL, NoBB),
+
+    ('DfmElbowFan_L',     0, 'UpArm_L', F_DEF, L_MSCL, NoBB),
+    ('DfmElbowFan_R',     0, 'UpArm_R', F_DEF, L_MSCL, NoBB),
 
     ('DfmBiceps_L',       0, 'UpArmHinge_L', F_DEF, L_MSCL, NoBB),
     ('DfmBiceps_R',       0, 'UpArmHinge_R', F_DEF, L_MSCL, NoBB),
@@ -286,17 +280,6 @@ ArmArmature = [
     ('DirElbowInv_L',       0*D, 'UpArm_L', 0, L_HELP, NoBB),
     ('DirElbowInv_R',       0*D, 'UpArm_R', 0, L_HELP, NoBB),
 
-]
-
-if MuscleBones:
-    ArmArmature += [
-    # Elbow deform
-    ('DfmLoArmFan_L',     0, 'UpArm_L', F_DEF, L_DEF, NoBB),
-    ('DfmLoArmFan_R',     0, 'UpArm_R', F_DEF, L_DEF, NoBB),
-    ('DfmElbowCompress_L',       0, 'DfmUpArm3_L', F_DEF, L_DEF, NoBB),
-    ('ElbowCompressTrg_L',       0, 'DfmLoArm1_L', 0, L_HELP, NoBB),
-    ('DfmElbowCompress_R',       0, 'DfmUpArm3_R', F_DEF, L_DEF, NoBB),
-    ('ElbowCompressTrg_R',       0, 'DfmLoArm1_R', 0, L_HELP, NoBB),
 ]
 
 #
@@ -489,8 +472,6 @@ def ArmControlPoses(fp, config):
     addPoseBone(fp, config, 'DfmLoArm2_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('IK', 0, 1, ['IK', 'Hand_R', 1, (90*D, 'LoArm2PT_R'), (True, False,True)])])
         
-    
-
     # Muscles
     
     addPoseBone(fp, config, 'DfmBiceps_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
@@ -499,14 +480,20 @@ def ArmControlPoses(fp, config):
     addPoseBone(fp, config, 'DfmBiceps_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', C_STRVOL, 1, ['Stretch', 'LoArm_R', 0.2, 1])])
 
+    addPoseBone(fp, config, 'DfmElbowFan_L', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
+        [('CopyRot', C_LOCAL, 0.5, ['Rot', 'LoArm_L', (1,0,1), (0,0,0), False])])
+
+    addPoseBone(fp, config, 'DfmElbowFan_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
+        [('CopyRot', C_LOCAL, 0.5, ['Rot', 'LoArm_R', (1,0,1), (0,0,0), False])])
+
+    return
+    
     
     addPoseBone(fp, config, 'DfmElbowFwd_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', C_PLANEZ, 1, ['Stretch', 'DfmLoArm1_L', 1, 1])])
 
     addPoseBone(fp, config, 'DfmElbowFwd_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', C_PLANEZ, 1, ['Stretch', 'DfmLoArm1_R', 1, 1])])
-    
-    return
 
 
 #

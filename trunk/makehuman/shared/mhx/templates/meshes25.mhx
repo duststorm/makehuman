@@ -66,7 +66,9 @@ end Mesh
       invert_vertex_group False ;
       *** refer-human object
       use_bone_envelopes False ;
-      use_deform_preserve_volume False ;
+      *** if-true config.preservevolume
+      use_deform_preserve_volume True ;
+      #endif
       use_multi_modifier True ;
       use_vertex_groups True ;
       vertex_group 'Cage' ;
@@ -74,6 +76,9 @@ end Mesh
   #else
     Modifier Armature ARMATURE
       *** refer-human object
+      *** if-true config.preservevolume
+      use_deform_preserve_volume True ;
+      #endif
       use_bone_envelopes False ;
       use_vertex_groups True ;
     end Modifier
