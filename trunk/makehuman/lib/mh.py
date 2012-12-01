@@ -8,7 +8,9 @@ if G.use_wx:
     wxversion.select('2.8')
 import glmodule as gl
 
-if G.use_wx:
+if G.use_qt:
+    import qtui as ui
+elif G.use_wx:
     import wxui as ui
 elif G.use_glut:
     import glutui as ui
