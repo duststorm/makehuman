@@ -161,7 +161,7 @@ SDL_BUTTON_RIGHT_MASK = 4
 
 button_mapping = {
     QtCore.Qt.LeftButton: (SDL_BUTTON_LEFT, SDL_BUTTON_LEFT_MASK),
-    QtCore.Qt.MiddleButton: (SDL_BUTTON_MIDDLE, SDL_BUTTON_MIDDLE_MASK),
+    QtCore.Qt.MidButton: (SDL_BUTTON_MIDDLE, SDL_BUTTON_MIDDLE_MASK),
     QtCore.Qt.RightButton: (SDL_BUTTON_RIGHT, SDL_BUTTON_RIGHT_MASK)
     }
 
