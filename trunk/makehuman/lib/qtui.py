@@ -1,7 +1,7 @@
 import sys
 import atexit
 
-from PyQt4 import Qt, QtCore, QtGui, QtOpenGL
+from PyQt4 import QtCore, QtGui, QtOpenGL
 
 from core import *
 from glmodule import updatePickingBuffer, getPickedColor, OnInit, OnExit, reshape, draw
@@ -194,8 +194,10 @@ class Canvas(QtOpenGL.QGLWidget):
         format = QtOpenGL.QGLFormat()
         format.setAlpha(True)
         format.setDepthBufferSize(24)
+        format.setSampleBuffers(True)
+        format.setSamples(4)
         super(Canvas, self).__init__(format, parent)
-	self.create()
+        self.create()
 
     def create(self):
         G.swapBuffers = self.swapBuffers
@@ -289,7 +291,7 @@ class Frame(QtGui.QWidget):
     title = "MakeHuman"
 
     def __init__(self, app, size):
-	self.app = app
+        self.app = app
         super(Frame, self).__init__()
         self.setWindowTitle(self.title)
         self.resize(*size)
@@ -313,8 +315,8 @@ class Application(QtGui.QApplication):
         super(Application, self).__init__(sys.argv)
 
     def OnInit(self):
-	self.mainwin = Frame(self, (G.windowWidth, G.windowHeight))
-	self.mainwin.show()
+        self.mainwin = Frame(self, (G.windowWidth, G.windowHeight))
+        self.mainwin.show()
 
 g_app = None
 
