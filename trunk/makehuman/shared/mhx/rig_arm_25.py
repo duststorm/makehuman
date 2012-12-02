@@ -135,8 +135,8 @@ ArmHeadsTails = [
 
     # Muscle
     
-    #('DfmElbowFwd_L',       'r-uparm2', 'r-loarm1'),
-    #('DfmElbowFwd_R',       'l-uparm2', 'l-loarm1'),
+    ('DfmElbowFwd_L',       'r-uparm2', 'r-loarm1'),
+    ('DfmElbowFwd_R',       'l-uparm2', 'l-loarm1'),
     
     ('DfmBiceps_L',          'r-biceps-head', 'r-biceps-tail'),
     ('DfmBiceps_R',          'l-biceps-head', 'l-biceps-tail'),
@@ -262,8 +262,8 @@ ArmArmature = [
     ('DfmHand_R',         0, 'Hand_R', F_DEF, L_DEF, NoBB),
     
     # Muscles
-    #('DfmElbowFwd_L',     0, 'UpArm_L', F_DEF, L_MSCL, NoBB),
-    #('DfmElbowFwd_R',     0, 'UpArm_R', F_DEF, L_MSCL, NoBB),
+    ('DfmElbowFwd_L',     0, 'UpArm_L', F_DEF, L_MSCL, NoBB),
+    ('DfmElbowFwd_R',     0, 'UpArm_R', F_DEF, L_MSCL, NoBB),
 
     ('DfmElbowFan_L',     0, 'UpArm_L', F_DEF, L_MSCL, NoBB),
     ('DfmElbowFan_R',     0, 'UpArm_R', F_DEF, L_MSCL, NoBB),
@@ -485,9 +485,6 @@ def ArmControlPoses(fp, config):
 
     addPoseBone(fp, config, 'DfmElbowFan_R', None, None, (1,1,1), (1,0,1), (1,1,1), (1,1,1), 0,
         [('CopyRot', C_LOCAL, 0.5, ['Rot', 'LoArm_R', (1,0,1), (0,0,0), False])])
-
-    return
-    
     
     addPoseBone(fp, config, 'DfmElbowFwd_L', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', C_PLANEZ, 1, ['Stretch', 'DfmLoArm1_L', 1, 1])])
@@ -495,6 +492,9 @@ def ArmControlPoses(fp, config):
     addPoseBone(fp, config, 'DfmElbowFwd_R', None, None, (1,1,1), (1,1,1), (1,1,1), (1,1,1), 0,
         [('StretchTo', C_PLANEZ, 1, ['Stretch', 'DfmLoArm1_R', 1, 1])])
 
+
+    return
+    
 
 #
 #    ArmWriteActions(fp)

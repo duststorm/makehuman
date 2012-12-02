@@ -1125,7 +1125,6 @@ def writeShapeKeys(fp, human, name, config, proxy):
         writeCorrectives(fp, human, rig_leg_25.HipTargetDrivers, "hips", proxy, 0.90, 0.92)                
         writeCorrectives(fp, human, rig_arm_25.ElbowTargetDrivers, "elbow", proxy, 0.92, 0.94)                
         writeCorrectives(fp, human, rig_leg_25.KneeTargetDrivers, "knee", proxy, 0.94, 0.96)                
-        #copyShapeKeys("shared/mhx/templates/shapekeys-body", fp, proxy, True)
 
     if not proxy:
         for path,name in config.customShapeFiles:

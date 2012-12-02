@@ -472,9 +472,10 @@ if MuscleBones:
     ShoulderTargetDrivers = []
 else:
     ShoulderDeformDrivers = []
-    ShoulderTargetDrivers = []
-    
-"""    
+
+if False:
+    ShoulderTargetDrivers = []    
+else:
     expr70 = "%.3f*(1-%.3f*x1)" % (90.0/70.0, 2/pi)
     expr70_60 = "%.3f*max(1-%.3f*x1,0)*max(1-%.3f*x2,0)" % (90.0/70.0, 2/pi, 3/pi)
 
@@ -526,4 +527,3 @@ else:
         [("UpArmVec", "DirShldrOut"),
          ("UpArm", "UpArmVecNeg")]),
 ]
-"""

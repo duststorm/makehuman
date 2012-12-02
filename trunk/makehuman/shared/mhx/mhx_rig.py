@@ -486,7 +486,7 @@ def setupRig(obj, config, proxyData):
         config.objectProps = [("MhxRig", '"MHX"')]
         config.armatureProps = []
         config.headName = 'Head'
-        config.preservevolume = True
+        config.preservevolume = False
         
         config.vertexGroupFiles = ["head", "bones", "palm", "tight"]
         if config.skirtrig == "own":
