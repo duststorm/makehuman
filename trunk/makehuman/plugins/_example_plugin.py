@@ -99,7 +99,7 @@ class ExampleTaskView(gui3d.TaskView):
             else:
                 human.storeMesh()
                 self.meshStored = True
-            human.mesh.coord += human.mesh.vnorm
+            human.mesh.coord += human.mesh.vnorm * value
             human.mesh.markCoords(coor=True)
             human.mesh.update()
     
@@ -108,7 +108,7 @@ class ExampleTaskView(gui3d.TaskView):
             human = gui3d.app.selectedHuman
             human.applyAllTargets()
             self.meshStored = False
-            human.mesh.coord += human.mesh.vnorm
+            human.mesh.coord += human.mesh.vnorm * value
             human.mesh.markCoords(coor=True)
             human.mesh.update()
 
