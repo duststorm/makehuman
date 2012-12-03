@@ -550,25 +550,13 @@ class Human(gui3d.Object):
 
     def storeMesh(self):
         print "Storing mesh status"
-        self.meshStored = []
-        self.meshStoredNormals = []
-        for v in self.meshData.verts:
-            self.meshStored.append((v.co[0],v.co[1],v.co[2]))
-            self.meshStoredNormals.append((v.no[0],v.no[1],v.no[2]))
+        self.meshStored = self.meshData.coord.copy()
+        self.meshStoredNormals = self.meshData.vnorm.copy()
 
     def restoreMesh(self):
-        self.meshData.setCoords(self.meshStored)
-        for i,v in enumerate(self.meshData.verts):
-            #v.co = self.meshStored[i]
-            v.no = self.meshStoredNormals[i]
-            """
-            v.co[0] = self.meshStored[i][0]
-            v.co[1] = self.meshStored[i][1]
-            v.co[2] = self.meshStored[i][2]
-            v.no[0] = self.meshStoredNormals[i][0]
-            v.no[1] = self.meshStoredNormals[i][1]
-            v.no[2] = self.meshStoredNormals[i][2]
-            """
+        self.meshData.coord[...] = self.meshStored
+        self.meshData.vnorm[...] = self.meshStoredNormals
+        self.meshData.markCoords(coor=True, norm=True)
 
     def resetMeshValues(self):
         self.childVal = 0.0
