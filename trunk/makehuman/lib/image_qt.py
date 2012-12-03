@@ -34,12 +34,16 @@ def save(path, data):
     if d == 1:
         data = np.dstack((data, data, data))
         d = 3
-        fmt = QtQui.QImage.Format_RGB32
     elif d == 2:
         l = data[...,0]
         a = data[...,1]
         data = np.dstack((l, l, l, a))
         d = 4
-        fmt = QtQui.QImage.Format_ARGB32
+
+    if d == 3:
+        fmt = QtGui.QImage.Format_RGB32
+    elif d == 4:
+        fmt = QtGui.QImage.Format_ARGB32
+
     im = QtGui.QImage(data.tostring(), w, h, w * d, fmt)
     im.save(path)
