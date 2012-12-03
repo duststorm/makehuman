@@ -99,8 +99,8 @@ class ExampleTaskView(gui3d.TaskView):
             else:
                 human.storeMesh()
                 self.meshStored = True
-            for v in human.mesh.verts:
-                v.co = [v.co[i] + v.no[i] * value for i in xrange(3)]
+            human.mesh.coord += human.mesh.vnorm
+            human.mesh.markCoords(coor=True)
             human.mesh.update()
     
         @self.meshSlider.event
@@ -108,8 +108,8 @@ class ExampleTaskView(gui3d.TaskView):
             human = gui3d.app.selectedHuman
             human.applyAllTargets()
             self.meshStored = False
-            for v in human.mesh.verts:
-                v.co = [v.co[i] + v.no[i] * value for i in xrange(3)]
+            human.mesh.coord += human.mesh.vnorm
+            human.mesh.markCoords(coor=True)
             human.mesh.update()
 
 category = None
