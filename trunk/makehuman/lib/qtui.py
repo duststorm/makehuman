@@ -7,10 +7,10 @@ from core import *
 from glmodule import updatePickingBuffer, getPickedColor, OnInit, OnExit, reshape, draw
 
 def keyDown(key, character, modifiers):
-    callKeyDown(key, unichr(character), modifiers)
+    callKeyDown(key, character, modifiers)
 
 def keyUp(key, character, modifiers):
-    callKeyUp(key, unichr(character), modifiers)
+    callKeyUp(key, character, modifiers)
     updatePickingBuffer()
 
 def mouseButtonDown(b, x, y):
@@ -250,6 +250,9 @@ class Canvas(QtOpenGL.QGLWidget):
 
         if key in key_mapping:
             key = key_mapping[key]
+            character = u''
+        elif character:
+            character = unicode(character)
         else:
             super(Canvas, self).keyPressEvent(ev)
             return
@@ -264,6 +267,9 @@ class Canvas(QtOpenGL.QGLWidget):
 
         if key in key_mapping:
             key = key_mapping[key]
+            character = u''
+        elif character:
+            character = unicode(character)
         else:
             super(Canvas, self).keyReleaseEvent(ev)
             return
