@@ -7,9 +7,9 @@
 
 # name shirt_game
 # obj_file shirt_game.obj
-# x_scale 4302 8697 1.3742
-# z_scale 8208 8220 2.0187
-# y_scale 8289 6827 0.0201
+# x_scale 3464 10305 2.7856
+# z_scale 6930 7245 2.1161
+# y_scale 14022 14040 4.9531
 # z_depth 40
 # shapekey Breathe
 # uvtex_layer 0 UVMap
