@@ -70,14 +70,14 @@ class PoseLoadTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Poses')
         if not os.path.exists(self.userPoses):
             os.makedirs(self.userPoses)
-        self.filechooser = self.addView(gui3d.FileChooser([self.systemPoses, self.userPoses], 'bvh', 'png', 'data/clothes/notfound.png'))
+        self.filechooser = self.addView(gui3d.FileChooser([self.systemPoses, self.userPoses], 'mhp', 'png', 'data/clothes/notfound.png'))
         self.update = self.filechooser.sortBox.addView(gui3d.Button('Check for updates'))
         self.mediaSync = None
 
         @self.filechooser.event
         def onFileSelected(filepath):
 
-            self.loadBvhFile(filepath)
+            self.loadMhpFile(filepath)
             
             gui3d.app.switchCategory('Modelling')
             
@@ -86,9 +86,9 @@ class PoseLoadTaskView(gui3d.TaskView):
             self.syncMedia()
  
 
-    def loadBvhFile(self, filepath): 
+    def loadMhpFile(self, filepath): 
     
-        print "LoadBVH", filepath
+        print "Load Mhp", filepath
 
         if self.armature:
             self.armature.printLocs()
@@ -96,7 +96,7 @@ class PoseLoadTaskView(gui3d.TaskView):
             self.armature.clear()
             self.armature.printLocs()
         
-        if os.path.basename(filepath) == "clear.bvh":
+        if os.path.basename(filepath) == "clear.mhp":
             return
 
         folder = os.path.dirname(filepath)
@@ -111,7 +111,7 @@ class PoseLoadTaskView(gui3d.TaskView):
             
         self.armature.setModifier(modifier)
 
-        self.armature.readBvhFile(filepath)
+        self.armature.readMhpFile(filepath)
 
  
     def onShow(self, event):

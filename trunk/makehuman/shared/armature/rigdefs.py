@@ -322,6 +322,22 @@ class CArmature:
             raise NameError("Dirty bones encountered") 
             
             
+    def readMhpFile(self, filepath):
+        print "Mhp", filepath
+        fp = open(filepath, "rU")
+        for line in fp:
+            words = line.split()
+            if len(words) < 5:
+                continue
+            if words[1] == "quat":
+                bone = self.bones[words[0]]
+                quat = float(words[2]),float(words[3]),float(words[4]),float(words[5])
+                mat = tm.quaternion_matrix(quat)
+                bone.matrixPose[:3,:3] = mat[:3,:3]
+        fp.close()
+        self.update()                    
+
+
     def readBvhFile(self, filepath):
         print "Bvh", filepath
         fp = open(filepath, "rU")

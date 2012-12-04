@@ -151,11 +151,15 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.operator("mh.saveas_target")           
 
         if rig and rig.type == 'ARMATURE':
-            layout.label("Export BVH")
+            layout.separator()
+            layout.label("Export/Import MHP")
+            layout.operator("mh.saveas_mhp")
+            layout.operator("mh.load_mhp")
+
+            layout.separator()
+            layout.label("Export/Import BVH")
             layout.prop(scn, "MhExportRotateMode")
             layout.operator("mh.saveas_bvh")
-            layout.label("Import BVH")
-            #layout.prop(scn, "MhImportRotateMode")
             layout.operator("mh.load_bvh")
 
 #----------------------------------------------------------

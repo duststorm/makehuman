@@ -45,7 +45,7 @@ import os
 import sys
 import math
 import random
-from mathutils import Vector
+from mathutils import Vector, Quaternion, Matrix
 from bpy.props import *
 from bpy_extras.io_utils import ExportHelper, ImportHelper
 
@@ -316,6 +316,115 @@ class VIEW3D_OT_SaveasTargetButton(bpy.types.Operator, ExportHelper):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
 
+
+#----------------------------------------------------------
+#   saveMhpFile(context, filepath):
+#   loadMhpFile(context, filepath):
+#----------------------------------------------------------
+
+def saveMhpFile(context, filepath):
+    ob = context.object
+    rig = ob.parent
+    scn = context.scene
+    if rig and rig.type == 'ARMATURE': 
+        roots = rigRoots(rig)
+        if len(roots) > 1:
+            raise NameError("Armature %s has multiple roots: %s" % (rig.name, roots))
+        (pname, ext) = os.path.splitext(filepath)
+        mhppath = pname + ".mhp"
+        
+        fp = open(mhppath, "w")
+        root = rig.pose.bones[roots[0]]
+        writeMhpBones(fp, root)
+        fp.close()
+        print("Mhp file %s saved" % mhppath)
+        
+        
+def writeMhpBones(fp, pb):
+    b = pb.bone
+    if pb.parent:
+        mat = b.matrix_local.inverted() * b.parent.matrix_local * pb.parent.matrix.inverted() * pb.matrix
+    else:
+        mat = b.matrix_local.inverted() * pb.matrix
+    #mat = pb.matrix_basis.copy()
+    maty = list(mat[2])
+    matz = list(mat[3])
+    #mat[2] = matz
+    #mat[3] = maty
+    q = mat.to_quaternion()
+    fp.write("%s\tquat\t%.4f\t%.4f\t%.4f\t%.4f\n" % (pb.name, q.w, q.x, q.y, q.z))
+    for child in pb.children:
+        writeMhpBones(fp, child)
+
+
+def loadMhpFile(context, filepath):
+    ob = context.object
+    rig = ob.parent
+    scn = context.scene
+    if rig and rig.type == 'ARMATURE':
+        (pname, ext) = os.path.splitext(filepath)
+        mhppath = pname + ".mhp"
+        
+        fp = open(mhppath, "rU")
+        for line in fp:
+            words = line.split()
+            if len(words) < 5:
+                continue
+            if words[1] == "quat":
+                q = Quaternion((float(words[2]), float(words[3]), float(words[4]), float(words[5])))
+                mat = q.to_matrix().to_4x4()
+                #maty = list(mat[2])
+                #matz = list(mat[3])
+                #mat[2] = matz
+                #mat[3] = maty
+                pb = rig.pose.bones[words[0]]
+                pb.matrix_basis = mat
+        fp.close()
+        print("Mhp file %s loaded" % mhppath)
+                
+                
+
+class VIEW3D_OT_LoadMhpButton(bpy.types.Operator):
+    bl_idname = "mh.load_mhp"
+    bl_label = "Load MHP File"
+    bl_options = {'UNDO'}
+
+    filename_ext = ".mhp"
+    filter_glob = StringProperty(default="*.mhp", options={'HIDDEN'})
+    filepath = bpy.props.StringProperty(
+        name="File Path", 
+        description="File path used for mhp file", 
+        maxlen= 1024, default= "")
+
+    def execute(self, context):
+        loadMhpFile(context, self.properties.filepath)
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+
+class VIEW3D_OT_SaveasMhpFileButton(bpy.types.Operator, ExportHelper):
+    bl_idname = "mh.saveas_mhp"
+    bl_label = "Save MHP File"
+    bl_options = {'UNDO'}
+
+    filename_ext = ".mhp"
+    filter_glob = StringProperty(default="*.mhp", options={'HIDDEN'})
+    filepath = bpy.props.StringProperty(
+        name="File Path", 
+        description="File path used for mhp file", 
+        maxlen= 1024, default= "")
+
+    def execute(self, context):
+        saveMhpFile(context, self.properties.filepath)
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
 #----------------------------------------------------------
 #   saveBvhFile(context, filepath):
 #   loadBvhFile(context, filepath):
@@ -396,23 +505,9 @@ def loadBvhFile(context, filepath):
         return False
 
 
-SkipList = ["Tongue1", "Tongue2", "Tongue3"]
-FingerList = ["Thumb", "Index", "Middle", "Ring", "Pinky"]
-
 def copyPose(src, trg):
     for name,srcBone in src.pose.bones.items():
-        bname = srcBone.name
-        try:
-            trgBone = trg.pose.bones[bname]
-        except KeyError:
-            trgBone = None
-        if not trgBone:
-            if (bname in SkipList) or (bname[0] == "_"):
-                continue
-            for fing in FingerList:
-                bname = bname.replace(fing, fing+"-")            
-            trgBone = trg.pose.bones[bname]
-
+        trgBone = trg.pose.bones[srcBone.name]
         s = srcBone.matrix_basis
         t = trgBone.matrix_basis.copy()
         for i in range(3):
@@ -733,10 +828,10 @@ class VIEW3D_OT_DiscardAllTargetsButton(bpy.types.Operator):
         return{'FINISHED'}                
 
 #----------------------------------------------------------
-# symmetrizeTarget(context, left2right):
+# symmetrizeTarget(context, left2right, mirror):
 #----------------------------------------------------------
 
-def symmetrizeTarget(context, left2right):
+def symmetrizeTarget(context, left2right, mirror):
     utils.setupVertexPairs(context, False)
     ob = context.object
     scn = context.scene
@@ -744,34 +839,63 @@ def symmetrizeTarget(context, left2right):
         return
     bpy.ops.object.mode_set(mode='OBJECT')
     verts = ob.active_shape_key.data
-    bverts = ob.data.vertices
+    
     for vn in the.Mid.keys():
         v = verts[vn]
         v.co[0] = 0
+        
     for (lvn,rvn) in the.Left.items():
         lv = verts[lvn].co
         rv = verts[rvn].co
-        if left2right:
+        if mirror:
+            tv = rv.copy()
+            verts[rvn].co = (-lv[0], lv[1], lv[2])
+            verts[lvn].co = (-tv[0], tv[1], tv[2])
+        elif left2right:
             rv[0] = -lv[0]
             rv[1] = lv[1]
             rv[2] = lv[2]
-            bverts[rvn].select = bverts[lvn].select
         else:
             lv[0] = -rv[0]
             lv[1] = rv[1]
             lv[2] = rv[2]
-            bverts[lvn].select = bverts[rvn].select
+
+    bverts = ob.data.vertices    
+    selected = {}
+    for v in bverts:
+        selected[v.index] = v.select
+
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='DESELECT')
+    bpy.ops.object.mode_set(mode='OBJECT')
+        
+    for vn in the.Mid.keys():
+        bverts[vn].select = selected[vn]
+
+    for (lvn,rvn) in the.Left.items():
+        if mirror:
+            bverts[lvn].select = selected[rvn]
+            bverts[rvn].select = selected[lvn]
+        elif left2right:
+            bverts[lvn].select = selected[lvn]
+            bverts[rvn].select = selected[lvn]
+        else:
+            bverts[lvn].select = selected[rvn]
+            bverts[rvn].select = selected[rvn]
+
     print("Target symmetrized")
     return
+
 
 class VIEW3D_OT_SymmetrizeTargetButton(bpy.types.Operator):
     bl_idname = "mh.symmetrize_target"
     bl_label = "Symmetrize"
     bl_options = {'UNDO'}
-    left2right = BoolProperty()
+    action = StringProperty()
 
     def execute(self, context):
-        symmetrizeTarget(context, self.left2right)
+        
+        symmetrizeTarget(context, (self.action=="Right"), (self.action=="Mirror"))
         return{'FINISHED'}                
                         
 #----------------------------------------------------------
