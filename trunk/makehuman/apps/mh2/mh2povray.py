@@ -130,6 +130,7 @@ def povrayExport(obj, app, settings):
         #
         print '[DEBUG]: Povray path: ', povray_bin
         #TO-DO: que hacer si el path es demasiado largo? Hay una opcion grafica en SDL para buscar archivos?
+        #~[en]: what to do if the path is too long? Is there any graphic option in SDL to browse for files?
 
     #
     if action == 'render':
@@ -145,6 +146,8 @@ def povrayExport(obj, app, settings):
             cmdLineOpt = ' +I%s' %  baseName
             #
             if os.name == 'nt':
+                povray_bin = '"' + povray_bin + '"'
+                baseName = '"' + baseName + '"'
                 cmdLineOpt = ' /RENDER %s' % baseName
             #
             cmdLineOpt += ' +W%d +H%d' % resolution
@@ -1132,8 +1135,10 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
         outputSceneFileDescriptor.write(
             "object { \n" +
             "   %s_Mesh2Object \n" % stuff.name +
+            "   rotate <0, 0, MakeHuman_RotateZ> \n" +
+            "   rotate <0, MakeHuman_RotateY, 0> \n" +
+            "   rotate <MakeHuman_RotateX, 0, 0> \n" +
             "   translate <MakeHuman_TranslateX, MakeHuman_TranslateY, MakeHuman_TranslateZ> \n" +
-            "   rotate <MakeHuman_RotateX, MakeHuman_RotateY, MakeHuman_RotateZ> \n" +
             "   material {%s_Material} \n" % stuff.name +
             "}  \n")
 

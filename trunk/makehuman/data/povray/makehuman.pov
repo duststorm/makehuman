@@ -56,8 +56,10 @@
   light_source {MakeHuman_LightSource}
   object {
     MakeHuman_Mesh(0)
-    translate <MakeHuman_TranslateX, MakeHuman_TranslateY, MakeHuman_TranslateZ>
-    rotate <MakeHuman_RotateX, MakeHuman_RotateY, MakeHuman_RotateZ>
+   rotate <0,0,MakeHuman_RotateZ> 
+   rotate <0,MakeHuman_RotateY,0>
+   rotate <MakeHuman_RotateX,0,0>
+   translate <MakeHuman_TranslateX, MakeHuman_TranslateY, MakeHuman_TranslateZ> 
     material { MakeHuman_Material} //texture {MakeHuman_Texture}
   } 
 #end
