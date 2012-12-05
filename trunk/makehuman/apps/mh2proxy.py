@@ -116,7 +116,8 @@ class CProxy:
             else:
                 verts.append( parent.verts[refVert].co )
                 
-        obj.changeCoords(verts)                
+        obj.changeCoords(verts)      
+        print "clo", (xScale, yScale, zScale)
         
 
     def getUuid(self):

@@ -110,12 +110,16 @@ class WarpModifier (humanmodifier.SimpleModifier):
         self.bases = {}
         if len(paths) == 1:
             path = paths[0]
-            char,key = getBaseCharacter(path[0])            
-            self.bases[key] = (path[0], char, -1)
+            bases = getBaseCharacter(path[0])
+            for char,key,repl in bases:
+                trgPath = fixTargetPath(path[0], repl)
+                self.bases[key] = (trgPath, char, -1)
         else:
             for path in paths:
-                char,key = getBaseCharacter(path[1])            
-                self.bases[key] = (path[0], char, -1)
+                bases = getBaseCharacter(path[1])            
+                for char,key,repl in bases:
+                    trgPath = fixTargetPath(path[0], repl)
+                    self.bases[key] = (trgPath, char, -1)
         self.isWarp = True
         self.bodypart = bodypart
         self.slider = None
@@ -142,15 +146,16 @@ class WarpModifier (humanmodifier.SimpleModifier):
 
 
     def compileWarpTarget(self, human):
+        print "Compile", self
         landmarks = theLandMarks[self.bodypart]
         hasChanged = getRefObject(human)
         self.getRefTarget(human)    
-        print "Compile", self
         #print len(list(self.refTargetVerts)), len(list(theRefObjectVerts)), len(list(human.shadowCoords))
         if self.refTargetVerts:
             shape = warp.warp_target(self.refTargetVerts, theRefObjectVerts, human.shadowCoords, landmarks)
         else:
             shape = {}
+        print "...done"
         return shape
 
     def getRefTarget(self, human):       
@@ -166,13 +171,11 @@ class WarpModifier (humanmodifier.SimpleModifier):
 
     
     def getBases(self, human):
-        global theRefObjects
-        
         targetChanged = False
         for key in self.bases.keys():
             target,char,cval0 = self.bases[key]
     
-            verts = theRefObjects[char]
+            verts = getRefObjectVerts(char)
             if not verts:
                 self.bases[key] = target,char,0
                 continue
@@ -190,8 +193,9 @@ class WarpModifier (humanmodifier.SimpleModifier):
         madeRefTarget = False
         for key in self.bases.keys():
             target,char,cval = self.bases[key]
+            folder = os.path.dirname(target)
             if cval:
-                #print "ch", target, cval
+                #print "ch", key, folder.split("/")[-1], cval
                 madeRefTarget = True
                 verts = self.getTargetInsist(target)
                 for n,v in verts.items():
@@ -208,23 +212,35 @@ class WarpModifier (humanmodifier.SimpleModifier):
         if verts:
             self.refTargets[target] = verts
             return verts
+            
+        for string in ["flaccid", "muscle", "light", "heavy"]:
+            if string in target:
+                print("  Did not find %s" % target)
+                return {}
+    
         target1 = target.replace("asian", "caucasian").replace("neutral", "caucasian").replace("african", "caucasian")
-        target1 = target1.replace("caucaucasian", "caucasian")
+        target1 = target1.replace("cauccaucasian", "caucasian")
         verts = self.getTarget(target1)
         if verts:
             self.refTargets[target] = verts
+            print("   Replaced %s\n  -> %s" % (target, target1))
             return verts
+            
         target2 = target1.replace("child", "young").replace("old", "young")
         verts = self.getTarget(target2)
         if verts:
             self.refTargets[target] = verts
+            print("   Replaced %s\n  -> %s" % (target, target2))
             return verts
+            
         target3 = target2.replace("male", "female")
         target3 = target3.replace("fefemale", "female")
         verts = self.getTarget(target3)
         self.refTargets[target] = verts
         if not verts:
             print("Warning: Found none of:\n    %s\n    %s\n    %s\n    %s" % (target, target1, target2, target3))
+        else:
+            print("   Replaced %s\n  -> %s" % (target, target3))        
         return verts
 
 
@@ -266,7 +282,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
         
 
 def getRefObject(human):
-    global theRefObjects, theRefObjectVerts, theBaseObjectVerts
+    global theRefObjectPaths, theRefObjectVerts, theBaseObjectVerts
        
     if human.iHaveChanged:
         print "Reference character changed"
@@ -274,44 +290,76 @@ def getRefObject(human):
     
         theRefObjectVerts = [ list(v) for v in theBaseObjectVerts ]
     
-        for (char, verts) in theRefObjects.items():
+        for char in theRefObjectPaths:
             cval = human.getDetail(char)
             if cval:
                 print "  ", os.path.basename(char), cval
+                verts = getRefObjectVerts(char)
                 for n,v in verts.items():
                     dr = fastmath.vmul3d(v, cval)
                     theRefObjectVerts[n] = fastmath.vadd3d(theRefObjectVerts[n], dr)
         return True
     else:
         return False
+        
+
+def getRefObjectVerts(path):
+    global theRefObjects
     
+    try:
+        return theRefObjects[path]
+    except KeyError:
+        pass
+    verts = readTarget(path)
+    theRefObjects[path] = verts
+    return verts            
+    
+
+def getBaseName(path, name1, name2, name3):
+    if name1 in path:
+        return name1
+    elif name2 in path:
+        return name2
+    else:
+        return name3
 
 
 def getBaseCharacter(path):    
-    if "african" in path:
-        race = "african"
-    elif "asian" in path:
-        race = "asian"
-    else:
-        race = "neutral"
-    
-    if "female" in path:
-        gender = "female"
-    elif "male" in path:
-        gender = "male"
-    else:
-        gender = "female"
-    
-    if "child" in path:
-        age = "child"
-    elif "old" in path:
-        age = "old"
-    else:
-        age = "young"
+    race = getBaseName(path, "african", "asian", "neutral")
+    gender = getBaseName(path, "female", "male", "female")
+    age = getBaseName(path, "child", "old", "young")
+    tone = getBaseName(path, "muscle", "flaccid", None)
+    weight = getBaseName(path, "heavy", "light", None)
 
-    path = "data/targets/macrodetails/%s-%s-%s.target" % (race, gender, age)
-    key = "%s-%s-%s" % (race, gender, age)
-    return path,key
+    path = "data/targets/macrodetails/%s-%s-%s.target" % (race, gender, age)    
+    repl = "%s-%s" % (gender, age)  
+    bases = [(path, race+"-"+repl, repl)]
+    
+    if tone:    
+        path = "data/targets/macrodetails/universal-%s-%s-%s.target" % (gender, age, tone)
+        repl = "%s-%s-%s" % (gender, age, tone)
+        bases.append( (path, race+"-"+repl, repl) )
+
+    if weight:    
+        path = "data/targets/macrodetails/universal-%s-%s-%s.target" % (gender, age, weight)
+        repl = "%s-%s-%s" % (gender, age, weight)
+        bases.append( (path, race+"-"+repl, repl) )
+
+    if tone and weight:    
+        path = "data/targets/macrodetails/universal-%s-%s-%s-%s.target" % (gender, age, tone, weight)
+        repl = "%s-%s-%s-%s" % (gender, age, tone, weight)
+        bases.append( (path, race+"-"+repl, repl) )
+
+    return bases
+
+
+def fixTargetPath(path, repl):
+    (before,orig,name) = path.rsplit("/", 2)
+    if "_" in orig:
+        repl = repl.replace("-", "_")
+    return "%s/%s/%s" % (before, repl, name)
+    
+
 
 #----------------------------------------------------------
 #   Call from exporter
@@ -355,8 +403,11 @@ def readTarget(path):
 #----------------------------------------------------------
 
 def defineGlobals():
-    global theLandMarks, theBaseObjectVerts, theRefObjects
+    global theLandMarks, theBaseObjectVerts, theRefObjectPaths, theRefObjects
     
+    obj = files3d.loadMesh("data/3dobjs/base.obj")
+    theBaseObjectVerts = [ v.co for v in obj.verts ]
+
     theLandMarks = {}
     folder = "data/landmarks"
     for file in os.listdir(folder):
@@ -373,18 +424,27 @@ def defineGlobals():
                     landmark.append(m)
 
         theLandMarks[name] = landmark
-
-    obj = files3d.loadMesh("data/3dobjs/base.obj")
-    theBaseObjectVerts = [ v.co for v in obj.verts ]
-
-    theRefObjects = {}
-    for race in ["african", "asian", "neutral"]:
-        for gender in ["female", "male"]:
-            for age in ["child", "young", "old"]:
-                path = "data/targets/macrodetails/%s-%s-%s.target" % (race, gender, age)
-                theRefObjects[path] = readTarget(path)
     
+    theRefObjectPaths = []
+    theRefObjects = {}
 
+    for race in ["african", "asian", "neutral"]:
+        for age in ["child", "young", "old"]:
+            for gender in ["female", "male"]:
+                path = "data/targets/macrodetails/%s-%s-%s.target" % (race, gender, age)
+                theRefObjectPaths.append(path)
+                
+    for age in ["child", "young", "old"]:
+        for gender in ["female", "male"]:
+            for tone in ["flaccid", "muscle"]:
+                path = "data/targets/macrodetails/universal-%s-%s-%s.target" % (gender, age, tone)
+                theRefObjectPaths.append(path)
+                for weight in ["light", "heavy"]:
+                    path = "data/targets/macrodetails/universal-%s-%s-%s-%s.target" % (gender, age, tone, weight)
+                    theRefObjectPaths.append(path)
+            for weight in ["light", "heavy"]:
+                path = "data/targets/macrodetails/universal-%s-%s-%s.target" % (gender, age, weight)
+                theRefObjectPaths.append(path)
 
 defineGlobals()
        

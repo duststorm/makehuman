@@ -254,8 +254,8 @@ def readCorrectives(drivers, human, part, t0, t1):
         gui3d.app.progress(t, text="Reading corrective %s %s" % (part, pose))
 
         shape = warpmodifier.compileWarpTarget(
-                "shared/mhx/targets/correctives/%s/${ethnic}/${gender}-${age}/%s.target" % (part, pose),
-                'GenderAgeEthnicModifier',
+                "shared/mhx/targets/correctives/%s/caucasian/${gender}-${age}-${tone}-${weight}/%s.target" % (part, pose),
+                'GenderAgeMuscleWeightModifier',
                 human, 
                 part)
 
