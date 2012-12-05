@@ -576,9 +576,10 @@ def printClothes(context, bob, pob, data):
     printClothesHeader(fp, scn)
     fp.write("# name %s\n" % pob.name.replace(" ","_"))
     fp.write("# obj_file %s.obj\n" % goodName(pob.name))
-    printScale(fp, bob, scn, 'x_scale', 0, 'MCX1', 'MCX2')
-    printScale(fp, bob, scn, 'z_scale', 1, 'MCY1', 'MCY2')
-    printScale(fp, bob, scn, 'y_scale', 2, 'MCZ1', 'MCZ2')
+    vnums = BodyPartVerts[scn.MCBodyPart]
+    printScale(fp, bob, scn, 'x_scale', 0, vnums[0])
+    printScale(fp, bob, scn, 'z_scale', 1, vnums[1])
+    printScale(fp, bob, scn, 'y_scale', 2, vnums[2])
 
     if not isSelfClothed(context):
         printStuff(fp, pob, context)
@@ -926,12 +927,11 @@ def writeColor(fp, string1, string2, color, intensity):
         "%s %.4f %.4f %.4f\n" % (string1, color[0], color[1], color[2]) +
         "%s %.4g\n" % (string2, intensity))
 
-def printScale(fp, bob, scn, name, index, prop1, prop2):
+def printScale(fp, bob, scn, name, index, vnums):
     if not scn.MCIsMHMesh:
         return
     verts = bob.data.vertices
-    n1 = eval("scn.%s" % prop1)
-    n2 = eval("scn.%s" % prop2)
+    n1,n2 = vnums
     if n1 >=0 and n2 >= 0:
         x1 = verts[n1].co[index]     
         x2 = verts[n2].co[index]
@@ -2063,37 +2063,17 @@ BodyPartVerts = {
     "Foot" : ((4909, 4943), (5728, 12226), (4684, 5732)), 
     }
 
-def setBoundaryVerts(scn): 
-    (x, y, z) = BodyPartVerts[scn.MCBodyPart]
-    setAxisVerts(scn, 'MCX1', 'MCX2', x)
-    setAxisVerts(scn, 'MCY1', 'MCY2', y)
-    setAxisVerts(scn, 'MCZ1', 'MCZ2', z)
-    
-def setAxisVerts(scn, prop1, prop2, x):
-    (x1, x2) = x
-    exec("scn.%s = x1" % prop1)
-    exec("scn.%s = x2" % prop2)
-    
-def selectBoundary(ob, scn):
+def examineBoundary(ob, scn):
     verts = ob.data.vertices
     bpy.ops.object.mode_set(mode='OBJECT')
     for v in verts:
         v.select = False
-    for xyz in ['X','Y','Z']:
-        for n in [1,2]:
-            n = eval("scn.MC%s%d" % (xyz, n))
-            print(n)
-            verts[n].select = True
+    vnums = BodyPartVerts[scn.MCBodyPart]
+    for m,n in vnums:
+        verts[m].select = True
+        verts[n].select = True
     bpy.ops.object.mode_set(mode='EDIT')
     return    
-    
-def setBoundary(context):       
-    scn = context.scene
-    setBoundaryVerts(scn)
-    if scn.MCExamineBoundary:
-        ob = getHuman(context)
-        selectBoundary(ob, scn)
-    return            
 
 ###################################################################################    
 #
@@ -2551,41 +2531,6 @@ def initInterface():
         description="Last clothing to keep vertices for",
         default=LastClothing)
 
-    bpy.types.Scene.MCX1 = IntProperty(
-        name="X1", 
-        description="First X vert for clothes rescaling",
-        default=4302)
-
-    bpy.types.Scene.MCX2 = IntProperty(
-        name="X2", 
-        description="Second X vert for clothes rescaling",
-        default=8697)
-
-    bpy.types.Scene.MCY1 = IntProperty(
-        name="Y1", 
-        description="First Y vert for clothes rescaling",
-        default=8208)
-
-    bpy.types.Scene.MCY2 = IntProperty(
-        name="Y2", 
-        description="Second Y vert for clothes rescaling",
-        default=8220)
-
-    bpy.types.Scene.MCZ1 = IntProperty(
-        name="Z1", 
-        description="First Z vert for clothes rescaling",
-        default=8289)
-
-    bpy.types.Scene.MCZ2 = IntProperty(
-        name="Z2", 
-        description="Second Z vert for clothes rescaling",
-        default=6827)
-    
-    bpy.types.Scene.MCExamineBoundary = BoolProperty(
-        name="Examine", 
-        description="Examine boundary when set",
-        default=False)
-
     bpy.types.Scene.MCBodyPart = EnumProperty(
         items = [('Head', 'Head', 'Head'),
                  ('Torso', 'Torso', 'Torso'),
@@ -2594,7 +2539,6 @@ def initInterface():
                  ('Leg', 'Leg', 'Leg'),
                  ('Foot', 'Foot', 'Foot')],
         default='Head')                 
-    #setBoundaryVerts(scn)
 
     setZDepthItems()
     bpy.types.Scene.MCZDepthName = EnumProperty(

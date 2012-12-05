@@ -181,17 +181,11 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.separator()
         layout.label("Boundary")
         layout.prop(scn, "MCBodyPart")   
-        layout.prop(scn, "MCExamineBoundary")           
-        layout.operator("mhclo.set_boundary")        
-        row = layout.row()
-        row.prop(scn, "MCX1")
-        row.prop(scn, "MCX2")
-        row = layout.row()
-        row.prop(scn, "MCY1")
-        row.prop(scn, "MCY2")
-        row = layout.row()
-        row.prop(scn, "MCZ1")
-        row.prop(scn, "MCZ2")   
+        vnums = makeclothes.BodyPartVerts[scn.MCBodyPart]
+        self.drawXYZ(vnums[0], "X", layout)
+        self.drawXYZ(vnums[1], "Y", layout)
+        self.drawXYZ(vnums[2], "Z", layout)
+        layout.operator("mhclo.examine_boundary")        
 
         layout.separator()
         drawLicenseInfo(layout, scn)
@@ -210,6 +204,12 @@ class MakeClothesPanel(bpy.types.Panel):
         #layout.operator("mhclo.offset_clothes")
         return
         
+    def drawXYZ(self, pair, name, layout):
+        m,n = pair
+        row = layout.row()
+        row.label("%s1:   %d" % (name,m))
+        row.label("%s2:   %d" % (name,n))
+              
 
 def drawLicenseInfo(layout, scn):        
         layout.label("Licensing")
@@ -527,17 +527,17 @@ class OBJECT_OT_MakeHumanButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 #
-#    class OBJECT_OT_SetBoundaryButton(bpy.types.Operator):
+#    class OBJECT_OT_ExamineBoundaryButton(bpy.types.Operator):
 #
 
-class OBJECT_OT_SetBoundaryButton(bpy.types.Operator):
-    bl_idname = "mhclo.set_boundary"
-    bl_label = "Set boundary"
+class OBJECT_OT_ExamineBoundaryButton(bpy.types.Operator):
+    bl_idname = "mhclo.examine_boundary"
+    bl_label = "Examine boundary"
     bl_options = {'UNDO'}
 
     def execute(self, context):
         try:
-            makeclothes.setBoundary(context)        
+            makeclothes.examineBoundary(context.object, context.scene)        
         except error.MhcloError:
             error.handleError(context)
         return{'FINISHED'}    
