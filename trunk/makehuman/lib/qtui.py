@@ -207,6 +207,7 @@ class Canvas(QtOpenGL.QGLWidget):
         # self.setAutoFillBackground(False)
         # self.setAttribute(QtCore.Qt.WA_PaintOnScreen)
         self.setAttribute(QtCore.Qt.WA_OpaquePaintEvent)
+        self.setMouseTracking(True)
 
     def mousePressEvent(self, ev):
         x = ev.x()
