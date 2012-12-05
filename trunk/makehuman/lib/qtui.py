@@ -231,6 +231,17 @@ class Canvas(QtOpenGL.QGLWidget):
 
         mouseButtonUp(b, x, y)
 
+    def wheelEvent(self, ev):
+        x = ev.x()
+        y = ev.y()
+
+        G.mouse_pos = x, y
+
+        b = 3 if ev.delta() > 0 else 4
+        b, mask = b+1, 1<<b
+
+        mouseButtonDown(b, x, y)
+
     def mouseMoveEvent(self, ev):
         global g_mouse_pos
 
