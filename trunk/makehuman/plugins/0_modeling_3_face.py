@@ -113,8 +113,8 @@ class FaceTaskView(gui3d.TaskView):
                 [
                     ('nose', 'compress', 'uncompress', 'rightView'),
                     ('nose', 'convex', 'concave', 'rightView'),
-                    ('nose', 'greek', 'ungreek', 'rightView'),                    
-                    ('nose', 'hump', 'unhump', 'rightView'),
+                    ('nose', 'moregreek', 'lessgreek', 'rightView'),                    
+                    ('nose', 'morehump', 'lesshump', 'rightView'),
                     ('nose', 'potato', 'point', 'rightView'),                    
                     ('nose-nostrils', 'point', 'unpoint', 'frontView'),
                     ('nose-nostrils', 'up', 'down', 'rightView'),
