@@ -80,15 +80,12 @@ def recursiveDirNames(root):
       pathlist = pathlist + recursiveDirNames(path) 
   return(pathlist)
 
-sys.path.append("./")
-sys.path.append('./lib')
-sys.path.append("./apps")
-sys.path.append("./shared")
-sys.path.append("./shared/mhx/templates")
-sys.path.append("./shared/mhx")
-sys.path=sys.path + recursiveDirNames("./apps")
-sys.path.append("./core")
-sys.path=sys.path + recursiveDirNames("./core")
+syspath = ["./", "./lib", "./apps", "./shared", "./shared/mhx/templates", "./shared/mhx"]
+syspath = syspath + recursiveDirNames("./apps")
+syspath.append("./core")
+syspath = syspath + recursiveDirNames("./core")
+syspath.extend(sys.path)
+sys.path = syspath
 
 import glob, imp
 from os.path import join, basename, splitext
