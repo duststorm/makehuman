@@ -25,6 +25,7 @@ import aljabr
 import warp
 import numpy
 import gui3d
+import warpmodifier
 
 from numpy import dot
 from numpy.linalg import inv
@@ -115,7 +116,12 @@ class CArmature:
         print ">"
         
 
-    def printLocs(self):
+    def printLocs(self, words):
+        return
+        string = ""
+        for word in words:
+            string += ("%s " % word)
+        print(string)
         verts = self.human.meshData.verts
         for vn in [3825]:
             x = verts[vn].co
@@ -132,8 +138,11 @@ class CArmature:
                 
 
     def clear(self):
+        print "Clear armature"
         for bone in self.boneList:
             bone.matrixPose = tm.identity_matrix()
+        self.human.posesNeedReset = False
+        warpmodifier.resetWarps(self.human)
         self.update()     
         self.removeModifier()
 
@@ -157,7 +166,7 @@ class CArmature:
 
 
     def syncRestVerts(self):
-        print "Synching"
+        print "Synch rest verts"
         obj = self.human.meshData
         for v in obj.verts:
             self.restVerts[v.idx].co[:3] = v.co
@@ -165,21 +174,19 @@ class CArmature:
 
     def removeModifier(self):
         if self.modifier:
-            print "Remove", self.modifier
             self.modifier.updateValue(self.human, 0.0)
             self.modifier = None
             self.human.meshData.update()
             self.syncRestVerts()                
-            self.printLocs()
+            self.printLocs(["Remove", self.modifier])
 
         
     def updateModifier(self):
         if self.modifier:
-            print "Update", self.modifier
             self.modifier.updateValue(self.human, 1.0)
             self.human.meshData.update()
             self.syncRestVerts()                
-            self.printLocs()
+            self.printLocs(["Update", self.modifier])
 
         
     def setModifier(self, modifier):
@@ -187,24 +194,21 @@ class CArmature:
         self.modifier = modifier
         self.modifier.updateValue(self.human, 1.0)
         self.syncRestVerts()
-        print "Set", self.modifier
-        self.printLocs()
+        self.printLocs(["setModifier", self.modifier])
 
 
     def update(self):
         human = self.human
         obj = human.meshData
-        self.printLocs()
+        self.printLocs(["Update", self])
 
-        print "Update", self
         for bone in self.boneList:
             bone.updateBone()
             bone.updateConstraints()
-        self.printLocs()            
+        self.printLocs(["Bones updated"])            
 
-        print "Update", human
         self.updateObj()
-        self.printLocs()
+        self.printLocs(["Updated", human])
 
         if human.proxy:
             human.updateProxyMesh()

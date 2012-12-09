@@ -43,7 +43,7 @@ import humanmodifier
 #   Pose library
 #
 
-
+"""
 class PoseModifier(humanmodifier.GenderAgeMuscleWeightModifier):
     def __init__(self, template):        
         humanmodifier.GenderAgeMuscleWeightModifier.__init__(self, template)
@@ -52,9 +52,9 @@ class PoseModifier(humanmodifier.GenderAgeMuscleWeightModifier):
 """        
 class PoseModifier(warpmodifier.WarpModifier):
     def __init__(self, template):
-	warpmodifier.WarpModifier.__init__(self, template, "body", "GenderAgeMuscleWeightModifier") 
-	self.isPose = True
-"""
+        warpmodifier.WarpModifier.__init__(self, template, "body", "GenderAgeMuscleWeightModifier") 
+        self.isPose = True
+
 
 class PoseLoadTaskView(gui3d.TaskView):
 
@@ -97,11 +97,13 @@ class PoseLoadTaskView(gui3d.TaskView):
             self.armature.printLocs()
         
         if os.path.basename(filepath) == "clear.mhp":
+            self.armature = None
             return
 
         folder = os.path.dirname(filepath)
         (fname, ext) = os.path.splitext(os.path.basename(filepath))
         modpath = '%s/${gender}-${age}-${tone}-${weight}-%s.target' % (folder, fname)
+        modpath = modpath.replace("\\","/")
         print filepath, modpath
         modifier = PoseModifier(modpath)
         modifier.updateValue(self.human, 1.0)
@@ -132,21 +134,27 @@ class PoseLoadTaskView(gui3d.TaskView):
 
 
     def onHumanChanging(self, event):
-        print "Human Changing", event.change
+        print "Pose onHumanChanging", event.change, event.human.posesNeedReset, self.armature
         
         human = event.human
+        if 0 and self.armature:
+            self.armature.clear()
+            self.armature = None
+            event.human.posesNeedReset = False
         if event.change == 'reset':
-            print "Clear", self.armature
+            print "Reset", self.armature
             if self.armature:
                 self.armature.clear()
                 self.armature = None
 
                 
     def onHumanChanged(self, event):
-        print "Human Changed", event.change
+        print "Pose onHumanChanged", event.change, event.human.posesNeedReset, self.armature
         if self.armature:
-            print "Rebuild", self.armature
-            self.armature.rebuild()            
+            self.armature.clear()
+            self.armature = None
+            #print "Rebuild", self.armature
+            #self.armature.rebuild()            
 
         #self.deleteModifier()
 

@@ -47,7 +47,9 @@ class Human(gui3d.Object):
 
         gui3d.Object.__init__(self, [0, 0, 0], mesh, True)
         
-        self.iHaveChanged = True
+        self.warpsNeedReset = True
+        self.posesNeedReset = True
+        self.armature = None
         algos3d.theHuman = self
         
         self.mesh.setCameraProjection(0)
@@ -110,8 +112,10 @@ class Human(gui3d.Object):
 
 
     def syncShadowCoords(self):
+        print "Sync shadow coords"
         coords = [ list(v.co) for v in self.meshData.verts ]
         self.shadowCoords = np.asarray(coords, dtype=np.float32)
+        
 
 
     # Overriding hide and show to account for both human base and the hairs!
@@ -444,7 +448,8 @@ class Human(gui3d.Object):
         if not (hasChanged or force):
             return
             
-        self.iHaveChanged = True
+        self.warpsNeedReset = True
+        self.posesNeedReset = True
         print "Human has changed - resetting warp targets"
         for target in algos3d.targetBuffer.values():
             if hasattr(target, "isWarp"):

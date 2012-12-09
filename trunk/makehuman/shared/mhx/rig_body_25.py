@@ -173,7 +173,7 @@ BodyArmature3 = [
     # Deform spine    
     ('DfmSpine1',          0, 'DfmPelvis', F_DEF+F_CON, L_DEF, (1,1,3) ),
     ('DfmSpine2',          0, 'DfmSpine1', F_DEF+F_CON, L_DEF, (1,1,3) ),
-    ('DfmSpine3',          0, 'DfmSpine2', F_DEF+F_CON, L_DEF, (1,1,3) ),
+    ('DfmSpine3',          0, 'DfmSpine2', F_DEF+F_CON, L_DEF, NoBB ),
     ('DfmNeck',            0, 'DfmSpine3', F_DEF+F_CON, L_DEF, (1,1,3) ),
 ]
 
@@ -210,9 +210,9 @@ BodyArmature5 = [
     ('DfmHead',            0, 'DfmNeck', F_DEF+F_CON, L_DEF, NoBB),
 
     # Stomach    
-    ('DfmRib',             0, 'DfmSpine3', F_DEF, L_DEF, (1,1,5) ),
+    ('DfmRib',             0, 'DfmSpine3', F_DEF, L_DEF, NoBB ),
     ('StomachTrg',         0, 'DfmHips', 0, L_HELP, NoBB),
-    ('DfmStomach',         0, 'DfmRib', F_DEF+F_CON, L_DEF, NoBB ),
+    ('DfmStomach',         0, 'DfmRib', F_DEF+F_CON, L_DEF, (1,1,5) ),
     
     # Breast
     ('Breast_L',           -45*D, 'DfmSpine3', F_DEF+F_WIR, L_TWEAK, NoBB),
