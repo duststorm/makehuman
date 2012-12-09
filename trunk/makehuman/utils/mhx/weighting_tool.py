@@ -954,6 +954,32 @@ class VIEW3D_OT_RecoverDiamondsButton(bpy.types.Operator):
 #    class VIEW3D_OT_ExportVertexGroupsButton(bpy.types.Operator):
 #
 
+def sortVertexGroups(ob):
+    rig = ob.parent
+    if not rig:
+        return ob.vertex_groups
+
+    roots = []
+    for bone in rig.data.bones:
+        if not bone.parent:
+            roots.append(bone)
+    
+    vgroups = []
+    for root in roots:
+        vgroups += sortBoneVGroups(root, ob)
+    return vgroups
+    
+    
+def sortBoneVGroups(bone, ob):  
+    try:
+        vgroups = [ob.vertex_groups[bone.name]]
+    except KeyError:
+        vgroups = []
+    for child in bone.children:
+        vgroups += sortBoneVGroups(child, ob)
+    return vgroups
+    
+        
 def exportVertexGroups(context):
     scn = context.scene
     filePath = scn['MhxVertexGroupFile']
@@ -962,7 +988,8 @@ def exportVertexGroups(context):
     fp = open(fileName, "w")
     ob = context.object
     me = ob.data
-    for vg in ob.vertex_groups:
+    vgroups = sortVertexGroups(ob)
+    for vg in vgroups:
         index = vg.index
         weights = []
         for v in me.vertices:
