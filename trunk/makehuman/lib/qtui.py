@@ -207,6 +207,7 @@ class Canvas(QtOpenGL.QGLWidget):
         # self.setAutoFillBackground(False)
         # self.setAttribute(QtCore.Qt.WA_PaintOnScreen)
         self.setAttribute(QtCore.Qt.WA_OpaquePaintEvent)
+        self.setAttribute(QtCore.Qt.WA_KeyCompression, False)
         self.setMouseTracking(True)
 
     def mousePressEvent(self, ev):
@@ -257,38 +258,36 @@ class Canvas(QtOpenGL.QGLWidget):
         g_mouse_pos = (x, y)
 
     def keyPressEvent(self, ev):
-        key = ev.nativeVirtualKey()
-        character = ev.text()
+        key = ev.key()
+        characters = ev.text()
 
         if key in key_mapping:
             key = key_mapping[key]
-            character = u''
-        elif character:
-            character = unicode(character)
+            keyDown(key, u'', getKeyModifiers())
+        elif characters:
+            for character in characters:
+                # ev.text() may hold multiple characters regardless of
+                #  WA_KeyCompression setting
+                character = unicode(character)
+                key = ord(character)
+                keyDown(key, character, getKeyModifiers())
         else:
             super(Canvas, self).keyPressEvent(ev)
-            return
-
-        keyDown(key, character, getKeyModifiers())
-
-        ev.accept()
 
     def keyReleaseEvent(self, ev):
-        key = ev.nativeVirtualKey()
-        character = ev.text()
+        key = ev.key()
+        characters = ev.text()
 
         if key in key_mapping:
             key = key_mapping[key]
-            character = u''
-        elif character:
+            keyUp(key, u'', getKeyModifiers())
+        elif characters:
+            character = characters[0]
             character = unicode(character)
+            key = ord(character)
+            keyUp(key, character, getKeyModifiers())
         else:
             super(Canvas, self).keyReleaseEvent(ev)
-            return
-
-        keyUp(key, character, getKeyModifiers())
-
-        ev.accept()
 
     def initializeGL(self):
         OnInit()
@@ -319,6 +318,7 @@ class Frame(QtGui.QWidget):
         self.layout.addWidget(self.canvas)
         self.setAttribute(QtCore.Qt.WA_PaintOnScreen)
         self.setAttribute(QtCore.Qt.WA_OpaquePaintEvent)
+        self.setAttribute(QtCore.Qt.WA_KeyCompression, False)
 
     def update(self):
         super(Frame, self).update()
