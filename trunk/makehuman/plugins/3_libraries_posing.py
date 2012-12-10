@@ -43,7 +43,7 @@ import humanmodifier
 #   Pose library
 #
 
-"""
+
 class PoseModifier(humanmodifier.GenderAgeMuscleWeightModifier):
     def __init__(self, template):        
         humanmodifier.GenderAgeMuscleWeightModifier.__init__(self, template)
@@ -54,7 +54,7 @@ class PoseModifier(warpmodifier.WarpModifier):
     def __init__(self, template):
         warpmodifier.WarpModifier.__init__(self, template, "body", "GenderAgeMuscleWeightModifier") 
         self.isPose = True
-
+"""
 
 class PoseLoadTaskView(gui3d.TaskView):
 
@@ -109,7 +109,7 @@ class PoseLoadTaskView(gui3d.TaskView):
         modifier.updateValue(self.human, 1.0)
         
         if not self.armature:
-            self.armature = armature.rigdefs.createRig(self.human, "rigid", False)
+            self.armature = armature.rigdefs.createRig(self.human, "soft1", False)
             
         self.armature.setModifier(modifier)
 

@@ -151,7 +151,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
         hasChanged = getRefObject(human)
         self.getRefTarget(human)    
         #print len(list(self.refTargetVerts)), len(list(theRefObjectVerts)), len(list(human.shadowCoords))
-        if self.refTargetVerts is not None:
+        if self.refTargetVerts:
             shape = warp.warp_target(self.refTargetVerts, theRefObjectVerts, human.shadowCoords, landmarks)
         else:
             shape = {}
