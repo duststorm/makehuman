@@ -155,6 +155,7 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.label("Export/Import MHP")
             layout.operator("mh.saveas_mhp")
             layout.operator("mh.load_mhp")
+            layout.operator("mh.convert_rig")
 
             layout.separator()
             layout.label("Export/Import BVH")

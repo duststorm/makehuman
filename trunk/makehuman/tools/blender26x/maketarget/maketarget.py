@@ -929,6 +929,160 @@ class VIEW3D_OT_SkipButton(bpy.types.Operator):
         return{'FINISHED'}           
 
 #----------------------------------------------------------
+#   Convert weights
+#----------------------------------------------------------
+
+def readWeights(mhFolder, name, nVerts):
+    weights = {}
+    for n in range(nVerts):
+        weights[n] = []
+    bone = None
+    filepath = os.path.join(mhFolder, "data/rigs", name+".rig")
+    fp = open(filepath, "rU")
+    for line in fp:
+        words = line.split()
+        if len(words) < 2:
+            pass
+        elif words[0] == "#":
+            if words[1] == "weights":
+                bone = words[2]
+            else:
+                bone = None
+        elif bone:
+            vn = int(words[0])
+            if vn < the.NBodyVerts:
+                weights[vn].append( (bone, float(words[1])) )
+    fp.close()           
+    
+    normedWeights = {}
+    for vn,data in weights.items():
+        wsum = 0.0
+        for bone,w in data:
+            wsum += w
+        ndata = []
+        for bone,w in data:
+            ndata.append((bone,w/wsum))
+        normedWeights[vn] = ndata
+
+    return normedWeights            
+
+
+def defineMatrices(rig):
+    mats = {}
+    for pb in rig.pose.bones:
+        mats[pb.name] = pb.matrix * pb.bone.matrix_local.inverted()
+    return mats
+        
+
+def getPoseLocs(mats, restLocs, weights, nVerts):
+    locs = {}
+    for n in range(nVerts):
+        if weights[n]:
+            mat = getMatrix(mats, weights[n])
+            locs[n] = mat * restLocs[n]
+        else:
+            locs[n] = restLocs[n]
+    return locs
+    
+    
+def getRestLocs(mats, poseLocs, weights, nVerts):
+    locs = {}
+    for n in range(nVerts):
+        if weights[n]:
+            mat = getMatrix(mats, weights[n])
+            locs[n] = mat.inverted() * poseLocs[n]
+        else:
+            locs[n] = poseLocs[n]
+    return locs
+    
+    
+def getMatrix(mats, weight):        
+    mat = Matrix()
+    mat.zero()
+    for bname,w in weight:
+        mat += w * mats[bname]
+    return mat
+
+
+def getShapeLocs(ob, nVerts):
+    locs = {}
+    for n in range(nVerts):
+        locs[n] = Vector((0,0,0))
+    for skey in ob.data.shape_keys.key_blocks:
+        if skey.name == "Basis":
+            continue       
+        for n,v in enumerate(skey.data):
+            bv = ob.data.vertices[n]
+            vec = v.co - bv.co
+            locs[n] += skey.value*vec
+    return locs
+    
+    
+def addLocs(locs1, locs2, nVerts):
+    locs = {}
+    for n in range(nVerts):
+        locs[n] = locs1[n] + locs2[n]
+    return locs
+
+
+def subLocs(locs1, locs2, nVerts):
+    locs = {}
+    for n in range(nVerts):
+        locs[n] = locs1[n] - locs2[n]
+    return locs
+
+
+def saveNewTarget(mhFolder, filename, locs, nVerts):
+    filepath = os.path.join(mhFolder, filename)
+    fp = open(filepath, "w")
+    locList = list(locs.items())
+    locList.sort()
+    for (n, dr) in locList:
+        if dr.length > 1e-4:
+            fp.write("%d %.5f %.5f %.5f\n" % (n, dr[0], dr[2], -dr[1]))
+    fp.close()
+    return
+        
+
+class VIEW3D_OT_ConvertRigButton(bpy.types.Operator):
+    bl_idname = "mh.convert_rig"
+    bl_label = "Convert to rig"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        scn = context.scene
+        ob = context.object
+        rig = ob.parent
+        nVerts = len(ob.data.vertices)
+        mhFolder = "/home/svn"
+        oldWeights = readWeights(mhFolder, "rigid", nVerts)
+        newWeights = readWeights(mhFolder, "soft1", nVerts)
+        mats = defineMatrices(rig)
+        restLocs = {}
+        for n in range(nVerts):
+            restLocs[n] = ob.data.vertices[n].co
+        oldShapeDiffs = getShapeLocs(ob, nVerts)
+        oldRestLocs = addLocs(restLocs, oldShapeDiffs, nVerts)
+        globalLocs = getPoseLocs(mats, oldRestLocs, oldWeights, nVerts)
+        newRestLocs = getRestLocs(mats, globalLocs, newWeights, nVerts)
+        newShapeDiffs = subLocs(newRestLocs, restLocs, nVerts)
+        saveNewTarget(mhFolder, "data/poses/dance1-soft1/test.target", newShapeDiffs, nVerts)
+
+        for vn in [3815,3821,4378]: #,,13288]: #, , 13288]:
+            print("\nv", vn, ob.data.vertices[vn].co)
+            print("  os", oldShapeDiffs[vn])
+            print("  or", oldRestLocs[vn])
+            print("  gl", globalLocs[vn])
+            print("  nr", newRestLocs[vn])            
+            print("  ns", newShapeDiffs[vn])            
+            for bone,w in oldWeights[vn]:
+                print("   ", bone, w)
+            for bone,w in newWeights[vn]:
+                print("   ", bone, w)
+
+        return{'FINISHED'}           
+
+#----------------------------------------------------------
 #   Init
 #----------------------------------------------------------
 
