@@ -932,12 +932,11 @@ class VIEW3D_OT_SkipButton(bpy.types.Operator):
 #   Convert weights
 #----------------------------------------------------------
 
-def readWeights(mhFolder, name, nVerts):
+def readWeights(filepath, nVerts):
     weights = {}
     for n in range(nVerts):
         weights[n] = []
     bone = None
-    filepath = os.path.join(mhFolder, "data/rigs", name+".rig")
     fp = open(filepath, "rU")
     for line in fp:
         words = line.split()
@@ -1006,16 +1005,18 @@ def getMatrix(mats, weight):
 
 def getShapeLocs(ob, nVerts):
     locs = {}
+    filename = "test"
     for n in range(nVerts):
         locs[n] = Vector((0,0,0))
     for skey in ob.data.shape_keys.key_blocks:
         if skey.name == "Basis":
             continue       
+        filename = skey.name
         for n,v in enumerate(skey.data):
             bv = ob.data.vertices[n]
             vec = v.co - bv.co
             locs[n] += skey.value*vec
-    return locs
+    return locs, filename
     
     
 def addLocs(locs1, locs2, nVerts):
@@ -1032,8 +1033,7 @@ def subLocs(locs1, locs2, nVerts):
     return locs
 
 
-def saveNewTarget(mhFolder, filename, locs, nVerts):
-    filepath = os.path.join(mhFolder, filename)
+def saveNewTarget(filepath, locs, nVerts):
     fp = open(filepath, "w")
     locList = list(locs.items())
     locList.sort()
@@ -1054,19 +1054,18 @@ class VIEW3D_OT_ConvertRigButton(bpy.types.Operator):
         ob = context.object
         rig = ob.parent
         nVerts = len(ob.data.vertices)
-        mhFolder = "/home/svn"
-        oldWeights = readWeights(mhFolder, "rigid", nVerts)
-        newWeights = readWeights(mhFolder, "soft1", nVerts)
+        oldWeights = readWeights(os.path.join(scn.MhProgramPath, "data/rigs", scn.MhSourceRig+".rig"), nVerts)
+        newWeights = readWeights(os.path.join(scn.MhProgramPath, "data/rigs",scn.MhTargetRig+".rig"), nVerts)
         mats = defineMatrices(rig)
         restLocs = {}
         for n in range(nVerts):
             restLocs[n] = ob.data.vertices[n].co
-        oldShapeDiffs = getShapeLocs(ob, nVerts)
+        oldShapeDiffs, filename = getShapeLocs(ob, nVerts)
         oldRestLocs = addLocs(restLocs, oldShapeDiffs, nVerts)
         globalLocs = getPoseLocs(mats, oldRestLocs, oldWeights, nVerts)
         newRestLocs = getRestLocs(mats, globalLocs, newWeights, nVerts)
         newShapeDiffs = subLocs(newRestLocs, restLocs, nVerts)
-        saveNewTarget(mhFolder, "data/poses/dance1-soft1/test.target", newShapeDiffs, nVerts)
+        saveNewTarget(os.path.join(scn.MhProgramPath, "data/poses", scn.MhPoseTargetDir, filename + ".target"), newShapeDiffs, nVerts)
 
         for vn in [3815,3821,4378]: #,,13288]: #, , 13288]:
             print("\nv", vn, ob.data.vertices[vn].co)
@@ -1090,6 +1089,11 @@ def init():
     bpy.types.Scene.MhRelax = FloatProperty(default = 0.5)
     bpy.types.Scene.MhUnlock = BoolProperty(default = False)
     
+    bpy.types.Scene.MhSourceRig = StringProperty(default = "rigid")
+    bpy.types.Scene.MhTargetRig = StringProperty(default = "soft1")
+    bpy.types.Scene.MhPoseTargetDir = StringProperty(default = "dance1-soft1")
+
+
     bpy.types.Scene.MhImportRotateMode = EnumProperty(
             name="Rotation",
             description="Rotation conversion",
