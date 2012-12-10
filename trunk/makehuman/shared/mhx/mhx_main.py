@@ -33,6 +33,8 @@ import os
 import time
 import numpy
 
+#import cProfile
+
 import mh2proxy
 import export_config
 import armature
@@ -76,6 +78,7 @@ def exportMhx(human, filename, options):
             print("Unable to open file for writing", outfile)
             fp = 0
         if fp:
+            #cProfile.runctx( 'exportMhx_25(human, config, fp)', globals(), locals())
             exportMhx_25(human, config, fp)
             fp.close()
             time2 = time.clock()
@@ -407,7 +410,6 @@ def copyFile25(human, tmplName, fp, proxy, config, proxyData):
                 writeGroups(fp, proxyData)
 
             elif key == 'mesh-shapeKey':
-                pass
                 writeShapeKeys(fp, human, "%sMesh" % the.Human, config, None)
 
             elif key == 'proxy-shapeKey':

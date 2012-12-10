@@ -174,11 +174,11 @@ def readShape(filename):
 #----------------------------------------------------------
 #   
 #----------------------------------------------------------
-
+"""
 def readFaceShapes(human, drivers, t0, t1):
     shapeList = []
     shapes = {}
-    t,dt = initTimes(drivers.keys(), t0, t1)
+    t,dt = initTimes(drivers.keys(), 0.0, 1.0)
 
     for name,value in drivers.items():
         (fname, bone, channel, sign, min, max) = value
@@ -212,7 +212,7 @@ def readFaceShapes(human, drivers, t0, t1):
 
 def readExpressions(human, t0, t1):
     shapeList = []
-    t,dt = initTimes(Expressions, t0, t1)
+    t,dt = initTimes(Expressions, 0.0, 1.0)
 
     for name in Expressions:
         gui3d.app.progress(t, text="Reading expression %s" % name)
@@ -226,11 +226,11 @@ def readExpressions(human, t0, t1):
         shapeList.append((name, shape))
         t += dt
     return shapeList
-
+"""
 
 def readExpressionUnits(human, t0, t1):
     shapeList = []
-    t,dt = initTimes(ExpressionUnits, t0, t1)
+    t,dt = initTimes(ExpressionUnits, 0.0, 1.0)
     
     for name in ExpressionUnits:
         gui3d.app.progress(t, text="Reading expression %s" % name)
@@ -248,7 +248,7 @@ def readExpressionUnits(human, t0, t1):
 
 def readCorrectives(drivers, human, part, t0, t1):
     shapeList = []
-    t,dt = initTimes(drivers, t0, t1)
+    t,dt = initTimes(drivers, 0.0, 1.0)
     
     for (pose, lr, expr, vars) in drivers:
         gui3d.app.progress(t, text="Reading corrective %s %s" % (part, pose))

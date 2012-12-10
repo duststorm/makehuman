@@ -107,7 +107,8 @@ class WarpModifier (humanmodifier.SimpleModifier):
 
         self.warppath = warppath
         self.template = template
-        self.paths = self.fallback.expandTemplate([(self.template, [])])
+        paths = self.fallback.expandTemplate([(self.template, [])])
+        self.paths = [(path.replace("-/","/"), factors) for (path,factors) in paths]
         self.bases = {}
 
         if len(self.paths) == 1:

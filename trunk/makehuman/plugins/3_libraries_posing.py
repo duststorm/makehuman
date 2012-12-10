@@ -34,6 +34,8 @@ import module3d
 import mh
 import aljabr
 
+#import cProfile
+
 import armature
 from armature import transformations as tm
 import warpmodifier
@@ -43,7 +45,7 @@ import humanmodifier
 #   Pose library
 #
 
-
+"""
 class PoseModifier(humanmodifier.GenderAgeMuscleWeightModifier):
     def __init__(self, template):        
         humanmodifier.GenderAgeMuscleWeightModifier.__init__(self, template)
@@ -54,7 +56,7 @@ class PoseModifier(warpmodifier.WarpModifier):
     def __init__(self, template):
         warpmodifier.WarpModifier.__init__(self, template, "body", "GenderAgeMuscleWeightModifier") 
         self.isPose = True
-"""
+
 
 class PoseLoadTaskView(gui3d.TaskView):
 
@@ -106,6 +108,7 @@ class PoseLoadTaskView(gui3d.TaskView):
         modpath = modpath.replace("\\","/")
         print filepath, modpath
         modifier = PoseModifier(modpath)
+        #cProfile.runctx( 'modifier.updateValue(self.human, 1.0)', globals(), locals())
         modifier.updateValue(self.human, 1.0)
         
         if not self.armature:
