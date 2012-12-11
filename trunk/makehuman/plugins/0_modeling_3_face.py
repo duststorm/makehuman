@@ -206,14 +206,18 @@ class FaceTaskView(gui3d.TaskView):
                     ('chin', 'prognathism1', 'prognathism2', 'rightView'),
 
                 ]]),
-            ('cheek', [('data/targets/cheek/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/cheek/images/', i[3]) for i in
-                [
-                    ('l-cheek', 'in', 'out', 'frontView'),
-                    ('l-cheek-bones', 'out', 'in', 'frontView'),
-                    ('r-cheek', 'in', 'out', 'frontView'),
-                    ('r-cheek-bones', 'out', 'in', 'frontView'),
-
-                ]])
+            ('cheek', [
+                (
+                    'data/targets/cheek/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), 
+                    i[0], i[1], i[2], 'data/targets/cheek/images/', i[3]
+                ) for i in [
+                      ('l-cheek', 'in', 'out', 'frontView'),
+                      ('l-cheek-bones', 'out', 'in', 'frontView'),
+                      ('r-cheek', 'in', 'out', 'frontView'),
+                      ('r-cheek-bones', 'out', 'in', 'frontView'),
+                      ]
+                    ]
+                    )
             ]
             
         features2 = [
@@ -265,7 +269,14 @@ class FaceTaskView(gui3d.TaskView):
 
                 # Create sliders
                 modifier = humanmodifier.GenderAgeEthnicModifier2(template[0])
-                self.modifiers['%s%d' % (name, index + 1)] = modifier
+                modifierName = template[1]
+                clashIndex = 0
+                while modifierName in self.modifiers:
+                    modifierName = '%s%d' % (template[1], clashIndex)
+                    clashIndex+=1
+
+                #self.modifiers['%s%d' % (name, index + 1)] = modifier
+                self.modifiers[modifierName] = modifier
 
                 slider = box.addView( (FaceSlider2(modifier, '%s%s.png' % (template[2], template[1]), template[3])))
                  
@@ -292,7 +303,12 @@ class FaceTaskView(gui3d.TaskView):
 
                 # Create sliders
                 modifier = humanmodifier.GenderAgeEthnicAsymmetricModifier(template[0], 'value', template[2], template[3], False)
-                self.modifiers['%s%d' % (name, index + 1)] = modifier
+                modifierName = template[1]
+                clashIndex = 0
+                while modifierName in self.modifiers:
+                    modifierName = '%s%d' % (template[1], clashIndex)
+                    clashIndex+=1
+                self.modifiers[modifierName] = modifier
 
                 slider = box.addView(FaceSlider(modifier, '%s%s-%s-%s.png' % (template[4], template[1], template[2], template[3]), template[5]))
                 self.sliders.append(slider)
@@ -301,6 +317,32 @@ class FaceTaskView(gui3d.TaskView):
 
         self.hideAllBoxes()
         self.groupBoxes[0].show()
+
+    def getModifiers(self):
+        return self.modifiers;
+
+    # return list of pairs of modifier names for symmetric body parts
+    def getSymmetricModifierPairNames(self):
+        pairs = []
+        for modifierName in self.modifiers:
+            if modifierName.startswith("r-"):
+                baseModifierName = modifierName[2:]
+                oppModifierName = "l-"+baseModifierName
+                pair = { 'left': modifierName,
+                        'right': oppModifierName }
+                pairs.append(pair)
+
+        return pairs;
+
+    # return list of singular modifier names
+    def getSingularModifierNames(self):
+        modifiers = [] 
+        for modifierName in self.modifiers:
+            if not modifierName.startswith("r-") and not modifierName.startswith("l-"):
+                modifiers.append(modifierName)
+
+        return modifiers;
+
 
     def hideAllBoxes(self):
 

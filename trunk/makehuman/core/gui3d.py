@@ -883,6 +883,19 @@ class TaskView(View):
         self.tab.setSelected(False)
         self.hide()
 
+    def getModifiers(self):
+        return {}
+
+    # return list of pairs of modifier names for symmetric body parts
+    # each pair is defined as { 'left':<left modifier name>, 'right':<right modifier name> }
+    def getSymmetricModifierPairNames(self):
+        return []
+
+    # return list of singular modifier names
+    def getSingularModifierNames(self):
+        return []
+ 
+
 
 # A category grouping similar tasks
 CategoryTabStyle = Style(**{
@@ -956,6 +969,21 @@ class Category(View):
         self.tabs.layout.rebuild()
         self.tabs.box.mesh.resize(event.width, 32)
 
+    def getViewByName(self, viewName):
+        """
+        Retrieve a view by name. Return the view or None if no matching view found.
+
+        :param viewName: The name of the view to be retrieved.
+        """
+        for view in self.children:
+            if hasattr(view, 'name'):
+                if view.name == viewName:
+                    return view
+        
+        return None
+
+
+ 
 # The application
 app = None
 
