@@ -137,14 +137,15 @@ class CArmature:
                 bone.drivers.append(drv)     
                 
 
-    def clear(self):
+    def clear(self, update=False):
         print "Clear armature"
         for bone in self.boneList:
             bone.matrixPose = tm.identity_matrix()
-        self.human.posesNeedReset = False
-        warpmodifier.resetWarps(self.human)
-        self.update()     
-        self.removeModifier()
+        if update:
+            self.human.posesNeedReset = False
+            warpmodifier.resetWarps(self.human)
+            self.update()     
+            self.removeModifier()
 
 
     def rebuild(self, update=True):   

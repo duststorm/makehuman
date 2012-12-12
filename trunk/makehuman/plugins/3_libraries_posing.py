@@ -40,6 +40,7 @@ import armature
 from armature import transformations as tm
 import warpmodifier
 import humanmodifier
+import posemode
 
 #
 #   Pose library
@@ -65,8 +66,6 @@ class PoseLoadTaskView(gui3d.TaskView):
         self.systemPoses = os.path.join('data', 'poses')
         self.userPoses = os.path.join(mh.getPath(''), 'data', 'poses')
 
-        self.human = gui3d.app.selectedHuman
-        self.armature = None
         self.dirty = False
         
         gui3d.TaskView.__init__(self, category, 'Poses')
@@ -92,31 +91,31 @@ class PoseLoadTaskView(gui3d.TaskView):
     
         print "Load Mhp", filepath
 
-        if self.armature:
-            self.armature.printLocs()
-            print "Clear", self.armature
-            self.armature.clear()
-            self.armature.printLocs()
+        human = gui3d.app.selectedHuman
+
+        if human.armature:
+            posemode.exitPoseMode(human)
         
         if os.path.basename(filepath) == "clear.mhp":
-            self.armature = None
+            posemode.exitPoseMode(human)
             return
 
+        posemode.enterPoseMode(human)
         folder = os.path.dirname(filepath)
         (fname, ext) = os.path.splitext(os.path.basename(filepath))
         modpath = '%s/${gender}-${age}-${tone}-${weight}-%s.target' % (folder, fname)
         modpath = modpath.replace("\\","/")
         print filepath, modpath
         modifier = PoseModifier(modpath)
-        #cProfile.runctx( 'modifier.updateValue(self.human, 1.0)', globals(), locals())
-        modifier.updateValue(self.human, 1.0)
+        #cProfile.runctx( 'modifier.updateValue(human, 1.0)', globals(), locals())
+        modifier.updateValue(human, 1.0)
         
-        if not self.armature:
-            self.armature = armature.rigdefs.createRig(self.human, "soft1", False)
+        if not human.armature:
+            human.armature = armature.rigdefs.createRig(human, "soft1", False)
             
-        self.armature.setModifier(modifier)
+        human.armature.setModifier(modifier)
 
-        self.armature.readMhpFile(filepath)
+        human.armature.readMhpFile(filepath)
 
  
     def onShow(self, event):
@@ -137,28 +136,11 @@ class PoseLoadTaskView(gui3d.TaskView):
 
 
     def onHumanChanging(self, event):
-        print "Pose onHumanChanging", event.change, event.human.posesNeedReset, self.armature
-        
-        human = event.human
-        if 0 and self.armature:
-            self.armature.clear()
-            self.armature = None
-            event.human.posesNeedReset = False
-        if event.change == 'reset':
-            print "Reset", self.armature
-            if self.armature:
-                self.armature.clear()
-                self.armature = None
+        posemode.changePoseMode(event)
 
                 
     def onHumanChanged(self, event):
-        print "Pose onHumanChanged", event.change, event.human.posesNeedReset, self.armature
-        if self.armature:
-            self.armature.clear()
-            self.armature = None
-            #print "Rebuild", self.armature
-            #self.armature.rebuild()            
-
+        posemode.changePoseMode(event)
         #self.deleteModifier()
 
 

@@ -8,6 +8,7 @@ import warpmodifier
 import warp
 import os
 import mh
+import posemode
 
 print 'Expression imported'
 
@@ -94,8 +95,7 @@ class ExpressionTaskView(gui3d.TaskView):
         
     def onHumanChanged(self, event):
         
-        human = event.human
-        
+        posemode.changePoseMode(event)        
         for slider in self.sliders:
             slider.update()
                 
@@ -135,7 +135,7 @@ class ExpressionTaskView(gui3d.TaskView):
     def loadExpression(self, filename, include):
 
         human = gui3d.app.selectedHuman
-
+        posemode.enterPoseMode(human)
         self.resetExpressions(include)
 
         f = open(filename, 'r')

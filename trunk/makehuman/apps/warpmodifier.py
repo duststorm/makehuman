@@ -283,9 +283,6 @@ def getRefObject(human):
     if human.warpsNeedReset:
         print "Reference character changed"
         human.warpsNeedReset = False                        
-        if human.armature:
-            human.armature.clear()
-            return True
         resetWarps(human)
         return True
     else:
@@ -296,7 +293,7 @@ def resetWarps(human):
     global theRefObjectPaths, theRefObjectVerts, theBaseObjectVerts
        
     print "Reset warps"
-    human.syncShadowCoords()    
+    #human.syncShadowCoords()    
     theRefObjectVerts = copyArray(theBaseObjectVerts)
     for char in theRefObjectPaths:
         cval = human.getDetail(char)

@@ -39,6 +39,7 @@ import mh2proxy
 import export_config
 import armature
 import warpmodifier
+import posemode
 
 from . import the
 from . import mhx_rig
@@ -59,7 +60,8 @@ the.Human = 'Human'
 #    exportMhx(human, filename, options):
 #
 
-def exportMhx(human, filename, options):    
+def exportMhx(human, filename, options):  
+    posemode.exitPoseMode(human)
     config = export_config.exportConfig(human, True, options)
     (fpath, ext) = os.path.splitext(filename)
 
