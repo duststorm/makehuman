@@ -1081,8 +1081,8 @@ def printProxyVGroup(fp, vgroups):
 #    writeShapeKeys(fp, human, name, config, proxy):
 #
 
-def writeCorrectives(fp, human, drivers, part, proxy, t0, t1):    
-    shapeList = read_expression.readCorrectives(drivers, human, part, t0, t1)
+def writeCorrectives(fp, human, drivers, folder, landmarks, proxy, t0, t1):    
+    shapeList = read_expression.readCorrectives(drivers, human, folder, landmarks, t0, t1)
     for (shape, pose, lr) in shapeList:
         writeShape(fp, pose, lr, shape, 0, 1, proxy)
     
@@ -1125,10 +1125,10 @@ def writeShapeKeys(fp, human, name, config, proxy):
                 writeShape(fp, pose, "Sym", shape, -1, 2, proxy)
         
     if config.bodyshapes and config.rigtype == "mhx":
-        writeCorrectives(fp, human, rig_shoulder_25.ShoulderTargetDrivers, "shoulder", proxy, 0.88, 0.90)                
-        writeCorrectives(fp, human, rig_leg_25.HipTargetDrivers, "hips", proxy, 0.90, 0.92)                
-        writeCorrectives(fp, human, rig_arm_25.ElbowTargetDrivers, "elbow", proxy, 0.92, 0.94)                
-        writeCorrectives(fp, human, rig_leg_25.KneeTargetDrivers, "knee", proxy, 0.94, 0.96)                
+        writeCorrectives(fp, human, rig_shoulder_25.ShoulderTargetDrivers, "shoulder", "shoulder", proxy, 0.88, 0.90)                
+        writeCorrectives(fp, human, rig_leg_25.HipTargetDrivers, "hips", "hips", proxy, 0.90, 0.92)                
+        writeCorrectives(fp, human, rig_arm_25.ElbowTargetDrivers, "elbow", "body", proxy, 0.92, 0.94)                
+        writeCorrectives(fp, human, rig_leg_25.KneeTargetDrivers, "knee", "knee", proxy, 0.94, 0.96)                
 
     if not proxy:
         for path,name in config.customShapeFiles:

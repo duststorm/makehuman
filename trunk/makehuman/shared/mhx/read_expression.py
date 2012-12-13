@@ -246,18 +246,18 @@ def readExpressionUnits(human, t0, t1):
     return shapeList
 
 
-def readCorrectives(drivers, human, part, t0, t1):
+def readCorrectives(drivers, human, folder, landmarks, t0, t1):
     shapeList = []
     t,dt = initTimes(drivers, 0.0, 1.0)
     
     for (pose, lr, expr, vars) in drivers:
-        gui3d.app.progress(t, text="Reading corrective %s %s" % (part, pose))
+        gui3d.app.progress(t, text="Reading corrective %s %s" % (folder, pose))
 
         shape = warpmodifier.compileWarpTarget(
-                "shared/mhx/targets/correctives/%s/caucasian/${gender}-${age}-${tone}-${weight}/%s.target" % (part, pose),
+                "shared/mhx/targets/correctives/%s/caucasian/${gender}-${age}-${tone}-${weight}/%s.target" % (folder, pose),
                 'GenderAgeMuscleWeightModifier',
                 human, 
-                part)
+                landmarks)
 
         shapeList.append((shape, pose, lr))
         t += dt
