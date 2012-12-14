@@ -61,7 +61,8 @@ the.Human = 'Human'
 #
 
 def exportMhx(human, filename, options):  
-    posemode.exitPoseMode(human)
+    posemode.exitPoseMode(human)        
+    posemode.enterPoseMode(human)
     config = export_config.exportConfig(human, True, options)
     (fpath, ext) = os.path.splitext(filename)
 
@@ -86,6 +87,7 @@ def exportMhx(human, filename, options):
             time2 = time.clock()
             print("Wrote MHX 2.5x file in %g s:" % (time2-time1), outfile)
 
+    posemode.exitPoseMode(human)        
     return        
 
 #
@@ -156,7 +158,6 @@ def exportMhx_25(human, config, fp):
         proxyCopy('Cage', human, config, proxyData, fp, 0.2, 0.25)
     
     gui3d.app.progress(0.25, text="Exporting main mesh")    
-    warpmodifier.resetWarpTargets(human)        
     if config.mainmesh:
         fp.write("#if toggle&T_Mesh\n")
         copyFile25(human, "shared/mhx/templates/meshes25.mhx", fp, None, config, proxyData)    

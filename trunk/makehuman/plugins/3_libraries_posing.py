@@ -93,9 +93,6 @@ class PoseLoadTaskView(gui3d.TaskView):
 
         human = gui3d.app.selectedHuman
 
-        if human.armature:
-            posemode.exitPoseMode(human)
-        
         if os.path.basename(filepath) == "clear.mhp":
             posemode.exitPoseMode(human)
             return
@@ -110,11 +107,9 @@ class PoseLoadTaskView(gui3d.TaskView):
         #cProfile.runctx( 'modifier.updateValue(human, 1.0)', globals(), locals())
         modifier.updateValue(human, 1.0)
         
-        if not human.armature:
-            human.armature = armature.rigdefs.createRig(human, "soft1", False)
-            
+    	if human.armature is None:
+    	    human.armature = armature.rigdefs.createRig(human, "soft1", False)            
         human.armature.setModifier(modifier)
-
         human.armature.readMhpFile(filepath)
 
  

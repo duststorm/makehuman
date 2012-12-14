@@ -22,10 +22,11 @@ class GroupBoxRadioButton(gui3d.RadioButton):
         self.parent.parent.hideAllBoxes()
         self.groupBox.show()
         
-class ExpressionSlider(humanmodifier.ModifierSlider):
-    def __init__(self, label, modifier):
         
-        humanmodifier.ModifierSlider.__init__(self, label=label, modifier=modifier)
+class ExpressionSlider(posemode.PoseModifierSlider):
+    def __init__(self, label, modifier):        
+        posemode.PoseModifierSlider.__init__(self, label, modifier)        
+
 
 class ExpressionTaskView(gui3d.TaskView):
 
@@ -119,15 +120,16 @@ class ExpressionTaskView(gui3d.TaskView):
 
         human = gui3d.app.selectedHuman
         
-        print "Reset", include
+        print "resetExpressions", include
 
         if include == "All":
             for name, modifier in self.modifiers.iteritems():
+                #print "  R", name
                 modifier.setValue(human, 0.0)
                 #modifier.updateValue(human, 0.0)  # Force recompilation
         else:
             for name, modifier in self.modifiers.iteritems():
-                print " R", name
+                print "  R", name
                 if name in include:
                     modifier.setValue(human, 0.0)
                     
@@ -173,6 +175,8 @@ class Action:
     def do(self):
         self.taskView.loadExpression(self.filename, self.include)
         self.human.applyAllTargets(gui3d.app.progress, True)
+        if self.human.armature:
+            self.human.armature.update()
         for slider in self.taskView.sliders:
             slider.update()
         if self.postAction:
@@ -183,6 +187,8 @@ class Action:
         for name, value in self.before.iteritems():
             self.taskView.modifiers[name].setValue(self.human, value)
         self.human.applyAllTargets(gui3d.app.progress, True)
+        if self.human.armature:
+            self.human.armature.update()
         for slider in self.taskView.sliders:
             slider.update()
         if self.postAction:

@@ -48,15 +48,12 @@ class Human(gui3d.Object):
         gui3d.Object.__init__(self, [0, 0, 0], mesh, True)
         
         self.warpsNeedReset = True
-        self.posesNeedReset = True
         self.armature = None
         algos3d.theHuman = self
         
         self.mesh.setCameraProjection(0)
         self.mesh.setShadeless(0)
         self.meshData = self.mesh
-        self.shadowCoords = None
-        self.syncShadowCoords()
         
         self.hairModelling = False #temporary variable for easier integration of makehair, will be cleaned later.
         self.hairObj = hairObj
@@ -108,14 +105,7 @@ class Human(gui3d.Object):
         self.muscleWeightModifier = humanmodifier.GenderAgeMuscleWeightModifier('data/targets/macrodetails/universal-${gender}-${age}-${tone}-${weight}.target')
         self.baseModifier = humanmodifier.GenderAgeEthnicModifier('data/targets/macrodetails/${ethnic}-${gender}-${age}.target')
         
-        self.setTexture("data/textures/texture.png")
-
-
-    def syncShadowCoords(self):
-        print "Sync shadow coords"
-        coords = [ list(v.co) for v in self.meshData.verts ]
-        self.shadowCoords = np.asarray(coords, dtype=np.float32)
-        
+        self.setTexture("data/textures/texture.png")        
 
 
     # Overriding hide and show to account for both human base and the hairs!
@@ -390,7 +380,6 @@ class Human(gui3d.Object):
         self.baseModifier.setValue(self, 1.0)
 
         algos3d.resetObj(self.meshData)
-        self.syncShadowCoords()
 
         if progressCallback:
             progressCallback(0.0)
@@ -431,7 +420,7 @@ class Human(gui3d.Object):
             
         self.callEvent('onChanged', HumanEvent(self, 'targets'))
         
-
+        
     def resetAllWarpTargets(self, force):
         hasChanged = False
         for (targetPath, morphFactor) in self.targetsDetailStack.iteritems():
@@ -442,14 +431,17 @@ class Human(gui3d.Object):
             if target:                
                 if (target.morphFactor != morphFactor) and not hasattr(target, "isPose"):
                     hasChanged = True
+                    print "Changed %s %f => %f", (target.name, target.morphFactor, morphFactor)
+                    break
             else:
                 print "New target:", os.path.basename(targetPath)
 
         if not (hasChanged or force):
             return
-            
+        
+        print "Warps need reset", hasChanged, force
         self.warpsNeedReset = True
-        self.posesNeedReset = True
+
         print "Human has changed - resetting warp targets"
         for target in algos3d.targetBuffer.values():
             if hasattr(target, "isWarp"):
@@ -460,9 +452,8 @@ class Human(gui3d.Object):
                 target.modifier.setValue(self, 0)
                 if target.modifier.slider:
                     target.modifier.slider.update()     
-                #target.apply(self, 0)
                 del algos3d.targetBuffer[target.name]
-                                
+
     
     def getPartNameForGroupName(self, groupName):
         for k in self.bodyZones:

@@ -599,19 +599,11 @@ expr135 = "2*(1-%.3f*x1)" % (2/pi)
 expr90_90 = "max(1-%.3f*x1,0)*max(1-%.3f*x2,0)" % (2/pi, 2/pi)
 
 ElbowTargetDrivers = [    
-    ("elbow-up-90", "LR", expr90_90, 
-        [("LoArmVec", "DirElbowUp"),
-         ("LoArm", "LoArmVec")]),
-    ("elbow-up-90-neg-90", "LR", expr90_90,
-        [("LoArmVec", "DirElbowUp"),
-         ("LoArm", "LoArmVecNeg")]),
+    ("elbow-up-90", "LR", expr90, 
+        [("LoArmVec", "DirElbowUp")]),
 
-    ("elbow-down-90", "LR", expr90_90, 
-        [("LoArmVec", "DirElbowDown"),
-         ("LoArm", "LoArmVec")]),
-    ("elbow-down-90-pos-90", "LR", expr90_90,
-        [("LoArmVec", "DirElbowDown"),
-         ("LoArm", "LoArmVecPos")]),
+    ("elbow-down-90", "LR", expr90, 
+        [("LoArmVec", "DirElbowDown")]),
 
 
 #    ("loarms-forward-90",  "LR", expr90,

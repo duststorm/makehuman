@@ -35,6 +35,7 @@ import os
 import warp
 import humanmodifier
 
+ShadowCoords = None
 
 #----------------------------------------------------------
 #   class WarpTarget
@@ -84,8 +85,7 @@ def saveWarpedTarget(shape, path):
     for (n, dr) in slist:
         fp.write("%d %.4f %.4f %.4f\n" % (n, dr[0], dr[1], dr[2]))
     fp.close()
-    
-   
+         
 #----------------------------------------------------------
 #   class WarpModifier
 #----------------------------------------------------------
@@ -104,6 +104,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
             
         humanmodifier.SimpleModifier.__init__(self, warppath)
         self.fallback = eval( "humanmodifier.%s('%s')" % (fallback, template))
+        self.modtype = fallback
 
         self.warppath = warppath
         self.template = template
@@ -140,29 +141,28 @@ class WarpModifier (humanmodifier.SimpleModifier):
         return humanmodifier.SimpleModifier.updateValue(self, human, value, updateNormals)
         
 
-    # overrides
-
     def clampValue(self, value):
         return max(0.0, min(1.0, value))
 
 
     def compileWarpTarget(self, human):
+        global ShadowCoords
         print "Compile", self
         landmarks = theLandMarks[self.bodypart]
-        hasChanged = getRefObject(human)
-        self.getRefTarget(human)    
-        #print len(list(self.refTargetVerts)), len(list(theRefObjectVerts)), len(list(human.shadowCoords))
+        objectChanged = self.getRefObject(human)
+        self.getRefTarget(human, objectChanged)    
+        #print len(list(self.refTargetVerts)), len(list(theRefObjectVerts[self.modtype])), len(list(ShadowCoords))
         if self.refTargetVerts:
-            shape = warp.warp_target(self.refTargetVerts, theRefObjectVerts, human.shadowCoords, landmarks)
+            shape = warp.warp_target(self.refTargetVerts, theRefObjectVerts[self.modtype], ShadowCoords, landmarks)
         else:
             shape = {}
         print "...done"
         return shape
 
 
-    def getRefTarget(self, human):       
+    def getRefTarget(self, human, objectChanged):       
         targetChanged = self.getBases(human)
-        if targetChanged:
+        if targetChanged or objectChanged:
             print "Reference target changed"
             if not self.makeRefTarget(human):
                 print "Updating character"
@@ -177,7 +177,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
         for key in self.bases.keys():
             char,cval0 = self.bases[key]
     
-            verts = getRefObjectVerts(char)
+            verts = self.getRefObjectVerts(char)
             if verts is None:
                 self.bases[key] = char,0
                 continue
@@ -279,42 +279,35 @@ class WarpModifier (humanmodifier.SimpleModifier):
         del algos3d.targetBuffer[self.warppath]
         
         
-def getRefObject(human):
-    if human.warpsNeedReset:
-        print "Reference character changed"
-        human.warpsNeedReset = False                        
-        resetWarps(human)
-        return True
-    else:
-        return False
-        
-
-def resetWarps(human):        
-    global theRefObjectPaths, theRefObjectVerts, theBaseObjectVerts
-       
-    print "Reset warps"
-    #human.syncShadowCoords()    
-    theRefObjectVerts = copyArray(theBaseObjectVerts)
-    for char in theRefObjectPaths:
-        cval = human.getDetail(char)
-        if cval:
-            print "  refobj", os.path.basename(char), cval
-            verts = getRefObjectVerts(char)
-            if verts is not None:
-                theRefObjectVerts = addVerts(theRefObjectVerts, cval, verts)
-
-
-def getRefObjectVerts(path):
-    global theRefObjects
+    def getRefObject(self, human):
+        global theRefObjects, theRefObjectVerts, theBaseObjectVerts
     
-    try:
-        return theRefObjects[path]
-    except KeyError:
-        pass
-    verts = readTarget(path)
-    if verts is not None:
-        theRefObjects[path] = verts
-    return verts            
+        if theRefObjectVerts[self.modtype]:
+            return False
+        else:
+            print "Reset warps"
+            refverts = copyArray(theBaseObjectVerts)
+            for char in theRefObjects.keys():
+                cval = human.getDetail(char)
+                if cval:
+                    print "  refobj", os.path.basename(char), cval
+                    verts = self.getRefObjectVerts(char)
+                    if verts is not None:
+                        refverts = addVerts(refverts, cval, verts)
+            theRefObjectVerts[self.modtype] = refverts                
+            return True
+
+
+    def getRefObjectVerts(self, path):
+        global theRefObjects
+    
+        if theRefObjects[path]:
+            return theRefObjects[path]
+        else:
+            verts = readTarget(path)
+            if verts is not None:
+                theRefObjects[path] = verts
+            return verts            
     
 
 def getBaseName(path, name1, name2, name3):
@@ -359,8 +352,8 @@ def getBaseCharacter(path):
 #   Call from exporter
 #----------------------------------------------------------
 
-def resetWarpTargets(human):
-    human.applyAllTargets(forceWarpReset=True)    
+#def resetWarpTargets(human):
+#    human.applyAllTargets(forceWarpReset=True)    
 
 
 def compileWarpTarget(template, fallback, human, bodypart):
@@ -433,8 +426,15 @@ def copyArray(verts):
 #   Init globals
 #----------------------------------------------------------
 
+def clearRefObject():
+    global theRefObjectVerts
+    theRefObjectVerts = {}
+    theRefObjectVerts["GenderAgeMuscleWeightModifier"] = None
+    theRefObjectVerts["GenderAgeEthnicModifier2"] = None
+    
+
 def defineGlobals():
-    global theLandMarks, theBaseObjectVerts, theRefObjectPaths, theRefObjects
+    global theLandMarks, theBaseObjectVerts, theRefObjects
     
     obj = files3d.loadMesh("data/3dobjs/base.obj")
     theBaseObjectVerts = [ v.co for v in obj.verts ]
@@ -457,26 +457,26 @@ def defineGlobals():
 
         theLandMarks[name] = landmark
     
-    theRefObjectPaths = []
+    clearRefObject()
     theRefObjects = {}
 
     for race in ["african", "asian", "neutral"]:
         for age in ["child", "young", "old"]:
             for gender in ["female", "male"]:
                 path = "data/targets/macrodetails/%s-%s-%s.target" % (race, gender, age)
-                theRefObjectPaths.append(path)
+                theRefObjects[path] = None
                 
     for age in ["child", "young", "old"]:
         for gender in ["female", "male"]:
             for tone in ["flaccid", "muscle"]:
                 path = "data/targets/macrodetails/universal-%s-%s-%s.target" % (gender, age, tone)
-                theRefObjectPaths.append(path)
+                theRefObjects[path] = None
                 for weight in ["light", "heavy"]:
                     path = "data/targets/macrodetails/universal-%s-%s-%s-%s.target" % (gender, age, tone, weight)
-                    theRefObjectPaths.append(path)
+                    theRefObjects[path] = None
             for weight in ["light", "heavy"]:
                 path = "data/targets/macrodetails/universal-%s-%s-%s.target" % (gender, age, weight)
-                theRefObjectPaths.append(path)
+                theRefObjects[path] = None
 
 defineGlobals()
        

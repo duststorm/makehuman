@@ -142,8 +142,6 @@ class CArmature:
         for bone in self.boneList:
             bone.matrixPose = tm.identity_matrix()
         if update:
-            self.human.posesNeedReset = False
-            warpmodifier.resetWarps(self.human)
             self.update()     
             self.removeModifier()
 
