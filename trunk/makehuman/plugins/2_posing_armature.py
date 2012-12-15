@@ -137,7 +137,6 @@ class PoseArmatureTaskView(gui3d.TaskView):
         self.showMesh = self.mainBox.addView(gui3d.CheckBox("Show Mesh", True))
         self.showRig = self.mainBox.addView(gui3d.CheckBox("Show Rig", False))
         self.restPosition = self.mainBox.addView(gui3d.CheckBox("Rest Position", False))
-        self.quatSkinning = self.mainBox.addView(gui3d.CheckBox("Quaternion skinning", False))
         
         #self.updateButton = self.mainBox.addView(gui3d.Button("Update"))
         self.reloadCharacterButton = self.mainBox.addView(gui3d.Button("Reload Character"))
@@ -232,7 +231,6 @@ class PoseArmatureTaskView(gui3d.TaskView):
         @self.showMesh.event
         def onClicked(event):
             gui3d.CheckBox.onClicked(self.showMesh, event)
-            self.armature.quatSkinning = self.quatSkinning.selected
             self.updateAll()                        
 
         @self.showRig.event
@@ -269,7 +267,10 @@ class PoseArmatureTaskView(gui3d.TaskView):
             if amt:
                 #amt.hide()
                 gui3d.app.removeObject(amt)
-            self.armature = armature.rigdefs.createRig(human, self.armature.rigtype, self.quatSkinning.selected)
+            if self.armature:
+                self.armature.rebuild()
+            else:
+                self.armature = armature.rigdefs.createRig(human, self.armature.rigtype)
             print "  ", human.meshData.verts[0]
             self.updateAll()
             print "  ", human.meshData.verts[0]
@@ -354,7 +355,10 @@ class PoseArmatureTaskView(gui3d.TaskView):
     def selectRig(self, prismType, rigtype):     
         self.prismType = prismType
         self.rigtype = rigtype
-        self.armature = armature.rigdefs.createRig(gui3d.app.selectedHuman, self.rigtype, self.quatSkinning.selected)
+        if self.armature:
+            self.armature.rebuild()
+        else:
+            self.armature = armature.rigdefs.createRig(gui3d.app.selectedHuman, self.rigtype)
         self.armatureObject = None
         
         self.mainBox.show()
@@ -454,7 +458,6 @@ class PoseArmatureTaskView(gui3d.TaskView):
         if not self.armature:
             return
         self.armature.restPosition = self.restPosition.selected
-        self.armature.quatSkinning = self.quatSkinning.selected
         human = gui3d.app.selectedHuman
         self.armature.update()
         amt = self.getArmature()

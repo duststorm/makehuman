@@ -99,7 +99,7 @@ import guimodelling, guifiles#, guirender
 from aljabr import centroid, vdist
 import algos3d
 import module3d
-import posemode
+#import posemode
 from math import tan, pi
 
 class Camera(events3d.EventHandler):
@@ -703,11 +703,11 @@ class MHApplication(gui3d.Application):
             self.promptAndExit()
           
         self.undoButton = self.addView(gui3d.Button("Undo",
-            style=gui3d.ButtonStyle._replace(width=40, left=650, top=480, zIndex=9.1)))
+            style=gui3d.ButtonStyle._replace(width=40, left=650, top=505, zIndex=9.1)))
         self.redoButton = self.addView(gui3d.Button("Redo",
-            style=gui3d.ButtonStyle._replace(width=40, left=694, top=480, zIndex=9.1)))
+            style=gui3d.ButtonStyle._replace(width=40, left=694, top=505, zIndex=9.1)))
         self.resetButton = self.addView(gui3d.Button("Reset",
-            style=gui3d.ButtonStyle._replace(width=40, left=738, top=480, zIndex=9.1)))
+            style=gui3d.ButtonStyle._replace(width=40, left=738, top=505, zIndex=9.1)))
                                         
         @self.undoButton.event
         def onClicked(event):
@@ -727,12 +727,10 @@ class MHApplication(gui3d.Application):
             mh.setCaption("MakeHuman r" + os.environ['SVNREVISION'] + " - [Untitled]")
           
         self.globalButton = self.addView(gui3d.Button("Global cam",
-            style=gui3d.ButtonStyle._replace(width=128, height=20, left=650, top=505, zIndex=9.1)))
-        self.faceButton = self.addView(gui3d.Button("Face cam",
             style=gui3d.ButtonStyle._replace(width=128, height=20, left=650, top=530, zIndex=9.1)))
-        self.poseModeBox = self.addView(gui3d.CheckBox("Pose mode", False,
-            style=gui3d.CheckBoxStyle._replace(width=128, height=20, left=650, top=555, zIndex=9.1)))
-        
+        self.faceButton = self.addView(gui3d.Button("Face cam",
+            style=gui3d.ButtonStyle._replace(width=128, height=20, left=650, top=555, zIndex=9.1)))
+
         @self.globalButton.event
         def onClicked(event):
           gui3d.app.setGlobalCamera()
@@ -740,7 +738,11 @@ class MHApplication(gui3d.Application):
         @self.faceButton.event
         def onClicked(event):
           gui3d.app.setFaceCamera()
-          
+
+        """          
+        self.poseModeBox = self.addView(gui3d.CheckBox("Pose mode", False,
+            style=gui3d.CheckBoxStyle._replace(width=128, height=20, left=650, top=555, zIndex=9.1)))
+        
         @self.poseModeBox.event
         def onClicked(event):
           print dir(event)
@@ -748,7 +750,8 @@ class MHApplication(gui3d.Application):
             posemode.exitPoseMode()
           else:
             posemode.enterPoseMode()
-
+        """
+        
         self.switchCategory("Modelling")
 
         self.progressBar.setProgress(1.0)

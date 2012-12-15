@@ -594,6 +594,7 @@ def setupRig(obj, config, proxyData):
             the.RigTail[bone] = findLocation(tail)
 
         appendRigBones(boneList, obj, "", L_MAIN, [], config)
+        print("BL", boneList[0])
         config.boneGroups = []
         config.recalcRoll = []              
         config.vertexGroupFiles = []

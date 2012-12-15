@@ -77,13 +77,13 @@ LayerNames = [
 ]
         
 class CArmature:
-    def __init__(self, human, config, quatSkinning):
+    def __init__(self, human, config):
         self.name = "Armature"
         self.config = config
         self.human = human
         self.modifier = None
-        self.quatSkinning = quatSkinning
         self.restPosition = False
+        self.dirty = True
         self.frames = []
         self.bones = {}
         self.boneList = []
@@ -98,7 +98,8 @@ class CArmature:
             self.last = 1
 
         self.matrixGlobal = tm.identity_matrix()
-        self.restVerts = {}
+        self.restCoords = None
+        self.boneWeights = {}
         if config.vertexWeights:
             self.vertexgroups = config.vertexWeights
         elif config.rigtype == "mhx":
@@ -125,7 +126,7 @@ class CArmature:
         verts = self.human.meshData.verts
         for vn in [3825]:
             x = verts[vn].co
-            y = self.restVerts[vn].co
+            y = self.restCoords[vn]
             print("   %d (%.4f %.4f %.4f) (%.4f %.4f %.4f)" % (vn, x[0], x[1], x[2], y[0], y[1], y[2]))
 
 
@@ -176,14 +177,16 @@ class CArmature:
         
 
     def rebuild(self, update=True):   
+        print "Rebuild", self, update, self.config.rigtype
         obj = self.human.meshData
         proxyData = {}
         mhx.mhx_rig.setupRig(obj, self.config, proxyData)
+        print "RHT", the.RigHead["Root"], the.RigTail["Root"]
         for bone in self.boneList:
             bone.rebuild()
             if bone.name in []:
                 print bone.name, bone.head, bone.tail
-                print "R", bone.matrixRest
+                #print "R", bone.matrixRest
                 #print "P", bone.matrixPose
                 #print "G", bone.matrixGlobal
         if self.modifier:
@@ -195,12 +198,10 @@ class CArmature:
 
     def syncRestVerts(self, caller):
         print "Synch rest verts: ", caller        
-        obj = self.human.meshData
-        #for v in obj.verts:
-        #    self.restVerts[v.idx].co[:3] = v.co
-        nVerts = len(obj.verts)
-        for n in range(nVerts):
-            self.restVerts[n].co[:3] = warpmodifier.ShadowCoords[n]
+        #nVerts = len(self.restVerts)
+        self.restCoords[:,:3] = warpmodifier.getWarpedCoords()
+        #for n in range(nVerts):
+        #    self.restVerts[n].co[:3] = coords[n]
     
 
     def removeModifier(self):
@@ -262,34 +263,27 @@ class CArmature:
         
     def updateObj(self):
         obj = self.human.meshData
-        coords = numpy.zeros((len(obj.verts), 3), float)
-        for n,v in enumerate(obj.verts):
-            vert = self.restVerts[v.idx]
-            coords[n] = vert.co[:3]
+        nVerts = len(obj.verts)
+        coords = numpy.zeros((nVerts,4), float)
+        for bname,data in self.boneWeights.items():
+            bone = self.bones[bname]
+            verts,weights = data
+            vec = dot(bone.matrixVerts, self.restCoords[verts].transpose())
+            wvec = weights*vec
+            coords[verts] += wvec.transpose()
+
+        """   
+        for vn in range(nVerts):
+            vert = self.restVerts[vn]
             if vert.groups:
-                if self.quatSkinning:
-                    if v.idx == 3902:
-                        print "Knee"
-                        print vert.groups
-                        print vert.dualQuat
-                    vert.dualQuat.weightedBoneSum(vert.groups)
-                    if v.idx == 3902:
-                        print vert.dualQuat
-                    vert.dualQuat.normalize()
-                    mat = vert.dualQuat.toMatrix()
-                    if v.idx == 3902:
-                        print vert.dualQuat
-                        print mat
-                else:
-                    mat = numpy.zeros((4,4), float)
-                    for bone,w in vert.groups:
-                        mat += w*bone.matrixVerts
-
-                coords[n] = dot(mat,vert.co)[:3] 
-                #if v.co[1] > 15:
-                #    halt
-
-        obj.changeCoords(coords)
+                mat = numpy.zeros((4,4), float)
+                for bone,w in vert.groups:
+                    mat += w*bone.matrixVerts
+                coords[vn] = dot(mat,vert.co)[:3] 
+            else:
+                coords[vn] = vert.co[:3]
+        """
+        obj.changeCoords(coords[:,:3])
         obj.calcNormals()
         obj.update()
 
@@ -308,25 +302,29 @@ class CArmature:
             if bone.layers & self.visible:
                 self.controls.append(bone)
             
-        obj = self.human.meshData
 
-        if not self.restVerts:
-            for v in obj.verts:
-                self.restVerts[v.idx] = CVertex(v)
-            for bname,vgroup in self.vertexgroups.items():
-                bone = self.bones[bname]
+        if not self.boneWeights:
+            nVerts = len(warpmodifier.ShadowCoords)
+            self.restCoords = numpy.zeros((nVerts,4), float)
+            self.restCoords[:,3] = 1
+            self.syncRestVerts("rest")
+            
+            wtot = numpy.zeros(nVerts, float)
+            for vgroup in self.vertexgroups.values():
                 for vn,w in vgroup:
-                    vert = self.restVerts[vn]
-                    vert.groups.append((bone,w))
-            for vn,vert in self.restVerts.items():
-                wtot = 0
-                for bone,w in vert.groups:
-                    wtot += w
-                vgroup = []
-                for bone,w in vert.groups:
-                    vgroup.append((bone,w/wtot))
-                vert.groups = vgroup       
-        else:
+                    wtot[vn] += w
+
+            self.boneWeights = {}
+            for bname,vgroup in self.vertexgroups.items():
+                weights = numpy.zeros(len(vgroup), float)
+                verts = []
+                n = 0
+                for vn,w in vgroup:
+                    verts.append(vn)
+                    weights[n] = w/wtot[vn]
+                    n += 1
+                self.boneWeights[bname] = (verts, weights)
+        else:                
             self.syncRestVerts("build")
                 
                 
@@ -469,24 +467,6 @@ class CArmature:
         self.update()                    
 
                 
-class CVertex:
-    def __init__(self, vert):
-        self.idx = vert.idx
-        self.co = numpy.array( (vert.co[0], vert.co[1], vert.co[2], 1) )
-        self.groups = []
-        self.dualQuat = dual_quaternions.DualQuaternion()
-        
-        
-    def __repr__(self):
-        if not self.groups:
-            return ""
-        string = "<CVertex %d %s [" % (self.idx, self.co)
-        for (b,w) in self.groups:
-            string += "\n  %s %.4g" % (b.name, w)
-        return string + "] >"
-        
-        
-   
 class CBone:
     def __init__(self, amt, name, roll, parent, flags, layers, bbone):
         self.name = name
@@ -538,7 +518,6 @@ class CBone:
         self.matrixPose = None
         self.matrixGlobal = None
         self.matrixVerts = None
-        self.dualQuat = dual_quaternions.DualQuaternion()
 
             
     def __repr__(self):
@@ -571,8 +550,12 @@ class CBone:
         else:
             self.matrixRelative = self.matrixRest
             self.matrixGlobal = self.matrixRelative   
-        self.matrixVerts = dot(self.matrixGlobal, inv(self.matrixRest))
-        self.dualQuat.fromMatrix(self.matrixVerts)
+        try:
+            self.matrixVerts = dot(self.matrixGlobal, inv(self.matrixRest))
+        except:
+            print self.name, self.head, self.tail
+            print self.matrixRest
+            halt
                        
 
     def getHead(self):
@@ -740,7 +723,6 @@ class CBone:
         for cns in self.constraints:
             cns.update(self.armature, self)
         self.matrixVerts = dot(self.matrixGlobal, numpy.linalg.inv(self.matrixRest))
-        self.dualQuat.fromMatrix(self.matrixVerts)
             
 
 
@@ -907,7 +889,7 @@ def checkPoints(vec1, vec2):
             (abs(vec1[2]-vec2[2]) < 1e-6))
     
 
-def createRig(human, rigtype, quatSkinning):
+def createRig(human, rigtype):
     config = export_config.exportConfig(human, True)
     config.exporting = False
     config.feetonground = False
@@ -919,7 +901,7 @@ def createRig(human, rigtype, quatSkinning):
     proxyData = {}
     mhx.mhx_rig.setupRig(obj, config, proxyData)
 
-    amt = CArmature(human, config, quatSkinning)
+    amt = CArmature(human, config)
     the.createdArmature = amt
     for (bname, roll, parent, flags, layers, bbone) in config.armatureBones:
         if config.exporting or layers & ACTIVE_LAYERS:

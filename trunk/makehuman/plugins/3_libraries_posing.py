@@ -108,8 +108,11 @@ class PoseLoadTaskView(gui3d.TaskView):
         modifier.updateValue(human, 1.0)
         
         amt = human.armature
-        if amt is None:
-            amt = human.armature = armature.rigdefs.createRig(human, "soft1", False)            
+        if amt:
+            pass
+            #amt.rebuild()
+        else:
+            amt = human.armature = armature.rigdefs.createRig(human, "soft1")            
         amt.setModifier(modifier)
         amt.readMhpFile(filepath)
         #amt.listPose()

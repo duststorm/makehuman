@@ -63,13 +63,13 @@ def enterPoseMode():
     warpmodifier.ShadowCoords = human.meshData.coord.copy()
     warpmodifier.clearRefObject()
     human.warpsNeedReset = False
-    if theShadowBones:
+    if False and theShadowBones:
         amt = armature.rigdefs.createRig(human, "Soft1", False)
         human.armature = amt
         amt.restore(theShadowBones)
         amt.update()
     print "Pose mode entered"
-    gui3d.app.poseModeBox.selected = True
+    #gui3d.app.poseModeBox.selected = True
     printVert(human)
 
     
@@ -93,15 +93,15 @@ def exitPoseMode():
     obj.changeCoords(warpmodifier.ShadowCoords)
     obj.calcNormals()
     obj.update()
-    warpmodifier.ShadowCoords = None
     
     if amt:
         amt.update()     
+        amt.dirty = True
         #amt.removeModifier()
         human.armature = None    
-        
+    warpmodifier.ShadowCoords = None    
     print "Pose mode exited"    
-    gui3d.app.poseModeBox.selected = False
+    #gui3d.app.poseModeBox.selected = False
     printVert(human)
     
     

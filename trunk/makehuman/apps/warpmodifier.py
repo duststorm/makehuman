@@ -50,7 +50,6 @@ class WarpTarget(algos3d.Target):
         self.human = human
         self.modifier = modifier
         self.isWarp = True
-        self.isPose = True
         self.isDirty = True
         self.isObsolete = False
         
@@ -367,6 +366,16 @@ def removeAllWarpTargets(human):
             if target.modifier.slider:
                 target.modifier.slider.update()     
             del algos3d.targetBuffer[target.name]
+
+
+def getWarpedCoords():
+    coords = ShadowCoords.copy()
+    for target in algos3d.targetBuffer.values():
+        if hasattr(target, "isWarp") and not hasattr(target, "isPose"):
+            verts = algos3d.targetBuffer[target.name].verts
+            coords[verts] += target.morphFactor * target.data
+    return coords                
+            
 
 #----------------------------------------------------------
 #   Call from exporter
