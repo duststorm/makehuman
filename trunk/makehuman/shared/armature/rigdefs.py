@@ -137,14 +137,43 @@ class CArmature:
                 bone.drivers.append(drv)     
                 
 
+    def listPose(self):
+        for bone in self.boneList:
+            quat = tm.quaternion_from_matrix(bone.matrixPose)
+            print "  ", bone.name, quat
+
+
     def clear(self, update=False):
         print "Clear armature"
         for bone in self.boneList:
             bone.matrixPose = tm.identity_matrix()
         if update:
+            halt
             self.update()     
             self.removeModifier()
 
+
+    def store(self):
+        shadowBones = {}
+        for bone in self.boneList:
+            shadowBones[bone.name] = bone.matrixPose
+            bone.matrixPose = tm.identity_matrix()
+        #self.listPose()
+        return shadowBones
+        
+        
+    def restore(self, shadowBones):        
+        for bone in self.boneList:
+            bone.matrixPose = shadowBones[bone.name]
+        #self.listPose()
+
+
+    def adapt(self):
+        shadowBones = self.store()
+        self.syncRestVerts("adapt")
+        self.restore(shadowBones)
+        self.update()
+        
 
     def rebuild(self, update=True):   
         obj = self.human.meshData
@@ -159,16 +188,19 @@ class CArmature:
                 #print "G", bone.matrixGlobal
         if self.modifier:
             self.modifier.updateValue(self.human, 1.0)
-        self.syncRestVerts()                
+        self.syncRestVerts("rebuild")                
         if update:
             self.update()            
 
 
-    def syncRestVerts(self):
-        print "Synch rest verts"
+    def syncRestVerts(self, caller):
+        print "Synch rest verts: ", caller        
         obj = self.human.meshData
-        for v in obj.verts:
-            self.restVerts[v.idx].co[:3] = v.co
+        #for v in obj.verts:
+        #    self.restVerts[v.idx].co[:3] = v.co
+        nVerts = len(obj.verts)
+        for n in range(nVerts):
+            self.restVerts[n].co[:3] = warpmodifier.ShadowCoords[n]
     
 
     def removeModifier(self):
@@ -176,7 +208,7 @@ class CArmature:
             self.modifier.updateValue(self.human, 0.0)
             self.modifier = None
             self.human.meshData.update()
-            self.syncRestVerts()                
+            self.syncRestVerts("removeModifier")                
             self.printLocs(["Remove", self.modifier])
 
         
@@ -184,7 +216,7 @@ class CArmature:
         if self.modifier:
             self.modifier.updateValue(self.human, 1.0)
             self.human.meshData.update()
-            self.syncRestVerts()                
+            self.syncRestVerts("updateModifier")                
             self.printLocs(["Update", self.modifier])
 
         
@@ -192,7 +224,7 @@ class CArmature:
         self.removeModifier()
         self.modifier = modifier
         self.modifier.updateValue(self.human, 1.0)
-        self.syncRestVerts()
+        self.syncRestVerts("setModifier")
         self.printLocs(["setModifier", self.modifier])
 
 
@@ -295,7 +327,7 @@ class CArmature:
                     vgroup.append((bone,w/wtot))
                 vert.groups = vgroup       
         else:
-            self.syncRestVerts()
+            self.syncRestVerts("build")
                 
                 
     def checkDirty(self):                

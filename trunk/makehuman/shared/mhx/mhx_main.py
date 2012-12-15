@@ -61,8 +61,8 @@ the.Human = 'Human'
 #
 
 def exportMhx(human, filename, options):  
-    posemode.exitPoseMode(human)        
-    posemode.enterPoseMode(human)
+    posemode.exitPoseMode()        
+    posemode.enterPoseMode()
     config = export_config.exportConfig(human, True, options)
     (fpath, ext) = os.path.splitext(filename)
 
@@ -87,7 +87,7 @@ def exportMhx(human, filename, options):
             time2 = time.clock()
             print("Wrote MHX 2.5x file in %g s:" % (time2-time1), outfile)
 
-    posemode.exitPoseMode(human)        
+    posemode.exitPoseMode()        
     return        
 
 #

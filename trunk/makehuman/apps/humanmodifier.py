@@ -84,11 +84,13 @@ class ModifierAction:
 class ModifierSlider(gui3d.Slider):
     
     def __init__(self, value=0.0, min=0.0, max=1.0, label=None,
-        style=gui3d.SliderStyle, thumbStyle=gui3d.SliderThumbStyle, modifier=None, valueConverter=None):
+        style=gui3d.SliderStyle, thumbStyle=gui3d.SliderThumbStyle, modifier=None, valueConverter=None,
+        warpResetNeeded=True):
         
         gui3d.Slider.__init__(self, value, min, max, label, style, thumbStyle, valueConverter)
         self.modifier = modifier
         self.value = None
+        self.warpResetNeeded = warpResetNeeded
         
     def onChanging(self, value):
         
@@ -104,6 +106,7 @@ class ModifierSlider(gui3d.Slider):
                     human.getSubdivisionMesh(False).setVisibility(0)
             self.modifier.updateValue(human, value, gui3d.app.settings.get('realtimeNormalUpdates', True))
             human.updateProxyMesh()
+            human.warpsNeedReset = self.warpResetNeeded
             
     def onChange(self, value):
         
@@ -117,6 +120,7 @@ class ModifierSlider(gui3d.Slider):
                 human.getSeedMesh().setVisibility(0)
             human.getSubdivisionMesh(False).setVisibility(1)
         self.value = None
+        human.warpsNeedReset = self.warpResetNeeded
         
     def update(self):
         
@@ -197,6 +201,7 @@ class GenericModifier:
     
         value = self.clampValue(value)
         factors = self.getFactors(human, value)
+        human.warpNeedReset = True
         
         for target in self.targets:
             human.setDetail(target[0], value * reduce(mul, [factors[factor] for factor in target[1]]))
@@ -235,6 +240,7 @@ class GenericModifier:
         if updateNormals:
             human.meshData.calcNormals(1, 1, self.verts, self.faces)
         human.meshData.update(self.verts, updateNormals)
+        human.warpNeedReset = True
 
 class SimpleModifier(GenericModifier):
 

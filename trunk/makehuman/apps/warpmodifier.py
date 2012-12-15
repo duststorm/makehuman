@@ -133,12 +133,18 @@ class WarpModifier (humanmodifier.SimpleModifier):
         return ("<WarpModifier %s>" % (os.path.basename(self.template)))
             
 
+    def setValue(self, human, value):
+        humanmodifier.SimpleModifier.setValue(self, human, value)
+        human.warpNeedReset = False
+
+
     def updateValue(self, human, value, updateNormals=1):        
         target = self.getWarpTarget(algos3d.theHuman)    
         if not target:
             return
         target.reinit()
-        return humanmodifier.SimpleModifier.updateValue(self, human, value, updateNormals)
+        humanmodifier.SimpleModifier.updateValue(self, human, value, updateNormals)
+        human.warpNeedReset = False
         
 
     def clampValue(self, value):
@@ -152,7 +158,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
         objectChanged = self.getRefObject(human)
         self.getRefTarget(human, objectChanged)    
         #print len(list(self.refTargetVerts)), len(list(theRefObjectVerts[self.modtype])), len(list(ShadowCoords))
-        if self.refTargetVerts:
+        if self.refTargetVerts and theRefObjectVerts[self.modtype]:
             shape = warp.warp_target(self.refTargetVerts, theRefObjectVerts[self.modtype], ShadowCoords, landmarks)
         else:
             shape = {}
@@ -348,13 +354,23 @@ def getBaseCharacter(path):
     return bases
 
 
+def removeAllWarpTargets(human):
+    print "Removing all warp targets"
+    for target in algos3d.targetBuffer.values():
+        if hasattr(target, "isWarp"):
+            print "  ", target
+            target.isDirty = True
+            target.isObsolete = True
+            human.setDetail(target.name, 0)
+            target.morphFactor = 0
+            target.modifier.setValue(human, 0)
+            if target.modifier.slider:
+                target.modifier.slider.update()     
+            del algos3d.targetBuffer[target.name]
+
 #----------------------------------------------------------
 #   Call from exporter
 #----------------------------------------------------------
-
-#def resetWarpTargets(human):
-#    human.applyAllTargets(forceWarpReset=True)    
-
 
 def compileWarpTarget(template, fallback, human, bodypart):
     mod = WarpModifier(template, bodypart, fallback)

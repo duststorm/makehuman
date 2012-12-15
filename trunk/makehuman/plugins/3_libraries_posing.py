@@ -94,23 +94,25 @@ class PoseLoadTaskView(gui3d.TaskView):
         human = gui3d.app.selectedHuman
 
         if os.path.basename(filepath) == "clear.mhp":
-            posemode.exitPoseMode(human)
+            posemode.exitPoseMode()
+            posemode.resetPoseMode()
             return
 
-        posemode.enterPoseMode(human)
+        posemode.enterPoseMode()
         folder = os.path.dirname(filepath)
         (fname, ext) = os.path.splitext(os.path.basename(filepath))
         modpath = '%s/${gender}-${age}-${tone}-${weight}-%s.target' % (folder, fname)
         modpath = modpath.replace("\\","/")
         print filepath, modpath
         modifier = PoseModifier(modpath)
-        #cProfile.runctx( 'modifier.updateValue(human, 1.0)', globals(), locals())
         modifier.updateValue(human, 1.0)
         
-    	if human.armature is None:
-    	    human.armature = armature.rigdefs.createRig(human, "soft1", False)            
-        human.armature.setModifier(modifier)
-        human.armature.readMhpFile(filepath)
+        amt = human.armature
+        if amt is None:
+            amt = human.armature = armature.rigdefs.createRig(human, "soft1", False)            
+        amt.setModifier(modifier)
+        amt.readMhpFile(filepath)
+        #amt.listPose()
 
  
     def onShow(self, event):
@@ -136,7 +138,6 @@ class PoseLoadTaskView(gui3d.TaskView):
                 
     def onHumanChanged(self, event):
         posemode.changePoseMode(event)
-        #self.deleteModifier()
 
 
     def loadHandler(self, human, values):

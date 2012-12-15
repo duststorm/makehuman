@@ -129,7 +129,7 @@ class ExpressionTaskView(gui3d.TaskView):
                 #modifier.updateValue(human, 0.0)  # Force recompilation
         else:
             for name, modifier in self.modifiers.iteritems():
-                print "  R", name
+                #print "  R", name
                 if name in include:
                     modifier.setValue(human, 0.0)
                     
@@ -137,7 +137,7 @@ class ExpressionTaskView(gui3d.TaskView):
     def loadExpression(self, filename, include):
 
         human = gui3d.app.selectedHuman
-        posemode.enterPoseMode(human)
+        posemode.enterPoseMode()
         self.resetExpressions(include)
 
         f = open(filename, 'r')
@@ -176,7 +176,7 @@ class Action:
         self.taskView.loadExpression(self.filename, self.include)
         self.human.applyAllTargets(gui3d.app.progress, True)
         if self.human.armature:
-            self.human.armature.update()
+            self.human.armature.adapt()
         for slider in self.taskView.sliders:
             slider.update()
         if self.postAction:

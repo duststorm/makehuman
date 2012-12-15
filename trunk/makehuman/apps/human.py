@@ -369,7 +369,7 @@ class Human(gui3d.Object):
         else:
             return None
     
-    def applyAllTargets(self, progressCallback=None, update=True, forceWarpReset=False):
+    def applyAllTargets(self, progressCallback=None, update=True):
         """
         This method applies all targets, in function of age and sex
 
@@ -386,8 +386,6 @@ class Human(gui3d.Object):
         progressVal = 0.0
         progressIncr = 0.5 / (len(self.targetsDetailStack) + 1)
 
-        self.resetAllWarpTargets(forceWarpReset)
-        
         for (targetPath, morphFactor) in self.targetsDetailStack.iteritems():
             algos3d.loadTranslationTarget(self.meshData, targetPath, morphFactor, None, 0, 0)
             
@@ -420,41 +418,7 @@ class Human(gui3d.Object):
             
         self.callEvent('onChanged', HumanEvent(self, 'targets'))
         
-        
-    def resetAllWarpTargets(self, force):
-        hasChanged = False
-        for (targetPath, morphFactor) in self.targetsDetailStack.iteritems():
-            try:
-                target = algos3d.targetBuffer[targetPath]
-            except KeyError:
-                target = None
-            if target:                
-                if (target.morphFactor != morphFactor) and not hasattr(target, "isPose"):
-                    hasChanged = True
-                    print "Changed %s %f => %f", (target.name, target.morphFactor, morphFactor)
-                    break
-            else:
-                print "New target:", os.path.basename(targetPath)
-
-        if not (hasChanged or force):
-            return
-        
-        print "Warps need reset", hasChanged, force
-        self.warpsNeedReset = True
-
-        print "Human has changed - resetting warp targets"
-        for target in algos3d.targetBuffer.values():
-            if hasattr(target, "isWarp"):
-                target.isDirty = True
-                target.isObsolete = True
-                self.setDetail(target.name, 0)
-                target.morphFactor = 0
-                target.modifier.setValue(self, 0)
-                if target.modifier.slider:
-                    target.modifier.slider.update()     
-                del algos3d.targetBuffer[target.name]
-
-    
+   
     def getPartNameForGroupName(self, groupName):
         for k in self.bodyZones:
             if k in groupName:
