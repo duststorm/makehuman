@@ -25,13 +25,6 @@ class Globals(object):
         self.keyUpCallback = None
         self.quitCallback = None
 
-        self.use_pil = False
-        self.use_glut = False
-        self.use_wx = False
-        self.use_qt = True
-        self.use_wximage = False
-        self.use_sdlimage = False
-        self.use_qtimage = True
         self.profile = False
 
 G = Globals()

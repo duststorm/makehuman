@@ -2,19 +2,7 @@ import os
 import numpy as np
 
 from core import G
-if G.use_qtimage:
-    import image_qt
-elif G.use_wximage:
-    import image_wx
-elif G.use_pil:
-    import image_pil
-elif G.use_sdlimage:
-    import image_sdl
-    import image_bmp
-    import image_png
-else:
-    import image_png
-    import image_bmp
+import image_qt
 
 _all = ['new', 'open', 'fromstring', 'fromdata']
 
@@ -22,15 +10,7 @@ def new(mode, size):
     return Image(mode, size)
 
 def open(path):
-    if G.use_qtimage:
-        return load_qt(path)
-    if G.use_wximage:
-        return load_wx(path)
-    if G.use_sdlimage:
-        return load_sdl(path)
-    if G.use_pil:
-        return load_pil(path)
-    return load_png(path)
+    return Image(data = image_qt.load(path))
 
 def fromstring(mode, size, data):
     im = Image(mode, size)
@@ -60,21 +40,7 @@ class Image(object):
         return {1: 'L', 2: 'LA', 3: 'RGB', 4: 'RGBA'}[c]
 
     def save(self, path):
-        if G.use_qtimage:
-            image_qt.save(path, self._data)
-        elif G.use_wximage:
-            image_wx.save(path, self._data)
-        elif G.use_pil:
-            image_pil.save(path, self._data)
-        else:
-            base, ext = os.path.splitext(path)
-            ext = ext.lower()
-            if ext == '.bmp':
-                image_bmp.save(path, self._data)
-            elif ext == '.png':
-                image_png.save(path, self._data)
-            else:
-                raise NotImplementedError()
+        image_qt.save(path, self._data)
 
     def resize(self, size, filter):
         dw, dh = size
@@ -132,19 +98,3 @@ class Image(object):
     def data(self):
         self._data = np.ascontiguousarray(self._data)
         return self._data
-
-def load_png(path):
-    return Image(data = image_png.load(path))
-
-def load_sdl(path):
-    return Image(data = image_sdl.load(path))
-
-def load_wx(path):
-    return Image(data = image_wx.load(path))
-
-def load_pil(path):
-    return Image(data = image_pil.load(path))
-
-def load_qt(path):
-    return Image(data = image_qt.load(path))
-

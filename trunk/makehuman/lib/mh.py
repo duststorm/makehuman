@@ -3,19 +3,9 @@ import os
 if sys.platform == 'win32':
     import _winreg
 from core import G
-if G.use_wx:
-    import wxversion
-    wxversion.select('2.8')
 import glmodule as gl
 
-if G.use_qt:
-    import qtui as ui
-elif G.use_wx:
-    import wxui as ui
-elif G.use_glut:
-    import glutui as ui
-else:
-    import sdlui as ui
+import qtui as ui
 
 from image import Image
 from texture import Texture
