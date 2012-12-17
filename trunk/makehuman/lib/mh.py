@@ -15,6 +15,10 @@ from camera import Camera
 world = G.world
 cameras = G.cameras
 
+Keys = ui.Keys
+Buttons = ui.Buttons
+Modifiers = ui.Modifiers
+
 def updatePickingBuffer():
     gl.updatePickingBuffer()
 
@@ -88,6 +92,9 @@ def setMouseDownCallback(callback):
 
 def setMouseUpCallback(callback):
     G.mouseUpCallback = callback
+
+def setMouseWheelCallback(callback):
+    G.mouseWheelCallback = callback
 
 def setMouseMovedCallback(callback):
     G.mouseMovedCallback = callback

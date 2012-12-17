@@ -82,88 +82,109 @@ def catching(func):
 
     return wrapper
 
-KMOD_LSHIFT = 0x0001
-KMOD_RSHIFT = 0x0002
-KMOD_LCTRL = 0x0040
-KMOD_RCTRL = 0x0080
-KMOD_LALT = 0x0100
-KMOD_RALT = 0x0200
-KMOD_LMETA = 0x0400
-KMOD_RMETA = 0x0800
+class Modifiers:
+    SHIFT = int(QtCore.Qt.ShiftModifier)
+    CTRL  = int(QtCore.Qt.ControlModifier)
+    ALT   = int(QtCore.Qt.AltModifier)
+    LMETA = int(QtCore.Qt.MetaModifier)
 
 def getKeyModifiers():
-    state = g_app.keyboardModifiers()
-    mod = 0
-    if state & QtCore.Qt.AltModifier:
-        mod |= KMOD_LALT
-    if state & QtCore.Qt.ControlModifier:
-        mod |= KMOD_LCTRL
-    if state & QtCore.Qt.ShiftModifier:
-        mod |= KMOD_LSHIFT
-    if state & QtCore.Qt.MetaModifier:
-        mod |= KMOD_META
-    return mod
+    return int(g_app.keyboardModifiers())
 
-SDLK_F1 = 282
-SDLK_F2 = 283
-SDLK_F3 = 284
-SDLK_F4 = 285
-SDLK_F5 = 286
-SDLK_F6 = 287
-SDLK_F7 = 288
-SDLK_F8 = 289
-SDLK_F9 = 290
-SDLK_F10 = 291
-SDLK_F11 = 292
-SDLK_F12 = 293
+class Keys:
+    a = QtCore.Qt.Key_A
+    b = QtCore.Qt.Key_B
+    c = QtCore.Qt.Key_C
+    d = QtCore.Qt.Key_D
+    e = QtCore.Qt.Key_E
+    f = QtCore.Qt.Key_F
+    g = QtCore.Qt.Key_G
+    h = QtCore.Qt.Key_H
+    i = QtCore.Qt.Key_I
+    j = QtCore.Qt.Key_J
+    k = QtCore.Qt.Key_K
+    l = QtCore.Qt.Key_L
+    m = QtCore.Qt.Key_M
+    n = QtCore.Qt.Key_N
+    o = QtCore.Qt.Key_O
+    p = QtCore.Qt.Key_P
+    q = QtCore.Qt.Key_Q
+    r = QtCore.Qt.Key_R
+    s = QtCore.Qt.Key_S
+    t = QtCore.Qt.Key_T
+    u = QtCore.Qt.Key_U
+    v = QtCore.Qt.Key_V
+    w = QtCore.Qt.Key_W
+    x = QtCore.Qt.Key_X
+    y = QtCore.Qt.Key_Y
+    z = QtCore.Qt.Key_Z
 
-SDLK_UP = 273
-SDLK_DOWN = 274
-SDLK_RIGHT = 275
-SDLK_LEFT = 276
-SDLK_INSERT = 277
-SDLK_HOME = 278
-SDLK_END = 279
-SDLK_PAGEUP = 280
-SDLK_PAGEDOWN = 281
+    N0 = QtCore.Qt.Key_0
+    N1 = QtCore.Qt.Key_1
+    N2 = QtCore.Qt.Key_2
+    N3 = QtCore.Qt.Key_3
+    N4 = QtCore.Qt.Key_4
+    N5 = QtCore.Qt.Key_5
+    N6 = QtCore.Qt.Key_6
+    N7 = QtCore.Qt.Key_7
+    N8 = QtCore.Qt.Key_8
+    N9 = QtCore.Qt.Key_9
 
-key_mapping = {
-    QtCore.Qt.Key_F1:        SDLK_F1,
-    QtCore.Qt.Key_F2:        SDLK_F2,
-    QtCore.Qt.Key_F3:        SDLK_F3,
-    QtCore.Qt.Key_F4:        SDLK_F4,
-    QtCore.Qt.Key_F5:        SDLK_F5,
-    QtCore.Qt.Key_F6:        SDLK_F6,
-    QtCore.Qt.Key_F7:        SDLK_F7,
-    QtCore.Qt.Key_F8:        SDLK_F8,
-    QtCore.Qt.Key_F9:        SDLK_F9,
-    QtCore.Qt.Key_F10:       SDLK_F10,
-    QtCore.Qt.Key_F11:       SDLK_F11,
-    QtCore.Qt.Key_F12:       SDLK_F12,
-    QtCore.Qt.Key_Left:      SDLK_LEFT,
-    QtCore.Qt.Key_Up:        SDLK_UP,
-    QtCore.Qt.Key_Right:     SDLK_RIGHT,
-    QtCore.Qt.Key_Down:      SDLK_DOWN,
-    QtCore.Qt.Key_PageUp:    SDLK_PAGEUP,
-    QtCore.Qt.Key_PageDown:  SDLK_PAGEDOWN,
-    QtCore.Qt.Key_Home:      SDLK_HOME,
-    QtCore.Qt.Key_End:       SDLK_END,
-    QtCore.Qt.Key_Insert:    SDLK_INSERT
-    }
+    F1  = QtCore.Qt.Key_F1
+    F2  = QtCore.Qt.Key_F2
+    F3  = QtCore.Qt.Key_F3
+    F4  = QtCore.Qt.Key_F4
+    F5  = QtCore.Qt.Key_F5
+    F6  = QtCore.Qt.Key_F6
+    F7  = QtCore.Qt.Key_F7
+    F8  = QtCore.Qt.Key_F8
+    F9  = QtCore.Qt.Key_F9
+    F10 = QtCore.Qt.Key_F10
+    F11 = QtCore.Qt.Key_F11
+    F12 = QtCore.Qt.Key_F12
+    F13 = QtCore.Qt.Key_F13
+    F14 = QtCore.Qt.Key_F14
+    F15 = QtCore.Qt.Key_F15
 
-SDL_BUTTON_LEFT = 1
-SDL_BUTTON_MIDDLE = 2
-SDL_BUTTON_RIGHT = 3
+    UP        = QtCore.Qt.Key_Up
+    DOWN      = QtCore.Qt.Key_Down
+    LEFT      = QtCore.Qt.Key_Left
+    RIGHT     = QtCore.Qt.Key_Right
 
-SDL_BUTTON_LEFT_MASK = 1
-SDL_BUTTON_MIDDLE_MASK = 2
-SDL_BUTTON_RIGHT_MASK = 4
+    PAGEUP    = QtCore.Qt.Key_PageUp
+    PAGEDOWN  = QtCore.Qt.Key_PageDown
+    HOME      = QtCore.Qt.Key_Home
+    END       = QtCore.Qt.Key_End
+    INSERT    = QtCore.Qt.Key_Insert
+    DELETE    = QtCore.Qt.Key_Delete
+    PAUSE     = QtCore.Qt.Key_Pause
 
-button_mapping = {
-    QtCore.Qt.LeftButton: (SDL_BUTTON_LEFT, SDL_BUTTON_LEFT_MASK),
-    QtCore.Qt.MidButton: (SDL_BUTTON_MIDDLE, SDL_BUTTON_MIDDLE_MASK),
-    QtCore.Qt.RightButton: (SDL_BUTTON_RIGHT, SDL_BUTTON_RIGHT_MASK)
-    }
+    RETURN    = QtCore.Qt.Key_Return
+    BACKSPACE = QtCore.Qt.Key_Backspace
+    ESCAPE    = QtCore.Qt.Key_Escape
+    TAB       = QtCore.Qt.Key_Tab
+
+    PLUS      = QtCore.Qt.Key_Plus
+    MINUS     = QtCore.Qt.Key_Minus
+    PERIOD    = QtCore.Qt.Key_Period
+
+    SHIFT     = QtCore.Qt.Key_Shift
+    CTRL      = QtCore.Qt.Key_Control
+    ALT       = QtCore.Qt.Key_Alt
+    META      = QtCore.Qt.Key_Meta
+
+Keys._all = set(getattr(Keys, k)
+                for k in dir(Keys)
+                if k[0] != '_')
+
+class Buttons:
+    LEFT = QtCore.Qt.LeftButton
+    MIDDLE = QtCore.Qt.MidButton
+    RIGHT = QtCore.Qt.RightButton
+
+    LEFT_MASK = LEFT
+    MIDDLE_MASK = MIDDLE
+    RIGHT_MASK = RIGHT
 
 g_mouse_pos = None
 
@@ -178,14 +199,7 @@ def handleMouse():
         yrel = y - oy
         G.mouse_pos = x, y
 
-        mouse_state = g_app.mouseButtons()
-        buttons = 0
-        if mouse_state & QtCore.Qt.LeftButton:
-            buttons |= SDL_BUTTON_LEFT_MASK
-        if mouse_state & QtCore.Qt.MidButton:
-            buttons |= SDL_BUTTON_MIDDLE_MASK
-        if mouse_state & QtCore.Qt.RightButton:
-            buttons |= SDL_BUTTON_RIGHT_MASK
+        buttons = int(g_app.mouseButtons())
 
         mouseMotion(buttons, x, y, xrel, yrel)
 
@@ -213,35 +227,31 @@ class Canvas(QtOpenGL.QGLWidget):
     def mousePressEvent(self, ev):
         x = ev.x()
         y = ev.y()
+        b = ev.button()
 
         G.mouse_pos = x, y
-
-        b = ev.button()
-        b, mask = button_mapping.get(b, (0, 0))
 
         mouseButtonDown(b, x, y)
 
     def mouseReleaseEvent(self, ev):
         x = ev.x()
         y = ev.y()
+        b = ev.button()
 
         G.mouse_pos = x, y
-
-        b = ev.button()
-        b, mask = button_mapping.get(b, (0, 0))
 
         mouseButtonUp(b, x, y)
 
     def wheelEvent(self, ev):
         x = ev.x()
         y = ev.y()
+        d = ev.delta()
 
         G.mouse_pos = x, y
 
-        b = 3 if ev.delta() > 0 else 4
-        b, mask = b+1, 1<<b
+        b = 1 if d > 0 else -1
 
-        mouseButtonDown(b, x, y)
+        callMouseWheel(b, x, y)
 
     def mouseMoveEvent(self, ev):
         global g_mouse_pos
@@ -261,9 +271,8 @@ class Canvas(QtOpenGL.QGLWidget):
         key = ev.key()
         characters = ev.text()
 
-        if key in key_mapping:
-            key = key_mapping[key]
-            keyDown(key, u'', getKeyModifiers())
+        if key in Keys._all:
+            keyDown(key, unicode(characters[:1]), getKeyModifiers())
         elif characters:
             for character in characters:
                 # ev.text() may hold multiple characters regardless of
@@ -278,9 +287,8 @@ class Canvas(QtOpenGL.QGLWidget):
         key = ev.key()
         characters = ev.text()
 
-        if key in key_mapping:
-            key = key_mapping[key]
-            keyUp(key, u'', getKeyModifiers())
+        if key in Keys._all:
+            keyUp(key, unicode(characters[:1]), getKeyModifiers())
         elif characters:
             character = characters[0]
             character = unicode(character)

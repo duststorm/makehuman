@@ -191,9 +191,9 @@ class AsymmTaskView(gui3d.TaskView):
     def onKeyDown(self, event):
 
         # Undo redo
-        if event.key == events3d.SDLK_y:
+        if event.key == events3d.Keys.y:
             gui3d.app.redo()
-        elif event.key == events3d.SDLK_z:
+        elif event.key == events3d.Keys.z:
             gui3d.app.undo()
             
         gui3d.TaskView.onKeyDown(self, event)

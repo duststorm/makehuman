@@ -1016,6 +1016,7 @@ class Application(events3d.EventHandler):
         mh.setMouseDownCallback(self.onMouseDownCallback)
         mh.setMouseUpCallback(self.onMouseUpCallback)
         mh.setMouseMovedCallback(self.onMouseMovedCallback)
+        mh.setMouseWheelCallback(self.onMouseWheelCallback)
         mh.setKeyDownCallback(self.onKeyDownCallback)
         mh.setKeyUpCallback(self.onKeyUpCallback)
         mh.setResizeCallback(self.onResizedCallback)
@@ -1213,35 +1214,29 @@ class Application(events3d.EventHandler):
     # called from native
 
     def onMouseDownCallback(self, button, x, y):
-        if button == 4:
-            self.onMouseWheelCallback(1)
-        elif button == 5:
-            self.onMouseWheelCallback(-1)
+        # Build event
+        event = events3d.MouseEvent(button, x, y)
+
+        # Get picked object
+        pickedObject = self.getSelectedFaceGroupAndObject()
+        if pickedObject:
+            object = pickedObject[1].object
         else:
+            object = self
 
-            # Build event
-            event = events3d.MouseEvent(button, x, y)
+        # If we have an object
+        # Try to give its view focus
+        if object != self:
+            self.focusObject = object
+            self.focusObject.view.setFocus()
 
-            # Get picked object
-            pickedObject = self.getSelectedFaceGroupAndObject()
-            if pickedObject:
-                object = pickedObject[1].object
-            else:
-                object = self
-               
-            # If we have an object
-            # Try to give its view focus
-            if object != self:
-                self.focusObject = object
-                self.focusObject.view.setFocus()
-   
-            # It is the object which will receive the following mouse messages
-   
-            self.mouseDownObject = object
-   
-            # Send event to the object
-   
-            object.callEvent('onMouseDown', event)
+        # It is the object which will receive the following mouse messages
+
+        self.mouseDownObject = object
+
+        # Send event to the object
+
+        object.callEvent('onMouseDown', event)
 
     def onMouseUpCallback(self, button, x, y):
         if button == 4 or button == 5:
@@ -1292,7 +1287,7 @@ class Application(events3d.EventHandler):
                 self.enteredObject.callEvent('onMouseEntered', event)
             object.callEvent('onMouseMoved', event)
 
-    def onMouseWheelCallback(self, wheelDelta):
+    def onMouseWheelCallback(self, wheelDelta, x, y):
 
         # Mouse wheel events, like key events are sent to the focus view
 
@@ -1303,13 +1298,13 @@ class Application(events3d.EventHandler):
             self.currentTask.callEvent('onMouseWheel', event)
 
     def onKeyDownCallback(self, key, character, modifiers):
-        if key == events3d.SDLK_TAB:
+        if key == events3d.Keys.TAB:
             if self.focusView:
 
-            # if self.focusView.wantsTab and not (modifiers & events3d.KMOD_CTRL):
+            # if self.focusView.wantsTab and not (modifiers & events3d.Modifiers.CTRL):
 
                 index = self.focusView.parent.children.index(self.focusView)
-                if modifiers & events3d.KMOD_SHIFT:
+                if modifiers & events3d.Modifiers.SHIFT:
                     start = index
                     index = index - 1 if index > 0 else len(self.focusView.parent.children) - 1
                     while start != index:
@@ -1563,11 +1558,11 @@ class Slider(View):
                 @self.edit.event
                 def onKeyDown(event):
                     
-                    if event.modifiers & events3d.KMOD_CTRL:
+                    if event.modifiers & events3d.Modifiers.CTRL:
                         TextEdit.onKeyDown(self.edit, event)
                         return
 
-                    if event.key == events3d.SDLK_RETURN:
+                    if event.key == events3d.Keys.RETURN:
                         self.setFocus()
                         app.redraw()
                     else:
@@ -1744,19 +1739,19 @@ class Slider(View):
         oldValue = self.__value
         newValue = self.__value
 
-        if event.key == events3d.SDLK_HOME:
+        if event.key == events3d.Keys.HOME:
             newValue = self.min
-        elif event.key == events3d.SDLK_LEFT:
+        elif event.key == events3d.Keys.LEFT:
             if isinstance(self.min, int):
                 newValue -= 1
             else:
                 newValue -= (self.max - self.min) / 10.0
-        elif event.key == events3d.SDLK_RIGHT:
+        elif event.key == events3d.Keys.RIGHT:
             if isinstance(self.min, int):
                 newValue += 1
             else:
                 newValue += (self.max - self.min) / 10.0
-        elif event.key == events3d.SDLK_END:
+        elif event.key == events3d.Keys.END:
             newValue = self.max
         else:
             View.onKeyDown(self, event)
@@ -1903,14 +1898,14 @@ class Button(View):
         pass
 
     def onKeyDown(self, event):
-        if event.key == events3d.SDLK_RETURN or event.key == events3d.SDLK_KP_ENTER:
+        if event.key == events3d.Keys.RETURN:
             self.setSelected(True)
             app.redraw()
         else:
             View.onKeyDown(self, event)
 
     def onKeyUp(self, event):
-        if event.key == events3d.SDLK_RETURN or event.key == events3d.SDLK_KP_ENTER:
+        if event.key == events3d.Keys.RETURN:
             self.setSelected(False)
             self.callEvent('onClicked', event)
             app.redraw()
@@ -2287,33 +2282,24 @@ class TextEdit(View):
 
     def onKeyDown(self, event):
         
-        if event.modifiers & events3d.KMOD_CTRL:
+        if event.modifiers & events3d.Modifiers.CTRL:
             View.onKeyDown(self, event)
             return
             
-        # Normalize key
         key = event.key
-        if key in xrange(events3d.SDLK_KP0, events3d.SDLK_KP9 + 1):
-            key = events3d.SDLK_0 + key - events3d.SDLK_KP0
-        elif key == events3d.SDLK_KP_PERIOD:
-            key = events3d.SDLK_PERIOD
-        elif key == events3d.SDLK_KP_MINUS:
-            key = events3d.SDLK_MINUS
-        elif key == events3d.SDLK_KP_PLUS:
-            key = events3d.SDLK_PLUS
 
-        if key == events3d.SDLK_BACKSPACE:
+        if key == events3d.Keys.BACKSPACE:
             self.__delText()
-        elif key == events3d.SDLK_RETURN:
+        elif key == events3d.Keys.RETURN:
             if len(self.text):
                 View.onKeyDown(self, event)
             return
-        elif key == events3d.SDLK_RIGHT:
+        elif key == events3d.Keys.RIGHT:
             if self.__position<len(self.text)-1:
                 self.__hideCursor()
                 self.__position += 1
                 self.__showCursor()
-        elif key == events3d.SDLK_LEFT:
+        elif key == events3d.Keys.LEFT:
             if self.__position > 0:
                 self.__hideCursor()
                 self.__position -= 1
@@ -2390,11 +2376,11 @@ class FileEntryView(View):
                 self.onFileSelected(self.edit.getText())
                 
     def onKeyDown(self, event):
-        if event.modifiers & events3d.KMOD_CTRL:
+        if event.modifiers & events3d.Modifiers.CTRL:
             View.onKeyDown(self, event)
             return
 
-        if event.key == events3d.SDLK_RETURN:
+        if event.key == events3d.Keys.RETURN:
             self.onFileSelected(self.edit.getText())
             app.redraw()
                 
@@ -2673,13 +2659,13 @@ class FileChooser(View):
             
     def onKeyDown(self, event):
 
-        if event.key == events3d.SDLK_F5:
+        if event.key == events3d.Keys.F5:
             self.refresh()
-        elif event.key == events3d.SDLK_UP:
+        elif event.key == events3d.Keys.UP:
             self.slider.setValue(self.slider.getValue()-1)
             self.scrollTo(self.slider.getValue())
             app.redraw()
-        elif event.key == events3d.SDLK_DOWN:
+        elif event.key == events3d.Keys.DOWN:
             self.slider.setValue(self.slider.getValue()+1)
             self.scrollTo(self.slider.getValue())
             app.redraw()
@@ -2820,7 +2806,7 @@ class FileChooser2(View):
         app.redraw()
 
     def onKeyDown(self, event):
-        if event.modifiers & events3d.KMOD_CTRL:
+        if event.modifiers & events3d.Modifiers.CTRL:
             View.onKeyDown(self, event)
             return
         if event.key == 276:
@@ -3041,14 +3027,14 @@ class ShortcutEdit(View):
         self.label.setText(self.shortcutToLabel(event.modifiers, event.key))
         app.redraw()
         
-        if event.key not in [events3d.SDLK_RCTRL, events3d.SDLK_LCTRL, events3d.SDLK_RALT, events3d.SDLK_LALT]:
+        if event.key not in [events3d.Keys.CTRL, events3d.Keys.ALT]:
             m = 0
         
-            if event.modifiers & events3d.KMOD_CTRL:
-                m |= events3d.KMOD_CTRL
+            if event.modifiers & events3d.Modifiers.CTRL:
+                m |= events3d.Modifiers.CTRL
                 
-            if event.modifiers & events3d.KMOD_ALT:
-                m |= events3d.KMOD_ALT
+            if event.modifiers & events3d.Modifiers.ALT:
+                m |= events3d.Modifiers.ALT
                 
             self.callEvent('onChanged', (m, event.key))
         
@@ -3056,10 +3042,10 @@ class ShortcutEdit(View):
         
         label = ''
         
-        if modifiers & events3d.KMOD_CTRL:
+        if modifiers & events3d.Modifiers.CTRL:
             label += 'Ctl-'
             
-        if modifiers & events3d.KMOD_ALT:
+        if modifiers & events3d.Modifiers.ALT:
             label += 'Alt-'
             
         if key in self.keyNames:
@@ -3073,44 +3059,42 @@ class ShortcutEdit(View):
         pass
         
     keyNames = {
-        events3d.SDLK_BACKSPACE:'Bck',
-        events3d.SDLK_RETURN:'Enter',
-        events3d.SDLK_PAUSE:'Pause',
+        events3d.Keys.BACKSPACE:'Bck',
+        events3d.Keys.RETURN:'Enter',
+        events3d.Keys.PAUSE:'Pause',
         
-        events3d.SDLK_ESCAPE:'Esc',
+        events3d.Keys.ESCAPE:'Esc',
         
-        events3d.SDLK_DELETE:'Del',
+        events3d.Keys.DELETE:'Del',
         
-        events3d.SDLK_UP:'Up',
-        events3d.SDLK_DOWN:'Down',
-        events3d.SDLK_RIGHT:'Right',
-        events3d.SDLK_LEFT:'Left',
-        events3d.SDLK_INSERT:'Ins',
-        events3d.SDLK_HOME:'Home',
-        events3d.SDLK_END:'End',
-        events3d.SDLK_PAGEUP:'PgUp',
-        events3d.SDLK_PAGEDOWN:'PgDn',
+        events3d.Keys.UP:'Up',
+        events3d.Keys.DOWN:'Down',
+        events3d.Keys.RIGHT:'Right',
+        events3d.Keys.LEFT:'Left',
+        events3d.Keys.INSERT:'Ins',
+        events3d.Keys.HOME:'Home',
+        events3d.Keys.END:'End',
+        events3d.Keys.PAGEUP:'PgUp',
+        events3d.Keys.PAGEDOWN:'PgDn',
 
-        events3d.SDLK_F1:'F1',
-        events3d.SDLK_F2:'F2',
-        events3d.SDLK_F3:'F3',
-        events3d.SDLK_F4:'F4',
-        events3d.SDLK_F5:'F5',
-        events3d.SDLK_F6:'F6',
-        events3d.SDLK_F7:'F7',
-        events3d.SDLK_F8:'F8',
-        events3d.SDLK_F9:'F9',
-        events3d.SDLK_F10:'F10',
-        events3d.SDLK_F11:'F11',
-        events3d.SDLK_F12:'F12',
-        events3d.SDLK_F13:'F13',
-        events3d.SDLK_F14:'F14',
-        events3d.SDLK_F15:'F15',
+        events3d.Keys.F1:'F1',
+        events3d.Keys.F2:'F2',
+        events3d.Keys.F3:'F3',
+        events3d.Keys.F4:'F4',
+        events3d.Keys.F5:'F5',
+        events3d.Keys.F6:'F6',
+        events3d.Keys.F7:'F7',
+        events3d.Keys.F8:'F8',
+        events3d.Keys.F9:'F9',
+        events3d.Keys.F10:'F10',
+        events3d.Keys.F11:'F11',
+        events3d.Keys.F12:'F12',
+        events3d.Keys.F13:'F13',
+        events3d.Keys.F14:'F14',
+        events3d.Keys.F15:'F15',
         
-        events3d.SDLK_RCTRL:'Ctl',
-        events3d.SDLK_LCTRL:'Ctl',
-        events3d.SDLK_RALT:'Alt',
-        events3d.SDLK_LALT:'Alt'
+        events3d.Keys.CTRL:'Ctl',
+        events3d.Keys.ALT:'Alt',
     }
     
 class MouseActionEdit(ShortcutEdit):
@@ -3130,7 +3114,7 @@ class MouseActionEdit(ShortcutEdit):
         
     def onMouseDragged(self, event):
         
-        modifiers = mh.getKeyModifiers() & (events3d.KMOD_CTRL | events3d.KMOD_ALT | events3d.KMOD_SHIFT)
+        modifiers = mh.getKeyModifiers() & (events3d.Modifiers.CTRL | events3d.Modifiers.ALT | events3d.Modifiers.SHIFT)
             
         self.label.setText(self.shortcutToLabel(modifiers, event.button))
         app.redraw()
@@ -3145,21 +3129,21 @@ class MouseActionEdit(ShortcutEdit):
         
         label = ''
         
-        if modifiers & events3d.KMOD_CTRL:
+        if modifiers & events3d.Modifiers.CTRL:
             label += 'Ctl-'
             
-        if modifiers & events3d.KMOD_ALT:
+        if modifiers & events3d.Modifiers.ALT:
             label += 'Alt-'
             
-        if modifiers & events3d.KMOD_SHIFT:
+        if modifiers & events3d.Modifiers.SHIFT:
             label += 'Shift-'
             
         buttons = []
-        if button & events3d.SDL_BUTTON_LEFT_MASK:
+        if button & events3d.Buttons.LEFT_MASK:
             buttons.append('Left')
-        if button & events3d.SDL_BUTTON_MIDDLE_MASK:
+        if button & events3d.Buttons.MIDDLE_MASK:
             buttons.append('Middle')
-        if button & events3d.SDL_BUTTON_RIGHT_MASK:
+        if button & events3d.Buttons.RIGHT_MASK:
             buttons.append('Right')
             
         label += '-'.join(buttons)

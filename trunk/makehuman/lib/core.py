@@ -20,6 +20,7 @@ class Globals(object):
         self.resizeCallback = None
         self.mouseDownCallback = None
         self.mouseUpCallback = None
+        self.mouseWheelCallback = None
         self.mouseMovedCallback = None
         self.keyDownCallback = None
         self.keyUpCallback = None
@@ -44,6 +45,14 @@ def callMouseButtonUp(b, x, y):
             profiler.run('G.mouseUpCallback(b, x, y)', globals(), locals())
         else:
             G.mouseUpCallback(b, x, y)
+
+def callMouseWheel(b, x, y):
+    profiler.flush()
+    if G.mouseWheelCallback:
+        if G.profile:
+            profiler.run('G.mouseWheelCallback(b, x, y)', globals(), locals())
+        else:
+            G.mouseWheelCallback(b, x, y)
 
 def callMouseMotion(s, x, y, xrel, yrel):
     if G.mouseMovedCallback:
