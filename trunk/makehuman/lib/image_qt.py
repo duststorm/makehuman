@@ -10,15 +10,22 @@ def load(path):
     w, h = im.width(), im.height()
     alpha = im.hasAlphaChannel()
     im = im.convertToFormat(QtGui.QImage.Format_ARGB32)
-    data = im.bits().asstring(h * w * 4)
-    data = np.fromstring(data, dtype=np.uint8).reshape((h, w, 4))
+    pixels = im.bits().asstring(h * w * 4)
+    pixels = np.fromstring(pixels, dtype=np.uint32).reshape((h, w))
     del im
 
-    # BGRA -> RGBA
-    data = data[...,[2,1,0,3]]
+    a = (pixels >> 24).astype(np.uint8)
+    r = (pixels >> 16).astype(np.uint8)
+    g = (pixels >>  8).astype(np.uint8)
+    b = (pixels >>  0).astype(np.uint8)
+    del pixels
 
-    if not alpha:
-        data = data[...,:3]
+    if alpha:
+        data = np.dstack((r,g,b,a))
+    else:
+        data = np.dstack((r,g,b))
+
+    del a,r,g,b
 
     dir, file = os.path.split(path)
     base, last = os.path.split(dir)
@@ -31,19 +38,22 @@ def load(path):
 
 def save(path, data):
     h, w, d = data.shape
-    if d == 1:
-        data = np.dstack((data, data, data))
-        d = 3
-    elif d == 2:
-        l = data[...,0]
-        a = data[...,1]
-        data = np.dstack((l, l, l, a))
-        d = 4
 
-    if d == 3:
+    pixels = np.empty((h, w), dtype = np.uint32)
+
+    if d == 1:
         fmt = QtGui.QImage.Format_RGB32
+        pixels[...] = data[...,0] * 0x10101
+    elif d == 2:
+        fmt = QtGui.QImage.Format_ARGB32
+        pixels[...] = data[...,1] * 0x1000000 + data[...,0] * 0x10101
+    elif d == 3:
+        fmt = QtGui.QImage.Format_RGB32
+        pixels[...] = 0xFF000000 + data[...,0] * 0x10000 + data[...,1] * 0x100 + data[...,2]
     elif d == 4:
         fmt = QtGui.QImage.Format_ARGB32
+        pixels[...] = data[...,3] * 0x1000000 + data[...,0] * 0x10000 + data[...,1] * 0x100 + data[...,2]
 
-    im = QtGui.QImage(data.tostring(), w, h, w * d, fmt)
-    im.save(path)
+    im = QtGui.QImage(pixels.tostring(), w, h, w * 4, fmt)
+    if not im.save(path):
+        raise RuntimeError('error saving image %s' % path)

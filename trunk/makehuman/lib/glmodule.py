@@ -11,7 +11,7 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 
 from core import *
-import image_base as img
+from image import Image
 import matrix
 from debugdump import DebugDump
 
@@ -63,7 +63,7 @@ def grabScreen(x, y, width, height, filename):
     surface = np.empty((height, rwidth, 3), dtype = np.uint8)
 
     glReadPixels(x, G.windowHeight - y - height, rwidth, height, GL_RGB, GL_UNSIGNED_BYTE, surface)
-    surface = img.fromdata(surface[:,:width,:])
+    surface = Image(data = surface[:,:width,:])
     surface = surface.flip_vertical()
 
     surface.save(filename)

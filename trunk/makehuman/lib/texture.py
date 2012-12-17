@@ -2,7 +2,6 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GL.ARB.texture_non_power_of_two import *
 from core import G
-import image_base as img
 from image import Image
 
 class Texture(object):
@@ -38,26 +37,24 @@ class Texture(object):
         if isinstance(image, (str, unicode)):
             image = Image(image)
 
-        surface = image.surface
-        if surface is None:
-            return
-
-        if surface.mode == "L":
+        if image.components == 1:
             internalFormat = GL_ALPHA8
             format = GL_ALPHA
-        elif surface.mode == "RGB":
+        elif image.components == 3:
             internalFormat = 3
             format = GL_RGB
-        elif surface.mode == "RGBA":
+        elif image.components == 4:
             internalFormat = 4
             format = GL_RGBA
         else:
             raise RuntimeError("Could not load image, unsupported pixel format")
 
-        surface = surface.flip_vertical()
-        pixels = surface.data()
+        image = image.flip_vertical()
+        pixels = image.data
 
-        if surface.size[1] == 1:
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
+
+        if image.height == 1:
             glBindTexture(GL_TEXTURE_1D, texture)
             glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
             glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
@@ -68,9 +65,9 @@ class Texture(object):
             glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
             if mipmaps:
-                gluBuild1DMipmaps(GL_TEXTURE_1D, internalFormat, surface.size[0], format, GL_UNSIGNED_BYTE, pixels)
+                gluBuild1DMipmaps(GL_TEXTURE_1D, internalFormat, image.width, format, GL_UNSIGNED_BYTE, pixels)
             else:
-                glTexImage1D(GL_TEXTURE_1D, 0, internalFormat, surface.size[0], 0, format, GL_UNSIGNED_BYTE, pixels)
+                glTexImage1D(GL_TEXTURE_1D, 0, internalFormat, image.width, 0, format, GL_UNSIGNED_BYTE, pixels)
             glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
         else:
             glBindTexture(GL_TEXTURE_2D, texture)
@@ -83,12 +80,12 @@ class Texture(object):
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
             if mipmaps:
-                gluBuild2DMipmaps(GL_TEXTURE_2D, internalFormat, surface.size[0], surface.size[1], format, GL_UNSIGNED_BYTE, pixels)
+                gluBuild2DMipmaps(GL_TEXTURE_2D, internalFormat, image.width, image.height, format, GL_UNSIGNED_BYTE, pixels)
             else:
-                glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, surface.size[0], surface.size[1], 0, format, GL_UNSIGNED_BYTE, pixels)
+                glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, image.width, image.height, 0, format, GL_UNSIGNED_BYTE, pixels)
             glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
 
-        texobj.width, texobj.height = surface.size
+        texobj.width, texobj.height = image.size
 
     @staticmethod
     def loadSubTexture(image, texture, x, y):
@@ -98,28 +95,24 @@ class Texture(object):
         if isinstance(image, (str, unicode)):
             image = Image(image)
 
-        surface = image.surface
-        if surface is None:
-            return
-
-        if surface.mode == "L":
+        if image.components == 1:
             internalFormat = GL_ALPHA8
             format = GL_ALPHA
-        elif surface.mode == "RGB":
+        elif image.components == 3:
             internalFormat = 3
             format = GL_RGB
-        elif surface.mode == "RGBA":
+        elif image.components == 4:
             internalFormat = 4
             format = GL_RGBA
         else:
             raise RuntimeError("Could not load image, unsupported pixel format")
 
-        surface = surface.flip_vertical()
-        pixels = surface.data()
+        image = image.flip_vertical()
+        pixels = image.data
 
-        if surface.size[1] == 1:
+        if image.height == 1:
             glBindTexture(GL_TEXTURE_1D, texture)
-            glTexSubImage1D(GL_TEXTURE_1D, 0, x, surface.size[0], format, GL_UNSIGNED_BYTE, pixels)
+            glTexSubImage1D(GL_TEXTURE_1D, 0, x, image.width, format, GL_UNSIGNED_BYTE, pixels)
         else:
             glBindTexture(GL_TEXTURE_2D, texture)
-            glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, surface.size[0], surface.size[1], format, GL_UNSIGNED_BYTE, pixels)
+            glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, image.width, image.height, format, GL_UNSIGNED_BYTE, pixels)
