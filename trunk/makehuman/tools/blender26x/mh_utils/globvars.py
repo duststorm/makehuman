@@ -33,6 +33,9 @@ Epsilon = 1e-3
 
 # Number of verts which are body, not clothes
 NBodyVerts = 15340
+FirstSkirtVert = 15340
+FirstTightsVert = 16096
+NTotalVerts = 18528
 
 Proxy = None
 

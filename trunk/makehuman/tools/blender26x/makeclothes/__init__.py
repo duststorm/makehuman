@@ -114,6 +114,8 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.operator("mhclo.remove_vertex_groups")
         layout.separator()
         layout.prop(scn, "MCAutoGroupType", expand=True)
+        if scn.MCAutoGroupType == 'Helpers':
+            layout.prop(scn, "MCAutoHelperType", expand=True)        
         layout.operator("mhclo.auto_vertex_groups")        
         layout.separator()
         layout.prop(scn, "MCKeepVertsUntil", expand=True)

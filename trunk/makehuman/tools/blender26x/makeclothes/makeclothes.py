@@ -53,14 +53,21 @@ ClothingEnums = [
     ("Tights", "Tights", "Tights")
 ]
 
+NBodyVerts = 15340
+FirstSkirtVert = 15340
+FirstTightsVert = 16096
+NTotalVerts = 18528
+
+TopOfSkirt1 = range(16691,16707)
+
 if BaseMeshVersion == "alpha_7":
     LastVertices = {
-        "Body" : 15340,
-        "Skirt" : 16096,
-        "Tights" : 18528,
+        "Body" : NBodyVerts,
+        "Skirt" : FirstTightsVert,
+        "Tights" : NTotalVerts,
     }
-    NBodyVerts = LastVertices["Body"]
     NBodyFaces = 14812
+
 
 #
 #   isHuman(ob):
@@ -2202,6 +2209,7 @@ def autoVertexGroups(context):
     print("Vertex groups auto assigned to %s" % scn.MCAutoGroupType.lower())
     return
 
+
 def getHumanVerts(me, scn):
     verts = {}
     if scn.MCAutoGroupType == 'Selected':
@@ -2209,19 +2217,38 @@ def getHumanVerts(me, scn):
             if v.select:
                 verts[v.index] = v
     elif scn.MCAutoGroupType == 'Helpers':
-        addHelperVerts(me, verts)
+        addHelperVerts(me, scn.MCAutoHelperType, verts)
     elif scn.MCAutoGroupType == 'Body':
         addBodyVerts(me, verts)
     elif scn.MCAutoGroupType == 'All':
-        addHelperVerts(me, verts)
+        addHelperVerts(me, 'All', verts)
         addBodyVerts(me, verts)
     return verts        
         
-def addHelperVerts(me, verts):
-    for v in me.vertices:
-        if v.index >= NBodyVerts:
-            verts[v.index] = v
-    return
+
+def addHelperVerts(me, htype, verts):
+    if htype == 'All':
+        for vn in range(FirstSkirtVert, NTotalVerts):
+            verts[vn] = me.vertices[vn]
+    elif htype == 'Skirt':
+        for vn in range(FirstSkirtVert, FirstTightsVert):
+            verts[vn] = me.vertices[vn]
+    elif htype == 'Tights':
+        for vn in range(FirstTightsVert, NTotalVerts):
+            verts[vn] = me.vertices[vn]
+    elif htype == 'Coat':
+        zmin = 1e6
+        for vn in TopOfSkirt1:
+            zn = me.vertices[vn].co[2]
+            if zn < zmin:
+                zmin = zn
+        for vn in range(FirstSkirtVert, FirstTightsVert):
+            verts[vn] = me.vertices[vn]
+        for vn in range(FirstTightsVert, NTotalVerts):
+            zn = me.vertices[vn].co[2]
+            if zn >= zmin:
+                verts[vn] = me.vertices[vn]
+
     
 def addBodyVerts(me, verts):
     meFaces = getFaces(me)
@@ -2556,6 +2583,13 @@ def initInterface():
                  ('Selected','Selected','Selected'),
                  ('All','All','All')],
     default='Helpers')
+                 
+    bpy.types.Scene.MCAutoHelperType = EnumProperty(
+        items = [('Skirt','Skirt','Skirt'),
+                 ('Tights','Tights','Tights'),
+                 ('Coat','Coat','Coat'),
+                 ('All','All','All')],
+    default='All')
                  
     bpy.types.Scene.MCRemoveGroupType = EnumProperty(
         items = [('Selected','Selected','Selected'),

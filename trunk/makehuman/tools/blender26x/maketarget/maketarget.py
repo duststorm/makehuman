@@ -108,6 +108,21 @@ class VIEW3D_OT_MakeBaseObjButton(bpy.types.Operator):
         return{'FINISHED'}    
 
 
+def deleteBetween(ob, first, last):
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.select_all(action='DESELECT')
+        bpy.ops.object.mode_set(mode='OBJECT')
+        for n in range(first):
+            ob.data.vertices[n].select = False
+        for n in range(first, last):
+            ob.data.vertices[n].select = True
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.delete(type='VERT')
+        bpy.ops.object.mode_set(mode='OBJECT')
+
+
 class VIEW3D_OT_DeleteHelpersButton(bpy.types.Operator):
     bl_idname = "mh.delete_clothes"
     bl_label = "Delete Clothes Helpers"
@@ -115,22 +130,22 @@ class VIEW3D_OT_DeleteHelpersButton(bpy.types.Operator):
 
     def execute(self, context):
         ob = context.object
-        bpy.ops.object.mode_set(mode='EDIT')
-        bpy.ops.mesh.select_all(action='DESELECT')
-        bpy.ops.object.mode_set(mode='OBJECT')
-        nverts = len(ob.data.vertices)
-        for n in range(the.NBodyVerts):
-            ob.data.vertices[n].select = False
-        for n in range(the.NBodyVerts,nverts):
-            ob.data.vertices[n].select = True
-        bpy.ops.object.mode_set(mode='EDIT')
-        bpy.ops.object.mode_set(mode='OBJECT')
-        bpy.ops.object.mode_set(mode='EDIT')
-        bpy.ops.mesh.delete(type='VERT')
-        bpy.ops.object.mode_set(mode='OBJECT')
+        deleteBetween(ob, the.NBodyVerts, the.NTotalVerts)
         return{'FINISHED'}    
         
 
+class VIEW3D_OT_TightsOnlyButton(bpy.types.Operator):
+    bl_idname = "mh.tights_only"
+    bl_label = "Edit Tights only"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        ob = context.object
+        ob.MhTightsOnly = True
+        deleteBetween(ob, the.FirstSkirtVert, the.FirstTightsVert)
+        return{'FINISHED'}     
+ 
+ 
 class VIEW3D_OT_LoadTargetButton(bpy.types.Operator):
     bl_idname = "mh.load_target"
     bl_label = "Load Target File"
@@ -250,17 +265,43 @@ def doSaveTarget(context, filepath):
     
     (fname,ext) = os.path.splitext(filepath)
     filepath = fname + ".target"
-    fp = open(filepath, "w")  
     print("Saving target %s to %s" % (ob, filepath))
-    for n,vco in verts.items():
-        bv = ob.data.vertices[n]
+    if ob.MhTightsOnly:
+        lines = readLines(filepath, the.FirstTightsVert)
+        fp = open(filepath, "w")  
+        for line in lines:
+            fp.write(line)
+        saveVerts(fp, ob, verts, saveAll, the.FirstTightsVert, the.NTotalVerts, the.FirstTightsVert-the.FirstSkirtVert)
+    else:
+        fp = open(filepath, "w")  
+        saveVerts(fp, ob, verts, saveAll, 0, the.NTotalVerts, 0)
+    fp.close()    
+    ob["FilePath"] = filepath
+
+
+def readLines(filepath, skip):
+    fp = open(filepath, "rU")
+    lines = []
+    for line in fp:
+        words = line.split()
+        if len(words) >= 2:
+            vn = int(words[0])
+            if vn >= skip:
+                return lines
+            else:
+                lines.append(line)
+    fp.close()
+    return lines
+    
+    
+def saveVerts(fp, ob, verts, saveAll, first, last, offs):
+    for n in range(first, last):
+        vco = verts[n-offs]
+        bv = ob.data.vertices[n-offs]
         vec = vco - bv.co
         if vec.length > the.Epsilon and (saveAll or bv.select):
             fp.write("%d %.6f %.6f %.6f\n" % (n, vec[0], vec[2], -vec[1]))
-    fp.close()    
-    ob["FilePath"] = filepath
-    
-    #saveBvhFile(context, filepath)
+
           
 def evalVertLocations(ob):    
     verts = {}
@@ -284,7 +325,7 @@ class VIEW3D_OT_SaveTargetButton(bpy.types.Operator):
     def execute(self, context):
         ob = context.object
         path = ob["FilePath"]
-        if the.Confirm:
+        if True or the.Confirm:
             the.Confirm = None
             doSaveTarget(context, path)
             print("Target saved")
@@ -1092,6 +1133,8 @@ def init():
     bpy.types.Scene.MhSourceRig = StringProperty(default = "rigid")
     bpy.types.Scene.MhTargetRig = StringProperty(default = "soft1")
     bpy.types.Scene.MhPoseTargetDir = StringProperty(default = "dance1-soft1")
+    
+    bpy.types.Object.MhTightsOnly = BoolProperty(default = False)
 
 
     bpy.types.Scene.MhImportRotateMode = EnumProperty(

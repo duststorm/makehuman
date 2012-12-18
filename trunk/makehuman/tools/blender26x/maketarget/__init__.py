@@ -96,6 +96,7 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.operator("mh.import_base_mhclo", text="Reimport Base Mhclo").delete = True
             layout.operator("mh.import_base_obj", text="Reimport Base Obj").delete = True
             layout.operator("mh.delete_clothes")
+            layout.operator("mh.tights_only")
             layout.separator()
         else:
             layout.operator("mh.import_base_mhclo", text="Import Base Mhclo").delete = False
