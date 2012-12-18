@@ -90,6 +90,7 @@ sys.path = syspath
 import glob, imp
 from os.path import join, basename, splitext
 
+from core import G
 import mh
 import files3d
 import gui3d, events3d, font3d, animation3d
@@ -494,7 +495,7 @@ class MHApplication(gui3d.Application):
         self.redrawNow()
         
         # self.tabs = self.addView(gui3d.TabView())
-        self.tabs = mh.ui.g_app.mainwin.tabs
+        self.tabs = G.app.mainwin.tabs
         
         @self.tabs.event
         def onTabSelected(tab):

@@ -3,6 +3,7 @@ import profiler
 
 class Globals(object):
     def __init__(self):
+        self.app = None
         self.world = []
         self.cameras = []
         self.windowHeight = 600

@@ -6,52 +6,7 @@ from PyQt4 import QtCore, QtGui, QtOpenGL
 from core import *
 from glmodule import updatePickingBuffer, getPickedColor, OnInit, OnExit, reshape, draw
 import events3d
-
-def keyDown(key, character, modifiers):
-    callKeyDown(key, character, modifiers)
-
-def keyUp(key, character, modifiers):
-    callKeyUp(key, character, modifiers)
-    updatePickingBuffer()
-
-def mouseButtonDown(b, x, y):
-    # Check which object/group was hit
-    if b in (1,2,3):
-        getPickedColor(x, y)
-
-    # Notify python
-    callMouseButtonDown(b, x, y)
-
-    # Update screen
-    queueUpdate()
-
-    if b in (1,2,3):
-        updatePickingBuffer()
-
-def mouseButtonUp(b, x, y):
-    # Check which object/group was hit
-    if b in (1,2,3):
-        getPickedColor(x, y)
-
-    # Notify python
-    callMouseButtonUp(b, x, y)
-
-    # Update screen
-    queueUpdate()
-
-    updatePickingBuffer()
-
-def mouseMotion(s, x, y, xrel, yrel):
-    # Check which object/group was hit
-    if not s:
-        getPickedColor(x, y)
-
-    # Notify python
-    callMouseMotion(s, x, y, xrel, yrel)
-
-    # Update screen
-    if s:
-        queueUpdate()
+import qtgui
 
 def quit():
     callQuit()
@@ -60,13 +15,13 @@ def shutDown():
     sys.exit()
 
 def queueUpdate():
-    g_app.mainwin.update()
+    G.app.mainwin.update()
 
 def setFullscreen(fullscreen):
     pass
 
 def setCaption(caption):
-    g_app.mainwin.setWindowTitle(caption)
+    G.app.mainwin.setWindowTitle(caption)
 
 import traceback
 def catching(func):
@@ -90,7 +45,7 @@ class Modifiers:
     LMETA = int(QtCore.Qt.MetaModifier)
 
 def getKeyModifiers():
-    return int(g_app.keyboardModifiers())
+    return int(G.app.keyboardModifiers())
 
 class Keys:
     a = QtCore.Qt.Key_A
@@ -189,21 +144,6 @@ class Buttons:
 
 g_mouse_pos = None
 
-def handleMouse():
-    global g_mouse_pos
-    if g_mouse_pos is not None:
-        # print 'mouse motion'
-        ox, oy = G.mouse_pos
-        (x, y) = g_mouse_pos
-        g_mouse_pos = None
-        xrel = x - ox
-        yrel = y - oy
-        G.mouse_pos = x, y
-
-        buttons = int(g_app.mouseButtons())
-
-        mouseMotion(buttons, x, y, xrel, yrel)
-
 class Canvas(QtOpenGL.QGLWidget):
     def __init__(self, parent):
         format = QtOpenGL.QGLFormat()
@@ -225,6 +165,48 @@ class Canvas(QtOpenGL.QGLWidget):
         self.setAttribute(QtCore.Qt.WA_KeyCompression, False)
         self.setMouseTracking(True)
 
+    @staticmethod
+    def mouseButtonDown(b, x, y):
+        # Check which object/group was hit
+        if b in (1,2,3):
+            getPickedColor(x, y)
+
+        # Notify python
+        callMouseButtonDown(b, x, y)
+
+        # Update screen
+        queueUpdate()
+
+        if b in (1,2,3):
+            updatePickingBuffer()
+
+    @staticmethod
+    def mouseButtonUp(b, x, y):
+        # Check which object/group was hit
+        if b in (1,2,3):
+            getPickedColor(x, y)
+
+        # Notify python
+        callMouseButtonUp(b, x, y)
+
+        # Update screen
+        queueUpdate()
+
+        updatePickingBuffer()
+
+    @staticmethod
+    def mouseMotion(s, x, y, xrel, yrel):
+        # Check which object/group was hit
+        if not s:
+            getPickedColor(x, y)
+
+        # Notify python
+        callMouseMotion(s, x, y, xrel, yrel)
+
+        # Update screen
+        if s:
+            queueUpdate()
+
     def mousePressEvent(self, ev):
         x = ev.x()
         y = ev.y()
@@ -232,7 +214,7 @@ class Canvas(QtOpenGL.QGLWidget):
 
         G.mouse_pos = x, y
 
-        mouseButtonDown(b, x, y)
+        self.mouseButtonDown(b, x, y)
 
     def mouseReleaseEvent(self, ev):
         x = ev.x()
@@ -241,7 +223,7 @@ class Canvas(QtOpenGL.QGLWidget):
 
         G.mouse_pos = x, y
 
-        mouseButtonUp(b, x, y)
+        self.mouseButtonUp(b, x, y)
 
     def wheelEvent(self, ev):
         x = ev.x()
@@ -268,19 +250,28 @@ class Canvas(QtOpenGL.QGLWidget):
 
         g_mouse_pos = (x, y)
 
+    @staticmethod
+    def keyDown(key, character, modifiers):
+        callKeyDown(key, character, modifiers)
+
+    @staticmethod
+    def keyUp(key, character, modifiers):
+        callKeyUp(key, character, modifiers)
+        updatePickingBuffer()
+
     def keyPressEvent(self, ev):
         key = ev.key()
         characters = ev.text()
 
         if key in Keys._all:
-            keyDown(key, unicode(characters[:1]), getKeyModifiers())
+            self.keyDown(key, unicode(characters[:1]), getKeyModifiers())
         elif characters:
             for character in characters:
                 # ev.text() may hold multiple characters regardless of
                 #  WA_KeyCompression setting
                 character = unicode(character)
                 key = ord(character)
-                keyDown(key, character, getKeyModifiers())
+                self.keyDown(key, character, getKeyModifiers())
         else:
             super(Canvas, self).keyPressEvent(ev)
 
@@ -289,12 +280,12 @@ class Canvas(QtOpenGL.QGLWidget):
         characters = ev.text()
 
         if key in Keys._all:
-            keyUp(key, unicode(characters[:1]), getKeyModifiers())
+            self.keyUp(key, unicode(characters[:1]), getKeyModifiers())
         elif characters:
             character = characters[0]
             character = unicode(character)
             key = ord(character)
-            keyUp(key, character, getKeyModifiers())
+            self.keyUp(key, character, getKeyModifiers())
         else:
             super(Canvas, self).keyReleaseEvent(ev)
 
@@ -307,84 +298,26 @@ class Canvas(QtOpenGL.QGLWidget):
     def resizeGL(self, w, h):
         reshape(w, h)
 
+    def handleMouse(self):
+        global g_mouse_pos
+        if g_mouse_pos is not None:
+            # print 'mouse motion'
+            ox, oy = G.mouse_pos
+            (x, y) = g_mouse_pos
+            g_mouse_pos = None
+            xrel = x - ox
+            yrel = y - oy
+            G.mouse_pos = x, y
+
+            buttons = int(G.app.mouseButtons())
+
+            self.mouseMotion(buttons, x, y, xrel, yrel)
+
     def idle(self, *args):
-        handleMouse()
+        self.handleMouse()
 
     def timerEvent(self, ev):
         handleTimer(ev.timerId())
-
-class Tab(events3d.EventHandler):
-    def __init__(self, parent, label):
-        super(Tab, self).__init__()
-        self.parent = parent
-        self.label = label
-
-    def setSelected(self, state):
-        pass
-
-class TabsBase(events3d.EventHandler):
-    def __init__(self):
-        super(TabsBase, self).__init__()
-        self.tabBar().setExpanding(False)
-        self.connect(self, QtCore.SIGNAL('currentChanged(int)'), self.tabChanged)
-        self._tabs = {}
-
-    def _event(self, arg):
-        if isinstance(arg, QtCore.QEvent):
-            return super(type(self), self).event(arg)
-        else:
-            return events3d.EventHandler.event(self, arg)
-
-    def _addTab(self, label):
-        tab = Tab(self, label)
-        tab.idx = self._makeTab(tab)
-        self._tabs[tab.idx] = tab
-        return tab
-
-    def tabChanged(self, idx):
-        tab = self._tabs.get(idx)
-        if tab:
-            self.callEvent('onTabSelected', tab)
-            tab.callEvent('onClicked', tab)
-            queueUpdate()
-
-class Tabs(QtGui.QTabWidget, TabsBase):
-    def __init__(self, parent = None):
-        QtGui.QTabWidget.__init__(self, parent)
-        TabsBase.__init__(self)
-
-    def event(self, arg):
-        return super(Tabs, self)._event(arg)
-
-    def _makeTab(self, tab):
-        tab.child = TabBar(self)
-        return super(Tabs, self).addTab(tab.child, tab.label)
-
-    def addTab(self, label):
-        return super(Tabs, self)._addTab(label)
-
-    def tabChanged(self, idx):
-        super(Tabs, self).tabChanged(idx)
-        tab = self._tabs.get(idx)
-        if tab:
-            tab.child.tabChanged(tab.child.currentIndex())
-
-class TabBar(QtGui.QTabBar, TabsBase):
-    def __init__(self, parent = None):
-        QtGui.QTabBar.__init__(self, parent)
-        TabsBase.__init__(self)
-
-    def event(self, arg):
-        return super(TabBar, self)._event(arg)
-
-    def tabBar(self):
-        return self
-
-    def _makeTab(self, tab):
-        return super(TabBar, self).addTab(tab.label)
-
-    def addTab(self, label):
-        return super(TabBar, self)._addTab(label)
 
 class Frame(QtGui.QWidget):
     title = "MakeHuman"
@@ -401,13 +334,26 @@ class Frame(QtGui.QWidget):
         self.layout = QtGui.QGridLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
 
-        self.tabs = Tabs(self)
-        self.layout.addWidget(self.tabs, 0, 0)
-        self.layout.setRowStretch(0, 0)
+        self.tabs = qtgui.Tabs(self)
+        self.layout.addWidget(self.tabs, 0, 0, 1, -1)
+
+        self.left = qtgui.SideBar(self)
+        self.layout.addWidget(self.left, 1, 0)
 
         self.canvas = Canvas(self)
-        self.layout.addWidget(self.canvas, 1, 0)
+        self.layout.addWidget(self.canvas, 1, 1)
+
+        self.right = qtgui.SideBar(self)
+        self.layout.addWidget(self.right, 1, 2)
+
+        self.layout.setRowStretch(0, 0)
         self.layout.setRowStretch(1, 1)
+
+        self.layout.setColumnStretch(0, 0)
+        self.layout.setColumnStretch(1, 1)
+        self.layout.setColumnStretch(2, 0)
+
+        self.sides = [self.left, self.right]
 
     def update(self):
         super(Frame, self).update()
@@ -417,6 +363,9 @@ class Frame(QtGui.QWidget):
         ev.ignore()
         quit()
 
+    def addWidget(self, side, widget, *args, **kwargs):
+        self.sides[side].addWidget(widget, *args, **kwargs)
+
 class Application(QtGui.QApplication):
     def __init__(self):
         super(Application, self).__init__(sys.argv)
@@ -425,26 +374,28 @@ class Application(QtGui.QApplication):
         self.mainwin = Frame(self, (G.windowWidth, G.windowHeight))
         self.mainwin.show()
 
-g_app = None
+    def addWidget(self, *args, **kwargs):
+        self.mainwin.addWidget(*args, **kwargs)
 
 def createWindow(useTimer = None):
-    global g_app
-    g_app = Application()
-    g_app.OnInit()
+    G.app = Application()
+    G.app.OnInit()
+    G.app.addWidget(0, QtGui.QLabel('Left'))
+    G.app.addWidget(1, QtGui.QLabel('Right'))
 
 def eventLoop():
-    g_app.exec_()
+    G.app.exec_()
     OnExit()
 
 g_timers = {}
 
 def addTimer(milliseconds, callback):
-    timer_id = g_app.mainwin.canvas.startTimer(milliseconds)
+    timer_id = G.app.mainwin.canvas.startTimer(milliseconds)
     g_timers[timer_id] = callback
     return timer_id
 
 def removeTimer(id):
-    g_app.mainwin.canvas.killTimer(id)
+    G.app.mainwin.canvas.killTimer(id)
     del g_timers[id]
 
 def handleTimer(id):
