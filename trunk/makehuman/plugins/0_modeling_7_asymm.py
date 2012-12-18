@@ -7,6 +7,7 @@ import gui3d
 import os
 import humanmodifier
 import events3d
+import mh
 
 class AssymSlider(gui3d.Slider):
     
@@ -191,9 +192,9 @@ class AsymmTaskView(gui3d.TaskView):
     def onKeyDown(self, event):
 
         # Undo redo
-        if event.key == events3d.Keys.y:
+        if event.key == mh.Keys.y:
             gui3d.app.redo()
-        elif event.key == events3d.Keys.z:
+        elif event.key == mh.Keys.z:
             gui3d.app.undo()
             
         gui3d.TaskView.onKeyDown(self, event)

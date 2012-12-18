@@ -471,11 +471,11 @@ class settingsTaskView(gui3d.TaskView) :
         @self.backgroundImage.event
         def onMouseDragged(event):
 
-            if event.button == events3d.Buttons.LEFT_MASK:
+            if event.button == mh.Buttons.LEFT_MASK:
                 x, y, z = self.backgroundImage.getPosition()
                 self.backgroundImage.setPosition([x + event.dx, y + event.dy, z])
                 taskview.fixateBackground()
-            elif event.button == events3d.Buttons.RIGHT_MASK:
+            elif event.button == mh.Buttons.RIGHT_MASK:
                 if abs(event.dx) > abs(event.dy):
                     taskview.backgroundWidth += event.dx
                     taskview.backgroundHeight = taskview.originalHeight * taskview.backgroundWidth / taskview.originalWidth

@@ -12,8 +12,6 @@
 This module contains classes to allow an object to handle events.
 """
 
-from mh import Keys, Buttons, Modifiers
-
 class Event:
     """
     Base class for all events, does not contain information.

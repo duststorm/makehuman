@@ -438,45 +438,45 @@ class MHApplication(gui3d.Application):
         
         self.shortcuts = {
             # Actions
-            (events3d.Modifiers.CTRL, events3d.Keys.z): self.undo,
-            (events3d.Modifiers.CTRL, events3d.Keys.y): self.redo,
-            (events3d.Modifiers.CTRL, events3d.Keys.m): self.goToModelling,
-            (events3d.Modifiers.CTRL, events3d.Keys.s): self.goToSave,
-            (events3d.Modifiers.CTRL, events3d.Keys.l): self.goToLoad,
-            (events3d.Modifiers.CTRL, events3d.Keys.e): self.goToExport,
-            (events3d.Modifiers.CTRL, events3d.Keys.r): self.goToRendering,
-            (events3d.Modifiers.CTRL, events3d.Keys.h): self.goToHelp,
-            (events3d.Modifiers.CTRL, events3d.Keys.q): self.promptAndExit,
-            (events3d.Modifiers.CTRL, events3d.Keys.w): self.toggleStereo,
-            (events3d.Modifiers.CTRL, events3d.Keys.f): self.toggleSolid,
-            (events3d.Modifiers.ALT, events3d.Keys.t): self.saveTarget,
-            (events3d.Modifiers.ALT, events3d.Keys.e): self.quickExport,
-            (events3d.Modifiers.ALT, events3d.Keys.s): self.toggleSubdivision,
-            (events3d.Modifiers.ALT, events3d.Keys.g): self.grabScreen,
+            (mh.Modifiers.CTRL, mh.Keys.z): self.undo,
+            (mh.Modifiers.CTRL, mh.Keys.y): self.redo,
+            (mh.Modifiers.CTRL, mh.Keys.m): self.goToModelling,
+            (mh.Modifiers.CTRL, mh.Keys.s): self.goToSave,
+            (mh.Modifiers.CTRL, mh.Keys.l): self.goToLoad,
+            (mh.Modifiers.CTRL, mh.Keys.e): self.goToExport,
+            (mh.Modifiers.CTRL, mh.Keys.r): self.goToRendering,
+            (mh.Modifiers.CTRL, mh.Keys.h): self.goToHelp,
+            (mh.Modifiers.CTRL, mh.Keys.q): self.promptAndExit,
+            (mh.Modifiers.CTRL, mh.Keys.w): self.toggleStereo,
+            (mh.Modifiers.CTRL, mh.Keys.f): self.toggleSolid,
+            (mh.Modifiers.ALT, mh.Keys.t): self.saveTarget,
+            (mh.Modifiers.ALT, mh.Keys.e): self.quickExport,
+            (mh.Modifiers.ALT, mh.Keys.s): self.toggleSubdivision,
+            (mh.Modifiers.ALT, mh.Keys.g): self.grabScreen,
             # Camera navigation
-            (0, events3d.Keys.N2): self.rotateDown,
-            (0, events3d.Keys.N4): self.rotateLeft,
-            (0, events3d.Keys.N6): self.rotateRight,
-            (0, events3d.Keys.N8): self.rotateUp,
-            (0, events3d.Keys.UP): self.panUp,
-            (0, events3d.Keys.DOWN): self.panDown,
-            (0, events3d.Keys.RIGHT): self.panRight,
-            (0, events3d.Keys.LEFT): self.panLeft,
-            (0, events3d.Keys.PLUS): self.zoomIn,
-            (0, events3d.Keys.MINUS): self.zoomOut,
-            (0, events3d.Keys.N1): self.frontView,
-            (0, events3d.Keys.N3): self.rightView,
-            (0, events3d.Keys.N7): self.topView,
-            (events3d.Modifiers.CTRL, events3d.Keys.N1): self.backView,
-            (events3d.Modifiers.CTRL, events3d.Keys.N3): self.leftView,
-            (events3d.Modifiers.CTRL, events3d.Keys.N7): self.bottomView,
-            (0, events3d.Keys.PERIOD): self.resetView
+            (0, mh.Keys.N2): self.rotateDown,
+            (0, mh.Keys.N4): self.rotateLeft,
+            (0, mh.Keys.N6): self.rotateRight,
+            (0, mh.Keys.N8): self.rotateUp,
+            (0, mh.Keys.UP): self.panUp,
+            (0, mh.Keys.DOWN): self.panDown,
+            (0, mh.Keys.RIGHT): self.panRight,
+            (0, mh.Keys.LEFT): self.panLeft,
+            (0, mh.Keys.PLUS): self.zoomIn,
+            (0, mh.Keys.MINUS): self.zoomOut,
+            (0, mh.Keys.N1): self.frontView,
+            (0, mh.Keys.N3): self.rightView,
+            (0, mh.Keys.N7): self.topView,
+            (mh.Modifiers.CTRL, mh.Keys.N1): self.backView,
+            (mh.Modifiers.CTRL, mh.Keys.N3): self.leftView,
+            (mh.Modifiers.CTRL, mh.Keys.N7): self.bottomView,
+            (0, mh.Keys.PERIOD): self.resetView
         }
         
         self.mouseActions = {
-            (0, events3d.Buttons.RIGHT_MASK): self.mouseTranslate,
-            (0, events3d.Buttons.LEFT_MASK): self.mouseRotate,
-            (0, events3d.Buttons.MIDDLE_MASK): self.mouseZoom
+            (0, mh.Buttons.RIGHT_MASK): self.mouseTranslate,
+            (0, mh.Buttons.LEFT_MASK): self.mouseRotate,
+            (0, mh.Buttons.MIDDLE_MASK): self.mouseZoom
         }
         
         self.helpIds = []
@@ -823,7 +823,7 @@ class MHApplication(gui3d.Application):
         if self.selectedHuman.isVisible():
             
             # Normalize modifiers
-            modifiers = mh.getKeyModifiers() & (events3d.Modifiers.CTRL | events3d.Modifiers.ALT | events3d.Modifiers.SHIFT)
+            modifiers = mh.getKeyModifiers() & (mh.Modifiers.CTRL | mh.Modifiers.ALT | mh.Modifiers.SHIFT)
             
             if (modifiers, event.button) in self.mouseActions:
                 self.mouseActions[(modifiers, event.button)](event)
@@ -844,12 +844,12 @@ class MHApplication(gui3d.Application):
     def onKeyDown(self, event):
         
         # Normalize modifiers
-        modifiers = event.modifiers & (events3d.Modifiers.CTRL | events3d.Modifiers.ALT)
+        modifiers = event.modifiers & (mh.Modifiers.CTRL | mh.Modifiers.ALT)
         
-        if modifiers & events3d.Modifiers.CTRL:
-            modifiers |= events3d.Modifiers.CTRL
-        if modifiers & events3d.Modifiers.ALT:
-            modifiers |= events3d.Modifiers.ALT
+        if modifiers & mh.Modifiers.CTRL:
+            modifiers |= mh.Modifiers.CTRL
+        if modifiers & mh.Modifiers.ALT:
+            modifiers |= mh.Modifiers.ALT
             
         # Normalize key
         key = event.key
@@ -1454,12 +1454,12 @@ class MHApplication(gui3d.Application):
         self.redraw()
         
     def zoomOut(self):
-        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.Modifiers.SHIFT else gui3d.app.settings.get('lowspeed', 1)
+        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & mh.Modifiers.SHIFT else gui3d.app.settings.get('lowspeed', 1)
         self.modelCamera.eyeZ += 0.65 * speed
         self.redraw()
         
     def zoomIn(self):
-        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.Modifiers.SHIFT else gui3d.app.settings.get('lowspeed', 1)
+        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & mh.Modifiers.SHIFT else gui3d.app.settings.get('lowspeed', 1)
         self.modelCamera.eyeZ -= 0.65 * speed
         self.redraw()
         
@@ -1490,7 +1490,7 @@ class MHApplication(gui3d.Application):
     # Mouse actions    
     def mouseTranslate(self, event):
             
-        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.Modifiers.SHIFT else gui3d.app.settings.get('lowspeed', 1)
+        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & mh.Modifiers.SHIFT else gui3d.app.settings.get('lowspeed', 1)
         
         human = self.selectedHuman
         trans = human.getPosition()
@@ -1502,7 +1502,7 @@ class MHApplication(gui3d.Application):
 
     def mouseRotate(self, event):
         
-        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.Modifiers.SHIFT else gui3d.app.settings.get('lowspeed', 1)
+        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & mh.Modifiers.SHIFT else gui3d.app.settings.get('lowspeed', 1)
         
         human = self.selectedHuman
         rot = human.getRotation()
@@ -1512,7 +1512,7 @@ class MHApplication(gui3d.Application):
         
     def mouseZoom(self, event):
     
-        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & events3d.Modifiers.SHIFT else gui3d.app.settings.get('lowspeed', 1)
+        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & mh.Modifiers.SHIFT else gui3d.app.settings.get('lowspeed', 1)
         
         if gui3d.app.settings.get('invertMouseWheel', False):
             speed *= -1
