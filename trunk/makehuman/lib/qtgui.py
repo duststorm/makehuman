@@ -16,9 +16,15 @@ class Tab(events3d.EventHandler):
         pass
 
 class Widget(events3d.EventHandler):
+    def __init__(self):
+        events3d.EventHandler.__init__(self)
+
     @staticmethod
     def getLanguageString(text):
         return text
+
+    def setPosition(self, position):
+        pass
 
 class TabsBase(Widget):
     def __init__(self):
@@ -76,6 +82,7 @@ class GroupBox(QtGui.QGroupBox, Widget):
     def __init__(self, position=None, label='', style=None):
         label = self.getLanguageString(label) if label else ''
         QtGui.QGroupBox.__init__(self, label)
+        Widget.__init__(self)
         self.layout = QtGui.QGridLayout(self)
 
     def __str__(self):
@@ -103,6 +110,7 @@ class Slider(QtGui.QSlider, Widget):
                  style=SliderStyle(), thumbStyle=None, valueConverter=None):
         orient = (QtCore.Qt.Horizontal if style.orientation == OrientationHorizontal else QtCore.Qt.Vertical)
         super(Slider, self).__init__(orient)
+        Widget.__init__(self)
         self.min = min
         self.max = max
         self.setMinimum(0)
@@ -133,6 +141,7 @@ class Slider(QtGui.QSlider, Widget):
 
 class ButtonBase(Widget):
     def __init__(self):
+        Widget.__init__(self)
         self.connect(self, QtCore.SIGNAL('clicked(bool)'), self._clicked)
 
     def getLabel(self):
@@ -147,10 +156,12 @@ class ButtonBase(Widget):
 class Button(QtGui.QPushButton, ButtonBase):
     def __init__(self, label=None, selected=False, style=None):
         super(Button, self).__init__(label)
+        ButtonBase.__init__(self)
 
 class CheckBox(QtGui.QCheckBox, ButtonBase):
     def __init__(self, label=None, selected=False, style=None):
         super(CheckBox, self).__init__(label)
+        ButtonBase.__init__(self)
         self.setChecked(selected)
 
 ToggleButton = CheckBox
@@ -160,6 +171,7 @@ class RadioButton(QtGui.QRadioButton, ButtonBase):
 
     def __init__(self, group, label=None, selected=False, style=None):
         super(RadioButton, self).__init__(label)
+        ButtonBase.__init__(self)
         self.group = group
         self.group.append(self)
         self.setChecked(selected)
@@ -198,6 +210,7 @@ class TextView(QtGui.QLabel, Widget):
     def __init__(self, label = '', style=None):
         label = self.getLanguageString(label) if label else ''
         super(TextView, self).__init__(label)
+        Widget.__init__(self)
 
     def setText(self, text):
         text = self.getLanguageString(text) if text else ''
@@ -219,6 +232,7 @@ def filenameValidator(text):
 class TextEdit(QtGui.QLineEdit, Widget):
     def __init__(self, text='', style=None, validator = None):
         super(TextEdit, self).__init__(text)
+        Widget.__init__(self)
         self.setValidator(validator)
         self.connect(self, QtCore.SIGNAL('textEdited(QString)'), self._textChanged)
 
@@ -257,9 +271,21 @@ class TextEdit(QtGui.QLineEdit, Widget):
             qvalidator = None
         super(TextEdit, self).setValidator(qvalidator)
 
+class ProgressBar(QtGui.QProgressBar, Widget):
+    def __init__(self, style=None, barStyle=None, visible=True):
+        super(ProgressBar, self).__init__()
+        Widget.__init__(self)
+        self.setVisible(visible)
+
+    def setProgress(self, progress, redraw=True):
+        min = self.minimum()
+        max = self.maximum()
+        self.setValue(min + progress * (max - min))
+
 class SideBar(QtGui.QWidget, Widget):
     def __init__(self, parent = None, flags = QtCore.Qt.WindowFlags(0)):
-        QtGui.QWidget.__init__(self, parent, flags)
+        super(SideBar, self).__init__(parent, flags)
+        Widget.__init__(self)
         self.layout0 = QtGui.QGridLayout(self)
         self.layout0.setContentsMargins(0, 0, 0, 0)
         self.layout0.setRowStretch(0, 0)
@@ -271,4 +297,5 @@ class SideBar(QtGui.QWidget, Widget):
 
     def addWidget(self, widget, row = 0, col = 0, rowSpan = 1, colsSpan = 1, alignment = QtCore.Qt.Alignment(0)):
         self.layout.addWidget(widget, row, col, rowSpan, colsSpan, alignment)
+        return widget
 

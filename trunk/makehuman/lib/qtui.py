@@ -346,14 +346,18 @@ class Frame(QtGui.QWidget):
         self.right = qtgui.SideBar(self)
         self.layout.addWidget(self.right, 1, 2)
 
+        self.bottom = qtgui.SideBar(self)
+        self.layout.addWidget(self.bottom, 2, 1, 1, -1)
+
         self.layout.setRowStretch(0, 0)
         self.layout.setRowStretch(1, 1)
+        self.layout.setRowStretch(2, 0)
 
         self.layout.setColumnStretch(0, 0)
         self.layout.setColumnStretch(1, 1)
         self.layout.setColumnStretch(2, 0)
 
-        self.sides = [self.left, self.right]
+        self.sides = [self.left, self.right, self.bottom]
 
     def update(self):
         super(Frame, self).update()
@@ -364,7 +368,7 @@ class Frame(QtGui.QWidget):
         quit()
 
     def addWidget(self, side, widget, *args, **kwargs):
-        self.sides[side].addWidget(widget, *args, **kwargs)
+        return self.sides[side].addWidget(widget, *args, **kwargs)
 
 class Application(QtGui.QApplication):
     def __init__(self):
@@ -375,7 +379,7 @@ class Application(QtGui.QApplication):
         self.mainwin.show()
 
     def addWidget(self, *args, **kwargs):
-        self.mainwin.addWidget(*args, **kwargs)
+        return self.mainwin.addWidget(*args, **kwargs)
 
 def createWindow(useTimer = None):
     G.app = Application()
