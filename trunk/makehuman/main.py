@@ -102,6 +102,7 @@ import algos3d
 import module3d
 #import posemode
 from math import tan, pi
+import qtgui
 
 class Camera(events3d.EventHandler):
 
@@ -490,8 +491,9 @@ class MHApplication(gui3d.Application):
         # Display the initial splash screen and the progress bar during startup
         mesh = gui3d.RectangleMesh(800, 600, gui3d.app.getThemeResource('images', 'splash.png'))
         self.splash = self.addObject(gui3d.Object([0, 0, 9.8], mesh))
-        self.progressBar = self.addView(gui3d.ProgressBar(gui3d.ProgressBarStyle._replace(left=800-150, top=600-15, zIndex=9.85)))
-        self.progressBar.text = self.progressBar.addView(gui3d.TextView(style=gui3d.TextViewStyle._replace(left=10, top=600-20, zIndex=9.85, width=800-150-20, textAlign=gui3d.AlignRight)))
+        self.progressBar = G.app.addWidget(2, qtgui.ProgressBar(), 0, 0, 1, -1)
+        # self.progressBar = self.addView(gui3d.ProgressBar(gui3d.ProgressBarStyle._replace(left=800-150, top=600-15, zIndex=9.85)))
+        # self.progressBar.text = self.progressBar.addView(gui3d.TextView(style=gui3d.TextViewStyle._replace(left=10, top=600-20, zIndex=9.85, width=800-150-20, textAlign=gui3d.AlignRight)))
         self.redrawNow()
         
         # self.tabs = self.addView(gui3d.TabView())
@@ -704,12 +706,9 @@ class MHApplication(gui3d.Application):
         def onClicked(event):
             self.promptAndExit()
           
-        self.undoButton = self.addView(gui3d.Button("Undo",
-            style=gui3d.ButtonStyle._replace(width=40, left=650, top=505, zIndex=9.1)))
-        self.redoButton = self.addView(gui3d.Button("Redo",
-            style=gui3d.ButtonStyle._replace(width=40, left=694, top=505, zIndex=9.1)))
-        self.resetButton = self.addView(gui3d.Button("Reset",
-            style=gui3d.ButtonStyle._replace(width=40, left=738, top=505, zIndex=9.1)))
+        self.undoButton = G.app.addWidget(1, qtgui.Button("Undo"), 1, 0)
+        self.redoButton = G.app.addWidget(1, qtgui.Button("Redo"), 1, 1)
+        self.resetButton = G.app.addWidget(1, qtgui.Button("Reset"), 1, 2)
                                         
         @self.undoButton.mhEvent
         def onClicked(event):
@@ -728,10 +727,8 @@ class MHApplication(gui3d.Application):
 
             mh.setCaption("MakeHuman r" + os.environ['SVNREVISION'] + " - [Untitled]")
           
-        self.globalButton = self.addView(gui3d.Button("Global cam",
-            style=gui3d.ButtonStyle._replace(width=128, height=20, left=650, top=530, zIndex=9.1)))
-        self.faceButton = self.addView(gui3d.Button("Face cam",
-            style=gui3d.ButtonStyle._replace(width=128, height=20, left=650, top=555, zIndex=9.1)))
+        self.globalButton = G.app.addWidget(1, qtgui.Button("Global cam"), 2, 0, 1, -1)
+        self.faceButton = G.app.addWidget(1, qtgui.Button("Face cam"), 3, 0, 1, -1)
 
         @self.globalButton.mhEvent
         def onClicked(event):
@@ -778,11 +775,8 @@ class MHApplication(gui3d.Application):
         self.dialog.hide()
         self.prompt('Warning', 'This is an alpha release, which means that there are still bugs present and features missing. Use at your own risk.',
             'OK', helpId='alphaWarning')
-        self.progressBar.blocker = self.progressBar.addObject(gui3d.Object( [0, 0, 9.7], gui3d.RectangleMesh(800, 600), visible=False))
         self.dialog.blocker.mesh.setColor([0, 0, 0, 128])
-        self.progressBar.blocker.mesh.setColor([0, 0, 0, 128])
         self.splash.hide()
-        self.progressBar.blocker.show()
 
         mh.setCaption("MakeHuman r" + os.environ['SVNREVISION'] + " - [Untitled]")
         
@@ -873,12 +867,11 @@ class MHApplication(gui3d.Application):
         self.faceButton.setPosition([event.width-150, event.height-45, 9.1])
         
         self.progressBar.setPosition([event.width-150, event.height-15, 9.85])
-        
-        self.dialog.blocker.mesh.resize(event.width, event.height)
-        self.dialog.box.setPosition([event.width/2-100, event.height/2-75, 9.8])
-        self.dialog.box.layout.rebuild()
-        
-        self.progressBar.blocker.mesh.resize(event.width, event.height)
+
+        if hasattr(self, 'dialog'):
+            self.dialog.blocker.mesh.resize(event.width, event.height)
+            self.dialog.box.setPosition([event.width/2-100, event.height/2-75, 9.8])
+            self.dialog.box.layout.rebuild()
         
     # Undo-redo
     def do(self, action):
