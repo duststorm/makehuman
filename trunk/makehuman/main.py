@@ -493,7 +493,8 @@ class MHApplication(gui3d.Application):
         self.progressBar.text = self.progressBar.addView(gui3d.TextView(style=gui3d.TextViewStyle._replace(left=10, top=600-20, zIndex=9.85, width=800-150-20, textAlign=gui3d.AlignRight)))
         self.redrawNow()
         
-        self.tabs = self.addView(gui3d.TabView())
+        # self.tabs = self.addView(gui3d.TabView())
+        self.tabs = mh.ui.g_app.mainwin.tabs
         
         @self.tabs.event
         def onTabSelected(tab):
@@ -859,7 +860,7 @@ class MHApplication(gui3d.Application):
             
     def onResized(self, event):
 
-        self.tabs.box.mesh.resize(event.width, 32)
+        # self.tabs.box.mesh.resize(event.width, 32)
         self.statusbar.mesh.resize(event.width, 32)
         self.statusbar.setPosition((0.0, event.height-20, 9))
         

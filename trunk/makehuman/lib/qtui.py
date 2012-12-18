@@ -5,6 +5,7 @@ from PyQt4 import QtCore, QtGui, QtOpenGL
 
 from core import *
 from glmodule import updatePickingBuffer, getPickedColor, OnInit, OnExit, reshape, draw
+import events3d
 
 def keyDown(key, character, modifiers):
     callKeyDown(key, character, modifiers)
@@ -312,6 +313,79 @@ class Canvas(QtOpenGL.QGLWidget):
     def timerEvent(self, ev):
         handleTimer(ev.timerId())
 
+class Tab(events3d.EventHandler):
+    def __init__(self, parent, label):
+        super(Tab, self).__init__()
+        self.parent = parent
+        self.label = label
+
+    def setSelected(self, state):
+        pass
+
+class TabsBase(events3d.EventHandler):
+    def __init__(self):
+        super(TabsBase, self).__init__()
+        self.tabBar().setExpanding(False)
+        self.connect(self, QtCore.SIGNAL('currentChanged(int)'), self.tabChanged)
+        self._tabs = {}
+
+    def _event(self, arg):
+        if isinstance(arg, QtCore.QEvent):
+            return super(type(self), self).event(arg)
+        else:
+            return events3d.EventHandler.event(self, arg)
+
+    def _addTab(self, label):
+        tab = Tab(self, label)
+        tab.idx = self._makeTab(tab)
+        self._tabs[tab.idx] = tab
+        return tab
+
+    def tabChanged(self, idx):
+        tab = self._tabs.get(idx)
+        if tab:
+            self.callEvent('onTabSelected', tab)
+            tab.callEvent('onClicked', tab)
+            queueUpdate()
+
+class Tabs(QtGui.QTabWidget, TabsBase):
+    def __init__(self, parent = None):
+        QtGui.QTabWidget.__init__(self, parent)
+        TabsBase.__init__(self)
+
+    def event(self, arg):
+        return super(Tabs, self)._event(arg)
+
+    def _makeTab(self, tab):
+        tab.child = TabBar(self)
+        return super(Tabs, self).addTab(tab.child, tab.label)
+
+    def addTab(self, label):
+        return super(Tabs, self)._addTab(label)
+
+    def tabChanged(self, idx):
+        super(Tabs, self).tabChanged(idx)
+        tab = self._tabs.get(idx)
+        if tab:
+            tab.child.tabChanged(tab.child.currentIndex())
+
+class TabBar(QtGui.QTabBar, TabsBase):
+    def __init__(self, parent = None):
+        QtGui.QTabBar.__init__(self, parent)
+        TabsBase.__init__(self)
+
+    def event(self, arg):
+        return super(TabBar, self)._event(arg)
+
+    def tabBar(self):
+        return self
+
+    def _makeTab(self, tab):
+        return super(TabBar, self).addTab(tab.label)
+
+    def addTab(self, label):
+        return super(TabBar, self)._addTab(label)
+
 class Frame(QtGui.QWidget):
     title = "MakeHuman"
 
@@ -319,14 +393,21 @@ class Frame(QtGui.QWidget):
         self.app = app
         super(Frame, self).__init__()
         self.setWindowTitle(self.title)
-        self.resize(*size)
-        self.canvas = Canvas(self)
-        self.layout = QtGui.QGridLayout(self)
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout.addWidget(self.canvas)
         self.setAttribute(QtCore.Qt.WA_PaintOnScreen)
         self.setAttribute(QtCore.Qt.WA_OpaquePaintEvent)
         self.setAttribute(QtCore.Qt.WA_KeyCompression, False)
+        self.resize(*size)
+
+        self.layout = QtGui.QGridLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+
+        self.tabs = Tabs(self)
+        self.layout.addWidget(self.tabs, 0, 0)
+        self.layout.setRowStretch(0, 0)
+
+        self.canvas = Canvas(self)
+        self.layout.addWidget(self.canvas, 1, 0)
+        self.layout.setRowStretch(1, 1)
 
     def update(self):
         super(Frame, self).update()

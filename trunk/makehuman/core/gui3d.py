@@ -944,10 +944,12 @@ class Category(View):
             raise KeyError('A category with this name already exists', name)
 
         app.categories[name] = self
-        self.tab = app.tabs.addTab(label or name, style=tabStyle)
+        # self.tab = app.tabs.addTab(label or name, style=tabStyle)
+        self.tab = app.tabs.addTab(label or name)
         self.tab.name = self.name
         
-        self.tabs = self.addView(TabView(style=TabViewStyle._replace(top=32, normal="lowerbar.png"), tabStyle=TaskTabStyle))
+        # self.tabs = self.addView(TabView(style=TabViewStyle._replace(top=32, normal="lowerbar.png"), tabStyle=TaskTabStyle))
+        self.tabs = self.tab.child
         
         @self.tabs.event
         def onTabSelected(tab):
@@ -965,9 +967,10 @@ class Category(View):
         self.hide()
     
     def onResized(self, event):
-        self.tabs.style.width = event.width
-        self.tabs.layout.rebuild()
-        self.tabs.box.mesh.resize(event.width, 32)
+        # self.tabs.style.width = event.width
+        # self.tabs.layout.rebuild()
+        # self.tabs.box.mesh.resize(event.width, 32)
+        pass
 
     def getViewByName(self, viewName):
         """
