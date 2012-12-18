@@ -85,53 +85,53 @@ class SettingsTaskView(gui3d.TaskView):
         for language in languageFiles:
             languageBox.addView(LanguageRadioButton(languages, language));y += 24
         
-        @self.shaderNo.event
+        @self.shaderNo.mhEvent
         def onClicked(event):
             gui3d.RadioButton.onClicked(self.shaderNo, event)
             human = gui3d.app.selectedHuman
             human.mesh.setShader(0)
             
-        @self.shaderPhong.event
+        @self.shaderPhong.mhEvent
         def onClicked(event):
             gui3d.RadioButton.onClicked(self.shaderPhong, event)
             self.setShader("data/shaders/glsl/phong_vertex_shader.txt", "data/shaders/glsl/phong_fragment_shader.txt")
                 
-        @self.shaderToon.event
+        @self.shaderToon.mhEvent
         def onClicked(event):
             gui3d.RadioButton.onClicked(self.shaderToon, event)
             self.setShader("data/shaders/glsl/toon_vertex_shader.txt", "data/shaders/glsl/toon_fragment_shader.txt")
             
-        #@self.shaderSkin.event
+        #@self.shaderSkin.mhEvent
         #def onClicked(event):
             #gui3d.RadioButton.onClicked(self.shaderSkin, event)
             #self.setShader("data/shaders/glsl/skin_vertex_shader.txt", "data/shaders/glsl/skin_fragment_shader.txt")
             #gui3d.app.selectedHuman.mesh.setShaderParameter("gradientMap", module3d.getTexture("data/textures/color_temperature.png").textureId)
             #gui3d.app.selectedHuman.mesh.setShaderParameter("ambientOcclusionMap", module3d.getTexture("data/textures/female_young.tif").textureId)
                 
-        @self.realtimeUpdates.event
+        @self.realtimeUpdates.mhEvent
         def onClicked(event):
             gui3d.ToggleButton.onClicked(self.realtimeUpdates, event)
             gui3d.app.settings['realtimeUpdates'] = self.realtimeUpdates.selected
             
-        @self.realtimeNormalUpdates.event
+        @self.realtimeNormalUpdates.mhEvent
         def onClicked(event):
             gui3d.ToggleButton.onClicked(self.realtimeNormalUpdates, event)
             gui3d.app.settings['realtimeNormalUpdates'] = self.realtimeNormalUpdates.selected
             
-        @self.normal.event
+        @self.normal.mhEvent
         def onChange(value):
             gui3d.app.settings['lowspeed'] = value
             
-        @self.shift.event
+        @self.shift.mhEvent
         def onChange(value):
             gui3d.app.settings['highspeed'] = value
             
-        @metric.event
+        @metric.mhEvent
         def onClicked(event):
             gui3d.RadioButton.onClicked(metric, event)
             gui3d.app.settings['units'] = 'metric'
             
-        @imperial.event
+        @imperial.mhEvent
         def onClicked(event):
             gui3d.RadioButton.onClicked(imperial, event)
             gui3d.app.settings['units'] = 'imperial'

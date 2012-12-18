@@ -50,7 +50,7 @@ class PoseRadioButton(gui3d.RadioButton):
         self.file = os.path.join(mh.getPath(''), "data", "poses", label+".bvh")
         gui3d.RadioButton.__init__(self, group, label, selected)
         
-        @self.event
+        @self.mhEvent
         def onClicked(event):
             gui3d.RadioButton.onClicked(self, event)
             self.view.armature.readBvhFile(self.file, gui3d.app.selectedHuman)
@@ -64,7 +64,7 @@ class BoneRadioButton(gui3d.RadioButton):
         self.name = label
         gui3d.RadioButton.__init__(self, group, label, selected)
         
-        @self.event
+        @self.mhEvent
         def onClicked(event):
             gui3d.RadioButton.onClicked(self, event)
             bone = self.view.armature.bones[self.name]
@@ -82,7 +82,7 @@ class LayerCheckBox(gui3d.CheckBox):
         self.name = label
         gui3d.CheckBox.__init__(self, label, selected)
         
-        @self.event
+        @self.mhEvent
         def onClicked(event):
             gui3d.CheckBox.onClicked(self, event)
             self.view.updateLayers()
@@ -191,7 +191,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
         self.layerBox.hide()
         
          
-        @self.selectRigButton.event
+        @self.selectRigButton.mhEvent
         def onClicked(event):     
             for name,button in self.prismButtons.items():
                 if button.selected:
@@ -202,13 +202,13 @@ class PoseArmatureTaskView(gui3d.TaskView):
             if rigtype:
                 self.selectRig(prismType, rigtype)                   
             
-        @self.testButton.event
+        @self.testButton.mhEvent
         def onClicked(event):
             listBones = doTest1(self.armature.bones)
             self.updateAll()
             doTest2(listBones)
                 
-        @self.poseButton.event
+        @self.poseButton.mhEvent
         def onClicked(event):
             if not self.poseButtons:
                 radio = []
@@ -223,41 +223,41 @@ class PoseArmatureTaskView(gui3d.TaskView):
                         self.poseButtons[pose] = self.poseBox.addView(button)
             self.poseBox.show()
                        
-        @self.showMesh.event
+        @self.showMesh.mhEvent
         def onClicked(event):
             gui3d.CheckBox.onClicked(self.showMesh, event)
             self.updateAll()                        
 
-        @self.showMesh.event
+        @self.showMesh.mhEvent
         def onClicked(event):
             gui3d.CheckBox.onClicked(self.showMesh, event)
             self.updateAll()                        
 
-        @self.showRig.event
+        @self.showRig.mhEvent
         def onClicked(event):
             gui3d.CheckBox.onClicked(self.showRig, event)
             self.updateAll()                        
 
-        @self.restPosition.event
+        @self.restPosition.mhEvent
         def onClicked(event):
             gui3d.CheckBox.onClicked(self.restPosition, event)
             self.updateAll()                        
 
-        @self.zeroBoneButton.event
+        @self.zeroBoneButton.mhEvent
         def onClicked(event):
             bone = self.getSelectedBone()
             bone.zeroTransformation()
             self.zeroSliders()
             self.updateAll()
 
-        @self.zeroAllButton.event
+        @self.zeroAllButton.mhEvent
         def onClicked(event):
             self.zeroSliders()
             for bone in self.armature.controls:
                 bone.zeroTransformation()
             self.updateAll()
 
-        @self.reloadCharacterButton.event
+        @self.reloadCharacterButton.mhEvent
         def onClicked(event):
             self.zeroSliders()
             human = gui3d.app.selectedHuman
@@ -275,7 +275,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
             self.updateAll()
             print "  ", human.meshData.verts[0]
 
-        @self.rotSlider.event
+        @self.rotSlider.mhEvent
         def onChange(value):
             bone = self.getSelectedBone()
             if self.rotX.selected:
@@ -287,48 +287,48 @@ class PoseArmatureTaskView(gui3d.TaskView):
             bone.rotate(value, axis, self.rotWorld.selected)
             self.updateSliders(bone)
                                                        
-        @self.QXslider.event
+        @self.QXslider.mhEvent
         def onChange(value):
             bone = self.getSelectedBone()
             bone.setRotationIndex(1, value, True)
             self.updateSliders(bone)
                 
-        @self.QYslider.event
+        @self.QYslider.mhEvent
         def onChange(value):
             bone = self.getSelectedBone()
             bone.setRotationIndex(2, value, True)
             self.updateSliders(bone)
                 
-        @self.QZslider.event
+        @self.QZslider.mhEvent
         def onChange(value):
             bone = self.getSelectedBone()
             bone.setRotationIndex(3, value, True)
             self.updateSliders(bone)
                 
-        @self.EXslider.event
+        @self.EXslider.mhEvent
         def onChange(value):
             bone = self.getSelectedBone()
             bone.setRotationIndex(1, value, False)
             self.updateSliders(bone)
                 
-        @self.EYslider.event
+        @self.EYslider.mhEvent
         def onChange(value):
             bone = self.getSelectedBone()
             bone.setRotationIndex(2, value, False)
             self.updateSliders(bone)
         
-        @self.EZslider.event
+        @self.EZslider.mhEvent
         def onChange(value):
             bone = self.getSelectedBone()
             bone.setRotationIndex(3, value, False)
             self.updateSliders(bone)
 
-        @self.cube.event
+        @self.cube.mhEvent
         def onMouseEntered(event):            
             gui3d.TaskView.onMouseEntered(self, event)
             gui3d.app.redraw()
 
-        @self.cube.event
+        @self.cube.mhEvent
         def onMouseDragged(event):        
             gui3d.app.selectedHuman.show()
             self.getArmature().hide()
@@ -340,7 +340,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
             if self.showRig.selected:
                 self.getArmature().show()
         
-        @self.cube.event
+        @self.cube.mhEvent
         def onMouseWheel(event):        
             gui3d.app.selectedHuman.show()
             self.getArmature().hide()
@@ -626,23 +626,23 @@ class CLayerObject:
         dummy = module3d.Object3D('Dummy%2d' % self.index)
          gui3d.app.addObject(gui3d.Object([0.0, 0.0, 0.0], dummy))  
         
-        @self.object.event
+        @self.object.mhEvent
         def onMouseEntered(self, event):
             print "Emtered", event
 
-        @self.object.event
+        @self.object.mhEvent
         def onMouseDown(self, event):
             print "Dpwm", event
 
-        @self.object.event
+        @self.object.mhEvent
         def onMouseDragged(self, event):
             print "Dragged", event
 
-        @self.object.event
+        @self.object.mhEvent
         def onMouseMoved(self, event):
             print "Moved", event
 
-        @self.object.event
+        @self.object.mhEvent
         def onMouseUp(self, event):
             print "Up", event
         """
@@ -827,7 +827,7 @@ def load(app):
     app.addLoadHandler('poses', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)
             
-    @taskview.event
+    @taskview.mhEvent
     def onMouseDown(event):
         part = app.getSelectedFaceGroup()
         print part.name

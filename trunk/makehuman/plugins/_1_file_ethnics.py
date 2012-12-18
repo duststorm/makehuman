@@ -55,7 +55,7 @@ class EthnicsTaskView(gui3d.TaskView):
         self.loadBox = self.addView(gui3d.GroupBox([650, y, 9.0], 'Load', gui3d.GroupBoxStyle._replace(height=25+24*1+6)));y+=25
         self.load = self.loadBox.addView(gui3d.Button("Load"));y+=24
         
-        @self.load.event
+        @self.load.mhEvent
         def onClicked(event):
             ethnic = self.africa.getSelection().name
             subEthnic = self.aethiopid.getSelection().name

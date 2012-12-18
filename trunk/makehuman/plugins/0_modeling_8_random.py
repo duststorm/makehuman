@@ -19,7 +19,7 @@ class RandomTaskView(gui3d.TaskView):
 
         self.lastRandoms = {}
         
-        @self.create.event
+        @self.create.mhEvent
         def onClicked(event):
             
             human = gui3d.app.selectedHuman
@@ -63,7 +63,7 @@ class RandomTaskView(gui3d.TaskView):
 
             self.setModifiers()
             
-        @self.modify.event
+        @self.modify.mhEvent
         def onClicked(event):
             human = gui3d.app.selectedHuman
             
@@ -106,11 +106,11 @@ class RandomTaskView(gui3d.TaskView):
     
             self.setModifiers()
 
-        @self.amount.event
+        @self.amount.mhEvent
         def onChange(value):
             self.setModifiers()
 
-        @self.symmetry.event
+        @self.symmetry.mhEvent
         def onChange(value):
             self.setModifiers()
 

@@ -951,7 +951,7 @@ class Category(View):
         # self.tabs = self.addView(TabView(style=TabViewStyle._replace(top=32, normal="lowerbar.png"), tabStyle=TaskTabStyle))
         self.tabs = self.tab.child
         
-        @self.tabs.event
+        @self.tabs.mhEvent
         def onTabSelected(tab):
             app.switchTask(tab.name)
             
@@ -1452,7 +1452,7 @@ class TabView(View):
         """
         tab = self.addView(ToggleButton(label, style=style or self.tabStyle))
 
-        @tab.event
+        @tab.mhEvent
         def onClicked(event):
             self.callEvent('onTabSelected', tab)
             
@@ -1546,7 +1546,7 @@ class Slider(View):
                     intValidator if isinstance(min, int) else floatValidator))
                 self.edit.hide()
                 
-                @self.edit.event
+                @self.edit.mhEvent
                 def onBlur(event):
                     
                     if self.edit.getText():
@@ -1558,7 +1558,7 @@ class Slider(View):
                     TextEdit.onBlur(self.edit, event)
                     self.edit.hide()
                     
-                @self.edit.event
+                @self.edit.mhEvent
                 def onKeyDown(event):
                     
                     if event.modifiers & mh.Modifiers.CTRL:
@@ -2373,7 +2373,7 @@ class FileEntryView(View):
         self.edit = self.addView(TextEdit(style=TextEditStyle._replace(left=200, top=90, zIndex=9.5), validator=filenameValidator))
         self.bConfirm = self.addView(Button(buttonLabel, style=ButtonStyle._replace(width=40, height=20, left=610, top=90, zIndex=9.1)))
 
-        @self.bConfirm.event
+        @self.bConfirm.mhEvent
         def onClicked(event):
             if len(self.edit.getText()):
                 self.onFileSelected(self.edit.getText())
@@ -2535,11 +2535,11 @@ class FileChooser(View):
         self.notFoundImage = notFoundImage
         self.sortBy = self.sort.fields()[0]
         
-        @self.refreshButton.event
+        @self.refreshButton.mhEvent
         def onClicked(value):
             self.refresh()
             
-        @self.slider.event
+        @self.slider.mhEvent
         def onChanging(value):
             self.scrollTo(value)
         
@@ -2728,15 +2728,15 @@ class FileChooser2(View):
         self.previousFileAnimation.append(animation3d.ScaleAction(self.currentFile.mesh, [1.5, 1.5, 1.5], [1.0, 1.0, 1.0]))
         self.previousFileAnimation.append(animation3d.UpdateAction(self.app))
 
-        @self.previousFile.event
+        @self.previousFile.mhEvent
         def onClicked(event):
             self.goPrevious()
 
-        @self.currentFile.event
+        @self.currentFile.mhEvent
         def onClicked(event):
             self.onFileSelected(self.files[self.selectedFile])
 
-        @self.nextFile.event
+        @self.nextFile.mhEvent
         def onClicked(event):
             self.goNext()
 

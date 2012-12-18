@@ -39,7 +39,7 @@ class HairTaskView(gui3d.TaskView):
         self.oHeadCentroid = [0.0, 7.436, 0.03 + 0.577]
         self.oHeadBBox = [[-0.84,6.409,-0.9862],[0.84,8.463,1.046]]
 
-        @self.filechooser.event
+        @self.filechooser.mhEvent
         def onFileSelected(filename):
             
             mhclo = filename.replace('.obj', '.mhclo')

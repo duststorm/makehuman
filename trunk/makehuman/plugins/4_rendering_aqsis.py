@@ -56,19 +56,19 @@ class AqsisTaskView(gui3d.TaskView):
         #Buttons
         self.renderButton = optionsBox.addView(gui3d.Button('Render'))
             
-        @self.shadingRateSlider.event
+        @self.shadingRateSlider.mhEvent
         def onChanging(value):
             self.app.settings['rendering_aqsis_shadingrate'] = value #Using global dictionary in app for global settings
             
-        @self.samplesSlider.event
+        @self.samplesSlider.mhEvent
         def onChanging(value):
             self.app.settings['rendering_aqsis_samples'] = value
             
-        @self.skinOilSlider.event
+        @self.skinOilSlider.mhEvent
         def onChanging(value):
             self.app.settings['rendering_aqsis_oil'] = value
             
-        @self.renderButton.event
+        @self.renderButton.mhEvent
         def onClicked(event):
             
             if not which("aqsis"):

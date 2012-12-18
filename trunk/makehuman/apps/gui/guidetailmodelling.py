@@ -564,13 +564,13 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.translationButton = self.modifiersBox.addView(gui3d.RadioButton(self.detailButtonGroup, 'Move', True, modifierStyle))
         self.scaleButton = self.modifiersBox.addView(gui3d.RadioButton(self.detailButtonGroup, label='Scale', style=modifierStyle));y+=24
 
-        @self.translationButton.event
+        @self.translationButton.mhEvent
         def onClicked(event):
             self.tool = Detail3dTool(gui3d.app, True, 'translation')
             gui3d.app.tool = self.tool
             gui3d.RadioButton.onClicked(self.translationButton, event)
 
-        @self.scaleButton.event
+        @self.scaleButton.mhEvent
         def onClicked(event):
             self.tool = Detail3dTool(gui3d.app, True, 'scale')
             gui3d.app.tool = self.tool
@@ -581,24 +581,24 @@ class DetailModelingTaskView(gui3d.TaskView):
         self.symmetryButton = self.modifiersBox.addView(gui3d.ToggleButton('Sym', style=modifierStyle))
         #self.microButton = self.modifiersBox.addView(gui3d.ToggleButton('Micro', style=modifierStyle))
 
-        @self.rightSymmetryButton.event
+        @self.rightSymmetryButton.mhEvent
         def onClicked(event):
             human = gui3d.app.selectedHuman
             human.applySymmetryRight()
 
-        @self.leftSymmetryButton.event
+        @self.leftSymmetryButton.mhEvent
         def onClicked(event):
             human = gui3d.app.selectedHuman
             human.applySymmetryLeft()
 
-        @self.symmetryButton.event
+        @self.symmetryButton.mhEvent
         def onClicked(event):
             gui3d.ToggleButton.onClicked(self.symmetryButton, event)
             human = gui3d.app.selectedHuman
             human.symmetryModeEnabled = self.symmetryButton.selected
             #self.parent.tasksByName['Micro modelling'].symmetryButton.setSelected(self.symmetryButton.selected)
         """    
-        @self.microButton.event
+        @self.microButton.mhEvent
         def onClicked(event):
             gui3d.ToggleButton.onClicked(self.microButton, event)
             self.tool = Detail3dTool(gui3d.app, self.microButton.selected, self.tool.type)

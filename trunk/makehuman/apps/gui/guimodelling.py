@@ -51,17 +51,17 @@ class ModellingCategory(gui3d.Category):
         self.wireButton = self.viewBox.addView(gui3d.ToggleButton('Wireframe'))
         self.subdivisionButton = self.viewBox.addView(gui3d.ToggleButton('Smooth'))
 
-        @self.anaglyphsButton.event
+        @self.anaglyphsButton.mhEvent
         def onClicked(event):
             gui3d.app.toggleStereo()
             self.anaglyphsButton.setSelected(mh.cameras[0].stereoMode != 0)
             
-        @self.wireButton.event
+        @self.wireButton.mhEvent
         def onClicked(event):
             gui3d.app.toggleSolid()
             self.wireButton.setSelected(gui3d.app.selectedHuman.mesh.solid == 0)
             
-        @self.subdivisionButton.event
+        @self.subdivisionButton.mhEvent
         def onClicked(event):
             gui3d.app.toggleSubdivision()
             self.subdivisionButton.setSelected(gui3d.app.selectedHuman.isSubdivided())

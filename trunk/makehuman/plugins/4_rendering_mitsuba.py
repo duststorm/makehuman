@@ -24,7 +24,7 @@ class MitsubaTaskView(gui3d.TaskView):
         mitsuba_bin = gui3d.app.settings.get('mitsuba_bin', '')
         self.path= pathBox.addView(gui3d.TextEdit(str(mitsuba_bin), gui3d.TextEditStyle._replace(width=112)))
         #
-        @self.path.event
+        @self.path.mhEvent
         def onChange(value):
             gui3d.app.settings['mitsuba_bin'] = 'Enter your path' if not value else str(value)
         
@@ -49,7 +49,7 @@ class MitsubaTaskView(gui3d.TaskView):
         self.renderButton = renderBox.addView(gui3d.Button('Render'))
                
 
-        @self.renderButton.event
+        @self.renderButton.mhEvent
         def onClicked(event):            
             
             reload(mh2mitsuba)  # Avoid having to close and reopen MH for every coding change (can be removed once testing is complete)

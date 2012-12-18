@@ -378,7 +378,7 @@ def load(app):
 
     print 'Measurement loaded'
 
-    @taskview.event
+    @taskview.mhEvent
     def onMouseDown(event):
         part = app.getSelectedFaceGroup()
         bodyZone = app.selectedHuman.getPartNameForGroupName(part.name)

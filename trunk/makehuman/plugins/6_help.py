@@ -17,19 +17,19 @@ class HelpTaskView(gui3d.TaskView):
         self.requestFeatureButton = optionsBox.addView(gui3d.Button("Request feature"))
         self.donateButton = optionsBox.addView(gui3d.Button("Donate"))
         
-        @self.manualButton.event
+        @self.manualButton.mhEvent
         def onClicked(event):
             webbrowser.open('http://download.tuxfamily.org/makehuman/makehuman_a_manual.pdf');
         
-        @self.reportBugButton.event
+        @self.reportBugButton.mhEvent
         def onClicked(event):
             webbrowser.open('http://code.google.com/p/makehuman/issues/entry');
           
-        @self.requestFeatureButton.event
+        @self.requestFeatureButton.mhEvent
         def onClicked(event):
             webbrowser.open('http://code.google.com/p/makehuman/issues/entry?template=Request%20feature');
             
-        @self.donateButton.event
+        @self.donateButton.mhEvent
         def onClicked(event):
             webbrowser.open('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=34KYQRLBE2K3N');
             

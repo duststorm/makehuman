@@ -20,12 +20,6 @@ class Widget(events3d.EventHandler):
     def getLanguageString(text):
         return text
 
-    def _event(self, arg):
-        if isinstance(arg, QtCore.QEvent):
-            return super(type(self), self).event(arg)
-        else:
-            return events3d.EventHandler.event(self, arg)
-
 class TabsBase(Widget):
     def __init__(self):
         super(TabsBase, self).__init__()
@@ -51,9 +45,6 @@ class Tabs(QtGui.QTabWidget, TabsBase):
         QtGui.QTabWidget.__init__(self, parent)
         TabsBase.__init__(self)
 
-    def event(self, arg):
-        return super(Tabs, self)._event(arg)
-
     def _makeTab(self, tab):
         tab.child = TabBar(self)
         return super(Tabs, self).addTab(tab.child, tab.label)
@@ -72,9 +63,6 @@ class TabBar(QtGui.QTabBar, TabsBase):
         QtGui.QTabBar.__init__(self, parent)
         TabsBase.__init__(self)
 
-    def event(self, arg):
-        return super(TabBar, self)._event(arg)
-
     def tabBar(self):
         return self
 
@@ -89,9 +77,6 @@ class GroupBox(QtGui.QGroupBox, Widget):
         label = self.getLanguageString(label) if label else ''
         QtGui.QGroupBox.__init__(self, label)
         self.layout = QtGui.QGridLayout(self)
-
-    def event(self, arg):
-        return super(View, self)._event(arg)
 
     def __str__(self):
         return "%s - %s" % (type(self), unicode(self.title()))
@@ -123,9 +108,6 @@ class Slider(QtGui.QSlider, Widget):
         self.setMinimum(0)
         self.setMaximum(1000)
         self.setValue(value)
-
-    def event(self, arg):
-        return super(Slider, self)._event(arg)
 
     def _f2i(self, x):
         return int(round(1000 * (x - self.min) / (self.max - self.min)))
@@ -166,16 +148,10 @@ class Button(QtGui.QPushButton, ButtonBase):
     def __init__(self, label=None, selected=False, style=None):
         super(Button, self).__init__(label)
 
-    def event(self, arg):
-        return super(Button, self)._event(arg)
-
 class CheckBox(QtGui.QCheckBox, ButtonBase):
     def __init__(self, label=None, selected=False, style=None):
         super(CheckBox, self).__init__(label)
         self.setChecked(selected)
-
-    def event(self, arg):
-        return super(Button, self)._event(arg)
 
 ToggleButton = CheckBox
 
@@ -191,9 +167,6 @@ class RadioButton(QtGui.QRadioButton, ButtonBase):
 
     def __del__(self):
         self._removeFromGroup(self.group)
-
-    def event(self, arg):
-        return super(Button, self)._event(arg)
 
     def _addToGroup(self, group):
         if id(group) in type(self).groups:
@@ -226,9 +199,6 @@ class TextView(QtGui.QLabel, Widget):
         label = self.getLanguageString(label) if label else ''
         super(TextView, self).__init__(label)
 
-    def event(self, arg):
-        return super(Button, self)._event(arg)
-
     def setText(self, text):
         text = self.getLanguageString(text) if text else ''
         super(TextView,self).setText(text)
@@ -251,9 +221,6 @@ class TextEdit(QtGui.QLineEdit, Widget):
         super(TextEdit, self).__init__(text)
         self.setValidator(validator)
         self.connect(self, QtCore.SIGNAL('textEdited(QString)'), self._textChanged)
-
-    def event(self, arg):
-        return super(SideBar, self)._event(arg)
 
     @property
     def text(self):
@@ -301,9 +268,6 @@ class SideBar(QtGui.QWidget, Widget):
         self.layout = QtGui.QGridLayout()
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout0.addLayout(self.layout, 0, 0)
-
-    def event(self, arg):
-        return super(SideBar, self)._event(arg)
 
     def addWidget(self, widget, row = 0, col = 0, rowSpan = 1, colsSpan = 1, alignment = QtCore.Qt.Alignment(0)):
         self.layout.addWidget(widget, row, col, rowSpan, colsSpan, alignment)

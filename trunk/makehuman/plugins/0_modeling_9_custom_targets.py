@@ -62,7 +62,7 @@ class CustomTargetsTaskView(gui3d.TaskView):
         y+=16
         self.folderBox = self.addView(gui3d.GroupBox(label = 'Folders', position=[650, y, 9.0], style=gui3d.GroupBoxStyle._replace(margin=[10,0,0,10])))
         
-        @rescanButton.event
+        @rescanButton.mhEvent
         def onClicked(event):
             #TODO: undo any applied change here
             self.searchTargets()

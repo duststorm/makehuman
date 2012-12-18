@@ -74,55 +74,55 @@ class HairPropertiesTaskView(gui3d.TaskView):
         mesh = gui3d.NineSliceMesh(112, 32, self.app.getThemeResource('images', 'color_preview.png'), [4,4,4,4])
         self.colorPreview = gui3d.Object(self, [18, y+2, 9.07], mesh)
                     
-        @self.redSlider.event
+        @self.redSlider.mhEvent
         def onChanging(value):
             self.setColor([value, self.greenSlider.getValue(), self.blueSlider.getValue()])
             
-        @self.redSlider.event
+        @self.redSlider.mhEvent
         def onChange(value):
             self.changeColor([value, self.greenSlider.getValue(), self.blueSlider.getValue()])
 
-        @self.greenSlider.event
+        @self.greenSlider.mhEvent
         def onChanging(value):
             self.setColor([self.redSlider.getValue(), value, self.blueSlider.getValue()])
             
-        @self.greenSlider.event
+        @self.greenSlider.mhEvent
         def onChange(value):
             self.changeColor([self.redSlider.getValue(), value, self.blueSlider.getValue()])
             
-        @self.blueSlider.event
+        @self.blueSlider.mhEvent
         def onChanging(value):
             self.setColor([self.redSlider.getValue(), self.greenSlider.getValue(), value])
 
-        @self.blueSlider.event
+        @self.blueSlider.mhEvent
         def onChange(value):
             self.changeColor([self.redSlider.getValue(), self.greenSlider.getValue(), value])
             
-        @self.hueSlider.event
+        @self.hueSlider.mhEvent
         def onChanging(value):
             self.setColor(hslToRgb(value, self.saturationSlider.getValue(), self.lightnessSlider.getValue()), False)
 
-        @self.hueSlider.event
+        @self.hueSlider.mhEvent
         def onChange(value):
             self.changeColor(hslToRgb(value, self.saturationSlider.getValue(), self.lightnessSlider.getValue()), False)
             
-        @self.saturationSlider.event
+        @self.saturationSlider.mhEvent
         def onChanging(value):
             self.setColor(hslToRgb(self.hueSlider.getValue(), value, self.lightnessSlider.getValue()), False)
 
-        @self.saturationSlider.event
+        @self.saturationSlider.mhEvent
         def onChange(value):
             self.changeColor(hslToRgb(self.hueSlider.getValue(), value, self.lightnessSlider.getValue()), False)
             
-        @self.lightnessSlider.event
+        @self.lightnessSlider.mhEvent
         def onChanging(value):
             self.setColor(hslToRgb(self.hueSlider.getValue(), self.saturationSlider.getValue(), value), False)
 
-        @self.lightnessSlider.event
+        @self.lightnessSlider.mhEvent
         def onChange(value):
             self.changeColor(hslToRgb(self.hueSlider.getValue(), self.saturationSlider.getValue(), value), False)
             
-        @self.widthSlider.event
+        @self.widthSlider.mhEvent
         def onChanging(value):
             human = self.app.selectedHuman
             if human.hairObj and len(human.hairObj.verts) > 0: 

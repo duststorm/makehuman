@@ -35,7 +35,7 @@ class CensorTaskView(gui3d.TaskView):
             self.breastCensorship.hide()
             self.genitalCensorship.hide()
             
-        @self.enableCensor.event
+        @self.enableCensor.mhEvent
         def onClicked(event):
             gui3d.ToggleButton.onClicked(self.enableCensor, event)
             gui3d.app.settings['censor'] = self.enableCensor.selected

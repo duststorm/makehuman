@@ -126,19 +126,19 @@ class BvhView(gui3d.TaskView):
         self.showHuman = self.optionsBox.addView(gui3d.ToggleButton("Show human"))
         self.exportFrame = self.optionsBox.addView(gui3d.Button("Export frame"))
         
-        @self.frameSlider.event
+        @self.frameSlider.mhEvent
         def onChanging(value):
             self.__updateSkeletonMesh(value-1)
             self.__updateHumanMesh(self.__humanSkeleton.root)
             gui3d.app.selectedHuman.meshData.update()
             
-        @self.frameSlider.event
+        @self.frameSlider.mhEvent
         def onChange(value):
             self.__updateSkeletonMesh(value-1)
             self.__updateHumanMesh(self.__humanSkeleton.root)
             gui3d.app.selectedHuman.meshData.update()
                 
-        @self.playPause.event
+        @self.playPause.mhEvent
         def onClicked(value):
             if self.playPause.label.getText() == 'Play':
                 self.playPause.label.setText('Pause')
@@ -147,7 +147,7 @@ class BvhView(gui3d.TaskView):
                 self.playPause.label.setText('Play')
                 mh.removeTimer(self.timer)
                 
-        @self.showHuman.event
+        @self.showHuman.mhEvent
         def onClicked(event):
             self.showHuman.setSelected(not self.showHuman.selected)
             if self.showHuman.selected:
@@ -157,7 +157,7 @@ class BvhView(gui3d.TaskView):
                 gui3d.app.selectedHuman.hide()
                 self.getSkeleton().show()
                 
-        @self.exportFrame.event
+        @self.exportFrame.mhEvent
         def onClicked(event):
             self.exportCurrentFrame()
                 

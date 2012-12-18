@@ -57,12 +57,12 @@ class HairTaskView(gui3d.TaskView):
         hairTexture = self.app.selectedHuman.hairFile.replace('.hair', '.png')
         self.currentHair = gui3d.Button(self.app.categories['Modelling'], [800-216, 600-36, 9.2], style=HairButtonStyle._replace(normal=hairTexture))
 
-        @self.currentHair.event
+        @self.currentHair.mhEvent
         def onClicked(event):
             self.app.switchCategory('Library')
             self.app.switchTask("Hair")
 
-        @self.filechooser.event
+        @self.filechooser.mhEvent
         def onFileSelected(filename, update=1):
             #hair files comes in pair, .obj and .hair.
             #.obj files contain geometric detail of the hair (can be edited by any 3rd party modelling software that opens wavefront .obj)

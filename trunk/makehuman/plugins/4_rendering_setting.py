@@ -17,11 +17,11 @@ class RenderingSettingTaskView(gui3d.TaskView):
         self.height= resBox.addView(gui3d.TextEdit(str(rendering_height), gui3d.TextEditStyle._replace(width=112),
             gui3d.intValidator))
 
-        @self.width.event
+        @self.width.mhEvent
         def onChange(value):
             gui3d.app.settings['rendering_width'] = 0 if not value else int(value)
 
-        @self.height.event
+        @self.height.mhEvent
         def onChange(value):
             gui3d.app.settings['rendering_height'] = 0 if not value else int(value)
 

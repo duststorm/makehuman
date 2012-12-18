@@ -33,7 +33,7 @@ class PovrayTaskView(gui3d.TaskView):
             if os.environ['PROCESSOR_ARCHITECTURE'] == 'x86':
                 self.win32sse2Button = pathBox.addView(gui3d.CheckBox('Use SSE2 bin', True)); y +=24
         #
-        @self.path.event
+        @self.path.mhEvent
         def onChange(value):
             gui3d.app.settings['povray_bin'] = 'Enter your path' if not value else str(value)
         #------------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ class PovrayTaskView(gui3d.TaskView):
         self.renderButton = optionsBox.addView(gui3d.Button('Render')); y +=24
         
         #        
-        @self.renderButton.event
+        @self.renderButton.mhEvent
         def onClicked(event):            
             
             reload(mh2povray)  # Avoid having to close and reopen MH for every coding change (can be removed once testing is complete)

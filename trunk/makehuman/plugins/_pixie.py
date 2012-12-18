@@ -32,15 +32,15 @@ def load(app):
 
     pixie = gui3d.TaskView(app.categories['Rendering'], 'Pixie', app.getThemeResource('images', 'button_pixie.png'))
 
-    @pixie.event
+    @pixie.mhEvent
     def onShow(event):
         pass
 
-    @pixie.event
+    @pixie.mhEvent
     def onHide(event):
         pass
 
-    @pixie.button.event
+    @pixie.button.mhEvent
     def onClicked(event):
         mh2renderman.saveScene(app.scene3d, 'scena.rib', 'renderman_output', 'pixie')
 

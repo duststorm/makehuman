@@ -24,17 +24,17 @@ class TextureToolTaskView(gui3d.TaskView):
         self.texture = self.box.addView(gui3d.RadioButton(group, "Texture"))
         self.textured = self.box.addView(gui3d.CheckBox("Textured", True))
         
-        @self.model.event
+        @self.model.mhEvent
         def onClicked(event):
             gui3d.RadioButton.onClicked(self.model, event)
             self.switchToModel()
             
-        @self.texture.event
+        @self.texture.mhEvent
         def onClicked(event):
             gui3d.RadioButton.onClicked(self.texture, event)
             self.switchToTexture()
             
-        @self.textured.event
+        @self.textured.mhEvent
         def onClicked(event):
             gui3d.CheckBox.onClicked(self.textured, event)
             if self.textured.selected:

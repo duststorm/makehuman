@@ -150,7 +150,7 @@ class EventHandler(object):
         
         widget = Widget()
         
-        @widget.event:
+        @widget.mhEvent:
         def onMouseDown(event):
             #Handle event
             
@@ -172,5 +172,5 @@ class EventHandler(object):
     def detachEvent(self, eventName):
         delattr(self, eventName)
 
-    def event(self, eventMethod):
+    def mhEvent(self, eventMethod):
         self.attachEvent(eventMethod.__name__, eventMethod)

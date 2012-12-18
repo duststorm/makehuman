@@ -401,7 +401,7 @@ class MHApplication(gui3d.Application):
 
         self.modelCamera = Camera()
         
-        @self.modelCamera.event
+        @self.modelCamera.mhEvent
         def onChanged(event):
             for category in self.categories.itervalues():
                 
@@ -497,7 +497,7 @@ class MHApplication(gui3d.Application):
         # self.tabs = self.addView(gui3d.TabView())
         self.tabs = G.app.mainwin.tabs
         
-        @self.tabs.event
+        @self.tabs.mhEvent
         def onTabSelected(tab):
             self.switchCategory(tab.name)
 
@@ -529,7 +529,7 @@ class MHApplication(gui3d.Application):
         self.undoStack = []
         self.redoStack = []
 
-        @self.selectedHuman.event
+        @self.selectedHuman.mhEvent
         def onMouseDown(event):
           if self.tool:
             self.selectedGroup = self.getSelectedFaceGroup()
@@ -537,42 +537,42 @@ class MHApplication(gui3d.Application):
           else:
             self.currentTask.callEvent("onMouseDown", event)
 
-        @self.selectedHuman.event
+        @self.selectedHuman.mhEvent
         def onMouseMoved(event):
           if self.tool:
             self.tool.callEvent("onMouseMoved", event)
           else:
             self.currentTask.callEvent("onMouseMoved", event)
 
-        @self.selectedHuman.event
+        @self.selectedHuman.mhEvent
         def onMouseDragged(event):
           if self.tool:
             self.tool.callEvent("onMouseDragged", event)
           else:
             self.currentTask.callEvent("onMouseDragged", event)
 
-        @self.selectedHuman.event
+        @self.selectedHuman.mhEvent
         def onMouseUp(event):
           if self.tool:
             self.tool.callEvent("onMouseUp", event)
           else:
             self.currentTask.callEvent("onMouseUp", event)
 
-        @self.selectedHuman.event
+        @self.selectedHuman.mhEvent
         def onMouseEntered(event):
           if self.tool:
             self.tool.callEvent("onMouseEntered", event)
           else:
             self.currentTask.callEvent("onMouseEntered", event)
 
-        @self.selectedHuman.event
+        @self.selectedHuman.mhEvent
         def onMouseExited(event):
           if self.tool:
             self.tool.callEvent("onMouseExited", event)
           else:
             self.currentTask.callEvent("onMouseExited", event)
             
-        @self.selectedHuman.event
+        @self.selectedHuman.mhEvent
         def onChanging(event):
             
             for category in self.categories.itervalues():
@@ -581,7 +581,7 @@ class MHApplication(gui3d.Application):
                     
                     task.callEvent('onHumanChanging', event)
                     
-        @self.selectedHuman.event
+        @self.selectedHuman.mhEvent
         def onChanged(event):
             
             for category in self.categories.itervalues():
@@ -590,7 +590,7 @@ class MHApplication(gui3d.Application):
                     
                     task.callEvent('onHumanChanged', event)
                     
-        @self.selectedHuman.event
+        @self.selectedHuman.mhEvent
         def onTranslated(event):
             
             for category in self.categories.itervalues():
@@ -599,7 +599,7 @@ class MHApplication(gui3d.Application):
                     
                     task.callEvent('onHumanTranslated', event)
                     
-        @self.selectedHuman.event
+        @self.selectedHuman.mhEvent
         def onRotated(event):
             
             for category in self.categories.itervalues():
@@ -608,7 +608,7 @@ class MHApplication(gui3d.Application):
                     
                     task.callEvent('onHumanRotated', event)
                     
-        @self.selectedHuman.event
+        @self.selectedHuman.mhEvent
         def onShown(event):
             
             for category in self.categories.itervalues():
@@ -617,7 +617,7 @@ class MHApplication(gui3d.Application):
                     
                     task.callEvent('onHumanShown', event)
                     
-        @self.selectedHuman.event
+        @self.selectedHuman.mhEvent
         def onHidden(event):
             
             for category in self.categories.itervalues():
@@ -700,7 +700,7 @@ class MHApplication(gui3d.Application):
           
         # Exit button
         category = self.addView(gui3d.Category(self, "Exit", tabStyle=gui3d.CategoryButtonStyle))
-        @category.tab.event
+        @category.tab.mhEvent
         def onClicked(event):
             self.promptAndExit()
           
@@ -711,15 +711,15 @@ class MHApplication(gui3d.Application):
         self.resetButton = self.addView(gui3d.Button("Reset",
             style=gui3d.ButtonStyle._replace(width=40, left=738, top=505, zIndex=9.1)))
                                         
-        @self.undoButton.event
+        @self.undoButton.mhEvent
         def onClicked(event):
             gui3d.app.undo()
 
-        @self.redoButton.event
+        @self.redoButton.mhEvent
         def onClicked(event):
             gui3d.app.redo()
 
-        @self.resetButton.event
+        @self.resetButton.mhEvent
         def onClicked(event):
             human = self.selectedHuman
             human.resetMeshValues()
@@ -733,11 +733,11 @@ class MHApplication(gui3d.Application):
         self.faceButton = self.addView(gui3d.Button("Face cam",
             style=gui3d.ButtonStyle._replace(width=128, height=20, left=650, top=555, zIndex=9.1)))
 
-        @self.globalButton.event
+        @self.globalButton.mhEvent
         def onClicked(event):
           gui3d.app.setGlobalCamera()
           
-        @self.faceButton.event
+        @self.faceButton.mhEvent
         def onClicked(event):
           gui3d.app.setFaceCamera()
 
@@ -745,7 +745,7 @@ class MHApplication(gui3d.Application):
         self.poseModeBox = self.addView(gui3d.CheckBox("Pose mode", False,
             style=gui3d.CheckBoxStyle._replace(width=128, height=20, left=650, top=555, zIndex=9.1)))
         
-        @self.poseModeBox.event
+        @self.poseModeBox.mhEvent
         def onClicked(event):
           print dir(event)
           if self.poseModeBox.selected:
@@ -788,13 +788,13 @@ class MHApplication(gui3d.Application):
         
         #printtree(self)
         
-        @self.dialog.button1.event
+        @self.dialog.button1.mhEvent
         def onClicked(event):
             if self.dialog.button1Action:
                 self.dialog.button1Action()
             self.dialog.hide()
             
-        @self.dialog.button2.event
+        @self.dialog.button2.mhEvent
         def onClicked(event):
             if self.dialog.button2Action:
                 self.dialog.button2Action()

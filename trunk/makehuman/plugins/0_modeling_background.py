@@ -179,7 +179,7 @@ class BackgroundTaskView(gui3d.TaskView):
 
         self.backgroundImageToggle = gui3d.app.categories['Modelling'].viewBox.addView(gui3d.ToggleButton('Background'));
 
-        @self.backgroundImageToggle.event
+        @self.backgroundImageToggle.mhEvent
         def onClicked(event):
             if self.backgroundImage.isVisible():
                 self.backgroundImage.hide()
@@ -204,7 +204,7 @@ class BackgroundTaskView(gui3d.TaskView):
 
         self.filechooser = self.addView(gui3d.FileChooser(self.backgroundsFolder, ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None))
 
-        @self.filechooser.event
+        @self.filechooser.mhEvent
         def onFileSelected(filename):
 
             self.reference = gui3d.app.selectedHuman.getPosition()
@@ -460,15 +460,15 @@ class settingsTaskView(gui3d.TaskView) :
         # sliders
         self.opacitySlider = self.backgroundBox.addView(gui3d.Slider(value=taskview.opacity, min=0,max=255, label = "Opacity: %d"))
 
-        @self.opacitySlider.event
+        @self.opacitySlider.mhEvent
         def onChanging(value):
             self.backgroundImage.mesh.setColor([255, 255, 255, value])
-        @self.opacitySlider.event
+        @self.opacitySlider.mhEvent
         def onChange(value):
             taskview.opacity = value
             self.backgroundImage.mesh.setColor([255, 255, 255, value])
 
-        @self.backgroundImage.event
+        @self.backgroundImage.mhEvent
         def onMouseDragged(event):
 
             if event.button == mh.Buttons.LEFT_MASK:
@@ -487,20 +487,20 @@ class settingsTaskView(gui3d.TaskView) :
 
         self.dragButton = self.backgroundBox.addView(gui3d.ToggleButton('Move & Resize'))
 
-        @self.dragButton.event
+        @self.dragButton.mhEvent
         def onClicked(event):
             gui3d.ToggleButton.onClicked(self.dragButton, event)
             self.backgroundImage.mesh.setPickable(self.dragButton.selected)
 
         self.projectBackgroundButton = self.backgroundBox.addView(gui3d.Button('Project background'))
 
-        @self.projectBackgroundButton.event
+        @self.projectBackgroundButton.mhEvent
         def onClicked(event):
             taskview.projectBackground()
 
         self.projectLightingButton = self.backgroundBox.addView(gui3d.Button('Project lighting'))
 
-        @self.projectLightingButton.event
+        @self.projectLightingButton.mhEvent
         def onClicked(event):
             taskview.projectLighting()
 

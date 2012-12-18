@@ -26,7 +26,7 @@ class MouseActionsTaskView(gui3d.TaskView):
         self.mouseBox.addView(gui3d.TextView("Zoom", style=MouseActionLabelStyle));self.mouseBox.addView(AppMouseActionEdit(gui3d.app.mouseZoom))
         self.invertMouseWheel = self.mouseBox.addView(gui3d.CheckBox("Invert wheel", gui3d.app.settings.get('invertMouseWheel', False)))
         
-        @self.invertMouseWheel.event
+        @self.invertMouseWheel.mhEvent
         def onClicked(event):
             gui3d.ToggleButton.onClicked(self.invertMouseWheel, event)
             gui3d.app.settings['invertMouseWheel'] = self.invertMouseWheel.selected

@@ -36,7 +36,7 @@ class UvTaskView(gui3d.TaskView):
             os.makedirs(uvDir)
         self.filechooser = self.addView(gui3d.FileChooser([uvDir , 'data/uvs'], 'mhuv', 'png', 'data/uvs/notfound.png'))
 
-        @self.filechooser.event
+        @self.filechooser.mhEvent
         def onFileSelected(filename):
             
             if os.path.basename(filename) == "clear.mhuv":

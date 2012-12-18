@@ -58,7 +58,7 @@ class SaveTaskView(gui3d.TaskView):
         mesh.setPickable(0)
         self.selection.hide()
 
-        @self.fileentry.event
+        @self.fileentry.mhEvent
         def onFileSelected(filename):
             
             modelPath = mh.getPath('models')
@@ -208,7 +208,7 @@ class LoadTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Load', )
         self.filechooser = self.addView(gui3d.FileChooser(modelPath, 'mhm', sort=HumanFileSort()))
 
-        @self.filechooser.event
+        @self.filechooser.mhEvent
         def onFileSelected(filename):
 
             human = gui3d.app.selectedHuman
@@ -344,7 +344,7 @@ class ExportTaskView(gui3d.TaskView):
         self.stlOptions.hide()
 
         """                    
-        @self.version24.event
+        @self.version24.mhEvent
         def onClicked(event):
             
             if self.version24.selected and self.version25.selected:
@@ -352,7 +352,7 @@ class ExportTaskView(gui3d.TaskView):
             else:
                 self.version24.setSelected(True)
                 
-        @self.version25.event
+        @self.version25.mhEvent
         def onClicked(event):
             
             if self.version25.selected and self.version24.selected:
@@ -361,43 +361,43 @@ class ExportTaskView(gui3d.TaskView):
                 self.version25.setSelected(True)
         """
         
-        @self.wavefrontObj.event
+        @self.wavefrontObj.mhEvent
         def onClicked(event):
             
             gui3d.RadioButton.onClicked(self.wavefrontObj, event)
             self.updateGui()
             
-        @self.mhx.event
+        @self.mhx.mhEvent
         def onClicked(event):
             
             gui3d.RadioButton.onClicked(self.mhx, event)
             self.updateGui()
         
-        @self.collada.event
+        @self.collada.mhEvent
         def onClicked(event):
             
             gui3d.RadioButton.onClicked(self.collada, event)
             self.updateGui()
         
-        @self.md5.event
+        @self.md5.mhEvent
         def onClicked(event):
             
             gui3d.RadioButton.onClicked(self.md5, event)
             self.updateGui()
         
-        @self.stl.event
+        @self.stl.mhEvent
         def onClicked(event):
             
             gui3d.RadioButton.onClicked(self.stl, event)
             self.updateGui()
             
-        @self.skel.event
+        @self.skel.mhEvent
         def onClicked(event):
             
             gui3d.RadioButton.onClicked(self.skel, event)
             self.updateGui()
         
-        @self.fileentry.event
+        @self.fileentry.mhEvent
         def onFileSelected(filename):
             
             exportPath = mh.getPath('exports')

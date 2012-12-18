@@ -102,20 +102,20 @@ class PoseTaskView(gui3d.TaskView):
     self.tets1 = None
     self.tets2 = None
     
-    @self.testButton.event
+    @self.testButton.mhEvent
     def onClicked(event):
         self.test()
 
     
-    @self.savePoseButton.event
+    @self.savePoseButton.mhEvent
     def onClicked(event):
         exportObj(gui3d.app.selectedHuman.meshData, os.path.join(mh.getPath('exports'), "posed.obj"))
 
-    @self.resetPoseButton.event
+    @self.resetPoseButton.mhEvent
     def onClicked(event):
         self.reset()
 
-    @self.Xslider.event
+    @self.Xslider.mhEvent
     def onChange(value):
         if self.joint:
             rotation = [value - self.joint.rotation[0], 0.0, 0.0]
@@ -124,7 +124,7 @@ class PoseTaskView(gui3d.TaskView):
             gui3d.app.selectedHuman.meshData.calcNormals()
             gui3d.app.selectedHuman.meshData.update()
                 
-    @self.Yslider.event
+    @self.Yslider.mhEvent
     def onChange(value):
         if self.joint:
             rotation = [0.0, value - self.joint.rotation[1], 0.0]
@@ -133,7 +133,7 @@ class PoseTaskView(gui3d.TaskView):
             gui3d.app.selectedHuman.meshData.calcNormals()
             gui3d.app.selectedHuman.meshData.update()
         
-    @self.Zslider.event
+    @self.Zslider.mhEvent
     def onChange(value):
         if self.joint:
             rotation = [0.0, 0.0, value - self.joint.rotation[2]]
@@ -347,7 +347,7 @@ def load(app):
     taskview = category.addView(PoseTaskView(category))
     print 'pose loaded'
             
-    @taskview.event
+    @taskview.mhEvent
     def onMouseDown(event):
         part = app.getSelectedFaceGroup()
         print part.name

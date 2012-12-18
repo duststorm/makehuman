@@ -40,7 +40,7 @@ class PoseTaskView(gui3d.TaskView):
         
         self.savePoseToggle = box.addView(gui3d.CheckBox("SavePose"))
 
-        @self.savePoseToggle.event
+        @self.savePoseToggle.mhEvent
         def onClicked(event):
             gui3d.ToggleButton.onClicked(self.savePoseToggle, event)
             if self.savePoseToggle.selected:
@@ -48,38 +48,38 @@ class PoseTaskView(gui3d.TaskView):
             else:
                 print "Save Pose deactivated"
 
-        @self.testPoseButton.event
+        @self.testPoseButton.mhEvent
         def onClicked(event):
             self.test(self.shoulder)
 
-        @self.resetPoseButton.event
+        @self.resetPoseButton.mhEvent
         def onClicked(event):
             self.reset(self.shoulder)
 
-        @self.shoulderXslider.event
+        @self.shoulderXslider.mhEvent
         def onChange(value):            
             self.shoulder.angle[0] = value
             self.shoulder.applyPose()
             
-        @self.shoulderXslider.event
+        @self.shoulderXslider.mhEvent
         def onChanging(value):
             pass
             
-        @self.shoulderYslider.event
+        @self.shoulderYslider.mhEvent
         def onChange(value):            
             self.shoulder.angle[1] = value 
             self.shoulder.applyPose()
             
-        @self.shoulderYslider.event
+        @self.shoulderYslider.mhEvent
         def onChanging(value):            
             pass
 
-        @self.shoulderZslider.event
+        @self.shoulderZslider.mhEvent
         def onChange(value):
             self.shoulder.angle[2] = value 
             self.shoulder.applyPose()
             
-        @self.shoulderZslider.event
+        @self.shoulderZslider.mhEvent
         def onChanging(value):            
             pass
             
@@ -137,7 +137,7 @@ def load(app):
     taskview = category.addView(PoseTaskView(category))
     print 'pose loaded'
             
-    @taskview.event
+    @taskview.mhEvent
     def onMouseDown(event):
         part = app.getSelectedFaceGroup()
         print part.name

@@ -212,7 +212,7 @@ class MhmLoadTaskView(gui3d.TaskView):
 
         self.filechooser = self.addView(gui3d.FileChooser([self.globalMhmPath, self.mhmPath], 'mhm', 'png'))
 
-        @self.filechooser.event
+        @self.filechooser.mhEvent
         def onFileSelected(filename):
 
             gui3d.app.do(Action(gui3d.app.selectedHuman, filename, self.mhmTaskView, self.include))

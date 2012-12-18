@@ -50,7 +50,7 @@ class MacroModelingTaskView(gui3d.TaskView):
 
         #hair update only necessary for : gender, age , height
         
-        @self.genderSlider.event
+        @self.genderSlider.mhEvent
         def onChange(value):
             human = gui3d.app.selectedHuman
             gui3d.app.do(MacroAction(human, 'Gender', value, self.syncSliders,False))
@@ -58,40 +58,40 @@ class MacroModelingTaskView(gui3d.TaskView):
             human.meshData.update()
 
 
-        @self.ageSlider.event
+        @self.ageSlider.mhEvent
         def onChange(value):
             human = gui3d.app.selectedHuman
             gui3d.app.do(MacroAction(human, 'Age', value, self.syncSliders,False))
             self.syncStatus()
             human.meshData.update()
 
-        @self.muscleSlider.event
+        @self.muscleSlider.mhEvent
         def onChange(value):
             human = gui3d.app.selectedHuman
             gui3d.app.do(MacroAction(human, 'Muscle', value, self.syncSliders))
             self.syncStatus()
 
-        @self.weightSlider.event
+        @self.weightSlider.mhEvent
         def onChange(value):
             human = gui3d.app.selectedHuman
             gui3d.app.do(MacroAction(human, 'Weight', value, self.syncSliders))
             self.syncStatus()
 
-        @self.heightSlider.event
+        @self.heightSlider.mhEvent
         def onChange(value):
             human = gui3d.app.selectedHuman
             gui3d.app.do(MacroAction(human, 'Height', value, self.syncSliders, False))
             self.syncStatus()
             human.meshData.update()
             
-        @self.africanSlider.event
+        @self.africanSlider.mhEvent
         def onChange(value):
             human = gui3d.app.selectedHuman
             gui3d.app.do(MacroAction(human, 'African', value, self.syncSliders, False))
             self.syncStatus()
             human.meshData.update()
             
-        @self.asianSlider.event
+        @self.asianSlider.mhEvent
         def onChange(value):
             human = gui3d.app.selectedHuman
             gui3d.app.do(MacroAction(human, 'Asian', value, self.syncSliders, False))

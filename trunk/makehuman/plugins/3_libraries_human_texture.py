@@ -63,7 +63,7 @@ class HumanTextureTaskView(gui3d.TaskView):
         self.update = self.filechooser.sortBox.addView(gui3d.Button('Check for updates'))
         self.mediaSync = None
 
-        @self.filechooser.event
+        @self.filechooser.mhEvent
         def onFileSelected(filename):
 
             gui3d.app.do(Action(gui3d.app.selectedHuman,
@@ -72,7 +72,7 @@ class HumanTextureTaskView(gui3d.TaskView):
             
             gui3d.app.switchCategory('Modelling')
             
-        @self.update.event
+        @self.update.mhEvent
         def onClicked(event):
             self.syncMedia()
             

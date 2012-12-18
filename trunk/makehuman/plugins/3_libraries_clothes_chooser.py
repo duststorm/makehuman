@@ -55,14 +55,14 @@ class ClothesTaskView(gui3d.TaskView):
         self.update = self.filechooser.sortBox.addView(gui3d.Button('Check for updates'))
         self.mediaSync = None
 
-        @self.filechooser.event
+        @self.filechooser.mhEvent
         def onFileSelected(filename):
             
             self.setClothes(gui3d.app.selectedHuman, filename)
 
             gui3d.app.switchCategory('Modelling')
             
-        @self.update.event
+        @self.update.mhEvent
         def onClicked(event):
             self.syncMedia()
         

@@ -23,7 +23,7 @@ class ExampleTaskView(gui3d.TaskView):
         self.pushed = 0
         self.aButtonLabel = box.addView(gui3d.TextView('Pushed 0 times'))
 
-        @self.aButton.event
+        @self.aButton.mhEvent
         def onClicked(event):
             self.pushed += 1
             self.aButtonLabel.setText('Pushed %d times' % self.pushed)
@@ -36,7 +36,7 @@ class ExampleTaskView(gui3d.TaskView):
 
         self.aToggleButtonLabel = box.addView(gui3d.TextView(label='Not selected'))
 
-        @self.aToggleButton.event
+        @self.aToggleButton.mhEvent
         def onClicked(event):
             gui3d.ToggleButton.onClicked(self.aToggleButton, event)
             if self.aToggleButton.selected:
@@ -56,12 +56,12 @@ class ExampleTaskView(gui3d.TaskView):
 
         self.aRadioButtonLabel = box.addView(gui3d.TextView(label='Button 1 is selected'))
 
-        @self.aRadioButton1.event
+        @self.aRadioButton1.mhEvent
         def onClicked(event):
             gui3d.RadioButton.onClicked(self.aRadioButton1, event)
             self.aRadioButtonLabel.setText('Button 1 is selected')
 
-        @self.aRadioButton2.event
+        @self.aRadioButton2.mhEvent
         def onClicked(event):
             gui3d.RadioButton.onClicked(self.aRadioButton2, event)
             self.aRadioButtonLabel.setText('Button 2 is selected')
@@ -74,7 +74,7 @@ class ExampleTaskView(gui3d.TaskView):
 
         self.aSliderLabel = box.addView(gui3d.TextView(label='Value is 0.5'))
 
-        @self.aSlider.event
+        @self.aSlider.mhEvent
         def onChange(value):
             self.aSliderLabel.setText('Value is %f' % value)
             self.aProgressBar.setProgress(value, 1)
@@ -91,7 +91,7 @@ class ExampleTaskView(gui3d.TaskView):
         self.meshSlider = box.addView(gui3d.Slider(value=0.5, label='Mesh distort %0.2f'))
         
         self.meshStored = False
-        @self.meshSlider.event
+        @self.meshSlider.mhEvent
         def onChanging(value):
             human = gui3d.app.selectedHuman
             if self.meshStored:
@@ -103,7 +103,7 @@ class ExampleTaskView(gui3d.TaskView):
             human.mesh.markCoords(coor=True)
             human.mesh.update()
     
-        @self.meshSlider.event
+        @self.meshSlider.mhEvent
         def onChange(value):
             human = gui3d.app.selectedHuman
             human.applyAllTargets()

@@ -32,19 +32,19 @@ class MakeHairTaskView(gui3d.TaskView):
         self.gravitySlider = gui3d.Slider(self, [10, y, 9.3], value=1.5,min=0.0,max=4.0,label="Gravity Factor: %.2f");y+=36
         self.cPEntry = gui3d.TextEdit(self, [18, y, 9.3], "9,12", gui3d.TextEditStyle._replace(width=112), gui3d.floatValidator);y+=24
         
-        @self.cPSlider.event
+        @self.cPSlider.mhEvent
         def onChange(value):
             self.cP = value;
 
-        @self.lengthSlider.event
+        @self.lengthSlider.mhEvent
         def onChange(value):
             self.length = value;
  
-        @self.numberSlider.event
+        @self.numberSlider.mhEvent
         def onChange(value):
             self.number = value;
 
-        @self.gravitySlider.event
+        @self.gravitySlider.mhEvent
         def onChange(value):
             self.gravity = value;
 
@@ -54,7 +54,7 @@ class MakeHairTaskView(gui3d.TaskView):
         self.createButton = gui3d.Button(self, [18, y, 9.3], "Create Hair");y+=24
         self.deleteButton = gui3d.Button(self, [18, y, 9.3], "Delete Hair");y+=24
         
-        @self.collisionButton.event
+        @self.collisionButton.mhEvent
         def onClicked(event):
             #todo try catch when self.cPEntry has invalid values
             #showing my lambda skills..
@@ -63,7 +63,7 @@ class MakeHairTaskView(gui3d.TaskView):
                 collision(self.octree,curve,app.selectedHuman.meshData.verts,0.09,cPIndices,True)
             self.app.selectedHuman.hairs.reloadGuides()
         
-        @self.createButton.event
+        @self.createButton.mhEvent
         def onClicked(event):
             scn = self.app.scene3d
             if app.selectedHuman.hairObj:
