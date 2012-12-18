@@ -150,7 +150,7 @@ def povrayExport(obj, app, settings):
                 baseName = '"' + baseName + '"'
                 cmdLineOpt = ' /RENDER %s' % baseName
             #
-            cmdLineOpt += ' +W%d +H%d' % resolution
+            cmdLineOpt += ' +W%d +H%d +a0.3 +am2' % resolution
         
             #
             pathHandle = subprocess.Popen(cwd=outputDirectory, args = povray_bin + cmdLineOpt, shell=True)

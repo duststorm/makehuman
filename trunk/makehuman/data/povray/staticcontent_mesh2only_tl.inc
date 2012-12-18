@@ -11,10 +11,14 @@
 }
 
 // Create a standard light definition based on MakeHuman settings.
-#declare MakeHuman_LightSource = light_source {<100,100,400>, rgb 1
-  spotlight radius 1000
-  translate < MakeHuman_LightX, -MakeHuman_LightY, MakeHuman_LightZ>
-  rotate <0, 0, 0>
+#declare MakeHuman_LightSource = light_source {
+    <MakeHuman_LightX, MakeHuman_LightY, MakeHuman_LightZ>
+    color rgb 1
+    spotlight
+    radius 1000
+    falloff 1000
+    tightness 1
+    point_at < MakeHuman_TranslateX, MakeHuman_TranslateY, MakeHuman_TranslateZ>
 }
 
 // Assign default values.
