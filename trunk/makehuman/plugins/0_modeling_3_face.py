@@ -10,12 +10,13 @@ import humanmodifier
 print 'Face imported'
 
 class GroupBoxRadioButton(gui.RadioButton):
-    def __init__(self, group, label, groupBox, selected=False):
+    def __init__(self, group, label, groupBox, parent, selected=False):
         super(GroupBoxRadioButton, self).__init__(group, label, selected, style=gui3d.ButtonStyle)
         self.groupBox = groupBox
+        self._parent = parent
 
     def onClicked(self, event):
-        self.parent.parent.hideAllBoxes()
+        self._parent.hideAllBoxes()
         self.groupBox.show()
 
 class FaceSlider(humanmodifier.ModifierSlider):
@@ -265,7 +266,7 @@ class FaceTaskView(gui3d.TaskView):
                     self.groupBoxes.append(box)
 
                     # Create radiobutton
-                    radio = self.categoryBox.addWidget(GroupBoxRadioButton(self.radioButtons, title, box, selected=len(self.radioButtons) == 0))
+                    radio = self.categoryBox.addWidget(GroupBoxRadioButton(self.radioButtons, title, box, self, selected=len(self.radioButtons) == 0))
                     y += 24
 
                 # Create sliders
@@ -299,7 +300,7 @@ class FaceTaskView(gui3d.TaskView):
                     self.groupBoxes.append(box)
 
                     # Create radiobutton
-                    radio = self.categoryBox.addWidget(GroupBoxRadioButton(self.radioButtons, title, box, selected=len(self.radioButtons) == 0))
+                    radio = self.categoryBox.addWidget(GroupBoxRadioButton(self.radioButtons, title, box, self, selected=len(self.radioButtons) == 0))
                     y += 24
 
                 # Create sliders
