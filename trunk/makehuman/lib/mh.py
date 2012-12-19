@@ -162,3 +162,13 @@ def getPath(type):
             raise ValueError("Unknown property '%s' for getPath()!" % typeStr);
 
     return path
+
+def addWidget(edge, widget, *args, **kwargs):
+    return ui.addWidget(edge, widget, *args, **kwargs)
+
+class Frame:
+    Bottom      = ui.Frame.Bottom
+    LeftTop     = ui.Frame.LeftTop
+    LeftBottom  = ui.Frame.LeftBottom
+    RightTop    = ui.Frame.RightTop
+    RightBottom = ui.Frame.RightBottom

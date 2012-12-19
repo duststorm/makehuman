@@ -38,19 +38,18 @@ import mh
 import gui3d
 import guimacromodelling
 import guidetailmodelling
-import qtgui
-from core import G
+import qtgui as gui
 
 class ModellingCategory(gui3d.Category):
 
     def __init__(self, parent):
         gui3d.Category.__init__(self, parent, 'Modelling')
               
-        self.viewBox = G.app.addWidget(0, qtgui.GroupBox(label = 'View settings'), 1, 0)
+        self.viewBox = mh.addWidget(mh.Frame.LeftBottom, gui.GroupBox(label = 'View settings'))
         
-        self.anaglyphsButton = self.viewBox.addWidget(qtgui.ToggleButton('Anaglyphs'))
-        self.wireButton = self.viewBox.addWidget(qtgui.ToggleButton('Wireframe'))
-        self.subdivisionButton = self.viewBox.addWidget(qtgui.ToggleButton('Smooth'))
+        self.anaglyphsButton = self.viewBox.addWidget(gui.ToggleButton('Anaglyphs'), 0)
+        self.wireButton = self.viewBox.addWidget(gui.ToggleButton('Wireframe'), 1)
+        self.subdivisionButton = self.viewBox.addWidget(gui.ToggleButton('Smooth'), 2)
 
         @self.anaglyphsButton.mhEvent
         def onClicked(event):

@@ -102,7 +102,7 @@ import algos3d
 import module3d
 #import posemode
 from math import tan, pi
-import qtgui
+import qtgui as gui
 
 class Camera(events3d.EventHandler):
 
@@ -491,7 +491,7 @@ class MHApplication(gui3d.Application):
         # Display the initial splash screen and the progress bar during startup
         mesh = gui3d.RectangleMesh(800, 600, gui3d.app.getThemeResource('images', 'splash.png'))
         self.splash = self.addObject(gui3d.Object([0, 0, 9.8], mesh))
-        self.progressBar = G.app.addWidget(2, qtgui.ProgressBar(), 0, 0, 1, -1)
+        self.progressBar = mh.addWidget(mh.Frame.Bottom, gui.ProgressBar())
         # self.progressBar = self.addView(gui3d.ProgressBar(gui3d.ProgressBarStyle._replace(left=800-150, top=600-15, zIndex=9.85)))
         # self.progressBar.text = self.progressBar.addView(gui3d.TextView(style=gui3d.TextViewStyle._replace(left=10, top=600-20, zIndex=9.85, width=800-150-20, textAlign=gui3d.AlignRight)))
         self.redrawNow()
@@ -705,11 +705,12 @@ class MHApplication(gui3d.Application):
         @category.tab.mhEvent
         def onClicked(event):
             self.promptAndExit()
-          
-        self.undoButton = G.app.addWidget(1, qtgui.Button("Undo"), 1, 0)
-        self.redoButton = G.app.addWidget(1, qtgui.Button("Redo"), 1, 1)
-        self.resetButton = G.app.addWidget(1, qtgui.Button("Reset"), 1, 2)
-                                        
+
+        self.buttonBox = mh.addWidget(mh.Frame.RightBottom, gui.GroupBox(label = 'Edit'))
+        self.undoButton  = self.buttonBox.addWidget(gui.Button("Undo"),  0, 0)
+        self.redoButton  = self.buttonBox.addWidget(gui.Button("Redo"),  0, 1)
+        self.resetButton = self.buttonBox.addWidget(gui.Button("Reset"), 0, 2)
+
         @self.undoButton.mhEvent
         def onClicked(event):
             gui3d.app.undo()
@@ -727,8 +728,8 @@ class MHApplication(gui3d.Application):
 
             mh.setCaption("MakeHuman r" + os.environ['SVNREVISION'] + " - [Untitled]")
           
-        self.globalButton = G.app.addWidget(1, qtgui.Button("Global cam"), 2, 0, 1, -1)
-        self.faceButton = G.app.addWidget(1, qtgui.Button("Face cam"), 3, 0, 1, -1)
+        self.globalButton = self.buttonBox.addWidget(gui.Button("Global cam"), 1, 0, 1, -1)
+        self.faceButton = self.buttonBox.addWidget(gui.Button("Face cam"), 2, 0, 1, -1)
 
         @self.globalButton.mhEvent
         def onClicked(event):
@@ -859,14 +860,14 @@ class MHApplication(gui3d.Application):
         self.statusbar.mesh.resize(event.width, 32)
         self.statusbar.setPosition((0.0, event.height-20, 9))
         
-        self.undoButton.setPosition([event.width-150, event.height-92, 9.1])
-        self.redoButton.setPosition([event.width-106, event.height-92, 9.1])
-        self.resetButton.setPosition([event.width-62, event.height-92, 9.1])
-        
-        self.globalButton.setPosition([event.width-150, event.height-70, 9.1])
-        self.faceButton.setPosition([event.width-150, event.height-45, 9.1])
-        
-        self.progressBar.setPosition([event.width-150, event.height-15, 9.85])
+        # self.undoButton.setPosition([event.width-150, event.height-92, 9.1])
+        # self.redoButton.setPosition([event.width-106, event.height-92, 9.1])
+        # self.resetButton.setPosition([event.width-62, event.height-92, 9.1])
+        # 
+        # self.globalButton.setPosition([event.width-150, event.height-70, 9.1])
+        # self.faceButton.setPosition([event.width-150, event.height-45, 9.1])
+        # 
+        # self.progressBar.setPosition([event.width-150, event.height-15, 9.85])
 
         if hasattr(self, 'dialog'):
             self.dialog.blocker.mesh.resize(event.width, event.height)

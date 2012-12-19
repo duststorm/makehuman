@@ -31,6 +31,7 @@ import mh
 import os
 from aljabr import vnorm, vsub, vadd, vdot, mtransform
 from math import floor, ceil, pi, sqrt, exp
+import qtgui as gui
 
 def pointInRect(point, rect):
 
@@ -177,7 +178,7 @@ class BackgroundTaskView(gui3d.TaskView):
         mesh.setColor([255, 255, 255, self.opacity])
         mesh.setPickable(0)
 
-        self.backgroundImageToggle = gui3d.app.categories['Modelling'].viewBox.addView(gui3d.ToggleButton('Background'));
+        self.backgroundImageToggle = gui3d.app.categories['Modelling'].viewBox.addWidget(gui.ToggleButton('Background'), 3);
 
         @self.backgroundImageToggle.mhEvent
         def onClicked(event):

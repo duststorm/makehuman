@@ -320,6 +320,12 @@ class Canvas(QtOpenGL.QGLWidget):
         handleTimer(ev.timerId())
 
 class Frame(QtGui.QWidget):
+    Bottom      = 0
+    LeftTop     = 1
+    LeftBottom  = 2
+    RightTop    = 3
+    RightBottom = 4
+
     title = "MakeHuman"
 
     def __init__(self, app, size):
@@ -330,34 +336,70 @@ class Frame(QtGui.QWidget):
         self.setAttribute(QtCore.Qt.WA_OpaquePaintEvent)
         self.setAttribute(QtCore.Qt.WA_KeyCompression, False)
         self.resize(*size)
+        self.create()
 
-        self.layout = QtGui.QGridLayout(self)
-        self.layout.setContentsMargins(0, 0, 0, 0)
+    def create(self):
+        self.v_layout = QtGui.QGridLayout(self)
+        self.v_layout.setContentsMargins(0, 0, 0, 0)
 
         self.tabs = qtgui.Tabs(self)
-        self.layout.addWidget(self.tabs, 0, 0, 1, -1)
+        self.v_layout.addWidget(self.tabs, 0, 0)
+        self.v_layout.setRowStretch(0, 0)
 
-        self.left = qtgui.SideBar(self)
-        self.layout.addWidget(self.left, 1, 0)
+        self.h_layout = QtGui.QGridLayout()
+        self.h_layout.setContentsMargins(0, 0, 0, 0)
+        self.v_layout.addLayout(self.h_layout, 1, 0)
+        self.v_layout.setRowStretch(1, 1)
+
+        self.bottom = QtGui.QBoxLayout(QtGui.QBoxLayout.BottomToTop)
+        self.v_layout.addLayout(self.bottom, 2, 0)
+        self.v_layout.setRowStretch(2, 0)
+
+        self.l_layout = QtGui.QGridLayout()
+        self.l_layout.setContentsMargins(0, 0, 0, 0)
+        self.h_layout.addLayout(self.l_layout, 0, 0)
+        self.h_layout.setColumnStretch(0, 0)
 
         self.canvas = Canvas(self)
-        self.layout.addWidget(self.canvas, 1, 1)
+        self.h_layout.addWidget(self.canvas, 0, 1)
+        self.h_layout.setColumnStretch(1, 1)
 
-        self.right = qtgui.SideBar(self)
-        self.layout.addWidget(self.right, 1, 2)
+        self.r_layout = QtGui.QGridLayout()
+        self.r_layout.setContentsMargins(0, 0, 0, 0)
+        self.h_layout.addLayout(self.r_layout, 0, 2)
+        self.h_layout.setColumnStretch(2, 0)
 
-        self.bottom = qtgui.SideBar(self)
-        self.layout.addWidget(self.bottom, 2, 1, 1, -1)
+        self.left_top = QtGui.QBoxLayout(QtGui.QBoxLayout.TopToBottom)
+        self.l_layout.addLayout(self.left_top, 0, 0)
+        self.l_layout.setRowStretch(0, 0)
 
-        self.layout.setRowStretch(0, 0)
-        self.layout.setRowStretch(1, 1)
-        self.layout.setRowStretch(2, 0)
+        self.l_layout.setRowStretch(1, 1)
 
-        self.layout.setColumnStretch(0, 0)
-        self.layout.setColumnStretch(1, 1)
-        self.layout.setColumnStretch(2, 0)
+        self.left_bottom  = QtGui.QBoxLayout(QtGui.QBoxLayout.BottomToTop)
+        self.l_layout.addLayout(self.left_bottom, 2, 0)
+        self.l_layout.setRowStretch(2, 0)
 
-        self.sides = [self.left, self.right, self.bottom]
+        self.right_top    = QtGui.QBoxLayout(QtGui.QBoxLayout.TopToBottom)
+        self.r_layout.addLayout(self.right_top, 0, 0)
+        self.r_layout.setRowStretch(0, 0)
+
+        self.r_layout.setRowStretch(1, 1)
+
+        self.right_bottom = QtGui.QBoxLayout(QtGui.QBoxLayout.BottomToTop)
+        self.r_layout.addLayout(self.right_bottom, 2, 0)
+        self.r_layout.setRowStretch(2, 0)
+
+        self.sides = {
+            self.Bottom:      self.bottom,
+            self.LeftTop:     self.left_top,
+            self.LeftBottom:  self.left_bottom,
+            self.RightTop:    self.right_top,
+            self.RightBottom: self.right_bottom
+            }
+
+    def addWidget(self, edge, widget, *args, **kwargs):
+        self.sides[edge].addWidget(widget, *args, **kwargs)
+        return widget
 
     def update(self):
         super(Frame, self).update()
@@ -367,9 +409,6 @@ class Frame(QtGui.QWidget):
         ev.ignore()
         quit()
 
-    def addWidget(self, side, widget, *args, **kwargs):
-        return self.sides[side].addWidget(widget, *args, **kwargs)
-
 class Application(QtGui.QApplication):
     def __init__(self):
         super(Application, self).__init__(sys.argv)
@@ -378,14 +417,9 @@ class Application(QtGui.QApplication):
         self.mainwin = Frame(self, (G.windowWidth, G.windowHeight))
         self.mainwin.show()
 
-    def addWidget(self, *args, **kwargs):
-        return self.mainwin.addWidget(*args, **kwargs)
-
 def createWindow(useTimer = None):
     G.app = Application()
     G.app.OnInit()
-    G.app.addWidget(0, QtGui.QLabel('Left'))
-    G.app.addWidget(1, QtGui.QLabel('Right'))
 
 def eventLoop():
     G.app.exec_()
@@ -410,3 +444,6 @@ def handleTimer(id):
 
 def callAsync(callback):
     QtCore.QTimer.singleShot(0, callback)
+
+def addWidget(edge, widget, *args, **kwargs):
+    return G.app.mainwin.addWidget(edge, widget, *args, **kwargs)

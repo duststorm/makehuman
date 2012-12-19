@@ -88,15 +88,15 @@ class GroupBox(QtGui.QGroupBox, Widget):
     def __str__(self):
         return "%s - %s" % (type(self), unicode(self.title()))
 
-    def addWidget(self, widget):
-        widget.setParent(self)
-        self.layout.addWidget(widget)
+    def addWidget(self, widget, row = 0, column = 0, rowSpan = 1, columnSpan = 1, alignment = QtCore.Qt.Alignment(0)):
+        # widget.setParent(self)
+        self.layout.addWidget(widget, row, column, rowSpan, columnSpan, alignment)
         widget.show()
         return widget
 
     def removeWidget(self, widget):
         self.layout.removeWidget(widget)
-        widget.setParent(None)
+        # widget.setParent(None)
 
 OrientationHorizontal = 0
 OrientationVertical = 1
@@ -281,21 +281,3 @@ class ProgressBar(QtGui.QProgressBar, Widget):
         min = self.minimum()
         max = self.maximum()
         self.setValue(min + progress * (max - min))
-
-class SideBar(QtGui.QWidget, Widget):
-    def __init__(self, parent = None, flags = QtCore.Qt.WindowFlags(0)):
-        super(SideBar, self).__init__(parent, flags)
-        Widget.__init__(self)
-        self.layout0 = QtGui.QGridLayout(self)
-        self.layout0.setContentsMargins(0, 0, 0, 0)
-        self.layout0.setRowStretch(0, 0)
-        self.layout0.setRowStretch(1, 1)
-
-        self.layout = QtGui.QGridLayout()
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout0.addLayout(self.layout, 0, 0)
-
-    def addWidget(self, widget, row = 0, col = 0, rowSpan = 1, colsSpan = 1, alignment = QtCore.Qt.Alignment(0)):
-        self.layout.addWidget(widget, row, col, rowSpan, colsSpan, alignment)
-        return widget
-
