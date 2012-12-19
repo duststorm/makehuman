@@ -320,3 +320,46 @@ class ShortcutEdit(QtGui.QLabel, Widget):
 
     def onChanged(self, shortcut):
         pass
+
+class MouseActionEdit(QtGui.QLabel, Widget):
+    def __init__(self, shortcut):
+        modifiers, button = shortcut
+        text = self.shortcutToLabel(modifiers, button)
+        super(MouseActionEdit, self).__init__(text)
+
+    def setShortcut(self, shortcut):
+        modifiers, button = shortcut
+        self.setText(self.shortcutToLabel(modifiers, button))
+
+    def mousePressEvent(self, event):
+        button = event.button()
+        modifiers = int(event.modifiers())
+        self.setText(self.shortcutToLabel(modifiers, button))
+        self.callEvent('onChanged', (modifiers, button))
+
+    def shortcutToLabel(self, modifiers, button):
+        labels = []
+        
+        if modifiers & QtCore.Qt.ControlModifier:
+            labels.append('Ctrl')
+        if modifiers & QtCore.Qt.AltModifier:
+            labels.append('Alt')
+        if modifiers & QtCore.Qt.MetaModifier:
+            labels.append('Meta')
+        if modifiers & QtCore.Qt.ShiftModifier:
+            labels.append('Shift')
+            
+        if button & QtCore.Qt.LeftButton:
+            labels.append('Left')
+        elif button & QtCore.Qt.MidButton:
+            labels.append('Middle')
+        elif button & QtCore.Qt.RightButton:
+            labels.append('Right')
+        else:
+            labels.append('[Unknown]')
+            
+        return '+'.join(labels)
+        
+    def onChanged(self, shortcut):
+        pass
+

@@ -3,32 +3,40 @@
 # We need this for gui controls
 
 import gui3d
+import mh
+import qtgui as gui
     
-class AppMouseActionEdit(gui3d.MouseActionEdit):
+class AppMouseActionEdit(gui.MouseActionEdit):
     def __init__(self, method):
-        gui3d.MouseActionEdit.__init__(self, gui3d.app.getMouseAction(method))
+        super(AppMouseActionEdit, self).__init__(gui3d.app.getMouseAction(method))
         self.method = method
 
     def onChanged(self, shortcut):
-        if not gui3d.app.setMouseAction(shortcut[0], shortcut[1], self.method):
+        modifiers, button = shortcut
+        if not gui3d.app.setMouseAction(modifiers, button, self.method):
             self.setShortcut(gui3d.app.getMouseAction(self.method))
-
-MouseActionLabelStyle = gui3d.TextViewStyle._replace(width=48)
 
 class MouseActionsTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Mouse')
+
+        row = [0]
+        def add(widget, name, method):
+            widget.addWidget(gui.TextView(name), row[0], 0)
+            widget.addWidget(AppMouseActionEdit(method), row[0], 1)
+            row[0] += 1
         
-        self.mouseBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Camera', gui3d.GroupBoxStyle._replace(height=25+25*3+24+6)))
-        self.mouseBox.addView(gui3d.TextView("Move", style=MouseActionLabelStyle));self.mouseBox.addView(AppMouseActionEdit(gui3d.app.mouseTranslate))
-        self.mouseBox.addView(gui3d.TextView("Rotate", style=MouseActionLabelStyle));self.mouseBox.addView(AppMouseActionEdit(gui3d.app.mouseRotate))
-        self.mouseBox.addView(gui3d.TextView("Zoom", style=MouseActionLabelStyle));self.mouseBox.addView(AppMouseActionEdit(gui3d.app.mouseZoom))
-        self.invertMouseWheel = self.mouseBox.addView(gui3d.CheckBox("Invert wheel", gui3d.app.settings.get('invertMouseWheel', False)))
+        self.mouseBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Camera')))
+
+        add(self.mouseBox, "Move",   gui3d.app.mouseTranslate)
+        add(self.mouseBox, "Rotate", gui3d.app.mouseRotate)
+        add(self.mouseBox, "Zoom",   gui3d.app.mouseZoom)
+
+        self.invertMouseWheel = self.mouseBox.addWidget(gui.CheckBox("Invert wheel", gui3d.app.settings.get('invertMouseWheel', False)))
         
         @self.invertMouseWheel.mhEvent
         def onClicked(event):
-            gui3d.ToggleButton.onClicked(self.invertMouseWheel, event)
             gui3d.app.settings['invertMouseWheel'] = self.invertMouseWheel.selected
 
     def onShow(self, event):

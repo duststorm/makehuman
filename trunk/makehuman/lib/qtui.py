@@ -42,7 +42,7 @@ class Modifiers:
     SHIFT = int(QtCore.Qt.ShiftModifier)
     CTRL  = int(QtCore.Qt.ControlModifier)
     ALT   = int(QtCore.Qt.AltModifier)
-    LMETA = int(QtCore.Qt.MetaModifier)
+    META  = int(QtCore.Qt.MetaModifier)
 
 def getKeyModifiers():
     return int(G.app.keyboardModifiers())
