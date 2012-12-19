@@ -4,17 +4,18 @@
 
 import gui3d
 import humanmodifier
+import mh
+import qtgui as gui
 
 print 'Head imported'
 
-class GroupBoxRadioButton(gui3d.RadioButton):
+class GroupBoxRadioButton(gui.RadioButton):
     def __init__(self, group, label, groupBox, selected=False):
-        gui3d.RadioButton.__init__(self, group, label, selected, style=gui3d.ButtonStyle)
+        super(GroupBoxRadioButton, self).__init__(group, label, selected, style=gui3d.ButtonStyle)
         self.groupBox = groupBox
         
     def onClicked(self, event):
-        gui3d.RadioButton.onClicked(self, event)
-        self.parent.parent.hideAllBoxes()
+        self.parentWidget()._parent.hideAllBoxes()
         self.groupBox.show()
         
 class HeadSlider(humanmodifier.ModifierSlider):
@@ -75,8 +76,7 @@ class HeadTaskView(gui3d.TaskView):
         
         self.modifiers = {}
         
-        self.categoryBox = self.addView(gui3d.GroupBox([650, y, 9.0], 'Category'))
-        y += 25
+        self.categoryBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Category')))
         
         for name, templates in features:
             
@@ -94,7 +94,7 @@ class HeadTaskView(gui3d.TaskView):
                     self.groupBoxes.append(box)
                     
                     # Create radiobutton
-                    radio = self.categoryBox.addView(GroupBoxRadioButton(self.radioButtons, title, box, selected=len(self.radioButtons) == 0))
+                    radio = self.categoryBox.addWidget(GroupBoxRadioButton(self.radioButtons, title, box, selected=len(self.radioButtons) == 0))
                     y += 24
             
                 # Create sliders

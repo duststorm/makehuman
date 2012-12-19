@@ -14,13 +14,12 @@ import qtgui as gui
 print 'Expression imported'
 
 class GroupBoxRadioButton(gui.RadioButton):
-    def __init__(self, group, label, groupBox, parent, selected=False):
+    def __init__(self, group, label, groupBox, selected=False):
         super(GroupBoxRadioButton, self).__init__(group, label, selected, style=gui3d.ButtonStyle)
         self.groupBox = groupBox
-        self._parent = parent
         
     def onClicked(self, event):
-        self._parent.hideAllBoxes()
+        self.parentWidget()._parent.hideAllBoxes()
         self.groupBox.show()
 
 class ExpressionSlider(posemode.PoseModifierSlider):
@@ -73,7 +72,7 @@ class ExpressionTaskView(gui3d.TaskView):
                 self.sliders.append(slider)
                 modifier.slider = slider
             # Create radiobutton
-            radio = self.categoryBox.addWidget(GroupBoxRadioButton(self.radioButtons, name.capitalize(), box, self, selected=len(self.radioButtons) == 0))
+            radio = self.categoryBox.addWidget(GroupBoxRadioButton(self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0))
 
         self.hideAllBoxes()
         self.groupBoxes[0].show()

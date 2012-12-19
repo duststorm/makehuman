@@ -103,6 +103,10 @@ class GroupBox(QtGui.QGroupBox, Widget):
         self.layout.removeWidget(widget)
         # widget.setParent(None)
 
+    @property
+    def children(self):
+        return list(self.layout.itemAt(i).widget() for i in xrange(self.layout.count()))
+
 OrientationHorizontal = 0
 OrientationVertical = 1
 
@@ -161,6 +165,9 @@ class ButtonBase(Widget):
     @property
     def selected(self):
         return self.isChecked()
+
+    def setSelected(self, value):
+        self.setChecked(value)
 
 class Button(QtGui.QPushButton, ButtonBase):
     def __init__(self, label=None, selected=False, style=None):

@@ -10,6 +10,7 @@ import module3d
 import humanmodifier
 import aljabr
 import mh
+import qtgui as gui
 
 class MeasurementValueConverter(gui3d.ValueConverter):
 
@@ -53,14 +54,13 @@ class MeasurementValueConverter(gui3d.ValueConverter):
                 tries -= 1
         return self.value
 
-class GroupBoxRadioButton(gui3d.RadioButton):
+class GroupBoxRadioButton(gui.RadioButton):
     def __init__(self, group, label, groupBox, selected=False):
-        gui3d.RadioButton.__init__(self, group, label, selected, style=gui3d.ButtonStyle)
+        super(GroupBoxRadioButton, self).__init__(group, label, selected, style=gui3d.ButtonStyle)
         self.groupBox = groupBox
 
     def onClicked(self, event):
-        gui3d.RadioButton.onClicked(self, event)
-        self.parent.parent.hideAllBoxes()
+        self.parentWidget()._parent.hideAllBoxes()
         self.groupBox.show()
         self.groupBox.children[0].setFocus()
 
@@ -151,7 +151,7 @@ class MeasureTaskView(gui3d.TaskView):
         measureDataPath = "data/targets/measure/"
 
         y = 80
-        self.categoryBox = self.addView(gui3d.GroupBox([650, y, 9.0], 'Category'));y += 25
+        self.categoryBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Category')))
 
         for name, subnames in measurements:
             # Create box
@@ -159,7 +159,7 @@ class MeasureTaskView(gui3d.TaskView):
             self.groupBoxes[name] = box
 
             # Create radiobutton
-            radio = self.categoryBox.addView(GroupBoxRadioButton(self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0));y += 24
+            radio = self.categoryBox.addWidget(GroupBoxRadioButton(self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0))
 
             # Create sliders
             for subname in subnames:
@@ -170,19 +170,17 @@ class MeasureTaskView(gui3d.TaskView):
                 slider = box.addView(MeasureSlider(sliderLabel[subname], self, subname, modifier))
                 self.sliders.append(slider)
 
-        y+=16
-        self.statsBox = self.addView(gui3d.GroupBox([650, y, 9.0], 'Statistics'));y += 25
-        self.height = self.statsBox.addView(gui3d.TextView('Height: '));y += 20
-        self.chest = self.statsBox.addView(gui3d.TextView('Chest: '));y += 20
-        self.waist = self.statsBox.addView(gui3d.TextView('Waist: '));y += 20
-        self.hips = self.statsBox.addView(gui3d.TextView('Hips: '));y += 20
-        y+=16
-        self.braBox = self.addView(gui3d.GroupBox([650, y, 9.0], 'Brassiere size'));y += 25
-        self.eu = self.braBox.addView(gui3d.TextView('EU: '));y += 20
-        self.jp = self.braBox.addView(gui3d.TextView('JP: '));y += 20
-        self.us = self.braBox.addView(gui3d.TextView('US: '));y += 20
-        self.uk = self.braBox.addView(gui3d.TextView('UK: '));y += 20
-        y+=16
+        self.statsBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Statistics')))
+        self.height = self.statsBox.addWidget(gui.TextView('Height: '))
+        self.chest = self.statsBox.addWidget(gui.TextView('Chest: '))
+        self.waist = self.statsBox.addWidget(gui.TextView('Waist: '))
+        self.hips = self.statsBox.addWidget(gui.TextView('Hips: '))
+
+        self.braBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Brassiere size')))
+        self.eu = self.braBox.addWidget(gui.TextView('EU: '))
+        self.jp = self.braBox.addWidget(gui.TextView('JP: '))
+        self.us = self.braBox.addWidget(gui.TextView('US: '))
+        self.uk = self.braBox.addWidget(gui.TextView('UK: '))
 
     def getMeasure(self, measure):
 

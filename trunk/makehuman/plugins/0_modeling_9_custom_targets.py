@@ -32,16 +32,16 @@ import mh
 import algos3d
 import os
 import humanmodifier
+import qtgui as gui
 
-class FolderButton(gui3d.RadioButton):
+class FolderButton(gui.RadioButton):
 
     def __init__(self, group, label, groupBox, selected=False):
-        gui3d.RadioButton.__init__(self, group, label, selected, style=gui3d.ButtonStyle)
+        super(FolderButton, self).__init__(group, label, selected, style=gui3d.ButtonStyle)
         self.groupBox = groupBox
         
     def onClicked(self, event):
-        gui3d.RadioButton.onClicked(self, event)
-        self.parent.parent.hideAllBoxes()
+        self.parentWidget()._parent.hideAllBoxes()
         self.groupBox.show()
 
 class CustomTargetsTaskView(gui3d.TaskView):
@@ -53,14 +53,13 @@ class CustomTargetsTaskView(gui3d.TaskView):
         if not os.path.exists(self.targetsPath):
             os.makedirs(self.targetsPath)
         
-        self.msg = self.addView(gui3d.TextView(label='No custom targets found.\nTo add a custom target, place the file in ' + self.targetsPath, \
-                                            style=gui3d.TextViewStyle._replace(left=10, top=80, width=320)))
+        self.msg = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.TextView('No custom targets found.\nTo add a custom target, place the file in ' + self.targetsPath)))
         
         y = 80
-        self.optionsBox = self.addView(gui3d.GroupBox(label = 'Options', position=[650, 80, 9.0], style=gui3d.GroupBoxStyle._replace(margin=[10,0,0,10])));y += 25
-        rescanButton = self.optionsBox.addView(gui3d.Button(label="Rescan targets' folder"));y += 20
-        y+=16
-        self.folderBox = self.addView(gui3d.GroupBox(label = 'Folders', position=[650, y, 9.0], style=gui3d.GroupBoxStyle._replace(margin=[10,0,0,10])))
+        self.optionsBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Options')))
+        rescanButton = self.optionsBox.addWidget(gui.Button("Rescan targets' folder"))
+
+        self.folderBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Folders')))
         
         @rescanButton.mhEvent
         def onClicked(event):
@@ -79,15 +78,15 @@ class CustomTargetsTaskView(gui3d.TaskView):
         for folder in self.folders:
             self.removeView(folder)
         for child in self.folderBox.children[:]:
-            self.folderBox.removeView(child)
+            self.folderBox.removeWidget(child)
             
         self.folders = []
         group = []
         
         for root, dirs, files in os.walk(self.targetsPath):
 
-            groupBox = self.addView(gui3d.GroupBox(label = 'Targets', position = [10, 80, 9.0]))
-            button = self.folderBox.addView(FolderButton(group, os.path.basename(root), groupBox, self.folderBox.children == 0))
+            groupBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Targets')))
+            button = self.folderBox.addWidget(FolderButton(group, os.path.basename(root), groupBox, len(self.folderBox.children) == 0))
             self.folders.append(groupBox)
 
             for f in files:

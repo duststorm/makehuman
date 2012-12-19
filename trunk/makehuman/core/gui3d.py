@@ -839,6 +839,7 @@ class View(events3d.EventHandler):
 
     def addWidget(self, widget):
         self.widgets.append(widget)
+        widget._parent = self
         if self.isVisible():
             widget.show()
         else:
