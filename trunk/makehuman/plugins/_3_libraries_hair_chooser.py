@@ -55,7 +55,8 @@ class HairTaskView(gui3d.TaskView):
         #self.app.categories["Rendering"].hairsClass = self
         
         hairTexture = self.app.selectedHuman.hairFile.replace('.hair', '.png')
-        self.currentHair = gui3d.Button(self.app.categories['Modelling'], [800-216, 600-36, 9.2], style=HairButtonStyle._replace(normal=hairTexture))
+        self.currentHair = self.addWidget(mh.addWidget(mh.Frame.RightBottom, gui.Button(self.app.categories['Modelling'])))
+        self.currentHair.setTexture(hairTexture)
 
         @self.currentHair.mhEvent
         def onClicked(event):

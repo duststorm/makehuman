@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import gui3d
+import mh
+import qtgui as gui
 
 class MacroAction:
 
@@ -30,20 +32,19 @@ class MacroModelingTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Macro modelling', label='Macro')
 
-        font = gui3d.app.getFont(gui3d.TextViewStyle.fontFamily)
-        self.status = self.addView(gui3d.TextView(style=gui3d.TextViewStyle._replace(width=800-20, left=10, top=600-2-font.lineHeight, zIndex=9.1)))
+        self.status = self.addWidget(mh.addWidget(mh.Frame.Bottom, gui.TextView()))
 
-        self.macroBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Main', style=gui3d.GroupBoxStyle._replace(height=25+36*5+6)))
+        self.macroBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Main')))
        
         # Macro sliders
 
-        self.genderSlider = self.macroBox.addView(gui3d.Slider(value=0.5, label = "Gender"))
-        self.ageSlider = self.macroBox.addView(gui3d.Slider(value=0.5, label = "Age"))
-        self.muscleSlider = self.macroBox.addView(gui3d.Slider(value=0.5, label = "Tone"))
-        self.weightSlider = self.macroBox.addView(gui3d.Slider(value=0.5, label = "Weight"))
-        self.heightSlider = self.macroBox.addView(gui3d.Slider(value=0.0, min=-1.0, max=1.0, label = "Height"))
-        self.africanSlider = self.macroBox.addView(gui3d.Slider(value=0.0, min=0.0, max=1.0, label = "Afro"))
-        self.asianSlider = self.macroBox.addView(gui3d.Slider(value=0.0, min=0.0, max=1.0, label = "Asian"))
+        self.genderSlider = self.macroBox.addWidget(gui.Slider(value=0.5, label = "Gender"))
+        self.ageSlider = self.macroBox.addWidget(gui.Slider(value=0.5, label = "Age"))
+        self.muscleSlider = self.macroBox.addWidget(gui.Slider(value=0.5, label = "Tone"))
+        self.weightSlider = self.macroBox.addWidget(gui.Slider(value=0.5, label = "Weight"))
+        self.heightSlider = self.macroBox.addWidget(gui.Slider(value=0.0, min=-1.0, max=1.0, label = "Height"))
+        self.africanSlider = self.macroBox.addWidget(gui.Slider(value=0.0, min=0.0, max=1.0, label = "Afro"))
+        self.asianSlider = self.macroBox.addWidget(gui.Slider(value=0.0, min=0.0, max=1.0, label = "Asian"))
         
         #self.radialBox = gui3d.GroupBox(self, [590, 80, 9.0], 'Radial', gui3d.GroupBoxStyle._replace(width=185+15))
         #self.radialWidget = gui3d.Radial(self.radialBox)

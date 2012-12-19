@@ -7,6 +7,8 @@ import random
 from math import sqrt, pow, log
 from collision import collision
 import simpleoctree
+import mh
+import qtgui as gui
 
 print 'makehair plugin'
 
@@ -25,12 +27,13 @@ class MakeHairTaskView(gui3d.TaskView):
         self.octree = simpleoctree.SimpleOctree(app.selectedHuman.meshStored,0.09)   
         #sliders
         y=80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+36*4+24*4+6));y+=25
-        self.cPSlider = gui3d.Slider(self, [10, y, 9.3], value=14,min=4,max=30,label="Control Points: %d");y+=36
-        self.lengthSlider = gui3d.Slider(self, [10, y, 9.3], value=5.0,min=0.0,max=7.0,label="Strand Length: %.2f");y+=36
-        self.numberSlider = gui3d.Slider(self, [10, y, 9.3], value=25,min=1,max=260,label="Strands Number: %d");y+=36
-        self.gravitySlider = gui3d.Slider(self, [10, y, 9.3], value=1.5,min=0.0,max=4.0,label="Gravity Factor: %.2f");y+=36
-        self.cPEntry = gui3d.TextEdit(self, [18, y, 9.3], "9,12", gui3d.TextEditStyle._replace(width=112), gui3d.floatValidator);y+=24
+
+        optionsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Options')))
+        self.cPSlider = optionsBox.addWidget(gui.Slider(value=14,min=4,max=30,label="Control Points: %d"))
+        self.lengthSlider = optionsBox.addWidget(gui.Slider(value=5.0,min=0.0,max=7.0,label="Strand Length: %.2f"))
+        self.numberSlider = optionsBox.addWidget(gui.Slider(value=25,min=1,max=260,label="Strands Number: %d"))
+        self.gravitySlider = optionsBox.addWidget(gui.Slider(value=1.5,min=0.0,max=4.0,label="Gravity Factor: %.2f"))
+        self.cPEntry = optionsBox.addWidget(gui.TextEdit("9,12", validator = gui3d.floatValidator))
         
         @self.cPSlider.mhEvent
         def onChange(value):
@@ -49,10 +52,10 @@ class MakeHairTaskView(gui3d.TaskView):
             self.gravity = value;
 
         #buttons
-        self.collisionButton = gui3d.Button(self, [18, y, 9.3], "Avoid Collision");y+=24
+        self.collisionButton = optionsBox.addWidget(gui.Button("Avoid Collision"))
         
-        self.createButton = gui3d.Button(self, [18, y, 9.3], "Create Hair");y+=24
-        self.deleteButton = gui3d.Button(self, [18, y, 9.3], "Delete Hair");y+=24
+        self.createButton = optionsBox.addWidget(gui.Button("Create Hair"))
+        self.deleteButton = optionsBox.addWidget(gui3d.Button("Delete Hair"))
         
         @self.collisionButton.mhEvent
         def onClicked(event):

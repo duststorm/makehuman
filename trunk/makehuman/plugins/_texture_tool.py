@@ -18,25 +18,22 @@ class TextureToolTaskView(gui3d.TaskView):
         self.mesh = None
         self.object = None
         
-        self.box = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Inspect'))
+        self.box = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Inspect')))
         group = []
-        self.model = self.box.addView(gui3d.RadioButton(group, "Model", True))
-        self.texture = self.box.addView(gui3d.RadioButton(group, "Texture"))
-        self.textured = self.box.addView(gui3d.CheckBox("Textured", True))
+        self.model = self.box.addWidget(gui.RadioButton(group, "Model", True))
+        self.texture = self.box.addWidget(gui.RadioButton(group, "Texture"))
+        self.textured = self.box.addWidget(gui.CheckBox("Textured", True))
         
         @self.model.mhEvent
         def onClicked(event):
-            gui3d.RadioButton.onClicked(self.model, event)
             self.switchToModel()
             
         @self.texture.mhEvent
         def onClicked(event):
-            gui3d.RadioButton.onClicked(self.texture, event)
             self.switchToTexture()
             
         @self.textured.mhEvent
         def onClicked(event):
-            gui3d.CheckBox.onClicked(self.textured, event)
             if self.textured.selected:
                 self.object.setTexture(gui3d.app.selectedHuman.mesh.texture)
             else:

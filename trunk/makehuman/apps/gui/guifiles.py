@@ -44,6 +44,7 @@ import mh2stl
 import mh2skel
 from shutil import copyfile
 from os.path import basename
+import qtgui as gui
 
 class SaveTaskView(gui3d.TaskView):
 
@@ -259,88 +260,82 @@ class ExportTaskView(gui3d.TaskView):
         self.exportHairGroup = []
         
         # Formats
-        y = 80
-        self.formatBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Format', gui3d.GroupBoxStyle._replace(height=25+24*5+6)));y+=25
-        self.wavefrontObj = self.formatBox.addView(gui3d.RadioButton(self.exportBodyGroup, "Wavefront obj", True, gui3d.ButtonStyle));y+=24
-        self.mhx = self.formatBox.addView(gui3d.RadioButton(self.exportBodyGroup, label="Blender exchange (mhx)", style=gui3d.ButtonStyle));y+=24
-        self.collada = self.formatBox.addView(gui3d.RadioButton(self.exportBodyGroup, label="Collada (dae)", style=gui3d.ButtonStyle));y+=24
-        self.md5 = self.formatBox.addView(gui3d.RadioButton(self.exportBodyGroup, label="MD5", style=gui3d.ButtonStyle));y+=24
-        self.stl = self.formatBox.addView(gui3d.RadioButton(self.exportBodyGroup, label="Stereolithography (stl)", style=gui3d.ButtonStyle));y+=24
-        self.skel = self.formatBox.addView(gui3d.RadioButton(self.exportBodyGroup, label="Skeleton (skel)", style=gui3d.ButtonStyle));y+=24
-        y+=16
+        self.formatBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Format')))
+        self.wavefrontObj = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, "Wavefront obj", True))
+        self.mhx = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Blender exchange (mhx)"))
+        self.collada = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Collada (dae)"))
+        self.md5 = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="MD5"))
+        self.stl = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Stereolithography (stl)"))
+        self.skel = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Skeleton (skel)"))
             
         # OBJ options
-        yy = y
-        self.objOptions = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*10+6)));y+=25
-        self.exportEyebrows = self.objOptions.addView(gui3d.CheckBox("Eyebrows", True));y+=24
-        self.exportLashes = self.objOptions.addView(gui3d.CheckBox("Eyelashes", True));y+=24
-        self.exportHelpers = self.objOptions.addView(gui3d.CheckBox("Helper geometry", False));y+=24
-        self.exportHidden = self.objOptions.addView(gui3d.CheckBox("Keep hidden faces", True));y+=24
-        self.exportSkeleton = self.objOptions.addView(gui3d.CheckBox("Skeleton", True));y+=24
-        self.exportSmooth = self.objOptions.addView(gui3d.CheckBox( "Subdivide", False));y+=24
+        self.objOptions = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Options')))
+        self.exportEyebrows = self.objOptions.addWidget(gui.CheckBox("Eyebrows", True))
+        self.exportLashes = self.objOptions.addWidget(gui.CheckBox("Eyelashes", True))
+        self.exportHelpers = self.objOptions.addWidget(gui.CheckBox("Helper geometry", False))
+        self.exportHidden = self.objOptions.addWidget(gui.CheckBox("Keep hidden faces", True))
+        self.exportSkeleton = self.objOptions.addWidget(gui.CheckBox("Skeleton", True))
+        self.exportSmooth = self.objOptions.addWidget(gui.CheckBox( "Subdivide", False))
         scales = []
-        (y, self.objScales) = self.addScales( self.objOptions, scales, "Obj", True, y)
+        self.objScales = self.addScales(self.objOptions, scales, "Obj", True)
 
         # MHX options
         """
         y = yy
-        self.mhxOptionsSource = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options source', gui3d.GroupBoxStyle._replace(height=25+24*2+6)));y+=25
+        self.mhxOptionsSource = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Options source')))
         source = []
-        self.mhxConfig = self.mhxOptionsSource.addView(gui3d.RadioButton(source, "Use config options"));y+=24
-        self.mhxGui = self.mhxOptionsSource.addView(gui3d.RadioButton(source, "Use gui options", True));y+=24
+        self.mhxConfig = self.mhxOptionsSource.addWidget(gui.RadioButton(source, "Use config options"))
+        self.mhxGui = self.mhxOptionsSource.addWidget(gui.RadioButton(source, "Use gui options", True))
         self.mhxOptionsSource.hide()
         y+=16
         """
         
-        y = 80
-        self.mhxOptions = self.addView(gui3d.GroupBox([660, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*14+6)));y+=25
-        #self.version24 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.4", False));y+=24
-        #self.version25 = self.mhxOptions.addView(gui3d.CheckBox("Version 2.5", True));y+=24
-        self.mhxSeparateFolder = self.mhxOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
-        self.mhxFeetOnGround = self.mhxOptions.addView(gui3d.CheckBox("Feet on ground", True));y+=24
-        self.mhxHidden = self.mhxOptions.addView(gui3d.CheckBox("Keep hidden faces", True));y+=24
-        self.mhxExpressionUnits = self.mhxOptions.addView(gui3d.CheckBox("Expressions", False));y+=24
-        #self.mhxFaceShapes = self.mhxOptions.addView(gui3d.CheckBox("Face shapes", True));y+=24
-        self.mhxBodyShapes = self.mhxOptions.addView(gui3d.CheckBox("Body shapes", True));y+=24
-        self.mhxCustomShapes = self.mhxOptions.addView(gui3d.CheckBox("Custom shapes", False));y+=24
-        #self.mhxFacePanel = self.mhxOptions.addView(gui3d.CheckBox("Face panel", True));y+=24
-        self.mhxClothes = self.mhxOptions.addView(gui3d.CheckBox("Clothes", True));y+=24
-        self.mhxClothesRig = self.mhxOptions.addView(gui3d.CheckBox("Clothes rig", True));y+=24
-        self.mhxCage = self.mhxOptions.addView(gui3d.CheckBox("Cage", False));y+=24
-        self.mhxAdvancedSpine = self.mhxOptions.addView(gui3d.CheckBox("Advanced spine", False));y+=24
-        self.mhxMaleRig = self.mhxOptions.addView(gui3d.CheckBox("Male rig", False));y+=24
-        #self.mhxSkirtRig = self.mhxOptions.addView(gui3d.CheckBox("Skirt rig", False));y+=24
+        self.mhxOptions = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Options')))
+        #self.version24 = self.mhxOptions.addWidget(gui.CheckBox("Version 2.4", False))
+        #self.version25 = self.mhxOptions.addWidget(gui.CheckBox("Version 2.5", True))
+        self.mhxSeparateFolder = self.mhxOptions.addWidget(gui.CheckBox("Separate folder", False))
+        self.mhxFeetOnGround = self.mhxOptions.addWidget(gui.CheckBox("Feet on ground", True))
+        self.mhxHidden = self.mhxOptions.addWidget(gui.CheckBox("Keep hidden faces", True))
+        self.mhxExpressionUnits = self.mhxOptions.addWidget(gui.CheckBox("Expressions", False))
+        #self.mhxFaceShapes = self.mhxOptions.addWidget(gui.CheckBox("Face shapes", True))
+        self.mhxBodyShapes = self.mhxOptions.addWidget(gui.CheckBox("Body shapes", True))
+        self.mhxCustomShapes = self.mhxOptions.addWidget(gui.CheckBox("Custom shapes", False))
+        #self.mhxFacePanel = self.mhxOptions.addWidget(gui.CheckBox("Face panel", True))
+        self.mhxClothes = self.mhxOptions.addWidget(gui.CheckBox("Clothes", True))
+        self.mhxClothesRig = self.mhxOptions.addWidget(gui.CheckBox("Clothes rig", True))
+        self.mhxCage = self.mhxOptions.addWidget(gui.CheckBox("Cage", False))
+        self.mhxAdvancedSpine = self.mhxOptions.addWidget(gui.CheckBox("Advanced spine", False))
+        self.mhxMaleRig = self.mhxOptions.addWidget(gui.CheckBox("Male rig", False))
+        #self.mhxSkirtRig = self.mhxOptions.addWidget(gui.CheckBox("Skirt rig", False))
         rigs = []
-        self.mhxMhx = self.mhxOptions.addView(gui3d.RadioButton(rigs, "Use mhx rig", True));y+=24
-        self.rigifyMhx = self.mhxOptions.addView(gui3d.RadioButton(rigs, "Use rigify rig", False));y+=24
-        (y, addedRigs) = self.addRigs( self.mhxOptions, rigs, "Mhx", False, y)
+        self.mhxMhx = self.mhxOptions.addWidget(gui.RadioButton(rigs, "Use mhx rig", True))
+        self.rigifyMhx = self.mhxOptions.addWidget(gui.RadioButton(rigs, "Use rigify rig", False))
+        addedRigs = self.addRigs(self.mhxOptions, rigs, "Mhx", False)
         self.mhxRigs = [(self.mhxMhx, "mhx"), (self.rigifyMhx, "rigify")] + addedRigs
         self.mhxOptions.hide()
         
         # Collada options
-        y = 80
-        self.colladaOptions = self.addView(gui3d.GroupBox([660, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*8+6)));y+=25
-        self.colladaRot90X = self.colladaOptions.addView(gui3d.CheckBox("Rotate 90 X", False));y+=24
-        self.colladaRot90Z = self.colladaOptions.addView(gui3d.CheckBox("Rotate 90 Z", False));y+=24
-        self.colladaEyebrows = self.colladaOptions.addView(gui3d.CheckBox("Eyebrows", True));y+=24
-        self.colladaLashes = self.colladaOptions.addView(gui3d.CheckBox("Eyelashes", True));y+=24
-        self.colladaHelpers = self.colladaOptions.addView(gui3d.CheckBox("Helper geometry", False));y+=24
-        self.colladaHidden = self.colladaOptions.addView(gui3d.CheckBox("Keep hidden faces", True));y+=24
-        # self.colladaSeparateFolder = self.colladaOptions.addView(gui3d.CheckBox("Separate folder", False));y+=24
-        # self.colladaPngTexture = self.colladaOptions.addView(gui3d.CheckBox("PNG texture", selected=True));y+=24
+        self.colladaOptions = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Options')))
+        self.colladaRot90X = self.colladaOptions.addWidget(gui.CheckBox("Rotate 90 X", False))
+        self.colladaRot90Z = self.colladaOptions.addWidget(gui.CheckBox("Rotate 90 Z", False))
+        self.colladaEyebrows = self.colladaOptions.addWidget(gui.CheckBox("Eyebrows", True))
+        self.colladaLashes = self.colladaOptions.addWidget(gui.CheckBox("Eyelashes", True))
+        self.colladaHelpers = self.colladaOptions.addWidget(gui.CheckBox("Helper geometry", False))
+        self.colladaHidden = self.colladaOptions.addWidget(gui.CheckBox("Keep hidden faces", True))
+        # self.colladaSeparateFolder = self.colladaOptions.addWidget(gui.CheckBox("Separate folder", False))
+        # self.colladaPngTexture = self.colladaOptions.addWidget(gui.CheckBox("PNG texture", selected=True))
         scales = []
-        (y, self.daeScales) = self.addScales( self.colladaOptions, scales, "Dae", True, y)
+        self.daeScales = self.addScales(self.colladaOptions, scales, "Dae", True)
         rigs = []
-        (y, self.daeRigs) = self.addRigs( self.colladaOptions, rigs, "Dae", True, y)
+        self.daeRigs = self.addRigs(self.colladaOptions, rigs, "Dae", True)
         self.colladaOptions.hide()
 
         # STL options
-        y = yy
-        self.stlOptions = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*3+6)));y+=25
+        self.stlOptions = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Options')))
         stlOptions = []
-        self.stlAscii = self.stlOptions.addView(gui3d.RadioButton(stlOptions,  "Ascii", selected=True));y+=24
-        self.stlBinary = self.stlOptions.addView(gui3d.RadioButton(stlOptions, "Binary"));y+=24
-        self.stlSmooth = self.stlOptions.addView(gui3d.CheckBox("Subdivide", False));y+=24
+        self.stlAscii = self.stlOptions.addWidget(gui.RadioButton(stlOptions,  "Ascii", selected=True))
+        self.stlBinary = self.stlOptions.addWidget(gui.RadioButton(stlOptions, "Binary"))
+        self.stlSmooth = self.stlOptions.addWidget(gui.CheckBox("Subdivide", False))
         self.stlOptions.hide()
 
         """                    
@@ -363,38 +358,26 @@ class ExportTaskView(gui3d.TaskView):
         
         @self.wavefrontObj.mhEvent
         def onClicked(event):
-            
-            gui3d.RadioButton.onClicked(self.wavefrontObj, event)
             self.updateGui()
             
         @self.mhx.mhEvent
         def onClicked(event):
-            
-            gui3d.RadioButton.onClicked(self.mhx, event)
             self.updateGui()
         
         @self.collada.mhEvent
         def onClicked(event):
-            
-            gui3d.RadioButton.onClicked(self.collada, event)
             self.updateGui()
         
         @self.md5.mhEvent
         def onClicked(event):
-            
-            gui3d.RadioButton.onClicked(self.md5, event)
             self.updateGui()
         
         @self.stl.mhEvent
         def onClicked(event):
-            
-            gui3d.RadioButton.onClicked(self.stl, event)
             self.updateGui()
             
         @self.skel.mhEvent
         def onClicked(event):
-            
-            gui3d.RadioButton.onClicked(self.skel, event)
             self.updateGui()
         
         @self.fileentry.mhEvent
@@ -541,7 +524,7 @@ class ExportTaskView(gui3d.TaskView):
         camera.focusZ = self.focusZ
         human.setRotation(self.rotation)
         
-    def addRigs(self, options, rigs, suffix, check, y):
+    def addRigs(self, options, rigs, suffix, check):
         path = "data/rigs"
         if not os.path.exists(path):
             print("Did not find directory %s" % path)
@@ -550,26 +533,20 @@ class ExportTaskView(gui3d.TaskView):
         for fname in os.listdir(path):
             (name, ext) = os.path.splitext(fname)
             if ext == ".rig":
-                expr = 'self.%s%s = options.addView(gui3d.RadioButton(rigs, "Use %s rig", check))' % (name, suffix, name)
-                #print(expr)
-                exec(expr)
+                button = options.addWidget(gui.RadioButton(rigs, "Use %s rig" % name, check))
+                setattr(self, name + suffix, button)
                 check = False
-                y += 24
-                button = eval('self.%s%s' % (name, suffix))
                 buttons.append((button,name))
-        return (y, buttons)                
+        return buttons
 
-    def addScales(self, options, scales, suffix, check, y):
+    def addScales(self, options, scales, suffix, check):
         buttons = []
         for name in ["decimeter", "meter", "inch", "centimeter"]:
-            expr = 'self.%s%s = options.addView(gui3d.RadioButton(scales, "%s", check))' % (name, suffix, name)
-            #print(expr)
-            exec(expr)
+            button = options.addWidget(gui.RadioButton(scales, name, check))
+            setattr(self, name + suffix, button)
             check = False
-            y += 24
-            button = eval('self.%s%s' % (name, suffix))
             buttons.append((button,name))
-        return (y, buttons)   
+        return buttons
         
     def getScale(self, buttons):
         for (button, name) in buttons:

@@ -31,6 +31,7 @@ from skeleton import Skeleton
 from math import pi
 import mh
 import mh2obj
+import qtgui as gui
 
 '''
 bvhToMhMapping = {
@@ -109,7 +110,7 @@ class BvhView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'BVH Player')
         
-        self.status = self.addView(gui3d.TextView(style=gui3d.TextViewStyle._replace(left=10, top=585, zIndex=9.1)))
+        self.status = self.addWidget(mh.addWidget(mh.Frame.Bottom, gui.TextView()))
         
         self.__skeleton = bvhSkeleton('data/bvhs/03_03.bvh')
         self.__skeleton.updateFrame(-1)
@@ -118,13 +119,13 @@ class BvhView(gui3d.TaskView):
         self.bone = None
         
         self.__humanSkeleton = Skeleton()
-        
-        self.optionsBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=24+25+36*1+24*2+6)))
 
-        self.frameSlider = self.optionsBox.addView(gui3d.Slider(value = 0, min = 0, max = self.__skeleton.frames, label = 'Frame: %d'))
-        self.playPause = self.optionsBox.addView(gui3d.Button("Play"))
-        self.showHuman = self.optionsBox.addView(gui3d.ToggleButton("Show human"))
-        self.exportFrame = self.optionsBox.addView(gui3d.Button("Export frame"))
+        self.optionsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Options')))
+
+        self.frameSlider = self.optionsBox.addWidget(gui.Slider(value = 0, min = 0, max = self.__skeleton.frames, label = 'Frame: %d'))
+        self.playPause = self.optionsBox.addWidget(gui.Button("Play"))
+        self.showHuman = self.optionsBox.addWidget(gui.ToggleButton("Show human"))
+        self.exportFrame = self.optionsBox.addWidget(gui.Button("Export frame"))
         
         @self.frameSlider.mhEvent
         def onChanging(value):

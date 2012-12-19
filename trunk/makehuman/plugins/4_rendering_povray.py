@@ -33,7 +33,7 @@ class PovrayTaskView(gui3d.TaskView):
         if os.name == 'nt':
             #
             if os.environ['PROCESSOR_ARCHITECTURE'] == 'x86':
-                self.win32sse2Button = pathBox.addView(gui3d.CheckBox('Use SSE2 bin', True))
+                self.win32sse2Button = pathBox.addWidget(gui.CheckBox('Use SSE2 bin', True))
         #
         @self.path.mhEvent
         def onChange(value):

@@ -142,7 +142,7 @@ class CustomTargetsTaskView(gui3d.TaskView):
                 self.folders[0].children[0].setFocus()
         self.syncSliders()
         for button in self.folderBox.children:
-            if button.checked:
+            if button.selected:
                 button.groupBox.show()
             else:
                 button.groupBox.hide()

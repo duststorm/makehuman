@@ -3,6 +3,8 @@
 # We need this for gui controls
 
 import gui3d
+import mh
+import qtgui as gui
 
 print 'example imported'
 
@@ -12,16 +14,16 @@ class ExampleTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Example')
 
-        box = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Example'))
+        box = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Example')))
         
         # We add a button to the current task
         # A button just fires an event when it is clicked, if a selected texture is specified,
         # it is used while the mouse is down on the button
 
-        self.aButton = box.addView(gui3d.Button('Button'))
+        self.aButton = box.addWidget(gui.Button('Button'))
         
         self.pushed = 0
-        self.aButtonLabel = box.addView(gui3d.TextView('Pushed 0 times'))
+        self.aButtonLabel = box.addWidget(gui.TextView('Pushed 0 times'))
 
         @self.aButton.mhEvent
         def onClicked(event):
@@ -32,13 +34,12 @@ class ExampleTaskView(gui3d.TaskView):
         # A toggle button fires an event when it is clicked but retains its selected state after the mouse is up,
         # if a selected texture is specified, it is used to show whether the button is toggled
 
-        self.aToggleButton = box.addView(gui3d.ToggleButton(label='ToggleButton'))
+        self.aToggleButton = box.addWidget(gui.ToggleButton('ToggleButton'))
 
-        self.aToggleButtonLabel = box.addView(gui3d.TextView(label='Not selected'))
+        self.aToggleButtonLabel = box.addWidget(gui.TextView('Not selected'))
 
         @self.aToggleButton.mhEvent
         def onClicked(event):
-            gui3d.ToggleButton.onClicked(self.aToggleButton, event)
             if self.aToggleButton.selected:
                 self.aToggleButtonLabel.setText('Selected')
             else:
@@ -51,28 +52,26 @@ class ExampleTaskView(gui3d.TaskView):
         self.aRadioButtonGroup = []
 
          # We make the first one selected
-        self.aRadioButton1 = box.addView(gui3d.RadioButton(self.aRadioButtonGroup, selected=True, label='RadioButton1'))
-        self.aRadioButton2 = box.addView(gui3d.RadioButton(self.aRadioButtonGroup, label='RadioButton2'))
+        self.aRadioButton1 = box.addWidget(gui.RadioButton(self.aRadioButtonGroup, 'RadioButton1', selected=True))
+        self.aRadioButton2 = box.addWidget(gui.RadioButton(self.aRadioButtonGroup, 'RadioButton2'))
 
-        self.aRadioButtonLabel = box.addView(gui3d.TextView(label='Button 1 is selected'))
+        self.aRadioButtonLabel = box.addWidget(gui.TextView('Button 1 is selected'))
 
         @self.aRadioButton1.mhEvent
         def onClicked(event):
-            gui3d.RadioButton.onClicked(self.aRadioButton1, event)
             self.aRadioButtonLabel.setText('Button 1 is selected')
 
         @self.aRadioButton2.mhEvent
         def onClicked(event):
-            gui3d.RadioButton.onClicked(self.aRadioButton2, event)
             self.aRadioButtonLabel.setText('Button 2 is selected')
 
         # When the slider is dragged and released, an onChange event is fired
         # By default a slider goes from 0.0 to 1.0, and the initial position will be 0.0 unless specified
 
         # We want the slider to start from the middle
-        self.aSlider = box.addView(gui3d.Slider(value=0.5, label='Slider %.2f'))
+        self.aSlider = box.addWidget(gui.Slider(value=0.5, label='Slider %.2f'))
 
-        self.aSliderLabel = box.addView(gui3d.TextView(label='Value is 0.5'))
+        self.aSliderLabel = box.addWidget(gui.TextView('Value is 0.5'))
 
         @self.aSlider.mhEvent
         def onChange(value):
@@ -81,14 +80,14 @@ class ExampleTaskView(gui3d.TaskView):
 
         # we also create a progressbar, which is updated as the slider moves
 
-        self.aProgressBar = box.addView(gui3d.ProgressBar(style=gui3d.ProgressBarStyle._replace(width=112, margin=[2,2,2,2]), barStyle=gui3d.ProgressBarBarStyle._replace(width=112, margin=[2,2,2,2])))
+        self.aProgressBar = box.addWidget(gui.ProgressBar())
         self.aProgressBar.setProgress(0.5, 0)
         
         # A text edit
 
-        self.aTextEdit = box.addView(gui3d.TextEdit(text='Some text', style=gui3d.TextEditStyle._replace(width=112)))
+        self.aTextEdit = box.addWidget(gui.TextEdit(text='Some text'))
         
-        self.meshSlider = box.addView(gui3d.Slider(value=0.5, label='Mesh distort %0.2f'))
+        self.meshSlider = box.addWidget(gui.Slider(value=0.5, label='Mesh distort %0.2f'))
         
         self.meshStored = False
         @self.meshSlider.mhEvent

@@ -369,15 +369,14 @@ class Camera(events3d.EventHandler):
     
         self.camera.projection = 0
 
-class PluginCheckBox(gui3d.CheckBox):
+class PluginCheckBox(gui.CheckBox):
 
     def __init__(self, module):
     
-        gui3d.CheckBox.__init__(self, module, False if module in gui3d.app.settings['excludePlugins'] else True)
+        super(PluginCheckBox, self).__init__(module, module not in gui3d.app.settings['excludePlugins'])
         self.module = module
         
     def onClicked(self, event):
-        gui3d.CheckBox.onClicked(self, event)
         if self.selected:
             gui3d.app.settings['excludePlugins'].remove(self.module)
         else:
@@ -390,10 +389,10 @@ class PluginsTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Plugins')
 
-        self.pluginsBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Plugins'))
+        self.pluginsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Plugins')))
         
         for module in gui3d.app.modules:
-            check = self.pluginsBox.addView(PluginCheckBox(module))
+            check = self.pluginsBox.addWidget(PluginCheckBox(module))
         
 class MHApplication(gui3d.Application):
   

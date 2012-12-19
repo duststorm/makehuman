@@ -5,6 +5,8 @@
 import colorsys
 import gui3d
 from aljabr import vdist, vmul, vnorm, vsub, vadd
+import mh
+import qtgui as gui
 
 def rgbToHsl(r, g, b):
     h, l, s = colorsys.rgb_to_hls(r / 255.0, g / 255.0, b / 255.0)
@@ -44,32 +46,23 @@ class HairPropertiesTaskView(gui3d.TaskView):
         
         gui3d.TaskView.__init__(self, category, 'Hair')
         
-        y = 80
-        gui3d.GroupBox(self, [10, y, 9.0], 'Hair properties', gui3d.GroupBoxStyle._replace(height=25+36*7+38+6));y+=25
+        propsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Hair properties')))
 
         #############
         #SLIDERS
         #############
         
-        self.widthSlider = gui3d.Slider(self, [10, y, 9.3], 1.0, 0.3, 30.0, "Hair width: %.2f");y+=36
+        self.widthSlider = propsBox.addWidget(gui.Slider(1.0, 0.3, 30.0, "Hair width: %.2f"))
         
-        self.redSlider = gui3d.Slider(self, [10, y, 9.01], 0, 0, 255, 'Red: %d',
-            gui3d.SliderStyle._replace(normal='color_slider_background.png'),
-            gui3d.SliderThumbStyle._replace(normal='color_slider.png', focused='color_slider_focused.png'));y+=36
+        self.redSlider = propsBox.addWidget(gui.Slider(0, 0, 255, 'Red: %d'))
 
-        self.greenSlider = gui3d.Slider(self, [10, y, 9.02], 0, 0, 255, 'Green: %d',
-            gui3d.SliderStyle._replace(normal='color_slider_background.png'),
-            gui3d.SliderThumbStyle._replace(normal='color_slider.png', focused='color_slider_focused.png'));y+=36
+        self.greenSlider = propsBox.addWidget(gui.Slider(0, 0, 255, 'Green: %d'))
 
-        self.blueSlider = gui3d.Slider(self, [10, y, 9.03], 0, 0, 255, 'Blue: %d',
-            gui3d.SliderStyle._replace(normal='color_slider_background.png'),
-            gui3d.SliderThumbStyle._replace(normal='color_slider.png', focused='color_slider_focused.png'));y+=36
+        self.blueSlider = propsBox.addWidget(gui.Slider(0, 0, 255, 'Blue: %d'))
         
-        self.hueSlider = gui3d.Slider(self, [10, y, 9.04], 0, 0, 359, 'Hue: %d');y+=36
-        self.saturationSlider = gui3d.Slider(self, [10, y, 9.05], 0, 0, 100, 'Saturation: %d',
-            gui3d.SliderStyle._replace(normal='color_slider_background.png'),
-            gui3d.SliderThumbStyle._replace(normal='color_slider.png', focused='color_slider_focused.png'));y+=36
-        self.lightnessSlider = gui3d.Slider(self, [10, y, 9.06], 0, 0, 100, 'Lightness: %d');y+=36
+        self.hueSlider = propsBox.addWidget(gui.Slider(0, 0, 359, 'Hue: %d'))
+        self.saturationSlider = propsBox.addWidget(gui.Slider(0, 0, 100, 'Saturation: %d'))
+        self.lightnessSlider = propsBox.addWidget(gui.Slider(0, 0, 100, 'Lightness: %d'))
 
         mesh = gui3d.NineSliceMesh(112, 32, self.app.getThemeResource('images', 'color_preview.png'), [4,4,4,4])
         self.colorPreview = gui3d.Object(self, [18, y+2, 9.07], mesh)

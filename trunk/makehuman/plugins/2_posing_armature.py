@@ -33,6 +33,7 @@ import gui3d
 import module3d
 import mh
 import aljabr
+import qtgui as gui
 
 import armature
 from armature import transformations as tm
@@ -43,30 +44,28 @@ import warpmodifier
 #   Dynamic buttons
 #
 
-class PoseRadioButton(gui3d.RadioButton):
+class PoseRadioButton(gui.RadioButton):
     def __init__(self, group, label, selected, view):
+        super(PoseRadioButton, self).__init__(group, label, selected)
         self.view = view
         self.name = label
         self.file = os.path.join(mh.getPath(''), "data", "poses", label+".bvh")
-        gui3d.RadioButton.__init__(self, group, label, selected)
         
         @self.mhEvent
         def onClicked(event):
-            gui3d.RadioButton.onClicked(self, event)
             self.view.armature.readBvhFile(self.file, gui3d.app.selectedHuman)
             self.view.updateAll()
             self.view.poseBox.hide()
 
 
-class BoneRadioButton(gui3d.RadioButton):
+class BoneRadioButton(gui.RadioButton):
     def __init__(self, group, label, selected, view):
+        super(BoneRadioButton, self).__init__(group, label, selected)
         self.view = view
         self.name = label
-        gui3d.RadioButton.__init__(self, group, label, selected)
         
         @self.mhEvent
         def onClicked(event):
-            gui3d.RadioButton.onClicked(self, event)
             bone = self.view.armature.bones[self.name]
             if self.view.activeBone:
                 self.view.armatureObject.setColor(self.view.activeBone, [255, 255, 255, 255])
@@ -76,15 +75,14 @@ class BoneRadioButton(gui3d.RadioButton):
             self.view.updateSliders(bone)
 
 
-class LayerCheckBox(gui3d.CheckBox):
+class LayerCheckBox(gui.CheckBox):
     def __init__(self, label, selected, view):
+        super(LayerCheckBox, self).__init__(label, selected)
         self.view = view
         self.name = label
-        gui3d.CheckBox.__init__(self, label, selected)
         
         @self.mhEvent
         def onClicked(event):
-            gui3d.CheckBox.onClicked(self, event)
             self.view.updateLayers()
 
 #
@@ -110,7 +108,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
         self.cube = cubeLayer.object
         self.cube.hide()
 
-        self.status = self.addView(gui3d.TextView(style=gui3d.TextViewStyle._replace(left=10, top=585, zIndex=9.1)))
+        self.status = self.addWidget(mh.addWidget(mh.Frame.Bottom, gui.TextView()))
         print "Status", self.status
 
         # Main box
@@ -149,20 +147,20 @@ class PoseArmatureTaskView(gui3d.TaskView):
         self.eulerBox.hide()
 
         # Rig select box        
-        self.rigBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Rig', gui3d.GroupBoxStyle._replace(height=25+24*14+6)))
+        self.rigBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Rig')))
 
         prisms = []
         self.prismButtons = {}
         first = True
         for type in ['Prism', 'Box', 'Line']:
-            self.prismButtons[type] = self.rigBox.addView(gui3d.RadioButton(prisms, type, first))
+            self.prismButtons[type] = self.rigBox.addWidget(gui.RadioButton(prisms, type, first))
             first = False
 
-        self.selectRigButton = self.rigBox.addView(gui3d.Button("SelectRig"))
+        self.selectRigButton = self.rigBox.addWidget(gui.Button("SelectRig"))
 
         rigs = []
         self.rigButtons = {}
-        self.rigButtons["mhx"] = self.rigBox.addView(gui3d.RadioButton(rigs, "Mhx", False))
+        self.rigButtons["mhx"] = self.rigBox.addWidget(gui.RadioButton(rigs, "Mhx", False))
         path = "data/rigs"
         if not os.path.exists(path):
             print("Did not find directory %s" % path)
@@ -172,21 +170,21 @@ class PoseArmatureTaskView(gui3d.TaskView):
             #for fname in os.listdir(path):
             #    (name, ext) = os.path.splitext(fname)
             #    if ext == ".rig":
-                    self.rigButtons[name] = self.rigBox.addView(gui3d.RadioButton(rigs, name.capitalize(), False)) 
+                    self.rigButtons[name] = self.rigBox.addWidget(gui.RadioButton(rigs, name.capitalize(), False)) 
         self.rigBox.show()                    
         
         # Bone select box        
-        self.boneBox = self.addView(gui3d.GroupBox([600, 80, 9.0], 'Bone', gui3d.GroupBoxStyle._replace(height=25+24*14+6)))
+        self.boneBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Bone')))
         self.boneButtons = {}
         self.boneBox.hide()
         
         # Pose select box        
-        self.poseBox = self.addView(gui3d.GroupBox([300, 80, 9.0], 'Pose', gui3d.GroupBoxStyle._replace(height=25+24*14+6)))
+        self.poseBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Pose')))
         self.poseButtons = {}
         self.poseBox.hide()
         
         # Layer select box
-        self.layerBox = self.addView(gui3d.GroupBox([750, 80, 9.0], 'Layers', gui3d.GroupBoxStyle._replace(height=25+24*14+6)))
+        self.layerBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Layers')))
         self.layerButtons = {}
         self.layerBox.hide()
         
@@ -220,7 +218,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
                     (pose, ext) = os.path.splitext(file)
                     if ext.lower() == ".bvh":
                         button = PoseRadioButton(radio, pose, False, self)
-                        self.poseButtons[pose] = self.poseBox.addView(button)
+                        self.poseButtons[pose] = self.poseBox.addWidget(button)
             self.poseBox.show()
                        
         @self.showMesh.mhEvent
@@ -367,7 +365,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
         for bone in self.armature.controls:
             print bone.name
             button = BoneRadioButton(radio, bone.name, first, self)
-            self.boneButtons[bone.name] = self.boneBox.addView(button)
+            self.boneButtons[bone.name] = self.boneBox.addWidget(button)
             first = False    
             
         self.boneBox.show()
@@ -376,7 +374,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
             self.layerButtons = []
             for bit,lname in armature.rigdefs.LayerNames:
                 check = LayerCheckBox(lname, self.armature.visible & bit, self)
-                self.layerButtons.append(self.layerBox.addView(check))
+                self.layerButtons.append(self.layerBox.addWidget(check))
             self.layerBox.show()
         else:
             self.layerBox.hide()

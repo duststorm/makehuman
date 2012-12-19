@@ -11,6 +11,8 @@ import mh2mitsuba
 # We need this for gui controls
 
 import gui3d
+import mh
+import qtgui as gui
 
 print 'Mitsuba imported'
 
@@ -20,33 +22,33 @@ class MitsubaTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Mitsuba')
 
         # Buttons
-        pathBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Mitsuba  bin  path', gui3d.GroupBoxStyle._replace(height=25+24*2+6)))
+        pathBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Mitsuba  bin  path')))
         mitsuba_bin = gui3d.app.settings.get('mitsuba_bin', '')
-        self.path= pathBox.addView(gui3d.TextEdit(str(mitsuba_bin), gui3d.TextEditStyle._replace(width=112)))
+        self.path= pathBox.addWidget(gui.TextEdit(str(mitsuba_bin)))
         #
         @self.path.mhEvent
         def onChange(value):
             gui3d.app.settings['mitsuba_bin'] = 'Enter your path' if not value else str(value)
         
         # Type of lighting method
-        lightingBox = self.addView(gui3d.GroupBox([10, 140, 9.0], 'Integrators', gui3d.GroupBoxStyle._replace(height=25+24*7+6)))
+        lightingBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Integrators')))
         lighting = []
-        self.dlButton = lightingBox.addView(gui3d.RadioButton(lighting, 'DirectLighting', selected = True))
-        self.ptButton = lightingBox.addView(gui3d.RadioButton(lighting, 'Path Tracing'))
-        self.pmButton = lightingBox.addView(gui3d.RadioButton(lighting, 'Photon Mapping'))
+        self.dlButton = lightingBox.addWidget(gui.RadioButton(lighting, 'DirectLighting', selected = True))
+        self.ptButton = lightingBox.addWidget(gui.RadioButton(lighting, 'Path Tracing'))
+        self.pmButton = lightingBox.addWidget(gui.RadioButton(lighting, 'Photon Mapping'))
         
         #
-        samplerBox = self.addView(gui3d.GroupBox([10, 250, 9.0], 'Sampler Options', gui3d.GroupBoxStyle._replace(height=25+24*7+6)))
+        samplerBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Sampler Options')))
         sampler = []
-        self.lowdButton = samplerBox.addView(gui3d.RadioButton(sampler, 'Low Discrepancy', selected = True))
-        self.indepButton = samplerBox.addView(gui3d.RadioButton(sampler, 'Independent'))
+        self.lowdButton = samplerBox.addWidget(gui.RadioButton(sampler, 'Low Discrepancy', selected = True))
+        self.indepButton = samplerBox.addWidget(gui.RadioButton(sampler, 'Independent'))
         #
-        renderBox = self.addView(gui3d.GroupBox([10, 336, 9.0], 'Render Options', gui3d.GroupBoxStyle._replace(height=25+24*7+6)))
+        renderBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Render Options')))
         source=[]
-        self.consoleButton = renderBox.addView(gui3d.RadioButton(source, 'Render console'))
-        self.guiButton = renderBox.addView(gui3d.RadioButton(source, 'Render GUI', selected = True))
-        self.xmlButton = renderBox.addView(gui3d.RadioButton(source, 'Write XML'))
-        self.renderButton = renderBox.addView(gui3d.Button('Render'))
+        self.consoleButton = renderBox.addWidget(gui.RadioButton(source, 'Render console'))
+        self.guiButton = renderBox.addWidget(gui.RadioButton(source, 'Render GUI', selected = True))
+        self.xmlButton = renderBox.addWidget(gui.RadioButton(source, 'Write XML'))
+        self.renderButton = renderBox.addWidget(gui.Button('Render'))
                
 
         @self.renderButton.mhEvent
