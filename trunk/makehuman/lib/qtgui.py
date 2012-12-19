@@ -114,20 +114,27 @@ class SliderStyle(object):
     def __init__(self):
         self.orientation = OrientationHorizontal
 
-class Slider(QtGui.QSlider, Widget):
-    def __init__(self, value=0.0, min=0.0, max=1.0, label=None,
-                 style=SliderStyle(), thumbStyle=None, valueConverter=None):
-        orient = (QtCore.Qt.Horizontal if style.orientation == OrientationHorizontal else QtCore.Qt.Vertical)
-        super(Slider, self).__init__(orient)
+class Slider(QtGui.QWidget, Widget):
+    def __init__(self, value=0.0, min=0.0, max=1.0, label=None, orientation=OrientationHorizontal, valueConverter=None):
+        super(Slider, self).__init__()
         Widget.__init__(self)
+        orient = (QtCore.Qt.Horizontal if orientation == OrientationHorizontal else QtCore.Qt.Vertical)
+        self.slider = QtGui.QSlider(orient)
         self.min = min
         self.max = max
-        self.setMinimum(0)
-        self.setMaximum(1000)
-        self.setValue(value)
-        self.setTracking(False)
-        self.connect(self, QtCore.SIGNAL('sliderMoved(int)'), self._changing)
-        self.connect(self, QtCore.SIGNAL('valueChanged(int)'), self._changed)
+        self.slider.setMinimum(0)
+        self.slider.setMaximum(1000)
+        self.slider.setValue(value)
+        self.slider.setTracking(False)
+        self.connect(self.slider, QtCore.SIGNAL('sliderMoved(int)'), self._changing)
+        self.connect(self.slider, QtCore.SIGNAL('valueChanged(int)'), self._changed)
+
+        self.label = QtGui.QLabel(label or '')
+        self.layout = QtGui.QGridLayout(self)
+        self.layout.addWidget(self.label, 0, 0)
+        self.layout.setColumnStretch(0, 0)
+        self.layout.addWidget(self.slider, 0, 1)
+        self.layout.setColumnStretch(1, 1)
 
     def _changing(self, value):
         self.callEvent('onChanging', self._i2f(value))
@@ -142,10 +149,10 @@ class Slider(QtGui.QSlider, Widget):
         return self.min + (x / 1000.0) * (self.max - self.min)
 
     def setValue(self, value):
-        super(Slider, self).setValue(self._f2i(value))
+        self.slider.setValue(self._f2i(value))
 
     def getValue(self):
-        return self._i2f(self.value())
+        return self._i2f(self.slider.value())
         
     def setMin(self, min):
         value = self.getValue()
