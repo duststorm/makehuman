@@ -102,7 +102,7 @@ class CustomTargetsTaskView(gui3d.TaskView):
         if self.folders:
             self.msg.hide()
             self.folderBox.children[0].setSelected(True)
-            self.folders[0].show()
+            # self.folders[0].show()
             if self.folders[0].children:
                 self.folders[0].children[0].setFocus()
         else:
@@ -141,7 +141,12 @@ class CustomTargetsTaskView(gui3d.TaskView):
             if self.folders[0].children:
                 self.folders[0].children[0].setFocus()
         self.syncSliders()
-        
+        for button in self.folderBox.children:
+            if button.checked:
+                button.groupBox.show()
+            else:
+                button.groupBox.hide()
+
     def loadHandler(self, human, values):
         
         modifier = self.modifiers.get(values[1], None)
