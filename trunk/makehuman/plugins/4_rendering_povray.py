@@ -45,7 +45,7 @@ class PovrayTaskView(gui3d.TaskView):
         self.useSSS = optionsBox.addWidget(gui.CheckBox('Use S.S. Scattering', False))
         
         # box
-        #optionsBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*7+6)))
+        #optionsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Options')))
         
         #Buttons
         # Simplified the gui a bit for the average user. Uncomment to clutter it up with developer - useful stuff.

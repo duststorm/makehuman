@@ -491,8 +491,6 @@ class MHApplication(gui3d.Application):
         mesh = gui3d.RectangleMesh(800, 600, gui3d.app.getThemeResource('images', 'splash.png'))
         self.splash = self.addObject(gui3d.Object([0, 0, 9.8], mesh))
         self.progressBar = mh.addWidget(mh.Frame.Bottom, gui.ProgressBar())
-        # self.progressBar = self.addView(gui3d.ProgressBar(gui3d.ProgressBarStyle._replace(left=800-150, top=600-15, zIndex=9.85)))
-        # self.progressBar.text = self.progressBar.addView(gui3d.TextView(style=gui3d.TextViewStyle._replace(left=10, top=600-20, zIndex=9.85, width=800-150-20, textAlign=gui3d.AlignRight)))
         self.redrawNow()
         
         # self.tabs = self.addView(gui3d.TabView())

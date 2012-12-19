@@ -55,7 +55,7 @@ class MakeHairTaskView(gui3d.TaskView):
         self.collisionButton = optionsBox.addWidget(gui.Button("Avoid Collision"))
         
         self.createButton = optionsBox.addWidget(gui.Button("Create Hair"))
-        self.deleteButton = optionsBox.addWidget(gui3d.Button("Delete Hair"))
+        self.deleteButton = optionsBox.addWidget(gui.Button("Delete Hair"))
         
         @self.collisionButton.mhEvent
         def onClicked(event):

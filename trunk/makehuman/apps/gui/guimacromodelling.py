@@ -46,7 +46,7 @@ class MacroModelingTaskView(gui3d.TaskView):
         self.africanSlider = self.macroBox.addWidget(gui.Slider(value=0.0, min=0.0, max=1.0, label = "Afro"))
         self.asianSlider = self.macroBox.addWidget(gui.Slider(value=0.0, min=0.0, max=1.0, label = "Asian"))
         
-        #self.radialBox = gui3d.GroupBox(self, [590, 80, 9.0], 'Radial', gui3d.GroupBoxStyle._replace(width=185+15))
+        #self.radialBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Radial')))
         #self.radialWidget = gui3d.Radial(self.radialBox)
 
         #hair update only necessary for : gender, age , height
