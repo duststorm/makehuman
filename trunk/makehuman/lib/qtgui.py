@@ -294,3 +294,29 @@ class ProgressBar(QtGui.QProgressBar, Widget):
         min = self.minimum()
         max = self.maximum()
         self.setValue(min + progress * (max - min))
+
+class ShortcutEdit(QtGui.QLabel, Widget):
+    def __init__(self, shortcut):
+        modifiers, key = shortcut
+        text = self.shortcutToLabel(modifiers, key)
+        super(ShortcutEdit, self).__init__(text)
+        self.setFocusPolicy(QtCore.Qt.StrongFocus)
+
+    def setShortcut(self, shortcut):
+        modifiers, key = shortcut
+        self.setText(self.shortcutToLabel(modifiers, key))
+
+    def keyPressEvent(self, event):
+        key = event.key()
+        mod = int(event.modifiers()) & ~QtCore.Qt.ShiftModifier
+        if key in (QtCore.Qt.Key_Shift, QtCore.Qt.Key_Control, QtCore.Qt.Key_Alt, QtCore.Qt.Key_Meta):
+            return
+        self.setText(self.shortcutToLabel(mod, key))
+        self.callEvent('onChanged', (mod, key))
+
+    def shortcutToLabel(self, mod, key):
+        seq = QtGui.QKeySequence(key + mod)
+        return seq.toString()
+
+    def onChanged(self, shortcut):
+        pass
