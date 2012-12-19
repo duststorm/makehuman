@@ -29,6 +29,8 @@ from operator import mul
 from string import Template
 import re
 import os
+import mh
+import qtgui as gui
 
 class RangeDetailModifier(humanmodifier.GenderAgeRangeModifier):
     
@@ -552,8 +554,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         self.sliders = []
 
-        y = 80
-        self.modifiersBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Modifiers', gui3d.GroupBoxStyle._replace(height=25+24*3+6)));y+=25
+        self.modifiersBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Modifiers', gui3d.GroupBoxStyle._replace(height=25+24*3+6))))
         
         modifierStyle = gui3d.ButtonStyle._replace(width=(112-4)/2, height=20)
 
@@ -561,25 +562,23 @@ class DetailModelingTaskView(gui3d.TaskView):
 
         self.tool = Detail3dTool(gui3d.app, True, 'translation')
 
-        self.translationButton = self.modifiersBox.addView(gui3d.RadioButton(self.detailButtonGroup, 'Move', True, modifierStyle))
-        self.scaleButton = self.modifiersBox.addView(gui3d.RadioButton(self.detailButtonGroup, label='Scale', style=modifierStyle));y+=24
+        self.translationButton = self.modifiersBox.addWidget(gui.RadioButton(self.detailButtonGroup, 'Move', True, modifierStyle))
+        self.scaleButton = self.modifiersBox.addWidget(gui.RadioButton(self.detailButtonGroup, label='Scale', style=modifierStyle))
 
         @self.translationButton.mhEvent
         def onClicked(event):
             self.tool = Detail3dTool(gui3d.app, True, 'translation')
             gui3d.app.tool = self.tool
-            gui3d.RadioButton.onClicked(self.translationButton, event)
 
         @self.scaleButton.mhEvent
         def onClicked(event):
             self.tool = Detail3dTool(gui3d.app, True, 'scale')
             gui3d.app.tool = self.tool
-            gui3d.RadioButton.onClicked(self.scaleButton, event)
 
-        self.rightSymmetryButton = self.modifiersBox.addView(gui3d.Button('Sym<', style=modifierStyle))
-        self.leftSymmetryButton = self.modifiersBox.addView(gui3d.Button('Sym>', style=modifierStyle));y+=24
-        self.symmetryButton = self.modifiersBox.addView(gui3d.ToggleButton('Sym', style=modifierStyle))
-        #self.microButton = self.modifiersBox.addView(gui3d.ToggleButton('Micro', style=modifierStyle))
+        self.rightSymmetryButton = self.modifiersBox.addWidget(gui.Button('Sym<', style=modifierStyle))
+        self.leftSymmetryButton = self.modifiersBox.addWidget(gui.Button('Sym>', style=modifierStyle))
+        self.symmetryButton = self.modifiersBox.addWidget(gui.ToggleButton('Sym', style=modifierStyle))
+        #self.microButton = self.modifiersBox.addWidget(gui.ToggleButton('Micro', style=modifierStyle))
 
         @self.rightSymmetryButton.mhEvent
         def onClicked(event):
@@ -593,14 +592,12 @@ class DetailModelingTaskView(gui3d.TaskView):
 
         @self.symmetryButton.mhEvent
         def onClicked(event):
-            gui3d.ToggleButton.onClicked(self.symmetryButton, event)
             human = gui3d.app.selectedHuman
             human.symmetryModeEnabled = self.symmetryButton.selected
             #self.parent.tasksByName['Micro modelling'].symmetryButton.setSelected(self.symmetryButton.selected)
         """    
         @self.microButton.mhEvent
         def onClicked(event):
-            gui3d.ToggleButton.onClicked(self.microButton, event)
             self.tool = Detail3dTool(gui3d.app, self.microButton.selected, self.tool.type)
             gui3d.app.tool = self.tool
         """

@@ -2,18 +2,19 @@
 # -*- coding: utf-8 -*-
 # We need this for gui controls
 
+import mh
+import qtgui as gui
 import gui3d
 import humanmodifier
 
 print 'Face imported'
 
-class GroupBoxRadioButton(gui3d.RadioButton):
+class GroupBoxRadioButton(gui.RadioButton):
     def __init__(self, group, label, groupBox, selected=False):
-        gui3d.RadioButton.__init__(self, group, label, selected, style=gui3d.ButtonStyle)
+        super(GroupBoxRadioButton, self).__init__(group, label, selected, style=gui3d.ButtonStyle)
         self.groupBox = groupBox
 
     def onClicked(self, event):
-        gui3d.RadioButton.onClicked(self, event)
         self.parent.parent.hideAllBoxes()
         self.groupBox.show()
 
@@ -245,7 +246,7 @@ class FaceTaskView(gui3d.TaskView):
 
         self.modifiers = {}
 
-        self.categoryBox = self.addView(gui3d.GroupBox([650, y, 9.0], 'Category'))
+        self.categoryBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Category')))
         y += 25
         
         for name, templates in features2:
@@ -264,7 +265,7 @@ class FaceTaskView(gui3d.TaskView):
                     self.groupBoxes.append(box)
 
                     # Create radiobutton
-                    radio = self.categoryBox.addView(GroupBoxRadioButton(self.radioButtons, title, box, selected=len(self.radioButtons) == 0))
+                    radio = self.categoryBox.addWidget(GroupBoxRadioButton(self.radioButtons, title, box, selected=len(self.radioButtons) == 0))
                     y += 24
 
                 # Create sliders
@@ -298,7 +299,7 @@ class FaceTaskView(gui3d.TaskView):
                     self.groupBoxes.append(box)
 
                     # Create radiobutton
-                    radio = self.categoryBox.addView(GroupBoxRadioButton(self.radioButtons, title, box, selected=len(self.radioButtons) == 0))
+                    radio = self.categoryBox.addWidget(GroupBoxRadioButton(self.radioButtons, title, box, selected=len(self.radioButtons) == 0))
                     y += 24
 
                 # Create sliders
@@ -360,8 +361,8 @@ class FaceTaskView(gui3d.TaskView):
             slider.update()
 
     def onResized(self, event):
-
-        self.categoryBox.setPosition([event.width - 150, self.categoryBox.getPosition()[1], 9.0])
+        pass
+        # self.categoryBox.setPosition([event.width - 150, self.categoryBox.getPosition()[1], 9.0])
 
     def onHumanChanged(self, event):
 

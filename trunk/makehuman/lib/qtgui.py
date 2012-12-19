@@ -26,6 +26,9 @@ class Widget(events3d.EventHandler):
     def setPosition(self, position):
         pass
 
+    def getPosition(self):
+        return (0, 0, 0)
+
 class TabsBase(Widget):
     def __init__(self):
         super(TabsBase, self).__init__()
@@ -79,7 +82,7 @@ class TabBar(QtGui.QTabBar, TabsBase):
         return super(TabBar, self)._addTab(label)
 
 class GroupBox(QtGui.QGroupBox, Widget):
-    def __init__(self, position=None, label='', style=None):
+    def __init__(self, label='', style=None):
         label = self.getLanguageString(label) if label else ''
         QtGui.QGroupBox.__init__(self, label)
         Widget.__init__(self)
@@ -88,8 +91,10 @@ class GroupBox(QtGui.QGroupBox, Widget):
     def __str__(self):
         return "%s - %s" % (type(self), unicode(self.title()))
 
-    def addWidget(self, widget, row = 0, column = 0, rowSpan = 1, columnSpan = 1, alignment = QtCore.Qt.Alignment(0)):
+    def addWidget(self, widget, row = None, column = 0, rowSpan = 1, columnSpan = 1, alignment = QtCore.Qt.Alignment(0)):
         # widget.setParent(self)
+        if row is None:
+            row = self.layout.count()
         self.layout.addWidget(widget, row, column, rowSpan, columnSpan, alignment)
         widget.show()
         return widget
@@ -152,6 +157,10 @@ class ButtonBase(Widget):
 
     def _clicked(self, state):
         self.callEvent('onClicked', None)
+
+    @property
+    def selected(self):
+        return self.isChecked()
 
 class Button(QtGui.QPushButton, ButtonBase):
     def __init__(self, label=None, selected=False, style=None):
@@ -249,9 +258,6 @@ class TextEdit(QtGui.QLineEdit, Widget):
 
     def getText(self):
         return self.toPlainText()
-        
-    def setPosition(self, position):
-        pass
 
     def validateText(self, text):
         if self.__validator:

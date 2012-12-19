@@ -192,16 +192,15 @@ class BackgroundTaskView(gui3d.TaskView):
                 gui3d.app.switchCategory('Library')
                 gui3d.app.switchTask('Background')
 
-        y = 280
-        self.backgroundBox = self.addView(gui3d.GroupBox([10, y, 9], 'Background 2 settings', gui3d.GroupBoxStyle._replace(height=25+36*3+24*1+6)));y+=25
+        self.backgroundBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Background 2 settings')))
 
         self.radioButtonGroup = []
-        self.bgImageFrontRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=True, label='Front'))
-        self.bgImageBackRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Back'))
-        self.bgImageLeftRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Left'))
-        self.bgImageRightRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Right'))
-        self.bgImageTopRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Top'))
-        self.bgImageBottomRadioButton = self.backgroundBox.addView(gui3d.RadioButton(self.radioButtonGroup, selected=False, label='Bottom'))
+        self.bgImageFrontRadioButton  = self.backgroundBox.addWidget(gui.RadioButton(self.radioButtonGroup, label='Front', selected=True))
+        self.bgImageBackRadioButton   = self.backgroundBox.addWidget(gui.RadioButton(self.radioButtonGroup, label='Back'))
+        self.bgImageLeftRadioButton   = self.backgroundBox.addWidget(gui.RadioButton(self.radioButtonGroup, label='Left'))
+        self.bgImageRightRadioButton  = self.backgroundBox.addWidget(gui.RadioButton(self.radioButtonGroup, label='Right'))
+        self.bgImageTopRadioButton    = self.backgroundBox.addWidget(gui.RadioButton(self.radioButtonGroup, label='Top'))
+        self.bgImageBottomRadioButton = self.backgroundBox.addWidget(gui.RadioButton(self.radioButtonGroup, label='Bottom'))
 
         self.filechooser = self.addView(gui3d.FileChooser(self.backgroundsFolder, ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None))
 
@@ -419,8 +418,8 @@ class BackgroundTaskView(gui3d.TaskView):
         self.updateBackground()
 
     def onResized(self, event):
-
-        self.filechooser.onResized(event)
+        if hasattr(self, 'filechooser'):
+            self.filechooser.onResized(event)
         self.updateBackground()
 
 # This method is called when the plugin is loaded into makehuman
@@ -456,10 +455,10 @@ class settingsTaskView(gui3d.TaskView) :
 
         self.lastPos = [0, 0]
 
-        self.backgroundBox = self.addView(gui3d.GroupBox([10, y, 9], 'Background settings', gui3d.GroupBoxStyle._replace(height=25+36*3+24*1+6)));y+=25
+        self.backgroundBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Background settings')))
 
         # sliders
-        self.opacitySlider = self.backgroundBox.addView(gui3d.Slider(value=taskview.opacity, min=0,max=255, label = "Opacity: %d"))
+        self.opacitySlider = self.backgroundBox.addWidget(gui.Slider(value=taskview.opacity, min=0,max=255, label = "Opacity: %d"))
 
         @self.opacitySlider.mhEvent
         def onChanging(value):
@@ -486,20 +485,19 @@ class settingsTaskView(gui3d.TaskView) :
                 self.backgroundImage.mesh.resize(taskview.backgroundWidth, taskview.backgroundHeight)
                 taskview.fixateBackground()
 
-        self.dragButton = self.backgroundBox.addView(gui3d.ToggleButton('Move & Resize'))
+        self.dragButton = self.backgroundBox.addWidget(gui.ToggleButton('Move && Resize'))
 
         @self.dragButton.mhEvent
         def onClicked(event):
-            gui3d.ToggleButton.onClicked(self.dragButton, event)
             self.backgroundImage.mesh.setPickable(self.dragButton.selected)
 
-        self.projectBackgroundButton = self.backgroundBox.addView(gui3d.Button('Project background'))
+        self.projectBackgroundButton = self.backgroundBox.addWidget(gui.Button('Project background'))
 
         @self.projectBackgroundButton.mhEvent
         def onClicked(event):
             taskview.projectBackground()
 
-        self.projectLightingButton = self.backgroundBox.addView(gui3d.Button('Project lighting'))
+        self.projectLightingButton = self.backgroundBox.addWidget(gui.Button('Project lighting'))
 
         @self.projectLightingButton.mhEvent
         def onClicked(event):

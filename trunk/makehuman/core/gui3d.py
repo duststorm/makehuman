@@ -628,6 +628,7 @@ class View(events3d.EventHandler):
         self.__totalVisibility = False
         self.__parent = None
         self.__attached = False
+        self.widgets = []
 
     def __del__(self):
     
@@ -836,6 +837,21 @@ class View(events3d.EventHandler):
     def onKeyUp(self, event):
         self.parent.callEvent('onKeyUp', event)
 
+    def addWidget(self, widget):
+        self.widgets.append(widget)
+        if self.isVisible():
+            widget.show()
+        else:
+            widget.hide()
+        return widget
+
+    def showWidgets(self):
+        for w in self.widgets:
+            w.show()
+
+    def hideWidgets(self):
+        for w in self.widgets:
+            w.hide()
 
 # A View representing a specific task
 TaskTabStyle = Style(**{
@@ -984,8 +1000,6 @@ class Category(View):
                     return view
         
         return None
-
-
  
 # The application
 app = None
@@ -1179,12 +1193,16 @@ class Application(events3d.EventHandler):
 
     def switchTask(self, name):
         if self.currentTask:
+            print 'hiding task %s' % self.currentTask.name
             self.currentTask.hide()
+            self.currentTask.hideWidgets()
 
         self.currentTask = self.currentCategory.tasksByName[name]
 
         if self.currentTask:
+            print 'showing task %s' % self.currentTask.name
             self.currentTask.show()
+            self.currentTask.showWidgets()
 
     def switchCategory(self, name):
 
@@ -1206,11 +1224,15 @@ class Application(events3d.EventHandler):
             return
 
         if self.currentCategory:
+            print 'hiding category %s' % self.currentCategory.name
             self.currentCategory.hide()
+            self.currentCategory.hideWidgets()
 
         self.currentCategory = category
 
+        print 'showing category %s' % self.currentCategory.name
         self.currentCategory.show()
+        self.currentCategory.showWidgets()
 
         self.switchTask(category.tasks[0].name)
 

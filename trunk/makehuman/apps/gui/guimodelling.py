@@ -44,12 +44,12 @@ class ModellingCategory(gui3d.Category):
 
     def __init__(self, parent):
         gui3d.Category.__init__(self, parent, 'Modelling')
-              
-        self.viewBox = mh.addWidget(mh.Frame.LeftBottom, gui.GroupBox(label = 'View settings'))
+
+        self.viewBox = self.addWidget(mh.addWidget(mh.Frame.LeftBottom, gui.GroupBox(label = 'View settings')))
         
-        self.anaglyphsButton = self.viewBox.addWidget(gui.ToggleButton('Anaglyphs'), 0)
-        self.wireButton = self.viewBox.addWidget(gui.ToggleButton('Wireframe'), 1)
-        self.subdivisionButton = self.viewBox.addWidget(gui.ToggleButton('Smooth'), 2)
+        self.anaglyphsButton = self.viewBox.addWidget(gui.ToggleButton('Anaglyphs'))
+        self.wireButton = self.viewBox.addWidget(gui.ToggleButton('Wireframe'))
+        self.subdivisionButton = self.viewBox.addWidget(gui.ToggleButton('Smooth'))
 
         @self.anaglyphsButton.mhEvent
         def onClicked(event):
