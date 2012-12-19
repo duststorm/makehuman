@@ -159,8 +159,9 @@ class Canvas(QtOpenGL.QGLWidget):
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.setFocus()
         self.setAutoBufferSwap(False)
-        # self.setAutoFillBackground(False)
+        self.setAutoFillBackground(False)
         # self.setAttribute(QtCore.Qt.WA_PaintOnScreen)
+        self.setAttribute(QtCore.Qt.WA_NoSystemBackground, False)
         self.setAttribute(QtCore.Qt.WA_OpaquePaintEvent)
         self.setAttribute(QtCore.Qt.WA_KeyCompression, False)
         self.setMouseTracking(True)
@@ -338,35 +339,56 @@ class Frame(QtGui.QWidget):
         self.resize(*size)
         self.create()
 
+    def panel(self):
+        widget = QtGui.QWidget()
+        # widget.setAttribute(QtCore.Qt.WA_PaintOnScreen, False)
+        widget.setAttribute(QtCore.Qt.WA_OpaquePaintEvent, False)
+        widget.setAutoFillBackground(True)
+        widget.setContentsMargins(0, 0, 0, 0)
+        return widget
+
     def create(self):
         self.v_layout = QtGui.QGridLayout(self)
         self.v_layout.setContentsMargins(0, 0, 0, 0)
+        self.v_layout.setSpacing(0)
 
-        self.tabs = qtgui.Tabs(self)
-        self.v_layout.addWidget(self.tabs, 0, 0)
+        self.t_panel = self.panel()
+        self.v_layout.addWidget(self.t_panel, 0, 0)
         self.v_layout.setRowStretch(0, 0)
+
+        self.t_layout = QtGui.QGridLayout(self.t_panel)
+        self.t_layout.setContentsMargins(0, 0, 0, 0)
+        self.tabs = qtgui.Tabs()
+        self.t_layout.addWidget(self.tabs)
 
         self.h_layout = QtGui.QGridLayout()
         self.h_layout.setContentsMargins(0, 0, 0, 0)
+        self.h_layout.setSpacing(0)
         self.v_layout.addLayout(self.h_layout, 1, 0)
         self.v_layout.setRowStretch(1, 1)
 
-        self.bottom = QtGui.QBoxLayout(QtGui.QBoxLayout.BottomToTop)
-        self.v_layout.addLayout(self.bottom, 2, 0)
+        self.b_panel = self.panel()
+        self.bottom = QtGui.QBoxLayout(QtGui.QBoxLayout.BottomToTop, self.b_panel)
+        # self.v_layout.addLayout(self.bottom, 2, 0)
+        self.v_layout.addWidget(self.b_panel, 2, 0)
         self.v_layout.setRowStretch(2, 0)
 
-        self.l_layout = QtGui.QGridLayout()
+        self.l_panel = self.panel()
+        self.l_layout = QtGui.QGridLayout(self.l_panel)
         self.l_layout.setContentsMargins(0, 0, 0, 0)
-        self.h_layout.addLayout(self.l_layout, 0, 0)
+        # self.h_layout.addLayout(self.l_layout, 0, 0)
+        self.h_layout.addWidget(self.l_panel, 0, 0)
         self.h_layout.setColumnStretch(0, 0)
 
         self.canvas = Canvas(self)
         self.h_layout.addWidget(self.canvas, 0, 1)
         self.h_layout.setColumnStretch(1, 1)
 
-        self.r_layout = QtGui.QGridLayout()
+        self.r_panel = self.panel()
+        self.r_layout = QtGui.QGridLayout(self.r_panel)
         self.r_layout.setContentsMargins(0, 0, 0, 0)
-        self.h_layout.addLayout(self.r_layout, 0, 2)
+        # self.h_layout.addLayout(self.r_layout, 0, 2)
+        self.h_layout.addWidget(self.r_panel, 0, 2)
         self.h_layout.setColumnStretch(2, 0)
 
         self.left_top = QtGui.QBoxLayout(QtGui.QBoxLayout.TopToBottom)
