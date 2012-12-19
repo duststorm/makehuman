@@ -125,6 +125,15 @@ class Slider(QtGui.QSlider, Widget):
         self.setMinimum(0)
         self.setMaximum(1000)
         self.setValue(value)
+        self.setTracking(False)
+        self.connect(self, QtCore.SIGNAL('sliderMoved(int)'), self._changing)
+        self.connect(self, QtCore.SIGNAL('valueChanged(int)'), self._changed)
+
+    def _changing(self, value):
+        self.callEvent('onChanging', self._i2f(value))
+
+    def _changed(self, value):
+        self.callEvent('onChange', self._i2f(value))
 
     def _f2i(self, x):
         return int(round(1000 * (x - self.min) / (self.max - self.min)))
