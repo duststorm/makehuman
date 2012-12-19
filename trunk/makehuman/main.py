@@ -706,7 +706,7 @@ class MHApplication(gui3d.Application):
         def onClicked(event):
             self.promptAndExit()
 
-        self.buttonBox = mh.addWidget(mh.Frame.RightBottom, gui.GroupBox(label = 'Edit'))
+        self.buttonBox = mh.addWidget(mh.Frame.RightBottom, gui.GroupBox('Edit'))
         self.undoButton  = self.buttonBox.addWidget(gui.Button("Undo"),  0, 0)
         self.redoButton  = self.buttonBox.addWidget(gui.Button("Redo"),  0, 1)
         self.resetButton = self.buttonBox.addWidget(gui.Button("Reset"), 0, 2)

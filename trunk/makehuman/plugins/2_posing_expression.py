@@ -9,20 +9,20 @@ import warp
 import os
 import mh
 import posemode
+import qtgui as gui
 
 print 'Expression imported'
 
-class GroupBoxRadioButton(gui3d.RadioButton):
-    def __init__(self, group, label, groupBox, selected=False):
-        gui3d.RadioButton.__init__(self, group, label, selected, style=gui3d.ButtonStyle)
+class GroupBoxRadioButton(gui.RadioButton):
+    def __init__(self, group, label, groupBox, parent, selected=False):
+        super(GroupBoxRadioButton, self).__init__(group, label, selected, style=gui3d.ButtonStyle)
         self.groupBox = groupBox
+        self._parent = parent
         
     def onClicked(self, event):
-        gui3d.RadioButton.onClicked(self, event)
-        self.parent.parent.hideAllBoxes()
+        self._parent.hideAllBoxes()
         self.groupBox.show()
-        
-        
+
 class ExpressionSlider(posemode.PoseModifierSlider):
     def __init__(self, label, modifier):        
         posemode.PoseModifierSlider.__init__(self, label, modifier)        
@@ -51,7 +51,7 @@ class ExpressionTaskView(gui3d.TaskView):
         
         self.modifiers = {}
         
-        self.categoryBox = self.addView(gui3d.GroupBox([650, 80, 9.0], 'Category'))
+        self.categoryBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Category')))
         
         for name, subnames in self.expressions:
             # Create box
@@ -73,7 +73,7 @@ class ExpressionTaskView(gui3d.TaskView):
                 self.sliders.append(slider)
                 modifier.slider = slider
             # Create radiobutton
-            radio = self.categoryBox.addView(GroupBoxRadioButton(self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0))
+            radio = self.categoryBox.addWidget(GroupBoxRadioButton(self.radioButtons, name.capitalize(), box, self, selected=len(self.radioButtons) == 0))
 
         self.hideAllBoxes()
         self.groupBoxes[0].show()

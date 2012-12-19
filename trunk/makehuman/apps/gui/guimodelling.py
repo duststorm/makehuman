@@ -45,7 +45,7 @@ class ModellingCategory(gui3d.Category):
     def __init__(self, parent):
         gui3d.Category.__init__(self, parent, 'Modelling')
 
-        self.viewBox = self.addWidget(mh.addWidget(mh.Frame.LeftBottom, gui.GroupBox(label = 'View settings')))
+        self.viewBox = self.addWidget(mh.addWidget(mh.Frame.LeftBottom, gui.GroupBox('View settings')))
         
         self.anaglyphsButton = self.viewBox.addWidget(gui.ToggleButton('Anaglyphs'))
         self.wireButton = self.viewBox.addWidget(gui.ToggleButton('Wireframe'))

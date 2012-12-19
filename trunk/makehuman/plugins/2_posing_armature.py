@@ -114,36 +114,36 @@ class PoseArmatureTaskView(gui3d.TaskView):
         print "Status", self.status
 
         # Main box
-        self.mainBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Rotation', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6)))
-        self.quatBox = self.addView(gui3d.GroupBox([10, 480, 9.0], 'Quaternion', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6)))
-        self.eulerBox = self.addView(gui3d.GroupBox([10, 660, 9.0], 'Euler', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6)))
+        self.mainBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Rotation')))
+        self.eulerBox = self.addWidget(mh.addWidget(mh.Frame.LeftBottom, gui.GroupBox('Euler')))
+        self.quatBox = self.addWidget(mh.addWidget(mh.Frame.LeftBottom, gui.GroupBox('Quaternion')))
 
-        self.QWslider = self.quatBox.addView(gui3d.Slider(value = 1000.0, min = -1000.0, max = 1000.0, label = "W: %d"))
-        self.QXslider = self.quatBox.addView(gui3d.Slider(value = 0.0, min = -1000.0, max = 1000.0, label = "X: %d"))
-        self.QYslider = self.quatBox.addView(gui3d.Slider(value = 0.0, min = -1000.0, max = 1000.0, label = "Y: %d"))
-        self.QZslider = self.quatBox.addView(gui3d.Slider(value = 0.0, min = -1000.0, max = 1000.0, label = "Z: %d"))
+        self.QWslider = self.quatBox.addWidget(gui.Slider(value = 1000.0, min = -1000.0, max = 1000.0, label = "W: %d"))
+        self.QXslider = self.quatBox.addWidget(gui.Slider(value = 0.0, min = -1000.0, max = 1000.0, label = "X: %d"))
+        self.QYslider = self.quatBox.addWidget(gui.Slider(value = 0.0, min = -1000.0, max = 1000.0, label = "Y: %d"))
+        self.QZslider = self.quatBox.addWidget(gui.Slider(value = 0.0, min = -1000.0, max = 1000.0, label = "Z: %d"))
 
-        self.EXslider = self.eulerBox.addView(gui3d.Slider(value = 0.0, min = -180, max = 180, label = "X: %d"))
-        self.EYslider = self.eulerBox.addView(gui3d.Slider(value = 0.0, min = -180, max = 180, label = "Y: %d"))
-        self.EZslider = self.eulerBox.addView(gui3d.Slider(value = 0.0, min = -180, max = 180, label = "Z: %d"))
+        self.EXslider = self.eulerBox.addWidget(gui.Slider(value = 0.0, min = -180, max = 180, label = "X: %d"))
+        self.EYslider = self.eulerBox.addWidget(gui.Slider(value = 0.0, min = -180, max = 180, label = "Y: %d"))
+        self.EZslider = self.eulerBox.addWidget(gui.Slider(value = 0.0, min = -180, max = 180, label = "Z: %d"))
 
-        self.rotSlider = self.mainBox.addView(gui3d.Slider(value = 0.0, min = -180, max = 180, label = "Rotation: %d"))
-        self.rotWorld = self.mainBox.addView(gui3d.CheckBox("World Rotation", False))
+        self.rotSlider = self.mainBox.addWidget(gui.Slider(value = 0.0, min = -180, max = 180, label = "Rotation: %d"))
+        self.rotWorld = self.mainBox.addView(gui.CheckBox("World Rotation", False))
         rots = []
-        self.rotX = self.mainBox.addView(gui3d.RadioButton(rots, "X", True)) 
-        self.rotY = self.mainBox.addView(gui3d.RadioButton(rots, "Y", False)) 
-        self.rotZ = self.mainBox.addView(gui3d.RadioButton(rots, "Z", False)) 
+        self.rotX = self.mainBox.addView(gui.RadioButton(rots, "X", True)) 
+        self.rotY = self.mainBox.addView(gui.RadioButton(rots, "Y", False)) 
+        self.rotZ = self.mainBox.addView(gui.RadioButton(rots, "Z", False)) 
         
-        self.showMesh = self.mainBox.addView(gui3d.CheckBox("Show Mesh", True))
-        self.showRig = self.mainBox.addView(gui3d.CheckBox("Show Rig", False))
-        self.restPosition = self.mainBox.addView(gui3d.CheckBox("Rest Position", False))
+        self.showMesh = self.mainBox.addView(gui.CheckBox("Show Mesh", True))
+        self.showRig = self.mainBox.addView(gui.CheckBox("Show Rig", False))
+        self.restPosition = self.mainBox.addView(gui.CheckBox("Rest Position", False))
         
-        #self.updateButton = self.mainBox.addView(gui3d.Button("Update"))
-        self.reloadCharacterButton = self.mainBox.addView(gui3d.Button("Reload Character"))
-        self.zeroBoneButton = self.mainBox.addView(gui3d.Button("Zero Bone"))
-        self.zeroAllButton = self.mainBox.addView(gui3d.Button("Zero All"))
-        self.poseButton = self.mainBox.addView(gui3d.Button("Pose"))
-        self.testButton = self.mainBox.addView(gui3d.Button("Test bones"))
+        #self.updateButton = self.mainBox.addView(gui.Button("Update"))
+        self.reloadCharacterButton = self.mainBox.addView(gui.Button("Reload Character"))
+        self.zeroBoneButton = self.mainBox.addView(gui.Button("Zero Bone"))
+        self.zeroAllButton = self.mainBox.addView(gui.Button("Zero All"))
+        self.poseButton = self.mainBox.addView(gui.Button("Pose"))
+        self.testButton = self.mainBox.addView(gui.Button("Test bones"))
         self.mainBox.hide()
         self.quatBox.hide()
         self.eulerBox.hide()
@@ -225,22 +225,18 @@ class PoseArmatureTaskView(gui3d.TaskView):
                        
         @self.showMesh.mhEvent
         def onClicked(event):
-            gui3d.CheckBox.onClicked(self.showMesh, event)
             self.updateAll()                        
 
         @self.showMesh.mhEvent
         def onClicked(event):
-            gui3d.CheckBox.onClicked(self.showMesh, event)
             self.updateAll()                        
 
         @self.showRig.mhEvent
         def onClicked(event):
-            gui3d.CheckBox.onClicked(self.showRig, event)
             self.updateAll()                        
 
         @self.restPosition.mhEvent
         def onClicked(event):
-            gui3d.CheckBox.onClicked(self.restPosition, event)
             self.updateAll()                        
 
         @self.zeroBoneButton.mhEvent

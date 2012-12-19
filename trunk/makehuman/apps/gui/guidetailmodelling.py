@@ -554,7 +554,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         self.sliders = []
 
-        self.modifiersBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Modifiers', gui3d.GroupBoxStyle._replace(height=25+24*3+6))))
+        self.modifiersBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Modifiers')))
         
         modifierStyle = gui3d.ButtonStyle._replace(width=(112-4)/2, height=20)
 

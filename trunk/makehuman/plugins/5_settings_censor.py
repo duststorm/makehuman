@@ -3,17 +3,18 @@
 # We need this for gui controls
 
 import gui3d, aljabr, mh
+import qtgui as gui
     
 class CensorTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Censor')
         
-        self.mouseBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Censor', gui3d.GroupBoxStyle._replace(height=25+25*3+24+6)))
-        self.enableCensor = self.mouseBox.addView(gui3d.CheckBox("Enable", gui3d.app.settings.get('censor', False)))
+        self.mouseBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Censor')))
+        self.enableCensor = self.mouseBox.addWidget(gui.CheckBox("Enable", gui3d.app.settings.get('censor', False)))
         type = []
-        self.blackSquare = self.mouseBox.addView(gui3d.RadioButton(type, "Black", gui3d.app.settings.get('censorType', 'black') == 'black'));
-        self.mosaic = self.mouseBox.addView(gui3d.RadioButton(type, "Mosaic", gui3d.app.settings.get('censorType', 'black square') == 'mosaic'));
+        self.blackSquare = self.mouseBox.addWidget(gui.RadioButton(type, "Black", gui3d.app.settings.get('censorType', 'black') == 'black'));
+        self.mosaic = self.mouseBox.addWidget(gui.RadioButton(type, "Mosaic", gui3d.app.settings.get('censorType', 'black square') == 'mosaic'));
         
         human = gui3d.app.selectedHuman
 
@@ -37,7 +38,6 @@ class CensorTaskView(gui3d.TaskView):
             
         @self.enableCensor.mhEvent
         def onClicked(event):
-            gui3d.ToggleButton.onClicked(self.enableCensor, event)
             gui3d.app.settings['censor'] = self.enableCensor.selected
             if self.enableCensor.selected:
                 self.updateCensor()

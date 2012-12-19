@@ -11,6 +11,8 @@ import mh2povray
 # We need this for gui controls
 
 import gui3d
+import mh
+import qtgui as gui
 
 print 'povray imported'
 
@@ -21,17 +23,17 @@ class PovrayTaskView(gui3d.TaskView):
         
         # for path to PovRay binaries file
         binarie = ''
-        y = 80
+
         bintype = []
-        pathBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Povray  bin  path')); y +=25+16 
+        pathBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Povray  bin  path')))
         # this part load old settings values for next session; str(povray_bin)
         povray_bin = gui3d.app.settings.get('povray_bin', '')
-        self.path= pathBox.addView(gui3d.TextEdit(str(povray_bin), gui3d.TextEditStyle._replace(width=112))); y +=24 
+        self.path= pathBox.addWidget(gui.TextEdit(str(povray_bin), gui3d.TextEditStyle._replace(width=112)))
         #
         if os.name == 'nt':
             #
             if os.environ['PROCESSOR_ARCHITECTURE'] == 'x86':
-                self.win32sse2Button = pathBox.addView(gui3d.CheckBox('Use SSE2 bin', True)); y +=24
+                self.win32sse2Button = pathBox.addView(gui3d.CheckBox('Use SSE2 bin', True))
         #
         @self.path.mhEvent
         def onChange(value):
@@ -39,24 +41,24 @@ class PovrayTaskView(gui3d.TaskView):
         #------------------------------------------------------------------------------------
         filter = []
         # Options box
-        optionsBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options')); y +=25+16 
-        self.useSSS = optionsBox.addView(gui3d.CheckBox('Use S.S. Scattering', False)); y +=24
+        optionsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Options')))
+        self.useSSS = optionsBox.addWidget(gui.CheckBox('Use S.S. Scattering', False))
         
         # box
-        #optionsBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*7+6))); y +=25+16
+        #optionsBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+24*7+6)))
         
         #Buttons
         # Simplified the gui a bit for the average user. Uncomment to clutter it up with developer - useful stuff.
         #source=[]
-        #self.iniButton = optionsBox.addView(gui3d.RadioButton(source, 'Use ini settings')); y +=24
-        #self.guiButton = optionsBox.addView(gui3d.RadioButton(source, 'Use gui settings', selected = True)); y +=24
+        #self.iniButton = optionsBox.addWidget(gui.RadioButton(source, 'Use ini settings'))
+        #self.guiButton = optionsBox.addWidget(gui.RadioButton(source, 'Use gui settings', selected = True))
         format=[]
-        self.arrayButton = optionsBox.addView(gui3d.RadioButton(format, 'Array  format')); y +=24
-        self.mesh2Button = optionsBox.addView(gui3d.RadioButton(format, 'Mesh2 format', selected = True)); y +=24
+        self.arrayButton = optionsBox.addWidget(gui.RadioButton(format, 'Array  format'))
+        self.mesh2Button = optionsBox.addWidget(gui.RadioButton(format, 'Mesh2 format', selected = True))
         #action=[]
-        #self.exportButton = optionsBox.addView(gui3d.RadioButton(action , 'Export only', selected = True)); y +=24
-        #self.exportandrenderButton = optionsBox.addView(gui3d.RadioButton(action , 'Export and render')); y +=24
-        self.renderButton = optionsBox.addView(gui3d.Button('Render')); y +=24
+        #self.exportButton = optionsBox.addWidget(gui.RadioButton(action , 'Export only', selected = True))
+        #self.exportandrenderButton = optionsBox.addWidget(gui.RadioButton(action , 'Export and render'))
+        self.renderButton = optionsBox.addWidget(gui.Button('Render'))
         
         #        
         @self.renderButton.mhEvent

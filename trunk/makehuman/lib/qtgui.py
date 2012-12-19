@@ -82,7 +82,7 @@ class TabBar(QtGui.QTabBar, TabsBase):
         return super(TabBar, self)._addTab(label)
 
 class GroupBox(QtGui.QGroupBox, Widget):
-    def __init__(self, label='', style=None):
+    def __init__(self, label = ''):
         label = self.getLanguageString(label) if label else ''
         QtGui.QGroupBox.__init__(self, label)
         Widget.__init__(self)

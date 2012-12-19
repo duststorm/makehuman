@@ -4,6 +4,8 @@
 
 import gui3d
 import webbrowser
+import mh
+import qtgui as gui
 
 class HelpTaskView(gui3d.TaskView):
 
@@ -11,11 +13,11 @@ class HelpTaskView(gui3d.TaskView):
         
         gui3d.TaskView.__init__(self, category, 'Help')
 
-        optionsBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Support options', gui3d.GroupBoxStyle._replace(height=25+24*4+6)))
-        self.manualButton = optionsBox.addView(gui3d.Button("Manual"))
-        self.reportBugButton = optionsBox.addView(gui3d.Button("Report bug"))
-        self.requestFeatureButton = optionsBox.addView(gui3d.Button("Request feature"))
-        self.donateButton = optionsBox.addView(gui3d.Button("Donate"))
+        optionsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Support options')))
+        self.manualButton = optionsBox.addWidget(gui.Button("Manual"))
+        self.reportBugButton = optionsBox.addWidget(gui.Button("Report bug"))
+        self.requestFeatureButton = optionsBox.addWidget(gui.Button("Request feature"))
+        self.donateButton = optionsBox.addWidget(gui.Button("Donate"))
         
         @self.manualButton.mhEvent
         def onClicked(event):

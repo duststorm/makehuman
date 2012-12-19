@@ -9,6 +9,8 @@ if 'nt' in sys.builtin_module_names:
     sys.path.append('./pythonmodules')
 import subprocess
 import mh2renderman
+import mh
+import qtgui as gui
 
 def which(program):
     """
@@ -46,15 +48,15 @@ class AqsisTaskView(gui3d.TaskView):
 
         self.sceneToRender = None
 
-        optionsBox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Options', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*1+6)))
+        optionsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Options')))
                                               
         #Sliders                            
-        self.shadingRateSlider= optionsBox.addView(gui3d.Slider(value=2, min=0.1, max=10, label = "ShadingRate: %.2f"))
-        self.samplesSlider= optionsBox.addView(gui3d.Slider(value=2, min=1.0, max=10, label = "Samples: %.2f"))
-        self.skinOilSlider= optionsBox.addView(gui3d.Slider(value=0.3, min=0.0, max=10, label = "Skin Oil: %.2f"))
+        self.shadingRateSlider= optionsBox.addWidget(gui.Slider(value=2, min=0.1, max=10, label = "ShadingRate: %.2f"))
+        self.samplesSlider= optionsBox.addWidget(gui.Slider(value=2, min=1.0, max=10, label = "Samples: %.2f"))
+        self.skinOilSlider= optionsBox.addWidget(gui.Slider(value=0.3, min=0.0, max=10, label = "Skin Oil: %.2f"))
         
         #Buttons
-        self.renderButton = optionsBox.addView(gui3d.Button('Render'))
+        self.renderButton = optionsBox.addWidget(gui.Button('Render'))
             
         @self.shadingRateSlider.mhEvent
         def onChanging(value):

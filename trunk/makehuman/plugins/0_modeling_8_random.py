@@ -3,19 +3,22 @@
 # We need this for gui controls
 
 import gui3d, random, humanmodifier
+import mh
+import qtgui as gui
+
 class RandomTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Random')
         
-        toolbox = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Tools', gui3d.GroupBoxStyle._replace(height=25+24*4+6)))
-        self.macro = toolbox.addView(gui3d.CheckBox("Macro", True))
-        self.height = toolbox.addView(gui3d.CheckBox("Height"))
-        self.face = toolbox.addView(gui3d.CheckBox("Face"))
-        self.symmetry = toolbox.addView(gui3d.Slider(value=-1.0, min=-1.0, max=1.0, label="Symmetry"))
-        self.amount = toolbox.addView(gui3d.Slider(value=0.5, label="Amount"))
-        self.create = toolbox.addView(gui3d.Button("Replace current"))
-        self.modify = toolbox.addView(gui3d.Button("Adjust current"))
+        toolbox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Tools')))
+        self.macro = toolbox.addWidget(gui.CheckBox("Macro", True))
+        self.height = toolbox.addWidget(gui.CheckBox("Height"))
+        self.face = toolbox.addWidget(gui.CheckBox("Face"))
+        self.symmetry = toolbox.addWidget(gui.Slider(value=-1.0, min=-1.0, max=1.0, label="Symmetry"))
+        self.amount = toolbox.addWidget(gui.Slider(value=0.5, label="Amount"))
+        self.create = toolbox.addWidget(gui.Button("Replace current"))
+        self.modify = toolbox.addWidget(gui.Button("Adjust current"))
 
         self.lastRandoms = {}
         

@@ -7,7 +7,8 @@ import gui3d
 import os
 import poseengine
 print 'Pose plugin imported'
-
+import mh
+import qtgui as gui
 
 class PoseTaskView(gui3d.TaskView):
 
@@ -27,22 +28,21 @@ class PoseTaskView(gui3d.TaskView):
         self.shoulder.keyRot1 = [-135,-67,0,45]
         self.shoulder.keyRot2 = [-115,-90,-67,-45,-22,0,22,45,67,90]
 
-        box = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Shoulder', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6)))
+        box = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Shoulder')))
 
-        self.shoulderXslider = box.addView(gui3d.Slider(value = 0.0, min = -85, max = 80, label = "RotX: %d"))
-        self.shoulderYslider = box.addView(gui3d.Slider(value = 0.0, min = -140, max = 50, label = "RotY: %d"))
-        self.shoulderZslider = box.addView(gui3d.Slider(value = 0.0, min = -120, max = 90, label = "RotZ: %d"))
+        self.shoulderXslider = box.addWidget(gui.Slider(value = 0.0, min = -85, max = 80, label = "RotX: %d"))
+        self.shoulderYslider = box.addWidget(gui.Slider(value = 0.0, min = -140, max = 50, label = "RotY: %d"))
+        self.shoulderZslider = box.addWidget(gui.Slider(value = 0.0, min = -120, max = 90, label = "RotZ: %d"))
 
         self.savePoseFiles = 0
 
-        self.resetPoseButton = box.addView(gui3d.Button("Reset"))
-        self.testPoseButton = box.addView(gui3d.Button("Test"))
+        self.resetPoseButton = box.addWidget(gui.Button("Reset"))
+        self.testPoseButton = box.addWidget(gui.Button("Test"))
         
-        self.savePoseToggle = box.addView(gui3d.CheckBox("SavePose"))
+        self.savePoseToggle = box.addWidget(gui.CheckBox("SavePose"))
 
         @self.savePoseToggle.mhEvent
         def onClicked(event):
-            gui3d.ToggleButton.onClicked(self.savePoseToggle, event)
             if self.savePoseToggle.selected:
                 print "Save Pose activated"
             else:

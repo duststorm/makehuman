@@ -55,17 +55,17 @@ class PoseTaskView(gui3d.TaskView):
     self.selectedGroups = []
     self.joint = None
             
-    self.box = self.addView(gui3d.GroupBox([10, 80, 9.0], 'Rotation', gui3d.GroupBoxStyle._replace(height=25+36*3+4+24*3+6)))
+    self.box = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Rotation')))
 
-    self.Xslider = self.box.addView(gui3d.Slider(value = 0.0, min = -180.0, max = 180.0, label = "RotX: %d"))
-    self.Yslider = self.box.addView(gui3d.Slider(value = 0.0, min = -180.0, max = 180.0, label = "RotY: %d"))
-    self.Zslider = self.box.addView(gui3d.Slider(value = 0.0, min = -180.0, max = 180.0, label = "RotZ: %d"))
+    self.Xslider = self.box.addWidget(gui.Slider(value = 0.0, min = -180.0, max = 180.0, label = "RotX: %d"))
+    self.Yslider = self.box.addWidget(gui.Slider(value = 0.0, min = -180.0, max = 180.0, label = "RotY: %d"))
+    self.Zslider = self.box.addWidget(gui.Slider(value = 0.0, min = -180.0, max = 180.0, label = "RotZ: %d"))
     
-    self.skin = self.box.addView(gui3d.CheckBox("Skin", False))
+    self.skin = self.box.addWidget(gui.CheckBox("Skin", False))
     
-    self.resetPoseButton = self.box.addView(gui3d.Button("Reset"))
-    self.savePoseButton = self.box.addView(gui3d.Button("Save"))
-    self.testButton = self.box.addView(gui3d.Button("Test"))
+    self.resetPoseButton = self.box.addWidget(gui.Button("Reset"))
+    self.savePoseButton = self.box.addWidget(gui.Button("Save"))
+    self.testButton = self.box.addWidget(gui.Button("Test"))
     
     #get bindings for r-shoulder-joint
     f = open("utils/makepose/r-shoulder-joint.txt")
