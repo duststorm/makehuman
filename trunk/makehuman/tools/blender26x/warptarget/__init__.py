@@ -105,9 +105,14 @@ class WarpTargetPanel(bpy.types.Panel):
             layout.operator("mh.load_target_character")
         
         layout.label("Target Morph")
+        layout.prop(scn, "MhNeutral", expand=True)
         layout.prop(scn, "MhTargetMorphTopDir")
         layout.prop(scn, "MhTargetMorphDir")
         layout.prop(scn, "MhTargetMorphFile")
+
+        layout.separator()
+        layout.label("Warp method")
+        layout.prop(scn, "MhWarpPart", expand=True)
 
         layout.separator()
         split = layout.split(0.8)

@@ -85,7 +85,7 @@ class CCharacter:
         scn.MhTone = self.tone
 
 
-    def updateFiles(self):
+    def updateFiles(self, scn):
         if self.race == "caucasian":
             race = "neutral"
         else:
@@ -94,16 +94,18 @@ class CCharacter:
         self.files = [(macro, 1.0)]
         
         univ = "universal-" + self.gender + "-" + self.age
-        if self.weight != "normal":
-            weight = univ + "-" + self.weight        
-            self.files.append( (weight, 1.0) )
-        
+
         if self.tone != "normal":
             tone = univ + "-" + self.tone        
-            self.files.append( (tone, 1.0) )
             if self.weight != "normal":
                 weight = tone + "-" + self.weight        
                 self.files.append( (weight, 1.0) )
+            else:            
+                self.files.append( (tone, 1.0) )
+        elif self.weight != "normal":
+            weight = univ + "-" + self.weight      
+            self.files.append( (weight, 1.0) )
+        
                 
     
     def fromFilePath(self, context, filepath, update):
@@ -147,12 +149,14 @@ class CCharacter:
                     prop = eval("self.%s" % table[word])
                 except KeyError:
                     continue
+                if prop == "caucasian":
+                    prop = context.scene.MhNeutral
                 print("change", word, prop)
                 filepath = filepath.replace(word, prop)
                 print(filepath)
         
         #self.setSceneProps(context)
-        self.updateFiles()
+        self.updateFiles(context.scene)
         return filepath
     
     
@@ -222,4 +226,9 @@ def init():
         name="Age",
         default = 'normal')
         
+    bpy.types.Scene.MhNeutral = EnumProperty(
+            name="Neutral/Caucasian",
+            items=(('neutral', 'neutral', 'neutral'),('caucasian', 'caucasian', 'caucasian')),
+            default = 'caucasian')
+
 

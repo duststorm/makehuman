@@ -57,7 +57,7 @@ class VIEW3D_OT_CreateBaseCharacterButton(bpy.types.Operator):
             
         char = character.CCharacter("Base")
         char.setCharacterProps(context)
-        char.updateFiles()
+        char.updateFiles(scn)
         char.loadTargets(context)
         
         base = char.object

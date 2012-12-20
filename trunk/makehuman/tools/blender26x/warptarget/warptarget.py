@@ -169,7 +169,7 @@ class VIEW3D_OT_UpdateTargetCharacterButton(bpy.types.Operator):
     def execute(self, context):
         the.TargetCharacter.character.setCharacterProps(context)
         updateTargetMorph(context)
-        the.TargetCharacter.character.updateFiles()
+        the.TargetCharacter.character.updateFiles(context.scene)
         return{'FINISHED'}    
 
 
@@ -197,20 +197,63 @@ def subFromMorph(ylocs, y0):
     return dys
     
     
-def saveTarget(path, dxs):
+def getVertexRange(locs, first, last):
+    part = {}
+    for n in range(first,last):
+        part[n] = locs[n]
+    return part
+    
+    
+def saveTarget(path, dxs, scn, first, last):
     print("Saving target %s" % path)
     folder = os.path.dirname(path)
     if not os.path.isdir(folder):
-    	print("Creating target folder %s" % folder)
-    	os.makedirs(folder)    
+        print("Creating target folder %s" % folder)
+        os.makedirs(folder)    
+        
+    before,after = readLines(path, first, last)
+    print("RL", len(before), len(after), first, last)
+    #halt
+        
     fp = open(path, "w")
     keys = list( dxs.keys() )
     keys.sort()
+    
+    for line in before:
+        fp.write(line)
     for n in keys:
-        dx = dxs[n]
-        fp.write("%d %.4g %.4g %.4g\n" % (n, dx[0], dx[1], dx[2]))
+        if n >= first and n < last:
+            dx = dxs[n]
+            fp.write("%d %.4g %.4g %.4g\n" % (n, dx[0], dx[1], dx[2]))
+    for line in after:
+        fp.write(line)
     fp.close()
     return        
+
+
+def readLines(filepath, first, last):
+    fp = open(filepath, "rU")
+    before = []
+    after = []
+    for line in fp:
+        words = line.split()
+        if len(words) >= 2:
+            vn = int(words[0])
+            if vn >= last:
+                after.append(line)
+            elif vn < first:
+                before.append(line)
+    fp.close()
+    return before,after
+    
+    
+def saveVerts(fp, ob, verts, saveAll, first, last, offs):
+    for n in range(first, last):
+        vco = verts[n-offs]
+        bv = ob.data.vertices[n-offs]
+        vec = vco - bv.co
+        if vec.length > the.Epsilon and (saveAll or bv.select):
+            fp.write("%d %.6f %.6f %.6f\n" % (n, vec[0], vec[2], -vec[1]))
 
 
 def printVerts(string, verts, keys):
@@ -232,19 +275,40 @@ def warpMorph(context):
         for file in os.listdir(srcDir):
             (fname, ext) = os.path.splitext(file)
             if ext == ".target":
-                warpSingleMorph(os.path.join(srcDir, file), os.path.join(trgDir, file), warpField)
+                warpSingleMorph(os.path.join(srcDir, file), os.path.join(trgDir, file), warpField, scn)
     else:
-        warpSingleMorph(srcPath, trgPath, warpField)
+        warpSingleMorph(srcPath, trgPath, warpField, scn)
     print("File(s) warped")        
         
-        
-def warpSingleMorph(srcPath, trgPath, warpField): 
+
+VertexRange = {
+    'Skirt':    (the.FirstSkirtVert, the.FirstTightsVert),
+    'Tights':    (the.FirstTightsVert, the.NTotalVerts)
+}
+    
+def warpSingleMorph(srcPath, trgPath, warpField, scn): 
     print("Warp %s -> %s" % (srcPath, trgPath))
-    dxs = the.SourceCharacter.readMorph(srcPath)
-    xlocs = addToMorph(dxs, the.SourceCharacter.verts)
-    ylocs = warpField.warpLocations(xlocs)
-    dys = subFromMorph(ylocs, the.TargetCharacter.verts)
-    saveTarget(trgPath, dys)            
+    if scn.MhWarpPart == 'All':    
+        dxs = the.SourceCharacter.readMorph(srcPath)
+        xlocs = addToMorph(dxs, the.SourceCharacter.verts)
+        ylocs = warpField.warpLocations(xlocs)
+        dys = subFromMorph(ylocs, the.TargetCharacter.verts)
+        saveTarget(trgPath, dys, scn, 0, the.NTotalVerts)            
+    else:
+        first, last = VertexRange[scn.MhWarpPart]
+        print(scn.MhWarpPart, first, last)
+        dyOld = the.TargetCharacter.readMorph(trgPath)
+        dyOldPart = getVertexRange(dyOld, first, last)
+        basePart = getVertexRange(the.TargetCharacter.verts, first, last)
+        basePart = subFromMorph(basePart, dyOldPart)
+
+        xsPart = getVertexRange(the.SourceCharacter.verts, first, last)
+        ysPart = warpField.warpLocations(xsPart)
+        dyNew = subFromMorph(ysPart, basePart)
+        saveTarget(trgPath, dyNew, scn, first, last)            
+        
+
+
     """
     keys = list( dxs.keys() )
     keys.sort()
@@ -300,6 +364,16 @@ def init():
         name = "Warp All Morphs In Directory",
         default = False)
 
+    bpy.types.Scene.MhWarpPart = EnumProperty(
+            name="Warp part",
+            description="Part of character to be warped",
+            items=(('Skirt', 'Skirt', 'Skirt'),
+                   ('Tights', 'Tights', 'Tights'),
+                   ('All', 'All', 'All'),
+                  ),
+            default='All',
+            )
+  
 
 
     the.SourceCharacter = CWarpCharacter("Source")
