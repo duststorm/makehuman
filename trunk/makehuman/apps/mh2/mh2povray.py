@@ -1100,6 +1100,8 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
         print 'Error opening file to read static content.'
         return 0
     staticContentLines = staticContentFileDescriptor.read()
+    staticContentLines = string.replace(staticContentLines, '%%SSS%%', '' if settings['SSS'] == True else '//')
+    staticContentLines = string.replace(staticContentLines, '%%SSSQ%%', str(settings['SSSQ']))    
     outputFileDescriptor.write(staticContentLines)
     outputFileDescriptor.write('\n')
     staticContentFileDescriptor.close()

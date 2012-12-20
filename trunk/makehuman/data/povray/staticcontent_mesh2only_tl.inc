@@ -1,3 +1,9 @@
+// Some global settings about the model.
+global_settings {
+    %%SSS%%subsurface { samples %%SSSQ%%, %%SSSQ%% }    // Enable SSS if set.
+    mm_per_unit 9581.7       // Adjust this for more accuracy.      
+}
+
 // Create a camera definition based on the MakeHuman camera settings when this 
 // file was generated. We need to convert between the OpenGL vertical FOV and 
 // the horizontal POV-Ray camera angle. We also need to account for the way 
@@ -42,7 +48,7 @@
         ambient 0.3 // rgb <0.00,0.00,0.00>
         diffuse 2.0
         reflection{0 } conserve_energy
-        // subsurface {translucency 0.6} //0.8}
+        subsurface {translucency rgb <0.1,1,0.8>} //0.8} //0.6}
     }
 
 //material{

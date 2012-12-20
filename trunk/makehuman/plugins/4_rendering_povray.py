@@ -43,6 +43,7 @@ class PovrayTaskView(gui3d.TaskView):
         # Options box
         optionsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Options')))
         self.useSSS = optionsBox.addWidget(gui.CheckBox('Use S.S. Scattering', False))
+        self.SSSQ = optionsBox.addWidget(gui.Slider(value=0.5, label="SSS Quality"))
         
         # box
         #optionsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Options')))
@@ -85,7 +86,8 @@ class PovrayTaskView(gui3d.TaskView):
                                     'format':'array' if self.arrayButton.selected else 'mesh2',
                                     'action':'render',      # 'export' if self.exportButton.selected else 'render',
                                     'bintype': binarie,
-                                    'SSS': True if self.useSSS.selected else False}) 
+                                    'SSS': True if self.useSSS.selected else False,
+                                    'SSSQ':50 * self.SSSQ.getValue()}) 
 
     def onShow(self, event):
         self.renderButton.setFocus()
