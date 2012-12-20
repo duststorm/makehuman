@@ -19,6 +19,11 @@ class Widget(events3d.EventHandler):
     def __init__(self):
         events3d.EventHandler.__init__(self)
 
+    def callEvent(self, eventType, event):
+        super(Widget, self).callEvent(eventType, event)
+        if G.app and G.app.mainwin and G.app.mainwin.canvas:
+            G.app.mainwin.canvas.update()
+
     @staticmethod
     def getLanguageString(text):
         return text
@@ -47,7 +52,6 @@ class TabsBase(Widget):
         if tab:
             self.callEvent('onTabSelected', tab)
             tab.callEvent('onClicked', tab)
-            G.app.mainwin.update()
 
 class Tabs(QtGui.QTabWidget, TabsBase):
     def __init__(self, parent = None):
