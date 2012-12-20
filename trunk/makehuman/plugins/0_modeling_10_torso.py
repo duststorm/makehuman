@@ -6,6 +6,8 @@ import gui3d
 import humanmodifier
 from string import Template
 import re
+import mh
+import qtgui as gui
 
 print 'Arms and leg imported'
 
@@ -74,15 +76,15 @@ class DetailSlider(humanmodifier.ModifierSlider):
         
         humanmodifier.ModifierSlider.__init__(self, value, min, max, label, modifier=modifier)
 
-class GroupBoxRadioButton(gui3d.RadioButton):
+class GroupBoxRadioButton(gui.RadioButton):
     def __init__(self, group, label, groupBox, selected=False):
-        gui3d.RadioButton.__init__(self, group, label, selected, style=gui3d.ButtonStyle)
+        super(GroupBoxRadioButton, self).__init__(group, label, selected)
         self.groupBox = groupBox
         
     def onClicked(self, event):
-        gui3d.RadioButton.onClicked(self, event)
-        self.parent.parent.hideAllBoxes()
-        self.groupBox.show()
+        self.parentWidget()._parent.groupBox.showWidget(self.groupBox)
+        # self.parentWidget()._parent.hideAllBoxes()
+        # self.groupBox.show()
         
 class TorsoSlider(humanmodifier.ModifierSlider):
     def __init__(self,modifier, image, view):
@@ -129,8 +131,6 @@ class TorsoTaskView(gui3d.TaskView):
                                                       
                 ]]), 
             ]
-
-        y = 80
         
         self.groupBoxes = []
         self.radioButtons = []
@@ -138,8 +138,8 @@ class TorsoTaskView(gui3d.TaskView):
         
         self.modifiers = {}
         
-        self.categoryBox = self.addView(gui3d.GroupBox([650, y, 9.0], 'Category'))
-        y += 25
+        self.categoryBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Category')))
+        self.groupBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.StackedBox()))
         
         for name, templates in features:
             
@@ -153,21 +153,18 @@ class TorsoTaskView(gui3d.TaskView):
                         title = '%s %d' % (name.capitalize(), index / 12 + 1)
                         
                     # Create box
-                    box = self.addView(gui3d.GroupBox([10, 80, 9.0], title, gui3d.GroupBoxStyle._replace(width=128+112+4)))
+                    box = self.groupBox.addWidget(gui.GroupBox(title))
                     self.groupBoxes.append(box)
                     
                     # Create radiobutton
-                    radio = self.categoryBox.addView(GroupBoxRadioButton(self.radioButtons, title, box, selected=len(self.radioButtons) == 0))
-                    y += 24
+                    radio = self.categoryBox.addWidget(GroupBoxRadioButton(self.radioButtons, title, box, selected=len(self.radioButtons) == 0))
             
                 # Create sliders
                 modifier = humanmodifier.GenderAgeEthnicAsymmetricModifier(template[0], 'value', template[2], template[3], False)
                 self.modifiers['%s%d' % (name, index + 1)] = modifier
 
-                slider = box.addView(TorsoSlider(modifier, '%s%s-%s-%s.png' % (template[4], template[1], template[2], template[3]), template[5]))
+                slider = box.addWidget(TorsoSlider(modifier, '%s%s-%s-%s.png' % (template[4], template[1], template[2], template[3]), template[5]))
                 self.sliders.append(slider)
-                
-        y += 16
 
         self.specialModifiers = {}
 
@@ -177,16 +174,17 @@ class TorsoTaskView(gui3d.TaskView):
         
         slider = DetailSlider(0.0, -1.0, 1.0, "Pelvis tone", self.specialModifiers['pelvisTone']);
         self.sliders.append(slider)
-        self.categoryBox.addView(slider);
+        self.categoryBox.addWidget(slider);
         slider = DetailSlider(0.0, -1.0, 1.0, "Stomach", self.specialModifiers['stomach']);
         self.sliders.append(slider)
-        self.categoryBox.addView(slider);
+        self.categoryBox.addWidget(slider);
         slider = DetailSlider(0.0, -1.0, 1.0, "Buttocks", self.specialModifiers['buttocks']);
         self.sliders.append(slider)
-        self.categoryBox.addView(slider);
+        self.categoryBox.addWidget(slider);
 
-        self.hideAllBoxes()
-        self.groupBoxes[0].show()
+        self.groupBox.showWidget(self.groupBoxes[0])
+        # self.hideAllBoxes()
+        # self.groupBoxes[0].show()
         
     def hideAllBoxes(self):
         

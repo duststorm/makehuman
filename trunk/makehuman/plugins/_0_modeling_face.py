@@ -15,19 +15,18 @@ class GroupBoxRadioButton(gui.RadioButton):
         self.groupBox = groupBox
         
     def onClicked(self, event):
-        self.parentWidget()._parent.hideAllBoxes()
-        self.groupBox.show()
+        self.parentWidget()._parent.groupBox.showWidget(self.groupBox)
         
 class FaceSlider(humanmodifier.ModifierSlider):
-    def __init__(self, parent, label, modifier):
+    def __init__(self, label, modifier):
         
-        humanmodifier.ModifierSlider.__init__(self, parent, label=label, modifier=modifier)
+        humanmodifier.ModifierSlider.__init__(self, label=label, modifier=modifier)
         
 class DetailSlider(humanmodifier.ModifierSlider):
     
-    def __init__(self, parent, value, min, max, label, modifier):
+    def __init__(self, value, min, max, label, modifier):
         
-        humanmodifier.ModifierSlider.__init__(self, parent, value, min, max, label, modifier=modifier)
+        humanmodifier.ModifierSlider.__init__(self, value, min, max, label, modifier=modifier)
         
 class AsymmetricDetailModifier(humanmodifier.GenderAgeAsymmetricModifier):
     
@@ -58,8 +57,6 @@ class FaceTaskView(gui3d.TaskView):
             ('head', ['data/targets/details/neutral_${gender}-${age}-head%d.target' % i for i in xrange(1, 9)]),
             ]
 
-        y = 80
-        
         self.groupBoxes = []
         self.radioButtons = []
         self.sliders = []
@@ -67,6 +64,7 @@ class FaceTaskView(gui3d.TaskView):
         self.modifiers = {}
         
         self.categoryBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Category')))
+        self.groupBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.StackedBox()))
         
         for name, templates in features:
             
@@ -80,36 +78,26 @@ class FaceTaskView(gui3d.TaskView):
                         title = '%s %d' % (name.capitalize(), index / 10 + 1)
                         
                     # Create box
-                    box = gui3d.GroupBox(self, [10, 80, 9.0], title, gui3d.GroupBoxStyle._replace(height=25+36*min(len(templates)-index, 10)+6))
+                    box = self.groupBox.addWidget(gui.GroupBox(title))
                     self.groupBoxes.append(box)
                     
                     # Create radiobutton
                     radio = self.categoryBox.addWidget(GroupBoxRadioButton(self.radioButtons, title, box, selected=len(self.radioButtons) == 0))
-                    y += 24
             
                 # Create sliders
                 modifier = humanmodifier.GenderAgeModifier(template)
                 self.modifiers['%s%d' % (name, index + 1)] = modifier
-                slider = FaceSlider(box, '%s %d' % (name.capitalize(), index + 1), modifier)
+                slider = box.addWidget(FaceSlider('%s %d' % (name.capitalize(), index + 1), modifier))
                 self.sliders.append(slider)
-                
-        y += 16
 
-        self.hideAllBoxes()
-        self.groupBoxes[0].show()
+        self.groupBox.showWidget(self.groupBoxes[0])
         
         self.headAgeModifier = AsymmetricDetailModifier('data/targets/details/${gender}-${age}-head-age${headAge}.target', 'headAge', '1', '2', False)
         self.faceAngleModifier = humanmodifier.Modifier('data/targets/details/facial-angle1.target', 'data/targets/details/facial-angle2.target')
 
-        self.headBox = gui3d.GroupBox(self, [650, y, 9.0], 'Head', gui3d.GroupBoxStyle._replace(height=25+36*2+6))
-        self.sliders.append(DetailSlider(self.headBox, 0.0, -1.0, 1.0, "Age", self.headAgeModifier))
-        self.sliders.append(DetailSlider(self.headBox, 0.0, -1.0, 1.0, "Face angle", self.faceAngleModifier))
-        
-    def hideAllBoxes(self):
-        
-        for box in self.groupBoxes:
-            
-            box.hide()
+        self.headBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Head')))
+        self.sliders.append(self.headBox.addWidget(DetailSlider(0.0, -1.0, 1.0, "Age", self.headAgeModifier)))
+        self.sliders.append(self.headBox.addWidget(DetailSlider(0.0, -1.0, 1.0, "Face angle", self.faceAngleModifier)))
     
     def onShow(self, event):
 

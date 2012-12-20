@@ -111,13 +111,11 @@ class PelvisStomachTaskView(gui3d.TaskView):
         
         self.sliders = []
         
-        y = 80
-        self.pelvisBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Pelvis', gui3d.GroupBoxStyle._replace(height=25+36*3+6)));y+=25
+        self.pelvisBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Pelvis')))
         
-        self.sliders.append(self.pelvisBox.addView(DetailSlider(0.0, -1.0, 1.0, "Pelvis tone", self.modifiers['pelvisTone'])));y+=36
-        self.sliders.append(self.pelvisBox.addView(DetailSlider(0.0, -1.0, 1.0, "Stomach", self.modifiers['stomach'])));y+=36
-        self.sliders.append(self.pelvisBox.addView(DetailSlider(0.0, -1.0, 1.0, "Buttocks", self.modifiers['buttocks'])));y+=36
-        y+=16
+        self.sliders.append(self.pelvisBox.addWidget(DetailSlider(0.0, -1.0, 1.0, "Pelvis tone", self.modifiers['pelvisTone'])))
+        self.sliders.append(self.pelvisBox.addWidget(DetailSlider(0.0, -1.0, 1.0, "Stomach", self.modifiers['stomach'])))
+        self.sliders.append(self.pelvisBox.addWidget(DetailSlider(0.0, -1.0, 1.0, "Buttocks", self.modifiers['buttocks'])))
 
     def onShow(self, event):
         self.sliders[0].setFocus()

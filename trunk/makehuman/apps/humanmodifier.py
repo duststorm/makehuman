@@ -32,6 +32,7 @@ from operator import mul
 import math
 import re
 import numpy as np
+import qtgui as gui
 
 class DetailAction:
 
@@ -81,13 +82,13 @@ class ModifierAction:
         self.postAction()
         return True
         
-class ModifierSlider(gui3d.Slider):
+class ModifierSlider(gui.Slider):
     
     def __init__(self, value=0.0, min=0.0, max=1.0, label=None,
         style=gui3d.SliderStyle, thumbStyle=gui3d.SliderThumbStyle, modifier=None, valueConverter=None,
         warpResetNeeded=True):
-        
-        gui3d.Slider.__init__(self, value, min, max, label, style, thumbStyle, valueConverter)
+        vertical = style.orientation == gui3d.OrientationVertical
+        super(ModifierSlider, self).__init__(value, min, max, label, vertical, valueConverter)
         self.modifier = modifier
         self.value = None
         self.warpResetNeeded = warpResetNeeded

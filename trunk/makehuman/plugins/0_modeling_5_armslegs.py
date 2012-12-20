@@ -15,8 +15,9 @@ class GroupBoxRadioButton(gui.RadioButton):
         self.groupBox = groupBox
         
     def onClicked(self, event):
-        self.parentWidget()._parent.hideAllBoxes()
-        self.groupBox.show()
+        self.parentWidget()._parent.groupBox.showWidget(self.groupBox)
+        # self.parentWidget()._parent.hideAllBoxes()
+        # self.groupBox.show()
         
 class HeadSlider(humanmodifier.ModifierSlider):
     def __init__(self,modifier, image, view):
@@ -148,16 +149,14 @@ class HeadTaskView(gui3d.TaskView):
                 ]]), 
             ]
 
-        y = 80
-        
         self.groupBoxes = []
         self.radioButtons = []
         self.sliders = []
         
         self.modifiers = {}
         
-        self.categoryBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Category')))
-        y += 25
+        self.categoryBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Category')))
+        self.groupBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.StackedBox()))
         
         for name, templates in features:
             
@@ -171,24 +170,22 @@ class HeadTaskView(gui3d.TaskView):
                         title = '%s %d' % (name.capitalize(), index / 12 + 1)
                         
                     # Create box
-                    box = self.addView(gui3d.GroupBox([10, 80, 9.0], title, gui3d.GroupBoxStyle._replace(width=128+112+4)))
+                    box = self.groupBox.addWidget(gui.GroupBox(title))
                     self.groupBoxes.append(box)
                     
                     # Create radiobutton
                     radio = self.categoryBox.addWidget(GroupBoxRadioButton(self.radioButtons, title, box, selected=len(self.radioButtons) == 0))
-                    y += 24
             
                 # Create sliders
                 modifier = humanmodifier.GenderAgeEthnicAsymmetricModifier(template[0], 'value', template[2], template[3], False)
                 self.modifiers['%s%d' % (name, index + 1)] = modifier
 
-                slider = box.addView(HeadSlider(modifier, '%s%s-%s-%s.png' % (template[4], template[1], template[2], template[3]), template[5]))
+                slider = box.addWidget(HeadSlider(modifier, '%s%s-%s-%s.png' % (template[4], template[1], template[2], template[3]), template[5]))
                 self.sliders.append(slider)
-                
-        y += 16
 
-        self.hideAllBoxes()
-        self.groupBoxes[0].show()
+        self.groupBox.showWidget(self.groupBoxes[0])
+        # self.hideAllBoxes()
+        # self.groupBoxes[0].show()
         
     def hideAllBoxes(self):
         

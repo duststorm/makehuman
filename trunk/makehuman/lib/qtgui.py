@@ -111,18 +111,11 @@ class GroupBox(QtGui.QGroupBox, Widget):
     def children(self):
         return list(self.layout.itemAt(i).widget() for i in xrange(self.layout.count()))
 
-OrientationHorizontal = 0
-OrientationVertical = 1
-
-class SliderStyle(object):
-    def __init__(self):
-        self.orientation = OrientationHorizontal
-
 class Slider(QtGui.QWidget, Widget):
-    def __init__(self, value=0.0, min=0.0, max=1.0, label=None, orientation=OrientationHorizontal, valueConverter=None):
+    def __init__(self, value=0.0, min=0.0, max=1.0, label=None, vertical=False, valueConverter=None):
         super(Slider, self).__init__()
         Widget.__init__(self)
-        orient = (QtCore.Qt.Horizontal if orientation == OrientationHorizontal else QtCore.Qt.Vertical)
+        orient = (QtCore.Qt.Vertical if vertical else QtCore.Qt.Horizontal)
         self.slider = QtGui.QSlider(orient)
         self.min = min
         self.max = max
@@ -130,20 +123,26 @@ class Slider(QtGui.QWidget, Widget):
         self.slider.setMaximum(1000)
         self.slider.setValue(value)
         self.slider.setTracking(False)
+        self.hold_events = False
         self.connect(self.slider, QtCore.SIGNAL('sliderMoved(int)'), self._changing)
         self.connect(self.slider, QtCore.SIGNAL('valueChanged(int)'), self._changed)
 
         self.label = QtGui.QLabel(label or '')
         self.layout = QtGui.QGridLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.addWidget(self.label, 0, 0)
         self.layout.setColumnStretch(0, 0)
         self.layout.addWidget(self.slider, 0, 1)
         self.layout.setColumnStretch(1, 1)
 
     def _changing(self, value):
+        if self.hold_events:
+            return
         self.callEvent('onChanging', self._i2f(value))
 
     def _changed(self, value):
+        if self.hold_events:
+            return
         self.callEvent('onChange', self._i2f(value))
 
     def _f2i(self, x):
@@ -153,7 +152,9 @@ class Slider(QtGui.QWidget, Widget):
         return self.min + (x / 1000.0) * (self.max - self.min)
 
     def setValue(self, value):
+        self.hold_events = True
         self.slider.setValue(self._f2i(value))
+        self.hold_events = False
 
     def getValue(self):
         return self._i2f(self.slider.value())
@@ -383,3 +384,19 @@ class MouseActionEdit(QtGui.QLabel, Widget):
     def onChanged(self, shortcut):
         pass
 
+class StackedBox(QtGui.QStackedWidget, Widget):
+    def __init__(self):
+        super(StackedBox, self).__init__()
+        Widget.__init__(self)
+        self.layout().setAlignment(QtCore.Qt.AlignTop)
+
+    def addWidget(self, widget):
+        w = QtGui.QWidget()
+        layout = QtGui.QVBoxLayout(w)
+        layout.addWidget(widget)
+        layout.addStretch()
+        super(StackedBox, self).addWidget(w)
+        return widget
+
+    def showWidget(self, widget):
+        self.setCurrentWidget(widget.parentWidget())

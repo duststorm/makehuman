@@ -16,8 +16,7 @@ class GroupBoxRadioButton(gui.RadioButton):
         self.groupBox = groupBox
 
     def onClicked(self, event):
-        self.parentWidget()._parent.hideAllBoxes()
-        self.groupBox.show()
+        self.parentWidget()._parent.groupBox.showWidget(self.groupBox)
         
 class ExpressionSlider(humanmodifier.ModifierSlider):
     def __init__(self, label, modifier):
@@ -54,10 +53,11 @@ class ExpressionTaskView(gui3d.TaskView):
         self.modifiers = {}
         
         self.categoryBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Category')))
+        self.groupBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.StackedBox()))
         
         for name, subnames in expressions:
             # Create box
-            box = self.addView(gui3d.GroupBox([10, 80, 9.0], name.capitalize()))
+            box = self.groupBox.addWidget(gui.GroupBox(name.capitalize()))
             self.groupBoxes.append(box)
             
             # Create sliders
@@ -69,21 +69,14 @@ class ExpressionTaskView(gui3d.TaskView):
                     "face",
                     "GenderAgeModifier")
                 self.modifiers[subname] = modifier
-                slider = box.addView(ExpressionSlider(subname.capitalize(), modifier))
+                slider = box.addWidget(ExpressionSlider(subname.capitalize(), modifier))
                 modifier.slider = slider
                 self.sliders.append(slider)
             
             # Create radiobutton
             radio = self.categoryBox.addWidget(GroupBoxRadioButton(self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0))
 
-        self.hideAllBoxes()
-        self.groupBoxes[0].show()
-        
-    def hideAllBoxes(self):
-        
-        for box in self.groupBoxes:
-            
-            box.hide()
+        self.groupBox.showWidget(self.groupBoxes[0])
     
     def onShow(self, event):
 

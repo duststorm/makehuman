@@ -29,6 +29,8 @@ from operator import mul
 from string import Template
 import re
 import os
+import mh
+import qtgui as gui
 
 print 'Gender imported'
 
@@ -189,16 +191,14 @@ class GenderTaskView(gui3d.TaskView):
         
         self.sliders = []
         
-        y = 80
-        genderBox = self.addView(gui3d.GroupBox([10, y, 9.0], 'Gender', gui3d.GroupBoxStyle._replace(height=25+36*3+6)));y+=25
+        genderBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Gender')))
         
-        self.sliders.append(genderBox.addView(DetailSlider(0.0, -1.0, 1.0, "Genitalia", self.modifiers['genitals'])));y+=36
-        self.sliders.append(genderBox.addView(DetailSlider(0.0, -1.0, 1.0, "Breast", self.modifiers['breastSize'])));y+=36
-        self.sliders.append(genderBox.addView(DetailSlider(0.5, 0.0, 1.0, "Breast firmness", self.modifiers['breastFirmness'])));y+=36
-        self.sliders.append(genderBox.addView(humanmodifier.ModifierSlider(0.0, -1.0, 1.0, "Breast position", modifier=self.modifiers['breastPosition'])));y+=36
-        self.sliders.append(genderBox.addView(humanmodifier.ModifierSlider(0.0, -1.0, 1.0, "Breast distance", modifier=self.modifiers['breastDistance'])));y+=36
-        self.sliders.append(genderBox.addView(humanmodifier.ModifierSlider(0.0, -1.0, 1.0, "Breast taper", modifier=self.modifiers['breastPoint'])));y+=36
-        y+=16
+        self.sliders.append(genderBox.addWidget(DetailSlider(0.0, -1.0, 1.0, "Genitalia", self.modifiers['genitals'])))
+        self.sliders.append(genderBox.addWidget(DetailSlider(0.0, -1.0, 1.0, "Breast", self.modifiers['breastSize'])))
+        self.sliders.append(genderBox.addWidget(DetailSlider(0.5, 0.0, 1.0, "Breast firmness", self.modifiers['breastFirmness'])))
+        self.sliders.append(genderBox.addWidget(humanmodifier.ModifierSlider(0.0, -1.0, 1.0, "Breast position", modifier=self.modifiers['breastPosition'])))
+        self.sliders.append(genderBox.addWidget(humanmodifier.ModifierSlider(0.0, -1.0, 1.0, "Breast distance", modifier=self.modifiers['breastDistance'])))
+        self.sliders.append(genderBox.addWidget(humanmodifier.ModifierSlider(0.0, -1.0, 1.0, "Breast taper", modifier=self.modifiers['breastPoint'])))
 
     def onShow(self, event):
         self.sliders[0].setFocus()

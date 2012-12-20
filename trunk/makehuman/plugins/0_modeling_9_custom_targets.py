@@ -117,7 +117,7 @@ class CustomTargetsTaskView(gui3d.TaskView):
         
         modifier = humanmodifier.SimpleModifier(os.path.join(targetPath, targetFile))
         self.modifiers[targetName] = modifier
-        self.sliders.append(box.addView(humanmodifier.ModifierSlider(value=0, label=targetName, modifier=modifier)))
+        self.sliders.append(box.addWidget(humanmodifier.ModifierSlider(value=0, label=targetName, modifier=modifier)))
         
     def syncSliders(self):
         
