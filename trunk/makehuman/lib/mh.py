@@ -173,3 +173,9 @@ class Frame:
     LeftBottom  = ui.Frame.LeftBottom
     RightTop    = ui.Frame.RightTop
     RightBottom = ui.Frame.RightBottom
+
+def changeCategory(category):
+    ui.changeCategory(category)
+
+def changeTask(category, task):
+    ui.changeTask(category, task)

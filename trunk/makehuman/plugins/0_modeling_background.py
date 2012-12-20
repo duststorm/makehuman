@@ -32,6 +32,7 @@ import os
 from aljabr import vnorm, vsub, vadd, vdot, mtransform
 from math import floor, ceil, pi, sqrt, exp
 import qtgui as gui
+import filechooser as fc
 
 def pointInRect(point, rect):
 
@@ -189,8 +190,7 @@ class BackgroundTaskView(gui3d.TaskView):
                 self.backgroundImage.show()
                 self.backgroundImageToggle.setSelected(True)
             else:
-                gui3d.app.switchCategory('Library')
-                gui3d.app.switchTask('Background')
+                gui.changeTask('Library', 'Background')
 
         self.backgroundBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Background 2 settings')))
 
@@ -202,7 +202,7 @@ class BackgroundTaskView(gui3d.TaskView):
         self.bgImageTopRadioButton    = self.backgroundBox.addWidget(gui.RadioButton(self.radioButtonGroup, label='Top'))
         self.bgImageBottomRadioButton = self.backgroundBox.addWidget(gui.RadioButton(self.radioButtonGroup, label='Bottom'))
 
-        self.filechooser = self.addView(gui3d.FileChooser(self.backgroundsFolder, ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None))
+        self.filechooser = self.addWidget(mh.addWidget(mh.Frame.Top, fc.FileChooser(self.backgroundsFolder, ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None)))
 
         @self.filechooser.mhEvent
         def onFileSelected(filename):
@@ -243,8 +243,7 @@ class BackgroundTaskView(gui3d.TaskView):
             gui3d.app.modelCamera.switchToOrtho()
 
 
-            gui3d.app.switchCategory('Modelling')
-            gui3d.app.switchTask('Background')
+            gui.changeTask('Modelling', 'Background')
             gui3d.app.redraw()
 
     def fixateBackground(self):
@@ -418,8 +417,6 @@ class BackgroundTaskView(gui3d.TaskView):
         self.updateBackground()
 
     def onResized(self, event):
-        if hasattr(self, 'filechooser'):
-            self.filechooser.onResized(event)
         self.updateBackground()
 
 # This method is called when the plugin is loaded into makehuman

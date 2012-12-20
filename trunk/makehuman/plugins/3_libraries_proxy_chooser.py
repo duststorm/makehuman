@@ -24,20 +24,22 @@ import gui3d, mh, os
 import files3d
 import mh2proxy
 import export_config
+import qtgui as gui
+import filechooser as fc
 
 class ProxyTaskView(gui3d.TaskView):
     
     def __init__(self, category):
         
         gui3d.TaskView.__init__(self, category, 'Proxies')
-        self.filechooser = self.addView(gui3d.FileChooser('data/proxymeshes', 'proxy', 'png', 'data/proxymeshes/notfound.png'))
+        self.filechooser = self.addWidget(mh.addWidget(mh.Frame.Top, fc.FileChooser('data/proxymeshes', 'proxy', 'png', 'data/proxymeshes/notfound.png')))
 
         @self.filechooser.mhEvent
         def onFileSelected(filename):
             
             self.setProxy(gui3d.app.selectedHuman, filename)
 
-            gui3d.app.switchCategory('Modelling')
+            mh.changeCategory('Modelling')
         
     def setProxy(self, human, filename):
 
@@ -57,9 +59,6 @@ class ProxyTaskView(gui3d.TaskView):
     def onHide(self, event):
         gui3d.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
-        
-    def onResized(self, event):
-        self.filechooser.onResized(event)
 
     def onHumanChanging(self, event):
         

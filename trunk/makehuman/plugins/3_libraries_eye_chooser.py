@@ -21,20 +21,22 @@ TO DO
 """
 
 import gui3d, mh, os, module3d
+import qtgui as gui
+import filechooser as fc
 
 class EyesTaskView(gui3d.TaskView):
     
     def __init__(self, category):
         
         gui3d.TaskView.__init__(self, category, 'Eyes')
-        self.filechooser = self.addView(gui3d.FileChooser('data/eyes', 'mhstx', 'png', 'data/eyes/notfound.png'))
+        self.filechooser = self.addWidget(mh.addWidget(mh.Frame.Top, fc.FileChooser('data/eyes', 'mhstx', 'png', 'data/eyes/notfound.png')))
 
         @self.filechooser.mhEvent
         def onFileSelected(filename):
             
             self.setEyes(gui3d.app.selectedHuman, filename)
 
-            gui3d.app.switchCategory('Modelling')
+            mh.changeCategory('Modelling')
         
     def setEyes(self, human, mhstx):
         
@@ -70,9 +72,6 @@ class EyesTaskView(gui3d.TaskView):
     def onHide(self, event):
         gui3d.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
-        
-    def onResized(self, event):
-        self.filechooser.onResized(event)
         
     def onHumanChanging(self, event):
         

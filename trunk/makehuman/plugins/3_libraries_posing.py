@@ -41,6 +41,8 @@ from armature import transformations as tm
 import warpmodifier
 import humanmodifier
 import posemode
+import qtgui as gui
+import filechooser as fc
 
 #
 #   Pose library
@@ -71,16 +73,15 @@ class PoseLoadTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Poses')
         if not os.path.exists(self.userPoses):
             os.makedirs(self.userPoses)
-        self.filechooser = self.addView(gui3d.FileChooser([self.systemPoses, self.userPoses], 'mhp', 'png', 'data/clothes/notfound.png'))
-        self.update = self.filechooser.sortBox.addView(gui3d.Button('Check for updates'))
+        self.filechooser = self.addWidget(mh.addWidget(mh.Frame.Top, fc.FileChooser([self.systemPoses, self.userPoses], 'mhp', 'png', 'data/clothes/notfound.png')))
+        self.update = self.filechooser.sortBox.addWidget(gui.Button('Check for updates'))
         self.mediaSync = None
 
         @self.filechooser.mhEvent
         def onFileSelected(filepath):
 
             self.loadMhpFile(filepath)
-            
-            gui3d.app.switchCategory('Modelling')
+            mh.changeCategory('Modelling')
             
         @self.update.mhEvent
         def onClicked(event):
@@ -130,10 +131,6 @@ class PoseLoadTaskView(gui3d.TaskView):
         gui3d.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
                 
-
-    def onResized(self, event):
-        self.filechooser.onResized(event)
-
 
     def onHumanChanging(self, event):
         posemode.changePoseMode(event)

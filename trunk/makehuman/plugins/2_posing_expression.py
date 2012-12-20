@@ -10,6 +10,7 @@ import os
 import mh
 import posemode
 import qtgui as gui
+import filechooser as fc
 
 print 'Expression imported'
 
@@ -212,14 +213,14 @@ class MhmLoadTaskView(gui3d.TaskView):
         if not os.path.exists(self.mhmPath):
             os.makedirs(self.mhmPath)
 
-        self.filechooser = self.addView(gui3d.FileChooser([self.globalMhmPath, self.mhmPath], 'mhm', 'png'))
+        self.filechooser = self.addWidget(mh.addWidget(mh.Frame.Top, fc.FileChooser([self.globalMhmPath, self.mhmPath], 'mhm', 'png')))
 
         @self.filechooser.mhEvent
         def onFileSelected(filename):
 
             gui3d.app.do(Action(gui3d.app.selectedHuman, filename, self.mhmTaskView, self.include))
             
-            gui3d.app.switchCategory('Modelling')
+            mh.changeCategory('Modelling')
 
     def onShow(self, event):
 
@@ -231,10 +232,6 @@ class MhmLoadTaskView(gui3d.TaskView):
     def onHide(self, event):
         gui3d.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
-        
-    def onResized(self, event):
-        self.filechooser.onResized(event)
-
 
 class ExpressionLoadTaskView(MhmLoadTaskView):
 

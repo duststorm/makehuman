@@ -45,6 +45,7 @@ import mh2skel
 from shutil import copyfile
 from os.path import basename
 import qtgui as gui
+import filechooser as fc
 
 class SaveTaskView(gui3d.TaskView):
 
@@ -80,7 +81,7 @@ class SaveTaskView(gui3d.TaskView):
             
             gui3d.app.setCaption("MakeHuman r" + os.environ['SVNREVISION'] + " - [" + filename + "]")
 
-            gui3d.app.switchCategory('Modelling')
+            mh.changeCategory('Modelling')
 
     def onShow(self, event):
 
@@ -207,7 +208,7 @@ class LoadTaskView(gui3d.TaskView):
         
         modelPath = mh.getPath('models')
         gui3d.TaskView.__init__(self, category, 'Load', )
-        self.filechooser = self.addView(gui3d.FileChooser(modelPath, 'mhm', sort=HumanFileSort()))
+        self.filechooser = self.addWidget(mh.addWidget(mh.Frame.Top, fc.FileChooser(modelPath, 'mhm', sort=HumanFileSort())))
 
         @self.filechooser.mhEvent
         def onFileSelected(filename):
@@ -226,7 +227,7 @@ class LoadTaskView(gui3d.TaskView):
             
             gui3d.app.setCaption("MakeHuman r" + os.environ['SVNREVISION'] + " - [" + name + "]")
 
-            gui3d.app.switchCategory('Modelling')
+            mh.changeCategory('Modelling')
 
     def onShow(self, event):
 
@@ -244,10 +245,6 @@ class LoadTaskView(gui3d.TaskView):
         
         gui3d.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
-
-    def onResized(self, event):
-        
-        self.filechooser.onResized(event)
 
 class ExportTaskView(gui3d.TaskView):
     
@@ -460,7 +457,7 @@ class ExportTaskView(gui3d.TaskView):
                     
             gui3d.app.prompt('Info', u'The mesh has been exported to %s.' % os.path.join(mh.getPath(''), u'exports'), 'OK', helpId='exportHelp')
 
-            gui3d.app.switchCategory('Modelling')
+            mh.changeCategory('Modelling')
             
     def updateGui(self):
         

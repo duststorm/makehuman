@@ -23,23 +23,14 @@ TO DO
 #import zipfile
 import gui3d, mh
 from os import path
-
-HairButtonStyle = gui3d.Style(**{
-    'width':32,
-    'height':32,
-    'mesh':None,
-    'normal':None,
-    'selected':None,
-    'focused':None,
-    'fontSize':gui3d.defaultFontSize,
-    'border':None
-    })
+import qtgui as gui
+import filechooser as fc
 
 class HairTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, "Hair")
         self.human = None
-        self.filechooser = gui3d.FileChooser(self, "data/hairs", "hair", "png")
+        self.filechooser = self.addWidget(mh.addWidget(mh.Frame.Top, fc.FileChooser("data/hairs", "hair", "png")))
         self.default = True
         self.saveAsCurves = True
         self.path = None
@@ -60,8 +51,7 @@ class HairTaskView(gui3d.TaskView):
 
         @self.currentHair.mhEvent
         def onClicked(event):
-            self.app.switchCategory('Library')
-            self.app.switchTask("Hair")
+            gui.changeTask('Library', 'Hair')
 
         @self.filechooser.mhEvent
         def onFileSelected(filename, update=1):
@@ -75,7 +65,7 @@ class HairTaskView(gui3d.TaskView):
 
             human.hairObj = human.hairs.loadHair(path="./data/hairs/"+filename, update=update)
 
-            self.app.switchCategory("Modelling")
+            mh.changeCategory('Modelling')
             human.setHairFile(path.join('data/hairs', filename + ".obj"))
             hairTexture = human.hairFile.replace('.obj', '.png')
             self.currentHair.setTexture(hairTexture)
@@ -93,10 +83,6 @@ class HairTaskView(gui3d.TaskView):
     def onHide(self, event):
         self.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
-    
-    def onResized(self, event):
-        self.currentHair.setPosition([event.width-216, event.height-36, 9.2])
-        self.filechooser.onResized(event)
 
     def onHumanChanged(self, event):
         

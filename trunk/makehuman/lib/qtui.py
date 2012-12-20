@@ -444,6 +444,7 @@ class Frame(QtGui.QWidget):
 
     def showCanvas(self):
         self.c_layout.setCurrentWidget(self.canvas)
+        self.update()
 
     def showCenter(self):
         self.c_layout.setCurrentWidget(self.c_panel)
@@ -493,3 +494,9 @@ def callAsync(callback):
 
 def addWidget(edge, widget, *args, **kwargs):
     return G.app.mainwin.addWidget(edge, widget, *args, **kwargs)
+
+def changeCategory(category):
+    G.app.mainwin.tabs.changeTab(category)
+
+def changeTask(category, task):
+    G.app.mainwin.tabs.findTab(category).child.changeTab(task)

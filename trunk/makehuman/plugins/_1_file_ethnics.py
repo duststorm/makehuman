@@ -75,7 +75,7 @@ class EthnicsTaskView(gui3d.TaskView):
         gui3d.app.categories['Files'].tasksByName['Save'].fileentry.text = filename.replace('.mhm', '')
         gui3d.app.categories['Files'].tasksByName['Save'].fileentry.edit.setText(filename.replace('.mhm', ''))
 
-        #gui3d.app.switchCategory('Modelling')
+        #mh.changeCategory('Modelling')
         
     def onResized(self, event):
         

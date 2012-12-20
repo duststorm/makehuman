@@ -25,6 +25,7 @@ import download
 import files3d
 import mh2proxy
 import export_config
+import qtgui as gui
 import filechooser as fc
 
 KnownTags = [
@@ -52,18 +53,17 @@ class ClothesTaskView(gui3d.TaskView):
         if not os.path.exists(self.userClothes):
             os.makedirs(self.userClothes)
         self.filechooser = self.addWidget(mh.addWidget(mh.Frame.Top, fc.FileChooser([self.systemClothes, self.userClothes], 'mhclo', 'png', 'data/clothes/notfound.png')))
-        # self.update = self.filechooser.sortBox.addView(gui3d.Button('Check for updates'))
+        self.update = self.filechooser.sortBox.addWidget(gui.Button('Check for updates'))
         self.mediaSync = None
 
         @self.filechooser.mhEvent
         def onFileSelected(filename):
             self.setClothes(gui3d.app.selectedHuman, filename)
+            mh.changeCategory('Modelling')
 
-            gui3d.app.switchCategory('Modelling')
-            
-        # @self.update.mhEvent
-        # def onClicked(event):
-        #     self.syncMedia()
+        @self.update.mhEvent
+        def onClicked(event):
+            self.syncMedia()
         
     def setClothes(self, human, mhclo):
     
@@ -174,10 +174,6 @@ class ClothesTaskView(gui3d.TaskView):
     def onHide(self, event):
         gui3d.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
-        
-    def onResized(self, event):
-        # self.filechooser.onResized(event)
-        pass
         
     def onHumanChanging(self, event):
         

@@ -7,7 +7,7 @@ import gui3d
 from qtgui import *
 import qtui
 
-class FileChooserRectangle(QtGui.QWidget, Widget):
+class FileChooserRectangle(Button):
     _imageCache = {}
 
     @classmethod
@@ -16,9 +16,10 @@ class FileChooserRectangle(QtGui.QWidget, Widget):
             cls._imageCache[path] = QtGui.QImage(path)
         return cls._imageCache[path]
 
-    def __init__(self, file, label, imagePath, size = (128, 128)):
+    def __init__(self, owner, file, label, imagePath, size = (128, 128)):
         super(FileChooserRectangle, self).__init__()
         Widget.__init__(self)
+        self.owner = owner
         self.file = file
 
         self.setMinimumSize(*size)
@@ -36,9 +37,8 @@ class FileChooserRectangle(QtGui.QWidget, Widget):
         self.layout.setRowStretch(1, 0)
 
     def onClicked(self, event):
-        parent = self.parentWidget().parentWidget().parentWidget()
-        parent.selection = self.file
-        parent.callEvent('onFileSelected', self.file)
+        self.owner.selection = self.file
+        self.owner.callEvent('onFileSelected', self.file)
 
 class FlowLayout(QtGui.QLayout):
     def __init__(self, parent = None):
@@ -262,14 +262,14 @@ class FileChooser(QtGui.QWidget, Widget):
 
     def refresh(self):
         for i in xrange(self.children.count()):
-            self.children.removeItem(self.children.itemAt(i))
+            self.children.removeItem(self.children.itemAt(0))
 
         # Create icons
         for file in self.sort.sort(self.sortBy, list(self.search())):
             label = os.path.basename(file)
             if isinstance(self.extension, str):
                 label = os.path.splitext(label)[0]
-            self.children.addWidget(FileChooserRectangle(file, label, self.getPreview(file)))
+            self.children.addWidget(FileChooserRectangle(self, file, label, self.getPreview(file)))
 
         gui3d.app.redraw()
 

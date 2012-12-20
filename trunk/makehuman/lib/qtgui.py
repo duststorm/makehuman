@@ -59,6 +59,15 @@ class TabsBase(Widget):
             self.callEvent('onTabSelected', tab)
             tab.callEvent('onClicked', tab)
 
+    def findTab(self, name):
+        for tab in self._tabs:
+            if tab.name == name:
+                return tab
+        return None
+
+    def changeTab(self, name):
+        self.setCurrentIndex(self.findTab(name).idx)
+
 class Tabs(QtGui.QTabWidget, TabsBase):
     def __init__(self, parent = None):
         QtGui.QTabWidget.__init__(self, parent)

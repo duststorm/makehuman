@@ -25,6 +25,8 @@ import files3d
 from aljabr import in2pts, vadd, vsub, calcBBox
 import mh2proxy
 import export_config
+import qtgui as gui
+import filechooser as fc
 
 class HairTaskView(gui3d.TaskView):
     
@@ -34,7 +36,7 @@ class HairTaskView(gui3d.TaskView):
         hairDir = os.path.join(mh.getPath(''), 'data', 'hairstyles')
         if not os.path.exists(hairDir):
             os.makedirs(hairDir)
-        self.filechooser = self.addView(gui3d.FileChooser([hairDir , 'data/hairstyles'], 'obj', 'png', 'data/hairstyles/notfound.png'))
+        self.filechooser = self.addWidget(mh.addWidget(mh.Frame.Top, fc.FileChooser([hairDir , 'data/hairstyles'], 'obj', 'png', 'data/hairstyles/notfound.png')))
       
         self.oHeadCentroid = [0.0, 7.436, 0.03 + 0.577]
         self.oHeadBBox = [[-0.84,6.409,-0.9862],[0.84,8.463,1.046]]
@@ -44,7 +46,7 @@ class HairTaskView(gui3d.TaskView):
             
             mhclo = filename.replace('.obj', '.mhclo')
             self.setHair(gui3d.app.selectedHuman, filename, mhclo)            
-            gui3d.app.switchCategory('Modelling')
+            mh.changeCategory('Modelling')
 
     def setHair(self, human, obj, mhclo):
 
@@ -98,9 +100,6 @@ class HairTaskView(gui3d.TaskView):
     def onHide(self, event):
         gui3d.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
-        
-    def onResized(self, event):
-        self.filechooser.onResized(event)
         
     def onHumanChanging(self, event):
         

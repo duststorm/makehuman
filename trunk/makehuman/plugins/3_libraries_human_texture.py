@@ -29,6 +29,8 @@ import gui3d
 import os
 import download
 import mh
+import qtgui as gui
+import filechooser as fc
 
 class Action:
 
@@ -59,8 +61,8 @@ class HumanTextureTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Human texture', label='Skin')
         if not os.path.exists(os.path.join(mh.getPath(''), 'data', 'skins')):
             os.makedirs(os.path.join(mh.getPath(''), 'data', 'skins'))
-        self.filechooser = self.addView(gui3d.FileChooser([self.systemSkins, self.userSkins], 'png', 'thumb', 'data/skins/notfound.thumb'))
-        self.update = self.filechooser.sortBox.addView(gui3d.Button('Check for updates'))
+        self.filechooser = self.addWidget(mh.addWidget(mh.Frame.Top, fc.FileChooser([self.systemSkins, self.userSkins], 'png', 'thumb', 'data/skins/notfound.thumb')))
+        self.update = self.filechooser.sortBox.addWidget(gui.Button('Check for updates'))
         self.mediaSync = None
 
         @self.filechooser.mhEvent
@@ -69,8 +71,8 @@ class HumanTextureTaskView(gui3d.TaskView):
             gui3d.app.do(Action(gui3d.app.selectedHuman,
                 gui3d.app.selectedHuman.getTexture(),
                 os.path.join(mh.getPath(''), 'data', 'skins', filename)))
-            
-            gui3d.app.switchCategory('Modelling')
+
+            mh.changeCategory('Modelling')
             
         @self.update.mhEvent
         def onClicked(event):
@@ -95,9 +97,6 @@ class HumanTextureTaskView(gui3d.TaskView):
     def onHide(self, event):
         gui3d.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
-        
-    def onResized(self, event):
-        self.filechooser.onResized(event)
         
     def onHumanChanging(self, event):
 

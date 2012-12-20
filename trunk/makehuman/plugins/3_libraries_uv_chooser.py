@@ -24,6 +24,8 @@ import gui3d, mh, os
 import files3d
 import export_config
 import mh2proxy
+import qtgui as gui
+import filechooser as fc
 
 
 class UvTaskView(gui3d.TaskView):
@@ -34,7 +36,7 @@ class UvTaskView(gui3d.TaskView):
         uvDir = os.path.join(mh.getPath(''), 'data', 'uvs')
         if not os.path.exists(uvDir):
             os.makedirs(uvDir)
-        self.filechooser = self.addView(gui3d.FileChooser([uvDir , 'data/uvs'], 'mhuv', 'png', 'data/uvs/notfound.png'))
+        self.filechooser = self.addWidget(mh.addWidget(mh.Frame.Top, fc.FileChooser([uvDir , 'data/uvs'], 'mhuv', 'png', 'data/uvs/notfound.png')))
 
         @self.filechooser.mhEvent
         def onFileSelected(filename):
@@ -43,7 +45,7 @@ class UvTaskView(gui3d.TaskView):
                 filename = None            
             self.setUv(gui3d.app.selectedHuman, filename)
 
-            gui3d.app.switchCategory('Modelling')
+            mh.changeCategory('Modelling')
         
     def setUv(self, human, filename):
 
@@ -63,9 +65,6 @@ class UvTaskView(gui3d.TaskView):
         gui3d.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
         
-    def onResized(self, event):
-        self.filechooser.onResized(event)
-
     def onHumanChanging(self, event):
         
         human = event.human
