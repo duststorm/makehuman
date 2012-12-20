@@ -400,3 +400,66 @@ class StackedBox(QtGui.QStackedWidget, Widget):
 
     def showWidget(self, widget):
         self.setCurrentWidget(widget.parentWidget())
+
+class Dialog(QtGui.QDialog):
+    def __init__(self, parent = None):
+        super(Dialog, self).__init__(parent)
+        self.setModal(True)
+
+        self.helpIds = set()
+
+        icon = self.style().standardIcon(QtGui.QStyle.SP_MessageBoxWarning)
+
+        self.layout = QtGui.QGridLayout(self)
+        self.layout.setColumnStretch(0, 0)
+        self.layout.setColumnStretch(1, 1)
+        self.layout.setColumnStretch(2, 0)
+        self.layout.setColumnStretch(3, 0)
+
+        self.icon = QtGui.QLabel()
+        self.icon.setPixmap(icon.pixmap(64))
+        self.layout.addWidget(self.icon, 0, 0, 2, 1)
+
+        self.text = QtGui.QLabel()
+        self.layout.addWidget(self.text, 0, 1, 1, -1)
+
+        self.check = QtGui.QCheckBox("Don't show this again")
+        self.layout.addWidget(self.check, 1, 1, 1, -1)
+
+        self.button1 = QtGui.QPushButton()
+        self.layout.addWidget(self.button1, 2, 2)
+
+        self.button2 = QtGui.QPushButton()
+        self.layout.addWidget(self.button2, 2, 3)
+
+        self.connect(self.button1, QtCore.SIGNAL('clicked(bool)'), self.reject)
+        self.connect(self.button2, QtCore.SIGNAL('clicked(bool)'), self.accept)
+
+    def prompt(self, title, text, button1Label, button2Label=None, button1Action=None, button2Action=None, helpId=None):
+        if helpId in self.helpIds:
+            return
+
+        self.setWindowTitle(title)
+        self.text.setText(text)
+        self.button1.setText(button1Label)
+
+        if button2Label is not None:
+            self.button2.setText(button2Label)
+            self.button2.show()
+        else:
+            self.button2.hide()
+
+        if helpId:
+            self.check.show()
+        else:
+            self.check.hide()
+
+        which = self.exec_()
+
+        if which == QtGui.QMessageBox.Ok and self.button1Action:
+            self.button1Action()
+        elif which == QtGui.QMessageBox.Cancel and self.button2Action:
+            self.button2Action()
+
+        if helpId and self.check.isChecked():
+            self.helpIds.add(helpId)

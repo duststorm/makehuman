@@ -479,7 +479,8 @@ class MHApplication(gui3d.Application):
             (0, mh.Buttons.LEFT_MASK): self.mouseRotate,
             (0, mh.Buttons.MIDDLE_MASK): self.mouseZoom
         }
-        
+
+        self.dialog = None
         self.helpIds = []
         
         self.loadSettings()
@@ -760,39 +761,15 @@ class MHApplication(gui3d.Application):
         
         self.selectedHuman.applyAllTargets(gui3d.app.progress)
         self.selectedHuman.callEvent('onChanged', human.HumanEvent(self.selectedHuman, 'reset'))
-        self.dialog = self.addView(gui3d.View())
-        self.dialog.blocker = self.dialog.addObject(gui3d.Object([0, 0, 9.7], gui3d.RectangleMesh(800, 600)))
-        self.dialog.box = self.dialog.addView(gui3d.GroupBox([800 / 2 - 100, 600 / 2 - 75, 9.8], '', gui3d.GroupBoxStyle._replace(width=200, height=150)))
-        self.dialog.text = self.dialog.box.addView(gui3d.TextView('', style=gui3d.TextViewStyle._replace(width=180)))
-        self.dialog.check = self.dialog.box.addView(gui3d.CheckBox("Don't show this again", style=gui3d.CheckBoxStyle._replace(width=180, margin=[2, 4, 2, 2])))
-        self.dialog.button1 = self.dialog.box.addView(gui3d.Button('', style=gui3d.ButtonStyle._replace(width=60, margin=[2, 4, 2, 2])))
-        self.dialog.button2 = self.dialog.box.addView(gui3d.Button('', style=gui3d.ButtonStyle._replace(width=60, margin=[2, 4, 2, 2])))
-        self.dialog.button1Action = None
-        self.dialog.button2Action = None
-        self.dialog.helpId = None
-        self.dialog.hide()
+
         self.prompt('Warning', 'This is an alpha release, which means that there are still bugs present and features missing. Use at your own risk.',
             'OK', helpId='alphaWarning')
-        self.dialog.blocker.mesh.setColor([0, 0, 0, 128])
+        # self.dialog.blocker.mesh.setColor([0, 0, 0, 128])
         self.splash.hide()
 
         mh.setCaption("MakeHuman r" + os.environ['SVNREVISION'] + " - [Untitled]")
         
         #printtree(self)
-        
-        @self.dialog.button1.mhEvent
-        def onClicked(event):
-            if self.dialog.button1Action:
-                self.dialog.button1Action()
-            self.dialog.hide()
-            
-        @self.dialog.button2.mhEvent
-        def onClicked(event):
-            if self.dialog.button2Action:
-                self.dialog.button2Action()
-            if self.dialog.helpId and self.dialog.check.selected:
-                self.helpIds.append(self.dialog.helpId)
-            self.dialog.hide()
         
         mh.updatePickingBuffer();
         self.redraw()
@@ -856,20 +833,6 @@ class MHApplication(gui3d.Application):
         # self.tabs.box.mesh.resize(event.width, 32)
         self.statusbar.mesh.resize(event.width, 32)
         self.statusbar.setPosition((0.0, event.height-20, 9))
-        
-        # self.undoButton.setPosition([event.width-150, event.height-92, 9.1])
-        # self.redoButton.setPosition([event.width-106, event.height-92, 9.1])
-        # self.resetButton.setPosition([event.width-62, event.height-92, 9.1])
-        # 
-        # self.globalButton.setPosition([event.width-150, event.height-70, 9.1])
-        # self.faceButton.setPosition([event.width-150, event.height-45, 9.1])
-        # 
-        # self.progressBar.setPosition([event.width-150, event.height-15, 9.85])
-
-        if hasattr(self, 'dialog'):
-            self.dialog.blocker.mesh.resize(event.width, event.height)
-            self.dialog.box.setPosition([event.width/2-100, event.height/2-75, 9.8])
-            self.dialog.box.layout.rebuild()
         
     # Undo-redo
     def do(self, action):
@@ -1074,29 +1037,10 @@ class MHApplication(gui3d.Application):
     
     # Global dialog
     def prompt(self, title, text, button1Label, button2Label=None, button1Action=None, button2Action=None, helpId=None):
-        
-        if helpId in self.helpIds:
-            return
-        #print self.helpIds
-        self.dialog.box.label.setText(title)
-        self.dialog.text.setText(text)
-        if button1Label and button2Label:
-            self.dialog.button1.show()
-            self.dialog.button1.setLabel(button1Label)
-            self.dialog.button2.setLabel(button2Label)
-        else:
-            self.dialog.button1.hide()
-            self.dialog.button2.setLabel(button1Label or button2Label)
-        self.dialog.button1Action = button1Action
-        self.dialog.button2Action = button2Action
-        self.dialog.helpId = helpId
-        if helpId:
-            self.dialog.check.show()
-        else:
-            self.dialog.check.hide()
-        self.dialog.show()
-        self.redraw()
-      
+        if self.dialog is None:
+            self.dialog = gui.Dialog(G.app.mainwin)
+        self.dialog.prompt(title, text, button1Label, button2Label, button1Action, button2Action, helpId)
+
     # Camera's
     def setCameraCenterViewDistance(self, center, view='front', distance=10):
     
