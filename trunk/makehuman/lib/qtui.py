@@ -322,10 +322,11 @@ class Canvas(QtOpenGL.QGLWidget):
 
 class Frame(QtGui.QWidget):
     Bottom      = 0
-    LeftTop     = 1
-    LeftBottom  = 2
-    RightTop    = 3
-    RightBottom = 4
+    Top         = 1
+    LeftTop     = 2
+    LeftBottom  = 3
+    RightTop    = 4
+    RightBottom = 5
 
     title = "MakeHuman"
 
@@ -369,25 +370,30 @@ class Frame(QtGui.QWidget):
 
         self.b_panel = self.panel()
         self.bottom = QtGui.QBoxLayout(QtGui.QBoxLayout.BottomToTop, self.b_panel)
-        # self.v_layout.addLayout(self.bottom, 2, 0)
         self.v_layout.addWidget(self.b_panel, 2, 0)
         self.v_layout.setRowStretch(2, 0)
 
         self.l_panel = self.panel()
         self.l_layout = QtGui.QGridLayout(self.l_panel)
         self.l_layout.setContentsMargins(0, 0, 0, 0)
-        # self.h_layout.addLayout(self.l_layout, 0, 0)
         self.h_layout.addWidget(self.l_panel, 0, 0)
         self.h_layout.setColumnStretch(0, 0)
 
-        self.canvas = Canvas(self)
-        self.h_layout.addWidget(self.canvas, 0, 1)
+        self.c_layout = QtGui.QStackedLayout()
+        self.h_layout.addLayout(self.c_layout, 0, 1)
         self.h_layout.setColumnStretch(1, 1)
+
+        self.canvas = Canvas(self)
+        self.c_layout.addWidget(self.canvas)
+
+        self.c_panel = self.panel()
+        self.center = QtGui.QBoxLayout(QtGui.QBoxLayout.TopToBottom, self.c_panel)
+
+        self.c_layout.addWidget(self.c_panel)
 
         self.r_panel = self.panel()
         self.r_layout = QtGui.QGridLayout(self.r_panel)
         self.r_layout.setContentsMargins(0, 0, 0, 0)
-        # self.h_layout.addLayout(self.r_layout, 0, 2)
         self.h_layout.addWidget(self.r_panel, 0, 2)
         self.h_layout.setColumnStretch(2, 0)
 
@@ -411,8 +417,11 @@ class Frame(QtGui.QWidget):
         self.r_layout.addLayout(self.right_bottom, 2, 0)
         self.r_layout.setRowStretch(2, 0)
 
+        self.showCanvas()
+
         self.sides = {
             self.Bottom:      self.bottom,
+            self.Top:         self.center,
             self.LeftTop:     self.left_top,
             self.LeftBottom:  self.left_bottom,
             self.RightTop:    self.right_top,
@@ -421,6 +430,8 @@ class Frame(QtGui.QWidget):
 
     def addWidget(self, edge, widget, *args, **kwargs):
         self.sides[edge].addWidget(widget, *args, **kwargs)
+        if edge == self.Top:
+            widget.installEventFilter(self)
         return widget
 
     def update(self):
@@ -430,6 +441,19 @@ class Frame(QtGui.QWidget):
     def closeEvent(self, ev):
         ev.ignore()
         quit()
+
+    def showCanvas(self):
+        self.c_layout.setCurrentWidget(self.canvas)
+
+    def showCenter(self):
+        self.c_layout.setCurrentWidget(self.c_panel)
+
+    def eventFilter(self, object, event):
+        if event.type() == QtCore.QEvent.ShowToParent:
+            self.showCenter()
+        if event.type() == QtCore.QEvent.HideToParent:
+            self.showCanvas()
+        return False
 
 class Application(QtGui.QApplication):
     def __init__(self):

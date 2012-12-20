@@ -168,6 +168,7 @@ def addWidget(edge, widget, *args, **kwargs):
 
 class Frame:
     Bottom      = ui.Frame.Bottom
+    Top         = ui.Frame.Top
     LeftTop     = ui.Frame.LeftTop
     LeftBottom  = ui.Frame.LeftBottom
     RightTop    = ui.Frame.RightTop

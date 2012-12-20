@@ -481,7 +481,7 @@ class MHApplication(gui3d.Application):
         }
 
         self.dialog = None
-        self.helpIds = []
+        self.helpIds = set()
         
         self.loadSettings()
         
@@ -907,11 +907,13 @@ class MHApplication(gui3d.Application):
         
         try:
             if os.path.isfile(os.path.join(mh.getPath(''), "help.ini")):
-                self.helpIds = []
+                self.helpIds = set()
                 f = open(os.path.join(mh.getPath(''), "help.ini"), 'r')
                 for line in f:
-                    self.helpIds.append(line[0:-1])
+                    self.helpIds.add(line[0:-1])
                 f.close()
+                if self.dialog is not None:
+                    self.dialog.helpIds.update(self.helpIds)
         except:
             print("Failed to load help settings")
         
@@ -933,6 +935,8 @@ class MHApplication(gui3d.Application):
             f.write('%d %d %s\n' % (mouseAction[0], mouseAction[1], method.__name__))
         f.close()
             
+        if self.dialog is not None:
+            self.helpIds.update(self.dialog.helpIds)
         f = open(os.path.join(mh.getPath(''), "help.ini"), 'w')
         for helpId in self.helpIds:
             f.write('%s\n' % helpId)
@@ -1039,6 +1043,7 @@ class MHApplication(gui3d.Application):
     def prompt(self, title, text, button1Label, button2Label=None, button1Action=None, button2Action=None, helpId=None):
         if self.dialog is None:
             self.dialog = gui.Dialog(G.app.mainwin)
+            self.dialog.helpIds.update(self.helpIds)
         self.dialog.prompt(title, text, button1Label, button2Label, button1Action, button2Action, helpId)
 
     # Camera's

@@ -24,6 +24,12 @@ class Widget(events3d.EventHandler):
         if G.app and G.app.mainwin and G.app.mainwin.canvas:
             G.app.mainwin.canvas.update()
 
+    def showEvent(self, event):
+        self.callEvent('onShow', self)
+
+    def hideEvent(self, event):
+        self.callEvent('onHide', self)
+
     @staticmethod
     def getLanguageString(text):
         return text
@@ -451,6 +457,7 @@ class Dialog(QtGui.QDialog):
 
         if helpId:
             self.check.show()
+            self.check.setChecked(False)
         else:
             self.check.hide()
 
