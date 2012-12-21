@@ -867,6 +867,9 @@ class Application(events3d.EventHandler):
         return module3d.selectionColorMap.getSelectedFaceGroup()
 
     def switchTask(self, name):
+        if self.currentTask and self.currentTask.name == name:
+            return
+
         if self.currentTask:
             print 'hiding task %s' % self.currentTask.name
             self.currentTask.hide()
