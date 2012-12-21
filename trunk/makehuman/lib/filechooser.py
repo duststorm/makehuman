@@ -260,7 +260,6 @@ class FileChooser(QtGui.QWidget, Widget):
                             yield os.path.join(root, f)
 
     def refresh(self):
-        print self.children.count()
         for i in xrange(self.children.count()):
             child = self.children.itemAt(0)
             self.children.removeItem(child)

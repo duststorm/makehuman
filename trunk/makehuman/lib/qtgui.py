@@ -7,6 +7,7 @@ from PyQt4 import QtCore, QtGui
 
 from core import G
 import events3d
+import language
 
 class Tab(events3d.EventHandler):
     def __init__(self, parent, name, label):
@@ -35,7 +36,9 @@ class Widget(events3d.EventHandler):
 
     @staticmethod
     def getLanguageString(text):
-        return text
+        if not text:
+            return text
+        return language.language.getLanguageString(text)
 
 class TabsBase(Widget):
     def __init__(self):
@@ -46,6 +49,7 @@ class TabsBase(Widget):
         self._tabs_by_name = {}
 
     def _addTab(self, name, label):
+        label = self.getLanguageString(label)
         tab = Tab(self, name, label)
         tab.idx = self._makeTab(tab)
         self._tabs_by_idx[tab.idx] = tab
@@ -126,6 +130,8 @@ class Slider(QtGui.QWidget, Widget):
     def __init__(self, value=0.0, min=0.0, max=1.0, label=None, vertical=False, valueConverter=None):
         super(Slider, self).__init__()
         Widget.__init__(self)
+        label = self.getLanguageString(label)
+
         orient = (QtCore.Qt.Vertical if vertical else QtCore.Qt.Horizontal)
         self.slider = QtGui.QSlider(orient)
         self.min = min
@@ -189,6 +195,7 @@ class ButtonBase(Widget):
         return unicode(self.text())
 
     def setLabel(self, label):
+        label = self.getLanguageString(label)
         self.setText(label)
 
     def _clicked(self, state):
@@ -203,11 +210,13 @@ class ButtonBase(Widget):
 
 class Button(QtGui.QPushButton, ButtonBase):
     def __init__(self, label=None, selected=False):
+        label = self.getLanguageString(label)
         super(Button, self).__init__(label)
         ButtonBase.__init__(self)
 
 class CheckBox(QtGui.QCheckBox, ButtonBase):
     def __init__(self, label=None, selected=False):
+        label = self.getLanguageString(label)
         super(CheckBox, self).__init__(label)
         ButtonBase.__init__(self)
         self.setChecked(selected)
@@ -218,6 +227,7 @@ class RadioButton(QtGui.QRadioButton, ButtonBase):
     groups = {}
 
     def __init__(self, group, label=None, selected=False):
+        label = self.getLanguageString(label)
         super(RadioButton, self).__init__(label)
         ButtonBase.__init__(self)
         self.group = group
@@ -256,7 +266,7 @@ class RadioButton(QtGui.QRadioButton, ButtonBase):
 
 class TextView(QtGui.QLabel, Widget):
     def __init__(self, label = ''):
-        label = self.getLanguageString(label) if label else ''
+        label = self.getLanguageString(label)
         super(TextView, self).__init__(label)
         Widget.__init__(self)
 
@@ -450,6 +460,9 @@ class Dialog(QtGui.QDialog):
         if helpId in self.helpIds:
             return
 
+        button1Label = self.getLanguageString(button1Label)
+        button2Label = self.getLanguageString(button2Label)
+
         self.setWindowTitle(title)
         self.text.setText(text)
         self.button1.setText(button1Label)
@@ -480,6 +493,8 @@ class FileEntryView(QtGui.QWidget, Widget):
     def __init__(self, buttonLabel):
         super(FileEntryView, self).__init__()
         Widget.__init__(self)
+
+        buttonLabel = self.getLanguageString(buttonLabel)
 
         self.directory = os.getcwd()
         self.filter = ''

@@ -103,6 +103,7 @@ import module3d
 #import posemode
 from math import tan, pi
 import qtgui as gui
+import language as lang
 
 class Camera(events3d.EventHandler):
 
@@ -399,44 +400,6 @@ class MHApplication(gui3d.Application):
     def __init__(self):
         gui3d.Application.__init__(self)
 
-        self.modelCamera = Camera()
-        
-        @self.modelCamera.mhEvent
-        def onChanged(event):
-            for category in self.categories.itervalues():
-                
-                for task in category.tasks:
-                    
-                    task.callEvent('onCameraChanged', event)
-
-        mh.cameras.append(self.modelCamera.camera)
-
-        self.guiCamera = Camera()
-        self.guiCamera.fovAngle = 45
-        self.guiCamera.eyeZ = 10
-        self.guiCamera.projection = 0
-        mh.cameras.append(self.guiCamera.camera)
-
-        self.setTheme("default")
-        #self.setTheme("3d")
-        self.setLanguage("english")
-        
-        self.fonts = {}
-        
-        self.settings = {
-            'realtimeUpdates': True,
-            'realtimeNormalUpdates': True,
-            'shader': None,
-            'lowspeed': 1,
-            'highspeed': 5,
-            'units':'metric',
-            'invertMouseWheel':False,
-            'font':'arial',
-            'language':'english',
-            'excludePlugins':[],
-            'rtl': False
-        }
-        
         self.shortcuts = {
             # Actions
             (mh.Modifiers.CTRL, mh.Keys.z): self.undo,
@@ -480,14 +443,51 @@ class MHApplication(gui3d.Application):
             (0, mh.Buttons.MIDDLE_MASK): self.mouseZoom
         }
 
-        self.dialog = None
-        self.helpIds = set()
+        self.settings = {
+            'realtimeUpdates': True,
+            'realtimeNormalUpdates': True,
+            'shader': None,
+            'lowspeed': 1,
+            'highspeed': 5,
+            'units':'metric',
+            'invertMouseWheel':False,
+            'font':'arial',
+            'language':'english',
+            'excludePlugins':[],
+            'rtl': False
+        }
         
-        self.loadSettings()
+        self.fonts = {}
         
         self.loadHandlers = {}
         self.saveHandlers = []
+
+        self.dialog = None
+        self.helpIds = set()
         
+        self.modelCamera = Camera()
+        
+        @self.modelCamera.mhEvent
+        def onChanged(event):
+            for category in self.categories.itervalues():
+                for task in category.tasks:
+                    task.callEvent('onCameraChanged', event)
+
+        mh.cameras.append(self.modelCamera.camera)
+
+        self.guiCamera = Camera()
+        self.guiCamera.fovAngle = 45
+        self.guiCamera.eyeZ = 10
+        self.guiCamera.projection = 0
+
+        mh.cameras.append(self.guiCamera.camera)
+
+        self.setTheme("default")
+        #self.setTheme("3d")
+        self.setLanguage("english")
+        
+        self.loadSettings()
+
         # Display the initial splash screen and the progress bar during startup
         mesh = gui3d.RectangleMesh(800, 600, gui3d.app.getThemeResource('images', 'splash.png'))
         self.splash = self.addObject(gui3d.Object([0, 0, 9.8], mesh))
@@ -960,55 +960,15 @@ class MHApplication(gui3d.Application):
             return os.path.join("data/themes/default/", folder, id)
             
     def setLanguage(self, language):
-        
-        path = os.path.join("data/languages/", language + ".ini")
-        if os.path.isfile(path):
-            f = open(path, 'rU')
-            try:
-                self.languageStrings = eval(f.read(), {"__builtins__":None}, {'True':True, 'False':False})
-            except:
-                import traceback
-                exc_type, exc_value, exc_traceback = sys.exc_info()
-                print ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback))
-                print('Error in language file %s' % language)
-                self.languageStrings = None
-            f.close()
-            if self.languageStrings and '__options__' in self.languageStrings:
-                if 'rtl' in self.languageStrings['__options__']:
-                    self.settings['rtl'] = self.languageStrings['__options__']['rtl']
-                else:
-                    self.settings['rtl'] = False
-            else:
-                self.settings['rtl'] = False
-        else:
-            self.languageStrings = None
+        lang.language.setLanguage(language)
+        self.settings['rtl'] = lang.language.rtl
             
     def getLanguageString(self, string):
-        if self.languageStrings:
-            try:
-                return self.languageStrings[string]
-            except:
-                if not hasattr(self, 'missingStrings'):
-                    self.missingStrings = set();
-                self.missingStrings.add(string)
-                return string
-        else:
-            return string
+        return lang.language.getLanguageString(string)
             
     def dumpMissingStrings(self):
-    
-        if not hasattr(self, 'missingStrings'):
-            return
-        try:
-            f = open(os.path.join("data/languages/", self.settings['language'] + ".missing"), 'w')
-            for string in self.missingStrings:
-                f.write("'")
-                f.write(string.encode('utf8'))
-                f.write("':'',\n")
-            f.close()
-        except:
-            pass
-      
+        lang.language.dumpMissingStrings()
+
     # Font resources
     def getFont(self, fontFamily):
         if fontFamily not in self.fonts:
