@@ -1,8 +1,9 @@
 # author Thomas Larsson
 # license GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 # homepage http://www.makehuman.org/
-# uuid ea54fb18-2145-46fd-a2d2-0ca8747868a9
+# uuid a223e500-2831-4a7e-a093-fdbbab8dfd70
 # basemesh alpha_7
+# tag Benchmark
 
 # name Benchmark_Tights
 # obj_file benchmark_tights.obj
@@ -14,8 +15,8 @@
 # uvtex_layer 0 base
 # objfile_layer 0
 # texture benchmark_tights_texture.png 0
-# material Material
-diffuse_color 0.8000 0.0350 0.0000
+# material White
+diffuse_color 0.8000 0.8000 0.8000
 diffuse_intensity 0.8
 specular_color 1.0000 1.0000 1.0000
 specular_intensity 0.5
