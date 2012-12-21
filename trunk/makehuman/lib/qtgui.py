@@ -449,8 +449,8 @@ class Dialog(QtGui.QDialog):
         self.button2 = QtGui.QPushButton()
         self.layout.addWidget(self.button2, 2, 3)
 
-        self.connect(self.button1, QtCore.SIGNAL('clicked(bool)'), self.reject)
-        self.connect(self.button2, QtCore.SIGNAL('clicked(bool)'), self.accept)
+        self.connect(self.button1, QtCore.SIGNAL('clicked(bool)'), self.accept)
+        self.connect(self.button2, QtCore.SIGNAL('clicked(bool)'), self.reject)
 
     def prompt(self, title, text, button1Label, button2Label=None, button1Action=None, button2Action=None, helpId=None):
         if helpId in self.helpIds:
@@ -474,10 +474,10 @@ class Dialog(QtGui.QDialog):
 
         which = self.exec_()
 
-        if which == QtGui.QMessageBox.Ok and self.button1Action:
-            self.button1Action()
-        elif which == QtGui.QMessageBox.Cancel and self.button2Action:
-            self.button2Action()
+        if which == QtGui.QDialog.Accepted and button1Action:
+            button1Action()
+        elif which == QtGui.QDialog.Rejected and button2Action:
+            button2Action()
 
         if helpId and self.check.isChecked():
             self.helpIds.add(helpId)
