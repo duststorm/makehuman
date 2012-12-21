@@ -60,15 +60,15 @@ class AqsisTaskView(gui3d.TaskView):
             
         @self.shadingRateSlider.mhEvent
         def onChanging(value):
-            self.app.settings['rendering_aqsis_shadingrate'] = value #Using global dictionary in app for global settings
+            gui3d.app.settings['rendering_aqsis_shadingrate'] = value #Using global dictionary in app for global settings
             
         @self.samplesSlider.mhEvent
         def onChanging(value):
-            self.app.settings['rendering_aqsis_samples'] = value
+            gui3d.app.settings['rendering_aqsis_samples'] = value
             
         @self.skinOilSlider.mhEvent
         def onChanging(value):
-            self.app.settings['rendering_aqsis_oil'] = value
+            gui3d.app.settings['rendering_aqsis_oil'] = value
             
         @self.renderButton.mhEvent
         def onClicked(event):
