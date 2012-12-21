@@ -108,7 +108,7 @@ class FlowLayout(QtGui.QLayout):
             return QtCore.QSize(0, 0)
         return self._children[0].sizeHint()
 
-class FileSort():
+class FileSort(object):
     """
     The default file sorting class. Can sort files on name, creation and modification date and size.
     """

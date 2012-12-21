@@ -9,7 +9,7 @@ class FontRadioButton(gui.RadioButton):
 
     def __init__(self, group, font):
     
-        super(FontRadioButton, self).__init__(group, font.capitalize(), gui3d.app.settings.get('font', 'arial') == font, style=gui3d.RadioButtonStyle._replace(fontFamily=font))
+        super(FontRadioButton, self).__init__(group, font.capitalize(), gui3d.app.settings.get('font', 'arial') == font)
         self.font = font
         
     def onClicked(self, event):

@@ -15,8 +15,8 @@ class RenderingSettingTaskView(gui3d.TaskView):
         rendering_width = gui3d.app.settings.get('rendering_width', 800)
         rendering_height = gui3d.app.settings.get('rendering_height', 600)
         resBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Resolution')))
-        self.width  = resBox.addWidget(gui.TextEdit(str(rendering_width), validator = gui3d.intValidator))
-        self.height = resBox.addWidget(gui.TextEdit(str(rendering_height), validator = gui3d.intValidator))
+        self.width  = resBox.addWidget(gui.TextEdit(str(rendering_width), validator = gui.intValidator))
+        self.height = resBox.addWidget(gui.TextEdit(str(rendering_height), validator = gui.intValidator))
 
         @self.width.mhEvent
         def onChange(value):

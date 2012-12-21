@@ -11,7 +11,7 @@ print 'Arms and leg imported'
 
 class GroupBoxRadioButton(gui.RadioButton):
     def __init__(self, group, label, groupBox, selected=False):
-        super(GroupBoxRadioButton, self).__init__(group, label, selected, style=gui3d.ButtonStyle)
+        super(GroupBoxRadioButton, self).__init__(group, label, selected)
         self.groupBox = groupBox
         
     def onClicked(self, event):
@@ -22,7 +22,7 @@ class GroupBoxRadioButton(gui.RadioButton):
 class HeadSlider(humanmodifier.ModifierSlider):
     def __init__(self,modifier, image, view):
         
-        humanmodifier.ModifierSlider.__init__(self, min=-1.0, max=1.0, modifier=modifier, style=gui3d.SliderStyle._replace(height=56, normal=image), thumbStyle=gui3d.SliderThumbStyle._replace(height = 32, width = 32, normal="slider2.png", focused="slider2_focused.png"))
+        humanmodifier.ModifierSlider.__init__(self, min=-1.0, max=1.0, modifier=modifier)
         
         self.view = getattr(gui3d.app, view)
         

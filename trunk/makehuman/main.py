@@ -494,7 +494,6 @@ class MHApplication(gui3d.Application):
         self.progressBar = mh.addWidget(mh.Frame.Bottom, gui.ProgressBar())
         self.redrawNow()
         
-        # self.tabs = self.addView(gui3d.TabView())
         self.tabs = G.app.mainwin.tabs
         
         @self.tabs.mhEvent
@@ -505,7 +504,6 @@ class MHApplication(gui3d.Application):
 
         self.progressBar.setProgress(0.1)
 
-        self.statusbar = self.addObject(gui3d.Object([0, 580, 9], gui3d.RectangleMesh(800, 32, self.getThemeResource("images", "lowerbar.png"))))
         mh.setClearColor(0.5, 0.5, 0.5, 1.0)
         
         mh.callAsync(self.loadHuman)
@@ -738,8 +736,7 @@ class MHApplication(gui3d.Application):
           gui3d.app.setFaceCamera()
 
         """          
-        self.poseModeBox = self.addView(gui3d.CheckBox("Pose mode", False,
-            style=gui3d.CheckBoxStyle._replace(width=128, height=20, left=650, top=555, zIndex=9.1)))
+        self.poseModeBox = self.buttonBox.addWidget(gui.CheckBox("Pose mode", False))
         
         @self.poseModeBox.mhEvent
         def onClicked(event):
@@ -829,10 +826,7 @@ class MHApplication(gui3d.Application):
             self.shortcuts[(modifiers, key)]()
             
     def onResized(self, event):
-
-        # self.tabs.box.mesh.resize(event.width, 32)
-        self.statusbar.mesh.resize(event.width, 32)
-        self.statusbar.setPosition((0.0, event.height-20, 9))
+        pass
         
     # Undo-redo
     def do(self, action):

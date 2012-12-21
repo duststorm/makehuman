@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import os
+
 from PyQt4 import QtCore, QtGui
 
 from core import G
@@ -206,12 +208,12 @@ class ButtonBase(Widget):
         self.setChecked(value)
 
 class Button(QtGui.QPushButton, ButtonBase):
-    def __init__(self, label=None, selected=False, style=None):
+    def __init__(self, label=None, selected=False):
         super(Button, self).__init__(label)
         ButtonBase.__init__(self)
 
 class CheckBox(QtGui.QCheckBox, ButtonBase):
-    def __init__(self, label=None, selected=False, style=None):
+    def __init__(self, label=None, selected=False):
         super(CheckBox, self).__init__(label)
         ButtonBase.__init__(self)
         self.setChecked(selected)
@@ -221,7 +223,7 @@ ToggleButton = CheckBox
 class RadioButton(QtGui.QRadioButton, ButtonBase):
     groups = {}
 
-    def __init__(self, group, label=None, selected=False, style=None):
+    def __init__(self, group, label=None, selected=False):
         super(RadioButton, self).__init__(label)
         ButtonBase.__init__(self)
         self.group = group
@@ -259,7 +261,7 @@ class RadioButton(QtGui.QRadioButton, ButtonBase):
                 return radio
 
 class TextView(QtGui.QLabel, Widget):
-    def __init__(self, label = '', style=None):
+    def __init__(self, label = ''):
         label = self.getLanguageString(label) if label else ''
         super(TextView, self).__init__(label)
         Widget.__init__(self)
@@ -282,7 +284,7 @@ def filenameValidator(text):
     return not text or len(set(text) & set('\\/:*?"<>|')) == 0
 
 class TextEdit(QtGui.QLineEdit, Widget):
-    def __init__(self, text='', style=None, validator = None):
+    def __init__(self, text='', validator = None):
         super(TextEdit, self).__init__(text)
         Widget.__init__(self)
         self.setValidator(validator)
@@ -290,17 +292,17 @@ class TextEdit(QtGui.QLineEdit, Widget):
 
     @property
     def text(self):
-        return self.toPlainText()
+        return self.getText()
 
     def _textChanged(self, string):
         self.callEvent('onChange', string)
 
     def setText(self, text):
-        self.setPlainText(text)
+        self.setText(text)
         self.moveCursor(QtGui.QTextCursor.End, QtGui.QTextCursor.MoveAnchor)
 
     def getText(self):
-        return self.toPlainText()
+        return super(TextEdit, self).text()
 
     def validateText(self, text):
         if self.__validator:
@@ -311,17 +313,17 @@ class TextEdit(QtGui.QLineEdit, Widget):
     def setValidator(self, validator):
         self.__validator = validator
         if validator == intValidator:
-            qvalidator = QIntValidator()
+            qvalidator = QtGui.QIntValidator()
         elif validator == floatValidator:
-            qvalidator = QDoubleValidator()
+            qvalidator = QtGui.QDoubleValidator()
         elif validator == filenameValidator:
-            qvalidator = QRegExpValidator(QRegExp(r'[\/:*?"<>|]*'))
+            qvalidator = QtGui.QRegExpValidator(QRegExp(r'[^\/:*?"<>|]*'))
         else:
             qvalidator = None
         super(TextEdit, self).setValidator(qvalidator)
 
 class ProgressBar(QtGui.QProgressBar, Widget):
-    def __init__(self, style=None, barStyle=None, visible=True):
+    def __init__(self, visible=True):
         super(ProgressBar, self).__init__()
         Widget.__init__(self)
         self.setVisible(visible)
@@ -479,3 +481,51 @@ class Dialog(QtGui.QDialog):
 
         if helpId and self.check.isChecked():
             self.helpIds.add(helpId)
+
+class FileEntryView(QtGui.QWidget, Widget):
+    def __init__(self, buttonLabel):
+        super(FileEntryView, self).__init__()
+        Widget.__init__(self)
+
+        self.directory = os.getcwd()
+        self.filter = ''
+
+        self.layout = QtGui.QGridLayout(self)
+
+        self.browse = QtGui.QPushButton("...")
+        self.layout.addWidget(self.browse, 0, 0)
+        self.layout.setColumnStretch(0, 0)
+
+        self.edit = QtGui.QLineEdit()
+        self.edit.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp(r'[^\/:*?"<>|]*')))
+        self.layout.addWidget(self.edit, 0, 1)
+        self.layout.setColumnStretch(1, 1)
+
+        self.confirm = QtGui.QPushButton(buttonLabel)
+        self.layout.addWidget(self.confirm, 0, 2)
+        self.layout.setColumnStretch(2, 0)
+
+        self.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Fixed)
+
+        self.connect(self.browse, QtCore.SIGNAL('clicked(bool)'), self._browse)
+        self.connect(self.confirm, QtCore.SIGNAL('clicked(bool)'), self._confirm)
+        self.connect(self.edit, QtCore.SIGNAL(' returnPressed()'), self._confirm)
+
+    def setDirectory(self, directory):
+        self.directory = directory
+
+    def setFilter(self, filter):
+        self.filter = filter
+        if '(*.*)' not in self.filter:
+            self.filter = ';;'.join([self.filter, 'All Files (*.*)'])
+
+    def _browse(self, state = None):
+        path = QtGui.QFileDialog.getSaveFileName(G.app.mainwin, "Save File", self.directory, self.filter)
+        self.edit.setText(path)
+
+    def _confirm(self, state = None):
+        if len(self.edit.text()):
+            self.callEvent('onFileSelected', self.edit.text())
+                
+    def onFocus(self, event):
+        self.edit.setFocus()

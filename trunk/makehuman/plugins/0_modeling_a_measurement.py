@@ -12,7 +12,7 @@ import aljabr
 import mh
 import qtgui as gui
 
-class MeasurementValueConverter(gui3d.ValueConverter):
+class MeasurementValueConverter(object):
 
     def __init__(self, task, measure, modifier):
 
@@ -56,7 +56,7 @@ class MeasurementValueConverter(gui3d.ValueConverter):
 
 class GroupBoxRadioButton(gui.RadioButton):
     def __init__(self, group, label, groupBox, selected=False):
-        super(GroupBoxRadioButton, self).__init__(group, label, selected, style=gui3d.ButtonStyle)
+        super(GroupBoxRadioButton, self).__init__(group, label, selected)
         self.groupBox = groupBox
 
     def onClicked(self, event):

@@ -37,7 +37,7 @@ import qtgui as gui
 class FolderButton(gui.RadioButton):
 
     def __init__(self, group, label, groupBox, selected=False):
-        super(FolderButton, self).__init__(group, label, selected, style=gui3d.ButtonStyle)
+        super(FolderButton, self).__init__(group, label, selected)
         self.groupBox = groupBox
         
     def onClicked(self, event):

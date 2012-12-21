@@ -52,8 +52,14 @@ class SaveTaskView(gui3d.TaskView):
     def __init__(self, category):
         
         gui3d.TaskView.__init__(self, category, 'Save')
-        self.fileentry = self.addView(gui3d.FileEntryView('Save'))
-        
+
+        modelPath = mh.getPath('models')
+
+        # self.fileentry = self.addView(gui3d.FileEntryView('Save'))
+        self.fileentry = self.addWidget(mh.addWidget(mh.Frame.Top, gui.FileEntryView('Save')))
+        self.fileentry.setDirectory(modelPath)
+        self.fileentry.setFilter('MakeHuman Models (*.mhm)')
+
         mesh = gui3d.FrameMesh(100, 100)
         self.selection = gui3d.app.addObject(gui3d.Object([0, 0, 9], mesh))
         mesh.setColor([0, 0, 0, 255])
@@ -62,22 +68,26 @@ class SaveTaskView(gui3d.TaskView):
 
         @self.fileentry.mhEvent
         def onFileSelected(filename):
-            
-            modelPath = mh.getPath('models')
-            if not os.path.exists(modelPath):
-                os.makedirs(modelPath)
+            if not filename.lower().endswith('.mhm'):
+                filename += '.mhm'
 
-            tags = filename
+            path = os.path.normpath(os.path.join(modelPath, filename))
+
+            dir, name = os.path.split(path)
+            name, ext = os.path.splitext(name)
+
+            if not os.path.exists(dir):
+                os.makedirs(dir)
 
             # Save the thumbnail
 
             leftTop = self.selection.getPosition()
-            mh.grabScreen(int(leftTop[0]+1), int(leftTop[1]+1), int(self.selection.width-1), int(self.selection.height-1), os.path.join(modelPath, filename + '.bmp'))
+            mh.grabScreen(int(leftTop[0]+1), int(leftTop[1]+1), int(self.selection.width-1), int(self.selection.height-1), os.path.join(dir, name + '.bmp'))
 
             # Save the model
 
             human = gui3d.app.selectedHuman
-            human.save(os.path.join(modelPath, filename + '.mhm'), tags)
+            human.save(path, name)
             
             gui3d.app.setCaption("MakeHuman r" + os.environ['SVNREVISION'] + " - [" + filename + "]")
 
@@ -134,16 +144,16 @@ class SaveTaskView(gui3d.TaskView):
         self.selection.height = int(rightBottom[1] - leftTop[1])
         self.selection.mesh.resize(self.selection.width, self.selection.height)
         
-class HumanFileSort(gui3d.FileSort):
+class HumanFileSort(fc.FileSort):
     
     def __init__(self):
         
-        gui3d.FileSort.__init__(self)
+        super(HumanFileSort, self).__init__()
         self.meta = {}
     
     def fields(self):
         
-        return list(gui3d.FileSort.fields(self)) + ["gender", "age", "muscle", "weight"]
+        return list(super(HumanFileSort, self).fields()) + ["gender", "age", "muscle", "weight"]
         
     def sortGender(self, filenames):
         
@@ -251,7 +261,12 @@ class ExportTaskView(gui3d.TaskView):
     def __init__(self, category):
         
         gui3d.TaskView.__init__(self, category, 'Export')
-        self.fileentry = self.addView(gui3d.FileEntryView('Export'))
+
+        exportPath = mh.getPath('exports')
+
+        self.fileentry = self.addWidget(mh.addWidget(mh.Frame.Top, gui.FileEntryView('Export')))
+        self.fileentry.setDirectory(exportPath)
+        self.fileentry.setFilter('All Files (*.*)')
 
         self.exportBodyGroup = []
         self.exportHairGroup = []
@@ -356,33 +371,44 @@ class ExportTaskView(gui3d.TaskView):
         @self.wavefrontObj.mhEvent
         def onClicked(event):
             self.updateGui()
+            self.fileentry.setFilter('Wavefront (*.obj)')
             
         @self.mhx.mhEvent
         def onClicked(event):
             self.updateGui()
+            self.fileentry.setFilter('Blender Exchange (*.mhx)')
         
         @self.collada.mhEvent
         def onClicked(event):
             self.updateGui()
+            self.fileentry.setFilter('Collada (*.dae)')
         
         @self.md5.mhEvent
         def onClicked(event):
             self.updateGui()
+            self.fileentry.setFilter('MD5 (*.md5)')
         
         @self.stl.mhEvent
         def onClicked(event):
             self.updateGui()
+            self.fileentry.setFilter('Stereolithography (*.stl)')
             
         @self.skel.mhEvent
         def onClicked(event):
             self.updateGui()
+            self.fileentry.setFilter('Skeleton (*.skel)')
         
         @self.fileentry.mhEvent
         def onFileSelected(filename):
-            
-            exportPath = mh.getPath('exports')
-            if not os.path.exists(exportPath):
-                os.makedirs(exportPath)
+
+            path = os.path.normpath(os.path.join(exportPath, filename))
+            dir, name = os.path.split(path)
+            name, ext = os.path.splitext(name)
+
+            if not os.path.exists(dir):
+                os.makedirs(dir)
+
+            filename = path
 
             if self.wavefrontObj.selected:
                 
@@ -395,10 +421,10 @@ class ExportTaskView(gui3d.TaskView):
                     "lashes" : self.exportLashes.selected,
                     "scale": self.getScale(self.objScales),
                 }                    
-                mh2obj_proxy.exportProxyObj(human, os.path.join(exportPath, filename), options)
+                mh2obj_proxy.exportProxyObj(human, os.path.join(dir, filename), options)
                 
                 if self.exportSkeleton.selected:
-                    mh2bvh.exportSkeleton(human.meshData, os.path.join(os.path.join(exportPath, filename), filename + ".bvh"))
+                    mh2bvh.exportSkeleton(human.meshData, os.path.join(os.path.join(dir, filename), filename + ".bvh"))
                     
             elif self.mhx.selected:
                 #mhxversion = []
@@ -427,7 +453,7 @@ class ExportTaskView(gui3d.TaskView):
                     'mhxrig': rig,
                 }
 
-                mh2mhx.exportMhx(gui3d.app.selectedHuman, os.path.join(exportPath, filename + ".mhx"), options)
+                mh2mhx.exportMhx(gui3d.app.selectedHuman, os.path.join(dir, filename + ".mhx"), options)
             elif self.collada.selected:
                 for (button, rig) in self.daeRigs:
                     if button.selected:
@@ -442,18 +468,18 @@ class ExportTaskView(gui3d.TaskView):
                     "hidden" : self.colladaHidden.selected,
                     "scale": self.getScale(self.daeScales),
                 }
-                mh2collada.exportCollada(gui3d.app.selectedHuman, os.path.join(exportPath, filename), options)
+                mh2collada.exportCollada(gui3d.app.selectedHuman, os.path.join(dir, filename), options)
             elif self.md5.selected:
-                mh2md5.exportMd5(gui3d.app.selectedHuman.meshData, os.path.join(exportPath, filename + ".md5mesh"))
+                mh2md5.exportMd5(gui3d.app.selectedHuman.meshData, os.path.join(dir, filename + ".md5mesh"))
             elif self.stl.selected:
                 mesh = gui3d.app.selectedHuman.getSubdivisionMesh() if self.exportSmooth.selected else gui3d.app.selectedHuman.meshData
                 if self.stlAscii.selected:
-                    mh2stl.exportStlAscii(mesh, os.path.join(exportPath, filename + ".stl"))
+                    mh2stl.exportStlAscii(mesh, os.path.join(dir, filename + ".stl"))
                 else:
-                    mh2stl.exportStlBinary(mesh, os.path.join(exportPath, filename + ".stl"))
+                    mh2stl.exportStlBinary(mesh, os.path.join(dir, filename + ".stl"))
             elif self.skel.selected:
                 mesh = gui3d.app.selectedHuman.getSubdivisionMesh() if self.exportSmooth.selected else gui3d.app.selectedHuman.meshData
-                mh2skel.exportSkel(mesh, os.path.join(exportPath, filename + ".skel"))
+                mh2skel.exportSkel(mesh, os.path.join(dir, filename + ".skel"))
                     
             gui3d.app.prompt('Info', u'The mesh has been exported to %s.' % os.path.join(mh.getPath(''), u'exports'), 'OK', helpId='exportHelp')
 

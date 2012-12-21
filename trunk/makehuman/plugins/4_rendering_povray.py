@@ -28,7 +28,7 @@ class PovrayTaskView(gui3d.TaskView):
         pathBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Povray  bin  path')))
         # this part load old settings values for next session; str(povray_bin)
         povray_bin = gui3d.app.settings.get('povray_bin', '')
-        self.path= pathBox.addWidget(gui.TextEdit(str(povray_bin), gui3d.TextEditStyle._replace(width=112)))
+        self.path= pathBox.addWidget(gui.TextEdit(str(povray_bin)))
         #
         if os.name == 'nt':
             #
