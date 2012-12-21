@@ -580,6 +580,9 @@ class View(events3d.EventHandler):
             widget.hide()
         return widget
 
+    def removeWidget(self, widget):
+        self.widgets.remove(widget)
+
     def showWidgets(self):
         for w in self.widgets:
             w.show()

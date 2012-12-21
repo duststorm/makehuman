@@ -166,6 +166,9 @@ def getPath(type):
 def addWidget(edge, widget, *args, **kwargs):
     return ui.addWidget(edge, widget, *args, **kwargs)
 
+def removeWidget(edge, widget):
+    return ui.removeWidget(edge, widget)
+
 class Frame:
     Bottom      = ui.Frame.Bottom
     Top         = ui.Frame.Top

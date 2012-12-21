@@ -562,6 +562,9 @@ class Frame(QtGui.QWidget):
             widget.installEventFilter(self)
         return widget
 
+    def removeWidget(self, edge, widget):
+        self.sides[edge].removeWidget(widget)
+
     def update(self):
         super(Frame, self).update()
         self.canvas.update()
@@ -625,6 +628,9 @@ def callAsync(callback):
 
 def addWidget(edge, widget, *args, **kwargs):
     return G.app.mainwin.addWidget(edge, widget, *args, **kwargs)
+
+def removeWidget(edge, widget):
+    return G.app.mainwin.removeWidget(edge, widget)
 
 def changeCategory(category):
     G.app.mainwin.tabs.changeTab(category)

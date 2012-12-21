@@ -53,7 +53,7 @@ class CustomTargetsTaskView(gui3d.TaskView):
         if not os.path.exists(self.targetsPath):
             os.makedirs(self.targetsPath)
         
-        self.msg = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.TextView('No custom targets found.\nTo add a custom target, place the file in ' + self.targetsPath)))
+        self.msg = self.addWidget(mh.addWidget(mh.Frame.Bottom, gui.TextView('No custom targets found.\nTo add a custom target, place the file in ' + self.targetsPath)))
         
         y = 80
         self.optionsBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Options')))
@@ -76,7 +76,8 @@ class CustomTargetsTaskView(gui3d.TaskView):
         self.modifiers = {}
         
         for folder in self.folders:
-            self.removeView(folder)
+            self.removeWidget(folder)
+            mh.removeWidget(mh.Frame.LeftTop, folder)
         for child in self.folderBox.children[:]:
             self.folderBox.removeWidget(child)
             
