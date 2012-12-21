@@ -697,7 +697,7 @@ class MHApplication(gui3d.Application):
         category.addView(PluginsTaskView(category))
           
         # Exit button
-        category = self.addView(gui3d.Category(self, "Exit", tabStyle=gui3d.CategoryButtonStyle))
+        category = self.addView(gui3d.Category(self, "Exit"))
         @category.tab.mhEvent
         def onClicked(event):
             self.promptAndExit()
@@ -824,9 +824,6 @@ class MHApplication(gui3d.Application):
             
         if (modifiers, key) in self.shortcuts:
             self.shortcuts[(modifiers, key)]()
-            
-    def onResized(self, event):
-        pass
         
     # Undo-redo
     def do(self, action):

@@ -210,12 +210,6 @@ class MeasureTaskView(gui3d.TaskView):
         self.groupBoxes['neck'].children[0].setFocus()
         self.syncSliders()
 
-    def onResized(self, event):
-
-        self.categoryBox.setPosition([event.width - 150, self.categoryBox.getPosition()[1], 9.0])
-        self.statsBox.setPosition([event.width - 150, self.statsBox.getPosition()[1], 9.0])
-        self.braBox.setPosition([event.width - 150, self.braBox.getPosition()[1], 9.0])
-
     def onSliderFocus(self):
 
         self.updateMeshes()

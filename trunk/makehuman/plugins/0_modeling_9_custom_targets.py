@@ -129,11 +129,6 @@ class CustomTargetsTaskView(gui3d.TaskView):
         for folder in self.folders:
             folder.hide()
         
-    def onResized(self, event):
-        
-        self.optionsBox.setPosition([event.width - 150, self.optionsBox.getPosition()[1], 9.0])
-        self.folderBox.setPosition([event.width - 150, self.folderBox.getPosition()[1], 9.0])
-        
     def onShow(self, event):
 
         gui3d.TaskView.onShow(self, event)

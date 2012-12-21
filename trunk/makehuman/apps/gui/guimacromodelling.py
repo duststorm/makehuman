@@ -151,8 +151,3 @@ class MacroModelingTaskView(gui3d.TaskView):
         if self.isVisible():
             self.syncSliders()
             self.syncStatus()
-
-    def onResized(self, event):
-        font = gui3d.app.getFont(gui3d.TextViewStyle.fontFamily)
-        self.status.setPosition([10, event.height-2-font.lineHeight, 9.1])
-        #self.radialBox.setPosition([event.width - 210, self.radialBox.getPosition()[1], 9.0])

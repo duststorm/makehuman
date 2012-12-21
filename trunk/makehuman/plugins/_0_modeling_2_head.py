@@ -28,12 +28,6 @@ class HeadSlider(humanmodifier.ModifierSlider):
         
         humanmodifier.ModifierSlider.onFocus(self, event)
         self.view()
-        
-    def setPosition(self, position):
-        
-        humanmodifier.ModifierSlider.setPosition(self, position)
-        self.thumb.setPosition([position[0], position[1] + self.style.height / 2 - self.thumbStyle.height / 2, position[2] + 0.01])
-        self.setValue(self.getValue())
 
 class HeadTaskView(gui3d.TaskView):
 
@@ -117,10 +111,6 @@ class HeadTaskView(gui3d.TaskView):
         
         for slider in self.sliders:
             slider.update()
-            
-    def onResized(self, event):
-        
-        self.categoryBox.setPosition([event.width - 150, self.categoryBox.getPosition()[1], 9.0])
         
     def onHumanChanged(self, event):
 

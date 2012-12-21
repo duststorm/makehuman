@@ -92,10 +92,6 @@ class ExpressionTaskView(gui3d.TaskView):
         gui3d.TaskView.onShow(self, event)
         for slider in self.sliders:
             slider.update()
-            
-    def onResized(self, event):
-        
-        self.categoryBox.setPosition([event.width - 150, self.categoryBox.getPosition()[1], 9.0])
         
     def onHumanChanged(self, event):
         

@@ -452,10 +452,6 @@ class BvhView(gui3d.TaskView):
             self.bone.setColor([0, 255, 0, 255])
             self.status.setText(event.group.name)
         gui3d.app.redraw()
-        
-    def onResized(self, event):
-        
-        self.status.setPosition([10, event.height-15, 9.1])
 
 def load(app):
     

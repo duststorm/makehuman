@@ -70,11 +70,6 @@ class ShortcutsTaskView(gui3d.TaskView):
 
         gui3d.TaskView.onHide(self, event)
         gui3d.app.saveSettings()
-        
-    def onResized(self, event):
-        
-        self.actionBox.setPosition([event.width - 150, self.actionBox.getPosition()[1], 9.0])
-        self.navigationBox.setPosition([event.width - 150, self.navigationBox.getPosition()[1], 9.0])
 
 def load(app):
     category = app.getCategory('Settings')

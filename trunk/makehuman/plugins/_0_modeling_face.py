@@ -107,11 +107,6 @@ class FaceTaskView(gui3d.TaskView):
         
         for slider in self.sliders:
             slider.update()
-            
-    def onResized(self, event):
-        
-        self.categoryBox.setPosition([event.width - 150, self.categoryBox.getPosition()[1], 9.0])
-        self.headBox.setPosition([event.width - 150, self.headBox.getPosition()[1], 9.0])
         
     def onHumanChanged(self, event):
         

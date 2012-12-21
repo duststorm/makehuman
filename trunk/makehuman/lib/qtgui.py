@@ -36,12 +36,6 @@ class Widget(events3d.EventHandler):
     def getLanguageString(text):
         return text
 
-    def setPosition(self, position):
-        pass
-
-    def getPosition(self):
-        return (0, 0, 0)
-
 class TabsBase(Widget):
     def __init__(self):
         super(TabsBase, self).__init__()

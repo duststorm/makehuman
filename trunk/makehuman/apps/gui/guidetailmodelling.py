@@ -607,9 +607,6 @@ class DetailModelingTaskView(gui3d.TaskView):
     def onHide(self, event):
         gui3d.app.tool = None
         gui3d.TaskView.onHide(self, event)
-        
-    def onResized(self, event):
-        self.modifiersBox.setPosition([event.width - 150, self.modifiersBox.getPosition()[1], 9.0])
 
     def syncSliders(self):
 

@@ -68,10 +68,3 @@ class ModellingCategory(gui3d.Category):
         
         self.addView(guimacromodelling.MacroModelingTaskView(self))
         self.addView(guidetailmodelling.DetailModelingTaskView(self))
-
-    def onResized(self, event):
-        gui3d.Category.onResized(self, event)
-        self.viewBox.setPosition([10, event.height-155, 9.0])
-
-
-

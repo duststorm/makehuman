@@ -50,10 +50,6 @@ class MouseActionsTaskView(gui3d.TaskView):
 
         gui3d.TaskView.onHide(self, event)
         gui3d.app.saveSettings()
-        
-    def onResized(self, event):
-        
-        pass
 
 def load(app):
     category = app.getCategory('Settings')

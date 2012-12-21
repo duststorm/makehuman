@@ -172,10 +172,6 @@ class AsymmTaskView(gui3d.TaskView):
         gui3d.TaskView.onShow(self, event)
         self.asymmBrowSlider.setFocus()
         self.syncSliders()
-        
-    def onResized(self, event):
-        
-        self.rightBox.setPosition([event.width - 150, self.rightBox.getPosition()[1], 9.0])
             
     def syncSliders(self):
         self.asymmBrowSlider.setValue(self.getSliderValue('brown'))
