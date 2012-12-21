@@ -9,9 +9,10 @@ from core import G
 import events3d
 
 class Tab(events3d.EventHandler):
-    def __init__(self, parent, label):
+    def __init__(self, parent, name, label):
         super(Tab, self).__init__()
         self.parent = parent
+        self.name = name
         self.label = label
 
     def setSelected(self, state):
@@ -41,25 +42,24 @@ class TabsBase(Widget):
         super(TabsBase, self).__init__()
         self.tabBar().setExpanding(False)
         self.connect(self, QtCore.SIGNAL('currentChanged(int)'), self.tabChanged)
-        self._tabs = {}
+        self._tabs_by_idx = {}
+        self._tabs_by_name = {}
 
-    def _addTab(self, label):
-        tab = Tab(self, label)
+    def _addTab(self, name, label):
+        tab = Tab(self, name, label)
         tab.idx = self._makeTab(tab)
-        self._tabs[tab.idx] = tab
+        self._tabs_by_idx[tab.idx] = tab
+        self._tabs_by_name[tab.name] = tab
         return tab
 
     def tabChanged(self, idx):
-        tab = self._tabs.get(idx)
+        tab = self._tabs_by_idx.get(idx)
         if tab:
             self.callEvent('onTabSelected', tab)
             tab.callEvent('onClicked', tab)
 
     def findTab(self, name):
-        for tab in self._tabs:
-            if tab.name == name:
-                return tab
-        return None
+        return self._tabs_by_name.get(name)
 
     def changeTab(self, name):
         self.setCurrentIndex(self.findTab(name).idx)
@@ -73,12 +73,12 @@ class Tabs(QtGui.QTabWidget, TabsBase):
         tab.child = TabBar(self)
         return super(Tabs, self).addTab(tab.child, tab.label)
 
-    def addTab(self, label):
-        return super(Tabs, self)._addTab(label)
+    def addTab(self, name, label):
+        return super(Tabs, self)._addTab(name, label)
 
     def tabChanged(self, idx):
         super(Tabs, self).tabChanged(idx)
-        tab = self._tabs.get(idx)
+        tab = self._tabs_by_idx.get(idx)
         if tab:
             tab.child.tabChanged(tab.child.currentIndex())
 
@@ -93,8 +93,8 @@ class TabBar(QtGui.QTabBar, TabsBase):
     def _makeTab(self, tab):
         return super(TabBar, self).addTab(tab.label)
 
-    def addTab(self, label):
-        return super(TabBar, self)._addTab(label)
+    def addTab(self, name, label):
+        return super(TabBar, self)._addTab(name, label)
 
 class GroupBox(QtGui.QGroupBox, Widget):
     def __init__(self, label = ''):

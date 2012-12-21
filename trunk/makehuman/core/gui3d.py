@@ -604,8 +604,7 @@ class TaskView(View):
         category.tasks.append(self)
         category.tasksByName[self.name] = self
 
-        self.tab = category.tabs.addTab(label or name)
-        self.tab.name = self.name
+        self.tab = category.tabs.addTab(name, label or name)
             
     def canFocus(self):
         return False
@@ -648,8 +647,7 @@ class Category(View):
             raise KeyError('A category with this name already exists', name)
 
         app.categories[name] = self
-        self.tab = app.tabs.addTab(label or name)
-        self.tab.name = self.name
+        self.tab = app.tabs.addTab(name, label or name)
         
         self.tabs = self.tab.child
         
