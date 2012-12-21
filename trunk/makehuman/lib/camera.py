@@ -53,9 +53,9 @@ class Camera(object):
         if stereoMode == 0:
             # No stereo
             if self.projection:
-                proj = matrix.perspective(self.fovAngle, float(G.windowWidth) / float(G.windowHeight), self.nearPlane, self.farPlane)
+                proj = matrix.perspective(self.fovAngle, float(max(1, G.windowWidth)) / float(max(1, G.windowHeight)), self.nearPlane, self.farPlane)
             elif self.left == self.right and self.top == self.bottom:
-                proj = matrix.ortho(0.0, G.windowWidth, G.windowHeight, 0.0, self.nearPlane, self.farPlane)
+                proj = matrix.ortho(0.0, max(1, G.windowWidth), max(1, G.windowHeight), 0.0, self.nearPlane, self.farPlane)
             else:
                 proj = matrix.ortho(self.left, self.right, self.bottom, self.top, self.nearPlane, self.farPlane)
 
@@ -64,7 +64,7 @@ class Camera(object):
                         self.upX, self.upY, self.upZ)          # Up
         elif stereoMode == 1:
             # Toe-in method, uses different eye positions, same focus point and projection
-            proj = matrix.perspective(self.fovAngle, float(G.windowWidth)/float(G.windowHeight), self.nearPlane, self.farPlane)
+            proj = matrix.perspective(self.fovAngle, float(max(1, G.windowWidth)) / float(max(1, G.windowHeight)), self.nearPlane, self.farPlane)
 
             if eye == 1:
                 mv = lookat(self.eyeX - 0.5 * self.eyeSeparation, self.eyeY, self.eyeZ, # Eye
@@ -76,7 +76,7 @@ class Camera(object):
                             self.upX, self.upY, self.upZ)                               # Up
         elif stereoMode == 2:
             # Off-axis method, uses different eye positions, focus points and projections
-            aspectratio = float(G.windowWidth) / float(G.windowHeight)
+            aspectratio = float(max(1, G.windowWidth)) / float(max(1, G.windowHeight))
             widthdiv2 = math.tan(math.radians(self.fovAngle) / 2) * self.nearPlane
             left  = - aspectratio * widthdiv2
             right = aspectratio * widthdiv2
