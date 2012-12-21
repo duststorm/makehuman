@@ -28,7 +28,7 @@ class AsymmTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Asymmetry')
 
         #Sliders
-        self.leftBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Face')))
+        self.leftBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.SliderBox('Face')))
         self.asymmBrowSlider = self.leftBox.addWidget(AssymSlider("brown", "Brow asymmetry"))
         self.asymmCheekSlider = self.leftBox.addWidget(AssymSlider("cheek", "Cheek asymmetry"))
         self.asymmEarsSlider = self.leftBox.addWidget(AssymSlider("ear", "Ears asymmetry"))
@@ -39,7 +39,7 @@ class AsymmTaskView(gui3d.TaskView):
         self.asymmTempleSlider = self.leftBox.addWidget(AssymSlider("temple", "Temple asymmetry"))
         self.asymmTopSlider = self.leftBox.addWidget(AssymSlider("top", "Top asymmetry"))
 
-        self.rightBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Body')))
+        self.rightBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.SliderBox('Body')))
         self.asymmTrunkSlider = self.rightBox.addWidget(AssymSlider("trunk", "Trunk asymmetry"))
         self.asymmBreastSlider = self.rightBox.addWidget(AssymSlider("breast", "Breast asymmetry"))
 

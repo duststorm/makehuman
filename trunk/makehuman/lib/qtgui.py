@@ -277,6 +277,30 @@ class TextView(QtGui.QLabel, Widget):
         text = getLanguageString(text) if text else ''
         super(TextView,self).setText(text % values)
 
+class SliderBox(GroupBox):
+    def __init__(self, label = ''):
+        super(SliderBox, self).__init__(label)
+        self.layout.setColumnStretch(0, 0)
+        self.layout.setColumnStretch(1, 1)
+        self.row = 0
+
+    def addWidget(self, widget, row = None, column = 0, rowSpan = 1, columnSpan = -1, alignment = QtCore.Qt.Alignment(0)):
+        if row is None:
+            row = self.row
+        else:
+            self.row = row
+        self.row += 1
+
+        if not isinstance(widget, Slider):
+            return super(SliderBox, self).addWidget(widget, row, column, rowSpan, columnSpan, alignment)
+
+        label = widget.label
+        widget.layout.removeWidget(label)
+        super(SliderBox, self).addWidget(label, row, 0, 1, 1)
+        super(SliderBox, self).addWidget(widget, row, 1, 1, -1)
+
+        return widget
+
 def intValidator(text):
     return not text or text.isdigit() or (text[0] == '-' and (len(text) == 1 or text[1:].isdigit()))
     

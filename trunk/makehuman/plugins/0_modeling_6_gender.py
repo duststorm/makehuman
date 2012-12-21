@@ -191,7 +191,7 @@ class GenderTaskView(gui3d.TaskView):
         
         self.sliders = []
         
-        genderBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Gender')))
+        genderBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.SliderBox('Gender')))
         
         self.sliders.append(genderBox.addWidget(DetailSlider(0.0, -1.0, 1.0, "Genitalia", self.modifiers['genitals'])))
         self.sliders.append(genderBox.addWidget(DetailSlider(0.0, -1.0, 1.0, "Breast", self.modifiers['breastSize'])))

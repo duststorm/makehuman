@@ -130,7 +130,7 @@ class TorsoTaskView(gui3d.TaskView):
         
         self.modifiers = {}
         
-        self.categoryBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Category')))
+        self.categoryBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.SliderBox('Category')))
         self.groupBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.StackedBox()))
         
         for name, templates in features:

@@ -57,7 +57,7 @@ class ExpressionTaskView(gui3d.TaskView):
         
         for name, subnames in self.expressions:
             # Create box
-            box = self.groupBox.addWidget(gui.GroupBox(name.capitalize()))
+            box = self.groupBox.addWidget(gui.SliderBox(name.capitalize()))
             self.groupBoxes.append(box)
             
             # Create sliders

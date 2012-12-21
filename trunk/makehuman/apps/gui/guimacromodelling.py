@@ -34,7 +34,7 @@ class MacroModelingTaskView(gui3d.TaskView):
 
         self.status = self.addWidget(mh.addWidget(mh.Frame.Bottom, gui.TextView()))
 
-        self.macroBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Main')))
+        self.macroBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.SliderBox('Main')))
        
         # Macro sliders
 

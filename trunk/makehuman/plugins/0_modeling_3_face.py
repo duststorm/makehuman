@@ -279,7 +279,7 @@ class FaceTaskView(gui3d.TaskView):
                         title = '%s %d' % (name.capitalize(), index / 12 + 1)
 
                     # Create box
-                    box = self.groupBox.addWidget(gui.GroupBox(title))
+                    box = self.groupBox.addWidget(gui.SliderBox(title))
                     self.groupBoxes.append(box)
 
                     # Create radiobutton

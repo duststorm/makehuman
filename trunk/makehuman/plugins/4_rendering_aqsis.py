@@ -48,7 +48,7 @@ class AqsisTaskView(gui3d.TaskView):
 
         self.sceneToRender = None
 
-        optionsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Options')))
+        optionsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.SliderBox('Options')))
                                               
         #Sliders                            
         self.shadingRateSlider= optionsBox.addWidget(gui.Slider(value=2, min=0.1, max=10, label = "ShadingRate: %.2f"))

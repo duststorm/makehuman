@@ -48,7 +48,7 @@ class SettingsTaskView(gui3d.TaskView):
         self.realtimeNormalUpdates = sliderBox.addWidget(gui.CheckBox("Update normals",
             gui3d.app.settings.get('realtimeNormalUpdates', True)))
             
-        mouseBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Mouse behavior')))
+        mouseBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.SliderBox('Mouse behavior')))
         self.normal = mouseBox.addWidget(gui.Slider(gui3d.app.settings.get('lowspeed', 1), 1, 10,
             "Normal: %d"))
         self.shift = mouseBox.addWidget(gui.Slider(gui3d.app.settings.get('highspeed', 5), 1, 10,

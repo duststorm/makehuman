@@ -156,7 +156,7 @@ class MeasureTaskView(gui3d.TaskView):
 
         for name, subnames in measurements:
             # Create box
-            box = self.groupBox.addWidget(gui.GroupBox(name.capitalize()))
+            box = self.groupBox.addWidget(gui.SliderBox(name.capitalize()))
             self.groupBoxes[name] = box
 
             # Create radiobutton
