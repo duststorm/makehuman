@@ -181,7 +181,6 @@ class FileChooser(QtGui.QWidget, Widget):
         self.previewExtension = previewExtension
 
         self.sort = sort
-        self.files = []
         self.selection = ''
         self.childY = {}
         self.notFoundImage = notFoundImage
@@ -261,8 +260,12 @@ class FileChooser(QtGui.QWidget, Widget):
                             yield os.path.join(root, f)
 
     def refresh(self):
+        print self.children.count()
         for i in xrange(self.children.count()):
-            self.children.removeItem(self.children.itemAt(0))
+            child = self.children.itemAt(0)
+            self.children.removeItem(child)
+            child.widget().hide()
+            child.widget().destroy()
 
         # Create icons
         for file in self.sort.sort(self.sortBy, list(self.search())):
