@@ -36,6 +36,8 @@ class Language(object):
         return string
             
     def dumpMissingStrings(self):
+        if not self.language:
+            return
         path = os.path.join("data", "languages", self.language + ".missing")
         with open(path, 'w') as f:
             for string in self.missingStrings:

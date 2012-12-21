@@ -533,7 +533,7 @@ class FileEntryView(QtGui.QWidget, Widget):
 
     def _confirm(self, state = None):
         if len(self.edit.text()):
-            self.callEvent('onFileSelected', self.edit.text())
+            self.callEvent('onFileSelected', unicode(self.edit.text()))
                 
     def onFocus(self, event):
         self.edit.setFocus()
