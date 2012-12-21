@@ -129,7 +129,7 @@ class Slider(QtGui.QWidget, Widget):
     def __init__(self, value=0.0, min=0.0, max=1.0, label=None, vertical=False, valueConverter=None):
         super(Slider, self).__init__()
         Widget.__init__(self)
-        label = getLanguageString(label)
+        self.text = getLanguageString(label) or ''
 
         orient = (QtCore.Qt.Vertical if vertical else QtCore.Qt.Horizontal)
         self.slider = QtGui.QSlider(orient)
@@ -137,13 +137,14 @@ class Slider(QtGui.QWidget, Widget):
         self.max = max
         self.slider.setMinimum(0)
         self.slider.setMaximum(1000)
-        self.slider.setValue(value)
+        self.slider.setValue(self._f2i(value))
         self.slider.setTracking(False)
         self.hold_events = False
         self.connect(self.slider, QtCore.SIGNAL('sliderMoved(int)'), self._changing)
         self.connect(self.slider, QtCore.SIGNAL('valueChanged(int)'), self._changed)
 
-        self.label = QtGui.QLabel(label or '')
+        label = (self.text % value) if '%' in self.text else self.text
+        self.label = QtGui.QLabel(label)
         self.layout = QtGui.QGridLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.addWidget(self.label, 0, 0)
@@ -154,12 +155,18 @@ class Slider(QtGui.QWidget, Widget):
     def _changing(self, value):
         if self.hold_events:
             return
-        self.callEvent('onChanging', self._i2f(value))
+        value = self._i2f(value)
+        if '%' in self.text:
+            self.label.setText(self.text % value)
+        self.callEvent('onChanging', value)
 
     def _changed(self, value):
         if self.hold_events:
             return
-        self.callEvent('onChange', self._i2f(value))
+        value = self._i2f(value)
+        if '%' in self.text:
+            self.label.setText(self.text % value)
+        self.callEvent('onChange', value)
 
     def _f2i(self, x):
         return int(round(1000 * (x - self.min) / (self.max - self.min)))
