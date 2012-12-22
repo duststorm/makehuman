@@ -6,7 +6,6 @@ class Object3D(object):
         self.parent = parent
 
         self.texture = 0
-        self.shader = 0
         self.nTransparentPrimitives = 0
         self.uniforms = None
 
@@ -121,6 +120,10 @@ class Object3D(object):
     @property
     def sz(self):
         return self.parent.sz
+
+    @property
+    def shader(self):
+        return self.parent.shader
 
     def clrid(self, idx):
         return self.parent._faceGroups[idx].colorID
