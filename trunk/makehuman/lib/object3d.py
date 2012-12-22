@@ -1,12 +1,13 @@
+import math
 import numpy as np
 import glmodule as gl
+from core import G
 
 class Object3D(object):
     def __init__(self, parent):
         self.parent = parent
 
         self.texture = 0
-        self.nTransparentPrimitives = 0
         self.uniforms = None
 
     @property
@@ -78,8 +79,8 @@ class Object3D(object):
         return self.parent.scale[:]
 
     @property
-    def transparentPrimitives(self):
-        return self.nTransparentPrimitives
+    def nTransparentPrimitives(self):
+        return self.parent.transparentPrimitives
 
     @property
     def transform(self):
@@ -138,7 +139,6 @@ class Object3D(object):
         return gl.pickMesh(self, *args, **kwargs)
 
     def sortFaces(self):
-        raise NotImplementedError()
         camera = G.cameras[0]
 
         cx = camera.eyeX
@@ -182,7 +182,7 @@ class Object3D(object):
         cz = tz + self.z
 
         # Prepare sorting data
-        verts = self.verts[self.indices] - (cx, cy, cz)
+        verts = self.verts[self.primitives] - (cx, cy, cz)
         distances = np.sum(verts ** 2, axis = -1)
         distances = np.amin(distances, axis = -1)
         distances = -distances
