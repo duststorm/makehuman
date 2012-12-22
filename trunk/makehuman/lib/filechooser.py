@@ -13,7 +13,7 @@ class FileChooserRectangle(Button):
     @classmethod
     def _getImage(cls, path):
         if path not in cls._imageCache:
-            cls._imageCache[path] = QtGui.QImage(path)
+            cls._imageCache[path] = QtGui.QPixmap(path)
         return cls._imageCache[path]
 
     def __init__(self, owner, file, label, imagePath, size = (128, 128)):
@@ -27,7 +27,7 @@ class FileChooserRectangle(Button):
 
         image = self._getImage(imagePath)
         self.preview = QtGui.QLabel()
-        self.preview.setPixmap(QtGui.QPixmap.fromImage(image))
+        self.preview.setPixmap(image)
         self.layout.addWidget(self.preview, 0, 0)
         self.layout.setRowStretch(0, 1)
 

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import sys
 import os
 
 from PyQt4 import QtCore, QtGui
@@ -133,7 +134,7 @@ class Slider(QtGui.QWidget, Widget):
     @classmethod
     def _getImage(cls, path):
         if path not in cls._imageCache:
-            cls._imageCache[path] = QtGui.QImage(path)
+            cls._imageCache[path] = QtGui.QPixmap(path)
         return cls._imageCache[path]
 
     def __init__(self, value=0.0, min=0.0, max=1.0, label=None, vertical=False, valueConverter=None, image=None):
@@ -164,7 +165,7 @@ class Slider(QtGui.QWidget, Widget):
 
         if image is not None:
             self.image = QtGui.QLabel()
-            self.image.setPixmap(QtGui.QPixmap.fromImage(self._getImage(image)))
+            self.image.setPixmap(self._getImage(image))
             self.layout.addWidget(self.image, 0, 1)
         else:
             self.image = None
@@ -610,3 +611,22 @@ class FileEntryView(QtGui.QWidget, Widget):
                 
     def onFocus(self, event):
         self.edit.setFocus()
+
+class SplashScreen(QtGui.QSplashScreen):
+    def __init__(self, image):
+        super(SplashScreen, self).__init__(G.app.mainwin, QtGui.QPixmap(image))
+        self._text = ''
+        self._format = '%s'
+
+    def setFormat(self, fmt):
+        self._format = fmt
+
+    def write(self, text):
+        sys.__stdout__.write(text)
+        self._text += text
+        while '\n' in self._text:
+            line, self._text = self._text.split('\n', 1)
+            line = line.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
+            line = self._format % line
+            self.showMessage(line, alignment = QtCore.Qt.AlignHCenter)
+            G.app.processEvents()

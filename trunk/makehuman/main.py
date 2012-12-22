@@ -488,11 +488,15 @@ class MHApplication(gui3d.Application):
         
         self.loadSettings()
 
+        self.splash = gui.SplashScreen(gui3d.app.getThemeResource('images', 'splash.png'))
+        self.splash.show()
         # Display the initial splash screen and the progress bar during startup
-        mesh = gui3d.RectangleMesh(800, 600, gui3d.app.getThemeResource('images', 'splash.png'))
-        self.splash = self.addObject(gui3d.Object([0, 0, 9.8], mesh))
+        # mesh = gui3d.RectangleMesh(800, 600, gui3d.app.getThemeResource('images', 'splash.png'))
+        # self.splash = self.addObject(gui3d.Object([0, 0, 9.8], mesh))
+        self.statusbar = mh.addWidget(mh.Frame.Bottom, gui.TextView())
+        self.statusbar.show()
         self.progressBar = mh.addWidget(mh.Frame.Bottom, gui.ProgressBar())
-        self.redrawNow()
+        # self.redrawNow()
         
         self.tabs = G.app.mainwin.tabs
         
@@ -501,12 +505,8 @@ class MHApplication(gui3d.Application):
             self.switchCategory(tab.name)
 
     def loadBackground(self):
-
         self.progressBar.setProgress(0.1)
-
         mh.setClearColor(0.5, 0.5, 0.5, 1.0)
-        
-        mh.callAsync(self.loadHuman)
         
     def loadHuman(self):   
 
@@ -514,8 +514,6 @@ class MHApplication(gui3d.Application):
         #hairObj = hair.loadHairsFile(self.scene3d, path="./data/hairs/default", update = False)
         #self.scene3d.clear(hairObj) 
         self.selectedHuman = self.addObject(human.Human(files3d.loadMesh("data/3dobjs/base.obj")))
-        
-        mh.callAsync(self.loadMainGui)
         
     def loadMainGui(self):
         
@@ -628,9 +626,7 @@ class MHApplication(gui3d.Application):
         
         self.addView(guimodelling.ModellingCategory(self))
         self.addView(guifiles.FilesCategory(self))
-        
-        mh.callAsync(self.loadPlugins)
-        
+
     def loadPlugins(self):
         
         self.progressBar.setProgress(0.4)
@@ -641,11 +637,10 @@ class MHApplication(gui3d.Application):
         self.pluginsToLoad = glob.glob(join("plugins/",'[!_]*.py'))
         self.pluginsToLoad.sort()
         self.pluginsToLoad.reverse()
-        
-        if self.pluginsToLoad:
-            mh.callAsync(self.loadNextPlugin)
-        else:
-            mh.callAsync(self.loadGui)
+
+        while self.pluginsToLoad:
+            self.loadNextPlugin()
+            yield
     
     def loadNextPlugin(self):
         
@@ -653,29 +648,24 @@ class MHApplication(gui3d.Application):
         stillToLoad = len(self.pluginsToLoad)
         self.progressBar.setProgress(0.4 + (float(alreadyLoaded) / float(alreadyLoaded + stillToLoad)) * 0.4)
         
-        if stillToLoad:
-            
-            path = self.pluginsToLoad.pop()
-            try:
-                name, ext = splitext(basename(path))
-                if name not in self.settings['excludePlugins']:
-                    module = imp.load_source(name, path)
-                    self.modules[name] = module
-                    module.load(self)
-                else:
-                    self.modules[name] = None
-            except Exception, e:
-                import traceback
-                exc_type, exc_value, exc_traceback = sys.exc_info()
-                print ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback))
-                print('Could not load %s' % name)
-                print e
-                
-            mh.callAsync(self.loadNextPlugin)
-            
-        else:
-            
-            mh.callAsync(self.loadGui)
+        if not stillToLoad:
+            return
+
+        path = self.pluginsToLoad.pop()
+        try:
+            name, ext = splitext(basename(path))
+            if name not in self.settings['excludePlugins']:
+                module = imp.load_source(name, path)
+                self.modules[name] = module
+                module.load(self)
+            else:
+                self.modules[name] = None
+        except Exception, e:
+            import traceback
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            print ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+            print('Could not load %s' % name)
+            print e
             
     def unloadPlugins(self):
         
@@ -757,8 +747,6 @@ class MHApplication(gui3d.Application):
 
         self.progressBar.setProgress(1.0)
         self.progressBar.hide()
-        
-        mh.callAsync(self.loadFinish)
                 
     def loadFinish(self):
         
@@ -767,8 +755,7 @@ class MHApplication(gui3d.Application):
 
         self.prompt('Warning', 'This is an alpha release, which means that there are still bugs present and features missing. Use at your own risk.',
             'OK', helpId='alphaWarning')
-        # self.dialog.blocker.mesh.setColor([0, 0, 0, 128])
-        self.splash.hide()
+        # self.splash.hide()
 
         mh.setCaption("MakeHuman r" + os.environ['SVNREVISION'] + " - [Untitled]")
         
@@ -776,11 +763,54 @@ class MHApplication(gui3d.Application):
         
         mh.updatePickingBuffer();
         self.redraw()
-        
+
+    class SplashOutputStream(object):
+        def __init__(self, splash):
+            self.splash = splash
+            self.text = ''
+
+        def write(self, text):
+            sys.__stdout__.write(text)
+            self.text += text
+            while '\n' in self.text:
+                line, self.text = self.text.split('\n', 1)
+                line = line.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
+                line = ''.join(['<br><br>'
+                                '<b>',
+                                '<font size="48" color="#ff0000">',
+                                line,
+                                '</font>',
+                                '</b>'])
+                self.splash.showMessage(line, alignment = gui.QtCore.Qt.AlignHCenter, color = gui.QtCore.Qt.white)
+                G.app.processEvents()
+
+    def startupSequence(self):
+        self.splash.setFormat('<br><br><b><font size="48" color="#ff0000">%s</font></b>')
+        sys.stdout = self.splash
+        yield None
+        self.loadBackground()
+        yield None
+        self.loadHuman()
+        yield None
+        self.loadMainGui()
+        yield None
+        for _ in self.loadPlugins():
+            yield None
+        yield None
+        self.loadGui()
+        yield None
+        self.loadFinish()
+        sys.stdout = sys.__stdout__
+        self.splash.finish(G.app.mainwin)
+
+    def nextStartupTask(self):
+        if not next(self.tasks, True):
+            mh.callAsync(self.nextStartupTask)
+
     # Events
     def onStart(self, event):
-        
-        mh.callAsync(self.loadBackground)
+        self.tasks = self.startupSequence()
+        self.nextStartupTask()
         
     def onStop(self, event):
         
@@ -989,12 +1019,15 @@ class MHApplication(gui3d.Application):
     # Global progress bar
     def progress(self, value, text=None):
         if text is not None:
-            self.progressBar.text.setText(text)
+            self.statusbar.setText(text)
+        else:
+            self.statusbar.setText('')
         if value <= 0:
             self.progressBar.show()
         elif value >= 1.0:
             self.progressBar.hide()
         self.progressBar.setProgress(value)
+        G.app.processEvents()
     
     # Global dialog
     def prompt(self, title, text, button1Label, button2Label=None, button1Action=None, button2Action=None, helpId=None):
