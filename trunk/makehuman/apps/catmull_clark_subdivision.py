@@ -367,3 +367,4 @@ def createSubdivisionObject(object, progressCallback=None):
 def updateSubdivisionObject(object, progressCallback=None):
     object.update()
     object.calcNormals()
+    object.sync_all()
