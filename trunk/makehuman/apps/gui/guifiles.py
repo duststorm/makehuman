@@ -278,9 +278,11 @@ class ExportTaskView(gui3d.TaskView):
         self.md5 = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="MD5"))
         self.stl = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Stereolithography (stl)"))
         self.skel = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Skeleton (skel)"))
-            
+
+        self.optionsBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.StackedBox()))
+
         # OBJ options
-        self.objOptions = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Options')))
+        self.objOptions = self.optionsBox.addWidget(gui.GroupBox('Options'))
         self.exportEyebrows = self.objOptions.addWidget(gui.CheckBox("Eyebrows", True))
         self.exportLashes = self.objOptions.addWidget(gui.CheckBox("Eyelashes", True))
         self.exportHelpers = self.objOptions.addWidget(gui.CheckBox("Helper geometry", False))
@@ -293,7 +295,7 @@ class ExportTaskView(gui3d.TaskView):
         # MHX options
         """
         y = yy
-        self.mhxOptionsSource = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Options source')))
+        self.mhxOptionsSource = self.optionsBox.addWidget(gui.GroupBox('Options source'))
         source = []
         self.mhxConfig = self.mhxOptionsSource.addWidget(gui.RadioButton(source, "Use config options"))
         self.mhxGui = self.mhxOptionsSource.addWidget(gui.RadioButton(source, "Use gui options", True))
@@ -301,7 +303,7 @@ class ExportTaskView(gui3d.TaskView):
         y+=16
         """
         
-        self.mhxOptions = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Options')))
+        self.mhxOptions = self.optionsBox.addWidget(gui.GroupBox('Options'))
         #self.version24 = self.mhxOptions.addWidget(gui.CheckBox("Version 2.4", False))
         #self.version25 = self.mhxOptions.addWidget(gui.CheckBox("Version 2.5", True))
         self.mhxSeparateFolder = self.mhxOptions.addWidget(gui.CheckBox("Separate folder", False))
@@ -323,10 +325,9 @@ class ExportTaskView(gui3d.TaskView):
         self.rigifyMhx = self.mhxOptions.addWidget(gui.RadioButton(rigs, "Use rigify rig", False))
         addedRigs = self.addRigs(self.mhxOptions, rigs, "Mhx", False)
         self.mhxRigs = [(self.mhxMhx, "mhx"), (self.rigifyMhx, "rigify")] + addedRigs
-        self.mhxOptions.hide()
         
         # Collada options
-        self.colladaOptions = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Options')))
+        self.colladaOptions = self.optionsBox.addWidget(gui.GroupBox('Options'))
         self.colladaRot90X = self.colladaOptions.addWidget(gui.CheckBox("Rotate 90 X", False))
         self.colladaRot90Z = self.colladaOptions.addWidget(gui.CheckBox("Rotate 90 Z", False))
         self.colladaEyebrows = self.colladaOptions.addWidget(gui.CheckBox("Eyebrows", True))
@@ -339,15 +340,18 @@ class ExportTaskView(gui3d.TaskView):
         self.daeScales = self.addScales(self.colladaOptions, scales, "Dae", True)
         rigs = []
         self.daeRigs = self.addRigs(self.colladaOptions, rigs, "Dae", True)
-        self.colladaOptions.hide()
 
         # STL options
-        self.stlOptions = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Options')))
+        self.stlOptions = self.optionsBox.addWidget(gui.GroupBox('Options'))
         stlOptions = []
         self.stlAscii = self.stlOptions.addWidget(gui.RadioButton(stlOptions,  "Ascii", selected=True))
         self.stlBinary = self.stlOptions.addWidget(gui.RadioButton(stlOptions, "Binary"))
         self.stlSmooth = self.stlOptions.addWidget(gui.CheckBox("Subdivide", False))
-        self.stlOptions.hide()
+
+        self.md5Options = self.optionsBox.addWidget(gui.GroupBox('Options'))
+        self.skelOptions = self.optionsBox.addWidget(gui.GroupBox('Options'))
+
+        self.updateGui()
 
         """                    
         @self.version24.mhEvent
@@ -485,26 +489,18 @@ class ExportTaskView(gui3d.TaskView):
             mh.changeCategory('Modelling')
             
     def updateGui(self):
-        
         if self.wavefrontObj.selected:
-            self.objOptions.show()
-        else:
-            self.objOptions.hide()
-            
-        if self.collada.selected:
-            self.colladaOptions.show()
-        else:
-            self.colladaOptions.hide()
-            
-        if self.mhx.selected:
-            self.mhxOptions.show()
-        else:
-            self.mhxOptions.hide()
-            
-        if self.stl.selected:
-            self.stlOptions.show()
-        else:
-            self.stlOptions.hide()
+            self.optionsBox.showWidget(self.objOptions)
+        elif self.mhx.selected:
+            self.optionsBox.showWidget(self.mhxOptions)
+        elif self.collada.selected:
+            self.optionsBox.showWidget(self.colladaOptions)
+        elif self.md5.selected:
+            self.optionsBox.showWidget(self.md5Options)
+        elif self.stl.selected:
+            self.optionsBox.showWidget(self.stlOptions)
+        elif self.skel.selected:
+            self.optionsBox.showWidget(self.skelOptions)
 
     def onShow(self, event):
 
