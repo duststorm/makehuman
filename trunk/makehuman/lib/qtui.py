@@ -637,3 +637,11 @@ def changeCategory(category):
 
 def changeTask(category, task):
     G.app.mainwin.tabs.findTab(category).child.changeTab(task)
+
+def refreshLayout(widget=None):
+    if widget is None:
+        widget = G.app.mainwin
+    widget.updateGeometry()
+    for child in QtGui.QWidget.children(widget):
+        if child.isWidgetType():
+            refreshLayout(child)

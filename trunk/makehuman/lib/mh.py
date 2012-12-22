@@ -182,3 +182,6 @@ def changeCategory(category):
 
 def changeTask(category, task):
     ui.changeTask(category, task)
+
+def refreshLayout():
+    ui.refreshLayout()

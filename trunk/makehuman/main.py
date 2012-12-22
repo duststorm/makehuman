@@ -688,7 +688,7 @@ class MHApplication(gui3d.Application):
                 print ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback))
                 print('Could not unload %s' % name)
                 print e
-                
+
     def loadGui(self):
         
         self.progressBar.setProgress(0.9)
@@ -726,6 +726,7 @@ class MHApplication(gui3d.Application):
           
         self.globalButton = self.buttonBox.addWidget(gui.Button("Global cam"), 1, 0, 1, -1)
         self.faceButton = self.buttonBox.addWidget(gui.Button("Face cam"), 2, 0, 1, -1)
+        self.imagesButton = self.buttonBox.addWidget(gui.CheckBox("Slider images", gui.Slider.imagesShown()), 3, 0, 1, -1)
 
         @self.globalButton.mhEvent
         def onClicked(event):
@@ -734,6 +735,11 @@ class MHApplication(gui3d.Application):
         @self.faceButton.mhEvent
         def onClicked(event):
           gui3d.app.setFaceCamera()
+
+        @self.imagesButton.mhEvent
+        def onClicked(event):
+            gui.Slider.showImages(self.imagesButton.selected)
+            mh.refreshLayout()
 
         """          
         self.poseModeBox = self.buttonBox.addWidget(gui.CheckBox("Pose mode", False))

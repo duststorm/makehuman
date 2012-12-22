@@ -85,8 +85,8 @@ class ModifierAction:
 class ModifierSlider(gui.Slider):
     
     def __init__(self, value=0.0, min=0.0, max=1.0, label=None, modifier=None, valueConverter=None,
-                 warpResetNeeded=True):
-        super(ModifierSlider, self).__init__(value, min, max, label, valueConverter=valueConverter)
+                 warpResetNeeded=True, image=None):
+        super(ModifierSlider, self).__init__(value, min, max, label, valueConverter=valueConverter, image=image)
         self.modifier = modifier
         self.value = None
         self.warpResetNeeded = warpResetNeeded

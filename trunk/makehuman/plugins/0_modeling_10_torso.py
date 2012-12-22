@@ -87,7 +87,7 @@ class GroupBoxRadioButton(gui.RadioButton):
 class TorsoSlider(humanmodifier.ModifierSlider):
     def __init__(self,modifier, image, view):
         
-        humanmodifier.ModifierSlider.__init__(self, min=-1.0, max=1.0, modifier=modifier)
+        humanmodifier.ModifierSlider.__init__(self, min=-1.0, max=1.0, modifier=modifier, image=image)
         
         self.view = getattr(gui3d.app, view)
         

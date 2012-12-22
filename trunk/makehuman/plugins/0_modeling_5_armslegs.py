@@ -16,18 +16,13 @@ class GroupBoxRadioButton(gui.RadioButton):
         
     def onClicked(self, event):
         self.parentWidget()._parent.groupBox.showWidget(self.groupBox)
-        # self.parentWidget()._parent.hideAllBoxes()
-        # self.groupBox.show()
         
 class HeadSlider(humanmodifier.ModifierSlider):
     def __init__(self,modifier, image, view):
-        
-        humanmodifier.ModifierSlider.__init__(self, min=-1.0, max=1.0, modifier=modifier)
-        
+        super(HeadSlider, self).__init__(min=-1.0, max=1.0, modifier=modifier, image=image)
         self.view = getattr(gui3d.app, view)
         
     def onFocus(self, event):
-        
         humanmodifier.ModifierSlider.onFocus(self, event)
         self.view()
 

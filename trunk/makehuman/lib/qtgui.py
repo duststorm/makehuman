@@ -126,7 +126,17 @@ class GroupBox(QtGui.QGroupBox, Widget):
         return list(self.layout.itemAt(i).widget() for i in xrange(self.layout.count()))
 
 class Slider(QtGui.QWidget, Widget):
-    def __init__(self, value=0.0, min=0.0, max=1.0, label=None, vertical=False, valueConverter=None):
+    _imageCache = {}
+    _show_images = False
+    _instances = set()
+
+    @classmethod
+    def _getImage(cls, path):
+        if path not in cls._imageCache:
+            cls._imageCache[path] = QtGui.QImage(path)
+        return cls._imageCache[path]
+
+    def __init__(self, value=0.0, min=0.0, max=1.0, label=None, vertical=False, valueConverter=None, image=None):
         super(Slider, self).__init__()
         Widget.__init__(self)
         self.text = getLanguageString(label) or ''
@@ -147,10 +157,42 @@ class Slider(QtGui.QWidget, Widget):
         self.label = QtGui.QLabel(label)
         self.layout = QtGui.QGridLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout.addWidget(self.label, 0, 0)
+        self.layout.addWidget(self.label, 1, 0)
         self.layout.setColumnStretch(0, 0)
-        self.layout.addWidget(self.slider, 0, 1)
+        self.layout.addWidget(self.slider, 1, 1)
         self.layout.setColumnStretch(1, 1)
+
+        if image is not None:
+            self.image = QtGui.QLabel()
+            self.image.setPixmap(QtGui.QPixmap.fromImage(self._getImage(image)))
+            self.layout.addWidget(self.image, 0, 1)
+        else:
+            self.image = None
+
+        self._update_image()
+
+        type(self)._instances.add(self)
+
+    def __del__(self):
+        type(self)._instances.remove(self)
+
+    def _update_image(self):
+        if self.image is None:
+            return
+        if type(self)._show_images:
+            self.image.show()
+        else:
+            self.image.hide()
+
+    @classmethod
+    def imagesShown(cls):
+        return cls._show_images
+
+    @classmethod
+    def showImages(cls, state):
+        cls._show_images = state
+        for w in cls._instances:
+            w._update_image()
 
     def _changing(self, value):
         if self.hold_events:
