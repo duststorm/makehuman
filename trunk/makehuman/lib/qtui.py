@@ -322,61 +322,6 @@ class Canvas(QtOpenGL.QGLWidget):
     def timerEvent(self, ev):
         handleTimer(ev.timerId())
 
-class XLayout(QtGui.QLayout):
-    def __init__(self, parent = None):
-        super(XLayout, self).__init__(parent)
-        self._children = []
-
-    def addItem(self, item):
-        self._children.append(item)
-
-    def count(self):
-        return len(self._children)
-
-    def itemAt(self, index):
-        if index < 0 or index >= self.count():
-            return None
-        return self._children[index]
-
-    def takeAt(self, index):
-        child = self.itemAt(index)
-        if child is not None:
-            del self._children[index]
-        return child
-
-    def _doLayout(self, x, y, width, height, real=False):
-        x1 = x + width
-        y1 = y + height
-        n = len(self._children)
-        for i, child in enumerate(self._children):
-            widget = child.widget()
-            if i == n - 1:
-                size = child.maximumSize()
-                w = size.width()
-                h = size.height()
-            else:
-                size = child.sizeHint()
-                w = size.width()
-                h = size.height()
-            if real:
-                child.setGeometry(QtCore.QRect(x, y, min(w, x1 - x), min(h, y1 - y)))
-            width = max(width, w)
-            y += h
-        return width, y
-
-    def sizeHint(self):
-        width, height = self._doLayout(0, 0, 0, 0, False)
-        return QtCore.QSize(width, height)
-
-    def maximumSize(self):
-        return self.sizeHint()
-
-    def setGeometry(self, rect):
-        self._doLayout(rect.x(), rect.y(), rect.width(), rect.height(), True)
-
-    def expandingDirections(self):
-        return QtCore.Qt.Vertical
-
 class VLayout(QtGui.QLayout):
     def __init__(self, parent = None):
         super(VLayout, self).__init__(parent)
@@ -505,14 +450,12 @@ class Frame(QtGui.QWidget):
         self.h_layout.setColumnStretch(0, 0)
 
         self.t_layout = QtGui.QBoxLayout(QtGui.QBoxLayout.TopToBottom)
-        # self.t_layout = XLayout()
         self.h_layout.addLayout(self.t_layout, 0, 1)
         self.h_layout.setColumnStretch(1, 1)
 
         self.t_panel = self.panel()
         self.top = VLayout(self.t_panel)
         self.top.setSizeConstraint(QtGui.QLayout.SetMinAndMaxSize)
-        # self.top = QtGui.QBoxLayout(QtGui.QBoxLayout.TopToBottom, self.t_panel)
         self.t_layout.addWidget(self.t_panel)
         self.t_panel.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Maximum)
 
@@ -545,8 +488,6 @@ class Frame(QtGui.QWidget):
         self.r_layout.addLayout(self.right_bottom, 2, 0)
         self.r_layout.setRowStretch(2, 0)
 
-        self.showCanvas()
-
         self.sides = {
             self.Bottom:      self.bottom,
             self.Top:         self.top,
@@ -558,8 +499,6 @@ class Frame(QtGui.QWidget):
 
     def addWidget(self, edge, widget, *args, **kwargs):
         self.sides[edge].addWidget(widget, *args, **kwargs)
-        if edge == self.Top:
-            widget.installEventFilter(self)
         return widget
 
     def removeWidget(self, edge, widget):
@@ -572,23 +511,6 @@ class Frame(QtGui.QWidget):
     def closeEvent(self, ev):
         ev.ignore()
         quit()
-
-    def showCanvas(self):
-        # self.t_layout.setStretch(0, 1)
-        # self.t_layout.setStretch(1, 100)
-        self.update()
-    
-    def showCenter(self):
-        # self.t_layout.setStretch(0, 100)
-        # self.t_layout.setStretch(1, 1)
-        pass
-    
-    def eventFilter(self, object, event):
-        if event.type() == QtCore.QEvent.ShowToParent:
-            self.showCenter()
-        if event.type() == QtCore.QEvent.HideToParent:
-            self.showCanvas()
-        return False
 
 class Application(QtGui.QApplication):
     def __init__(self):
