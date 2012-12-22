@@ -27,6 +27,7 @@ import bpy
 import os
 from bpy.props import *
 import mathutils
+import numpy
 
 from mh_utils import globvars as the
 from mh_utils import utils
@@ -57,12 +58,13 @@ class CWarpCharacter:
                     n += 1
         fp.close()                    
         
-        prefix = os.path.join(scn.MhProgramPath, "data/targets/macrodetails/")
+        prefix = os.path.join(scn.MhProgramPath, "data/targets/")
         ext = ".target"
-        for (file, value) in self.character.files:
-            path = os.path.join(prefix, file + ".target")
+        for (folder, file, value) in self.character.files:
+            path = os.path.join(prefix, folder, file + ".target")
             try:
-                fp = open(path, "r")
+                print("File", path)
+                fp = open(path, "rU")
             except:
                 print("No such file", path)
                 continue
@@ -151,8 +153,9 @@ class VIEW3D_OT_SetSourceMorphButton(bpy.types.Operator):
         (scn.MhSourceMorphTopDir, scn.MhSourceMorphDir) = partitionTargetPath(os.path.dirname(self.properties.filepath))
         scn.MhSourceMorphFile = os.path.basename(self.properties.filepath)    
         the.SourceCharacter = CWarpCharacter("Source")
-        the.SourceCharacter.character.fromFilePath(context, scn.MhSourceMorphDir, True)
-        the.SourceCharacter.character.fromFilePath(context, scn.MhSourceMorphFile, True)
+        partOnly = (context.scene.MhWarpPart != 'All')
+        the.SourceCharacter.character.fromFilePath(context, scn.MhSourceMorphDir, True, include=partOnly)
+        the.SourceCharacter.character.fromFilePath(context, scn.MhSourceMorphFile, True, include=partOnly, folder=scn.MhSourceMorphDir)
         updateTargetMorph(context)
         return {'FINISHED'}
 
@@ -169,15 +172,15 @@ class VIEW3D_OT_UpdateTargetCharacterButton(bpy.types.Operator):
     def execute(self, context):
         the.TargetCharacter.character.setCharacterProps(context)
         updateTargetMorph(context)
-        the.TargetCharacter.character.updateFiles(context.scene)
         return{'FINISHED'}    
 
 
 def updateTargetMorph(context):
     scn = context.scene
+    partOnly = (scn.MhWarpPart != 'All')
     scn.MhTargetMorphTopDir = scn.MhSourceMorphTopDir
-    scn.MhTargetMorphDir = the.TargetCharacter.character.fromFilePath(context, scn.MhSourceMorphDir, False)
-    scn.MhTargetMorphFile = the.TargetCharacter.character.fromFilePath(context, scn.MhSourceMorphFile, False)
+    scn.MhTargetMorphDir = the.TargetCharacter.character.fromFilePath(context, scn.MhSourceMorphDir, False, subdirs=scn.MhUseSubdirs)
+    scn.MhTargetMorphFile = the.TargetCharacter.character.fromFilePath(context, scn.MhSourceMorphFile, False, subdirs=True, include=partOnly, folder=scn.MhTargetMorphDir)
 
 #----------------------------------------------------------
 #   Warp morph
@@ -199,12 +202,24 @@ def subFromMorph(ylocs, y0):
     
 def getVertexRange(locs, first, last):
     part = {}
-    for n in range(first,last):
-        part[n] = locs[n]
+    for n in locs.keys():
+        if n in range(first,last):
+            part[n] = locs[n]
     return part
     
     
-def saveTarget(path, dxs, scn, first, last):
+def subRange(ylocs, y0, first, last):
+    dys = {}
+    for n in ylocs.keys():
+        if n in range(first,last):
+            try:
+                dys[n] = ylocs[n] - y0[n]
+            except KeyError:
+                dys[n] = ylocs[n]
+    return dys
+    
+    
+def saveTarget(path, dxs, scn, first, last, active):
     print("Saving target %s" % path)
     folder = os.path.dirname(path)
     if not os.path.isdir(folder):
@@ -222,9 +237,10 @@ def saveTarget(path, dxs, scn, first, last):
     for line in before:
         fp.write(line)
     for n in keys:
-        if n >= first and n < last:
+        if n >= first and n < last and (active == None or active[n]):
             dx = dxs[n]
-            fp.write("%d %.4g %.4g %.4g\n" % (n, dx[0], dx[1], dx[2]))
+            if dx.length > 1e-4:
+                fp.write("%d %.4g %.4g %.4g\n" % (n, dx[0], dx[1], dx[2]))
     for line in after:
         fp.write(line)
     fp.close()
@@ -285,6 +301,16 @@ VertexRange = {
     'Skirt':    (the.FirstSkirtVert, the.FirstTightsVert),
     'Tights':    (the.FirstTightsVert, the.NTotalVerts)
 }
+
+def setActive(verts, scn):
+    if scn.MhKeepActive:
+        active = numpy.zeros(the.NTotalVerts, bool)
+        for n in verts.keys():
+            active[n] = True
+    else:
+        return None
+    return active
+    
     
 def warpSingleMorph(srcPath, trgPath, warpField, scn): 
     print("Warp %s -> %s" % (srcPath, trgPath))
@@ -293,19 +319,22 @@ def warpSingleMorph(srcPath, trgPath, warpField, scn):
         xlocs = addToMorph(dxs, the.SourceCharacter.verts)
         ylocs = warpField.warpLocations(xlocs)
         dys = subFromMorph(ylocs, the.TargetCharacter.verts)
-        saveTarget(trgPath, dys, scn, 0, the.NTotalVerts)            
+        active = setActive(dxs, scn)
+        saveTarget(trgPath, dys, scn, 0, the.NTotalVerts, active)            
     else:
         first, last = VertexRange[scn.MhWarpPart]
         print(scn.MhWarpPart, first, last)
+        dxs = the.SourceCharacter.readMorph(srcPath)
+        active = setActive(dxs, scn)
         dyOld = the.TargetCharacter.readMorph(trgPath)
         dyOldPart = getVertexRange(dyOld, first, last)
         basePart = getVertexRange(the.TargetCharacter.verts, first, last)
-        basePart = subFromMorph(basePart, dyOldPart)
+        basePart = subRange(basePart, dyOldPart, first, last)
 
         xsPart = getVertexRange(the.SourceCharacter.verts, first, last)
         ysPart = warpField.warpLocations(xsPart)
-        dyNew = subFromMorph(ysPart, basePart)
-        saveTarget(trgPath, dyNew, scn, first, last)            
+        dyNew = subRange(ysPart, basePart, first, last)
+        saveTarget(trgPath, dyNew, scn, first, last, active)            
         
 
 
@@ -363,6 +392,14 @@ def init():
     bpy.types.Scene.MhWarpAllMorphsInDir = BoolProperty(
         name = "Warp All Morphs In Directory",
         default = False)
+
+    bpy.types.Scene.MhUseSubdirs = BoolProperty(
+        name = "Use Subdirectories for tone and weight",
+        default = True)
+        
+    bpy.types.Scene.MhKeepActive = BoolProperty(
+        name = "Keep active verts",
+        default = True)                
 
     bpy.types.Scene.MhWarpPart = EnumProperty(
             name="Warp part",

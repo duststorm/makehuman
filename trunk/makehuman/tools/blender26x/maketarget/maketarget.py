@@ -202,7 +202,7 @@ def loadTargetFromMesh(context):
     ob.use_shape_key_edit_mode = True
     ob["NTargets"] += 1
     ob["FilePath"] = 0
-    ob["SelectedOnly"] = False
+    ob.SelectedOnly = False
     scn.objects.unlink(trg)
     return
 
@@ -232,7 +232,7 @@ def newTarget(context):
     ob.use_shape_key_edit_mode = True
     ob["NTargets"] += 1
     ob["FilePath"] = 0
-    ob["SelectedOnly"] = False
+    ob.SelectedOnly = False
     return
 
 
@@ -257,7 +257,7 @@ def doSaveTarget(context, filepath):
     ob.active_shape_key_index = ob["NTargets"]
     if not checkValid(ob):
         return
-    saveAll = not ob["SelectedOnly"]
+    saveAll = not ob.SelectedOnly
     skey = ob.active_shape_key    
     if skey.name[0:6] == "Target":
         skey.name = utils.nameFromPath(filepath)
@@ -307,9 +307,13 @@ def evalVertLocations(ob):
     verts = {}
     for v in ob.data.vertices:
         verts[v.index] = v.co.copy()
+        
     for skey in ob.data.shape_keys.key_blocks:
-        if skey.name == "Basis":
+        if (skey.name == "Basis" or
+            (ob.MhZeroOtherTargets and skey != ob.active_shape_key)):
+            print("Skipped", skey.name)
             continue       
+        print("Adding", skey.name)
         for n,v in enumerate(skey.data):
             bv = ob.data.vertices[n]
             vec = v.co - bv.co
@@ -1135,6 +1139,10 @@ def init():
     bpy.types.Scene.MhPoseTargetDir = StringProperty(default = "dance1-soft1")
     
     bpy.types.Object.MhTightsOnly = BoolProperty(default = False)
+    bpy.types.Object.MhSkirtOnly = BoolProperty(default = False)
+
+    bpy.types.Object.SelectedOnly = BoolProperty(name="Selected verts only", default = True)
+    bpy.types.Object.MhZeroOtherTargets = BoolProperty(name="Automatically zero other targets", default = True)
 
 
     bpy.types.Scene.MhImportRotateMode = EnumProperty(

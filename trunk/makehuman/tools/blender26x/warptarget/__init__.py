@@ -106,6 +106,7 @@ class WarpTargetPanel(bpy.types.Panel):
         
         layout.label("Target Morph")
         layout.prop(scn, "MhNeutral", expand=True)
+        layout.prop(scn, "MhUseSubdirs")
         layout.prop(scn, "MhTargetMorphTopDir")
         layout.prop(scn, "MhTargetMorphDir")
         layout.prop(scn, "MhTargetMorphFile")
@@ -113,13 +114,16 @@ class WarpTargetPanel(bpy.types.Panel):
         layout.separator()
         layout.label("Warp method")
         layout.prop(scn, "MhWarpPart", expand=True)
+        layout.prop(scn, "MhKeepActive")
+
+        layout.separator()
+        layout.operator("mh.warp_morph")
 
         layout.separator()
         split = layout.split(0.8)
         split.prop(scn, "MhLandmarks")
         split.operator("mh.update_landmarks")
         layout.prop(scn, "MhWarpAllMorphsInDir")
-        layout.operator("mh.warp_morph")
 
 #----------------------------------------------------------
 #   Settings buttons

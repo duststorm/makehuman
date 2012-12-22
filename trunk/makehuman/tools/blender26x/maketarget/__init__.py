@@ -146,7 +146,8 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.separator()
             layout.operator("mh.apply_targets")
             layout.separator()
-            layout.prop(ob, '["SelectedOnly"]')
+            layout.prop(ob, "SelectedOnly")
+            layout.prop(ob, "MhZeroOtherTargets")
             if ob["FilePath"]:
                 layout.operator("mh.save_target")           
             layout.operator("mh.saveas_target")           

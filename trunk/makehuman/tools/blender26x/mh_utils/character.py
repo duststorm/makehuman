@@ -85,13 +85,14 @@ class CCharacter:
         scn.MhTone = self.tone
 
 
-    def updateFiles(self, scn):
+    def updateFiles(self, scn, include):
+        folder = "macrodetails"
         if self.race == "caucasian":
             race = "neutral"
         else:
             race = self.race
         macro = race + "-" + self.gender + "-" + self.age
-        self.files = [(macro, 1.0)]
+        self.files = [(folder, macro, 1.0)]
         
         univ = "universal-" + self.gender + "-" + self.age
 
@@ -99,16 +100,15 @@ class CCharacter:
             tone = univ + "-" + self.tone        
             if self.weight != "normal":
                 weight = tone + "-" + self.weight        
-                self.files.append( (weight, 1.0) )
+                self.files.append( (folder, weight, 1.0) )
             else:            
-                self.files.append( (tone, 1.0) )
+                self.files.append( (folder, tone, 1.0) )
         elif self.weight != "normal":
             weight = univ + "-" + self.weight      
-            self.files.append( (weight, 1.0) )
-        
+            self.files.append( (folder, weight, 1.0) )
                 
     
-    def fromFilePath(self, context, filepath, update):
+    def fromFilePath(self, context, filepath, update, subdirs=True, include=False, folder=""):
         string = filepath
         for char in ["/", "\\", "-", "_", "."]:
             string = string.replace(char, " ")
@@ -151,24 +151,48 @@ class CCharacter:
                     continue
                 if prop == "caucasian":
                     prop = context.scene.MhNeutral
+                elif prop == "normal":
+                    prop = ""
                 print("change", word, prop)
                 filepath = filepath.replace(word, prop)
+                filepath = filepath.replace("--", "-").replace("-.", ".")
                 print(filepath)
+                
+            if subdirs:
+                filename,ext = os.path.splitext(filepath)
+                if self.tone != "normal":
+                    filename = filename.replace("-"+self.tone, "")
+                    if self.weight != "normal":
+                        filename = filename.replace("-"+self.weight, "")
+                        filename = filename.replace(self.age, self.age+"-"+self.tone+"-"+self.weight)
+                    else:
+                        filename = filename.replace(self.age, self.age+"-"+self.tone)
+                elif self.weight != "normal":
+                    filename = filename.replace("-"+self.weight, "")
+                    filename = filename.replace(self.age, self.age+"-"+self.weight)
+                filepath = filename + ext
+            print(filepath)
         
         #self.setSceneProps(context)
-        self.updateFiles(context.scene)
+        self.updateFiles(context.scene, include)        
+        (filename, ext) = os.path.splitext(filepath)
+        print("include", include, filepath, filename)
+        print("  ", self.files)
+        if include and filename not in self.files:
+            self.files.append( (folder, filename, 1.0) )
+        print("  ", self.files)
         return filepath
     
     
     def loadTargets(self, context):                
         scn = context.scene
-        prefix = os.path.join(scn.MhProgramPath, "data/targets/macrodetails/")
+        prefix = os.path.join(scn.MhProgramPath, "data/targets/")
         ext = ".target"
         self.object = import_obj.importBaseObj(context)
         self.objectName = self.object.name
         scn.objects.active = self.object
-        for (file, value) in self.files:
-            path = os.path.join(prefix, file + ".target")
+        for (folder, file, value) in self.files:
+            path = os.path.join(prefix, folder, file + ".target")
             print(path, value)
             try:
                 skey = utils.loadTarget(path, context)
@@ -181,9 +205,9 @@ class CCharacter:
     def drawFiles(self, layout, scn):
         layout.label("Files:")
         box = layout.box()
-        for (file, weight) in self.files:
+        for (folder, file, weight) in self.files:
             split = box.split(0.8)
-            split.label("    " + file)
+            split.label("    %s/%s" % (folder, file))
             split.label("%.2f" % weight)
 
 
@@ -228,7 +252,7 @@ def init():
         
     bpy.types.Scene.MhNeutral = EnumProperty(
             name="Neutral/Caucasian",
-            items=(('neutral', 'neutral', 'neutral'),('caucasian', 'caucasian', 'caucasian')),
+            items=(('neutral', 'neutral', 'neutral'),('caucasian', 'caucasian', 'caucasian'),('universal', 'universal', 'universal')),
             default = 'caucasian')
 
 
