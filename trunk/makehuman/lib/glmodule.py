@@ -40,16 +40,16 @@ def createShader(vertexShader, fragmentShader):
     if not bool(glCreateProgram):
         raise RuntimeError("No shader support detected")
 
-    p = glCreateProgram()
+    program = glCreateProgram()
 
-    glAttachShader(p, vertexShader)
-    glAttachShader(p, fragmentShader)
+    glAttachShader(program, vertexShader)
+    glAttachShader(program, fragmentShader)
 
-    glLinkProgram(p)
+    glLinkProgram(program)
     if not glGetProgramiv(program, GL_LINK_STATUS):
         raise RuntimeError("Error linking shader: %s" % glGetProgramInfoLog(program))
 
-    return p
+    return program
 
 def grabScreen(x, y, width, height, filename):
     if width <= 0 or height <= 0:
