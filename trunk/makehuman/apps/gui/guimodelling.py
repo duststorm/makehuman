@@ -51,6 +51,12 @@ class ModellingCategory(gui3d.Category):
         self.wireButton = self.viewBox.addWidget(gui.ToggleButton('Wireframe'))
         self.subdivisionButton = self.viewBox.addWidget(gui.ToggleButton('Smooth'))
 
+        self.symmetryBox = self.addWidget(mh.addWidget(mh.Frame.LeftBottom, gui.GroupBox('Symmetry')))
+
+        self.rightSymmetryButton = self.symmetryBox.addWidget(gui.Button('Sym<'))
+        self.leftSymmetryButton = self.symmetryBox.addWidget(gui.Button('Sym>'))
+        self.symmetryButton = self.symmetryBox.addWidget(gui.ToggleButton('Sym'))
+
         @self.anaglyphsButton.mhEvent
         def onClicked(event):
             gui3d.app.toggleStereo()
@@ -65,6 +71,21 @@ class ModellingCategory(gui3d.Category):
         def onClicked(event):
             gui3d.app.toggleSubdivision()
             self.subdivisionButton.setSelected(gui3d.app.selectedHuman.isSubdivided())
+
+        @self.rightSymmetryButton.mhEvent
+        def onClicked(event):
+            human = gui3d.app.selectedHuman
+            human.applySymmetryRight()
+
+        @self.leftSymmetryButton.mhEvent
+        def onClicked(event):
+            human = gui3d.app.selectedHuman
+            human.applySymmetryLeft()
+
+        @self.symmetryButton.mhEvent
+        def onClicked(event):
+            human = gui3d.app.selectedHuman
+            human.symmetryModeEnabled = self.symmetryButton.selected
         
         self.addView(guimacromodelling.MacroModelingTaskView(self))
         self.addView(guidetailmodelling.DetailModelingTaskView(self))

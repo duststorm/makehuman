@@ -573,26 +573,8 @@ class DetailModelingTaskView(gui3d.TaskView):
             self.tool = Detail3dTool(gui3d.app, True, 'scale')
             gui3d.app.tool = self.tool
 
-        self.rightSymmetryButton = self.modifiersBox.addWidget(gui.Button('Sym<'))
-        self.leftSymmetryButton = self.modifiersBox.addWidget(gui.Button('Sym>'))
-        self.symmetryButton = self.modifiersBox.addWidget(gui.ToggleButton('Sym'))
         #self.microButton = self.modifiersBox.addWidget(gui.ToggleButton('Micro'))
 
-        @self.rightSymmetryButton.mhEvent
-        def onClicked(event):
-            human = gui3d.app.selectedHuman
-            human.applySymmetryRight()
-
-        @self.leftSymmetryButton.mhEvent
-        def onClicked(event):
-            human = gui3d.app.selectedHuman
-            human.applySymmetryLeft()
-
-        @self.symmetryButton.mhEvent
-        def onClicked(event):
-            human = gui3d.app.selectedHuman
-            human.symmetryModeEnabled = self.symmetryButton.selected
-            #self.parent.tasksByName['Micro modelling'].symmetryButton.setSelected(self.symmetryButton.selected)
         """    
         @self.microButton.mhEvent
         def onClicked(event):
