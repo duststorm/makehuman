@@ -34,14 +34,6 @@ main OpenGL/SDL/Application event handling loop.
 import mh
 import gui3d
 import os
-import mh2obj
-import mh2bvh
-import mh2mhx
-import mh2obj_proxy
-import mh2collada
-import mh2md5
-import mh2stl
-import mh2skel
 from shutil import copyfile
 from os.path import basename
 import qtgui as gui
@@ -403,6 +395,7 @@ class ExportTaskView(gui3d.TaskView):
         
         @self.fileentry.mhEvent
         def onFileSelected(filename):
+            import mh2obj, mh2bvh, mh2mhx, mh2obj_proxy, mh2collada, mh2md5, mh2stl, mh2skel
 
             path = os.path.normpath(os.path.join(exportPath, filename))
             dir, name = os.path.split(path)

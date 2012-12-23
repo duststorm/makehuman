@@ -94,7 +94,6 @@ from core import G
 import mh
 import files3d
 import gui3d, events3d, font3d, animation3d
-import mh2obj, mh2bvh, mh2mhx
 import human
 import guimodelling, guifiles#, guirender
 from aljabr import centroid, vdist
@@ -764,43 +763,32 @@ class MHApplication(gui3d.Application):
         mh.updatePickingBuffer();
         self.redraw()
 
-    class SplashOutputStream(object):
-        def __init__(self, splash):
-            self.splash = splash
-            self.text = ''
-
-        def write(self, text):
-            sys.__stdout__.write(text)
-            self.text += text
-            while '\n' in self.text:
-                line, self.text = self.text.split('\n', 1)
-                line = line.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
-                line = ''.join(['<br><br>'
-                                '<b>',
-                                '<font size="48" color="#ff0000">',
-                                line,
-                                '</font>',
-                                '</b>'])
-                self.splash.showMessage(line, alignment = gui.QtCore.Qt.AlignHCenter, color = gui.QtCore.Qt.white)
-                G.app.processEvents()
-
     def startupSequence(self):
         self.splash.setFormat('<br><br><b><font size="48" color="#ff0000">%s</font></b>')
+        old_stdout = sys.stdout
         sys.stdout = self.splash
         yield None
+        print 'Loading background'
         self.loadBackground()
         yield None
+        print 'Loading human'
         self.loadHuman()
         yield None
+        print 'Loading main GUI'
         self.loadMainGui()
         yield None
+        print 'Loading plugins'
         for _ in self.loadPlugins():
             yield None
         yield None
+        print 'Loading GUI'
         self.loadGui()
         yield None
+        print 'Loading done'
         self.loadFinish()
-        sys.stdout = sys.__stdout__
+        print ''
+        yield None
+        sys.stdout = old_stdout
         self.splash.finish(G.app.mainwin)
 
     def nextStartupTask(self):
@@ -1317,8 +1305,11 @@ class MHApplication(gui3d.Application):
         exportPath = mh.getPath('exports')
         if not os.path.exists(exportPath):
             os.makedirs(exportPath)
+        import mh2obj
         mh2obj.exportObj(self.selectedHuman.meshData, exportPath + '/quick_export.obj')
+        import mh2bvh
         mh2bvh.exportSkeleton(self.selectedHuman.meshData, exportPath + '/quick_export.bvh')
+        import mh2mhx
         mh2mhx.exportMhx(self.selectedHuman.meshData, exportPath + '/quick_export.mhx')
         
     def grabScreen(self):

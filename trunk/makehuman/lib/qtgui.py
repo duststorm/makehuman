@@ -617,12 +617,14 @@ class SplashScreen(QtGui.QSplashScreen):
         super(SplashScreen, self).__init__(G.app.mainwin, QtGui.QPixmap(image))
         self._text = ''
         self._format = '%s'
+        self._stdout = sys.stdout
 
     def setFormat(self, fmt):
         self._format = fmt
 
     def write(self, text):
-        sys.__stdout__.write(text)
+        if self._stdout:
+            self._stdout.write(text)
         self._text += text
         while '\n' in self._text:
             line, self._text = self._text.split('\n', 1)
