@@ -178,7 +178,7 @@ class GenderTaskView(gui3d.TaskView):
         
         self.modifiers = {}
         
-        self.modifiers['genitals'] = AsymmetricDetailModifier('data/targets/details/genitals_${gender}_${genitals}_${age}.target', 'genitals', 'feminine', 'masculine', False)
+        self.modifiers['genitals'] = AsymmetricDetailModifier('data/targets/genitals/genitals_${gender}_${genitals}_${age}.target', 'genitals', 'feminine', 'masculine', False)
         
         self.modifiers['breastSize'] = BreastSizeModifier()
         self.modifiers['breastFirmness'] = BreastFirmnessModifier()
