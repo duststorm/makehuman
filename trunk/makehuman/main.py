@@ -93,281 +93,15 @@ from os.path import join, basename, splitext
 from core import G
 import mh
 import files3d
-import gui3d, events3d, font3d, animation3d
+import gui3d, font3d, animation3d
 import human
-import guimodelling, guifiles#, guirender
-from aljabr import centroid, vdist
+import guimodelling, guifiles
+from aljabr import centroid
 import algos3d
-import module3d
 #import posemode
-from math import tan, pi
 import qtgui as gui
 import language as lang
-
-class Camera(events3d.EventHandler):
-
-    def __init__(self):
-    
-        self.camera = mh.Camera();
-        self.changedPending = False;
-        
-    def getProjection(self):
-    
-        return self.camera.projection
-
-    def setProjection(self, value):
-    
-        self.camera.projection = value
-        self.changed()
-        
-    projection = property(getProjection, setProjection)
-        
-    def getFovAngle(self):
-    
-        return self.camera.fovAngle
-
-    def setFovAngle(self, value):
-    
-        self.camera.fovAngle = value
-        self.changed()
-        
-    fovAngle = property(getFovAngle, setFovAngle)
-    
-    def getNearPlane(self):
-    
-        return self.camera.nearPlane
-
-    def setNearPlane(self, value):
-    
-        self.camera.nearPlane = value
-        self.changed()
-        
-    nearPlane = property(getNearPlane, setNearPlane)
-    
-    def getFarPlane(self):
-    
-        return self.camera.farPlane
-
-    def setFarPlane(self, value):
-    
-        self.camera.farPlane = value
-        self.changed()
-        
-    farPlane = property(getFarPlane, setFarPlane)
-    
-    def getEyeX(self):
-    
-        return self.camera.eyeX
-
-    def setEyeX(self, value):
-    
-        self.camera.eyeX = value
-        self.changed()
-        
-    eyeX = property(getEyeX, setEyeX)
-        
-    def getEyeY(self):
-    
-        return self.camera.eyeY
-
-    def setEyeY(self, value):
-    
-        self.camera.eyeY = value
-        self.changed()
-        
-    eyeY = property(getEyeY, setEyeY)
-    
-    def getEyeZ(self):
-    
-        return self.camera.eyeZ
-
-    def setEyeZ(self, value):
-    
-        self.camera.eyeZ = value
-        if self.camera.projection == 0:
-            self.switchToOrtho();
-        self.changed()
-        
-    eyeZ = property(getEyeZ, setEyeZ)
-    
-    @property
-    def eye(self):
-        return (self.camera.eyeX, self.camera.eyeY, self.camera.eyeZ)
-        
-    def getFocusX(self):
-    
-        return self.camera.focusX
-
-    def setFocusX(self, value):
-    
-        self.camera.focusX = value
-        self.changed()
-        
-    focusX = property(getFocusX, setFocusX)
-        
-    def getFocusY(self):
-    
-        return self.camera.focusY
-
-    def setFocusY(self, value):
-    
-        self.camera.focusY = value
-        self.changed()
-        
-    focusY = property(getFocusY, setFocusY)
-    
-    def getFocusZ(self):
-    
-        return self.camera.focusZ
-
-    def setFocusZ(self, value):
-    
-        self.camera.focusZ = value
-        if self.camera.projection == 0:
-            self.switchToOrtho();
-        self.changed()
-        
-    focusZ = property(getFocusZ, setFocusZ)
-    
-    @property
-    def focus(self):
-        return (self.camera.focusX, self.camera.focusY, self.camera.focusZ)
-    
-    def getUpX(self):
-    
-        return self.camera.upX
-
-    def setUpX(self, value):
-    
-        self.camera.upX = value
-        self.changed()
-        
-    upX = property(getUpX, setUpX)
-        
-    def getUpY(self):
-    
-        return self.camera.upY
-
-    def setUpY(self, value):
-    
-        self.camera.upY = value
-        self.changed()
-        
-    upY = property(getUpY, setUpY)
-    
-    def getUpZ(self):
-    
-        return self.camera.upZ
-
-    def setUpZ(self, value):
-    
-        self.camera.upZ = value
-        self.changed()
-        
-    upZ = property(getUpZ, setUpZ)
-    
-    @property
-    def focus(self):
-        return (self.camera.upX, self.camera.upY, self.camera.upZ)
-        
-    def getLeft(self):
-    
-        return self.camera.left
-
-    def setLeft(self, value):
-    
-        self.camera.left = value
-        self.changed()
-        
-    left = property(getLeft, setLeft)
-    
-    def getRight(self):
-    
-        return self.camera.right
-
-    def setRight(self, value):
-    
-        self.camera.right = value
-        self.changed()
-        
-    right = property(getRight, setRight)
-    
-    def getBottom(self):
-    
-        return self.camera.bottom
-
-    def setBottom(self, value):
-    
-        self.camera.bottom = value
-        self.changed()
-        
-    bottom = property(getBottom, setBottom)
-    
-    def getTop(self):
-    
-        return self.camera.top
-
-    def setTop(self, value):
-    
-        self.camera.top = value
-        self.changed()
-        
-    top = property(getTop, setTop)
-    
-    def getStereoMode(self):
-    
-        return self.camera.stereoMode
-
-    def setStereoMode(self, value):
-    
-        self.camera.stereoMode = value
-        self.changed()
-        
-    stereoMode = property(getStereoMode, setStereoMode)
-        
-    def convertToScreen(self, x, y, z, obj=None):
-    
-        return self.camera.convertToScreen(x, y, z, obj)
-        
-    def convertToWorld3D(self, x, y, z):
-    
-        return self.camera.convertToWorld3D(x, y, z)
-        
-    def changed(self):
-        
-        if self.changedPending:
-            return
-            
-        self.changedPending = True
-        mh.callAsync(self.callChanged)
-        
-    def callChanged(self):
-    
-        self.callEvent('onChanged', self)
-        self.changedPending = False
-        
-    def switchToOrtho(self):
-    
-        self.camera.projection = 0
-        
-        self.camera.nearPlane = 0.001
-            
-        width, height = gui3d.app.getWindowSize()
-        aspect = float(width) / float(height)
-        fov = tan(self.camera.fovAngle * 0.5 * pi / 180.0)
-        y = vdist(self.eye, self.focus) * fov
-        x = y * aspect
-        
-        self.camera.left = -x
-        self.camera.right = x
-        self.camera.bottom = -y
-        self.camera.top = y
-        
-        self.camera.nearPlane = -100.0
-        
-    def switchToPerspective(self):
-    
-        self.camera.projection = 0
+from camera3d import Camera
 
 class PluginCheckBox(gui.CheckBox):
 
@@ -464,7 +198,7 @@ class MHApplication(gui3d.Application):
         self.dialog = None
         self.helpIds = set()
         
-        self.modelCamera = Camera()
+        self.modelCamera = Camera(self)
         
         @self.modelCamera.mhEvent
         def onChanged(event):
@@ -474,7 +208,7 @@ class MHApplication(gui3d.Application):
 
         mh.cameras.append(self.modelCamera.camera)
 
-        self.guiCamera = Camera()
+        self.guiCamera = Camera(self)
         self.guiCamera.fovAngle = 45
         self.guiCamera.eyeZ = 10
         self.guiCamera.projection = 0
@@ -1075,107 +809,63 @@ class MHApplication(gui3d.Application):
         tl.append(animation3d.UpdateAction(self))
         tl.start()
 
-    def setFaceCamera(self):
-        
+    def setTargetCamera(self, names, view='front', distance=10):
         human = self.selectedHuman
-        headNames = [group.name for group in human.meshData.faceGroups if ("head" in group.name or "jaw" in group.name)]
-        self.setCameraGroupsViewDistance(headNames)
+        groupNames = [group.name
+                      for group in human.meshData.faceGroups
+                      if any(name in group.name for name in names)]
+        self.setCameraGroupsViewDistance(groupNames, view, distance)
+
+    def setFaceCamera(self):
+        self.setTargetCamera(("head", "jaw"))
         
     def setLeftHandFrontCamera(self):
-        
-        human = self.selectedHuman
-        leftHandNames = [group.name for group in human.meshData.faceGroups if ("l-hand" in group.name)]
-        self.setCameraGroupsViewDistance(leftHandNames)
+        self.setTargetCamera("l-hand")
         
     def setLeftHandTopCamera(self):
-        
-        human = self.selectedHuman
-        leftHandNames = [group.name for group in human.meshData.faceGroups if ("l-hand" in group.name)]
-        self.setCameraGroupsViewDistance(leftHandNames, 'top')
+        self.setTargetCamera("l-hand", 'top')
         
     def setRightHandFrontCamera(self):
-        
-        human = self.selectedHuman
-        rightHandNames = [group.name for group in human.meshData.faceGroups if ("r-hand" in group.name)]
-        self.setCameraGroupsViewDistance(rightHandNames)
+        self.setTargetCamera("r-hand")
         
     def setRightHandTopCamera(self):
-        
-        human = self.selectedHuman
-        rightHandNames = [group.name for group in human.meshData.faceGroups if ("r-hand" in group.name)]
-        self.setCameraGroupsViewDistance(rightHandNames, 'top')
+        self.setTargetCamera("r-hand", 'top')
         
     def setLeftFootFrontCamera(self):
-        
-        human = self.selectedHuman
-        leftFootNames = [group.name for group in human.meshData.faceGroups if ("l-foot" in group.name)]
-        self.setCameraGroupsViewDistance(leftFootNames)
+        self.setTargetCamera("l-foot")
         
     def setLeftFootLeftCamera(self):
-        
-        human = self.selectedHuman
-        leftFootNames = [group.name for group in human.meshData.faceGroups if ("l-foot" in group.name)]
-        self.setCameraGroupsViewDistance(leftFootNames, 'left')
+        self.setTargetCamera("l-foot", 'left')
         
     def setRightFootFrontCamera(self):
-        
-        human = self.selectedHuman
-        rightFootNames = [group.name for group in human.meshData.faceGroups if ("r-foot" in group.name)]
-        self.setCameraGroupsViewDistance(rightFootNames)
+        self.setTargetCamera("r-foot")
         
     def setRightFootRightCamera(self):
-        
-        human = self.selectedHuman
-        rightFootNames = [group.name for group in human.meshData.faceGroups if ("r-foot" in group.name)]
-        self.setCameraGroupsViewDistance(rightFootNames, 'right')
+        self.setTargetCamera("r-foot", 'right')
         
     def setLeftArmFrontCamera(self):
-        
-        human = self.selectedHuman
-        leftArmNames = [group.name for group in human.meshData.faceGroups if ("l-lowerarm" in group.name or "l-upperarm" in group.name)]
-        self.setCameraGroupsViewDistance(leftArmNames, distance=30)
+        self.setTargetCamera(("l-lowerarm", "l-upperarm"), distance=30)
         
     def setLeftArmTopCamera(self):
-        
-        human = self.selectedHuman
-        leftArmNames = [group.name for group in human.meshData.faceGroups if ("l-lowerarm" in group.name or "l-upperarm" in group.name)]
-        self.setCameraGroupsViewDistance(leftArmNames, 'top', distance=30)
+        self.setTargetCamera(("l-lowerarm", "l-upperarm"), top, distance=30)
         
     def setRightArmFrontCamera(self):
-        
-        human = self.selectedHuman
-        rightArmNames = [group.name for group in human.meshData.faceGroups if ("r-lowerarm" in group.name or "r-upperarm" in group.name)]
-        self.setCameraGroupsViewDistance(rightArmNames, distance=30)
+        self.setTargetCamera(("r-lowerarm", "r-upperarm"), distance=30)
         
     def setRightArmTopCamera(self):
-        
-        human = self.selectedHuman
-        rightArmNames = [group.name for group in human.meshData.faceGroups if ("r-lowerarm" in group.name or "r-upperarm" in group.name)]
-        self.setCameraGroupsViewDistance(rightArmNames, 'top', distance=30)
+        self.setTargetCamera(("r-lowerarm", "r-upperarm"), top, distance=30)
         
     def setLeftLegFrontCamera(self):
-        
-        human = self.selectedHuman
-        leftLegNames = [group.name for group in human.meshData.faceGroups if ("l-lowerleg" in group.name or "l-upperleg" in group.name)]
-        self.setCameraGroupsViewDistance(leftLegNames, distance=30)
+        self.setTargetCamera(("l-lowerleg", "l-upperleg"), distance=30)
         
     def setLeftLegLeftCamera(self):
-        
-        human = self.selectedHuman
-        leftLegNames = [group.name for group in human.meshData.faceGroups if ("l-lowerleg" in group.name or "l-upperleg" in group.name)]
-        self.setCameraGroupsViewDistance(leftLegNames, 'left', distance=30)
+        self.setTargetCamera(("l-lowerleg", "l-upperleg"), left, distance=30)
         
     def setRightLegFrontCamera(self):
-        
-        human = self.selectedHuman
-        rightLegNames = [group.name for group in human.meshData.faceGroups if ("r-lowerleg" in group.name or "r-upperleg" in group.name)]
-        self.setCameraGroupsViewDistance(rightLegNames, distance=30)
+        self.setTargetCamera(("r-lowerleg", "r-upperleg"), distance=30)
         
     def setRightLegRightCamera(self):
-        
-        human = self.selectedHuman
-        rightLegNames = [group.name for group in human.meshData.faceGroups if ("r-lowerleg" in group.name or "r-upperleg" in group.name)]
-        self.setCameraGroupsViewDistance(rightLegNames, 'right', distance=30)
+        self.setTargetCamera(("r-lowerleg", "r-upperleg"), right, distance=30)
         
     # Shortcuts
     def setShortcut(self, modifier, key, method):
@@ -1320,100 +1010,94 @@ class MHApplication(gui3d.Application):
         mh.grabScreen(180, 80, 440, 440, os.path.join(grabPath, 'grab.bmp'))
         
     # Camera navigation
-    def rotateDown(self):
+    def rotateCamera(self, axis, amount):
         human = self.selectedHuman
         rot = human.getRotation()
-        rot[0] += 5.0
+        rot[axis] += amount
         human.setRotation(rot)
         self.redraw()
+        
+    def panCamera(self, axis, amount):
+        human = self.selectedHuman
+        trans = human.getPosition()
+        trans[axis] += amount
+        human.setPosition(trans)
+        self.redraw()
+
+    def cameraSpeed(self):
+        if mh.getKeyModifiers() & mh.Modifiers.SHIFT:
+            return gui3d.app.settings.get('highspeed', 5)
+        else:
+            return gui3d.app.settings.get('lowspeed', 1)
+
+    def zoomCamera(self, amount):
+        self.modelCamera.eyeZ += amount * self.cameraSpeed()
+        self.redraw()
+
+    def rotateAction(self, axis):
+        return animation3d.RotateAction(self.selectedHuman, self.selectedHuman.getRotation(), axis)
+
+    def axisView(self, axis):
+        animation3d.animate(self, 0.20, [self.rotateAction(axis)])
+
+    def rotateDown(self):
+        self.rotateCamera(0, 5.0)
         
     def rotateLeft(self):
-        human = self.selectedHuman
-        rot = human.getRotation()
-        rot[1] -= 5.0
-        human.setRotation(rot)
-        self.redraw()
+        self.rotateCamera(0, -5.0)
         
     def rotateRight(self):
-        human = self.selectedHuman
-        rot = human.getRotation()
-        rot[1] += 5.0
-        human.setRotation(rot)
-        self.redraw()
+        self.rotateCamera(1, 5.0)
         
     def rotateUp(self):
-        human = self.selectedHuman
-        rot = human.getRotation()
-        rot[0] -= 5.0
-        human.setRotation(rot)
-        self.redraw()
+        self.rotateCamera(1, -5.0)
         
     def panUp(self):
-        human = self.selectedHuman
-        trans = human.getPosition()
-        trans[1] += 0.05
-        human.setPosition(trans)
-        self.redraw()
+        self.panCamera(1, 0.05)
                     
     def panDown(self):
-        human = self.selectedHuman
-        trans = human.getPosition()
-        trans[1] -= 0.05
-        human.setPosition(trans)
-        self.redraw()      
+        self.panCamera(1, -0.05)
         
     def panRight(self):
-        human = self.selectedHuman
-        trans = human.getPosition()
-        trans[0] += 0.05
-        human.setPosition(trans)
-        self.redraw()
+        self.panCamera(0, 0.05)
         
     def panLeft(self):
-        human = self.selectedHuman
-        trans = human.getPosition()
-        trans[0] -= 0.05
-        human.setPosition(trans)
-        self.redraw()
+        self.panCamera(0, -0.05)
         
     def zoomOut(self):
-        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & mh.Modifiers.SHIFT else gui3d.app.settings.get('lowspeed', 1)
-        self.modelCamera.eyeZ += 0.65 * speed
-        self.redraw()
+        self.zoomCamera(0.65)
         
     def zoomIn(self):
-        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & mh.Modifiers.SHIFT else gui3d.app.settings.get('lowspeed', 1)
-        self.modelCamera.eyeZ -= 0.65 * speed
-        self.redraw()
-        
+        self.zoomCamera(-0.65)
+
     def frontView(self):
-        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman, self.selectedHuman.getRotation(), [0.0, 0.0, 0.0])])
+        self.axisView([0.0, 0.0, 0.0])
         
     def rightView(self):
-        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman, self.selectedHuman.getRotation(), [0.0, -90.0, 0.0])])
+        self.axisView([0.0, -90.0, 0.0])
         
     def topView(self):
-        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman, self.selectedHuman.getRotation(), [90.0, 0.0, 0.0])])
+        self.axisView([90.0, 0.0, 0.0])
         
     def backView(self):
-        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman, self.selectedHuman.getRotation(), [0.0, 180.0, 0.0])])
+        self.axisView([0.0, 180.0, 0.0])
         
     def leftView(self):
-        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman, self.selectedHuman.getRotation(), [0.0, 90.0, 0.0])])
+        self.axisView([0.0, 90.0, 0.0])
         
     def bottomView(self):
-        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman, self.selectedHuman.getRotation(), [-90.0, 0.0, 0.0])])
+        self.axisView([-90.0, 0.0, 0.0])
         
     def resetView(self):
         cam = self.modelCamera
-        animation3d.animate(self, 0.20, [animation3d.RotateAction(self.selectedHuman, self.selectedHuman.getRotation(), [0.0, 0.0, 0.0]),
-            animation3d.CameraAction(cam, None,
-            [cam.eyeX, cam.eyeY, 60.0, cam.focusX, cam.focusY, cam.focusZ, 0, 1, 0])])
+        animation3d.animate(self, 0.20, [
+            self.rotateAction([0.0, 0.0, 0.0]),
+            animation3d.CameraAction(cam, None, [cam.eyeX, cam.eyeY, 60.0, cam.focusX, cam.focusY, cam.focusZ, 0, 1, 0])])
         
     # Mouse actions    
     def mouseTranslate(self, event):
             
-        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & mh.Modifiers.SHIFT else gui3d.app.settings.get('lowspeed', 1)
+        speed = self.cameraSpeed()
         
         human = self.selectedHuman
         trans = human.getPosition()
@@ -1425,7 +1109,7 @@ class MHApplication(gui3d.Application):
 
     def mouseRotate(self, event):
         
-        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & mh.Modifiers.SHIFT else gui3d.app.settings.get('lowspeed', 1)
+        speed = self.cameraSpeed()
         
         human = self.selectedHuman
         rot = human.getRotation()
@@ -1435,7 +1119,7 @@ class MHApplication(gui3d.Application):
         
     def mouseZoom(self, event):
     
-        speed = gui3d.app.settings.get('highspeed', 5) if mh.getKeyModifiers() & mh.Modifiers.SHIFT else gui3d.app.settings.get('lowspeed', 1)
+        speed = self.cameraSpeed()
         
         if gui3d.app.settings.get('invertMouseWheel', False):
             speed *= -1
