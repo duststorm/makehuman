@@ -73,15 +73,15 @@ class MeasureSlider(humanmodifier.ModifierSlider):
         self.measure = measure
 
     def onChange(self, value):
-        humanmodifier.ModifierSlider.onChange(self, value)
+        super(MeasureSlider, self).onChange(value)
         self.parent.parent.syncSliderLabels()
 
     def onFocus(self, event):
-        humanmodifier.ModifierSlider.onFocus(self, event)
+        super(MeasureSlider, self).onFocus(self, event)
         self.parent.parent.onSliderFocus()
 
     def onBlur(self, event):
-        humanmodifier.ModifierSlider.onBlur(self, event)
+        super(MeasureSlider, self).onBlur(self, event)
         self.parent.parent.onSliderBlur()
 
 class MeasureTaskView(gui3d.TaskView):

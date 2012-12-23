@@ -25,8 +25,7 @@ class HeadSlider(humanmodifier.ModifierSlider):
         self.view = getattr(gui3d.app, view)
         
     def onFocus(self, event):
-        
-        humanmodifier.ModifierSlider.onFocus(self, event)
+        super(HeadSlider, self).onFocus(event)
         self.view()
 
 class HeadTaskView(gui3d.TaskView):

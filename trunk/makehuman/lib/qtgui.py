@@ -15,16 +15,6 @@ def getLanguageString(text):
         return text
     return language.language.getLanguageString(text)
 
-class Tab(events3d.EventHandler):
-    def __init__(self, parent, name, label):
-        super(Tab, self).__init__()
-        self.parent = parent
-        self.name = name
-        self.label = label
-
-    def setSelected(self, state):
-        pass
-
 class Widget(events3d.EventHandler):
     def __init__(self):
         events3d.EventHandler.__init__(self)
@@ -34,11 +24,42 @@ class Widget(events3d.EventHandler):
         if G.app and G.app.mainwin and G.app.mainwin.canvas:
             G.app.mainwin.canvas.update()
 
+    def focusInEvent(self, event):
+        self.callEvent('onFocus', self)
+
+    def focusOutEvent(self, event):
+        self.callEvent('onBlur', self)
+
     def showEvent(self, event):
         self.callEvent('onShow', self)
 
     def hideEvent(self, event):
         self.callEvent('onHide', self)
+
+    def onFocus(self, event):
+        pass
+
+    def onBlur(self, event):
+        pass
+
+    def onShow(self, event):
+        pass
+
+    def onHide(self, event):
+        pass
+
+class Tab(Widget):
+    def __init__(self, parent, name, label):
+        super(Tab, self).__init__()
+        self.parent = parent
+        self.name = name
+        self.label = label
+
+    def setSelected(self, state):
+        pass
+
+    def onClicked(self, event):
+        pass
 
 class TabsBase(Widget):
     def __init__(self):
@@ -67,6 +88,9 @@ class TabsBase(Widget):
 
     def changeTab(self, name):
         self.setCurrentIndex(self.findTab(name).idx)
+
+    def onTabSelected(self, event):
+        pass
 
 class Tabs(QtGui.QTabWidget, TabsBase):
     def __init__(self, parent = None):
@@ -153,6 +177,7 @@ class Slider(QtGui.QWidget, Widget):
         self.hold_events = False
         self.connect(self.slider, QtCore.SIGNAL('sliderMoved(int)'), self._changing)
         self.connect(self.slider, QtCore.SIGNAL('valueChanged(int)'), self._changed)
+        self.slider.installEventFilter(self)
 
         label = (self.text % value) if '%' in self.text else self.text
         self.label = QtGui.QLabel(label)
@@ -176,6 +201,15 @@ class Slider(QtGui.QWidget, Widget):
 
     def __del__(self):
         type(self)._instances.remove(self)
+
+    def eventFilter(self, object, event):
+        if object != self.slider:
+            return
+        if event.type() == QtCore.QEvent.FocusIn:
+            self.callEvent('onFocus', self)
+        elif event.type() == QtCore.QEvent.FocusOut:
+            self.callEvent('onBlur', self)
+        return False
 
     def _update_image(self):
         if self.image is None:
@@ -235,6 +269,12 @@ class Slider(QtGui.QWidget, Widget):
         self.max = max
         self.setValue(value)
 
+    def onChanging(self, event):
+        pass
+
+    def onChange(self, event):
+        pass
+
 class ButtonBase(Widget):
     def __init__(self):
         Widget.__init__(self)
@@ -256,6 +296,9 @@ class ButtonBase(Widget):
 
     def setSelected(self, value):
         self.setChecked(value)
+
+    def onClicked(self, event):
+        pass
 
 class Button(QtGui.QPushButton, ButtonBase):
     def __init__(self, label=None, selected=False):
@@ -398,6 +441,9 @@ class TextEdit(QtGui.QLineEdit, Widget):
         else:
             qvalidator = None
         super(TextEdit, self).setValidator(qvalidator)
+
+    def onChange(self, event):
+        pass
 
 class ProgressBar(QtGui.QProgressBar, Widget):
     def __init__(self, visible=True):
@@ -611,6 +657,9 @@ class FileEntryView(QtGui.QWidget, Widget):
                 
     def onFocus(self, event):
         self.edit.setFocus()
+
+    def onFileSelected(self, shortcut):
+        pass
 
 class SplashScreen(QtGui.QSplashScreen):
     def __init__(self, image):

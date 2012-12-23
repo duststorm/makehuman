@@ -25,8 +25,7 @@ class FaceSlider(humanmodifier.ModifierSlider):
         self.view = getattr(gui3d.app, view)
 
     def onFocus(self, event):
-
-        humanmodifier.ModifierSlider.onFocus(self, event)
+        super(FaceSlider, self).onFocus(event)
         self.view()
         
 class FaceSlider2(humanmodifier.ModifierSlider):
@@ -37,8 +36,7 @@ class FaceSlider2(humanmodifier.ModifierSlider):
         self.view = getattr(gui3d.app, view)
 
     def onFocus(self, event):
-
-        humanmodifier.ModifierSlider.onFocus(self, event)
+        super(FaceSlider2, self).onFocus(event)
         self.view()
 
 class FaceTaskView(gui3d.TaskView):
