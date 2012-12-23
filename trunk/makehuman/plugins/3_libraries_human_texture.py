@@ -139,7 +139,7 @@ class HumanTextureTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Library')
-    taskview = category.addView(HumanTextureTaskView(category))
+    taskview = category.addTask(HumanTextureTaskView(category))
 
     print 'Texture chooser loaded'
 

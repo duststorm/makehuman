@@ -152,7 +152,7 @@ class PoseLoadTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Library')
-    taskview = category.addView(PoseLoadTaskView(category))
+    taskview = category.addTask(PoseLoadTaskView(category))
 
     app.addLoadHandler('poses', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)

@@ -425,9 +425,9 @@ class BackgroundTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Library')
-    taskview = category.addView(BackgroundTaskView(category))
+    taskview = category.addTask(BackgroundTaskView(category))
     category = app.getCategory('Modelling')
-    taskview = category.addView(settingsTaskView(category, taskview))
+    taskview = category.addTask(settingsTaskView(category, taskview))
 
     print 'Background chooser loaded'
 

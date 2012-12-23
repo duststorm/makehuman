@@ -214,7 +214,7 @@ class TorsoTaskView(gui3d.TaskView):
     
 def load(app):
     category = app.getCategory('Modelling')
-    taskview = category.addView(TorsoTaskView(category))
+    taskview = category.addTask(TorsoTaskView(category))
     
     app.addLoadHandler('torso', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)

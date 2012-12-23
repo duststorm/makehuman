@@ -202,7 +202,7 @@ taskview = None
 
 def load(app):
     category = app.categories['Modelling']
-    taskview = category.addView(HairPropertiesTaskView())
+    taskview = category.addTask(HairPropertiesTaskView())
     print 'hair properties loaded'
 
 def unload(app):

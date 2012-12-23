@@ -456,7 +456,7 @@ class BvhView(gui3d.TaskView):
 def load(app):
     
     category = app.getCategory('Posing')
-    taskview = category.addView(BvhView(category))
+    taskview = category.addTask(BvhView(category))
     
     print 'BVH Player loaded'
 

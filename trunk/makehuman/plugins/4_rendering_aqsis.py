@@ -111,7 +111,7 @@ class AqsisTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Rendering')
-    taskview = category.addView(AqsisTaskView(category))
+    taskview = category.addTask(AqsisTaskView(category))
 
 def unload(app):
     pass

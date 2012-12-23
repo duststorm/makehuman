@@ -73,7 +73,7 @@ class ShortcutsTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Settings')
-    taskview = category.addView(ShortcutsTaskView(category))
+    taskview = category.addTask(ShortcutsTaskView(category))
 
 def unload(app):
     pass

@@ -157,7 +157,7 @@ taskview = None
 
 def load(app):
     category = app.getCategory('Experiments')
-    taskview = category.addView(TextureToolTaskView(category))
+    taskview = category.addTask(TextureToolTaskView(category))
     print 'Texture tool loaded'
 
 # This method is called when the plugin is unloaded from makehuman

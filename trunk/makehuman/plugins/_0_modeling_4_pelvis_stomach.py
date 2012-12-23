@@ -137,7 +137,7 @@ class PelvisStomachTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Modelling')
-    taskview = category.addView(PelvisStomachTaskView(category))
+    taskview = category.addTask(PelvisStomachTaskView(category))
 
     print 'Pelvis/Stomach loaded'
 

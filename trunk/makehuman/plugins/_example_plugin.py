@@ -120,7 +120,7 @@ taskview = None
 
 def load(app):
     category = app.getCategory('Example')
-    taskview = category.addView(ExampleTaskView(category))
+    taskview = category.addTask(ExampleTaskView(category))
 
     print 'example loaded'
     print 'Hello world'

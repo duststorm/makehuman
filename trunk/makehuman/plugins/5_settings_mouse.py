@@ -53,7 +53,7 @@ class MouseActionsTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Settings')
-    taskview = category.addView(MouseActionsTaskView(category))
+    taskview = category.addTask(MouseActionsTaskView(category))
 
 def unload(app):
     pass

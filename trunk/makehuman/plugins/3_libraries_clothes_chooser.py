@@ -228,7 +228,7 @@ class ClothesTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Library')
-    taskview = category.addView(ClothesTaskView(category))
+    taskview = category.addTask(ClothesTaskView(category))
 
     app.addLoadHandler('clothes', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)

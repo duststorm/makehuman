@@ -268,7 +268,7 @@ class SkeletonView(gui3d.TaskView):
 def load(app):
     
     category = app.getCategory('Posing')
-    taskview = category.addView(SkeletonView(category))
+    taskview = category.addTask(SkeletonView(category))
     
     print 'Skeleton loaded'
 

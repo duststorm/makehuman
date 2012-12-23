@@ -134,7 +134,7 @@ class HeadTaskView(gui3d.TaskView):
     
 def load(app):
     category = app.getCategory('Modelling')
-    taskview = category.addView(HeadTaskView(category))
+    taskview = category.addTask(HeadTaskView(category))
     
     app.addLoadHandler('head', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)

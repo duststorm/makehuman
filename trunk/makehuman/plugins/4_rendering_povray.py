@@ -99,7 +99,7 @@ class PovrayTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Rendering')
-    taskview = category.addView(PovrayTaskView(category))
+    taskview = category.addTask(PovrayTaskView(category))
 
     print 'Povray loaded'
 

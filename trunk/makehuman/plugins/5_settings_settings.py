@@ -142,7 +142,7 @@ class SettingsTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Settings')
-    taskview = category.addView(SettingsTaskView(category))
+    taskview = category.addTask(SettingsTaskView(category))
     print 'Settings imported'
 
 def unload(app):

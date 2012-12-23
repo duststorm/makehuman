@@ -126,7 +126,7 @@ class CensorTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Settings')
-    taskview = category.addView(CensorTaskView(category))
+    taskview = category.addTask(CensorTaskView(category))
 
 def unload(app):
     pass

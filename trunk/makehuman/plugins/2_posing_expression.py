@@ -257,14 +257,14 @@ class VisemeLoadTaskView(MhmLoadTaskView):
 
 def load(app):
     category = app.getCategory('Posing')
-    taskview = category.addView(ExpressionTaskView(category))
+    taskview = category.addTask(ExpressionTaskView(category))
     
     app.addLoadHandler('expression', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)
 
     category = app.getCategory('Library')
-    category.addView(ExpressionLoadTaskView(category, taskview))
-    category.addView(VisemeLoadTaskView(category, taskview))
+    category.addTask(ExpressionLoadTaskView(category, taskview))
+    category.addTask(VisemeLoadTaskView(category, taskview))
     
     print 'Expression loaded'
 

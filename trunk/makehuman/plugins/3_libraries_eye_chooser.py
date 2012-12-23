@@ -100,7 +100,7 @@ class EyesTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Library')
-    taskview = category.addView(EyesTaskView(category))
+    taskview = category.addTask(EyesTaskView(category))
 
     app.addLoadHandler('eyes', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)

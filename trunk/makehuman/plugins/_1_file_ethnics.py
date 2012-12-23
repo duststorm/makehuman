@@ -92,7 +92,7 @@ class EthnicsTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Files')
-    taskview = category.addView(EthnicsTaskView(category))
+    taskview = category.addTask(EthnicsTaskView(category))
     
     app.addLoadHandler('ethnic', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)

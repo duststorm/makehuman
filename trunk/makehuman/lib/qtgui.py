@@ -55,9 +55,6 @@ class Tab(Widget):
         self.name = name
         self.label = label
 
-    def setSelected(self, state):
-        pass
-
     def onClicked(self, event):
         pass
 

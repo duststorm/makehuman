@@ -134,7 +134,7 @@ taskview = None
 
 def load(app):
     category = app.getCategory('Experiments')
-    taskview = category.addView(PoseTaskView(category))
+    taskview = category.addTask(PoseTaskView(category))
     print 'pose loaded'
             
     @taskview.mhEvent

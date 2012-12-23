@@ -574,12 +574,9 @@ class ExportTaskView(gui3d.TaskView):
         
 class FilesCategory(gui3d.Category):
 
-    def __init__(self, parent):
-        
-        gui3d.Category.__init__(self, parent, 'Files')
+    def __init__(self):
+        super(FilesCategory, self).__init__('Files')
 
-        self.addView(SaveTaskView(self))
-        self.addView(LoadTaskView(self))
-        self.addView(ExportTaskView(self))
-
-
+        self.addTask(SaveTaskView(self))
+        self.addTask(LoadTaskView(self))
+        self.addTask(ExportTaskView(self))

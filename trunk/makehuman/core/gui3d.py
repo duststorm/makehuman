@@ -46,7 +46,7 @@ class Object(events3d.EventHandler):
         self.mesh.object = self
         self.mesh.setVisibility(visible)
         
-        self.__view = None
+        self._view = None
         
         self.visible = visible
         
@@ -66,9 +66,9 @@ class Object(events3d.EventHandler):
         self.__subdivisionMesh = None
         self.__proxySubdivisionMesh = None
         
-    def __attach(self):
+    def _attach(self):
     
-        if self.__view().isVisible() and self.visible:
+        if self._view().isVisible() and self.visible:
             self.mesh.setVisibility(1)
         else:
             self.mesh.setVisibility(0)
@@ -82,7 +82,7 @@ class Object(events3d.EventHandler):
         if self.__proxySubdivisionMesh:
            self.__proxySubdivisionMesh.attach()
             
-    def __detach(self):
+    def _detach(self):
         
         self.__seedMesh.detach()
         if self.__proxyMesh:
@@ -94,7 +94,7 @@ class Object(events3d.EventHandler):
             
     @property
     def view(self):
-        return self.__view()
+        return self._view()
 
     def show(self):
         
@@ -111,7 +111,7 @@ class Object(events3d.EventHandler):
         
     def setVisibility(self, visibility):
 
-        if self.__view().isVisible() and self.visible and visibility:
+        if self._view().isVisible() and self.visible and visibility:
             self.mesh.setVisibility(1)
         else:
             self.mesh.setVisibility(0)
@@ -307,50 +307,35 @@ class Object(events3d.EventHandler):
     
         self.getSubdivisionMesh(True)
             
-    def getBBox(self):
-        return self.mesh.calcBBox()
-        
-    def getWidth(self):
-        bbox = self.getBBox()
-        return bbox[1][0] - bbox[0][0]
-        
-    def getHeight(self):
-        bbox = self.getBBox()
-        return bbox[1][1] - bbox[0][1]
-        
-    def getDepth(self):
-        bbox = self.getBBox()
-        return bbox[1][2] - bbox[0][2]
-
     def onMouseDown(self, event):
-        self.__view().callEvent('onMouseDown', event)
+        self._view().callEvent('onMouseDown', event)
 
     def onMouseMoved(self, event):
-        self.__view().callEvent('onMouseMoved', event)
+        self._view().callEvent('onMouseMoved', event)
 
     def onMouseDragged(self, event):
-        self.__view().callEvent('onMouseDragged', event)
+        self._view().callEvent('onMouseDragged', event)
 
     def onMouseUp(self, event):
-        self.__view().callEvent('onMouseUp', event)
+        self._view().callEvent('onMouseUp', event)
 
     def onMouseEntered(self, event):
-        self.__view().callEvent('onMouseEntered', event)
+        self._view().callEvent('onMouseEntered', event)
 
     def onMouseExited(self, event):
-        self.__view().callEvent('onMouseExited', event)
+        self._view().callEvent('onMouseExited', event)
 
     def onClicked(self, event):
-        self.__view().callEvent('onClicked', event)
+        self._view().callEvent('onClicked', event)
 
     def onMouseWheel(self, event):
-        self.__view().callEvent('onMouseWheel', event)
+        self._view().callEvent('onMouseWheel', event)
 
     def onKeyDown(self, event):
-        self.__view().callEvent('onKeyDown', event)
+        self._view().callEvent('onKeyDown', event)
 
     def onKeyUp(self, event):
-        self.__view().callEvent('onKeyDown', event)
+        self._view().callEvent('onKeyDown', event)
 
 class View(events3d.EventHandler):
 
@@ -362,43 +347,38 @@ class View(events3d.EventHandler):
 
         self.children = []
         self.objects = []
-        self.__visible = False
-        self.__totalVisibility = False
-        self.__parent = None
-        self.__attached = False
+        self._visible = False
+        self._totalVisibility = False
+        self._parent = None
+        self._attached = False
         self.widgets = []
-
-    def __del__(self):
-    
-        del self.children[:]
-        del self.objects[:]
         
     @property
     def parent(self):
-        if self.__parent:
-            return self.__parent();
+        if self._parent:
+            return self._parent();
         else:
             return None
             
-    def __attach(self):
+    def _attach(self):
         
-        self.__attached = True
+        self._attached = True
         
         for object in self.objects:
-            object._Object__attach()
+            object._attach()
             
         for child in self.children:
-            child.__attach()
+            child._attach()
         
-    def __detach(self):
+    def _detach(self):
     
-        self.__attached = False
+        self._attached = False
         
         for object in self.objects:
-            object._Object__detach()
+            object._detach()
             
         for child in self.children:
-            child.__detach()
+            child._detach()
         
     def addView(self, view):
         """
@@ -412,10 +392,10 @@ class View(events3d.EventHandler):
         if view.parent:
             raise RuntimeException('The view is already added to a view')
             
-        view.__parent = weakref.ref(self)
-        view.__updateVisibility()
-        if self.__attached:
-            view.__attach()
+        view._parent = weakref.ref(self)
+        view._updateVisibility()
+        if self._attached:
+            view._attach()
 
         self.children.append(view)
             
@@ -431,9 +411,9 @@ class View(events3d.EventHandler):
         if view not in self.children:
             raise RuntimeException('The view is not a child of this view')
             
-        view.__parent = None
-        if self.__attached:
-            view.__detach()
+        view._parent = None
+        if self._attached:
+            view._detach()
             
         self.children.remove(view)
             
@@ -446,12 +426,12 @@ class View(events3d.EventHandler):
         :return: The object, for convenience.
         :rvalue: gui3d.Object
         """
-        if object._Object__view:
+        if object._view:
             raise RuntimeException('The object is already added to a view')
             
-        object._Object__view = weakref.ref(self)
-        if self.__attached:
-            object._Object__attach()
+        object._view = weakref.ref(self)
+        if self._attached:
+            object._attach()
             
         self.objects.append(object)
             
@@ -467,79 +447,48 @@ class View(events3d.EventHandler):
         if object not in self.objects:
             raise RuntimeException('The object is not a child of this view')
             
-        object._Object__view = None
-        if self.__attached:
-            object._Object__detach()
+        object._view = None
+        if self._attached:
+            object._detach()
             
         self.objects.remove(object)
         
     def show(self):
-        self.__visible = True
-        self.__updateVisibility()
+        self._visible = True
+        self._updateVisibility()
 
     def hide(self):
-        self.__visible = False
-        self.__updateVisibility()
+        self._visible = False
+        self._updateVisibility()
         
     def isShown(self):
-        return self.__visible
+        return self._visible
 
     def isVisible(self):
-        return self.__totalVisibility
+        return self._totalVisibility
 
-    def setFocus(self):
-        app.setFocus(self)
+    def _updateVisibility(self):
+        previousVisibility = self._totalVisibility
 
-    def hasFocus(self):
-        return app.focusView is self
-        
-    def canFocus(self):
-        return True
-        
-    def getBBox(self):
-        if not self.objects:
-            return 0
-        
-        bbox = self.objects[0].getBBox()
-        for i in xrange(1, len(self.objects)):
-            bb = self.objects[i].getBBox()
-            bbox = [[min(bbox[0], bb[0]), min(bbox[1], bb[1]), min(bbox[2], bb[2])],
-                [max(bbox[0], bb[0]), max(bbox[1], bb[1]), max(bbox[2], bb[2])]]
-                
-        return bbox
-        
-    def getWidth(self):
-        bbox = self.getBBox()
-        return bbox[1][0] - bbox[0][0]
-        
-    def getHeight(self):
-        bbox = self.getBBox()
-        return bbox[1][1] - bbox[0][1]
-        
-    def getDepth(self):
-        bbox = self.getBBox()
-        return bbox[1][2] - bbox[0][2]
+        self._totalVisibility = self._visible and (not self.parent or self.parent.isVisible())
 
-    def __updateVisibility(self):
-        previousVisibility = self.__totalVisibility
-        if self.parent:
-            self.__totalVisibility = self.parent.isVisible() and self.__visible
-        else:
-            self.__totalVisibility = self.__visible
-        if self.__totalVisibility:
-            for o in self.objects:
-                o.setVisibility(True)
-        else:
-            for o in self.objects:
-                o.setVisibility(False)
+        for o in self.objects:
+            o.setVisibility(self._totalVisibility)
+
         for v in self.children:
-            v.__updateVisibility()
+            v._updateVisibility()
 
-        if self.__totalVisibility != previousVisibility:
-            if self.__totalVisibility:
+        if self._totalVisibility != previousVisibility:
+            if self._totalVisibility:
                 self.callEvent('onShow', None)
             else:
                 self.callEvent('onHide', None)
+
+    def onShow(self, event):
+        self.show()
+
+    def onHide(self, event):
+        self.hide()
 
     def onMouseDown(self, event):
         self.parent.callEvent('onMouseDown', event)
@@ -594,30 +543,11 @@ class View(events3d.EventHandler):
 class TaskView(View):
 
     def __init__(self, category, name, label=None):
-        View.__init__(self)
+        super(TaskView, self).__init__()
         self.name = name
+        self.label = label
         self.focusWidget = None
-
-        if name in category.tasksByName:
-            raise KeyError('A task with this name already exists', name)
-
-        category.tasks.append(self)
-        category.tasksByName[self.name] = self
-
-        self.tab = category.tabs.addTab(name, label or name)
-            
-    def canFocus(self):
-        return False
-
-    def onShow(self, event):
-
-        self.tab.setSelected(True)
-        self.show()
-
-    def onHide(self, event):
-
-        self.tab.setSelected(False)
-        self.hide()
+        self.tab = None
 
     def getModifiers(self):
         return {}
@@ -630,54 +560,42 @@ class TaskView(View):
     # return list of singular modifier names
     def getSingularModifierNames(self):
         return []
- 
-
 
 class Category(View):
 
-    def __init__(self, app, name, label = None):
-        
-        View.__init__(self)
-        
+    def __init__(self, name, label = None):
+        super(Category, self).__init__()
         self.name = name
+        self.label = label
         self.tasks = []
         self.tasksByName = {}
+        self.tab = None
+        self.tabs = None
 
-        if name in app.categories:
-            raise KeyError('A category with this name already exists', name)
+    def _taskTab(self, task):
+        if task.tab is None:
+            task.tab = self.tabs.addTab(task.name, task.label or task.name)
 
-        app.categories[name] = self
-        self.tab = app.tabs.addTab(name, label or name)
-        
-        self.tabs = self.tab.child
-        
+    def realize(self, app):
+        for task in self.tasks:
+            self._taskTab(task)
+
         @self.tabs.mhEvent
         def onTabSelected(tab):
             app.switchTask(tab.name)
-            
-    def canFocus(self):
-        return False
 
-    def onShow(self, event):
-        self.tab.setSelected(True)
-        self.show()
+    def addTask(self, task):
+        if task.name in self.tasksByName:
+            raise KeyError('A task with this name already exists', task.name)
+        self.tasks.append(task)
+        self.tasksByName[task.name] = task
+        self.addView(task)
+        if self.tabs is not None:
+            self._taskTab(task)
+        return task
 
-    def onHide(self, event):
-        self.tab.setSelected(False)
-        self.hide()
-
-    def getViewByName(self, viewName):
-        """
-        Retrieve a view by name. Return the view or None if no matching view found.
-
-        :param viewName: The name of the view to be retrieved.
-        """
-        for view in self.children:
-            if hasattr(view, 'name'):
-                if view.name == viewName:
-                    return view
-        
-        return None
+    def getTaskByName(self, name):
+        return self.tasksByName.get(name)
  
 # The application
 app = None
@@ -698,9 +616,6 @@ class Application(events3d.EventHandler):
         self.categories = {}
         self.currentCategory = None
         self.currentTask = None
-        self.focusView = None
-        self.focusObject = None
-        self.focusGroup = None
         self.mouseDownObject = None
         self.enteredObject = None
         self.fullscreen = False
@@ -762,11 +677,11 @@ class Application(events3d.EventHandler):
         :return: The object, for convenience.
         :rvalue: gui3d.Object
         """
-        if object._Object__view:
+        if object._view:
             raise RuntimeException('The object is already attached to a view')
             
-        object._Object__view = weakref.ref(self)
-        object._Object__attach()
+        object._view = weakref.ref(self)
+        object._attach()
         
         self.objects.append(object)
             
@@ -782,8 +697,8 @@ class Application(events3d.EventHandler):
         if object not in self.objects:
             raise RuntimeException('The object is not a child of this view')
             
-        object._Object__view = None
-        object._Object__detach()
+        object._view = None
+        object._detach()
         
         self.objects.remove(object)
         
@@ -799,9 +714,9 @@ class Application(events3d.EventHandler):
         if view.parent:
             raise RuntimeException('The view is already attached')
             
-        view._View__parent = weakref.ref(self)
-        view._View__updateVisibility()
-        view._View__attach()
+        view._parent = weakref.ref(self)
+        view._updateVisibility()
+        view._attach()
         
         self.children.append(view)
             
@@ -817,44 +732,13 @@ class Application(events3d.EventHandler):
         if view not in self.children:
             raise RuntimeException('The view is not a child of this view')
             
-        view._View__parent = None
-        view._View__detach()
+        view._parent = None
+        view._detach()
         
         self.children.remove(view)
 
     def isVisible(self):
         return True
-        
-    def canFocus(self):
-        return False
-
-    def setFocus(self, view=None):
-
-        #print ('setFocus', view)
-
-        if self.focusView == view:
-            return
-
-        if not view:
-            view = self
-
-        if view.canFocus():
-            event = events3d.FocusEvent(self.focusView, view)
-
-            if self.focusView:
-                self.focusView.callEvent('onBlur', event)
-
-            self.focusView = view
-            self.focusView.callEvent('onFocus', event)
-            self.focusObject = None
-        else:
-            event = events3d.FocusEvent(self.focusView, None)
-
-            if self.focusView:
-                self.focusView.callEvent('onBlur', event)
-
-            self.focusView = None
-            self.focusObject = None
             
     def getSelectedFaceGroupAndObject(self):
     
@@ -863,6 +747,21 @@ class Application(events3d.EventHandler):
     def getSelectedFaceGroup(self):
     
         return module3d.selectionColorMap.getSelectedFaceGroup()
+
+    def addCategory(self, category):
+        if category.name in self.categories:
+            raise KeyError('A category with this name already exists', category.name)
+
+        if category.parent:
+            raise RuntimeException('The category is already attached')
+
+        self.categories[category.name] = category
+        category.tab = self.tabs.addTab(category.name, category.label or category.name)
+        category.tabs = category.tab.child
+        self.addView(category)
+        category.realize(self)
+
+        return category
 
     def switchTask(self, name):
         if self.currentTask and self.currentTask.name == name:
@@ -925,12 +824,6 @@ class Application(events3d.EventHandler):
         else:
             object = self
 
-        # If we have an object
-        # Try to give its view focus
-        if object != self:
-            self.focusObject = object
-            self.focusObject.view.setFocus()
-
         # It is the object which will receive the following mouse messages
 
         self.mouseDownObject = object
@@ -989,53 +882,18 @@ class Application(events3d.EventHandler):
             object.callEvent('onMouseMoved', event)
 
     def onMouseWheelCallback(self, wheelDelta, x, y):
-
-        # Mouse wheel events, like key events are sent to the focus view
-
         event = events3d.MouseWheelEvent(wheelDelta)
-        if self.focusView:
-            self.focusView.callEvent('onMouseWheel', event)
-        elif self.currentTask:
+        if self.currentTask:
             self.currentTask.callEvent('onMouseWheel', event)
 
     def onKeyDownCallback(self, key, character, modifiers):
-        if key == mh.Keys.TAB:
-            if self.focusView:
-
-            # if self.focusView.wantsTab and not (modifiers & mh.Modifiers.CTRL):
-
-                index = self.focusView.parent.children.index(self.focusView)
-                if modifiers & mh.Modifiers.SHIFT:
-                    start = index
-                    index = index - 1 if index > 0 else len(self.focusView.parent.children) - 1
-                    while start != index:
-                        child = self.focusView.parent.children[index]
-                        if child.canFocus():
-                            child.setFocus()
-                            break
-                        index = index - 1 if index > 0 else len(self.focusView.parent.children) - 1
-                else:
-                    start = index
-                    index = index + 1 if index < len(self.focusView.parent.children) - 1 else 0
-                    while start != index:
-                        child = self.focusView.parent.children[index]
-                        if child.canFocus():
-                            child.setFocus()
-                            break
-                        index = index + 1 if index < len(self.focusView.parent.children) - 1 else 0
-                self.redraw()
-                return
         event = events3d.KeyEvent(key, character, modifiers)
-        if self.focusView:
-            self.focusView.callEvent('onKeyDown', event)
-        else:
+        if self.currentTask:
             self.currentTask.callEvent('onKeyDown', event)
 
     def onKeyUpCallback(self, key, character, modifiers):
         event = events3d.KeyEvent(key, character, modifiers)
-        if self.focusView:
-            self.focusView.callEvent('onKeyUp', event)
-        else:
+        if self.currentTask:
             self.currentTask.callEvent('onKeyUp', event)
             
     def onResizedCallback(self, width, height, fullscreen):
@@ -1062,8 +920,8 @@ class Application(events3d.EventHandler):
         self.callEvent('onQuit', None)
             
     def getCategory(self, name):
-        try:
-            return self.categories[name]
-        except:
-            return self.addView(Category(self, name, None))
+        category = self.categories.get(name)
+        if category:
+            return category
+        return self.addCategory(Category(name))
 

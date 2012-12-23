@@ -344,7 +344,7 @@ taskview = None
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
 def load(app):
     category = app.getCategory('Posing')
-    taskview = category.addView(PoseTaskView(category))
+    taskview = category.addTask(PoseTaskView(category))
     print 'pose loaded'
             
     @taskview.mhEvent

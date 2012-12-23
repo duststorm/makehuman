@@ -222,9 +222,10 @@ class MeasureTaskView(gui3d.TaskView):
     def updateMeshes(self):
 
         human = gui3d.app.selectedHuman
-        slider = gui3d.app.focusView
+        # slider = gui3d.app.focusView
 
-        if (isinstance(slider, MeasureSlider)):
+        # if (isinstance(slider, MeasureSlider)):
+        if False:
 
             """
             # InfluenceMesh
@@ -366,7 +367,7 @@ def load(app):
     Plugin load function, needed by design.
     """
     category = app.getCategory('Modelling')
-    taskview = category.addView(MeasureTaskView(category))
+    taskview = category.addTask(MeasureTaskView(category))
 
     app.addLoadHandler('measure', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)

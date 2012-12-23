@@ -220,7 +220,7 @@ class GenderTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Modelling')
-    taskview = category.addView(GenderTaskView(category))
+    taskview = category.addTask(GenderTaskView(category))
 
     print 'Gender loaded'
 

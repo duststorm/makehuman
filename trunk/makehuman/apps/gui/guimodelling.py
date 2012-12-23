@@ -42,8 +42,8 @@ import qtgui as gui
 
 class ModellingCategory(gui3d.Category):
 
-    def __init__(self, parent):
-        gui3d.Category.__init__(self, parent, 'Modelling')
+    def __init__(self):
+        super(ModellingCategory, self).__init__('Modelling')
 
         self.viewBox = self.addWidget(mh.addWidget(mh.Frame.LeftBottom, gui.GroupBox('View settings')))
         
@@ -87,5 +87,5 @@ class ModellingCategory(gui3d.Category):
             human = gui3d.app.selectedHuman
             human.symmetryModeEnabled = self.symmetryButton.selected
         
-        self.addView(guimacromodelling.MacroModelingTaskView(self))
-        self.addView(guidetailmodelling.DetailModelingTaskView(self))
+        self.addTask(guimacromodelling.MacroModelingTaskView(self))
+        self.addTask(guidetailmodelling.DetailModelingTaskView(self))

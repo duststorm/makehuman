@@ -40,7 +40,7 @@ class RandomTaskView(gui3d.TaskView):
 
             if self.face.selected:
                 category = gui3d.app.getCategory('Modelling')
-                taskview = category.getViewByName('Face')
+                taskview = category.getTaskByName('Face')
                 modifiers = taskview.getModifiers()
                 
                 symmetricModifiers = taskview.getSymmetricModifierPairNames()
@@ -83,7 +83,7 @@ class RandomTaskView(gui3d.TaskView):
             
             if self.face.selected:
                 category = gui3d.app.getCategory('Modelling')
-                taskview = category.getViewByName('Face')
+                taskview = category.getTaskByName('Face')
                 modifiers = taskview.getModifiers()
                 
                 symmetricModifiers = taskview.getSymmetricModifierPairNames()
@@ -135,7 +135,7 @@ class RandomTaskView(gui3d.TaskView):
 
         if self.face.selected:
             category = gui3d.app.getCategory('Modelling')
-            taskview = category.getViewByName('Face')
+            taskview = category.getTaskByName('Face')
             modifiers = taskview.getModifiers()
             symmetricModifiers = taskview.getSymmetricModifierPairNames()
             symFactor = self.symmetry.getValue()
@@ -179,7 +179,7 @@ class RandomTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Modelling')
-    taskview = category.addView(RandomTaskView(category))
+    taskview = category.addTask(RandomTaskView(category))
     print 'Random imported'
 
 def unload(app):

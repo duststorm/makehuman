@@ -816,7 +816,7 @@ def load(app):
     return
     
     category = app.getCategory('Posing')
-    taskview = category.addView(PoseArmatureTaskView(category))
+    taskview = category.addTask(PoseArmatureTaskView(category))
 
     app.addLoadHandler('poses', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)

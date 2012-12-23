@@ -85,7 +85,7 @@ class ProxyTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Library')
-    taskview = category.addView(ProxyTaskView(category))
+    taskview = category.addTask(ProxyTaskView(category))
 
     app.addLoadHandler('proxy', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)

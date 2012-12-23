@@ -70,7 +70,7 @@ class MitsubaTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Rendering')
-    taskview = category.addView(MitsubaTaskView(category))
+    taskview = category.addTask(MitsubaTaskView(category))
 
     print 'Mitsuba loaded'
 

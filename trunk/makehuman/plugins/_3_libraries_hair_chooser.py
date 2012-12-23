@@ -107,7 +107,7 @@ class HairTaskView(gui3d.TaskView):
 
 def load(app):
     category = app.getCategory('Library')
-    taskview = category.addView(HairTaskView(category))
+    taskview = category.addTask(HairTaskView(category))
 
     print 'Hair chooser loaded'
 

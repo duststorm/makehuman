@@ -165,7 +165,7 @@ taskview = None
 
 def load(app):
     category = app.getCategory('Modelling')
-    taskview = category.addView(CustomTargetsTaskView(category, app))
+    taskview = category.addTask(CustomTargetsTaskView(category, app))
     
     app.addLoadHandler('custom', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)

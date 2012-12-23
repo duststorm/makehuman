@@ -623,8 +623,8 @@ class MHApplication(gui3d.Application):
 
         # Set up categories and tasks
         
-        self.addView(guimodelling.ModellingCategory(self))
-        self.addView(guifiles.FilesCategory(self))
+        self.addCategory(guimodelling.ModellingCategory())
+        self.addCategory(guifiles.FilesCategory())
 
     def loadPlugins(self):
         
@@ -683,10 +683,10 @@ class MHApplication(gui3d.Application):
         self.progressBar.setProgress(0.9)
               
         category = self.getCategory('Settings')
-        category.addView(PluginsTaskView(category))
+        category.addTask(PluginsTaskView(category))
           
         # Exit button
-        category = self.addView(gui3d.Category(self, "Exit"))
+        category = self.addCategory(gui3d.Category(self, "Exit"))
         @category.tab.mhEvent
         def onClicked(event):
             self.promptAndExit()
