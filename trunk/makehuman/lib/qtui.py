@@ -3,25 +3,10 @@ import atexit
 
 from PyQt4 import QtCore, QtGui, QtOpenGL
 
-from core import *
-from glmodule import updatePickingBuffer, getPickedColor, OnInit, OnExit, reshape, draw
+from core import G
+import glmodule as gl
 import events3d
 import qtgui
-
-def quit():
-    callQuit()
-
-def shutDown():
-    sys.exit()
-
-def queueUpdate():
-    G.app.mainwin.update()
-
-def setFullscreen(fullscreen):
-    pass
-
-def setCaption(caption):
-    G.app.mainwin.setWindowTitle(caption)
 
 import traceback
 def catching(func):
@@ -43,9 +28,6 @@ class Modifiers:
     CTRL  = int(QtCore.Qt.ControlModifier)
     ALT   = int(QtCore.Qt.AltModifier)
     META  = int(QtCore.Qt.MetaModifier)
-
-def getKeyModifiers():
-    return int(G.app.keyboardModifiers())
 
 class Keys:
     a = QtCore.Qt.Key_A
@@ -143,6 +125,7 @@ class Buttons:
     RIGHT_MASK = RIGHT
 
 g_mouse_pos = None
+gg_mouse_pos = None
 
 class Canvas(QtOpenGL.QGLWidget):
     def __init__(self, parent):
@@ -168,99 +151,116 @@ class Canvas(QtOpenGL.QGLWidget):
         self.setMinimumHeight(5)
         self.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Ignored)
 
-    @staticmethod
-    def mouseButtonDown(b, x, y):
+    def callback(self, name, *args, **kwargs):
+        accum = kwargs.get('accum', False)
+        name = 'on%sCallback' % name
+        app = self.parentWidget().app
+        if not hasattr(app, name):
+            return
+        func = getattr(app, name)
+        if G.profile:
+            if accum:
+                profiler.accum('func(*args)' % name, globals(), locals())
+            else:
+                profiler.flush()
+                profiler.run('func(*args)' % name, globals(), locals())
+        else:
+            func(*args)
+
+    def mouseButtonDown(self, b, x, y):
         # Check which object/group was hit
         if b in (1,2,3):
-            getPickedColor(x, y)
+            gl.getPickedColor(x, y)
 
         # Notify python
-        callMouseButtonDown(b, x, y)
+        self.callback('MouseDown', b, x, y)
 
         # Update screen
-        queueUpdate()
+        self.update()
 
         if b in (1,2,3):
-            updatePickingBuffer()
+            gl.updatePickingBuffer()
 
-    @staticmethod
-    def mouseButtonUp(b, x, y):
+    def mouseButtonUp(self, b, x, y):
         # Check which object/group was hit
         if b in (1,2,3):
-            getPickedColor(x, y)
+            gl.getPickedColor(x, y)
 
         # Notify python
-        callMouseButtonUp(b, x, y)
+        self.callback('MouseUp', b, x, y)
 
         # Update screen
-        queueUpdate()
+        self.update()
 
-        updatePickingBuffer()
+        gl.updatePickingBuffer()
 
-    @staticmethod
-    def mouseMotion(s, x, y, xrel, yrel):
+    def mouseMotion(self, s, x, y, xrel, yrel):
         # Check which object/group was hit
         if not s:
-            getPickedColor(x, y)
+            gl.getPickedColor(x, y)
 
         # Notify python
-        callMouseMotion(s, x, y, xrel, yrel)
+        self.callback('MouseMoved', s, x, y, xrel, yrel, accum = True)
 
         # Update screen
         if s:
-            queueUpdate()
+            self.update()
 
     def mousePressEvent(self, ev):
+        global gg_mouse_pos
+
         x = ev.x()
         y = ev.y()
         b = ev.button()
 
-        G.mouse_pos = x, y
+        gg_mouse_pos = x, y
 
         self.mouseButtonDown(b, x, y)
 
     def mouseReleaseEvent(self, ev):
+        global gg_mouse_pos
+
         x = ev.x()
         y = ev.y()
         b = ev.button()
 
-        G.mouse_pos = x, y
+        gg_mouse_pos = x, y
 
         self.mouseButtonUp(b, x, y)
 
     def wheelEvent(self, ev):
+        global gg_mouse_pos
+
         x = ev.x()
         y = ev.y()
         d = ev.delta()
 
-        G.mouse_pos = x, y
+        gg_mouse_pos = x, y
 
         b = 1 if d > 0 else -1
 
-        callMouseWheel(b, x, y)
+        self.callback('MouseWheel', b, x, y)
 
     def mouseMoveEvent(self, ev):
-        global g_mouse_pos
+        global gg_mouse_pos, g_mouse_pos
 
         x = ev.x()
         y = ev.y()
 
-        if G.mouse_pos is None:
-            G.mouse_pos = x, y
+        if gg_mouse_pos is None:
+            gg_mouse_pos = x, y
 
         if g_mouse_pos is None:
             QtCore.QTimer.singleShot(0, self.idle)
 
         g_mouse_pos = (x, y)
 
-    @staticmethod
-    def keyDown(key, character, modifiers):
-        callKeyDown(key, character, modifiers)
+    def keyDown(self, key, character, modifiers):
+        self.callback('KeyDown', key, character, modifiers)
 
-    @staticmethod
-    def keyUp(key, character, modifiers):
-        callKeyUp(key, character, modifiers)
-        updatePickingBuffer()
+    def keyUp(self, key, character, modifiers):
+        self.callback('KeyUp', key, character, modifiers)
+        gl.updatePickingBuffer()
 
     def keyPressEvent(self, ev):
         key = ev.key()
@@ -293,24 +293,26 @@ class Canvas(QtOpenGL.QGLWidget):
             super(Canvas, self).keyReleaseEvent(ev)
 
     def initializeGL(self):
-        OnInit()
+        gl.OnInit()
 
     def paintGL(self):
-        draw()
+        gl.draw()
 
     def resizeGL(self, w, h):
-        reshape(w, h)
+        gl.reshape(w, h)
+        self.callback('Resized', w, h, False)
 
     def handleMouse(self):
-        global g_mouse_pos
+        global gg_mouse_pos, g_mouse_pos
+
         if g_mouse_pos is not None:
             # print 'mouse motion'
-            ox, oy = G.mouse_pos
+            ox, oy = gg_mouse_pos
             (x, y) = g_mouse_pos
             g_mouse_pos = None
             xrel = x - ox
             yrel = y - oy
-            G.mouse_pos = x, y
+            gg_mouse_pos = x, y
 
             buttons = int(G.app.mouseButtons())
 
@@ -510,25 +512,45 @@ class Frame(QtGui.QWidget):
 
     def closeEvent(self, ev):
         ev.ignore()
-        quit()
+        self.app.onQuitCallback()
 
-class Application(QtGui.QApplication):
+class Application(QtGui.QApplication, events3d.EventHandler):
     def __init__(self):
         super(Application, self).__init__(sys.argv)
 
     def OnInit(self):
         self.mainwin = Frame(self, (G.windowWidth, G.windowHeight))
         self.mainwin.show()
+        
+    def started(self):
+        self.callEvent('onStart', None)
 
-def createWindow(useTimer = None):
-    G.app = Application()
-    G.app.OnInit()
+    def start(self):
+        self.OnInit()
+        callAsync(self.started)
+        self.exec_()
+        gl.OnExit()
 
-def eventLoop():
-    G.app.exec_()
-    OnExit()
-
+    def stop(self):
+        self.callEvent('onStop', None)
+        sys.exit()
+        
+    def redraw(self):
+        self.mainwin.update()
+        
+    def redrawNow(self):
+        gl.draw()
+        
+    def getWindowSize(self):
+        return G.windowWidth, G.windowHeight
+        
 g_timers = {}
+
+def getKeyModifiers():
+    return int(QtGui.QApplication.keyboardModifiers())
+
+def setCaption(caption):
+    G.app.mainwin.setWindowTitle(caption)
 
 def addTimer(milliseconds, callback):
     timer_id = G.app.mainwin.canvas.startTimer(milliseconds)

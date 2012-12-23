@@ -10,7 +10,7 @@ OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-from core import *
+from core import G
 from image import Image
 import matrix
 from debugdump import DebugDump
@@ -139,8 +139,6 @@ def reshape(w, h):
     G.windowWidth = w
 
     updatePickingBuffer()
-
-    callResize(w, h, False)
 
 def drawBegin():
     # clear the screen & depth buffer

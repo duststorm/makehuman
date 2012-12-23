@@ -622,52 +622,6 @@ class Application(events3d.EventHandler):
         self.width = 800
         self.height = 600
         
-        mh.setMouseDownCallback(self.onMouseDownCallback)
-        mh.setMouseUpCallback(self.onMouseUpCallback)
-        mh.setMouseMovedCallback(self.onMouseMovedCallback)
-        mh.setMouseWheelCallback(self.onMouseWheelCallback)
-        mh.setKeyDownCallback(self.onKeyDownCallback)
-        mh.setKeyUpCallback(self.onKeyUpCallback)
-        mh.setResizeCallback(self.onResizedCallback)
-        mh.setQuitCallback(self.onQuitCallback)
-
-        mh.startWindow(1)
-        
-    def started(self):
-        self.callEvent('onStart', None)
-
-    def run(self):
-        """
-        Starts the event loop
-        """
-        mh.callAsync(self.started)
-        mh.startEventLoop()
-
-    def stop(self):
-        self.callEvent('onStop', None)
-        mh.shutDown()
-        
-    def redraw(self):
-        """
-        Redraws the screen once control is returned to the event handler.
-        """
-        mh.redraw(1)
-        
-    def redrawNow(self):
-        """
-        Redraws immediately.
-        """
-        mh.redraw(0)
-        
-    def getWindowSize(self):
-        """
-        Returns the current window size.
-        
-        :returns: The current window size.
-        :rtype: (int, int)
-        """
-        return mh.getWindowSize()
-        
     def addObject(self, object):
         """
         Adds the object to the application. The object will also be attached and will get an OpenGL counterpart.

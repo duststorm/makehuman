@@ -41,10 +41,13 @@ class PluginsTaskView(gui3d.TaskView):
         for module in gui3d.app.modules:
             check = self.pluginsBox.addWidget(PluginCheckBox(module))
 
-class MHApplication(gui3d.Application):
-
+class MHApplication(gui3d.Application, mh.Application):
     def __init__(self):
+        if G.app is not None:
+            raise RuntimeError('MHApplication is a singleton')
+        G.app = self
         gui3d.Application.__init__(self)
+        mh.Application.__init__(self)
 
         self.shortcuts = {
             # Actions
@@ -127,28 +130,6 @@ class MHApplication(gui3d.Application):
         self.guiCamera.projection = 0
 
         mh.cameras.append(self.guiCamera.camera)
-
-        self.setTheme("default")
-        #self.setTheme("3d")
-        self.setLanguage("english")
-
-        self.loadSettings()
-
-        self.splash = gui.SplashScreen(gui3d.app.getThemeResource('images', 'splash.png'))
-        self.splash.show()
-        # Display the initial splash screen and the progress bar during startup
-        # mesh = gui3d.RectangleMesh(800, 600, gui3d.app.getThemeResource('images', 'splash.png'))
-        # self.splash = self.addObject(gui3d.Object([0, 0, 9.8], mesh))
-        self.statusbar = mh.addWidget(mh.Frame.Bottom, gui.TextView())
-        self.statusbar.show()
-        self.progressBar = mh.addWidget(mh.Frame.Bottom, gui.ProgressBar())
-        # self.redrawNow()
-
-        self.tabs = G.app.mainwin.tabs
-
-        @self.tabs.mhEvent
-        def onTabSelected(tab):
-            self.switchCategory(tab.name)
 
     def loadBackground(self):
         self.progressBar.setProgress(0.1)
@@ -436,7 +417,7 @@ class MHApplication(gui3d.Application):
         print ''
         yield None
         sys.stdout = old_stdout
-        self.splash.finish(G.app.mainwin)
+        self.splash.finish(self.mainwin)
 
     def nextStartupTask(self):
         if not next(self.tasks, True):
@@ -662,12 +643,12 @@ class MHApplication(gui3d.Application):
         elif value >= 1.0:
             self.progressBar.hide()
         self.progressBar.setProgress(value)
-        G.app.processEvents()
+        self.processEvents()
 
     # Global dialog
     def prompt(self, title, text, button1Label, button2Label=None, button1Action=None, button2Action=None, helpId=None):
         if self.dialog is None:
-            self.dialog = gui.Dialog(G.app.mainwin)
+            self.dialog = gui.Dialog(self.mainwin)
             self.dialog.helpIds.update(self.helpIds)
         self.dialog.prompt(title, text, button1Label, button2Label, button1Action, button2Action, helpId)
 
@@ -1044,3 +1025,31 @@ class MHApplication(gui3d.Application):
             self.prompt('Exit', 'You have unsaved changes. Are you sure you want to exit the application?', 'Yes', 'No', self.stop)
         else:
             self.stop()
+
+    def OnInit(self):
+        mh.Application.OnInit(self)
+
+        self.setTheme("default")
+        #self.setTheme("3d")
+        self.setLanguage("english")
+
+        self.loadSettings()
+
+        self.splash = gui.SplashScreen(gui3d.app.getThemeResource('images', 'splash.png'))
+        self.splash.show()
+        # Display the initial splash screen and the progress bar during startup
+        # mesh = gui3d.RectangleMesh(800, 600, gui3d.app.getThemeResource('images', 'splash.png'))
+        # self.splash = self.addObject(gui3d.Object([0, 0, 9.8], mesh))
+        self.statusbar = mh.addWidget(mh.Frame.Bottom, gui.TextView())
+        self.statusbar.show()
+        self.progressBar = mh.addWidget(mh.Frame.Bottom, gui.ProgressBar())
+        # self.redrawNow()
+
+        self.tabs = self.mainwin.tabs
+
+        @self.tabs.mhEvent
+        def onTabSelected(tab):
+            self.switchCategory(tab.name)
+
+    def run(self):
+        self.start()

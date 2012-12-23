@@ -25,43 +25,14 @@ def updatePickingBuffer():
 def getColorPicked():
     return G.color_picked
 
-def getMousePos():
-    if G.mouse_pos is None:
-        return 0, 0
-    return G.mouse_pos
-
 def getKeyModifiers():
     return ui.getKeyModifiers()
-
-def getWindowSize():
-    return G.windowWidth, G.windowHeight
-
-def startWindow(useTimer = False):
-    ui.createWindow(useTimer)
-
-def startEventLoop():
-    ui.eventLoop()
-
-def shutDown():
-    ui.shutDown()
-
-def redraw(async):
-    if async:
-        ui.queueUpdate()
-    else:
-        gl.draw()
-
-def drawOneMesh(obj):
-    gl.drawOneMesh(obj.object3d)
-
-def setFullscreen(fullscreen):
-    ui.setFullscreen(fullscreen)
 
 def setCaption(caption):
     ui.setCaption(caption)
 
 def setClearColor(r, g, b, a):
-    gl.setClearColor(r, g, b, a);
+    G.clearColor = (r, g, b, a)
 
 def createVertexShader(source):
     return gl.createVertexShader(source)
@@ -83,30 +54,6 @@ def removeTimer(id):
 
 def callAsync(callback):
     ui.callAsync(callback)
-
-def setResizeCallback(callback):
-    G.resizeCallback = callback
-
-def setMouseDownCallback(callback):
-    G.mouseDownCallback = callback
-
-def setMouseUpCallback(callback):
-    G.mouseUpCallback = callback
-
-def setMouseWheelCallback(callback):
-    G.mouseWheelCallback = callback
-
-def setMouseMovedCallback(callback):
-    G.mouseMovedCallback = callback
-
-def setKeyDownCallback(callback):
-    G.keyDownCallback = callback
-
-def setKeyUpCallback(callback):
-    G.keyUpCallback = callback
-
-def setQuitCallback(callback):
-    G.quitCallback = callback
 
 def getPath(type):
     if isinstance(type, (str, unicode)):
@@ -159,7 +106,7 @@ def getPath(type):
         elif typeStr == "":
             path += "/"
         else:
-            raise ValueError("Unknown property '%s' for getPath()!" % typeStr);
+            raise ValueError("Unknown property '%s' for getPath()!" % typeStr)
 
     return path
 
@@ -185,3 +132,5 @@ def changeTask(category, task):
 
 def refreshLayout():
     ui.refreshLayout()
+
+Application = ui.Application
