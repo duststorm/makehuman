@@ -84,7 +84,9 @@ class MHApplication(gui3d.Application, mh.Application):
             (mh.Modifiers.CTRL, mh.Keys.N1): self.backView,
             (mh.Modifiers.CTRL, mh.Keys.N3): self.leftView,
             (mh.Modifiers.CTRL, mh.Keys.N7): self.bottomView,
-            (0, mh.Keys.PERIOD): self.resetView
+            (0, mh.Keys.PERIOD): self.resetView,
+            # Version check
+            (0, 0x12345678): self._versionSentinel
         }
 
         self.mouseActions = {
@@ -131,6 +133,10 @@ class MHApplication(gui3d.Application, mh.Application):
         self.guiCamera.projection = 0
 
         mh.cameras.append(self.guiCamera.camera)
+
+    def _versionSentinel(self):
+        # dummy method used for checking the shortcuts.ini version
+        pass
 
     def loadBackground(self):
         self.progressBar.setProgress(0.1)
@@ -538,6 +544,7 @@ class MHApplication(gui3d.Application, mh.Application):
 
         try:
             if os.path.isfile(os.path.join(mh.getPath(''), "shortcuts.ini")):
+                shortcuts = self.shortcuts.copy()
                 self.shortcuts = {}
                 f = open(os.path.join(mh.getPath(''), "shortcuts.ini"), 'r')
                 for line in f:
@@ -546,6 +553,9 @@ class MHApplication(gui3d.Application, mh.Application):
                     if hasattr(self, method[0:-1]):
                         self.shortcuts[(int(modifier), int(key))] = getattr(self, method[0:-1])
                 f.close()
+                if (0, 0x12345678) not in self.shortcuts:
+                    log.warning('shortcuts.ini out of date; ignoring')
+                    self.shortcuts = shortcuts
         except:
             log.error('Failed to load shortcut settings')
 
