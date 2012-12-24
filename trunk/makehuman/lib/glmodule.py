@@ -135,8 +135,6 @@ def reshape(w, h):
 
     # go back to modelview matrix so we can move the objects about
     glMatrixMode(GL_MODELVIEW)
-    G.windowHeight = h
-    G.windowWidth = w
 
     updatePickingBuffer()
 

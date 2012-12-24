@@ -299,6 +299,8 @@ class Canvas(QtOpenGL.QGLWidget):
         gl.draw()
 
     def resizeGL(self, w, h):
+        G.windowHeight = h
+        G.windowWidth = w
         gl.reshape(w, h)
         self.callback('Resized', w, h, False)
 
