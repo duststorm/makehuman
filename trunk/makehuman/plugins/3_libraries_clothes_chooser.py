@@ -85,7 +85,12 @@ class ClothesTaskView(gui3d.TaskView):
         if proxy.clothings:
             folder = os.path.dirname(mhclo)
             for piece in proxy.clothings:
-                piecefile = os.path.join(folder, piece, piece+".mhclo")
+                piecedir = os.path.join(folder, piece)
+                print "Find", piecedir
+                if os.path.exists(piecedir):
+                    piecefile = os.path.join(piecedir, piece + ".mhclo")
+                else:
+                    piecefile = piecedir + ".mhclo"
                 self.setClothes(human, piecefile)
             return
             
@@ -108,6 +113,8 @@ class ClothesTaskView(gui3d.TaskView):
         if proxy.texture:
             (dir, name) = proxy.texture
             tex = os.path.join(folder, name)
+            if not os.path.exists(tex):
+                tex = os.path.join(self.systemClothes, "textures", name)
             mesh.setTexture(tex)
         else:
             pass

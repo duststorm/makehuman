@@ -68,6 +68,27 @@ class VIEW3D_OT_PrintVnumsToFileButton(bpy.types.Operator):
         print(path, "written")
         return{'FINISHED'}    
         
+        
+class VIEW3D_OT_ReadVNumsButton(bpy.types.Operator):
+    bl_idname = "mhw.read_vnums_from_file"
+    bl_label = "Read Vnums from file"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        scn = context.scene
+        ob = context.object
+        path = os.path.expanduser(scn['MhxVertexGroupFile'])
+        fp = open(path, "rU")
+        for line in fp:
+            try:
+                vn = int(line)
+            except:
+                vn = -1
+            if vn >= 0:
+                ob.data.vertices[vn].select = True
+        fp.close()
+        return {'FINISHED'}
+
      
 def printFirstVertNum(context):
     ob = context.object
@@ -1778,6 +1799,7 @@ class MhxWeightToolsPanel(bpy.types.Panel):
         layout.operator("mhw.export_vertex_groups")    
         layout.operator("mhw.export_sum_groups")    
         layout.operator("mhw.print_vnums_to_file")
+        layout.operator("mhw.read_vnums_from_file")
 
         layout.separator()
         layout.operator("mhw.localize_files")
