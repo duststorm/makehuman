@@ -442,6 +442,19 @@ class TextEdit(QtGui.QLineEdit, Widget):
     def onChange(self, event):
         pass
 
+class DocumentEdit(QtGui.QTextEdit, Widget):
+    def __init__(self, text=''):
+        super(DocumentEdit, self).__init__(text)
+        Widget.__init__(self)
+        self.setAcceptRichText(False)
+
+    def setText(self, text):
+        self.setPlainText(text)
+
+    def addText(self, text):
+        self.moveCursor(QtGui.QTextCursor.End, QtGui.QTextCursor.MoveAnchor)
+        self.insertPlainText(text)
+
 class ProgressBar(QtGui.QProgressBar, Widget):
     def __init__(self, visible=True):
         super(ProgressBar, self).__init__()
