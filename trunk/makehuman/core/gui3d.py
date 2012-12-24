@@ -655,7 +655,9 @@ class Application(events3d.EventHandler):
         return category
 
     def switchTask(self, name):
-        if self.currentTask and self.currentTask.name == name:
+        newTask = self.currentCategory.tasksByName[name]
+
+        if self.currentTask and self.currentTask is newTask:
             return
 
         if self.currentTask:

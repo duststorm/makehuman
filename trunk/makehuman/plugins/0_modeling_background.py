@@ -239,12 +239,11 @@ class BackgroundTaskView(gui3d.TaskView):
             bg.show()
             self.backgroundImageToggle.setSelected(True)
 
-            # Switch to orthogonal view
-            gui3d.app.modelCamera.switchToOrtho()
-
-
             mh.changeTask('Modelling', 'Background')
             gui3d.app.redraw()
+
+            # Switch to orthogonal view
+            gui3d.app.modelCamera.switchToOrtho()
 
     def fixateBackground(self):
 

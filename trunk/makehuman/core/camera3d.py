@@ -1,5 +1,7 @@
+import math
 import events3d
 import mh
+import aljabr
 
 class Camera(events3d.EventHandler):
 
@@ -251,8 +253,8 @@ class Camera(events3d.EventHandler):
             
         width, height = self.app.getWindowSize()
         aspect = float(width) / float(height)
-        fov = tan(self.camera.fovAngle * 0.5 * pi / 180.0)
-        y = vdist(self.eye, self.focus) * fov
+        fov = math.tan(self.camera.fovAngle * 0.5 * math.pi / 180.0)
+        y = aljabr.vdist(self.eye, self.focus) * fov
         x = y * aspect
         
         self.camera.left = -x
