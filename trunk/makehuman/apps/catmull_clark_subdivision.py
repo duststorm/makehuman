@@ -336,7 +336,8 @@ class SubdivisionObject(Object3D):
         vc = vc1 + vc2
         del vc1, vc2
 
-        evert[...] = np.where((ic1 == ic2)[:,None], (2 * mvert + vc) / 6, (mvert + vc) / 4)
+        # evert[...] = np.where((ic1 == ic2)[:,None], (2 * mvert + vc) / 6, (mvert + vc) / 4)
+        evert[...] = np.where((ic1 == ic2)[:,None], mvert / 2, (mvert + vc) / 4)
         del ic1, ic2, vc
 
         nvface = parent.nfaces[self.vtx_map]
@@ -349,9 +350,11 @@ class SubdivisionObject(Object3D):
         ofvert = np.sum(cvert[self.face_rmap[parent.vface[self.vtx_map]]] * facewt, axis=1)
         opvert = pcoord
 
-        # bvert[...] = (ofvert + 2 * oevert + (nvface[:,None] - 3) * opvert) / nvface[:,None]
         valid = nvface >= 3
-        bvert[...] = np.where(valid[:,None],(2 * oevert + (nvface[:,None] - 2) * opvert) / nvface[:,None],opvert)
+        # bvert[...] = np.where(valid[:,None],(2 * oevert + (nvface[:,None] - 2) * opvert) / nvface[:,None],opvert)
+        bvert[...] = np.where(valid[:,None],
+                              (ofvert + 2 * oevert + (nvface[:,None] - 3) * opvert) / nvface[:,None],
+                              (3 * oevert - ofvert) / 2) # anti-crinkle hack
 
         self.markCoords(coor=True)
 
