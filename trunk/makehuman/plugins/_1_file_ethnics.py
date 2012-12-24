@@ -71,6 +71,7 @@ class EthnicsTaskView(gui3d.TaskView):
 
         del gui3d.app.undoStack[:]
         del gui3d.app.redoStack[:]
+        gui3d.app.modified = False
 
         gui3d.app.categories['Files'].tasksByName['Save'].fileentry.text = filename.replace('.mhm', '')
         gui3d.app.categories['Files'].tasksByName['Save'].fileentry.edit.setText(filename.replace('.mhm', ''))

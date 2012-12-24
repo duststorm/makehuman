@@ -151,6 +151,7 @@ class MHApplication(gui3d.Application, mh.Application):
 
         self.undoStack = []
         self.redoStack = []
+        self.modified = False
 
         @self.selectedHuman.mhEvent
         def onMouseDown(event):
@@ -482,11 +483,13 @@ class MHApplication(gui3d.Application, mh.Application):
         if action.do():
             self.undoStack.append(action)
             del self.redoStack[:]
+            self.modified = True
             print("do " + action.name)
             self.redraw()
 
     def did(self, action):
         self.undoStack.append(action)
+        self.modified = True
         del self.redoStack[:]
         print("did " + action.name)
         self.redraw()
@@ -497,6 +500,7 @@ class MHApplication(gui3d.Application, mh.Application):
             print("undo " + action.name)
             action.undo()
             self.redoStack.append(action)
+            self.modified = True
             self.redraw()
 
     def redo(self):
@@ -505,6 +509,7 @@ class MHApplication(gui3d.Application, mh.Application):
             print("redo " + action.name)
             action.do()
             self.undoStack.append(action)
+            self.modified = True
             self.redraw()
 
     # Settings
@@ -1021,7 +1026,7 @@ class MHApplication(gui3d.Application, mh.Application):
         self.modelCamera.eyeZ -= 0.05 * event.dy * speed
 
     def promptAndExit(self):
-        if self.undoStack:
+        if self.modified:
             self.prompt('Exit', 'You have unsaved changes. Are you sure you want to exit the application?', 'Yes', 'No', self.stop)
         else:
             self.stop()
