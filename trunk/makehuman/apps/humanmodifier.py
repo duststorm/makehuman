@@ -623,12 +623,12 @@ class GenderAgeEthnicAsymmetricModifier(GenderAgeEthnicModifier2):
             #print target[0], human.getDetail(target[0])
             
     def getValue(self, human):
-        
-        left = sum([human.getDetail(target[0]) for target in self.targets if self.left in target[0]])
-        if left:
-            return -left
+
+        right = sum([human.getDetail(target[0]) for target in self.targets if self.right in target[0]])
+        if right:
+            return right
         else:
-            return sum([human.getDetail(target[0]) for target in self.targets if self.right in target[0]])
+            return -sum([human.getDetail(target[0]) for target in self.targets if self.left in target[0]])
             
     def expandTemplate(self, targets):
         
