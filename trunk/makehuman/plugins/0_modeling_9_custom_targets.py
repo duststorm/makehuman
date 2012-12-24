@@ -170,14 +170,10 @@ def load(app):
     app.addLoadHandler('custom', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)
 
-    print 'Custom targets plugin loaded'
-
 
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
 
 
 def unload(app):
-    print 'Custom targets plugin unloaded'
-
-
+    pass

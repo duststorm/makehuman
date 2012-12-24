@@ -29,8 +29,7 @@ from operator import mul
 from string import Template
 import re
 import os
-
-print 'Pelvis/Stomach imported'
+import mh
    
 class AsymmetricDetailModifier(humanmodifier.GenderAgeAsymmetricModifier):
     
@@ -138,8 +137,6 @@ class PelvisStomachTaskView(gui3d.TaskView):
 def load(app):
     category = app.getCategory('Modelling')
     taskview = category.addTask(PelvisStomachTaskView(category))
-
-    print 'Pelvis/Stomach loaded'
 
 def unload(app):
     pass

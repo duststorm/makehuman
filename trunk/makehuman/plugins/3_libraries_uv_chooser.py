@@ -26,7 +26,7 @@ import export_config
 import mh2proxy
 import qtgui as gui
 import filechooser as fc
-
+import log
 
 class UvTaskView(gui3d.TaskView):
     
@@ -79,7 +79,7 @@ class UvTaskView(gui3d.TaskView):
 
         mhuv = values[1]
         if not os.path.exists(os.path.realpath(mhuv)):
-            print mhuv, "does not exist. Skipping."
+            log.notice('UvTaskView.loadHandler: %s does not exist. Skipping.', mhuv)
             return
         self.setUv(human, mhuv)
         

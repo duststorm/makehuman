@@ -269,8 +269,6 @@ def load(app):
     
     category = app.getCategory('Posing')
     taskview = category.addTask(SkeletonView(category))
-    
-    print 'Skeleton loaded'
 
 def unload(app):
     pass

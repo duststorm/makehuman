@@ -9,8 +9,6 @@ import re
 import mh
 import qtgui as gui
 
-print 'Arms and leg imported'
-
 class AsymmetricDetailModifier(humanmodifier.GenderAgeAsymmetricModifier):
     
     def __init__(self, template, parameterName, left, right, always=True):
@@ -218,8 +216,6 @@ def load(app):
     
     app.addLoadHandler('torso', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)
-
-    print 'Torso loaded'
 
 def unload(app):
     pass

@@ -6,9 +6,9 @@ import os.path
 import gui3d
 import os
 import poseengine
-print 'Pose plugin imported'
 import mh
 import qtgui as gui
+import log
 
 class PoseTaskView(gui3d.TaskView):
 
@@ -44,9 +44,9 @@ class PoseTaskView(gui3d.TaskView):
         @self.savePoseToggle.mhEvent
         def onClicked(event):
             if self.savePoseToggle.selected:
-                print "Save Pose activated"
+                log.notice("Save Pose activated")
             else:
-                print "Save Pose deactivated"
+                log.notice("Save Pose deactivated")
 
         @self.testPoseButton.mhEvent
         def onClicked(event):
@@ -106,7 +106,7 @@ class PoseTaskView(gui3d.TaskView):
             if self.savePoseToggle.selected:
                 tName = "limb_%s_%s_%s.pose"%(angle[0],angle[1],angle[2])
                 savePath = os.path.join(poseDir,tName)
-                print "saved in %s"%(savePath)
+                log.message("saved in %s", savePath)
 
             self.shoulderXslider.setValue(angle[0])
             self.shoulderYslider.setValue(angle[1])
@@ -135,16 +135,14 @@ taskview = None
 def load(app):
     category = app.getCategory('Experiments')
     taskview = category.addTask(PoseTaskView(category))
-    print 'pose loaded'
             
     @taskview.mhEvent
     def onMouseDown(event):
         part = app.getSelectedFaceGroup()
-        print part.name
+        log.message("PoseTaskView.onMouseDown: %s", part.name)
 
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
 
 def unload(app):
-    print 'pose unloaded'
-
+    pass

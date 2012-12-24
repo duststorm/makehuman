@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import sys, os
-if 'nt' in sys.builtin_module_names:
-    sys.path.append('./pythonmodules')
 
 # We need this for rendering
 
@@ -13,8 +11,6 @@ import mh2povray
 import gui3d
 import mh
 import qtgui as gui
-
-print 'povray imported'
 
 class PovrayTaskView(gui3d.TaskView):
 
@@ -101,14 +97,9 @@ def load(app):
     category = app.getCategory('Rendering')
     taskview = category.addTask(PovrayTaskView(category))
 
-    print 'Povray loaded'
-
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
 
 
 def unload(app):
-    
-    print 'Povray unloaded'
-
-
+    pass

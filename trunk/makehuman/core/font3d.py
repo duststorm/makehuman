@@ -13,6 +13,7 @@ This module contains classes and methods to work with bitmap fonts and text.
 """
 
 import module3d
+import log
 
 class Font:
     """
@@ -91,7 +92,7 @@ class Font:
         try:
             charRecord = self.charMap[ord(char)]
         except:
-            print('Character with ordinal %04x is missing.' % ord(char))
+            log.notice('Character with ordinal %04x is missing.', ord(char))
             charRecord = self.charMap[ord('?')]
         x1 = charRecord['xoffset']
         y1 = charRecord['yoffset']
@@ -104,7 +105,7 @@ class Font:
         try:
             charRecord = self.charMap[ord(char)]
         except:
-            print('Character with ordinal %04x is missing.' % ord(char))
+            log.notice('Character with ordinal %04x is missing.', ord(char))
             charRecord = self.charMap[ord('?')]
         x1 = float(charRecord['xoffset']) / float(self.width)
         y1 = float(charRecord['yoffset']) / float(self.height)
@@ -117,7 +118,7 @@ class Font:
         try:
             charRecord = self.charMap[ord(char)]
         except:
-            print('Character with ordinal %04x is missing.' % ord(char))
+            log.notice('Character with ordinal %04x is missing.', ord(char))
             charRecord = self.charMap[ord('?')]
         u1 = float(charRecord['x']) / float(self.width)
         v1 = 1.0 - float(charRecord['y']) / float(self.height)

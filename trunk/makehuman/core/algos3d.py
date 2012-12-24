@@ -49,6 +49,7 @@ import files3d
 import os
 import numpy as np
 import traceback
+import log
 
 NMHVerts = 18528
 
@@ -86,7 +87,7 @@ class Target:
             self._load(self.name)
         except:
             self.verts = []
-            print 'Unable to open %s'%(name)
+            log.error('Unable to open %s', name)
             return
 
         self.faces = obj.getFacesForVertices(self.verts)
@@ -104,7 +105,7 @@ class Target:
                     obj._load_text(path)
                     obj._save_binary(path)
                 except StandardError, e:
-                    print name, e
+                    log.error('converting target %s', name, exc_info=True)
 
     dtype = [('index','u4'),('vector','(3,)f4')]
     dtype_ext = [('index','<u4'),('vector','(3,)<f4')]
@@ -123,13 +124,13 @@ class Target:
         self.raw = np.asarray(data, dtype=Target.dtype)
 
     def _save_binary(self, name):
-        print 'compiling %s' % name
+        log.message('compiling %s', name)
         try:
             name, ext = os.path.splitext(name)
             name = '%s%s%s' % (name, os.path.extsep, 'bin')
             np.asarray(self.raw, dtype=Target.dtype_ext).tofile(name)
         except StandardError, e:
-            traceback.print_exc()
+            log.error('error', exc_info=True)
             # pass
 
     def _load_binary(self, name):
@@ -137,10 +138,10 @@ class Target:
             raise RuntimeError()
         bname = '%s%s%s' % (os.path.splitext(name)[0], os.path.extsep, 'bin')
         if not os.path.exists(bname):
-            print 'compiled file missing: %s' % bname
+            log.message('compiled file missing: %s', name)
             raise RuntimeError()
         if os.stat(bname).st_mtime < os.stat(name).st_mtime:
-            print 'compiled file out of date: %s' % bname
+            log.message('compiled file out of date: %s', bname)
             raise RuntimeError()
         self.raw = np.asarray(np.fromfile(bname, dtype=Target.dtype_ext), dtype=Target.dtype)
 
@@ -391,7 +392,7 @@ def loadRotationTarget(obj, targetPath, morphFactor):
         fileDescriptor = f.readlines()
         f.close()
     except:
-        print "Error opening target file: %s"%(targetPath)
+        log.error('Error opening target file: %s', targetPath)
         return 0
 
 
@@ -433,7 +434,7 @@ def loadRotationTarget(obj, targetPath, morphFactor):
     
     verticesToUpdate = [obj.verts[i] for i in set(indicesToUpdate)]
     obj.update(verticesToUpdate)
-    print "ROTATION TIME", time.time()-a
+    log.message('rotation time: %f', time.time()-a)
 
     return 1
 
@@ -503,7 +504,7 @@ def saveTranslationTarget(obj, targetPath, groupToSave=None, epsilon=0.001):
     try:
         fileDescriptor = open(targetPath, 'w')
     except:
-        print 'Unable to open %s'%(targetPath)
+        log.error('Unable to open %s', targetPath)
         return None
 
     # for fidx in modifiedFacesIndices.values():
@@ -515,7 +516,7 @@ def saveTranslationTarget(obj, targetPath, groupToSave=None, epsilon=0.001):
 
     fileDescriptor.close()
     if nVertsExported == 0:
-        print 'Warning%t|Zero verts exported in file ' + targetPath
+        log.warning('Zero verts exported in file %s', targetPath)
 
 
 def checkMeshTopology(obj, verbose=None):
@@ -607,19 +608,19 @@ def checkMeshTopology(obj, verbose=None):
                 break
     for v in obj.verts:
         v.update(0, 0, 1)
-    print 'Check Mesh result:'
-    print 'Mesh %s has %s isolated verts ' % (obj.name, len(isolate_verts))
+    log.message('Check Mesh result:')
+    log.message('Mesh %s has %s isolated verts ', obj.name, len(isolate_verts))
     if verbose:
         for iv in isolate_verts:
-            print iv
-    print 'Mesh %s has %s boundary edges ' % (obj.name, len(edges_boundary))
+            log.message('%s', iv)
+    log.message('Mesh %s has %s boundary edges ', obj.name, len(edges_boundary))
     if verbose:
         for eb in edges_boundary:
-            print eb
-    print 'Mesh %s has %s edges shared between faces with opposite normals ' % (obj.name, len(wrong_normals_edges))
+            log.message('%s', eb)
+    log.message('Mesh %s has %s edges shared between faces with opposite normals ', obj.name, len(wrong_normals_edges))
     if verbose:
         for wne in wrong_normals_edges:
-            print wne
+            log.message('%s', wne)
 
 
 def analyzeTarget(obj, targetPath):
@@ -647,7 +648,7 @@ def analyzeTarget(obj, targetPath):
     try:
         fileDescriptor = open(targetPath)
     except:
-        print 'Unable to open %s'%(targetPath)
+        log.error('Unable to open %s', targetPath)
         return 0
 
     targetData = fileDescriptor.readlines()
@@ -690,7 +691,7 @@ def colorizeVerts(obj, color, targetPath=None, faceGroupName=None):
         try:
             fileDescriptor = open(targetPath)
         except:
-            print 'Unable to open %s'%(targetPath)
+            log.error('Unable to open %s', targetPath)
             return 0
 
         for vData in fileDescriptor:
@@ -710,9 +711,9 @@ def colorizeVerts(obj, color, targetPath=None, faceGroupName=None):
                     f.color = [color, color, color]
                     f.updateColors()
         if not found:
-            print 'Warning, face group %s not found in %s possible values are' % (faceGroupName, obj.name)
-            for faceGroup in obj.faceGroups:
-                print faceGroup.name
+            log.warning('face group %s not found in %s possible values are:\n%s',
+                           faceGroupName, obj.name,
+                           '\n'.join(faceGroup.name for faceGroup in obj.faceGroups))
     else:
         for v in obj.verts:
             v.color = color
@@ -767,7 +768,7 @@ def loadVertsColors(obj, colorsPath, update=1, mode='new'):
     #    obj.colors = xrange(len(obj.verts))
 
     if len(colorData) != len(obj.faces):
-        print 'Warning: Color data does not match number of vertices ( %i vs %i)' % (len(colorData), len(obj.faces))
+        log.warning('Color data does not match number of vertices ( %i vs %i)', len(colorData), len(obj.faces))
         return 0
 
     for (i, f) in enumerate(obj.faces):
@@ -848,14 +849,13 @@ def saveVertsColorsFromBitmap(obj, imagePath):
                 faceColors.append(color)
             objectColor.append(faceColors)
     else:
-
-        print 'WARNING: %s not converted in verts color' % imagePath
+        log.warning('%s not converted in verts color', imagePath)
         return
 
     try:
         fileDescriptor = open(imagePath + '.colors', 'w')
     except:
-        print 'error to save obj file'
+        log.error('unable to save obj file', imagePath)
         return 0
 
     # Write, for each line, a sequence of 3 verts color of the triangle:
@@ -869,7 +869,7 @@ def saveVertsColorsFromBitmap(obj, imagePath):
                              colorVert1[2], colorVert1[3], colorVert2[0], colorVert2[1], colorVert2[2], colorVert2[3]))
     fileDescriptor.close()
 
-    print 'Time to save colors ', time.time() - t1
+    log.message('Time to save colors %s', time.time() - t1)
 
 
 def resetObj(obj, update=None, calcNorm=None):

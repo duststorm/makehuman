@@ -25,14 +25,15 @@ TO DO
 
 """
 
-print 'importing Pose armature plugin'
-
 import os
 import numpy as np
 import gui3d
 import module3d
 import mh
 import aljabr
+import qtgui as gui
+import filechooser as fc
+import log
 
 #import cProfile
 
@@ -41,8 +42,6 @@ from armature import transformations as tm
 import warpmodifier
 import humanmodifier
 import posemode
-import qtgui as gui
-import filechooser as fc
 
 #
 #   Pose library
@@ -90,7 +89,7 @@ class PoseLoadTaskView(gui3d.TaskView):
 
     def loadMhpFile(self, filepath): 
     
-        print "Load Mhp", filepath
+        log.message("Load Mhp: %s", filepath)
 
         human = gui3d.app.selectedHuman
 
@@ -104,7 +103,7 @@ class PoseLoadTaskView(gui3d.TaskView):
         (fname, ext) = os.path.splitext(os.path.basename(filepath))
         modpath = '%s/${gender}-${age}-${tone}-${weight}-%s.target' % (folder, fname)
         modpath = modpath.replace("\\","/")
-        print filepath, modpath
+        log.debug('PoseLoadTaskView.loadMhpFile: %s %s', filepath, modpath)
         modifier = PoseModifier(modpath)
         modifier.updateValue(human, 1.0)
         
@@ -163,6 +162,3 @@ def load(app):
 
 def unload(app):
     pass
-
-
-print("Pose library loaded")

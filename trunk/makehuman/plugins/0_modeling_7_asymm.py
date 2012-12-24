@@ -202,8 +202,6 @@ def load(app):
     """
     category = app.getCategory('Modelling')
     taskview = category.addTask(AsymmTaskView(category))
-    
-    print 'Asymmetry loaded'
 
 def unload(app):
     pass

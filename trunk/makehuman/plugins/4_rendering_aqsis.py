@@ -11,6 +11,7 @@ import subprocess
 import mh2renderman
 import mh
 import qtgui as gui
+import log
 
 def which(program):
     """
@@ -22,8 +23,8 @@ def which(program):
     
     if sys.platform == "win32" and not program.endswith(".exe"):
         program += ".exe"
-        
-    print "looking for", program
+
+    log.message("looking for %s", program)
         
     def is_exe(fpath):
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
@@ -35,7 +36,7 @@ def which(program):
     else:
         for path in os.environ["PATH"].split(os.pathsep):
             exe_file = os.path.join(path, program)
-            print exe_file
+            log.message("testing %s", exe_file)
             if is_exe(exe_file):
                 return exe_file
 

@@ -43,7 +43,6 @@ class HelpTaskView(gui3d.TaskView):
 def load(app):
     category = app.getCategory('Help')
     taskview = category.addTask(HelpTaskView(category))
-    print 'Help imported'
 
 def unload(app):
     pass

@@ -16,8 +16,6 @@ def hslToRgb(h, s, l):
     r, g, b = colorsys.hls_to_rgb(h / 359.0, l / 100.0, s / 100.0)
     return [int(r * 255.0), int(g * 255.0), int(b * 255.0)]
 
-print 'hair properties imported'
-
 class Action:
 
     def __init__(self, human, before, after, postAction=None):
@@ -203,10 +201,9 @@ taskview = None
 def load(app):
     category = app.categories['Modelling']
     taskview = category.addTask(HairPropertiesTaskView())
-    print 'hair properties loaded'
 
 def unload(app):
-    print 'hair properties unloaded'
+    pass
 
 #obj = hair object
 def hairWidthUpdate(scn, obj,res=0.04, widthFactor=1.0): #luckily both normal and vertex index of object remains the same!

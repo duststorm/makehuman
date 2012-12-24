@@ -27,6 +27,7 @@ import mh2proxy
 import export_config
 import qtgui as gui
 import filechooser as fc
+import log
 
 class HairTaskView(gui3d.TaskView):
     
@@ -119,7 +120,7 @@ class HairTaskView(gui3d.TaskView):
         
         mhclo = values[1]
         if not os.path.exists(os.path.realpath(mhclo)):
-            print mhclo, "does not exist. Skipping."
+            log.notice('HairTaskView.loadHandler: %s does not exist. Skipping.', mhclo)
             return
         obj = mhclo.replace(".mhclo", ".obj")
         self.setHair(human, obj, mhclo)

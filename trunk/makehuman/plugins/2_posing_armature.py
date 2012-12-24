@@ -25,8 +25,6 @@ TO DO
 
 """
 
-print 'importing Pose armature plugin'
-
 import os
 import numpy as np
 import gui3d
@@ -34,6 +32,7 @@ import module3d
 import mh
 import aljabr
 import qtgui as gui
+import log
 
 import armature
 from armature import transformations as tm
@@ -109,7 +108,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
         self.cube.hide()
 
         self.status = self.addWidget(mh.addWidget(mh.Frame.Bottom, gui.TextView()))
-        print "Status", self.status
+        log.debug("PoseArmatureTaskView: Status: %s", self.status)
 
         # Main box
         self.mainBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Rotation')))
@@ -163,7 +162,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
         self.rigButtons["mhx"] = self.rigBox.addWidget(gui.RadioButton(rigs, "Mhx", False))
         path = "data/rigs"
         if not os.path.exists(path):
-            print("Did not find directory %s" % path)
+            log.notice("Did not find directory %s", path)
         else:
             buttons = []
             for name in ["game", "simple", "rigid"]:
@@ -255,7 +254,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
         def onClicked(event):
             self.zeroSliders()
             human = gui3d.app.selectedHuman
-            print "Reload", human.meshData.verts[0]
+            log.debug("PoseArmature: Reload: %s", human.meshData.verts[0])
             amt = self.getArmature()
             self.armatureObject = None
             if amt:
@@ -265,9 +264,9 @@ class PoseArmatureTaskView(gui3d.TaskView):
                 self.armature.rebuild()
             else:
                 self.armature = armature.rigdefs.createRig(human, self.armature.rigtype)
-            print "  ", human.meshData.verts[0]
+            log.debug("   %s", human.meshData.verts[0])
             self.updateAll()
-            print "  ", human.meshData.verts[0]
+            log.debug("   %s", human.meshData.verts[1])
 
         @self.rotSlider.mhEvent
         def onChange(value):
@@ -363,7 +362,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
         radio = []
         self.boneButtons = {}
         for bone in self.armature.controls:
-            print bone.name
+            log.debug("bone: %s", bone.name)
             button = BoneRadioButton(radio, bone.name, first, self)
             self.boneButtons[bone.name] = self.boneBox.addWidget(button)
             first = False    
@@ -410,7 +409,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
             if button.selected:
                 #print "Bone", name, "selected"
                 return self.armature.bones[name]
-        print "BUG: No bone selected"                    
+        log.notice("BUG: No bone selected")
         return None
 
    
@@ -504,7 +503,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
         
      
     def loadHandler(self, human, values):
-        print "loadHandler", values
+        log.debug("loadHandler: %s", values)
         filepath = values[1]
         self.loadBvhFile(filepath)
        
@@ -538,7 +537,7 @@ class CArmatureObject:
         
         
     def setColor(self, bone, value):
-        print bone.name, value
+        log.debug("setColor: %s %s", bone.name, value)
         for layer in self.layers.values():
             if layer:
                 layer.setColor(bone, value)
@@ -654,7 +653,7 @@ class CLayerObject:
         del self._data
 
         self.coords = np.vstack(coord)
-        print "fb", len(coord), len(self.coords)
+        log.debug("finishBuild: %d %d", len(coord), len(self.coords))
         self.mesh.setCoords(self.coords)
         self.mesh.setUVs(np.zeros((1, 2), dtype=np.float32))
         self.mesh.setFaces(np.vstack(faces), None, np.hstack(group))
@@ -669,7 +668,7 @@ class CLayerObject:
         
         for fg in self.mesh.faceGroups:
             if not fg.parent:
-                print fg, fg.parent
+                log.debug("finishBuild: %s %s", fg, fg.parent)
                 halt
         return self.object
 
@@ -701,7 +700,7 @@ class CLayerObject:
             
     def update(self, change):
         if 0 and change:
-            print "Armature has changed"
+            log.message("Armature has changed")
             #gui3d.app.removeObject(self.armatureObject)
             self.armatureObject.hide()
             self.armatureObject = None
@@ -748,7 +747,7 @@ def doTest1(bones):
     try:
         fp = open(thePoseBoneFile)
     except:
-        print "Did not find", thePoseBoneFile
+        log.warning("Did not find %s", thePoseBoneFile)
         return
     readBones = []
     setBones = []
@@ -824,11 +823,10 @@ def load(app):
     @taskview.mhEvent
     def onMouseDown(event):
         part = app.getSelectedFaceGroup()
-        print part.name
+        log.debug("PoseArmatureTaskView.onMouseDown: %s", part.name)
 
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
 
 def unload(app):  
-    print 'pose unloaded'
-    
+    pass

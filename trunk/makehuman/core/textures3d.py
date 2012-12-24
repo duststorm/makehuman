@@ -29,6 +29,7 @@ such as the 3D algorithms.
 
 __docformat__ = 'restructuredtext'
 
+import log
 
 def byteToBit(val, numdigits=8, base=2):
     """
@@ -83,7 +84,7 @@ def readTGA(filename):
     try:
         f = open(filename, 'rb')
     except IOError, (errno, strerror):
-        print 'I/O error(%s): %s' % (errno, strerror)
+        log.error('I/O error(%s): %s', errno, strerror)
         return None
     fileReaded = f.read()
     for i in xrange(len(fileReaded)):
@@ -93,19 +94,19 @@ def readTGA(filename):
     # byteList[0] is the Identification Field.
 
     lengthOfID = byteList[0]
-    print 'Identification Field lentgh = %i' % lengthOfID
+    log.message('Identification Field lentgh = %i', lengthOfID)
 
     # byteList[1] is the Color Map Type.
 
     if byteList[1] != 0:
-        print 'this module work only with true color image, no mapped type'
+        log.warning('this module work only with true color image, no mapped type')
         return None
 
     # byteList[2] is the image type field.
 
     if byteList[2] != 2:
-        print 'Image type =', byteList[2]
-        print 'This module work only with uncompressed true color image'
+        log.message('Image type = %s', byteList[2])
+        log.warning('This module work only with uncompressed true color image')
         return None
 
     # byteList[12] and istByte[13] are 2 byte of image X resolution.
@@ -116,12 +117,12 @@ def readTGA(filename):
     # of bytes for short and long values after a file has been read.
 
     TGAXres = byteList[12] + byteList[13] * 256
-    print 'X resolution: %i' % TGAXres
+    log.message('X resolution: %i', TGAXres)
 
     # byteList[14] and istByte[15] are 2 byte of image Y resolution.
 
     TGAYres = byteList[14] + byteList[15] * 256
-    print 'Y resolution: %i' % TGAYres
+    log.message('Y resolution: %i', TGAYres)
 
     # byteList[16] is the pixel depth: 8,16,24,32, etc.
 
@@ -131,10 +132,10 @@ def readTGA(filename):
     elif pixelDepth == 32:
         byteUsedForPixel = 4
     else:
-        print 'This module work only with 24 or 32 bits images'
+        log.warning('This module work only with uncompressed true color image')
         return None
 
-    print 'Pixel Depth: %i' % pixelDepth
+    log.message('Pixel Depth: %i', pixelDepth)
 
     # byteList[17] is Image Descriptor
 
@@ -149,16 +150,16 @@ def readTGA(filename):
     a = imageDescrBit[5]
     b = imageDescrBit[4]
     if a == 0 and b == 0:
-        print 'The image origin is Bottom Left'
+        log.message('The image origin is Bottom Left')
         origin = 'BL'
     if a == 0 and b == 1:
-        print 'The image origin is Bottom Right'
+        log.message('The image origin is Bottom Right')
         origin = 'BR'
     if a == 1 and b == 0:
-        print 'The image origin is Top Left'
+        log.message('The image origin is Top Left')
         origin = 'TL'
     if a == 1 and b == 1:
-        print 'The image origin is Top Right'
+        log.message('The image origin is Top Right')
         origin = 'TR'
 
     # Calculation of TGA header length

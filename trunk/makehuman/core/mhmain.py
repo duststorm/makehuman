@@ -15,6 +15,7 @@ import algos3d
 import qtgui as gui
 import language as lang
 from camera3d import Camera
+import log
 
 class PluginCheckBox(gui.CheckBox):
 
@@ -283,29 +284,27 @@ class MHApplication(gui3d.Application, mh.Application):
         try:
             name, ext = splitext(basename(path))
             if name not in self.settings['excludePlugins']:
+                log.message('Importing plugin %s', name)
                 module = imp.load_source(name, path)
                 self.modules[name] = module
+                log.message('Imported plugin %s', name)
+                log.message('Loading plugin %s', name)
                 module.load(self)
+                log.message('Loaded plugin %s', name)
             else:
                 self.modules[name] = None
         except Exception, e:
-            import traceback
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            print ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback))
-            print('Could not load %s' % name)
-            print e
+            log.warning('Could not load %s', name, exc_info=True)
 
     def unloadPlugins(self):
 
         for name, module in self.modules.iteritems():
             try:
+                log.message('Unloading plugin %s', name)
                 module.unload(self)
+                log.message('Unloaded plugin %s', name)
             except Exception, e:
-                import traceback
-                exc_type, exc_value, exc_traceback = sys.exc_info()
-                print ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback))
-                print('Could not unload %s' % name)
-                print e
+                log.warning('Could not unload %s', name, exc_info=True)
 
     def loadGui(self):
 
@@ -397,26 +396,33 @@ class MHApplication(gui3d.Application, mh.Application):
         old_stdout = sys.stdout
         sys.stdout = self.splash
         yield None
-        print 'Loading background'
+
+        log.message('Loading background')
         self.loadBackground()
         yield None
-        print 'Loading human'
+
+        log.message('Loading human')
         self.loadHuman()
         yield None
-        print 'Loading main GUI'
+
+        log.message('Loading main GUI')
         self.loadMainGui()
         yield None
-        print 'Loading plugins'
+
+        log.message('Loading plugins')
         for _ in self.loadPlugins():
             yield None
         yield None
-        print 'Loading GUI'
+
+        log.message('Loading GUI')
         self.loadGui()
         yield None
-        print 'Loading done'
+
+        log.message('Loading done')
         self.loadFinish()
-        print ''
         yield None
+
+        log.message('')
         sys.stdout = old_stdout
         self.splash.finish(self.mainwin)
 
@@ -484,20 +490,20 @@ class MHApplication(gui3d.Application, mh.Application):
             self.undoStack.append(action)
             del self.redoStack[:]
             self.modified = True
-            print("do " + action.name)
+            log.message('do %s', action.name)
             self.redraw()
 
     def did(self, action):
         self.undoStack.append(action)
         self.modified = True
         del self.redoStack[:]
-        print("did " + action.name)
+        log.message('did %s', action.name)
         self.redraw()
 
     def undo(self):
         if self.undoStack:
             action = self.undoStack.pop()
-            print("undo " + action.name)
+            log.message('undo %s', action.name)
             action.undo()
             self.redoStack.append(action)
             self.modified = True
@@ -506,7 +512,7 @@ class MHApplication(gui3d.Application, mh.Application):
     def redo(self):
         if self.redoStack:
             action = self.redoStack.pop()
-            print("redo " + action.name)
+            log.message('redo %s', action.name)
             action.do()
             self.undoStack.append(action)
             self.modified = True
@@ -522,7 +528,7 @@ class MHApplication(gui3d.Application, mh.Application):
                 self.settings.update(settings)
                 f.close()
         except:
-            print("Failed to load settings")
+            log.error('Failed to load settings')
 
         if 'language' in gui3d.app.settings:
             self.setLanguage(gui3d.app.settings['language'])
@@ -538,7 +544,7 @@ class MHApplication(gui3d.Application, mh.Application):
                         self.shortcuts[(int(modifier), int(key))] = getattr(self, method[0:-1])
                 f.close()
         except:
-            print("Failed to load shortcut settings")
+            log.error('Failed to load shortcut settings')
 
         try:
             if os.path.isfile(os.path.join(mh.getPath(''), "mouse.ini")):
@@ -551,7 +557,7 @@ class MHApplication(gui3d.Application, mh.Application):
                         self.mouseActions[(int(modifier), int(button))] = getattr(self, method[0:-1])
                 f.close()
         except:
-            print("Failed to load mouse settings")
+            log.error('Failed to load mouse settings')
 
         try:
             if os.path.isfile(os.path.join(mh.getPath(''), "help.ini")):
@@ -563,7 +569,7 @@ class MHApplication(gui3d.Application, mh.Application):
                 if self.dialog is not None:
                     self.dialog.helpIds.update(self.helpIds)
         except:
-            print("Failed to load help settings")
+            log.error('Failed to load help settings')
 
     def saveSettings(self):
         if not os.path.exists(mh.getPath('')):
@@ -600,7 +606,7 @@ class MHApplication(gui3d.Application, mh.Application):
 
             if len(lineData) > 0:
                 if lineData[0] == "version":
-                    print("Version " + lineData[1])
+                    log.message('Version %s', lineData[1])
                 elif lineData[0] == "color":
                     if lineData[1] == "clear":
                         mh.setClearColor(float(lineData[2]), float(lineData[3]), float(lineData[4]), float(lineData[5]))
@@ -888,7 +894,7 @@ class MHApplication(gui3d.Application, mh.Application):
     def saveTarget(self):
         human = self.selectedHuman
         algos3d.saveTranslationTarget(human.meshData, "full_target.target")
-        print "Full target exported"
+        log.message("Full target exported")
 
     def quickExport(self):
         exportPath = mh.getPath('exports')

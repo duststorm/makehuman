@@ -6,9 +6,6 @@ import gui3d
 import mh
 import qtgui as gui
 
-print 'example imported'
-
-
 class ExampleTaskView(gui3d.TaskView):
 
     def __init__(self, category):
@@ -122,15 +119,10 @@ def load(app):
     category = app.getCategory('Example')
     taskview = category.addTask(ExampleTaskView(category))
 
-    print 'example loaded'
-    print 'Hello world'
-
 
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
 
 
 def unload(app):
-    print 'example unloaded'
-
-
+    pass

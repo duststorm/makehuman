@@ -8,8 +8,6 @@ import warpmodifier
 import mh
 import qtgui as gui
 
-print 'Expression imported'
-
 class GroupBoxRadioButton(gui.RadioButton):
     def __init__(self, group, label, groupBox, selected=False):
         super(GroupBoxRadioButton, self).__init__(group, label, selected)
@@ -119,11 +117,9 @@ def load(app):
     app.addLoadHandler('expression', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)
 
-    print 'Expression loaded'
-
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
 
 
 def unload(app):
-    print 'Expression unloaded'
+    pass

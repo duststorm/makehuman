@@ -4,6 +4,7 @@
 
 import gui3d, mh, os, module3d
 import qtgui as gui
+import log
 
 class FontRadioButton(gui.RadioButton):
 
@@ -128,7 +129,7 @@ class SettingsTaskView(gui3d.TaskView):
                 human.shader_program = mh.createShader(human.vertex_shader, human.fragment_shader)
                 human.mesh.setShader(human.shader_program)
             except Exception, e:
-                print "No shader support: " + str(e)
+                log.message("No shader support: %s", str(e))
     
     def onShow(self, event):
     
@@ -143,7 +144,6 @@ class SettingsTaskView(gui3d.TaskView):
 def load(app):
     category = app.getCategory('Settings')
     taskview = category.addTask(SettingsTaskView(category))
-    print 'Settings imported'
 
 def unload(app):
     pass

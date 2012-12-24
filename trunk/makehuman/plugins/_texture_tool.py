@@ -8,8 +8,6 @@ import module3d
 import os
 from aljabr import vsub, vcross, vlen
 
-print 'Texture tool imported'
-
 class TextureToolTaskView(gui3d.TaskView):
 
     def __init__(self, category):
@@ -158,11 +156,9 @@ taskview = None
 def load(app):
     category = app.getCategory('Experiments')
     taskview = category.addTask(TextureToolTaskView(category))
-    print 'Texture tool loaded'
 
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
 
 def unload(app):
-    print 'Texture tool unloaded'
-
+    pass

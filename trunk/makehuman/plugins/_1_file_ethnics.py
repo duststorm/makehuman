@@ -5,6 +5,7 @@
 import gui3d, os
 import mh
 import qtgui as gui
+import log
 
 class EthnicsTaskView(gui3d.TaskView):
 
@@ -81,7 +82,7 @@ class EthnicsTaskView(gui3d.TaskView):
     def loadHandler(self, human, values):
         
         target = '%s.target' % os.path.join('data/models/ethnics', values[1])
-        print target
+        log.message("EthnicsTaskView: %s", target)
         human.setDetail(target, float(values[2]))
        
     def saveHandler(self, human, file):
@@ -97,8 +98,6 @@ def load(app):
     
     app.addLoadHandler('ethnic', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)
-    
-    print 'Ethnics imported'
 
 def unload(app):
     pass

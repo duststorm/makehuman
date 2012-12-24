@@ -11,8 +11,7 @@ import mh
 import posemode
 import qtgui as gui
 import filechooser as fc
-
-print 'Expression imported'
+import log
 
 class GroupBoxRadioButton(gui.RadioButton):
     def __init__(self, group, label, groupBox, selected=False):
@@ -118,8 +117,8 @@ class ExpressionTaskView(gui3d.TaskView):
     def resetExpressions(self, include):
 
         human = gui3d.app.selectedHuman
-        
-        print "resetExpressions", include
+
+        log.message("resetExpressions %s", include)
 
         if include == "All":
             for name, modifier in self.modifiers.iteritems():
@@ -265,12 +264,10 @@ def load(app):
     category = app.getCategory('Library')
     category.addTask(ExpressionLoadTaskView(category, taskview))
     category.addTask(VisemeLoadTaskView(category, taskview))
-    
-    print 'Expression loaded'
 
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
 
 
 def unload(app):
-    print 'Expression unloaded'
+    pass

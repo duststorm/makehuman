@@ -25,6 +25,7 @@ import gui3d, mh
 from os import path
 import qtgui as gui
 import filechooser as fc
+import log
 
 class HairTaskView(gui3d.TaskView):
     def __init__(self, category):
@@ -59,7 +60,7 @@ class HairTaskView(gui3d.TaskView):
             #.obj files contain geometric detail of the hair (can be edited by any 3rd party modelling software that opens wavefront .obj)
             #.hair files contain metadata of hair used by the makehair utility
             filename = path.splitext(filename)[0]
-            print("Loading %s" %(filename))
+            log.message("Loading %s", filename)
             human = self.app.selectedHuman
             if human.hairObj: human.scene.clear(human.hairObj)
 
@@ -109,12 +110,9 @@ def load(app):
     category = app.getCategory('Library')
     taskview = category.addTask(HairTaskView(category))
 
-    print 'Hair chooser loaded'
-
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
 
 
 def unload(app):
-    print 'Hair chooser unloaded'
-
+    pass

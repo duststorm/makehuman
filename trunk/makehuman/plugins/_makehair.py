@@ -10,8 +10,6 @@ import simpleoctree
 import mh
 import qtgui as gui
 
-print 'makehair plugin'
-
 class MakeHairTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'MakeHair')
@@ -201,6 +199,4 @@ def load(app):
 # At the moment this is not used, but in the future it will remove the added GUI elements
 
 def unload(app):
-    print 'makehair unloaded'
-
-
+    pass

@@ -32,8 +32,6 @@ import os
 import mh
 import qtgui as gui
 
-print 'Gender imported'
-
 class RangeDetailModifier(humanmodifier.GenderAgeRangeModifier):
     
     def __init__(self, template, parameterName, parameterRange, always=True):
@@ -221,8 +219,6 @@ class GenderTaskView(gui3d.TaskView):
 def load(app):
     category = app.getCategory('Modelling')
     taskview = category.addTask(GenderTaskView(category))
-
-    print 'Gender loaded'
 
 def unload(app):
     pass

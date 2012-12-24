@@ -11,6 +11,7 @@ import humanmodifier
 import aljabr
 import mh
 import qtgui as gui
+import log
 
 class MeasurementValueConverter(object):
 
@@ -372,13 +373,11 @@ def load(app):
     app.addLoadHandler('measure', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)
 
-    print 'Measurement loaded'
-
     @taskview.mhEvent
     def onMouseDown(event):
         part = app.getSelectedFaceGroup()
         bodyZone = app.selectedHuman.getPartNameForGroupName(part.name)
-        print bodyZone
+        log.message("body zone %s", bodyZone)
         if bodyZone in app.selectedHuman.bodyZones:
             if bodyZone == "neck":
                 taskview.showGroup('neck')
@@ -400,7 +399,7 @@ def load(app):
     taskview.showGroup('neck')
 
 def unload(app):
-    print 'Measurement unloaded'
+    pass
 
 class Ruler:
 

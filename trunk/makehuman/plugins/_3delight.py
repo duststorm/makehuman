@@ -5,8 +5,6 @@ if 'nt' in sys.builtin_module_names:
     sys.path.append('./pythonmodules')
 import subprocess
 
-print '3delight imported'
-
 povray = None
 
 # This method is called when the plugin is loaded into makehuman
@@ -23,14 +21,12 @@ def load(app):
     subprocess.Popen('shaderdl data/shaders/renderman/hair.sl -o data/shaders/renderman/hair.sdl', shell=True)
     subprocess.Popen('shaderdl data/shaders/renderman/shadowspot.sl -o data/shaders/renderman/shadowspot.sdl', shell=True)
 
-    print '3delight loaded'
-
 
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
 
 
 def unload(app):
-    print '3delight unloaded'
+    pass
 
 

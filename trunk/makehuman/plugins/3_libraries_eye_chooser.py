@@ -23,6 +23,7 @@ TO DO
 import gui3d, mh, os, module3d
 import qtgui as gui
 import filechooser as fc
+import log
 
 class EyesTaskView(gui3d.TaskView):
     
@@ -44,9 +45,7 @@ class EyesTaskView(gui3d.TaskView):
         try:
             subTextures = eval(f.read(), {"__builtins__":None}, {'True':True, 'False':False})
         except:
-            import traceback
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            print ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+            log.warning("setEyes(%s)", mhstx, exc_info=True)
             f.close()
             return
         f.close()

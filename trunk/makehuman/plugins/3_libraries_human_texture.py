@@ -141,12 +141,9 @@ def load(app):
     category = app.getCategory('Library')
     taskview = category.addTask(HumanTextureTaskView(category))
 
-    print 'Texture chooser loaded'
-
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
 
 
 def unload(app):
-    print 'Texture chooser unloaded'
-
+    pass

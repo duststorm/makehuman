@@ -14,8 +14,6 @@ import gui3d
 import mh
 import qtgui as gui
 
-print 'Mitsuba imported'
-
 class MitsubaTaskView(gui3d.TaskView):
 
     def __init__(self, category):
@@ -72,14 +70,9 @@ def load(app):
     category = app.getCategory('Rendering')
     taskview = category.addTask(MitsubaTaskView(category))
 
-    print 'Mitsuba loaded'
-
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
 
 
 def unload(app):
-    
-    print 'Mitsuba unloaded'
-
-
+    pass

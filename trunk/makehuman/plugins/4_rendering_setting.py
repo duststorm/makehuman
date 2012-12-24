@@ -34,7 +34,6 @@ class RenderingSettingTaskView(gui3d.TaskView):
 def load(app):
     category = app.getCategory('Rendering')
     taskview = category.addTask(RenderingSettingTaskView(category))
-    print 'Rendering setting imported'
 
 def unload(app):
     pass

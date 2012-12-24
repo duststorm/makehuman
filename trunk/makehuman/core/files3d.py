@@ -54,6 +54,7 @@ import os
 import algos3d
 import module3d
 import numpy as np
+import log
 
 originalVertexCache = {}
 
@@ -91,7 +92,7 @@ def loadMesh(path, locX=0, locY=0, locZ=0, loadColors=1):
     try:
         objFile = open(path)
     except:
-        print 'Warning: obj file not found: ', path
+        log.warning('Warning: obj file not found: %s', path)
         return False
 
     verts = []
@@ -210,7 +211,7 @@ def loadVertsCoo(path):
     try:
         fileDescriptor = open(path)
     except:
-        print 'Error opening %s file' % path
+        log.error('Error opening %s file', path)
         return
     originalVertexCoordinates = []
     for data in fileDescriptor:

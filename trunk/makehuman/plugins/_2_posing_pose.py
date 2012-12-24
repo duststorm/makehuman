@@ -1,20 +1,22 @@
 print 'importing Pose2 plugin'
 
-import os.path
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # We need this for gui controls
 
+import os.path
 import gui3d
 import math
+import mh
+import log
 from aljabr import * #todo: import the necessities only
 from skeleton import Skeleton
 from mh2obj import exportObj
-print 'importing linalg'
+log.message('importing linalg')
 from linalg import *
-print 'imported linalg'
+log.message('imported linalg')
 from copy import deepcopy
-import mh, module3d
+import module3d
 
 #torso comes after clavicle because of getJointZones :P
 jointZones = ('l-eye','r-eye', 'jaw', 'nose', 'mouth', 'head', 'neck',  
@@ -345,18 +347,16 @@ taskview = None
 def load(app):
     category = app.getCategory('Posing')
     taskview = category.addTask(PoseTaskView(category))
-    print 'pose loaded'
             
     @taskview.mhEvent
     def onMouseDown(event):
         part = app.getSelectedFaceGroup()
-        print part.name
 
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
 
 def unload(app):  
-    print 'pose unloaded'
+    pass
     
 #rotate one side of tets along z-axis
 def deformTets(tets, center, transform):

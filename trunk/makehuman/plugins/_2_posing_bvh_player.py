@@ -457,8 +457,6 @@ def load(app):
     
     category = app.getCategory('Posing')
     taskview = category.addTask(BvhView(category))
-    
-    print 'BVH Player loaded'
 
 def unload(app):
     pass

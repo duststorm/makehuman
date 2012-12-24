@@ -14,15 +14,6 @@ taskview = None
 
 def load(app):
     taskview = AnimeModelingTaskView(app.categories['Modelling'])
-    print 'Anime modeling loaded'
-
 
 def unload(app):
     pass
-
-  # Remove taskview
-
-    print 'Anime modeling unloaded'
-
-
-print 'Anime modeling imported'

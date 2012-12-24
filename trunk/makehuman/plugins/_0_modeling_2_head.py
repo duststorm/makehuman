@@ -7,8 +7,6 @@ import humanmodifier
 import mh
 import qtgui as gui
 
-print 'Head imported'
-
 class GroupBoxRadioButton(gui.RadioButton):
     def __init__(self, group, label, groupBox, selected=False):
         super(GroupBoxRadioButton, self).__init__(group, label, selected)
@@ -138,8 +136,6 @@ def load(app):
     
     app.addLoadHandler('head', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)
-
-    print 'Head loaded'
 
 def unload(app):
     pass

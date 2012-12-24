@@ -180,7 +180,6 @@ class RandomTaskView(gui3d.TaskView):
 def load(app):
     category = app.getCategory('Modelling')
     taskview = category.addTask(RandomTaskView(category))
-    print 'Random imported'
 
 def unload(app):
     pass

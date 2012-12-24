@@ -31,7 +31,8 @@ through the body. The methods can be used to enhance some costume modelled hair 
 import math
 import simpleoctree
 from aljabr import *
-
+import mh
+import log
 
 def getTangent(point, i, verts, size, isNurb=False, res=0.08):  # default Octree Resolution is set to 0.08
     """
@@ -55,8 +56,8 @@ def getTangent(point, i, verts, size, isNurb=False, res=0.08):  # default Octree
 
         point2 = vmul(vec1, -res / vlen(vec1))
         point2 = vadd(L2, point2)
-        print 'point2 is: ', point2
-        print 'Deflection is done through incidence'
+        log.message("point2 is: %s", point2)
+        log.message('Deflection is done through incidence')
     else:
 
         # YES! then try to deflect through the tangent space
@@ -68,7 +69,7 @@ def getTangent(point, i, verts, size, isNurb=False, res=0.08):  # default Octree
             point2 = vadd(L2, tangent)
             point2 = vadd(point2, vmul(normal, res))
         else:
-            print 'Collision and normal lines are parallel'
+            log.message('Collision and normal lines are parallel')
             tangent = [normal[0], -normal[2], normal[1]]  # arbitrary rotation of 90deg.. choose x-axis rotation!
             tangent = vmul(tangent, l)
             point2 = vadd(L2, tangent)
@@ -188,7 +189,7 @@ def deflect(line, verts, gravity, isNurb=True):  # assume gravity is negative y-
     for j in range(0, len(verts)):
         if [verts[j].co[0], verts[j].co[1], verts[j].co[2]] == line[1]:
             return 0  # 0 means do not change the curve
-            print 'line[1] and mesh verts match'
+            log.message('line[1] and mesh verts match')
         if gravity and verts[j].co[1] < line[0][1] or not gravity:  # assume G=[0,-1,0]
             distTemp = vdist(line[0], verts[j].co)
             if distTemp < dist:

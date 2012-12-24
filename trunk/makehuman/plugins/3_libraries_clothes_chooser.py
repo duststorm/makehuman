@@ -27,6 +27,7 @@ import mh2proxy
 import export_config
 import qtgui as gui
 import filechooser as fc
+import log
 
 KnownTags = [
     "shoes",
@@ -100,7 +101,7 @@ class ClothesTaskView(gui3d.TaskView):
             gui3d.app.removeObject(clo)
             del human.clothesObjs[uuid]
             self.clothesList.remove(uuid)
-            print "Removed clothing", proxy.name, uuid
+            log.message("Removed clothing %s %s", proxy.name, uuid)
             return
 
         mesh = files3d.loadMesh(obj)
@@ -137,12 +138,12 @@ class ClothesTaskView(gui3d.TaskView):
                             oldClo = human.clothesObjs[oldUuid]
                         except KeyError:
                             continue
-                        print "Removed clothing", oldUuid
+                        log.message("Removed clothing %s", oldUuid)
                         gui3d.app.removeObject(oldClo)
                         del human.clothesObjs[oldUuid]
                         self.clothesList.remove(oldUuid)
                     else:
-                        print "Kept clothing", oldUuid
+                        log.message("Kept clothing %s", oldUuid)
                         newUuids.append(oldUuid)
                 newUuids.append(uuid)
                 self.taggedClothes[tag] = newUuids
@@ -179,7 +180,7 @@ class ClothesTaskView(gui3d.TaskView):
         
         human = event.human
         if event.change == 'reset':
-            print 'deleting clothes'
+            log.message("deleting clothes")
             for (uuid,clo) in human.clothesObjs.items():
                 if clo:
                     gui3d.app.removeObject(clo)
@@ -197,7 +198,7 @@ class ClothesTaskView(gui3d.TaskView):
 
         mhclo = export_config.getExistingProxyFile(values, "clothes")
         if not mhclo:
-            print values[1], "does not exist. Skipping."
+            log.notice("%s does not exist. Skipping.", values[1])
         else:            
             self.setClothes(human, mhclo)
         

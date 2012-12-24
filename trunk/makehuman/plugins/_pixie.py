@@ -13,8 +13,6 @@ import mh2renderman
 
 import gui3d
 
-print 'pixie imported'
-
 aqsis = None
 
 # This method is called when the plugin is loaded into makehuman
@@ -44,14 +42,10 @@ def load(app):
     def onClicked(event):
         mh2renderman.saveScene(app.scene3d, 'scena.rib', 'renderman_output', 'pixie')
 
-    print 'pixie loaded'
-
 
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
 
 
 def unload(app):
-    print 'pixie unloaded'
-
-
+    pass
