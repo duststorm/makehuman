@@ -57,41 +57,28 @@ class Object(events3d.EventHandler):
         self.__subdivisionMesh = None
         self.__proxySubdivisionMesh = None
         
-    def __del__(self):
-    
-        self.proxy = None
-        
-        self.__seedMesh = None
-        self.__proxyMesh = None
-        self.__subdivisionMesh = None
-        self.__proxySubdivisionMesh = None
-        
     def _attach(self):
     
         if self._view().isVisible() and self.visible:
             self.mesh.setVisibility(1)
         else:
             self.mesh.setVisibility(0)
-            
-        if self.__seedMesh:
-           self.__seedMesh.attach()
-        if self.__proxyMesh:
-           self.__proxyMesh.attach()
-        if self.__subdivisionMesh:
-           self.__subdivisionMesh.attach()
-        if self.__proxySubdivisionMesh:
-           self.__proxySubdivisionMesh.attach()
+
+        for mesh in self._meshes():
+            mesh.attach()
             
     def _detach(self):
-        
-        self.__seedMesh.detach()
-        if self.__proxyMesh:
-            self.__proxyMesh.detach()
-        if self.__subdivisionMesh:
-            self.__subdivisionMesh.detach()
-        if self.__proxySubdivisionMesh:
-            self.__proxySubdivisionMesh.detach()
-            
+        for mesh in self._meshes():
+            mesh.detach()
+
+    def _meshes(self):
+        for mesh in (self.__seedMesh,
+                     self.__proxyMesh,
+                     self.__subdivisionMesh,
+                     self.__proxySubdivisionMesh):
+            if mesh is not None:
+                yield mesh
+
     @property
     def view(self):
         return self._view()
@@ -120,61 +107,26 @@ class Object(events3d.EventHandler):
         return [self.mesh.x, self.mesh.y, self.mesh.z]
 
     def setPosition(self, position):
-        self.__seedMesh.setLoc(position[0], position[1], position[2])
-        if self.__proxyMesh:
-            self.__proxyMesh.setLoc(position[0], position[1], position[2])
-        if self.__subdivisionMesh:
-            self.__subdivisionMesh.setLoc(position[0], position[1], position[2])
-        if self.__proxySubdivisionMesh:
-            self.__proxySubdivisionMesh.setLoc(position[0], position[1], position[2])
+        for mesh in self._meshes():
+            mesh.setLoc(position[0], position[1], position[2])
 
     def getRotation(self):
         return [self.mesh.rx, self.mesh.ry, self.mesh.rz]
 
     def setRotation(self, rotation):
-        self.__seedMesh.setRot(rotation[0], rotation[1], rotation[2])
-        if self.__proxyMesh:
-            self.__proxyMesh.setRot(rotation[0], rotation[1], rotation[2])
-        if self.__subdivisionMesh:
-            self.__subdivisionMesh.setRot(rotation[0], rotation[1], rotation[2])
-        if self.__proxySubdivisionMesh:
-            self.__proxySubdivisionMesh.setRot(rotation[0], rotation[1], rotation[2])
+        for mesh in self._meshes():
+            mesh.setRot(rotation[0], rotation[1], rotation[2])
             
-    def setScale(self, scale, scaleY=None, scaleZ=None):
-        if scaleZ:
-            self.__seedMesh.setScale(scale, scaleY, scaleZ)
-            if self.__proxyMesh:
-                self.__proxyMesh.setScale(scale, scaleY, scaleZ)
-            if self.__subdivisionMesh:
-                self.__subdivisionMesh.setScale(scale, scaleY, scaleZ)
-            if self.__proxySubdivisionMesh:
-                self.__proxySubdivisionMesh.setScale(scale, scaleY, scaleZ)
-        elif scaleY:
-            self.__seedMesh.setScale(scale, scaleY, 1)
-            if self.__proxyMesh:
-                self.__proxyMesh.setScale(scale, scaleY, 1)
-            if self.__subdivisionMesh:
-                self.__subdivisionMesh.setScale(scale, scaleY, 1)
-            if self.__proxySubdivisionMesh:
-                self.__proxySubdivisionMesh.setScale(scale, scaleY, 1)
-        else:
-            self.__seedMesh.setScale(scale, scale, 1)
-            if self.__proxyMesh:
-                self.__proxyMesh.setScale(scale, scale, 1)
-            if self.__subdivisionMesh:
-                self.__subdivisionMesh.setScale(scale, scale, 1)
-            if self.__proxySubdivisionMesh:
-                self.__proxySubdivisionMesh.setScale(scale, scale, 1)
+    def setScale(self, scale, scaleY=None, scaleZ=1):
+        if scaleY is None:
+            scaleY = scale
+        for mesh in self._meshes():
+            mesh.setScale(scale, scaleY, scaleZ)
 
     def setTexture(self, texture):
         if texture:
-            self.__seedMesh.setTexture(texture)
-            if self.__proxyMesh:
-                self.__proxyMesh.setTexture(texture)
-            if self.__subdivisionMesh:
-                self.__subdivisionMesh.setTexture(texture)
-            if self.__proxySubdivisionMesh:
-                self.__proxySubdivisionMesh.setTexture(texture)
+            for mesh in self._meshes():
+                mesh.setTexture(texture)
         else:
             self.clearTexture()
             
@@ -182,25 +134,15 @@ class Object(events3d.EventHandler):
         return self.__seedMesh.texture
 
     def clearTexture(self):
-        self.__seedMesh.clearTexture()
-        if self.__proxyMesh:
-            self.__proxyMesh.clearTexture()
-        if self.__subdivisionMesh:
-            self.__subdivisionMesh.clearTexture()
-        if self.__proxySubdivisionMesh:
-            self.__proxySubdivisionMesh.clearTexture()
+        for mesh in self._meshes():
+            mesh.clearTexture()
             
     def hasTexture(self):
         return self.__seedMesh.hasTexture()
         
     def setSolid(self, solid):
-        self.__seedMesh.setSolid(solid)
-        if self.__proxyMesh:
-            self.__proxyMesh.setSolid(solid)
-        if self.__subdivisionMesh:
-            self.__subdivisionMesh.setSolid(solid)
-        if self.__proxySubdivisionMesh:
-            self.__proxySubdivisionMesh.setSolid(solid)
+        for mesh in self._meshes():
+            mesh.setSolid(solid)
             
     def isSolid(self):
         return self.__seedMesh.solid
@@ -241,14 +183,9 @@ class Object(events3d.EventHandler):
             (folder, name) = proxy.obj_file
             
             self.__proxyMesh = files3d.loadMesh(os.path.join(folder, name))
-            self.__proxyMesh.x, self.__proxyMesh.y, self.__proxyMesh.z = self.mesh.x, self.mesh.y, self.mesh.z
-            self.__proxyMesh.rx, self.__proxyMesh.ry, self.__proxyMesh.rz = self.mesh.rx, self.mesh.ry, self.mesh.rz
-            self.__proxyMesh.sx, self.__proxyMesh.sy, self.__proxyMesh.sz = self.mesh.sx, self.mesh.sy, self.mesh.sz
-            self.__proxyMesh.visibility = self.mesh.visibility
-            self.__proxyMesh.shadeless = self.mesh.shadeless
-            self.__proxyMesh.pickable = self.mesh.pickable
-            self.__proxyMesh.cameraMode = self.mesh.cameraMode
-            self.__proxyMesh.texture = self.mesh.texture
+            for attr in ('x', 'y', 'z', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz',
+                         'visibility', 'shadeless', 'pickable', 'cameraMode', 'texture'):
+                setattr(self.__proxyMesh, attr, getattr(self.mesh, attr))
             
             self.__proxyMesh.object = self.mesh.object
             
