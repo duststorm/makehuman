@@ -190,7 +190,7 @@ class BackgroundTaskView(gui3d.TaskView):
                 self.backgroundImage.show()
                 self.backgroundImageToggle.setSelected(True)
             else:
-                gui.changeTask('Library', 'Background')
+                mh.changeTask('Library', 'Background')
 
         self.backgroundBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Background 2 settings')))
 
@@ -243,7 +243,7 @@ class BackgroundTaskView(gui3d.TaskView):
             gui3d.app.modelCamera.switchToOrtho()
 
 
-            gui.changeTask('Modelling', 'Background')
+            mh.changeTask('Modelling', 'Background')
             gui3d.app.redraw()
 
     def fixateBackground(self):

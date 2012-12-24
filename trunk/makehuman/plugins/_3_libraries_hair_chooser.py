@@ -51,7 +51,7 @@ class HairTaskView(gui3d.TaskView):
 
         @self.currentHair.mhEvent
         def onClicked(event):
-            gui.changeTask('Library', 'Hair')
+            mh.changeTask('Library', 'Hair')
 
         @self.filechooser.mhEvent
         def onFileSelected(filename, update=1):
