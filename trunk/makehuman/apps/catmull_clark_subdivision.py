@@ -44,6 +44,7 @@ class SubdivisionObject(Object3D):
         self.shadeless = object.shadeless
         self.solid = object.solid
         self.transparentPrimitives = object.transparentPrimitives * 4
+        self.object = object.object
         self.parent = object
 
     def create(self, progressCallback):
