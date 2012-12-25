@@ -90,7 +90,8 @@ class TorsoSlider(humanmodifier.ModifierSlider):
         
     def onFocus(self, event):
         super(TorsoSlider, self).onFocus(event)
-        self.view()
+        if gui3d.app.settings.get('cameraAutoZoom', True):
+            self.view()
 
 class TorsoTaskView(gui3d.TaskView):
 
@@ -184,7 +185,8 @@ class TorsoTaskView(gui3d.TaskView):
 
         gui3d.TaskView.onShow(self, event)
         
-        gui3d.app.setGlobalCamera()
+        if gui3d.app.settings.get('cameraAutoZoom', True):
+            gui3d.app.setGlobalCamera()
         
         for slider in self.sliders:
             slider.update()

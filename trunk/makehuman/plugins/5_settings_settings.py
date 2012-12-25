@@ -48,6 +48,8 @@ class SettingsTaskView(gui3d.TaskView):
             gui3d.app.settings.get('realtimeUpdates', True)))
         self.realtimeNormalUpdates = sliderBox.addWidget(gui.CheckBox("Update normals",
             gui3d.app.settings.get('realtimeNormalUpdates', True)))
+        self.cameraAutoZoom = sliderBox.addWidget(gui.CheckBox("Auto-zoom camera",
+            gui3d.app.settings.get('cameraAutoZoom', True)))
             
         mouseBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.SliderBox('Mouse behavior')))
         self.normal = mouseBox.addWidget(gui.Slider(gui3d.app.settings.get('lowspeed', 1), 1, 10,
@@ -104,6 +106,10 @@ class SettingsTaskView(gui3d.TaskView):
         @self.realtimeNormalUpdates.mhEvent
         def onClicked(event):
             gui3d.app.settings['realtimeNormalUpdates'] = self.realtimeNormalUpdates.selected
+
+        @self.cameraAutoZoom.mhEvent
+        def onClicked(event):
+            gui3d.app.settings['cameraAutoZoom'] = self.cameraAutoZoom.selected
             
         @self.normal.mhEvent
         def onChange(value):

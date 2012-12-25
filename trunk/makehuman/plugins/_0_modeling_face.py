@@ -101,7 +101,8 @@ class FaceTaskView(gui3d.TaskView):
 
         gui3d.TaskView.onShow(self, event)
         
-        self.app.setFaceCamera()
+        if gui3d.app.settings.get('cameraAutoZoom', True):
+            self.app.setFaceCamera()
         
         for slider in self.sliders:
             slider.update()

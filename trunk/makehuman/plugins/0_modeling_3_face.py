@@ -24,7 +24,8 @@ class FaceSlider(humanmodifier.ModifierSlider):
 
     def onFocus(self, event):
         super(FaceSlider, self).onFocus(event)
-        self.view()
+        if gui3d.app.settings.get('cameraAutoZoom', True):
+            self.view()
         
 class FaceSlider2(humanmodifier.ModifierSlider):
     def __init__(self, modifier, image, view):
@@ -35,7 +36,8 @@ class FaceSlider2(humanmodifier.ModifierSlider):
 
     def onFocus(self, event):
         super(FaceSlider2, self).onFocus(event)
-        self.view()
+        if gui3d.app.settings.get('cameraAutoZoom', True):
+            self.view()
 
 class FaceTaskView(gui3d.TaskView):
 
@@ -324,7 +326,8 @@ class FaceTaskView(gui3d.TaskView):
 
         gui3d.TaskView.onShow(self, event)
 
-        gui3d.app.setFaceCamera()
+        if gui3d.app.settings.get('cameraAutoZoom', True):
+            gui3d.app.setFaceCamera()
 
         for slider in self.sliders:
             slider.update()

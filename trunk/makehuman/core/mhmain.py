@@ -98,6 +98,7 @@ class MHApplication(gui3d.Application, mh.Application):
         self.settings = {
             'realtimeUpdates': True,
             'realtimeNormalUpdates': True,
+            'cameraAutoZoom': True,
             'shader': None,
             'lowspeed': 1,
             'highspeed': 5,
