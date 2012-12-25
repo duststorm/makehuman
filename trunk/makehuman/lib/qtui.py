@@ -554,7 +554,7 @@ class Application(QtGui.QApplication, events3d.EventHandler):
 
     class LogHandler(logging.Handler):
         def __init__(self, write, level=logging.NOTSET):
-            super(Application.LogHandler, self).__init__(level)
+            logging.Handler.__init__(self, level)
             self._write = write
 
         def emit(self, record):
