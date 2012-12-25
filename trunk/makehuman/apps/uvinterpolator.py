@@ -111,21 +111,21 @@ class UVFinder:
 			diff[i]/=length
 			result[i] = sol[i] + mult*diff[i]
 			if self.debug_output: 
-				print '--: ', result[i]
+				log.message('--: %s', result[i])
 			if result[i] < 0.0 or result[i]>1.0:
 				return None
 		if self.debug_output:
 			for i in range(self.numUVs):
-				print '++ ', diff[i], sol[i]
+				log.message('++ %s %s', diff[i], sol[i])
 
 		return result
 		
 	def dump_solution(self, sol, dist, step):
-		print 'solution:'
+		log.debug('solution:')
 		for i in range(self.numUVs):
-			print self.uvs_by_index[i], sol[i]
-		print 'dist: ', dist
-		print 'step: ', step
+                    log.debug('%s %s', self.uvs_by_index[i], sol[i])
+		log.debug('dist: %s', dist)
+		log.debug('step: %s', step)
 		
 	def improve(self, best, step):
 		found = 0
@@ -164,10 +164,10 @@ class UVFinder:
 
 	def solve(self, targets):
 		if self.debug_output:
-			print '----'
+			log.debug('----')
 			for(k,v) in targets.iteritems():
-				if v > 0.0:
-					print 'searching: ', k, v
+                            if v > 0.0:
+                                log.debug('searching: %s %s', k, v)
 		self.targets = targets
 		start = 1.0 / self.numUVs
 		best = [ start for i in range(self.numUVs) ]
@@ -180,11 +180,11 @@ class UVFinder:
 		solution = []
 
 		if self.debug_output:
-			print '----'
+			log.debug('----')
 			for i in range(self.numUVs):
-				if(best[i] > 0.0):
-					print 'UVSolution: ', self.uvs_by_index[i], best[i]
-			print '----'
+                            if(best[i] > 0.0):
+                                log.debug('UVSolution: ', self.uvs_by_index[i], best[i])
+			log.debug('----')
 
 
 		for i in range(self.numUVs):

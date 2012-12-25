@@ -72,7 +72,7 @@ the following examples illustrate the use of the load search and save functions:
 __docformat__ = 'restructuredtext'
 
 import time
-
+import log
 
 def joinRecords(record1, record2):
     """
@@ -96,7 +96,7 @@ def joinRecords(record1, record2):
     joinedRecord = fields1.union(fields2)
     joinedRecord = list(joinedRecord)
     joinedRecord.insert(0, recordID)
-    print 'joining', joinedRecord
+    log.message('joining %s', joinedRecord)
     return ' '.join(joinedRecord)
 
 
@@ -123,7 +123,7 @@ def loadRecord(archivePath, recordID):
     for line in f:
         if line.find(recordID) != -1:
             record = line.split()
-            print 'Found %s fields in %s sec' % (len(record), time.time() - time1)
+            log.message('Found %s fields in %s sec', len(record), time.time() - time1)
             break
     f.close()
     return record
@@ -152,7 +152,7 @@ def searchRecord(archivePath, field):
         if line.find(field) != -1:
             recordIDs.append(line.split()[0])
     f.close()
-    print 'Found %s records in %s sec' % (len(recordIDs), time.time() - time1)
+    log.message('Found %s records in %s sec', len(recordIDs), time.time() - time1)
     return recordIDs
 
 
@@ -190,7 +190,7 @@ def saveRecord(archivePath, recordToSave):
             records.append(line.strip())
         f.close()
     except:
-        print 'A new %s archive will be created' % archivePath
+        log.message('A new %s archive will be created', archivePath)
 
     if not isExistent:
         records.append(recordToSave)
@@ -199,6 +199,6 @@ def saveRecord(archivePath, recordToSave):
     for record in records:
         f.write('%s\n' % record)
     f.close()
-    print 'Record %s saved in %s sec' % (recordID, time.time() - time1)
+    log.message('Record %s saved in %s sec', recordID, time.time() - time1)
 
 

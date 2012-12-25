@@ -27,6 +27,7 @@ import time
 import numpy as np
 
 from module3d import Object3D
+import log
 
 class SubdivisionObject(Object3D):
     def __init__(self, object):
@@ -53,7 +54,7 @@ class SubdivisionObject(Object3D):
         def progress(x):
             last = now[0]
             now[0] = time.time()
-            print '%d: %f' % (x, now[0] - last)
+            log.debug('%d: %f', x, now[0] - last)
             if progressCallback:
                 progressCallback(float(x)/total)
 

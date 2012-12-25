@@ -5,6 +5,8 @@
 import os
 import sys
 
+import log
+
 def which(program):
     """
     Checks whether a program exists, similar to http://en.wikipedia.org/wiki/Which_(Unix)
@@ -16,7 +18,7 @@ def which(program):
     if sys.platform == "win32" and not program.endswith(".exe"):
         program += ".exe"
         
-    print "looking for", program
+    log.message("looking for %s", program)
         
     def is_exe(fpath):
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
@@ -28,7 +30,7 @@ def which(program):
     else:
         for path in os.environ["PATH"].split(os.pathsep):
             exe_file = os.path.join(path, program)
-            print exe_file
+            log.message("%s", exe_file)
             if is_exe(exe_file):
                 return exe_file
 

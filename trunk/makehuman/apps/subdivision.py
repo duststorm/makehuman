@@ -44,7 +44,7 @@ __docformat__ = 'restructuredtext'
 
 import time
 import module3d
-
+import log
 
 def newSubVert1(v, object):
     """
@@ -250,7 +250,7 @@ def subdivide(ob, scene):
     t = time.time()
     subdividedObj = scene.getObject(ob.name + '.sub')
     if subdividedObj:
-        print 'Sub data present'
+        log.message('Sub data present')
         for v in subdividedObj.verts:
             if v.sub_type == 1:
                 calcSubCoord1(v)
@@ -261,9 +261,9 @@ def subdivide(ob, scene):
             v.update()
     else:
 
-        print 'Calculating sub data'
+        log.message('Calculating sub data')
         calcSubData(ob, scene)
-    print 'time for subdivision: %s' % (time.time() - t)
+    log.message('time for subdivision: %s', time.time() - t)
 
 
 def addEdgeVert(v0, v1, v2, face, edges, object):
@@ -373,7 +373,7 @@ def calcSubData(ob, scene):
 
         # subdividedObj.colors.append([v.color[0],v.color[1], v.color[2], v.color[3]])
 
-    print 'time to create new obj and map verts: ', time.time() - t3
+    log.message('time to create new obj and map verts: ', time.time() - t3)
 
     t4 = time.time()
     edgeVerts = {}
@@ -396,7 +396,7 @@ def calcSubData(ob, scene):
 
             # subdividedObj.colors.append([ev.color[0],ev.color[1], ev.color[2], ev.color[3]])
 
-    print 'time to add edge verts: ', time.time() - t4
+    log.message('time to add edge verts: ', time.time() - t4)
 
     fg = subdividedObj.createFaceGroup('subobj')
     for f in ob.faces:
@@ -437,6 +437,6 @@ def calcSubData(ob, scene):
     subdividedObj.texture = ob.texture
 
     scene.update()
-    print 'Time to calc and send subdata: ', time.time() - t1
+    log.message('Time to calc and send subdata: ', time.time() - t1)
 
 

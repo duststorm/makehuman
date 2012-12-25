@@ -5,6 +5,7 @@ import numpy as np
 
 import mh
 from compat import VertProxy, FaceProxy, VertsProxy, FacesProxy
+import log
 
 class Texture(mh.Texture):
 
@@ -26,13 +27,13 @@ def getTexture(path, cache=None):
         texture = cache[path]
         
         if os.stat(path).st_mtime != texture.modified:
-            print ('reloading ', path)	# TL: unicode problems unbracketed
+            log.message('reloading %s', path)	# TL: unicode problems unbracketed
 
             try:
                 img = mh.Image(path=path)
                 texture.loadImage(img)
             except RuntimeError, text:
-                print text
+                log.error("%s", text, exc_info=True)
                 return
             else:
                 texture.modified = os.stat(path).st_mtime
@@ -42,7 +43,7 @@ def getTexture(path, cache=None):
             texture = Texture(img)
             #texture.loadSubImage('data/themes/default/images/slider_focused.png', 0, 0)
         except RuntimeError, text:
-            print text
+            log.error("%s", text, exc_info=True)
         else:
             texture.modified = os.stat(path).st_mtime
             cache[path] = texture
@@ -50,12 +51,12 @@ def getTexture(path, cache=None):
     return texture
     
 def reloadTextures():
-    print 'Reloading textures'
+    log.message('Reloading textures')
     for path in textureCache:
         try:
             textureCache[path].loadImage(path)
         except RuntimeError, text:
-            print text
+            log.error("%s", text, exc_info=True)
 
 class FaceGroup(object):
     """

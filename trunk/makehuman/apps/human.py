@@ -346,9 +346,6 @@ class Human(gui3d.Object):
 
     def getDetail(self, name):
         return self.targetsDetailStack.get(name, 0.0)
-        if value:
-            print "getdetail", name, os.path.basename(value)
-        return value
 
     def setHairFile(self, filename):
         self.hairFile = filename
@@ -509,7 +506,7 @@ class Human(gui3d.Object):
 
 
     def storeMesh(self):
-        print "Storing mesh status"
+        log.message("Storing mesh status")
         self.meshStored = self.meshData.coord.copy()
         self.meshStoredNormals = self.meshData.vnorm.copy()
 
@@ -562,10 +559,10 @@ class Human(gui3d.Object):
 
             if len(lineData) > 0 and not lineData[0] == '#':
                 if lineData[0] == 'version':
-                    print 'Version ' + lineData[1]
+                    log.message('Version %s', lineData[1])
                 elif lineData[0] == 'tags':
                     for tag in lineData:
-                        print 'Tag ' + tag
+                        log.message('Tag %s', tag)
                 elif lineData[0] == 'gender':
                     self.setGender(float(lineData[1]))
                 elif lineData[0] == 'age':
@@ -587,7 +584,7 @@ class Human(gui3d.Object):
                 elif lineData[0] in gui3d.app.loadHandlers:
                     gui3d.app.loadHandlers[lineData[0]](self, lineData)
                 else:
-                    print('Could not load %s' % lineData)
+                    log.message('Could not load %s', lineData)
 
         f.close()
 

@@ -22,6 +22,8 @@ import os
 import mh
 import shutil
 
+import log
+
 #
 #    safePrint( string, filename ):
 #    Utility for evading encoding errors
@@ -65,10 +67,10 @@ def proxyFilePtr(name):
         filename = os.path.realpath( os.path.join(path, name) )
         try:
             fp = open(filename, "r")
-            print("    Using config file", filename )
+            log.message("    Using config file %s", filename)
             return fp
         except:
-            print("*** Cannot open",  filename )
+            log.error("Cannot open %s", filename, exc_info=True)
     return None
     
 #
@@ -163,7 +165,7 @@ def getExistingProxyFile(words, category):
     if len(words) <= 2:
         if not os.path.exists(os.path.realpath(path)):
             return None
-        print ("Found", path)
+        log.message("Found %s", path)
         return path
     else:
         file = os.path.basename(path)
@@ -176,7 +178,7 @@ def getExistingProxyFile(words, category):
         for path in paths:        
             uuid1 = scanFileForUuid(path)
             if uuid1 == uuid:
-                print("Found", path, uuid)
+                log.message("Found %s %s", path, uuid)
                 return path
         return None                
 
@@ -222,7 +224,7 @@ def exportConfig(human, useHair, options=None):
     useDae = True
 
     if options:
-        print(options)
+        log.message("%s", options)
         cfg.mhxversion = options['mhxversion']
         cfg.hidden = options['hidden']
         #cfg.expressions = options['expressions']
@@ -387,12 +389,12 @@ def getSubFolder(path, name):
     folder = os.path.join(path, name)
     #print "Using folder", folder
     if not os.path.exists(folder):
-        print "Creating folder"
+        log.message("Creating folder %s", folder)
         #print folder
         try:
             os.mkdir(folder)
         except:
-            print "Unable to create separate folder:",
+            log.error("Unable to create separate folder:", exc_info=True)
             #print folder
             return None
     return folder        
@@ -424,9 +426,9 @@ def getOutFileName(filePath, fromDir, isTexture, human, config):
         if not done:
             if 0 and human:
                 texture = module3d.getTexture(human.getTexture())
-                print(dir(texture))
+                log.debug("%s", dir(texture))
                 img = mh.Image(human.getTexture())
-                print(dir(img))
+                log.debug("%s", dir(img))
                 img.save(toPath)
                 halt
             try:

@@ -30,6 +30,7 @@ Categories:
 from math import sqrt, cos, sin, tan, atan2, fabs, acos, pi, exp
 from random import random
 import numpy as np
+import log
 
 machine_epsilon = 1.0e-16
 degree2rad = pi/180.0
@@ -960,7 +961,7 @@ def centroid(vertsList):
 
     nVerts = len(vertsList)
     if nVerts == 0:
-        print 'Warning: no verts to calc centroid'
+        log.warning('no verts to calc centroid')
         return 0
 
     return np.sum(vertsList, axis = 0) / nVerts
@@ -1282,7 +1283,7 @@ def jacobianEllipticFunction(u,m):
 
     """
     if (m< 0) or (m >1):
-        print "Coefficient for Elliptic Integral should be between 1 and 0"
+        log.warning("Coefficient for Elliptic Integral should be between 1 and 0")
         return  #error-code!
     a=[0]*9
     c=[0]*9
@@ -1316,7 +1317,7 @@ def jacobianEllipticFunction(u,m):
 
     while fabs(c[i]/a[i])>machine_epsilon:
         if i>7:
-            print "Overflow in the calculation of Jacobian elliptic functions"
+            log.warning("Overflow in the calculation of Jacobian elliptic functions")
             break
         ai = a[i]
         i=i+1

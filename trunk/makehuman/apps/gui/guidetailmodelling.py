@@ -31,6 +31,7 @@ import re
 import os
 import mh
 import qtgui as gui
+import log
 
 class RangeDetailModifier(humanmodifier.GenderAgeRangeModifier):
     
@@ -237,7 +238,7 @@ class DetailTool(events3d.EventHandler):
 
         self.modifier = None
         if not (leftTarget and rightTarget):
-            print 'No targets available'
+            log.notice('No targets available')
             return
 
         self.modifier = humanmodifier.Modifier(leftTarget, rightTarget)
@@ -273,7 +274,7 @@ class DetailTool(events3d.EventHandler):
 
     def onMouseDragged(self, event):
         if not self.modifier:
-            print 'No modifier available'
+            log.notice('No modifier available')
             
         human = gui3d.app.selectedHuman
 
@@ -472,7 +473,7 @@ class Detail3dTool(events3d.EventHandler):
         groups = []
 
         if self.micro:
-            print(event.group)
+            log.debug("%s", event.group)
             groups.append(event.group)
             if human.symmetryModeEnabled:
                 sg = human.getSymmetryGroup(event.group)

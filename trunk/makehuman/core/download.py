@@ -2,6 +2,7 @@ import os
 import urllib2
 import mh
 from threading import Thread
+import log
 
 class MediaSync(Thread):
     
@@ -74,7 +75,7 @@ class DownloadCache():
         try:
             downloaded, etag, modified, data = self.__downloadConditionally(url, etag, modified)
         except urllib2.HTTPError, e:
-            print('Could not download %s: %s' % (url, e))
+            log.notice('Could not download %s: %s', url, e)
             return False, e.code
                 
         if downloaded:

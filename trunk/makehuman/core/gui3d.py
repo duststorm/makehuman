@@ -22,6 +22,7 @@ import files3d
 import weakref
 from catmull_clark_subdivision import createSubdivisionObject, updateSubdivisionObject
 from geometry3d import NineSliceMesh, RectangleMesh, FrameMesh
+import log
 
 # Wrapper around Object3D
 class Object(events3d.EventHandler):
@@ -661,14 +662,14 @@ class Application(events3d.EventHandler):
             return
 
         if self.currentTask:
-            print 'hiding task %s' % self.currentTask.name
+            log.debug('hiding task %s', self.currentTask.name)
             self.currentTask.hide()
             self.currentTask.hideWidgets()
 
         self.currentTask = self.currentCategory.tasksByName[name]
 
         if self.currentTask:
-            print 'showing task %s' % self.currentTask.name
+            log.debug('showing task %s', self.currentTask.name)
             self.currentTask.show()
             self.currentTask.showWidgets()
 
@@ -692,13 +693,13 @@ class Application(events3d.EventHandler):
             return
 
         if self.currentCategory:
-            print 'hiding category %s' % self.currentCategory.name
+            log.debug('hiding category %s', self.currentCategory.name)
             self.currentCategory.hide()
             self.currentCategory.hideWidgets()
 
         self.currentCategory = category
 
-        print 'showing category %s' % self.currentCategory.name
+        log.debug('showing category %s', self.currentCategory.name)
         self.currentCategory.show()
         self.currentCategory.showWidgets()
 
