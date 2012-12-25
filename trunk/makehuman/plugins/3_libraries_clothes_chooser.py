@@ -86,7 +86,7 @@ class ClothesTaskView(gui3d.TaskView):
             folder = os.path.dirname(mhclo)
             for piece in proxy.clothings:
                 piecedir = os.path.join(folder, piece)
-                print "Find", piecedir
+                log.message("Find %s", piecedir)
                 if os.path.exists(piecedir):
                     piecefile = os.path.join(piecedir, piece + ".mhclo")
                 else:
