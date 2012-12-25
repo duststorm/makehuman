@@ -434,7 +434,6 @@ class MHApplication(gui3d.Application, mh.Application):
 
         sys.stdout = old_stdout
         self.splash.finish(self.mainwin)
-        self.removeLogTarget(self.splash_logger)
 
     def nextStartupTask(self):
         if not next(self.tasks, True):
@@ -1062,7 +1061,6 @@ class MHApplication(gui3d.Application, mh.Application):
 
         self.splash = gui.SplashScreen(gui3d.app.getThemeResource('images', 'splash.png'))
         self.splash.show()
-        self.splash_logger = self.addLogTarget(self.splash.write)
 
         # Display the initial splash screen and the progress bar during startup
         # mesh = gui3d.RectangleMesh(800, 600, gui3d.app.getThemeResource('images', 'splash.png'))

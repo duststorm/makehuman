@@ -87,6 +87,9 @@ syspath = syspath + recursiveDirNames("./core")
 syspath.extend(sys.path)
 sys.path = syspath
 
+import log
+log.init()
+
 from mhmain import MHApplication
 
 application = MHApplication()

@@ -4,6 +4,7 @@ import math
 import atexit
 import numpy as np
 
+print sys.path
 import OpenGL
 OpenGL.ERROR_CHECKING = False
 OpenGL.ERROR_ON_COPY = True

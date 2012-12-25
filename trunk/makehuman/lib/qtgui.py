@@ -687,7 +687,12 @@ class SplashScreen(QtGui.QSplashScreen):
         self._text += text
         while '\n' in self._text:
             line, self._text = self._text.split('\n', 1)
-            line = line.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
-            line = self._format % line
-            self.showMessage(line, alignment = QtCore.Qt.AlignHCenter)
-            G.app.processEvents()
+            self.logMessage(line)
+
+    def escape(self, text):
+        return text.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
+
+    def logMessage(self, text):
+        text = self._format % self.escape(text)
+        self.showMessage(text, alignment = QtCore.Qt.AlignHCenter)
+        G.app.processEvents()

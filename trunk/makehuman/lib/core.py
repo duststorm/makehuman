@@ -1,5 +1,3 @@
-import traceback
-import profiler
 
 class Globals(object):
     def __init__(self):

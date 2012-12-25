@@ -520,15 +520,13 @@ class Frame(QtGui.QWidget):
 class Application(QtGui.QApplication, events3d.EventHandler):
     def __init__(self):
         super(Application, self).__init__(sys.argv)
+        self.splash = None
+        self.log_window = None
 
     def OnInit(self):
         self.mainwin = Frame(self, (G.windowWidth, G.windowHeight))
         self.mainwin.show()
         self.log_window = qtgui.DocumentEdit()
-
-        logging.getLogger().setLevel(logging.DEBUG)
-        self.addLogTarget(self.addLogMessage)
-        self.addLogTarget(sys.stdout.write)
         
     def started(self):
         self.callEvent('onStart', None)
@@ -552,23 +550,9 @@ class Application(QtGui.QApplication, events3d.EventHandler):
     def getWindowSize(self):
         return G.windowWidth, G.windowHeight
 
-    class LogHandler(logging.Handler):
-        def __init__(self, write, level=logging.NOTSET):
-            logging.Handler.__init__(self, level)
-            self._write = write
-
-        def emit(self, record):
-            self._write(self.format(record) + '\n')
-
-    def addLogTarget(self, target, level=logging.DEBUG):
-        handler = type(self).LogHandler(target, level)
-        logging.getLogger().addHandler(handler)
-        return handler
-
-    def removeLogTarget(self, handler):
-        logging.getLogger().removeHandler(handler)
-
     def addLogMessage(self, text):
+        if self.log_window is None:
+            return
         self.log_window.addText(text)
 
 g_timers = {}
