@@ -1,7 +1,7 @@
 # author Thomas Larsson
 # license GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 # homepage http://www.makehuman.org/
-# uuid 9c49545a-22da-46b3-9efc-f62f0866e436
+# uuid ee202a9e-5892-4708-8008-96d983e73349
 # basemesh alpha_7
 
 # name Eve_Bra
@@ -9,7 +9,9 @@
 # x_scale 3464 10305 2.5128
 # z_scale 6930 7245 1.6554
 # y_scale 14022 14040 4.5292
-# z_depth 20
+# z_depth 30
+# subsurf 0 1
+# solidify 0.030 -1.000
 # shapekey Breathe
 # uvtex_layer 0 base
 # objfile_layer 0

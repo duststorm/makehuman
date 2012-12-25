@@ -1,7 +1,7 @@
 # author Thomas Larsson
 # license GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 # homepage http://www.makehuman.org/
-# uuid fcc40223-4a85-47a2-a587-ee97ff1bfb6d
+# uuid a8f8a409-3131-41a0-b8a8-b42cfe38661b
 # basemesh alpha_7
 
 # name Eve_T_Shirt
@@ -9,7 +9,9 @@
 # x_scale 3464 10305 2.5128
 # z_scale 6930 7245 1.6554
 # y_scale 14022 14040 4.5292
-# z_depth 20
+# z_depth 30
+# subsurf 0 1
+# solidify 0.020 -1.000
 # shapekey Breathe
 # uvtex_layer 0 base
 # objfile_layer 0
