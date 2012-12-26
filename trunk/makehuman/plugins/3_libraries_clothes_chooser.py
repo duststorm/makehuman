@@ -40,8 +40,6 @@ KnownTags = [
     "underweartop",
 ]
 
-theActiveClothing = None 
-
 #
 #   Clothes
 #
@@ -49,7 +47,7 @@ theActiveClothing = None
 class ClothesTaskView(gui3d.TaskView):
     
     def __init__(self, category):
-        
+
         self.systemClothes = os.path.join('data', 'clothes')
         self.userClothes = os.path.join(mh.getPath(''), 'data', 'clothes')
 
@@ -65,27 +63,21 @@ class ClothesTaskView(gui3d.TaskView):
 
         @self.filechooser.mhEvent
         def onFileSelected(filename):
-            global theActiveClothing
-            
             self.setClothes(gui3d.app.selectedHuman, filename)
-            print "Active clo", theActiveClothing
-            if 0 and theActiveClothing:
-                mh.changeTask('Library', 'Clothes Textures')
-            else:
-                mh.changeCategory('Modelling')
+            mh.changeCategory('Modelling')
 
         @self.update.mhEvent
         def onClicked(event):
             self.syncMedia()
+
         
     def setClothes(self, human, filepath):
-        global theActiveClothing
-    
         if os.path.basename(filepath) == "clear.mhclo":
             for name,clo in human.clothesObjs.items():
                 gui3d.app.removeObject(clo)
                 del human.clothesObjs[name]
             self.clothesList = []
+            human.activeClothing = None
             return
 
         proxy = mh2proxy.readProxyFile(human.meshData, filepath, False)
@@ -119,6 +111,8 @@ class ClothesTaskView(gui3d.TaskView):
             gui3d.app.removeObject(clo)
             del human.clothesObjs[uuid]
             self.clothesList.remove(uuid)
+            if human.activeClothing == uuid:
+                human.activeClothing = None
             log.message("Removed clothing %s %s", proxy.name, uuid)
             return
 
@@ -133,7 +127,6 @@ class ClothesTaskView(gui3d.TaskView):
             pass
         
         clo = gui3d.app.addObject(gui3d.Object(human.getPosition(), mesh))
-        theActiveClothing = (clo, filepath)
         clo.setRotation(human.getRotation())
         clo.mesh.setCameraProjection(0)
         clo.mesh.setSolid(human.mesh.solid)
@@ -141,6 +134,7 @@ class ClothesTaskView(gui3d.TaskView):
         clo.mesh.originalClothesVerts = [v.co[:] for v in clo.mesh.verts]
         human.clothesObjs[uuid] = clo        
         human.clothesProxies[uuid] = proxy
+        human.activeClothing = uuid
         self.clothesList.append(uuid)
         
         for tag in proxy.tags:
@@ -163,6 +157,8 @@ class ClothesTaskView(gui3d.TaskView):
                         gui3d.app.removeObject(oldClo)
                         del human.clothesObjs[oldUuid]
                         self.clothesList.remove(oldUuid)
+                        if human.activeClothing == oldUuid:
+                            human.activeClothing = None
                     else:
                         log.message("Kept clothing %s", oldUuid)
                         newUuids.append(oldUuid)
@@ -173,6 +169,7 @@ class ClothesTaskView(gui3d.TaskView):
         clo.setSubdivided(human.isSubdivided())
         
         #self.clothesButton.setTexture(obj.replace('.obj', '.png'))
+
     
     def adaptClothesToHuman(self, human):
 
@@ -208,6 +205,7 @@ class ClothesTaskView(gui3d.TaskView):
                 del human.clothesObjs[uuid]
                 del human.clothesProxies[uuid]
             self.clothesList = []
+            human.activeClothing = None
             # self.clothesButton.setTexture('data/clothes/clear.png')
 
     def onHumanChanged(self, event):
@@ -244,97 +242,6 @@ class ClothesTaskView(gui3d.TaskView):
         
         self.mediaSync = None
 
-#
-#   Clothes Textures
-#
-
-class ClothesTexturesTaskView(gui3d.TaskView):
-    
-    def __init__(self, category):
-        
-        self.systemTextures = os.path.join('data', 'clothes', 'textures')
-        self.userTextures = os.path.join(mh.getPath(''), 'data', 'clothes', 'textures')
-        self.defaultTextures = [self.systemTextures, self.userTextures]  
-        self.textures = self.defaultTextures
-
-        gui3d.TaskView.__init__(self, category, 'Clothes Textures')
-        if not os.path.exists(self.userTextures):
-            os.makedirs(self.userTextures)
-
-        self.filewidget = mh.addWidget(mh.Frame.Top, fc.FileChooser(self.defaultTextures, 'png', 'png'))
-        self.filechooser = self.addWidget(self.filewidget)
-        self.update = self.filechooser.sortBox.addWidget(gui.Button('Check for updates'))
-        self.mediaSync = None 
-        self.activeClothing = None
-
-        @self.filechooser.mhEvent
-        def onFileSelected(filename):
-            global theActiveClothing
-            if theActiveClothing:
-                (clo, filepath) = theActiveClothing
-                clo.mesh.setTexture(filename)
-            mh.changeCategory('Modelling')
-
-        @self.update.mhEvent
-        def onClicked(event):
-            self.syncMedia()
-
-    def onShow(self, event):
-        global theActiveClothing
-
-        print "onShow", theActiveClothing
-        if not theActiveClothing:
-            self.onHide(event)
-            return
-            
-        gui3d.app.selectedHuman.hide()
-        gui3d.TaskView.onShow(self, event)
-
-        if theActiveClothing != self.activeClothing:
-            self.activeClothing = theActiveClothing
-            (clo, filepath) = theActiveClothing
-            print "onShow", theActiveClothing
-            fc = self.filechooser
-            print "  fc", fc, fc.children.count(), fc.files
-            self.textures = [os.path.dirname(filepath)] + self.defaultTextures            
-            print "  added"
-
-        self.filechooser.setFocus()
-        
-        #if not os.path.isdir(self.userClothes) or not len([filename for filename in os.listdir(self.userClothes) if filename.lower().endswith('mhclo')]):    
-        #    gui3d.app.prompt('No user clothes found', 'You don\'t seem to have any user clothes, download them from the makehuman media repository?\nNote: this can take some time depending on your connection speed.', 'Yes', 'No', self.syncMedia)
-
-    def onHide(self, event):
-        gui3d.app.selectedHuman.show()
-        gui3d.TaskView.onHide(self, event)
-        
-    def onHumanChanging(self, event):        
-        human = event.human
-        if event.change == 'reset':
-            log.message("deleting textures")
-            # self.clothesButton.setTexture('data/clothes/clear.png')
-
-    def onHumanChanged(self, event):
-        pass        
-
-    def loadHandler(self, human, values):
-        pass
-        
-    def saveHandler(self, human, file):
-        pass
-        
-    def syncMedia(self):
-        
-        if self.mediaSync:
-            return
-        if not os.path.isdir(self.userTextures):
-            os.makedirs(self.userTextures)
-        self.mediaSync = download.MediaSync(gui3d.app, self.userTextures, 'http://download.tuxfamily.org/makehuman/clothes/textures/', self.syncMediaFinished)
-        self.mediaSync.start()
-        
-    def syncMediaFinished(self):
-        
-        self.mediaSync = None
 
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
@@ -345,11 +252,6 @@ def load(app):
     taskview = category.addTask(ClothesTaskView(category))
 
     app.addLoadHandler('clothes', taskview.loadHandler)
-    app.addSaveHandler(taskview.saveHandler)
-
-    taskview = category.addTask(ClothesTexturesTaskView(category))
-
-    app.addLoadHandler('clothes_textures', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)
 
 # This method is called when the plugin is unloaded from makehuman
