@@ -60,6 +60,7 @@ class Human(gui3d.Object):
         self.hairProxy = None
         self.clothesObjs = {}
         self.clothesProxies = {}
+        self.activeClothing = None
         self.targetsDetailStack = {}  # All details targets applied, with their values
         self.symmetryModeEnabled = False
 
