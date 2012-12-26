@@ -95,8 +95,15 @@ class MakeTargetPanel(bpy.types.Panel):
         if utils.isBaseOrTarget(ob):
             layout.operator("mh.import_base_mhclo", text="Reimport Base Mhclo").delete = True
             layout.operator("mh.import_base_obj", text="Reimport Base Obj").delete = True
-            layout.operator("mh.delete_clothes")
-            layout.operator("mh.tights_only")
+            #layout.operator("mh.delete_clothes")
+            #layout.operator("mh.tights_only")
+            if ob.MhIrrelevantDeleted:
+                layout.label("Only %s Affected" % ob.MhAffectOnly)
+            else:
+                layout.label("Affect Only:")
+                layout.prop(ob, "MhAffectOnly", expand=True)
+                layout.operator("mh.delete_irrelevant")  
+
             layout.separator()
         else:
             layout.operator("mh.import_base_mhclo", text="Import Base Mhclo").delete = False

@@ -2156,7 +2156,7 @@ def deleteHelpers(context):
     bpy.ops.object.mode_set(mode='OBJECT')
     print("Vertices deleted")
     return                
-            
+       
 #
 #    removeVertexGroups(context, removeType):
 #

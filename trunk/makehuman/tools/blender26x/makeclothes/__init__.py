@@ -119,7 +119,8 @@ class MakeClothesPanel(bpy.types.Panel):
         layout.operator("mhclo.auto_vertex_groups")        
         layout.separator()
         layout.prop(scn, "MCKeepVertsUntil", expand=True)
-        layout.operator("mhclo.delete_helpers")        
+        layout.operator("mhclo.delete_helpers")  
+        
         
         layout.separator()
         layout.label("Materials")

@@ -123,6 +123,42 @@ def deleteBetween(ob, first, last):
         bpy.ops.object.mode_set(mode='OBJECT')
 
 
+IrrelevantVerts = {
+    'Body' : (the.FirstSkirtVert, the.NTotalVerts),
+    'Skirt' : (the.NTotalVerts, the.NTotalVerts),
+    'Tights' : (the.FirstSkirtVert, the.FirstTightsVert),
+}
+
+AffectedVerts = {
+    'Body' : (0, the.FirstSkirtVert),
+    'Skirt' : (the.FirstSkirtVert, the.FirstTightsVert),
+    'Tights' : (the.FirstTightsVert, the.NTotalVerts),
+}
+
+OffsetVerts = {
+    'Body' : 0,
+    'Skirt' : 0,
+    'Tights' : the.FirstTightsVert-the.FirstSkirtVert,
+}
+
+class VIEW3D_OT_DeleteIrrelevantButton(bpy.types.Operator):
+    bl_idname = "mh.delete_irrelevant"
+    bl_label = "Delete Irrelevant Verts"
+    bl_options = {'UNDO'}
+
+    def execute(self, context):
+        ob = context.object
+        if ob.MhIrrelevantDeleted:
+            return
+        if ob.MhAffectOnly != 'All':
+            first,last = IrrelevantVerts[ob.MhAffectOnly]
+            deleteBetween(ob, first, last)
+            if ob.MhAffectOnly in ['Tights']:
+                ob.MhNoLoad = True
+            ob.MhIrrelevantDeleted = True
+        return{'FINISHED'}    
+
+"""
 class VIEW3D_OT_DeleteHelpersButton(bpy.types.Operator):
     bl_idname = "mh.delete_clothes"
     bl_label = "Delete Clothes Helpers"
@@ -144,7 +180,7 @@ class VIEW3D_OT_TightsOnlyButton(bpy.types.Operator):
         ob.MhTightsOnly = True
         deleteBetween(ob, the.FirstSkirtVert, the.FirstTightsVert)
         return{'FINISHED'}     
- 
+""" 
  
 class VIEW3D_OT_LoadTargetButton(bpy.types.Operator):
     bl_idname = "mh.load_target"
@@ -157,6 +193,10 @@ class VIEW3D_OT_LoadTargetButton(bpy.types.Operator):
         name="File Path", 
         description="File path used for target file", 
         maxlen= 1024, default= "")
+
+    @classmethod
+    def poll(self, context):
+        return (context.object and not context.object.MhNoLoad)
 
     def execute(self, context):
         utils.loadTarget(self.properties.filepath, context)
@@ -212,6 +252,10 @@ class VIEW3D_OT_LoadTargetFromMeshButton(bpy.types.Operator):
     bl_label = "Load Target From Mesh"
     bl_options = {'UNDO'}
 
+    @classmethod
+    def poll(self, context):
+        return (context.object and not context.object.MhNoLoad)
+
     def execute(self, context):
         loadTargetFromMesh(context)
         return {'FINISHED'}
@@ -241,6 +285,10 @@ class VIEW3D_OT_NewTargetButton(bpy.types.Operator):
     bl_label = "New Target"
     bl_options = {'UNDO'}
 
+    @classmethod
+    def poll(self, context):
+        return (context.object and not context.object.MhNoLoad)
+
     def execute(self, context):
         newTarget(context)
         return {'FINISHED'}
@@ -266,12 +314,16 @@ def doSaveTarget(context, filepath):
     (fname,ext) = os.path.splitext(filepath)
     filepath = fname + ".target"
     print("Saving target %s to %s" % (ob, filepath))
-    if ob.MhTightsOnly:
-        lines = readLines(filepath, the.FirstTightsVert)
+    if ob.MhAffectOnly != 'All':
+        first,last = AffectedVerts[ob.MhAffectOnly]
+        before,after = readLines(filepath, first,last)
         fp = open(filepath, "w")  
-        for line in lines:
+        for line in before:
             fp.write(line)
-        saveVerts(fp, ob, verts, saveAll, the.FirstTightsVert, the.NTotalVerts, the.FirstTightsVert-the.FirstSkirtVert)
+        offset = OffsetVerts[ob.MhAffectOnly]
+        saveVerts(fp, ob, verts, saveAll, first, last, offset)
+        for (vn, string) in after:
+            fp.write("%d %s" % (vn, string))
     else:
         fp = open(filepath, "w")  
         saveVerts(fp, ob, verts, saveAll, 0, the.NTotalVerts, 0)
@@ -279,19 +331,20 @@ def doSaveTarget(context, filepath):
     ob["FilePath"] = filepath
 
 
-def readLines(filepath, skip):
+def readLines(filepath, first, last):
     fp = open(filepath, "rU")
-    lines = []
+    before = []
+    after = []
     for line in fp:
-        words = line.split()
+        words = line.split(None, 1)
         if len(words) >= 2:
             vn = int(words[0])
-            if vn >= skip:
-                return lines
-            else:
-                lines.append(line)
+            if vn < first:
+                before.append(line)
+            elif vn >= last:
+                after.append((vn, words[1]))
     fp.close()
-    return lines
+    return before,after
     
     
 def saveVerts(fp, ob, verts, saveAll, first, last, offs):
@@ -1138,8 +1191,18 @@ def init():
     bpy.types.Scene.MhTargetRig = StringProperty(default = "soft1")
     bpy.types.Scene.MhPoseTargetDir = StringProperty(default = "dance1-soft1")
     
-    bpy.types.Object.MhTightsOnly = BoolProperty(default = False)
-    bpy.types.Object.MhSkirtOnly = BoolProperty(default = False)
+    #bpy.types.Object.MhTightsOnly = BoolProperty(default = False)
+    #bpy.types.Object.MhSkirtOnly = BoolProperty(default = False)
+                 
+    bpy.types.Object.MhAffectOnly = EnumProperty(
+        items = [('Body','Body','Body'),
+                 ('Skirt','Skirt','Skirt'),
+                 ('Tights','Tights','Tights'),
+                 ('All','All','All')],
+    default='All')
+    
+    bpy.types.Object.MhIrrelevantDeleted = BoolProperty(name="Irrelevant deleted", default = False)
+    bpy.types.Object.MhNoLoad = BoolProperty(name="Cannot load", default = False)
 
     bpy.types.Object.SelectedOnly = BoolProperty(name="Selected verts only", default = True)
     bpy.types.Object.MhZeroOtherTargets = BoolProperty(name="Automatically zero other targets", default = True)

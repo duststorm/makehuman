@@ -113,7 +113,7 @@ class CCharacter:
         for char in ["/", "\\", "-", "_", "."]:
             string = string.replace(char, " ")
         words = string.split()
-        print(words)
+        #print(words)
 
         table = {
             "caucasian" : "race",
@@ -142,7 +142,7 @@ class CCharacter:
                     exec("self.%s = word" % table[word])
                 except KeyError:
                     continue
-                print("set", table[word], word)
+                #print("set", table[word], word)
         else:
             for word in words:
                 try:
@@ -153,7 +153,7 @@ class CCharacter:
                     prop = context.scene.MhNeutral
                 elif prop == "normal":
                     prop = ""
-                print("change", word, prop)
+                #print("change", word, prop)
                 filepath = filepath.replace(word, prop)
                 filepath = filepath.replace("--", "-").replace("-.", ".")
                 print(filepath)
@@ -176,11 +176,10 @@ class CCharacter:
         #self.setSceneProps(context)
         self.updateFiles(context.scene, include)        
         (filename, ext) = os.path.splitext(filepath)
-        print("include", include, filepath, filename)
-        print("  ", self.files)
+        #print("include", include, filepath, filename)
         if include and filename not in self.files:
             self.files.append( (folder, filename, 1.0) )
-        print("  ", self.files)
+        #print("  ", self.files)
         return filepath
     
     
