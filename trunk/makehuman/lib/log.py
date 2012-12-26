@@ -40,44 +40,9 @@ class ApplicationLogHandler(logging.Handler):
         if G.app is not None and G.app.log_window is not None:
             G.app.log_window.addText(self.format(record) + '\n')
 
-defaultConfig = {
-    'version': 1,
-    'handlers': {
-        'stdout': {
-            'class': 'logging.StreamHandler',
-            'level': logging.DEBUG,
-            'stream': sys.stdout
-            },
-        'splash': {
-            'class': 'log.SplashLogHandler',
-            'level': logging.DEBUG
-            },
-        'app': {
-            'class': 'log.ApplicationLogHandler',
-            'level': logging.DEBUG
-            }
-        },
-    'root': {
-        'level': logging.DEBUG,
-        'handlers': ['stdout', 'splash', 'app']
-        }
-    }
-
-try:
-    _filename = os.path.join(getPath(''), "makehuman.log")
-    with open(_filename, 'w') as f:
-        pass
-    defaultConfig['handlers']['file'] = {
-        'class': 'logging.FileHandler',
-        'level': logging.DEBUG,
-        'filename': _filename
-        }
-    defaultConfig['root']['handlers'].append('file')
-except:
-    pass
-
 def init():
-    logging.config.dictConfig(defaultConfig)
     filename = os.path.join(getPath(''), "logging.ini")
     if os.path.isfile(filename):
         logging.config.fileConfig(filename)
+    else:
+        logging.config.fileConfig(os.path.join('data','logging.ini'))
