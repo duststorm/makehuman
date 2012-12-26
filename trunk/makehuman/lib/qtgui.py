@@ -249,6 +249,8 @@ class Slider(QtGui.QWidget, Widget):
         return self.min + (x / 1000.0) * (self.max - self.min)
 
     def setValue(self, value):
+        if self._f2i(value) == self.slider.value():
+            return
         self.hold_events = True
         self.slider.setValue(self._f2i(value))
         self.hold_events = False
