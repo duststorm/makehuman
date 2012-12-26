@@ -234,7 +234,6 @@ class Slider(QtGui.QWidget, Widget):
         self.slider.setMaximum(1000)
         self.slider.setValue(self._f2i(value))
         self.slider.setTracking(False)
-        self.hold_events = False
         self.connect(self.slider, QtCore.SIGNAL('sliderMoved(int)'), self._changing)
         self.connect(self.slider, QtCore.SIGNAL('valueChanged(int)'), self._changed)
         self.slider.installEventFilter(self)
@@ -290,16 +289,12 @@ class Slider(QtGui.QWidget, Widget):
             w._update_image()
 
     def _changing(self, value):
-        if self.hold_events:
-            return
         value = self._i2f(value)
         if '%' in self.text:
             self.label.setText(self.text % value)
         self.callEvent('onChanging', value)
 
     def _changed(self, value):
-        if self.hold_events:
-            return
         value = self._i2f(value)
         if '%' in self.text:
             self.label.setText(self.text % value)
@@ -314,9 +309,9 @@ class Slider(QtGui.QWidget, Widget):
     def setValue(self, value):
         if self._f2i(value) == self.slider.value():
             return
-        self.hold_events = True
+        self.blockSignals(True)
         self.slider.setValue(self._f2i(value))
-        self.hold_events = False
+        self.blockSignals(False)
 
     def getValue(self):
         return self._i2f(self.slider.value())
@@ -761,3 +756,17 @@ class SplashScreen(QtGui.QSplashScreen):
         text = self._format % self.escape(text)
         self.showMessage(text, alignment = QtCore.Qt.AlignHCenter)
         G.app.processEvents()
+
+class StatusBar(QtGui.QStatusBar, Widget):
+    def __init__(self):
+        super(StatusBar, self).__init__()
+        Widget.__init__(self)
+        self._perm = QtGui.QLabel()
+        self.addWidget(self._perm, 1)
+        self.duration = 2000
+
+    def showMessage(self, text, permanent=False):
+        if permanent:
+            self._perm.setText(text)
+        else:
+            super(StatusBar, self).showMessage(text, self.duration)

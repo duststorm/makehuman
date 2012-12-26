@@ -522,6 +522,7 @@ class Application(QtGui.QApplication, events3d.EventHandler):
         super(Application, self).__init__(sys.argv)
         self.splash = None
         self.log_window = None
+        self.statusBar = None
 
     def OnInit(self):
         self.mainwin = Frame(self, (G.windowWidth, G.windowHeight))

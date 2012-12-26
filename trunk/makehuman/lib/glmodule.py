@@ -4,7 +4,6 @@ import math
 import atexit
 import numpy as np
 
-print sys.path
 import OpenGL
 OpenGL.ERROR_CHECKING = False
 OpenGL.ERROR_ON_COPY = True
@@ -15,6 +14,7 @@ from core import G
 from image import Image
 import matrix
 from debugdump import DebugDump
+import log
 
 g_primitiveMap = [GL_POINTS, GL_LINES, GL_TRIANGLES, GL_QUADS]
 

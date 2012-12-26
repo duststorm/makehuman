@@ -380,7 +380,7 @@ class MHApplication(gui3d.Application, mh.Application):
         self.switchCategory("Modelling")
 
         self.progressBar.setProgress(1.0)
-        self.progressBar.hide()
+        # self.progressBar.hide()
 
     def loadFinish(self):
 
@@ -656,17 +656,25 @@ class MHApplication(gui3d.Application, mh.Application):
     def setCaption(self, caption):
         mh.setCaption(caption.encode('utf8'))
 
+    # Global status bar
+    def status(self, text, permanent=False):
+        if self.statusBar is None:
+            return
+        self.statusBar.showMessage(text, permanent)
+
     # Global progress bar
     def progress(self, value, text=None):
         if text is not None:
-            self.statusbar.setText(text)
+            self.status(text)
+
+        if self.progressBar is None:
+            return
+
+        if value >= 1.0:
+            self.progressBar.reset()
         else:
-            self.statusbar.setText('')
-        if value <= 0:
-            self.progressBar.show()
-        elif value >= 1.0:
-            self.progressBar.hide()
-        self.progressBar.setProgress(value)
+            self.progressBar.setProgress(value)
+
         self.processEvents()
 
     # Global dialog
@@ -901,7 +909,7 @@ class MHApplication(gui3d.Application, mh.Application):
         self.redraw()
 
     def toggleSubdivision(self):
-        self.selectedHuman.setSubdivided(not self.selectedHuman.isSubdivided(), True, gui3d.app.progress)
+        self.selectedHuman.setSubdivided(not self.selectedHuman.isSubdivided(), True, self.progress)
         self.redraw()
 
     def saveTarget(self):
@@ -1065,10 +1073,9 @@ class MHApplication(gui3d.Application, mh.Application):
         # Display the initial splash screen and the progress bar during startup
         # mesh = gui3d.RectangleMesh(800, 600, gui3d.app.getThemeResource('images', 'splash.png'))
         # self.splash = self.addObject(gui3d.Object([0, 0, 9.8], mesh))
-        self.statusbar = mh.addWidget(mh.Frame.Bottom, gui.TextView())
-        self.statusbar.show()
+        self.statusBar = mh.addWidget(mh.Frame.Bottom, gui.StatusBar())
+        self.statusBar.show()
         self.progressBar = mh.addWidget(mh.Frame.Bottom, gui.ProgressBar())
-        # self.redrawNow()
 
         self.tabs = self.mainwin.tabs
 

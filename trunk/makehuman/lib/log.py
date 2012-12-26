@@ -10,6 +10,7 @@ from core import G
 from getpath import getPath
 
 NOTICE = 25
+MESSAGE = logging.INFO
 
 message = logging.info
 
@@ -28,12 +29,18 @@ except:
     def notice(format, *args, **kwargs):
         logging.log(NOTICE, format, *args, **kwargs)
 
-logging.addLevelName(NOTICE, "notice")
+logging.addLevelName(NOTICE, "NOTICE")
+logging.addLevelName(MESSAGE, "MESSAGE")
 
 class SplashLogHandler(logging.Handler):
     def emit(self, record):
         if G.app is not None and G.app.splash is not None:
             G.app.splash.logMessage(self.format(record).split('\n',1)[0] + '\n')
+
+class StatusLogHandler(logging.Handler):
+    def emit(self, record):
+        if G.app is not None and G.app.statusBar is not None:
+            G.app.statusBar.showMessage(self.format(record))
 
 class ApplicationLogHandler(logging.Handler):
     def emit(self, record):

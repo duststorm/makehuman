@@ -32,8 +32,6 @@ class MacroModelingTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Macro modelling', label='Macro')
 
-        self.status = self.addWidget(mh.addWidget(mh.Frame.Bottom, gui.TextView()))
-
         self.macroBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.SliderBox('Main')))
        
         # Macro sliders
@@ -138,14 +136,22 @@ class MacroModelingTaskView(gui3d.TaskView):
         else:
             units = 'in'
             height *= 0.393700787
-        self.status.setTextFormat('Gender: %s, Age: %d, Muscle: %.2f%%, Weight: %.2f%%, Height: %.2f %s', gender, age, muscle, weight, height, units)
+
+        self.setStatus('Gender: %s, Age: %d, Muscle: %.2f%%, Weight: %.2f%%, Height: %.2f %s', gender, age, muscle, weight, height, units)
+
+    def setStatus(self, format, *args):
+        gui3d.app.status(format % args, True)
 
     def onShow(self, event):
         self.genderSlider.setFocus()
         self.syncSliders()
         self.syncStatus()
-        gui3d.TaskView.onShow(self, event)
-        
+        super(MacroModelingTaskView, self).onShow(event)
+
+    def onHide(self, event):
+        self.setStatus('')
+        super(MacroModelingTaskView, self).onHide(event)
+
     def onHumanChanged(self, event):
             
         if self.isVisible():
