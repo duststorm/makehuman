@@ -41,8 +41,10 @@ class ApplicationLogHandler(logging.Handler):
             G.app.log_window.addText(self.format(record) + '\n')
 
 def init():
-    filename = os.path.join(getPath(''), "logging.ini")
+    userDir = getPath('')
+    defaults = dict(mhUserDir = userDir.replace('\\','/'))
+    filename = os.path.join(userDir, "logging.ini")
     if os.path.isfile(filename):
-        logging.config.fileConfig(filename)
+        logging.config.fileConfig(filename, defaults)
     else:
-        logging.config.fileConfig(os.path.join('data','logging.ini'))
+        logging.config.fileConfig(os.path.join('data','logging.ini'), defaults)
