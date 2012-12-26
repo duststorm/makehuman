@@ -12,7 +12,7 @@ import mh2mitsuba
 
 import gui3d
 import mh
-import qtgui as gui
+import gui
 
 class MitsubaTaskView(gui3d.TaskView):
 

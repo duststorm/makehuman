@@ -25,7 +25,7 @@ import files3d
 from aljabr import in2pts, vadd, vsub, calcBBox
 import mh2proxy
 import export_config
-import qtgui as gui
+import gui
 import filechooser as fc
 import log
 

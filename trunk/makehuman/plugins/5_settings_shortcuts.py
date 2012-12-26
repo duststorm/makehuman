@@ -4,7 +4,7 @@
 
 import gui3d
 import mh
-import qtgui as gui
+import gui
     
 class AppShortcutEdit(gui.ShortcutEdit):
     def __init__(self, method):

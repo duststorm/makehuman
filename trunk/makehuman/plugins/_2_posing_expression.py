@@ -6,7 +6,7 @@ import gui3d
 import humanmodifier
 import warpmodifier
 import mh
-import qtgui as gui
+import gui
 
 class GroupBoxRadioButton(gui.RadioButton):
     def __init__(self, group, label, groupBox, selected=False):

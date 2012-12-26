@@ -3,7 +3,7 @@
 # We need this for gui controls
 
 import gui3d, aljabr, mh
-import qtgui as gui
+import gui
     
 class CensorTaskView(gui3d.TaskView):
 

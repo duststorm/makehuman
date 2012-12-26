@@ -38,7 +38,7 @@ import mh
 import gui3d
 import guimacromodelling
 import guidetailmodelling
-import qtgui as gui
+import gui
 
 class ModellingCategory(gui3d.Category):
 

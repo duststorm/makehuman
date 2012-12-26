@@ -23,7 +23,7 @@ TO DO
 #import zipfile
 import gui3d, mh
 from os import path
-import qtgui as gui
+import gui
 import filechooser as fc
 import log
 

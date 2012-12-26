@@ -9,7 +9,7 @@ import warp
 import os
 import mh
 import posemode
-import qtgui as gui
+import gui
 import filechooser as fc
 import log
 

@@ -31,7 +31,7 @@ from skeleton import Skeleton
 from math import pi
 import mh
 import mh2obj
-import qtgui as gui
+import gui
 
 '''
 bvhToMhMapping = {

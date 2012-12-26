@@ -10,7 +10,7 @@ import mh2povray
 
 import gui3d
 import mh
-import qtgui as gui
+import gui
 
 class PovrayTaskView(gui3d.TaskView):
 

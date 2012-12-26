@@ -24,7 +24,7 @@ import gui3d, mh, os
 import files3d
 import export_config
 import mh2proxy
-import qtgui as gui
+import gui
 import filechooser as fc
 import log
 

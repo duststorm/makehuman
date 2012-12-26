@@ -31,7 +31,7 @@ import mh
 import os
 from aljabr import vnorm, vsub, vadd, vdot, mtransform
 from math import floor, ceil, pi, sqrt, exp
-import qtgui as gui
+import gui
 import filechooser as fc
 
 def pointInRect(point, rect):

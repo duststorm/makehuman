@@ -12,7 +12,7 @@ import guimodelling, guifiles
 from aljabr import centroid
 import algos3d
 #import posemode
-import qtgui as gui
+import gui
 import language as lang
 from camera3d import Camera
 import log

@@ -6,7 +6,7 @@ import colorsys
 import gui3d
 from aljabr import vdist, vmul, vnorm, vsub, vadd
 import mh
-import qtgui as gui
+import gui
 
 def rgbToHsl(r, g, b):
     h, l, s = colorsys.rgb_to_hls(r / 255.0, g / 255.0, b / 255.0)

@@ -25,7 +25,7 @@ import download
 import files3d
 import mh2proxy
 import export_config
-import qtgui as gui
+import gui
 import filechooser as fc
 import log
 

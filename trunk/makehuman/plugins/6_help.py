@@ -5,7 +5,7 @@
 import gui3d
 import webbrowser
 import mh
-import qtgui as gui
+import gui
 
 class HelpTaskView(gui3d.TaskView):
 

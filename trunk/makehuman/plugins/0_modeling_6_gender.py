@@ -30,7 +30,7 @@ from string import Template
 import re
 import os
 import mh
-import qtgui as gui
+import gui
 
 class RangeDetailModifier(humanmodifier.GenderAgeRangeModifier):
     

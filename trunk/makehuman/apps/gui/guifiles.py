@@ -36,7 +36,7 @@ import gui3d
 import os
 from shutil import copyfile
 from os.path import basename
-import qtgui as gui
+import gui
 import filechooser as fc
 
 class SaveTaskView(gui3d.TaskView):

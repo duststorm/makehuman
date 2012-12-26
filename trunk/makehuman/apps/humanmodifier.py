@@ -32,7 +32,7 @@ from operator import mul
 import math
 import re
 import numpy as np
-import qtgui as gui
+import gui
 
 class DetailAction:
 

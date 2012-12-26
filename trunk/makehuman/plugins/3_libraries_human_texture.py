@@ -29,7 +29,7 @@ import gui3d
 import os
 import download
 import mh
-import qtgui as gui
+import gui
 import filechooser as fc
 
 class Action:

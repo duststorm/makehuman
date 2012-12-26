@@ -4,7 +4,7 @@
 
 import gui3d, os
 import mh
-import qtgui as gui
+import gui
 import log
 
 class EthnicsTaskView(gui3d.TaskView):

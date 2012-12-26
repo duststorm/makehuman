@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import gui3d
 import mh
-import qtgui as gui
+import gui
 
 class MacroAction:
 

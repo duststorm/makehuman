@@ -7,7 +7,7 @@ import humanmodifier
 from string import Template
 import re
 import mh
-import qtgui as gui
+import gui
 
 class AsymmetricDetailModifier(humanmodifier.GenderAgeAsymmetricModifier):
     

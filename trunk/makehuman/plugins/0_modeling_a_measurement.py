@@ -10,7 +10,7 @@ import module3d
 import humanmodifier
 import aljabr
 import mh
-import qtgui as gui
+import gui
 import log
 
 class MeasurementValueConverter(object):

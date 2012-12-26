@@ -3,7 +3,7 @@
 # We need this for gui controls
 
 import mh
-import qtgui as gui
+import gui
 import gui3d
 import humanmodifier
 

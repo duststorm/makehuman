@@ -8,7 +8,7 @@ from math import sqrt, pow, log
 from collision import collision
 import simpleoctree
 import mh
-import qtgui as gui
+import gui
 
 class MakeHairTaskView(gui3d.TaskView):
     def __init__(self, category):

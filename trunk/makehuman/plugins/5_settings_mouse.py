@@ -4,7 +4,7 @@
 
 import gui3d
 import mh
-import qtgui as gui
+import gui
     
 class AppMouseActionEdit(gui.MouseActionEdit):
     def __init__(self, method):

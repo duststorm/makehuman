@@ -21,7 +21,7 @@ TO DO
 """
 
 import gui3d, mh, os, module3d
-import qtgui as gui
+import gui
 import filechooser as fc
 import log
 

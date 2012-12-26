@@ -32,7 +32,7 @@ import mh
 import algos3d
 import os
 import humanmodifier
-import qtgui as gui
+import gui
 
 class FolderButton(gui.RadioButton):
 

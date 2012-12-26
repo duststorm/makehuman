@@ -7,7 +7,7 @@ import gui3d
 import os
 import poseengine
 import mh
-import qtgui as gui
+import gui
 import log
 
 class PoseTaskView(gui3d.TaskView):

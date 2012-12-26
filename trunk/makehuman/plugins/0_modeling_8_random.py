@@ -4,7 +4,7 @@
 
 import gui3d, random, humanmodifier
 import mh
-import qtgui as gui
+import gui
 
 class RandomTaskView(gui3d.TaskView):
 

@@ -24,7 +24,7 @@ import gui3d, mh, os
 import files3d
 import mh2proxy
 import export_config
-import qtgui as gui
+import gui
 import filechooser as fc
 
 class ProxyTaskView(gui3d.TaskView):

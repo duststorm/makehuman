@@ -31,7 +31,7 @@ import gui3d
 import module3d
 import mh
 import aljabr
-import qtgui as gui
+import gui
 import log
 
 import armature

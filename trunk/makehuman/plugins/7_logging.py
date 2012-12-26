@@ -4,7 +4,7 @@
 
 import gui3d
 import mh
-import qtgui as gui
+import gui
 from core import G
 
 class LoggingTaskView(gui3d.TaskView):

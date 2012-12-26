@@ -3,7 +3,7 @@
 # We need this for gui controls
 
 import gui3d, mh, os, module3d
-import qtgui as gui
+import gui
 import log
 
 class FontRadioButton(gui.RadioButton):

@@ -10,7 +10,7 @@ if 'nt' in sys.builtin_module_names:
 import subprocess
 import mh2renderman
 import mh
-import qtgui as gui
+import gui
 import log
 
 def which(program):

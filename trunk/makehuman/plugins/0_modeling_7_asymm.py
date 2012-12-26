@@ -8,7 +8,7 @@ import os
 import humanmodifier
 import events3d
 import mh
-import qtgui as gui
+import gui
 
 class AssymSlider(gui.Slider):
     
