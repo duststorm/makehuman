@@ -319,7 +319,7 @@ class FaceProxy(object):
     uv = property(get_uv, set_uv)
 
     def get_group(self):
-        return self.object._faceGroups[self.idx]
+        return self.object._faceGroups[self.object.group[self.idx]]
 
     group = property(get_group)
 
