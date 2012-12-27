@@ -12,9 +12,6 @@ class CensorTaskView(gui3d.TaskView):
         
         self.mouseBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Censor')))
         self.enableCensor = self.mouseBox.addWidget(gui.CheckBox("Enable", gui3d.app.settings.get('censor', False)))
-        type = []
-        self.blackSquare = self.mouseBox.addWidget(gui.RadioButton(type, "Black", gui3d.app.settings.get('censorType', 'black') == 'black'));
-        self.mosaic = self.mouseBox.addWidget(gui.RadioButton(type, "Mosaic", gui3d.app.settings.get('censorType', 'black square') == 'mosaic'));
         
         human = gui3d.app.selectedHuman
 
