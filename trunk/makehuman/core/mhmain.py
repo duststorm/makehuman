@@ -446,10 +446,7 @@ class MHApplication(gui3d.Application, mh.Application):
 
     def onStop(self, event):
 
-        try:
-            self.saveSettings()
-        except:
-            self.prompt('Error', 'Could not save settings file.', 'OK')
+        self.saveSettings(True)
         self.unloadPlugins()
         self.dumpMissingStrings()
 
@@ -587,30 +584,35 @@ class MHApplication(gui3d.Application, mh.Application):
         except:
             log.error('Failed to load help settings')
 
-    def saveSettings(self):
-        if not os.path.exists(mh.getPath('')):
-            os.makedirs(mh.getPath(''))
+    def saveSettings(self, promptOnFail=False):
+        try:
+            if not os.path.exists(mh.getPath('')):
+                os.makedirs(mh.getPath(''))
 
-        f = open(os.path.join(mh.getPath(''), "settings.ini"), 'w')
-        f.write(repr(self.settings))
-        f.close()
+            f = open(os.path.join(mh.getPath(''), "settings.ini"), 'w')
+            f.write(repr(self.settings))
+            f.close()
 
-        f = open(os.path.join(mh.getPath(''), "shortcuts.ini"), 'w')
-        for shortcut, method in self.shortcuts.iteritems():
-            f.write('%d %d %s\n' % (shortcut[0], shortcut[1], method.__name__))
-        f.close()
+            f = open(os.path.join(mh.getPath(''), "shortcuts.ini"), 'w')
+            for shortcut, method in self.shortcuts.iteritems():
+                f.write('%d %d %s\n' % (shortcut[0], shortcut[1], method.__name__))
+            f.close()
 
-        f = open(os.path.join(mh.getPath(''), "mouse.ini"), 'w')
-        for mouseAction, method in self.mouseActions.iteritems():
-            f.write('%d %d %s\n' % (mouseAction[0], mouseAction[1], method.__name__))
-        f.close()
+            f = open(os.path.join(mh.getPath(''), "mouse.ini"), 'w')
+            for mouseAction, method in self.mouseActions.iteritems():
+                f.write('%d %d %s\n' % (mouseAction[0], mouseAction[1], method.__name__))
+            f.close()
 
-        if self.dialog is not None:
-            self.helpIds.update(self.dialog.helpIds)
-        f = open(os.path.join(mh.getPath(''), "help.ini"), 'w')
-        for helpId in self.helpIds:
-            f.write('%s\n' % helpId)
-        f.close()
+            if self.dialog is not None:
+                self.helpIds.update(self.dialog.helpIds)
+            f = open(os.path.join(mh.getPath(''), "help.ini"), 'w')
+            for helpId in self.helpIds:
+                f.write('%s\n' % helpId)
+            f.close()
+        except:
+            log.error('Failed to save settings file')
+            if promptOnFail:
+                self.prompt('Error', 'Could not save settings file.', 'OK')
 
     # Themes
     def setTheme(self, theme):
