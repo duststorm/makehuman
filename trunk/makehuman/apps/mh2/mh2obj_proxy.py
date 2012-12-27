@@ -33,7 +33,7 @@ def exportProxyObj(human, name, options):
     cfg = export_config.exportConfig(human, True)
     cfg.separatefolder = True
 
-    stuffs = object_collection.setupObjects(name, human,
+    stuffs = object_collection.setupObjects(os.path.splitext(name)[0], human,
         helpers=options["helpers"], 
         hidden=options["hidden"], 
         eyebrows=options["eyebrows"], 
@@ -41,7 +41,7 @@ def exportProxyObj(human, name, options):
     
     (scale, unit) = options["scale"]   
     #name = export_config.goodName(name)
-    outfile = export_config.getOutFileFolder(name+".obj", cfg)   
+    outfile = export_config.getOutFileFolder(name, cfg)   
     (path, ext) = os.path.splitext(outfile)
 
     filename = "%s_clothed.obj" % path

@@ -407,7 +407,10 @@ class ExportTaskView(gui3d.TaskView):
             if not os.path.exists(dir):
                 os.makedirs(dir)
 
-            filename = path
+            def filename(targetExt, different = False):
+                if not different and ext != '' and ('.' + targetExt.lower()) != ext.lower():
+                    log.warning("expected extension '.%s' but got '%s'", targetExt, ext)
+                return os.path.join(dir, name + '.' + targetExt)
 
             if self.wavefrontObj.selected:
                 
@@ -420,10 +423,10 @@ class ExportTaskView(gui3d.TaskView):
                     "lashes" : self.exportLashes.selected,
                     "scale": self.getScale(self.objScales),
                 }                    
-                mh2obj_proxy.exportProxyObj(human, os.path.join(dir, filename), options)
+                mh2obj_proxy.exportProxyObj(human, filename("obj"), options)
                 
                 if self.exportSkeleton.selected:
-                    mh2bvh.exportSkeleton(human.meshData, os.path.join(os.path.join(dir, filename), filename + ".bvh"))
+                    mh2bvh.exportSkeleton(human.meshData, filename("bvh", True))
                     
             elif self.mhx.selected:
                 #mhxversion = []
@@ -452,7 +455,7 @@ class ExportTaskView(gui3d.TaskView):
                     'mhxrig': rig,
                 }
 
-                mh2mhx.exportMhx(gui3d.app.selectedHuman, os.path.join(dir, filename + ".mhx"), options)
+                mh2mhx.exportMhx(gui3d.app.selectedHuman, filename("mhx"), options)
             elif self.collada.selected:
                 for (button, rig) in self.daeRigs:
                     if button.selected:
@@ -467,18 +470,18 @@ class ExportTaskView(gui3d.TaskView):
                     "hidden" : self.colladaHidden.selected,
                     "scale": self.getScale(self.daeScales),
                 }
-                mh2collada.exportCollada(gui3d.app.selectedHuman, os.path.join(dir, filename), options)
+                mh2collada.exportCollada(gui3d.app.selectedHuman, filename("dae"), options)
             elif self.md5.selected:
-                mh2md5.exportMd5(gui3d.app.selectedHuman.meshData, os.path.join(dir, filename + ".md5mesh"))
+                mh2md5.exportMd5(gui3d.app.selectedHuman.meshData, filename("md5mesh"))
             elif self.stl.selected:
                 mesh = gui3d.app.selectedHuman.getSubdivisionMesh() if self.exportSmooth.selected else gui3d.app.selectedHuman.meshData
                 if self.stlAscii.selected:
-                    mh2stl.exportStlAscii(mesh, os.path.join(dir, filename + ".stl"))
+                    mh2stl.exportStlAscii(mesh, filename("stl"))
                 else:
-                    mh2stl.exportStlBinary(mesh, os.path.join(dir, filename + ".stl"))
+                    mh2stl.exportStlBinary(mesh, filename("stl"))
             elif self.skel.selected:
                 mesh = gui3d.app.selectedHuman.getSubdivisionMesh() if self.exportSmooth.selected else gui3d.app.selectedHuman.meshData
-                mh2skel.exportSkel(mesh, os.path.join(dir, filename + ".skel"))
+                mh2skel.exportSkel(mesh, filename("skel"))
                     
             gui3d.app.prompt('Info', u'The mesh has been exported to %s.' % dir, 'OK', helpId='exportHelp')
 
