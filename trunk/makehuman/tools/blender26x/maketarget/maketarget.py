@@ -332,9 +332,12 @@ def doSaveTarget(context, filepath):
 
 
 def readLines(filepath, first, last):
-    fp = open(filepath, "rU")
     before = []
     after = []
+    try:
+        fp = open(filepath, "rU")
+    except NameError:
+        return before,after
     for line in fp:
         words = line.split(None, 1)
         if len(words) >= 2:
@@ -408,6 +411,46 @@ class VIEW3D_OT_SaveasTargetButton(bpy.types.Operator, ExportHelper):
     def execute(self, context):
         doSaveTarget(context, self.properties.filepath)
         print("Target saved")
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+
+#----------------------------------------------------------
+#   
+#----------------------------------------------------------
+
+def pruneTarget(context, filepath):
+    ob = context.object
+    lines = []
+    before,after = readLines(filepath, -1,-1)
+    for vn,string in after:
+        if ob.data.vertices[vn].select:
+            lines.append((vn, string))
+    print("Pruning", len(before), len(after), len(lines))
+    fp = open(filepath, "w")
+    for vn,string in lines:            
+        fp.write(str(vn) + " " + string)
+    fp.close()
+
+
+class VIEW3D_OT_PruneTargetFileButton(bpy.types.Operator, ExportHelper):
+    bl_idname = "mh.prune_target_file"
+    bl_label = "Prune Target File"
+    bl_options = {'UNDO'}
+
+    filename_ext = ".target"
+    filter_glob = StringProperty(default="*.target", options={'HIDDEN'})
+    filepath = bpy.props.StringProperty(
+        name="File Path", 
+        description="File path used for target file", 
+        maxlen= 1024, default= "")
+
+    def execute(self, context):
+        pruneTarget(context, self.properties.filepath)
+        print("Target pruned")
         return {'FINISHED'}
 
     def invoke(self, context, event):

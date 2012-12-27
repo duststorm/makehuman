@@ -88,6 +88,7 @@ class MakeTargetPanel(bpy.types.Panel):
         if not utils.drawConfirm(layout, scn):
             return
         settings.drawDirectories(layout, scn)
+        layout.operator("mh.prune_target_file")
 
         layout.label("Load materials from")
         layout.prop(scn, "MhLoadMaterial", expand=True)
