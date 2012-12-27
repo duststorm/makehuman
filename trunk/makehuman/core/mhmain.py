@@ -446,7 +446,10 @@ class MHApplication(gui3d.Application, mh.Application):
 
     def onStop(self, event):
 
-        self.saveSettings()
+        try:
+            self.saveSettings()
+        except:
+            self.prompt('Error', 'Could not save settings file.', 'OK')
         self.unloadPlugins()
         self.dumpMissingStrings()
 
