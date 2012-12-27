@@ -1248,7 +1248,7 @@ def init():
     bpy.types.Object.MhNoLoad = BoolProperty(name="Cannot load", default = False)
 
     bpy.types.Object.SelectedOnly = BoolProperty(name="Selected verts only", default = True)
-    bpy.types.Object.MhZeroOtherTargets = BoolProperty(name="Automatically zero other targets", default = True)
+    bpy.types.Object.MhZeroOtherTargets = BoolProperty(name="Only save active target", description="Set values of all other targets to 0", default = True)
 
 
     bpy.types.Scene.MhImportRotateMode = EnumProperty(
