@@ -741,6 +741,8 @@ class MHApplication(gui3d.Application, mh.Application):
         tl.start()
 
     def setTargetCamera(self, names, view='front', distance=10):
+        if not isinstance(names, (tuple, list)):
+            names = (names,)
         human = self.selectedHuman
         groupNames = [group.name
                       for group in human.meshData.faceGroups
