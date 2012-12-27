@@ -54,7 +54,7 @@ def exportCollada(human, filename, options):
     the.Rotate90X = options["rotate90X"]
     the.Rotate90Z = options["rotate90Z"]
     the.Options = options
-    outfile = export_config.getOutFileFolder(filename+".dae", the.Config)        
+    outfile = export_config.getOutFileFolder(filename, the.Config)        
     try:
         fp = open(outfile, 'w')
         print("Writing Collada file", outfile)
