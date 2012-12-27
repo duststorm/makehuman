@@ -479,7 +479,7 @@ class ExportTaskView(gui3d.TaskView):
                 mesh = gui3d.app.selectedHuman.getSubdivisionMesh() if self.exportSmooth.selected else gui3d.app.selectedHuman.meshData
                 mh2skel.exportSkel(mesh, os.path.join(dir, filename + ".skel"))
                     
-            gui3d.app.prompt('Info', u'The mesh has been exported to %s.' % os.path.join(mh.getPath(''), u'exports'), 'OK', helpId='exportHelp')
+            gui3d.app.prompt('Info', u'The mesh has been exported to %s.' % dir, 'OK', helpId='exportHelp')
 
             mh.changeCategory('Modelling')
             
