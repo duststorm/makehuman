@@ -38,6 +38,7 @@ from shutil import copyfile
 from os.path import basename
 import gui
 import filechooser as fc
+import log
 
 class SaveTaskView(gui3d.TaskView):
 

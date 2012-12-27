@@ -25,6 +25,8 @@ __docformat__ = 'restructuredtext'
 
 import math
 
+import log
+
 # first version of uv interpolator
 # picks a start solution (1/nth of each of the n-targets)
 # then tries to improve the solution in a given amount of iterations
@@ -33,7 +35,6 @@ import math
 # best improvement is chosen as new current solution
 # if no improvement can be achieved, the step size is divided by 2
 # best solution is returned
-
 
 class UVFinder:
 	def __init__(self, debug_output):

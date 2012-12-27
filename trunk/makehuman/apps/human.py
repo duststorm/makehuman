@@ -31,6 +31,7 @@ import humanmodifier
 import hair
 import events3d
 import warp
+import log
 
 class HumanEvent(events3d.Event):
 
