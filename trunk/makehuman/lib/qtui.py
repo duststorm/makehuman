@@ -562,6 +562,9 @@ class Application(QtGui.QApplication, events3d.EventHandler):
             return
         self.log_window.addText(text)
 
+    def processEvents(self, flags = QtCore.QEventLoop.ExcludeUserInputEvents):
+        super(Application, self).processEvents(flags)
+
 g_timers = {}
 
 def getKeyModifiers():
