@@ -770,3 +770,165 @@ class StatusBar(QtGui.QStatusBar, Widget):
             self._perm.setText(text)
         else:
             super(StatusBar, self).showMessage(text, self.duration)
+
+class VScrollLayout(QtGui.QLayout):
+    def __init__(self, parent = None):
+        super(VScrollLayout, self).__init__(parent)
+        self.setContentsMargins(0, 0, 0, 0)
+        self.setSizeConstraint(QtGui.QLayout.SetNoConstraint)
+        self._child = None
+        self._position = 0
+
+    def addItem(self, item):
+        if self._child is not None:
+            raise RuntimeError('layout already has a child')
+        self._child = item
+        self._update()
+
+    def count(self):
+        return int(self._child is not None)
+
+    def itemAt(self, index):
+        if index != 0:
+            return None
+        if self._child is None:
+            return None
+        return self._child
+
+    def takeAt(self, index):
+        if self.child is None:
+            return None
+        child = self._child
+        self._child = None
+        self._update()
+        return child
+
+    def minimumSize(self):
+        if self._child is None:
+            return super(VScrollLayout, self).minimumSize()
+        left, top, right, bottom = self.getContentsMargins()
+        return QtCore.QSize(self._child.minimumSize().width() + left + right, 0)
+
+    def maximumSize(self):
+        if self._child is None:
+            return super(VScrollLayout, self).maximumSize()
+        left, top, right, bottom = self.getContentsMargins()
+        return self._child.maximumSize() + QtCore.QSize(left + right, top + bottom)
+
+    def sizeHint(self):
+        if self._child is None:
+            return super(VScrollLayout, self).sizeHint()
+        left, top, right, bottom = self.getContentsMargins()
+        # log.debug('VScrollLayout.sizeHint(child): %d %d', self._child.sizeHint().width(), self._child.sizeHint().height())
+        return self._child.sizeHint() + QtCore.QSize(left + right, top + bottom)
+
+    def setGeometry(self, rect):
+        super(VScrollLayout, self).setGeometry(rect)
+        self._position
+        # log.debug('VScrollLayout.setGeometry: position: %d', self._position)
+        # log.debug('VScrollLayout.setGeometry: %d %d %d %d', rect.x(), rect.y(), rect.width(), rect.height())
+        if self._child is None:
+            return
+        size = self._child.sizeHint()
+        left, top, right, bottom = self.getContentsMargins()
+        # log.debug('VScrollLayout.getContentsMargins: %d %d %d %d', left, top, right, bottom)
+        x = rect.x() + left
+        y = rect.y() + top - self._position
+        rect = QtCore.QRect(x, y, size.width(), size.height())
+        # log.debug('VScrollLayout.setGeometry(child): %d %d %d %d', rect.x(), rect.y(), rect.width(), rect.height())
+        self._child.setGeometry(rect)
+
+    def expandingDirections(self):
+        if self._child is None:
+            return 0
+        return self._child.expandingDirections()
+
+    def hasHeightForWidth(self):
+        if self._child is None:
+            return super(VScrollLayout, self).hasHeightForWidth()
+        return self._child.hasHeightForWidth()
+
+    def heightForWidth(self, width):
+        if self._child is None:
+            return super(VScrollLayout, self).heightForWidth(width)
+        return self._child.heightForWidth(width)
+
+    def setPosition(self, value):
+        self._position = value
+        self._update()
+
+    def _update(self):
+        self.update()
+
+    def childHeight(self):
+        if self._child is None:
+            return 0
+        left, top, right, bottom = self.getContentsMargins()
+        return self._child.sizeHint().height() + top + bottom
+
+class Viewport(QtGui.QWidget):
+    def __init__(self):
+        super(Viewport, self).__init__()
+        self.setContentsMargins(0, 0, 0, 0)
+        self._layout = VScrollLayout(self)
+        self._layout.setContentsMargins(1, 20, 1, 20)
+        self._layout.setContentsMargins(0, 0, 0, 0)
+        self._child = None
+
+    def setWidget(self, widget):
+        if widget is None:
+            self._layout.removeWidget(self._child)
+        else:
+            widget.setContentsMargins(0, 0, 0, 0)
+            self._layout.addWidget(widget)
+        self._child = widget
+        self.updateGeometry()
+
+    def childHeight(self):
+        return self._layout.childHeight()
+
+    def setPosition(self, value):
+        self._layout.setPosition(value)
+
+class VScrollArea(QtGui.QWidget, Widget):
+    def __init__(self):
+        super(VScrollArea, self).__init__()
+        Widget.__init__(self)
+
+        self._viewport = Viewport()
+        self._scrollbar = QtGui.QScrollBar(QtCore.Qt.Vertical)
+        self._scrollbar.setRange(0, 0)
+        self._scrollbar.setMinimumHeight(0)
+        self._layout = QtGui.QBoxLayout(QtGui.QBoxLayout.RightToLeft, self)
+        self._layout.addWidget(self._scrollbar, 0)
+        self._layout.addWidget(self._viewport, 1)
+        self._layout.setContentsMargins(0, 0, 0, 0)
+        self._scrollbar.setTracking(True)
+        self.connect(self._scrollbar, QtCore.SIGNAL('valueChanged(int)'), self._changed)
+
+    def setWidget(self, widget):
+        self._viewport.setWidget(widget)
+        self.updateGeometry()
+        self._updateScrollSize()
+
+    def resizeEvent(self, event):
+        # log.debug('resizeEvent: %d, %d', event.size().width(), event.size().height())
+        super(VScrollArea, self).resizeEvent(event)
+        self._updateScrollSize()
+        self._updateScrollPosition()
+
+    def _updateScrollSize(self):
+        cheight = self._viewport.childHeight()
+        vheight = self._viewport.size().height()
+        # log.debug('_updateScrollSize: %d, %d', cheight, vheight)
+        self._scrollbar.setRange(0, cheight - vheight)
+        self._scrollbar.setPageStep(vheight)
+
+    def _changed(self, value):
+        # log.debug('VScrollArea_changed: %d', value)
+        self._updateScrollPosition()
+
+    def _updateScrollPosition(self):
+        value = self._scrollbar.value()
+        # log.debug('_updateScrollPosition: %d', value)
+        self._viewport.setPosition(value)

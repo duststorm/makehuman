@@ -473,8 +473,14 @@ class Frame(QtGui.QWidget):
         self.h_layout.addWidget(self.r_panel, 0, 2)
         self.h_layout.setColumnStretch(2, 0)
 
-        self.left_top = QtGui.QBoxLayout(QtGui.QBoxLayout.TopToBottom)
-        self.l_layout.addLayout(self.left_top, 0, 0)
+        self.lt_panel = qtgui.VScrollArea()
+        self.lt_panel.setMinimumHeight(250)
+        # self.left_top = QtGui.QBoxLayout(QtGui.QBoxLayout.TopToBottom)
+        # self.l_layout.addLayout(self.left_top, 0, 0)
+        self.l_layout.addWidget(self.lt_panel, 0, 0)
+        self.lt_child = self.panel()
+        self.lt_panel.setWidget(self.lt_child)
+        self.left_top = QtGui.QBoxLayout(QtGui.QBoxLayout.TopToBottom, self.lt_child)
         self.l_layout.setRowStretch(0, 0)
 
         self.l_layout.setRowStretch(1, 1)
