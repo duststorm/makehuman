@@ -87,6 +87,11 @@ syspath = syspath + recursiveDirNames("./core")
 syspath.extend(sys.path)
 sys.path = syspath
 
+import getpath
+userDir = getpath.getPath('')
+if not os.path.isdir(userDir):
+    os.makedirs(userDir)
+
 import log
 log.init()
 
