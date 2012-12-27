@@ -9,30 +9,46 @@ import qtui
 
 class FileChooserRectangle(Button):
     _imageCache = {}
+    _size = (128, 128)
+    _aspect_mode = QtCore.Qt.KeepAspectRatioByExpanding
+    _scale_mode = QtCore.Qt.SmoothTransformation
 
     @classmethod
     def _getImage(cls, path):
-        if path not in cls._imageCache:
-            cls._imageCache[path] = QtGui.QPixmap(path)
-        return cls._imageCache[path]
+        if path in cls._imageCache:
+            return cls._imageCache[path]
+        pixmap = QtGui.QPixmap(path)
+        width, height = cls._size
+        pixmap = pixmap.scaled(width, height, cls._aspect_mode, cls._scale_mode)
+        pwidth = pixmap.width()
+        pheight = pixmap.height()
+        if pwidth > width or pheight > height:
+            x0 = max(0, (pwidth - width) / 2)
+            y0 = max(0, (pheight - height) / 2)
+            pixmap = pixmap.copy(x0, y0, width, height)
+        cls._imageCache[path] = pixmap
+        return pixmap
 
-    def __init__(self, owner, file, label, imagePath, size = (128, 128)):
+    def __init__(self, owner, file, label, imagePath):
         super(FileChooserRectangle, self).__init__()
         Widget.__init__(self)
         self.owner = owner
         self.file = file
 
-        self.setMinimumSize(*size)
         self.layout = QtGui.QGridLayout(self)
+        self.layout.setSizeConstraint(QtGui.QLayout.SetMinimumSize)
 
         image = self._getImage(imagePath)
         self.preview = QtGui.QLabel()
         self.preview.setPixmap(image)
         self.layout.addWidget(self.preview, 0, 0)
         self.layout.setRowStretch(0, 1)
+        self.layout.setColumnMinimumWidth(0, self._size[0])
+        self.layout.setRowMinimumHeight(0, self._size[1])
 
         self.label = QtGui.QLabel()
         self.label.setText(label)
+        self.label.setMinimumWidth(1)
         self.layout.addWidget(self.label, 1, 0)
         self.layout.setRowStretch(1, 0)
 
