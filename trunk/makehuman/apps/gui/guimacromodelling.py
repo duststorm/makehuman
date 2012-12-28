@@ -140,7 +140,7 @@ class MacroModelingTaskView(gui3d.TaskView):
         self.setStatus('Gender: %s, Age: %d, Muscle: %.2f%%, Weight: %.2f%%, Height: %.2f %s', gender, age, muscle, weight, height, units)
 
     def setStatus(self, format, *args):
-        gui3d.app.status(format % args, True)
+        gui3d.app.statusPersist(format, *args)
 
     def onShow(self, event):
         self.genderSlider.setFocus()

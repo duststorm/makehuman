@@ -662,10 +662,15 @@ class MHApplication(gui3d.Application, mh.Application):
         mh.setCaption(caption.encode('utf8'))
 
     # Global status bar
-    def status(self, text, permanent=False):
+    def status(self, text, *args):
         if self.statusBar is None:
             return
-        self.statusBar.showMessage(text, permanent)
+        self.statusBar.showMessage(text, *args)
+
+    def statusPersist(self, text, *args):
+        if self.statusBar is None:
+            return
+        self.statusBar.setMessage(text, *args)
 
     # Global progress bar
     def progress(self, value, text=None):

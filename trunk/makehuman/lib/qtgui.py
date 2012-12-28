@@ -767,12 +767,13 @@ class StatusBar(QtGui.QStatusBar, Widget):
         self.addWidget(self._perm, 1)
         self.duration = 2000
 
-    def showMessage(self, text, permanent=False):
-        text = getLanguageString(text)
-        if permanent:
-            self._perm.setText(text)
-        else:
-            super(StatusBar, self).showMessage(text, self.duration)
+    def showMessage(self, text, *args):
+        text = getLanguageString(text) % args
+        super(StatusBar, self).showMessage(text, self.duration)
+
+    def setMessage(self, text, *args):
+        text = getLanguageString(text) % args
+        self._perm.setText(text)
 
 class VScrollLayout(QtGui.QLayout):
     def __init__(self, parent = None):

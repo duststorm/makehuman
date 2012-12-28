@@ -107,10 +107,10 @@ class CustomTargetsTaskView(gui3d.TaskView):
 
     def syncStatus(self):
         if self.sliders:
-            msg = ''
+            gui3d.app.statusPersist('')
         else:
-            msg = 'No custom targets found. To add a custom target, place the file in %s' % self.targetsPath
-        gui3d.app.status(msg, True)
+            gui3d.app.statusPersist('No custom targets found. To add a custom target, place the file in %s',
+                                    self.targetsPath)
 
     def createTargetControls(self, box, targetPath, targetFile):
         # When the slider is dragged and released, an onChange event is fired
