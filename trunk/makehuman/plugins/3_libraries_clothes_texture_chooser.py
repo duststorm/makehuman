@@ -7,7 +7,7 @@ B{Code Home Page:}    U{http://code.google.com/p/makehuman/}
 
 B{Authors:}           Marc Flerackers
 
-B{Copyright(c):}      MakeHuman Team 2001-2011
+B{Copyright(c):}      MakeHuman Team 2001-2012
 
 B{Licensing:}         GPL3 (see also U{http://sites.google.com/site/makehumandocs/licensing})
 
@@ -49,29 +49,33 @@ class TexturesTaskView(gui3d.TaskView):
         self.filewidget = mh.addWidget(mh.Frame.Top, fc.FileChooser(self.defaultTextures, 'png', 'png'))
         self.filechooser = self.addWidget(self.filewidget)
         self.update = self.filechooser.sortBox.addWidget(gui.Button('Check for updates'))
-        self.mediaSync = None 
+        self.mediaSync = None
         self.activeClothing = None
         
         #self.clothesBox = mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Textures'))
         #self.cloGroup = []
         #for i, uuid in enumerate(theClothesList):
         #    filepath = human.clothesProxies[uuid].file
-        #    print "  ", filepath
+        #    log.debug("  " + filepath)
         #    self.clothesBox.addWidget(RadioButton(self.cloGroup, filepath, False))
-        
+
+        self.clothesBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Clothes')))
+        self.appliedClothes = []
+        self.clothesSelections = []
 
         @self.filechooser.mhEvent
         def onFileSelected(filename):
             human = gui3d.app.selectedHuman
-            uuid = human.activeClothing
-            if uuid:
-                clo = human.clothesObjs[uuid]
-                clo.mesh.setTexture(filename)
+            if not self.activeClothing:
+                return
+            uuid = self.activeClothing
+            clo = human.clothesObjs[uuid]
+            clo.mesh.setTexture(filename)
             mh.changeCategory('Modelling')
 
         #@self.clothesBox.mhEvent
         #def onClicked(event):
-        #    print "ClothesBox clicked", event, event.change
+        #    log.debug("ClothesBox clicked %s %s" % (event, event.change)
             
         @self.update.mhEvent
         def onClicked(event):
@@ -80,33 +84,61 @@ class TexturesTaskView(gui3d.TaskView):
     def onShow(self, event):
         human = gui3d.app.selectedHuman
 
-        print "onShow", human.clothesObjs
+        log.debug("onShow %s" % str(human.clothesObjs))
         #if human.activeClothing is None:
         #    self.onHide(event)
         #    return
-            
+
+        for radioBtn in self.appliedClothes:
+            radioBtn.hide()
+            radioBtn.destroy()
+        self.appliedClothes = []
+        self.clothesSelections = []
+        theClothesList = human.clothesObjs.keys()
+        self.activeClothing = None
+        for i, uuid in enumerate(theClothesList):
+            if i == 0:
+                self.activeClothing = uuid
+            radioBtn = self.clothesBox.addWidget(gui.RadioButton(self.appliedClothes, human.clothesProxies[uuid].name, selected=len(self.appliedClothes) == 0))
+            self.clothesSelections.append( (radioBtn, uuid) )
+
+            @radioBtn.mhEvent
+            def onClicked(event):
+                for radio, uuid in self.clothesSelections:
+                    if radio.selected:
+                        self.activeClothing = uuid
+                        log.debug( 'Selected clothing "%s" (%s)' % (radio.text(), uuid) )
+                        self.reloadTextureChooser()
+                        return
+
         gui3d.app.selectedHuman.hide()
         gui3d.TaskView.onShow(self, event)
 
-        if human.activeClothing != self.activeClothing:
-            uuid = human.activeClothing
-            self.activeClothing = uuid
-            if uuid:
-                clo = human.clothesObjs[uuid]
-                filepath = human.clothesProxies[uuid].file
-                print "onShow", clo, filepath
-                self.textures = [os.path.dirname(filepath)] + self.defaultTextures            
-            else:
-                self.textures = self.defaultTextures            
-            
-            fc = self.filechooser
-            print "  fc", fc, fc.children.count(), fc.files
-            print "  added"
-
-        self.filechooser.setFocus()
+        self.reloadTextureChooser()
         
         #if not os.path.isdir(self.userClothes) or not len([filename for filename in os.listdir(self.userClothes) if filename.lower().endswith('mhclo')]):    
         #    gui3d.app.prompt('No user clothes found', 'You don\'t seem to have any user clothes, download them from the makehuman media repository?\nNote: this can take some time depending on your connection speed.', 'Yes', 'No', self.syncMedia)
+
+    def reloadTextureChooser(self):
+        human = gui3d.app.selectedHuman
+        if self.activeClothing:
+            uuid = self.activeClothing
+            clo = human.clothesObjs[uuid]
+            filepath = human.clothesProxies[uuid].file
+            log.debug("onShow %s %s" % (clo, filepath) )
+            self.textures = [os.path.dirname(filepath)] + self.defaultTextures            
+        else:
+            # TODO maybe dont show anything?
+            self.textures = self.defaultTextures            
+            
+            fc = self.filechooser
+            log.debug("  fc %s %s %s" % (fc, fc.children.count(), str(fc.files)) )
+            log.debug("  added")
+
+        # Reload filechooser
+        self.filewidget.paths = self.textures
+        self.filewidget.refresh()
+        self.filechooser.setFocus()
 
     def onHide(self, event):
         gui3d.app.selectedHuman.show()
@@ -117,6 +149,7 @@ class TexturesTaskView(gui3d.TaskView):
         if event.change == 'reset':
             log.message("deleting textures")
             # self.clothesButton.setTexture('data/clothes/clear.png')
+            # TODO
 
     def onHumanChanged(self, event):
         pass        
