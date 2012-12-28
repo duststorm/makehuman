@@ -78,11 +78,11 @@ class MeasureSlider(humanmodifier.ModifierSlider):
 
     def onFocus(self, event):
         super(MeasureSlider, self).onFocus(event)
-        self.task.onSliderFocus()
+        self.task.onSliderFocus(self)
 
     def onBlur(self, event):
         super(MeasureSlider, self).onBlur(event)
-        self.task.onSliderBlur()
+        self.task.onSliderBlur(self)
 
 class MeasureTaskView(gui3d.TaskView):
 
@@ -146,6 +146,7 @@ class MeasureTaskView(gui3d.TaskView):
         self.groupBoxes = {}
         self.radioButtons = []
         self.sliders = []
+        self.active_slider = None
 
         self.modifiers = {}
 
@@ -210,16 +211,34 @@ class MeasureTaskView(gui3d.TaskView):
         self.groupBoxes['neck'].children[0].setFocus()
         self.syncSliders()
 
-    def onSliderFocus(self):
-
+    def onSliderFocus(self, slider):
+        self.active_slider = slider
         self.updateMeshes()
         self.measureObject.show()
 
-    def onSliderBlur(self):
-
+    def onSliderBlur(self, slider):
+        if self.active_slider is slider:
+            self.active_slider = None
         self.measureObject.hide()
 
     def updateMeshes(self):
+        if self.active_slider is None:
+            return
+
+        human = gui3d.app.selectedHuman
+
+        vertidx = self.ruler.Measures[self.active_slider.measure]
+        matrix = np.asarray(gui3d.app.modelCamera.camera.getConvertToScreenMatrix(human.mesh.object3d))
+
+        coords = np.hstack((human.mesh.coord[vertidx], np.ones((len(vertidx),1))))
+        coords = np.sum(matrix[None,:,:] * coords[:,None,:], axis = -1)
+        coords = coords[:,:2] / coords[:,3:]
+        self.measureMesh.coord[:len(vertidx),:2] = coords
+        self.measureMesh.coord[len(vertidx):,:2] = coords[-1:]
+        self.measureMesh.markCoords(coor = True)
+        self.measureMesh.update()
+
+    def updateMeshes_OLD(self):
 
         human = gui3d.app.selectedHuman
         # slider = gui3d.app.focusView

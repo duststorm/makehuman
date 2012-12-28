@@ -109,28 +109,33 @@ class Camera(object):
 
     transform = property(getTransform, None, None, "The transform of the camera.")
 
-    def convertToScreen(self, x, y, z, obj = None):
-        "Convert 3D OpenGL world coordinates to screen coordinates."
-        world = x, y, z
+    @staticmethod
+    def getFlipMatrix():
+        t = matrix.translate((0, G.windowHeight, 0))
+        s = matrix.scale((1,-1,1))
+        return t * s
 
-        viewport = matrix.viewport(0, 0, G.windowWidth, G.windowHeight)
-        projection, modelview = self.getMatrices(0)
-
-        if obj and isinstance(obj, Object3D):
-            m = modelview
-            m = m * matrix.translate((obj.x, obj.y, obj.z))
+    @staticmethod
+    def getObjectMatrix(obj):
+            m = matrix.translate((obj.x, obj.y, obj.z))
             m = m * matrix.rotx(obj.rx)
             m = m * matrix.roty(obj.ry)
             m = m * matrix.rotz(obj.rz)
             m = m * matrix.scale((obj.sx, obj.sy, obj.sz))
-            modelview = m
+            return m
 
+    def getConvertToScreenMatrix(self, obj = None):
+        viewport = matrix.viewport(0, 0, G.windowWidth, G.windowHeight)
+        projection, modelview = self.getMatrices(0)
         m = viewport * projection * modelview
+        if obj and isinstance(obj, Object3D):
+            m = m * self.getObjectMatrix(obj)
+        return self.getFlipMatrix() * m
 
+    def convertToScreen(self, x, y, z, obj = None):
+        "Convert 3D OpenGL world coordinates to screen coordinates."
+        m = self.getConvertToScreenMatrix(obj)
         sx, sy, sz = matrix.transform3(m, [x, y, z])
-
-        sy = G.windowHeight - sy
-
         return [sx, sy, sz]
 
     def convertToWorld2D(self, sx, sy):
