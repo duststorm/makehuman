@@ -400,6 +400,7 @@ class TaskPanel(qtgui.VScrollArea):
         self.setMinimumHeight(250)
         self.child = QtGui.QWidget()
         self.child.setContentsMargins(0, 0, 0, 0)
+        self.child.setSizePolicy(QtGui.QSizePolicy.MinimumExpanding, QtGui.QSizePolicy.Preferred)
         self.setWidget(self.child)
         self.layout = QtGui.QBoxLayout(QtGui.QBoxLayout.TopToBottom, self.child)
 

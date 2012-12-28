@@ -789,20 +789,22 @@ class VScrollLayout(QtGui.QLayout):
     def minimumSize(self):
         if self._child is None:
             return super(VScrollLayout, self).minimumSize()
+        # log.debug('VScrollLayout.minimumSize(child): %d %d', self._child.sizeHint().width(), self._child.sizeHint().height())
         left, top, right, bottom = self.getContentsMargins()
         return QtCore.QSize(self._child.minimumSize().width() + left + right, 0)
 
     def maximumSize(self):
         if self._child is None:
             return super(VScrollLayout, self).maximumSize()
+        # log.debug('VScrollLayout.maximumSize(child): %d %d', self._child.sizeHint().width(), self._child.sizeHint().height())
         left, top, right, bottom = self.getContentsMargins()
         return self._child.maximumSize() + QtCore.QSize(left + right, top + bottom)
 
     def sizeHint(self):
         if self._child is None:
             return super(VScrollLayout, self).sizeHint()
-        left, top, right, bottom = self.getContentsMargins()
         # log.debug('VScrollLayout.sizeHint(child): %d %d', self._child.sizeHint().width(), self._child.sizeHint().height())
+        left, top, right, bottom = self.getContentsMargins()
         return self._child.sizeHint() + QtCore.QSize(left + right, top + bottom)
 
     def setGeometry(self, rect):
@@ -815,9 +817,14 @@ class VScrollLayout(QtGui.QLayout):
         size = self._child.sizeHint()
         left, top, right, bottom = self.getContentsMargins()
         # log.debug('VScrollLayout.getContentsMargins: %d %d %d %d', left, top, right, bottom)
-        x = rect.x() + left
-        y = rect.y() + top - self._position
-        rect = QtCore.QRect(x, y, size.width(), size.height())
+
+        rect = rect.adjusted(left, top, -right, -bottom)
+        rect.adjust(0, -self._position, 0, -self._position)
+        # log.debug("%x", int(self._child.widget().sizePolicy().horizontalPolicy()))
+        if not self._child.widget().sizePolicy().horizontalPolicy() & QtGui.QSizePolicy.ExpandFlag:
+            rect.setWidth(size.width())
+        rect.setHeight(size.height())
+
         # log.debug('VScrollLayout.setGeometry(child): %d %d %d %d', rect.x(), rect.y(), rect.width(), rect.height())
         self._child.setGeometry(rect)
 
@@ -887,12 +894,18 @@ class VScrollArea(QtGui.QWidget, Widget):
         self._layout.addWidget(self._viewport, 1)
         self._layout.setContentsMargins(0, 0, 0, 0)
         self._scrollbar.setTracking(True)
+        self._widget = None
         self.connect(self._scrollbar, QtCore.SIGNAL('valueChanged(int)'), self._changed)
 
     def setWidget(self, widget):
-        self._viewport.setWidget(widget)
+        if self._widget is not None:
+            self._widget.removeEventFilter(self)
+        self._widget = widget
+        self._viewport.setWidget(self._widget)
         self.updateGeometry()
         self._updateScrollSize()
+        if self._widget is not None:
+            self._widget.installEventFilter(self)
 
     def resizeEvent(self, event):
         # log.debug('resizeEvent: %d, %d', event.size().width(), event.size().height())
@@ -915,3 +928,11 @@ class VScrollArea(QtGui.QWidget, Widget):
         value = self._scrollbar.value()
         # log.debug('_updateScrollPosition: %d', value)
         self._viewport.setPosition(value)
+
+    def eventFilter(self, object, event):
+        if object == self._widget and event.type() != QtCore.QEvent.Resize:
+            # log.debug('Viewport child resize: %d,%d -> %d,%d',
+            #           event.oldSize().width(), event.oldSize().height(),
+            #           event.size().width(), event.size().height())
+            self._updateScrollSize()
+        return False
