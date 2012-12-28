@@ -222,7 +222,7 @@ def findVert(verts, v, x, y, z, notfound):
 #   loadTarget(filepath, context):
 #----------------------------------------------------------
 
-def loadTarget(filepath, context):
+def loadTarget(filepath, context, firstIrrelevant=100000, lastIrrelevant=100000, offset=0):
     realpath = os.path.realpath(os.path.expanduser(filepath))
     fp = open(realpath, "rU")  
     #print("Loading target %s" % realpath)
@@ -245,6 +245,13 @@ def loadTarget(filepath, context):
             pass
         else:
             index = int(words[0])
+
+            if index >= firstIrrelevant:
+                if index < lastIrrelevant:
+                    continue
+                else:
+                    index -= offset
+                 
             if index >= nverts:
                 print("Stopped loading at index %d" % index)
                 break

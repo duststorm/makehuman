@@ -154,7 +154,7 @@ class VIEW3D_OT_DeleteIrrelevantButton(bpy.types.Operator):
             first,last = IrrelevantVerts[ob.MhAffectOnly]
             deleteBetween(ob, first, last)
             if ob.MhAffectOnly in ['Tights']:
-                ob.MhNoLoad = True
+                ob.MhMeshVertsDeleted = True
             ob.MhIrrelevantDeleted = True
         return{'FINISHED'}    
 
@@ -194,12 +194,14 @@ class VIEW3D_OT_LoadTargetButton(bpy.types.Operator):
         description="File path used for target file", 
         maxlen= 1024, default= "")
 
-    @classmethod
-    def poll(self, context):
-        return (context.object and not context.object.MhNoLoad)
-
     def execute(self, context):
-        utils.loadTarget(self.properties.filepath, context)
+        ob = context.object
+        if ob.MhMeshVertsDeleted:
+            first,last = IrrelevantVerts[ob.MhAffectOnly]
+            offset = OffsetVerts[ob.MhAffectOnly]
+            utils.loadTarget(self.properties.filepath, context, firstIrrelevant=first, lastIrrelevant=last, offset=offset)
+        else:
+            utils.loadTarget(self.properties.filepath, context)
         print("Target loaded")
         return {'FINISHED'}
 
@@ -254,7 +256,7 @@ class VIEW3D_OT_LoadTargetFromMeshButton(bpy.types.Operator):
 
     @classmethod
     def poll(self, context):
-        return (context.object and not context.object.MhNoLoad)
+        return (context.object and not context.object.MhMeshVertsDeleted)
 
     def execute(self, context):
         loadTargetFromMesh(context)
@@ -285,9 +287,9 @@ class VIEW3D_OT_NewTargetButton(bpy.types.Operator):
     bl_label = "New Target"
     bl_options = {'UNDO'}
 
-    @classmethod
-    def poll(self, context):
-        return (context.object and not context.object.MhNoLoad)
+    #@classmethod
+    #def poll(self, context):
+    #    return (context.object and not context.object.MhMeshVertsDeleted)
 
     def execute(self, context):
         newTarget(context)
@@ -320,7 +322,10 @@ def doSaveTarget(context, filepath):
         fp = open(filepath, "w")  
         for line in before:
             fp.write(line)
-        offset = OffsetVerts[ob.MhAffectOnly]
+        if ob.MhMeshVertsDeleted:
+            offset = OffsetVerts[ob.MhAffectOnly]
+        else:
+            offset = 0
         saveVerts(fp, ob, verts, saveAll, first, last, offset)
         for (vn, string) in after:
             fp.write("%d %s" % (vn, string))
@@ -719,6 +724,10 @@ class VIEW3D_OT_ApplyTargetsButton(bpy.types.Operator):
     bl_label = "Apply Targets"
     bl_options = {'UNDO'}
 
+    @classmethod
+    def poll(self, context):
+        return (context.object and not context.object.MhMeshVertsDeleted)
+
     def execute(self, context):
         if the.Confirm:
             the.Confirm = None
@@ -897,6 +906,10 @@ class VIEW3D_OT_FitTargetButton(bpy.types.Operator):
     bl_idname = "mh.fit_target"
     bl_label = "Fit Target"
     bl_options = {'UNDO'}
+
+    @classmethod
+    def poll(self, context):
+        return (context.object and not context.object.MhMeshVertsDeleted)
 
     def execute(self, context):
         fitTarget(context)
@@ -1245,7 +1258,7 @@ def init():
     default='All')
     
     bpy.types.Object.MhIrrelevantDeleted = BoolProperty(name="Irrelevant deleted", default = False)
-    bpy.types.Object.MhNoLoad = BoolProperty(name="Cannot load", default = False)
+    bpy.types.Object.MhMeshVertsDeleted = BoolProperty(name="Cannot load", default = False)
 
     bpy.types.Object.SelectedOnly = BoolProperty(name="Selected verts only", default = True)
     bpy.types.Object.MhZeroOtherTargets = BoolProperty(name="Only save active target", description="Set values of all other targets to 0", default = True)
