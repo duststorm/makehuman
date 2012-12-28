@@ -74,8 +74,7 @@ class CustomTargetsTaskView(gui3d.TaskView):
         self.modifiers = {}
         
         for folder in self.folders:
-            self.removeWidget(folder)
-            mh.removeWidget(mh.Frame.LeftTop, folder)
+            self.removeLeftWidget(folder)
         for child in self.folderBox.children[:]:
             self.folderBox.removeWidget(child)
             

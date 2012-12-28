@@ -510,6 +510,12 @@ class TaskView(View):
     def addRightWidget(self, widget):
         return self.right.addWidget(widget)
 
+    def removeLeftWidget(self, widget):
+        self.left.removeWidget(widget)
+
+    def removeRightWidget(self, widget):
+        self.right.removeWidget(widget)
+
 class Category(View):
 
     def __init__(self, name, label = None):

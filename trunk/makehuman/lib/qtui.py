@@ -407,6 +407,9 @@ class TaskPanel(qtgui.VScrollArea):
         self.layout.addWidget(widget, *args, **kwargs)
         return widget
 
+    def removeWidget(self, widget):
+        self.layout.removeWidget(widget)
+
 class Frame(QtGui.QWidget):
     Bottom      = 0
     Top         = 1
