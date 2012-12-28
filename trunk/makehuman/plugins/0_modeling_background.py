@@ -33,7 +33,6 @@ from aljabr import vnorm, vsub, vadd, vdot, mtransform
 from math import floor, ceil, pi, sqrt, exp
 import gui
 import filechooser as fc
-from language import language
 
 def pointInRect(point, rect):
 
@@ -377,7 +376,7 @@ class BackgroundTaskView(gui3d.TaskView):
 
         gui3d.TaskView.onShow(self, event)
         gui3d.app.selectedHuman.hide()
-        gui3d.app.prompt('Info', language.getLanguageString(u'Images which are placed in %s will show up here.') % self.backgroundsFolder, 'OK', helpId='backgroundHelp')
+        gui3d.app.prompt('Info', u'Images which are placed in %s will show up here.' % self.backgroundsFolder, 'OK', helpId='backgroundHelp')
         self.filechooser.setFocus()
 
     def onHide(self, event):
