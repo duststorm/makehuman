@@ -11,7 +11,7 @@ class ExampleTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Example')
 
-        box = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Example')))
+        box = self.addLeftWidget(gui.GroupBox('Example'))
         
         # We add a button to the current task
         # A button just fires an event when it is clicked, if a selected texture is specified,

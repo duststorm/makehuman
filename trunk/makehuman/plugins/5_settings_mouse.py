@@ -27,7 +27,7 @@ class MouseActionsTaskView(gui3d.TaskView):
             widget.addWidget(AppMouseActionEdit(method), row[0], 1)
             row[0] += 1
         
-        self.mouseBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Camera')))
+        self.mouseBox = self.addLeftWidget(gui.GroupBox('Camera'))
 
         add(self.mouseBox, "Move",   gui3d.app.mouseTranslate)
         add(self.mouseBox, "Rotate", gui3d.app.mouseRotate)

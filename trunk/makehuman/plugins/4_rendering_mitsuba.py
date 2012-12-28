@@ -20,7 +20,7 @@ class MitsubaTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Mitsuba')
 
         # Buttons
-        pathBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Mitsuba  bin  path')))
+        pathBox = self.addLeftWidget(gui.GroupBox('Mitsuba  bin  path'))
         mitsuba_bin = gui3d.app.settings.get('mitsuba_bin', '')
         self.path= pathBox.addWidget(gui.TextEdit(str(mitsuba_bin)))
         #
@@ -29,19 +29,19 @@ class MitsubaTaskView(gui3d.TaskView):
             gui3d.app.settings['mitsuba_bin'] = 'Enter your path' if not value else str(value)
         
         # Type of lighting method
-        lightingBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Integrators')))
+        lightingBox = self.addLeftWidget(gui.GroupBox('Integrators'))
         lighting = []
         self.dlButton = lightingBox.addWidget(gui.RadioButton(lighting, 'DirectLighting', selected = True))
         self.ptButton = lightingBox.addWidget(gui.RadioButton(lighting, 'Path Tracing'))
         self.pmButton = lightingBox.addWidget(gui.RadioButton(lighting, 'Photon Mapping'))
         
         #
-        samplerBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Sampler Options')))
+        samplerBox = self.addLeftWidget(gui.GroupBox('Sampler Options'))
         sampler = []
         self.lowdButton = samplerBox.addWidget(gui.RadioButton(sampler, 'Low Discrepancy', selected = True))
         self.indepButton = samplerBox.addWidget(gui.RadioButton(sampler, 'Independent'))
         #
-        renderBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Render Options')))
+        renderBox = self.addLeftWidget(gui.GroupBox('Render Options'))
         source=[]
         self.consoleButton = renderBox.addWidget(gui.RadioButton(source, 'Render console'))
         self.guiButton = renderBox.addWidget(gui.RadioButton(source, 'Render GUI', selected = True))

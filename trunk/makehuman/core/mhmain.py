@@ -37,7 +37,7 @@ class PluginsTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Plugins')
 
-        self.pluginsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Plugins')))
+        self.pluginsBox = self.addLeftWidget(gui.GroupBox('Plugins'))
 
         for module in gui3d.app.modules:
             check = self.pluginsBox.addWidget(PluginCheckBox(module))
@@ -376,6 +376,8 @@ class MHApplication(gui3d.Application, mh.Application):
           else:
             posemode.enterPoseMode()
         """
+
+        mh.refreshLayout()
 
         self.switchCategory("Modelling")
 

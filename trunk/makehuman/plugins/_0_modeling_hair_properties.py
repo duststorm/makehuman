@@ -44,7 +44,7 @@ class HairPropertiesTaskView(gui3d.TaskView):
         
         gui3d.TaskView.__init__(self, category, 'Hair')
         
-        propsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Hair properties')))
+        propsBox = self.addLeftWidget(gui.GroupBox('Hair properties'))
 
         #############
         #SLIDERS

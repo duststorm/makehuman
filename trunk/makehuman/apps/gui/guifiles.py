@@ -266,7 +266,7 @@ class ExportTaskView(gui3d.TaskView):
         self.exportHairGroup = []
         
         # Formats
-        self.formatBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Format')))
+        self.formatBox = self.addLeftWidget(gui.GroupBox('Format'))
         self.wavefrontObj = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, "Wavefront obj", True))
         self.mhx = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Blender exchange (mhx)"))
         self.collada = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Collada (dae)"))
@@ -274,7 +274,7 @@ class ExportTaskView(gui3d.TaskView):
         self.stl = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Stereolithography (stl)"))
         self.skel = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Skeleton (skel)"))
 
-        self.optionsBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.StackedBox()))
+        self.optionsBox = self.addRightWidget(gui.StackedBox())
 
         # OBJ options
         self.objOptions = self.optionsBox.addWidget(gui.GroupBox('Options'))

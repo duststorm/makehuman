@@ -11,7 +11,7 @@ class RandomTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Random')
         
-        toolbox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.SliderBox('Tools')))
+        toolbox = self.addLeftWidget(gui.SliderBox('Tools'))
         self.macro = toolbox.addWidget(gui.CheckBox("Macro", True))
         self.height = toolbox.addWidget(gui.CheckBox("Height"))
         self.face = toolbox.addWidget(gui.CheckBox("Face"))

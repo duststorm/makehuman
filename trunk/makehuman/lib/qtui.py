@@ -394,6 +394,19 @@ class VLayout(QtGui.QLayout):
     def expandingDirections(self):
         return QtCore.Qt.Vertical
 
+class TaskPanel(qtgui.VScrollArea):
+    def __init__(self):
+        super(TaskPanel, self).__init__()
+        self.setMinimumHeight(250)
+        self.child = QtGui.QWidget()
+        self.child.setContentsMargins(0, 0, 0, 0)
+        self.setWidget(self.child)
+        self.layout = QtGui.QBoxLayout(QtGui.QBoxLayout.TopToBottom, self.child)
+
+    def addWidget(self, widget, *args, **kwargs):
+        self.layout.addWidget(widget, *args, **kwargs)
+        return widget
+
 class Frame(QtGui.QWidget):
     Bottom      = 0
     Top         = 1
@@ -473,14 +486,8 @@ class Frame(QtGui.QWidget):
         self.h_layout.addWidget(self.r_panel, 0, 2)
         self.h_layout.setColumnStretch(2, 0)
 
-        self.lt_panel = qtgui.VScrollArea()
-        self.lt_panel.setMinimumHeight(250)
-        # self.left_top = QtGui.QBoxLayout(QtGui.QBoxLayout.TopToBottom)
-        # self.l_layout.addLayout(self.left_top, 0, 0)
-        self.l_layout.addWidget(self.lt_panel, 0, 0)
-        self.lt_child = self.panel()
-        self.lt_panel.setWidget(self.lt_child)
-        self.left_top = QtGui.QBoxLayout(QtGui.QBoxLayout.TopToBottom, self.lt_child)
+        self.left_top    = QtGui.QStackedLayout()
+        self.l_layout.addLayout(self.left_top, 0, 0)
         self.l_layout.setRowStretch(0, 0)
 
         self.l_layout.setRowStretch(1, 1)
@@ -489,7 +496,7 @@ class Frame(QtGui.QWidget):
         self.l_layout.addLayout(self.left_bottom, 2, 0)
         self.l_layout.setRowStretch(2, 0)
 
-        self.right_top    = QtGui.QBoxLayout(QtGui.QBoxLayout.TopToBottom)
+        self.right_top    = QtGui.QStackedLayout()
         self.r_layout.addLayout(self.right_top, 0, 0)
         self.r_layout.setRowStretch(0, 0)
 
@@ -502,11 +509,23 @@ class Frame(QtGui.QWidget):
         self.sides = {
             self.Bottom:      self.bottom,
             self.Top:         self.top,
-            self.LeftTop:     self.left_top,
             self.LeftBottom:  self.left_bottom,
-            self.RightTop:    self.right_top,
             self.RightBottom: self.right_bottom,
             }
+
+    def addPanel(self, parent):
+        panel = TaskPanel()
+        parent.addWidget(panel)
+        return panel
+
+    def addPanels(self):
+        left = self.addPanel(self.left_top)
+        right = self.addPanel(self.right_top)
+        return left, right
+
+    def showPanels(self, left, right):
+        self.left_top.setCurrentWidget(left)
+        self.right_top.setCurrentWidget(right)
 
     def addWidget(self, edge, widget, *args, **kwargs):
         self.sides[edge].addWidget(widget, *args, **kwargs)
@@ -610,3 +629,9 @@ def refreshLayout(widget=None):
     for child in QtGui.QWidget.children(widget):
         if child.isWidgetType():
             refreshLayout(child)
+
+def addPanels():
+    return G.app.mainwin.addPanels()
+
+def showPanels(left, right):
+    return G.app.mainwin.showPanels(left, right)

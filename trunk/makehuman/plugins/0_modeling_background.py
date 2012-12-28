@@ -192,7 +192,7 @@ class BackgroundTaskView(gui3d.TaskView):
             else:
                 mh.changeTask('Library', 'Background')
 
-        self.backgroundBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Background 2 settings')))
+        self.backgroundBox = self.addLeftWidget(gui.GroupBox('Background 2 settings'))
 
         self.radioButtonGroup = []
         self.bgImageFrontRadioButton  = self.backgroundBox.addWidget(gui.RadioButton(self.radioButtonGroup, label='Front', selected=True))
@@ -449,7 +449,7 @@ class settingsTaskView(gui3d.TaskView) :
 
         self.lastPos = [0, 0]
 
-        self.backgroundBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Background settings')))
+        self.backgroundBox = self.addLeftWidget(gui.GroupBox('Background settings'))
 
         # sliders
         self.opacitySlider = self.backgroundBox.addWidget(gui.Slider(value=taskview.opacity, min=0,max=255, label = "Opacity: %d"))

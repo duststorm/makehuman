@@ -26,7 +26,7 @@ class MakeHairTaskView(gui3d.TaskView):
         #sliders
         y=80
 
-        optionsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Options')))
+        optionsBox = self.addLeftWidget(gui.GroupBox('Options'))
         self.cPSlider = optionsBox.addWidget(gui.Slider(value=14,min=4,max=30,label="Control Points: %d"))
         self.lengthSlider = optionsBox.addWidget(gui.Slider(value=5.0,min=0.0,max=7.0,label="Strand Length: %.2f"))
         self.numberSlider = optionsBox.addWidget(gui.Slider(value=25,min=1,max=260,label="Strands Number: %d"))

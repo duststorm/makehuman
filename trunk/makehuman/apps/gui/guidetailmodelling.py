@@ -555,7 +555,7 @@ class DetailModelingTaskView(gui3d.TaskView):
         
         self.sliders = []
 
-        self.modifiersBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Modifiers')))
+        self.modifiersBox = self.addLeftWidget(gui.GroupBox('Modifiers'))
 
         self.detailButtonGroup = []
 

@@ -37,13 +37,13 @@ class SettingsTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Settings')
 
         self.shaderGroup = []
-        shaderBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Shader')))
+        shaderBox = self.addLeftWidget(gui.GroupBox('Shader'))
         self.shaderNo = shaderBox.addWidget(gui.RadioButton(self.shaderGroup, "No shader", True))
         self.shaderPhong = shaderBox.addWidget(gui.RadioButton(self.shaderGroup, "Phong shader"))
         self.shaderToon = shaderBox.addWidget(gui.RadioButton(self.shaderGroup, "Toon shader"))
         #self.shaderSkin = shaderBox.addWidget(gui.RadioButton(self.shaderGroup, "Skin shader"))
         
-        sliderBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Slider behavior')))
+        sliderBox = self.addLeftWidget(gui.GroupBox('Slider behavior'))
         self.realtimeUpdates = sliderBox.addWidget(gui.CheckBox("Update real-time",
             gui3d.app.settings.get('realtimeUpdates', True)))
         self.realtimeNormalUpdates = sliderBox.addWidget(gui.CheckBox("Update normals",
@@ -51,7 +51,7 @@ class SettingsTaskView(gui3d.TaskView):
         self.cameraAutoZoom = sliderBox.addWidget(gui.CheckBox("Auto-zoom camera",
             gui3d.app.settings.get('cameraAutoZoom', True)))
             
-        mouseBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.SliderBox('Mouse behavior')))
+        mouseBox = self.addLeftWidget(gui.SliderBox('Mouse behavior'))
         self.normal = mouseBox.addWidget(gui.Slider(gui3d.app.settings.get('lowspeed', 1), 1, 10,
             "Normal: %d"))
         self.shift = mouseBox.addWidget(gui.Slider(gui3d.app.settings.get('highspeed', 5), 1, 10,
@@ -59,13 +59,13 @@ class SettingsTaskView(gui3d.TaskView):
             
         modes = [] 
                
-        unitBox = self.unitsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Units')))
+        unitBox = self.unitsBox = self.addLeftWidget(gui.GroupBox('Units'))
         metric = unitBox.addWidget(gui.RadioButton(modes, 'Metric', gui3d.app.settings.get('units', 'metric') == 'metric'))
         imperial = unitBox.addWidget(gui.RadioButton(modes, 'Imperial', gui3d.app.settings.get('units', 'metric') == 'imperial'))
         
         fonts = []
         
-        fontsBox = self.fontsBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Font')))
+        fontsBox = self.fontsBox = self.addRightWidget(gui.GroupBox('Font'))
         
         fontFiles = [os.path.basename(filename).replace('.fnt', '') for filename in os.listdir('data/fonts') if filename.split(os.extsep)[-1] == "fnt"]
         for font in fontFiles:
@@ -73,7 +73,7 @@ class SettingsTaskView(gui3d.TaskView):
         
         languages = []
         
-        languageBox = self.languageBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Language')))
+        languageBox = self.languageBox = self.addRightWidget(gui.GroupBox('Language'))
         languageBox.addWidget(LanguageRadioButton(languages, 'english'))
         
         languageFiles = [os.path.basename(filename).replace('.ini', '') for filename in os.listdir('data/languages') if filename.split(os.extsep)[-1] == "ini"]

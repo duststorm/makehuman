@@ -12,15 +12,16 @@ import gui
 
 class AssymSlider(gui.Slider):
     
-    def __init__(self, bodypart, label):
+    def __init__(self, task, bodypart, label):
         super(AssymSlider, self).__init__(value=0.0, min=-1.0, max=1.0, label=label)
         self.bodypart = bodypart
+        self.task = task
         
     def onChange(self, value):
-        self.parentWidget()._parent.changeValue(self.bodypart, value)
+        self.task.changeValue(self.bodypart, value)
         
     def onChanging(self, value):
-        self.parentWidget()._parent.changeValue(self.bodypart, value, True)
+        self.task.changeValue(self.bodypart, value, True)
 
 class AsymmTaskView(gui3d.TaskView):
 
@@ -28,20 +29,20 @@ class AsymmTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Asymmetry')
 
         #Sliders
-        self.leftBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.SliderBox('Face')))
-        self.asymmBrowSlider = self.leftBox.addWidget(AssymSlider("brown", "Brow asymmetry"))
-        self.asymmCheekSlider = self.leftBox.addWidget(AssymSlider("cheek", "Cheek asymmetry"))
-        self.asymmEarsSlider = self.leftBox.addWidget(AssymSlider("ear", "Ears asymmetry"))
-        self.asymmEyeSlider = self.leftBox.addWidget(AssymSlider("eye", "Eye asymmetry"))
-        self.asymmJawSlider = self.leftBox.addWidget(AssymSlider("jaw", "Jaw asymmetry"))
-        self.asymmMouthSlider = self.leftBox.addWidget(AssymSlider("mouth", "Mouth asymmetry"))
-        self.asymmNoseSlider = self.leftBox.addWidget(AssymSlider("nose", "Nose asymmetry"))
-        self.asymmTempleSlider = self.leftBox.addWidget(AssymSlider("temple", "Temple asymmetry"))
-        self.asymmTopSlider = self.leftBox.addWidget(AssymSlider("top", "Top asymmetry"))
+        self.leftBox = self.addLeftWidget(gui.SliderBox('Face'))
+        self.asymmBrowSlider = self.leftBox.addWidget(AssymSlider(self, "brown", "Brow asymmetry"))
+        self.asymmCheekSlider = self.leftBox.addWidget(AssymSlider(self, "cheek", "Cheek asymmetry"))
+        self.asymmEarsSlider = self.leftBox.addWidget(AssymSlider(self, "ear", "Ears asymmetry"))
+        self.asymmEyeSlider = self.leftBox.addWidget(AssymSlider(self, "eye", "Eye asymmetry"))
+        self.asymmJawSlider = self.leftBox.addWidget(AssymSlider(self, "jaw", "Jaw asymmetry"))
+        self.asymmMouthSlider = self.leftBox.addWidget(AssymSlider(self, "mouth", "Mouth asymmetry"))
+        self.asymmNoseSlider = self.leftBox.addWidget(AssymSlider(self, "nose", "Nose asymmetry"))
+        self.asymmTempleSlider = self.leftBox.addWidget(AssymSlider(self, "temple", "Temple asymmetry"))
+        self.asymmTopSlider = self.leftBox.addWidget(AssymSlider(self, "top", "Top asymmetry"))
 
-        self.rightBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.SliderBox('Body')))
-        self.asymmTrunkSlider = self.rightBox.addWidget(AssymSlider("trunk", "Trunk asymmetry"))
-        self.asymmBreastSlider = self.rightBox.addWidget(AssymSlider("breast", "Breast asymmetry"))
+        self.rightBox = self.addRightWidget(gui.SliderBox('Body'))
+        self.asymmTrunkSlider = self.rightBox.addWidget(AssymSlider(self, "trunk", "Trunk asymmetry"))
+        self.asymmBreastSlider = self.rightBox.addWidget(AssymSlider(self, "breast", "Breast asymmetry"))
 
         #Get a list with all targes (complete with path) used in asymm library
         self.asymmDataPath = "data/targets/asym/"

@@ -486,6 +486,7 @@ class TaskView(View):
         self.label = label
         self.focusWidget = None
         self.tab = None
+        self.left, self.right = mh.addPanels()
 
     def getModifiers(self):
         return {}
@@ -498,6 +499,16 @@ class TaskView(View):
     # return list of singular modifier names
     def getSingularModifierNames(self):
         return []
+
+    def showWidgets(self):
+        super(TaskView, self).showWidgets()
+        mh.showPanels(self.left, self.right)
+
+    def addLeftWidget(self, widget):
+        return self.left.addWidget(widget)
+
+    def addRightWidget(self, widget):
+        return self.right.addWidget(widget)
 
 class Category(View):
 

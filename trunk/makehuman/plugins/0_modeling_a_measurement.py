@@ -56,15 +56,13 @@ class MeasurementValueConverter(object):
         return self.value
 
 class GroupBoxRadioButton(gui.RadioButton):
-    def __init__(self, group, label, groupBox, selected=False):
+    def __init__(self, task, group, label, groupBox, selected=False):
         super(GroupBoxRadioButton, self).__init__(group, label, selected)
         self.groupBox = groupBox
+        self.task = task
 
     def onClicked(self, event):
-        self.parentWidget()._parent.groupBox.showWidget(self.groupBox)
-        # self.parentWidget()._parent.hideAllBoxes()
-        # self.groupBox.show()
-        # self.groupBox.children[0].setFocus()
+        self.task.groupBox.showWidget(self.groupBox)
 
 class MeasureSlider(humanmodifier.ModifierSlider):
     def __init__(self, label, task, measure, modifier):
@@ -72,18 +70,19 @@ class MeasureSlider(humanmodifier.ModifierSlider):
         humanmodifier.ModifierSlider.__init__(self, value=0.0, min=-1.0, max=1.0,
             label=label, modifier=modifier, valueConverter=MeasurementValueConverter(task, measure, modifier))
         self.measure = measure
+        self.task = task
 
     def onChange(self, value):
         super(MeasureSlider, self).onChange(value)
-        self.parent.parent.syncSliderLabels()
+        self.task.syncSliderLabels()
 
     def onFocus(self, event):
-        super(MeasureSlider, self).onFocus(self, event)
-        self.parent.parent.onSliderFocus()
+        super(MeasureSlider, self).onFocus(event)
+        self.task.onSliderFocus()
 
     def onBlur(self, event):
-        super(MeasureSlider, self).onBlur(self, event)
-        self.parent.parent.onSliderBlur()
+        super(MeasureSlider, self).onBlur(event)
+        self.task.onSliderBlur()
 
 class MeasureTaskView(gui3d.TaskView):
 
@@ -152,8 +151,8 @@ class MeasureTaskView(gui3d.TaskView):
 
         measureDataPath = "data/targets/measure/"
 
-        self.categoryBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Category')))
-        self.groupBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.StackedBox()))
+        self.categoryBox = self.addRightWidget(gui.GroupBox('Category'))
+        self.groupBox = self.addLeftWidget(gui.StackedBox())
 
         for name, subnames in measurements:
             # Create box
@@ -161,7 +160,7 @@ class MeasureTaskView(gui3d.TaskView):
             self.groupBoxes[name] = box
 
             # Create radiobutton
-            radio = self.categoryBox.addWidget(GroupBoxRadioButton(self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0))
+            radio = self.categoryBox.addWidget(GroupBoxRadioButton(self, self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0))
 
             # Create sliders
             for subname in subnames:
@@ -172,13 +171,13 @@ class MeasureTaskView(gui3d.TaskView):
                 slider = box.addWidget(MeasureSlider(sliderLabel[subname], self, subname, modifier))
                 self.sliders.append(slider)
 
-        self.statsBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Statistics')))
+        self.statsBox = self.addRightWidget(gui.GroupBox('Statistics'))
         self.height = self.statsBox.addWidget(gui.TextView('Height: '))
         self.chest = self.statsBox.addWidget(gui.TextView('Chest: '))
         self.waist = self.statsBox.addWidget(gui.TextView('Waist: '))
         self.hips = self.statsBox.addWidget(gui.TextView('Hips: '))
 
-        self.braBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Brassiere size')))
+        self.braBox = self.addRightWidget(gui.GroupBox('Brassiere size'))
         self.eu = self.braBox.addWidget(gui.TextView('EU: '))
         self.jp = self.braBox.addWidget(gui.TextView('JP: '))
         self.us = self.braBox.addWidget(gui.TextView('US: '))

@@ -21,7 +21,7 @@ class PovrayTaskView(gui3d.TaskView):
         binarie = ''
 
         bintype = []
-        pathBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Povray  bin  path')))
+        pathBox = self.addLeftWidget(gui.GroupBox('Povray  bin  path'))
         # this part load old settings values for next session; str(povray_bin)
         povray_bin = gui3d.app.settings.get('povray_bin', '')
         self.path= pathBox.addWidget(gui.TextEdit(str(povray_bin)))
@@ -37,12 +37,12 @@ class PovrayTaskView(gui3d.TaskView):
         #------------------------------------------------------------------------------------
         filter = []
         # Options box
-        optionsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Options')))
+        optionsBox = self.addLeftWidget(gui.GroupBox('Options'))
         self.useSSS = optionsBox.addWidget(gui.CheckBox('Use S.S. Scattering', False))
         self.SSSQ = optionsBox.addWidget(gui.Slider(value=0.5, label="SSS Quality"))
         
         # box
-        #optionsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Options')))
+        #optionsBox = self.addLeftWidget(gui.GroupBox('Options'))
         
         #Buttons
         # Simplified the gui a bit for the average user. Uncomment to clutter it up with developer - useful stuff.

@@ -110,7 +110,7 @@ class PelvisStomachTaskView(gui3d.TaskView):
         
         self.sliders = []
         
-        self.pelvisBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.SliderBox('Pelvis')))
+        self.pelvisBox = self.addLeftWidget(gui.SliderBox('Pelvis'))
         
         self.sliders.append(self.pelvisBox.addWidget(DetailSlider(0.0, -1.0, 1.0, "Pelvis tone", self.modifiers['pelvisTone'])))
         self.sliders.append(self.pelvisBox.addWidget(DetailSlider(0.0, -1.0, 1.0, "Stomach", self.modifiers['stomach'])))

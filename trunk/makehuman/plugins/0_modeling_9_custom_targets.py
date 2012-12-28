@@ -36,12 +36,13 @@ import gui
 
 class FolderButton(gui.RadioButton):
 
-    def __init__(self, group, label, groupBox, selected=False):
+    def __init__(self, task, group, label, groupBox, selected=False):
         super(FolderButton, self).__init__(group, label, selected)
         self.groupBox = groupBox
+        self.task = task
         
     def onClicked(self, event):
-        self.parentWidget()._parent.hideAllBoxes()
+        self.task.hideAllBoxes()
         self.groupBox.show()
 
 class CustomTargetsTaskView(gui3d.TaskView):
@@ -53,10 +54,10 @@ class CustomTargetsTaskView(gui3d.TaskView):
         if not os.path.exists(self.targetsPath):
             os.makedirs(self.targetsPath)
         
-        self.optionsBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Options')))
+        self.optionsBox = self.addRightWidget(gui.GroupBox('Options'))
         rescanButton = self.optionsBox.addWidget(gui.Button("Rescan targets' folder"))
 
-        self.folderBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Folders')))
+        self.folderBox = self.addRightWidget(gui.GroupBox('Folders'))
         
         @rescanButton.mhEvent
         def onClicked(event):
@@ -83,8 +84,8 @@ class CustomTargetsTaskView(gui3d.TaskView):
         
         for root, dirs, files in os.walk(self.targetsPath):
 
-            groupBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Targets')))
-            button = self.folderBox.addWidget(FolderButton(group, os.path.basename(root), groupBox, len(self.folderBox.children) == 0))
+            groupBox = self.addLeftWidget(gui.GroupBox('Targets'))
+            button = self.folderBox.addWidget(FolderButton(self, group, os.path.basename(root), groupBox, len(self.folderBox.children) == 0))
             self.folders.append(groupBox)
 
             for f in files:

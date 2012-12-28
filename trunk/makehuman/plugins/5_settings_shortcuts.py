@@ -27,7 +27,7 @@ class ShortcutsTaskView(gui3d.TaskView):
             widget.addWidget(AppShortcutEdit(method), row[0], 1)
             row[0] += 1
 
-        self.cameraBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Camera')))
+        self.cameraBox = self.addLeftWidget(gui.GroupBox('Camera'))
         add(self.cameraBox, "Turn left",    gui3d.app.rotateLeft)
         add(self.cameraBox, "Turn up",      gui3d.app.rotateUp)
         add(self.cameraBox, "Turn down",    gui3d.app.rotateDown)
@@ -46,11 +46,11 @@ class ShortcutsTaskView(gui3d.TaskView):
         add(self.cameraBox, "Bottom view",  gui3d.app.bottomView)
         add(self.cameraBox, "Reset view",   gui3d.app.resetView)
 
-        self.actionBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Actions')))
+        self.actionBox = self.addRightWidget(gui.GroupBox('Actions'))
         add(self.actionBox, "Undo",         gui3d.app.undo)
         add(self.actionBox, "Redo",         gui3d.app.redo)
 
-        self.navigationBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Navigation')))
+        self.navigationBox = self.addRightWidget(gui.GroupBox('Navigation'))
         add(self.navigationBox, "Modelling", gui3d.app.goToModelling)
         add(self.navigationBox, "Save",      gui3d.app.goToSave)
         add(self.navigationBox, "Load",      gui3d.app.goToLoad)

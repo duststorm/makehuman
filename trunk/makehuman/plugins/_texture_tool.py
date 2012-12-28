@@ -16,7 +16,7 @@ class TextureToolTaskView(gui3d.TaskView):
         self.mesh = None
         self.object = None
         
-        self.box = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Inspect')))
+        self.box = self.addLeftWidget(gui.GroupBox('Inspect'))
         group = []
         self.model = self.box.addWidget(gui.RadioButton(group, "Model", True))
         self.texture = self.box.addWidget(gui.RadioButton(group, "Texture"))

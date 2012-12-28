@@ -58,12 +58,16 @@ def addWidget(edge, widget, *args, **kwargs):
 def removeWidget(edge, widget):
     return ui.removeWidget(edge, widget)
 
+def addPanels():
+    return ui.addPanels()
+
+def showPanels(left, right):
+    return ui.showPanels(left, right)
+
 class Frame:
     Bottom      = ui.Frame.Bottom
     Top         = ui.Frame.Top
-    LeftTop     = ui.Frame.LeftTop
     LeftBottom  = ui.Frame.LeftBottom
-    RightTop    = ui.Frame.RightTop
     RightBottom = ui.Frame.RightBottom
 
 def changeCategory(category):

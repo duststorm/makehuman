@@ -14,14 +14,13 @@ import filechooser as fc
 import log
 
 class GroupBoxRadioButton(gui.RadioButton):
-    def __init__(self, group, label, groupBox, selected=False):
+    def __init__(self, task, group, label, groupBox, selected=False):
         super(GroupBoxRadioButton, self).__init__(group, label, selected)
         self.groupBox = groupBox
+        self.task = task
         
     def onClicked(self, event):
-        self.parentWidget()._parent.groupBox.showWidget(self.groupBox)
-        # self.parentWidget()._parent.hideAllBoxes()
-        # self.groupBox.show()
+        self.task.groupBox.showWidget(self.groupBox)
 
 class ExpressionSlider(posemode.PoseModifierSlider):
     def __init__(self, label, modifier):        
@@ -51,8 +50,8 @@ class ExpressionTaskView(gui3d.TaskView):
         
         self.modifiers = {}
         
-        self.categoryBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Category')))
-        self.groupBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.StackedBox()))
+        self.categoryBox = self.addRightWidget(gui.GroupBox('Category'))
+        self.groupBox = self.addLeftWidget(gui.StackedBox())
         
         for name, subnames in self.expressions:
             # Create box
@@ -74,7 +73,7 @@ class ExpressionTaskView(gui3d.TaskView):
                 self.sliders.append(slider)
                 modifier.slider = slider
             # Create radiobutton
-            radio = self.categoryBox.addWidget(GroupBoxRadioButton(self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0))
+            radio = self.categoryBox.addWidget(GroupBoxRadioButton(self, self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0))
 
         self.groupBox.showWidget(self.groupBoxes[0])
         # self.hideAllBoxes()

@@ -111,7 +111,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
         log.debug("PoseArmatureTaskView: Status: %s", self.status)
 
         # Main box
-        self.mainBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Rotation')))
+        self.mainBox = self.addLeftWidget(gui.GroupBox('Rotation'))
         self.eulerBox = self.addWidget(mh.addWidget(mh.Frame.LeftBottom, gui.GroupBox('Euler')))
         self.quatBox = self.addWidget(mh.addWidget(mh.Frame.LeftBottom, gui.GroupBox('Quaternion')))
 
@@ -146,7 +146,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
         self.eulerBox.hide()
 
         # Rig select box        
-        self.rigBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Rig')))
+        self.rigBox = self.addLeftWidget(gui.GroupBox('Rig'))
 
         prisms = []
         self.prismButtons = {}
@@ -173,17 +173,17 @@ class PoseArmatureTaskView(gui3d.TaskView):
         self.rigBox.show()                    
         
         # Bone select box        
-        self.boneBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Bone')))
+        self.boneBox = self.addRightWidget(gui.GroupBox('Bone'))
         self.boneButtons = {}
         self.boneBox.hide()
         
         # Pose select box        
-        self.poseBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Pose')))
+        self.poseBox = self.addRightWidget(gui.GroupBox('Pose'))
         self.poseButtons = {}
         self.poseBox.hide()
         
         # Layer select box
-        self.layerBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Layers')))
+        self.layerBox = self.addRightWidget(gui.GroupBox('Layers'))
         self.layerButtons = {}
         self.layerBox.hide()
         

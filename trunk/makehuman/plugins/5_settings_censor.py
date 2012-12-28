@@ -10,7 +10,7 @@ class CensorTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Censor')
         
-        self.mouseBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Censor')))
+        self.mouseBox = self.addLeftWidget(gui.GroupBox('Censor'))
         self.enableCensor = self.mouseBox.addWidget(gui.CheckBox("Enable", gui3d.app.settings.get('censor', False)))
         
         human = gui3d.app.selectedHuman

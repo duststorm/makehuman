@@ -8,12 +8,13 @@ import mh
 import gui
 
 class GroupBoxRadioButton(gui.RadioButton):
-    def __init__(self, group, label, groupBox, selected=False):
+    def __init__(self, task, group, label, groupBox, selected=False):
         super(GroupBoxRadioButton, self).__init__(group, label, selected)
         self.groupBox = groupBox
+        self.task = task
         
     def onClicked(self, event):
-        self.parentWidget()._parent.groupBox.showWidget(self.groupBox)
+        self.task.groupBox.showWidget(self.groupBox)
         
 class HeadSlider(humanmodifier.ModifierSlider):
     def __init__(self, modifier, image, view):
@@ -65,8 +66,8 @@ class HeadTaskView(gui3d.TaskView):
         
         self.modifiers = {}
         
-        self.categoryBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Category')))
-        self.groupBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.StackedBox()))
+        self.categoryBox = self.addRightWidget(gui.GroupBox('Category'))
+        self.groupBox = self.addLeftWidget(gui.StackedBox())
         
         for name, templates in features:
             
@@ -84,7 +85,7 @@ class HeadTaskView(gui3d.TaskView):
                     self.groupBoxes.append(box)
                     
                     # Create radiobutton
-                    radio = self.categoryBox.addWidget(GroupBoxRadioButton(self.radioButtons, title, box, selected=len(self.radioButtons) == 0))
+                    radio = self.categoryBox.addWidget(GroupBoxRadioButton(self, self.radioButtons, title, box, selected=len(self.radioButtons) == 0))
             
                 # Create sliders
                 modifier = humanmodifier.GenderAgeEthnicAsymmetricModifier(template[0], 'value', template[2], template[3], False)

@@ -13,12 +13,12 @@ class EthnicsTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Ethnics')
 
         self.ethnicGroup = []
-        ethnicBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Ethnic')))
+        ethnicBox = self.addLeftWidget(gui.GroupBox('Ethnic'))
         self.africa = ethnicBox.addWidget(gui.RadioButton(self.ethnicGroup, "Africa", True))
         self.africa.name = "africa"
         
         self.subEthnicGroup = []
-        subEthnicBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Sub ethnic')))
+        subEthnicBox = self.addLeftWidget(gui.GroupBox('Sub ethnic'))
         self.aethiopid = subEthnicBox.addWidget(gui.RadioButton(self.subEthnicGroup, "Aethiopid", True))
         self.aethiopid.name = "aethiopid"
         self.center = subEthnicBox.addWidget(gui.RadioButton(self.subEthnicGroup, "Center"))
@@ -35,14 +35,14 @@ class EthnicsTaskView(gui3d.TaskView):
         self.bantu.name = "bantu"
         
         self.genderGroup = []
-        self.genderBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Gender')))
+        self.genderBox = self.addRightWidget(gui.GroupBox('Gender'))
         self.female = self.genderBox.addWidget(gui.RadioButton(self.genderGroup, "Female", True))
         self.female.name = "female"
         self.male = self.genderBox.addWidget(gui.RadioButton(self.genderGroup, "Male"))
         self.male.name = "male"
         
         self.ageGroup = []
-        self.ageBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Age')))
+        self.ageBox = self.addRightWidget(gui.GroupBox('Age'))
         self.child = self.ageBox.addWidget(gui.RadioButton(self.ageGroup, "Child", True))
         self.child.name = "child"
         self.young = self.ageBox.addWidget(gui.RadioButton(self.ageGroup, "Young"))
@@ -50,7 +50,7 @@ class EthnicsTaskView(gui3d.TaskView):
         self.old = self.ageBox.addWidget(gui.RadioButton(self.ageGroup, "Old"))
         self.old = "old"
         
-        self.loadBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Load')))
+        self.loadBox = self.addRightWidget(gui.GroupBox('Load'))
         self.load = self.loadBox.addWidget(gui.Button("Load"))
         
         @self.load.mhEvent

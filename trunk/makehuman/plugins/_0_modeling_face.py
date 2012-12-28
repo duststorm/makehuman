@@ -8,12 +8,13 @@ import mh
 import gui
 
 class GroupBoxRadioButton(gui.RadioButton):
-    def __init__(self, group, label, groupBox, selected=False):
+    def __init__(self, task, group, label, groupBox, selected=False):
         super(GroupBoxRadioButton, self).__init__(group, label, selected)
         self.groupBox = groupBox
+        self.task = task
         
     def onClicked(self, event):
-        self.parentWidget()._parent.groupBox.showWidget(self.groupBox)
+        self.task.groupBox.showWidget(self.groupBox)
         
 class FaceSlider(humanmodifier.ModifierSlider):
     def __init__(self, label, modifier):
@@ -61,8 +62,8 @@ class FaceTaskView(gui3d.TaskView):
         
         self.modifiers = {}
         
-        self.categoryBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Category')))
-        self.groupBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.StackedBox()))
+        self.categoryBox = self.addRightWidget(gui.GroupBox('Category'))
+        self.groupBox = self.addLeftWidget(gui.StackedBox())
         
         for name, templates in features:
             
@@ -80,7 +81,7 @@ class FaceTaskView(gui3d.TaskView):
                     self.groupBoxes.append(box)
                     
                     # Create radiobutton
-                    radio = self.categoryBox.addWidget(GroupBoxRadioButton(self.radioButtons, title, box, selected=len(self.radioButtons) == 0))
+                    radio = self.categoryBox.addWidget(GroupBoxRadioButton(self, self.radioButtons, title, box, selected=len(self.radioButtons) == 0))
             
                 # Create sliders
                 modifier = humanmodifier.GenderAgeModifier(template)
@@ -93,7 +94,7 @@ class FaceTaskView(gui3d.TaskView):
         self.headAgeModifier = AsymmetricDetailModifier('data/targets/details/${gender}-${age}-head-age${headAge}.target', 'headAge', '1', '2', False)
         self.faceAngleModifier = humanmodifier.Modifier('data/targets/details/facial-angle1.target', 'data/targets/details/facial-angle2.target')
 
-        self.headBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Head')))
+        self.headBox = self.addLeftWidget(gui.GroupBox('Head'))
         self.sliders.append(self.headBox.addWidget(DetailSlider(0.0, -1.0, 1.0, "Age", self.headAgeModifier)))
         self.sliders.append(self.headBox.addWidget(DetailSlider(0.0, -1.0, 1.0, "Face angle", self.faceAngleModifier)))
     

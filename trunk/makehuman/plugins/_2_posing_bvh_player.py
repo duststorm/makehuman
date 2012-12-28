@@ -120,7 +120,7 @@ class BvhView(gui3d.TaskView):
         
         self.__humanSkeleton = Skeleton()
 
-        self.optionsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Options')))
+        self.optionsBox = self.addLeftWidget(gui.GroupBox('Options'))
 
         self.frameSlider = self.optionsBox.addWidget(gui.Slider(value = 0, min = 0, max = self.__skeleton.frames, label = 'Frame: %d'))
         self.playPause = self.optionsBox.addWidget(gui.Button("Play"))

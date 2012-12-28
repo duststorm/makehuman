@@ -32,7 +32,7 @@ class MacroModelingTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Macro modelling', label='Macro')
 
-        self.macroBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.SliderBox('Main')))
+        self.macroBox = self.addLeftWidget(gui.SliderBox('Main'))
        
         # Macro sliders
 
@@ -44,7 +44,7 @@ class MacroModelingTaskView(gui3d.TaskView):
         self.africanSlider = self.macroBox.addWidget(gui.Slider(value=0.0, min=0.0, max=1.0, label = "Afro"))
         self.asianSlider = self.macroBox.addWidget(gui.Slider(value=0.0, min=0.0, max=1.0, label = "Asian"))
         
-        #self.radialBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Radial')))
+        #self.radialBox = self.addRightWidget(gui.GroupBox('Radial'))
         #self.radialWidget = gui3d.Radial(self.radialBox)
 
         #hair update only necessary for : gender, age , height

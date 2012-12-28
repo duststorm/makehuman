@@ -59,7 +59,7 @@ class TexturesTaskView(gui3d.TaskView):
         #    log.debug("  " + filepath)
         #    self.clothesBox.addWidget(RadioButton(self.cloGroup, filepath, False))
 
-        self.clothesBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Clothes')))
+        self.clothesBox = self.addRightWidget(gui.GroupBox('Clothes'))
         self.appliedClothes = []
         self.clothesSelections = []
 

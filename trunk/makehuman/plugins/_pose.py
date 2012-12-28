@@ -28,7 +28,7 @@ class PoseTaskView(gui3d.TaskView):
         self.shoulder.keyRot1 = [-135,-67,0,45]
         self.shoulder.keyRot2 = [-115,-90,-67,-45,-22,0,22,45,67,90]
 
-        box = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Shoulder')))
+        box = self.addLeftWidget(gui.GroupBox('Shoulder'))
 
         self.shoulderXslider = box.addWidget(gui.Slider(value = 0.0, min = -85, max = 80, label = "RotX: %d"))
         self.shoulderYslider = box.addWidget(gui.Slider(value = 0.0, min = -140, max = 50, label = "RotY: %d"))

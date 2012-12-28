@@ -57,7 +57,7 @@ class PoseTaskView(gui3d.TaskView):
     self.selectedGroups = []
     self.joint = None
             
-    self.box = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Rotation')))
+    self.box = self.addLeftWidget(gui.GroupBox('Rotation'))
 
     self.Xslider = self.box.addWidget(gui.Slider(value = 0.0, min = -180.0, max = 180.0, label = "RotX: %d"))
     self.Yslider = self.box.addWidget(gui.Slider(value = 0.0, min = -180.0, max = 180.0, label = "RotY: %d"))

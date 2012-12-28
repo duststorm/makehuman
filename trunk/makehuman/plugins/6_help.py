@@ -13,7 +13,7 @@ class HelpTaskView(gui3d.TaskView):
         
         gui3d.TaskView.__init__(self, category, 'Help')
 
-        optionsBox = self.addWidget(mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Support options')))
+        optionsBox = self.addLeftWidget(gui.GroupBox('Support options'))
         self.manualButton = optionsBox.addWidget(gui.Button("Manual"))
         self.reportBugButton = optionsBox.addWidget(gui.Button("Report bug"))
         self.requestFeatureButton = optionsBox.addWidget(gui.Button("Request feature"))
