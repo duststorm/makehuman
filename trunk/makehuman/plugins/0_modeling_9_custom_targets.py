@@ -55,7 +55,6 @@ class CustomTargetsTaskView(gui3d.TaskView):
         
         self.msg = self.addWidget(mh.addWidget(mh.Frame.Bottom, gui.TextView('No custom targets found.\nTo add a custom target, place the file in %s') % self.targetsPath))
         
-        y = 80
         self.optionsBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Options')))
         rescanButton = self.optionsBox.addWidget(gui.Button("Rescan targets' folder"))
 
