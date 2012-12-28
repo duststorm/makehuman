@@ -633,7 +633,7 @@ class Dialog(QtGui.QDialog):
         self.text = QtGui.QLabel()
         self.layout.addWidget(self.text, 0, 1, 1, -1)
 
-        self.check = QtGui.QCheckBox("Don't show this again")
+        self.check = QtGui.QCheckBox(getLanguageString("Don't show this again"))
         self.layout.addWidget(self.check, 1, 1, 1, -1)
 
         self.button1 = QtGui.QPushButton()
@@ -651,6 +651,8 @@ class Dialog(QtGui.QDialog):
 
         button1Label = getLanguageString(button1Label)
         button2Label = getLanguageString(button2Label)
+        text = getLanguageString(text)
+        title = getLanguageString(title)
 
         self.setWindowTitle(title)
         self.text.setText(text)
@@ -713,12 +715,12 @@ class FileEntryView(QtGui.QWidget, Widget):
         self.directory = directory
 
     def setFilter(self, filter):
-        self.filter = filter
+        self.filter = getLanguageString(filter)
         if '(*.*)' not in self.filter:
-            self.filter = ';;'.join([self.filter, 'All Files (*.*)'])
+            self.filter = ';;'.join([self.filter, getLanguageString('All Files')+' (*.*)'])
 
     def _browse(self, state = None):
-        path = QtGui.QFileDialog.getSaveFileName(G.app.mainwin, "Save File", self.directory, self.filter)
+        path = QtGui.QFileDialog.getSaveFileName(G.app.mainwin, getLanguageString("Save File"), self.directory, self.filter)
         self.edit.setText(path)
 
     def _confirm(self, state = None):

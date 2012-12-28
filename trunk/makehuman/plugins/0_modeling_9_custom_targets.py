@@ -33,6 +33,7 @@ import algos3d
 import os
 import humanmodifier
 import gui
+from language import language
 
 class FolderButton(gui.RadioButton):
 
@@ -53,7 +54,7 @@ class CustomTargetsTaskView(gui3d.TaskView):
         if not os.path.exists(self.targetsPath):
             os.makedirs(self.targetsPath)
         
-        self.msg = self.addWidget(mh.addWidget(mh.Frame.Bottom, gui.TextView('No custom targets found.\nTo add a custom target, place the file in ' + self.targetsPath)))
+        self.msg = self.addWidget(mh.addWidget(mh.Frame.Bottom, gui.TextView(language.getLanguageString('No custom targets found.\nTo add a custom target, place the file in %s') % self.targetsPath)))
         
         y = 80
         self.optionsBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Options')))
