@@ -53,8 +53,6 @@ class CustomTargetsTaskView(gui3d.TaskView):
         if not os.path.exists(self.targetsPath):
             os.makedirs(self.targetsPath)
         
-        self.msg = self.addWidget(mh.addWidget(mh.Frame.Bottom, gui.TextView('No custom targets found.\nTo add a custom target, place the file in %s') % self.targetsPath))
-        
         self.optionsBox = self.addWidget(mh.addWidget(mh.Frame.RightTop, gui.GroupBox('Options')))
         rescanButton = self.optionsBox.addWidget(gui.Button("Rescan targets' folder"))
 
@@ -99,15 +97,21 @@ class CustomTargetsTaskView(gui3d.TaskView):
             for child in folder.children:
                 child.update()
             
-        if self.folders:
-            self.msg.hide()
+        if self.sliders:
             self.folderBox.children[0].setSelected(True)
             # self.folders[0].show()
             if self.folders[0].children:
                 self.folders[0].children[0].setFocus()
+
+        self.syncStatus()
+
+    def syncStatus(self):
+        if self.sliders:
+            msg = ''
         else:
-            self.msg.show()
-        
+            msg = 'No custom targets found. To add a custom target, place the file in %s' % self.targetsPath
+        gui3d.app.status(msg, True)
+
     def createTargetControls(self, box, targetPath, targetFile):
         # When the slider is dragged and released, an onChange event is fired
         # By default a slider goes from 0.0 to 1.0, and the initial position will be 0.0 unless specified
@@ -141,6 +145,7 @@ class CustomTargetsTaskView(gui3d.TaskView):
                 button.groupBox.show()
             else:
                 button.groupBox.hide()
+        self.syncStatus()
 
     def loadHandler(self, human, values):
         

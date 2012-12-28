@@ -768,6 +768,7 @@ class StatusBar(QtGui.QStatusBar, Widget):
         self.duration = 2000
 
     def showMessage(self, text, permanent=False):
+        text = getLanguageString(text)
         if permanent:
             self._perm.setText(text)
         else:
