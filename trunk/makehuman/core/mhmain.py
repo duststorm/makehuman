@@ -329,7 +329,7 @@ class MHApplication(gui3d.Application, mh.Application):
         self.buttonBox = mh.addWidget(mh.Frame.RightBottom, gui.GroupBox('Edit'))
         self.undoButton  = self.buttonBox.addWidget(gui.Button("Undo"),  0, 0)
         self.redoButton  = self.buttonBox.addWidget(gui.Button("Redo"),  0, 1)
-        self.resetButton = self.buttonBox.addWidget(gui.Button("Reset"), 0, 2)
+        self.resetButton = self.buttonBox.addWidget(gui.Button("Reset"), 2, 0)
 
         @self.undoButton.mhEvent
         def onClicked(event):
@@ -348,9 +348,9 @@ class MHApplication(gui3d.Application, mh.Application):
 
             mh.setCaption("MakeHuman r" + os.environ['SVNREVISION'] + " - [Untitled]")
 
-        self.globalButton = self.buttonBox.addWidget(gui.Button("Global cam"), 1, 0, 1, -1)
-        self.faceButton = self.buttonBox.addWidget(gui.Button("Face cam"), 2, 0, 1, -1)
-        self.imagesButton = self.buttonBox.addWidget(gui.CheckBox("Slider images", gui.Slider.imagesShown()), 3, 0, 1, -1)
+        self.globalButton = self.buttonBox.addWidget(gui.Button("Global cam"), 3, 0, 1, -1)
+        self.faceButton = self.buttonBox.addWidget(gui.Button("Face cam"), 4, 0, 1, -1)
+        self.imagesButton = self.buttonBox.addWidget(gui.CheckBox("Slider images", gui.Slider.imagesShown()), 5, 0, 1, -1)
 
         @self.globalButton.mhEvent
         def onClicked(event):
