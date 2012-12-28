@@ -33,6 +33,7 @@ import math
 import re
 import numpy as np
 import gui
+import log
 
 class DetailAction:
 
@@ -621,15 +622,18 @@ class GenderAgeEthnicAsymmetricModifier(GenderAgeEthnicModifier2):
         for target in self.targets:
             human.setDetail(target[0], reduce(mul, [factors[factor] for factor in target[1]]))
             #print target[0], human.getDetail(target[0])
-            
-    def getValue(self, human):
 
-        right = sum([human.getDetail(target[0]) for target in self.targets if self.right in target[0]])
+    @staticmethod
+    def parseTarget(target):
+        return target[0].split('/')[-1].split('.')[0].split('-')
+
+    def getValue(self, human):
+        right = sum([human.getDetail(target[0]) for target in self.targets if self.right in self.parseTarget(target)])
         if right:
             return right
         else:
-            return -sum([human.getDetail(target[0]) for target in self.targets if self.left in target[0]])
-            
+            return -sum([human.getDetail(target[0]) for target in self.targets if self.left in self.parseTarget(target)])
+
     def expandTemplate(self, targets):
         
         targets = GenderAgeEthnicModifier2.expandTemplate(self, targets)
