@@ -43,6 +43,10 @@ class Object3D(object):
         return self.parent.shadeless
 
     @property
+    def depthless(self):
+        return self.parent.depthless
+
+    @property
     def vertsPerPrimitive(self):
         return self.parent.vertsPerPrimitive
 

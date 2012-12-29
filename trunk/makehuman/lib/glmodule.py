@@ -92,9 +92,7 @@ def updatePickingBuffer():
     glClearColor(0.0, 0.0, 0.0, 0.0)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-    for i, camera in enumerate(G.cameras):
-        cameraPosition(camera, 0)
-        drawMeshes(1, i)
+    drawMeshes(True)
 
     # Make sure the data is 1 byte aligned
     glPixelStorei(GL_PACK_ALIGNMENT, 1)
@@ -264,9 +262,7 @@ def setObjectUniforms(obj):
                 glUniform1i(index, currentTextureSampler)
                 currentTextureSampler += 1
 
-def drawMesh(obj, cameraType):
-    if obj.cameraMode != cameraType:
-        return
+def drawMesh(obj):
     if not obj.visibility:
         return
 
@@ -323,6 +319,12 @@ def drawMesh(obj, cameraType):
         glDrawElements(g_primitiveMap[obj.vertsPerPrimitive-1], obj.primitives.size, GL_UNSIGNED_INT, obj.primitives)
         glDisable(GL_ALPHA_TEST)
         glDepthMask(GL_TRUE)
+    elif obj.depthless:
+        glDepthMask(GL_FALSE)
+        glDisable(GL_DEPTH_TEST)
+        glDrawElements(g_primitiveMap[obj.vertsPerPrimitive-1], obj.primitives.size, GL_UNSIGNED_INT, obj.primitives)
+        glEnable(GL_DEPTH_TEST)
+        glDepthMask(GL_TRUE)
     else:
         glDrawElements(g_primitiveMap[obj.vertsPerPrimitive-1], obj.primitives.size, GL_UNSIGNED_INT, obj.primitives)
 
@@ -353,9 +355,7 @@ def drawMesh(obj, cameraType):
 
     glPopMatrix()
 
-def pickMesh(obj, cameraType):
-    if obj.cameraMode != cameraType:
-        return
+def pickMesh(obj):
     if not obj.visibility:
         return
     if not obj.pickable:
@@ -386,41 +386,45 @@ def pickMesh(obj, cameraType):
 
     glPopMatrix()
 
-def drawMeshes(pickMode, cameraType):
+def drawOrPick(pickMode, obj):
+    if pickMode:
+        if hasattr(obj, 'pick'):
+            obj.pick()
+    else:
+        if hasattr(obj, 'draw'):
+            obj.draw()
+
+def drawMeshes(pickMode):
     if G.world is None:
         return
 
+    cameraMode = None
     # Draw all objects contained by G.world
     for obj in sorted(G.world, key = (lambda obj: obj.priority)):
-        if pickMode:
-            if hasattr(obj, 'pick'):
-                obj.pick(cameraType)
-        else:
-            if hasattr(obj, 'draw'):
-                obj.draw(cameraType)
-
-def _draw():
-    drawBegin()
-
-    for i, camera in enumerate(G.cameras):
-        # draw the objects in dynamic camera
+        camera = G.cameras[obj.cameraMode]
         if camera.stereoMode:
             glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_TRUE) # Red
             cameraPosition(camera, 1)
-            drawMeshes(0, i)
+            drawOrPick(pickMode, obj)
             glClear(GL_DEPTH_BUFFER_BIT)
             glColorMask(GL_FALSE, GL_TRUE, GL_TRUE, GL_TRUE) # Cyan
             cameraPosition(camera, 2)
-            drawMeshes(0, i)
+            drawOrPick(pickMode, obj)
             # To prevent the GUI from overwritting the red model, we need to render it again in the z-buffer
             glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE) # None, only z-buffer
             cameraPosition(camera, 1)
-            drawMeshes(0, i)
+            drawOrPick(pickMode, obj)
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE) # All
+            cameraMode = None
         else:
-            cameraPosition(camera, 0)
-            drawMeshes(0, i)
+            if cameraMode != obj.cameraMode:
+                cameraPosition(camera, 0)
+                cameraMode = obj.cameraMode
+            drawOrPick(pickMode, obj)
 
+def _draw():
+    drawBegin()
+    drawMeshes(False)
     drawEnd()
 
 def draw():
@@ -428,11 +432,3 @@ def draw():
         profiler.accum('_draw()', globals(), locals())
     else:
         _draw()
-
-def drawOneMesh(obj):
-    glDrawBuffer(GL_FRONT)
-    glClear(GL_DEPTH_BUFFER_BIT)
-    cameraPosition(G.cameras[obj.cameraMode], 0)
-    obj.draw(obj.cameraMode)
-    glDrawBuffer(GL_BACK)
-    glFlush()

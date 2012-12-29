@@ -55,7 +55,9 @@ class SaveTaskView(gui3d.TaskView):
         mesh = gui3d.FrameMesh(100, 100)
         self.selection = gui3d.app.addObject(gui3d.Object([0, 0, 9], mesh))
         mesh.setColor([0, 0, 0, 255])
-        mesh.setPickable(0)
+        mesh.setPickable(False)
+        mesh.setShadeless(True)
+        mesh.setDepthless(True)
         mesh.priority = 90
         self.selection.hide()
 

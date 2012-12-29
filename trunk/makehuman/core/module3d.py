@@ -121,14 +121,15 @@ class Object3D(object):
         self._groups_rev = {}
         self.materials = {}	# TL: used by mhx export
         self.cameraMode = 1
-        self.visibility = 1
-        self.pickable = 1
+        self.visibility = True
+        self.pickable = True
         self.texture = None
         self.textureId = 0
         self.shader = 0
         self.shaderParameters = {}
-        self.shadeless = 0
-        self.solid = 1
+        self.shadeless = False
+        self.depthless = False
+        self.solid = True
         self.transparentPrimitives = 0
         self.object3d = None
         self.vmap = None
@@ -708,8 +709,8 @@ class Object3D(object):
         """
         This method is used to specify the shader.
         
-        :param shadeless: The shader.
-        :type shadeless: int
+        :param shader: The shader.
+        :type shader: int
         """
 
         self.shader = shader
@@ -728,7 +729,18 @@ class Object3D(object):
         """
 
         self.shadeless = shadeless
-            
+
+    def setDepthless(self, depthless):
+        """
+        This method is used to specify whether or not the object occludes or is occluded
+        by other objects
+
+        :param depthless: Whether or not the object is occluded or occludes.
+        :type depthless: Boolean
+        """
+
+        self.depthless = depthless
+
     def setSolid(self, solid):
         """
         This method is used to specify whether or not the object is drawn solid or wireframe.

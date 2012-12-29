@@ -100,14 +100,15 @@ class MeasureTaskView(gui3d.TaskView):
         self.measureMesh.setUVs(np.zeros((1, 2), dtype=np.float32))
         self.measureMesh.setFaces(np.arange(count).reshape((-1,2)))
 
-        self.measureMesh.setCameraProjection(1)
-        self.measureMesh.setShadeless(1)
+        self.measureMesh.setCameraProjection(0)
+        self.measureMesh.setShadeless(True)
+        self.measureMesh.setDepthless(True)
         self.measureMesh.setColor([255, 255, 255, 255])
         self.measureMesh.setPickable(0)
         self.measureMesh.updateIndexBuffer()
         self.measureMesh.priority = 50
 
-        self.measureObject = self.addObject(gui3d.Object([0, 0, 9], self.measureMesh))
+        self.measureObject = self.addObject(gui3d.Object([0, 0, 0], self.measureMesh))
 
         measurements = [
             ('neck', ['neckcirc', 'neckheight']),
@@ -229,83 +230,14 @@ class MeasureTaskView(gui3d.TaskView):
         human = gui3d.app.selectedHuman
 
         vertidx = self.ruler.Measures[self.active_slider.measure]
-        matrix = np.asarray(gui3d.app.modelCamera.camera.getConvertToScreenMatrix(human.mesh.object3d))
 
-        coords = np.hstack((human.mesh.coord[vertidx], np.ones((len(vertidx),1))))
-        coords = np.sum(matrix[None,:,:] * coords[:,None,:], axis = -1)
-        coords = coords[:,:2] / coords[:,3:]
-        self.measureMesh.coord[:len(vertidx),:2] = coords
-        self.measureMesh.coord[len(vertidx):,:2] = coords[-1:]
+        coords = human.mesh.coord[vertidx]
+        self.measureMesh.coord[:len(vertidx),:] = coords
+        self.measureMesh.coord[len(vertidx):,:] = coords[-1:]
         self.measureMesh.markCoords(coor = True)
         self.measureMesh.update()
 
-    def updateMeshes_OLD(self):
-
-        human = gui3d.app.selectedHuman
-        # slider = gui3d.app.focusView
-
-        # if (isinstance(slider, MeasureSlider)):
-        if False:
-
-            """
-            # InfluenceMesh
-            # Force caching of vert indices if they don't exist yet
-            if not slider.modifier.verts:
-                slider.modifier.updateValue(human, slider.modifier.getValue(human), 0)
-
-            vmin, vmax = aljabr.calcBBox([human.mesh.verts[i] for i in slider.modifier.verts])
-
-            box = [
-                vmin,
-                [vmax[0], vmin[1], vmin[2]],
-                [vmax[0], vmax[1], vmin[2]],
-                [vmin[0], vmax[1], vmin[2]],
-                [vmin[0], vmin[1], vmax[2]],
-                [vmax[0], vmin[1], vmax[2]],
-                vmax,
-                [vmin[0], vmax[1], vmax[2]]
-            ]
-
-            for i, v in enumerate(box):
-                box[i] = gui3d.app.modelCamera.convertToScreen(v[0], v[1], v[2], human.mesh.object3d)
-
-            x1, y1, x2, y2 = min([v[0] for v in box]), min([v[1] for v in box]), max([v[0] for v in box]), max([v[1] for v in box])
-
-            self.influenceMesh.setPosition([x1, y1, 8.9])
-            self.influenceMesh.mesh.resize(x2 - x1, y2 - y1)
-            """
-
-            # MeasureMesh
-            vertidx = self.ruler.Measures[slider.measure]
-            for i, j in enumerate(vertidx):
-                # From hdusel in regard of issue 183: As agreed with marc I'll change the
-                # call from packed to discrete because packed structs
-                # are not available on Python 2.6.1 which is mandatory for MakeHuman to run
-                # on OS X 10.5.x
-                #
-                # self.measureMesh.verts[i].co = gui3d.app.modelCamera.convertToScreen(*human.mesh.verts[j].co, obj=human.mesh.object3d)
-                #
-                co = gui3d.app.modelCamera.convertToScreen(human.mesh.verts[j].co[0], human.mesh.verts[j].co[1], human.mesh.verts[j].co[2], obj=human.mesh.object3d)
-                co[2] = 0.0
-                self.measureMesh.verts[i].co = co
-            for i in xrange(len(vertidx), len(self.measureMesh.verts)):
-                self.measureMesh.verts[i].co = self.measureMesh.verts[len(vertidx)-1].co[:]
-
-            self.measureMesh.update()
-
     def onHumanChanged(self, event):
-
-        self.updateMeshes()
-
-    def onHumanTranslated(self, event):
-
-        self.updateMeshes()
-
-    def onHumanRotated(self, event):
-
-        self.updateMeshes()
-
-    def onCameraChanged(self, event):
 
         self.updateMeshes()
 
