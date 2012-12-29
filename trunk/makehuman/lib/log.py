@@ -50,8 +50,23 @@ class ApplicationLogHandler(logging.Handler):
 def init():
     userDir = getPath('')
     defaults = dict(mhUserDir = userDir.replace('\\','/'))
-    filename = os.path.join(userDir, "logging.ini")
-    if os.path.isfile(filename):
-        logging.config.fileConfig(filename, defaults)
-    else:
+
+    try:
+        filename = os.path.join(userDir, "logging.ini")
+        if os.path.isfile(filename):
+            logging.config.fileConfig(filename, defaults)
+            return
+    except Exception:
+        pass
+
+    try:
         logging.config.fileConfig(os.path.join('data','logging.ini'), defaults)
+        return
+    except Exception:
+        pass
+
+    try:
+        logging.basicConfig(level = logging.DEBUG)
+        return
+    except Exception:
+        pass
