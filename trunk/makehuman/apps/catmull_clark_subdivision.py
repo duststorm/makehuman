@@ -337,25 +337,32 @@ class SubdivisionObject(Object3D):
         vc = vc1 + vc2
         del vc1, vc2
 
-        # evert[...] = np.where((ic1 == ic2)[:,None], (2 * mvert + vc) / 6, (mvert + vc) / 4)
-        evert[...] = np.where((ic1 == ic2)[:,None], mvert / 2, (mvert + vc) / 4)
+        inedge = (ic1 == ic2)
+
+        evert[...] = np.where(inedge[:,None], mvert / 2, (mvert + vc) / 4)
         del ic1, ic2, vc
 
         nvface = parent.nfaces[self.vtx_map]
 
+        # comment: this code could really do with some comments
         edgewt = np.arange(self.MAX_FACES)[None,:,None] < self.nedges[:,None,None]
+        edgewt2 = edgewt * inedge[self.vedge][:,:,None]
         edgewt = edgewt / self.nedges.astype(np.float32)[:,None,None]
+        nvedge = np.sum(edgewt2, axis=1)
         oevert = np.sum(mvert[self.vedge] * edgewt / 2, axis=1)
+        oevert2 = np.sum(mvert[self.vedge] * edgewt2 / 2, axis=1)
         facewt = np.arange(self.MAX_FACES)[None,:,None] < nvface[:,None,None]
         facewt = facewt / nvface.astype(np.float32)[:,None,None]
         ofvert = np.sum(cvert[self.face_rmap[parent.vface[self.vtx_map]]] * facewt, axis=1)
         opvert = pcoord
 
         valid = nvface >= 3
-        # bvert[...] = np.where(valid[:,None],(2 * oevert + (nvface[:,None] - 2) * opvert) / nvface[:,None],opvert)
+
         bvert[...] = np.where(valid[:,None],
-                              (ofvert + 2 * oevert + (nvface[:,None] - 3) * opvert) / nvface[:,None],
-                              (3 * oevert - ofvert) / 2) # anti-crinkle hack
+                              np.where((self.nedges == nvface)[:,None],
+                                       (ofvert + 2 * oevert + (nvface[:,None] - 3) * opvert) / nvface[:,None],
+                                       (oevert2 + opvert) / (nvedge + 1)),
+                              (3 * oevert - ofvert) / 2)
 
         self.markCoords(coor=True)
 
