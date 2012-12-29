@@ -108,6 +108,12 @@ class ExampleTaskView(gui3d.TaskView):
             human.mesh.markCoords(coor=True)
             human.mesh.update()
 
+    def onShow(self, event):
+        gui3d.app.statusPersist('This is an example plugin; see plugins/6_help_example_plugin.py')
+
+    def onHide(self, event):
+        gui3d.app.statusPersist('')
+
 category = None
 taskview = None
 
@@ -116,7 +122,7 @@ taskview = None
 
 
 def load(app):
-    category = app.getCategory('Example')
+    category = app.getCategory('Help')
     taskview = category.addTask(ExampleTaskView(category))
 
 

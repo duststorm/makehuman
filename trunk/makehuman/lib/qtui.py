@@ -511,8 +511,10 @@ class Frame(QtGui.QWidget):
         self.r_layout.addWidget(self.right_bottom, 2, 0)
         self.r_layout.setRowStretch(2, 0)
 
-        self.statusBar = self.bottom.addWidget(qtgui.StatusBar())
-        self.progressBar = self.bottom.addWidget(qtgui.ProgressBar())
+        self.statusBar = qtgui.StatusBar()
+        self.bottom.addWidget(self.statusBar)
+        self.progressBar = qtgui.ProgressBar()
+        self.bottom.addWidget(self.progressBar)
 
     def addPanels(self):
         left = TaskPanel()
