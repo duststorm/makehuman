@@ -660,6 +660,7 @@ class CLayerObject:
         self.mesh.setSolid(0)
         self.mesh.calcNormals()
         self.mesh.updateIndexBuffer()
+        self.mesh.priority = 30
 
         self.object = gui3d.app.addObject( gui3d.Object(location, self.mesh) )  
         

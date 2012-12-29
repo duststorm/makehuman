@@ -56,6 +56,7 @@ class SaveTaskView(gui3d.TaskView):
         self.selection = gui3d.app.addObject(gui3d.Object([0, 0, 9], mesh))
         mesh.setColor([0, 0, 0, 255])
         mesh.setPickable(0)
+        mesh.priority = 90
         self.selection.hide()
 
         @self.fileentry.mhEvent

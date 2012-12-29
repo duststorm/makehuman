@@ -47,6 +47,7 @@ class SubdivisionObject(Object3D):
         self.transparentPrimitives = object.transparentPrimitives * 4
         self.object = object.object
         self.parent = object
+        self.priority = object.priority
 
     def create(self, progressCallback):
         total = 19

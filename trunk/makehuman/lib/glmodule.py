@@ -391,7 +391,7 @@ def drawMeshes(pickMode, cameraType):
         return
 
     # Draw all objects contained by G.world
-    for obj in G.world:
+    for obj in sorted(G.world, key = (lambda obj: obj.priority)):
         if pickMode:
             if hasattr(obj, 'pick'):
                 obj.pick(cameraType)

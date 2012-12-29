@@ -126,6 +126,10 @@ class Object3D(object):
     def shader(self):
         return self.parent.shader
 
+    @property
+    def priority(self):
+        return self.parent.priority
+
     def clrid(self, idx):
         return self.parent._faceGroups[idx].colorID
 

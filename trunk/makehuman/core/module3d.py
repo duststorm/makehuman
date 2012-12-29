@@ -133,6 +133,7 @@ class Object3D(object):
         self.object3d = None
         self.vmap = None
         self.tmap = None
+        self.priority = 0
 
         self.__object = None
 
@@ -305,7 +306,7 @@ class Object3D(object):
         selectionColorMap.assignSelectionID(self)
 
         self.object3d = mh.Object3D(self)
-        mh.world.append(self.object3d)
+        mh.addObject(self.object3d)
 
         if self.texture:
             self.setTexture(self.texture)
@@ -316,7 +317,7 @@ class Object3D(object):
         """
 
         if self.object3d:
-            mh.world.remove(self.object3d)
+            mh.removeObject(self.object3d)
             self.object3d = None
 
     def setCoords(self, coords):

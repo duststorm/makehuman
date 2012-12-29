@@ -9,7 +9,6 @@ from texture import Texture
 from object3d import Object3D
 from camera import Camera
 
-world = G.world
 cameras = G.cameras
 
 Keys = ui.Keys
@@ -90,3 +89,9 @@ def addTopWidget(widget, *args, **kwargs):
 
 def removeTopWidget(widget):
     return G.app.mainwin.removeTopWidget(widget)
+
+def addObject(obj):
+    G.world.append(obj)
+
+def removeObject(obj):
+    G.world.remove(obj)

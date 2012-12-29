@@ -105,6 +105,7 @@ class MeasureTaskView(gui3d.TaskView):
         self.measureMesh.setColor([255, 255, 255, 255])
         self.measureMesh.setPickable(0)
         self.measureMesh.updateIndexBuffer()
+        self.measureMesh.priority = 50
 
         self.measureObject = self.addObject(gui3d.Object([0, 0, 9], self.measureMesh))
 

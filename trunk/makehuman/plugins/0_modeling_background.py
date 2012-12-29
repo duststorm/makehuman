@@ -178,6 +178,7 @@ class BackgroundTaskView(gui3d.TaskView):
         self.opacity = 100
         mesh.setColor([255, 255, 255, self.opacity])
         mesh.setPickable(0)
+        mesh.priority = -90
 
         self.backgroundImageToggle = gui3d.app.categories['Modelling'].viewBox.addWidget(gui.ToggleButton('Background'), 3);
 

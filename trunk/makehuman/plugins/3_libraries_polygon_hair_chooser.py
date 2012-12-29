@@ -77,6 +77,7 @@ class HairTaskView(gui3d.TaskView):
             human.hairObj.mesh.setSolid(human.mesh.solid)
             human.hairObj.mesh.setTransparentPrimitives(len(human.hairObj.mesh.faces))
             human.hairObj.mesh.originalHairVerts = [v.co[:] for v in human.hairObj.mesh.verts]
+            human.hairObj.mesh.priority = 20
                 
             hairName = human.hairObj.mesh.name.split('.')[0]
 
