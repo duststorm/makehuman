@@ -36,7 +36,8 @@ class UvTaskView(gui3d.TaskView):
         uvDir = os.path.join(mh.getPath(''), 'data', 'uvs')
         if not os.path.exists(uvDir):
             os.makedirs(uvDir)
-        self.filechooser = self.addWidget(mh.addWidget(mh.Frame.Top, fc.FileChooser([uvDir , 'data/uvs'], 'mhuv', 'png', 'data/uvs/notfound.png')))
+        self.filechooser = self.addTopWidget(fc.FileChooser([uvDir , 'data/uvs'], 'mhuv', 'png', 'data/uvs/notfound.png'))
+        self.addLeftWidget(self.filechooser.sortBox)
 
         @self.filechooser.mhEvent
         def onFileSelected(filename):

@@ -110,8 +110,6 @@ class BvhView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'BVH Player')
         
-        self.status = self.addWidget(mh.addWidget(mh.Frame.Bottom, gui.TextView()))
-        
         self.__skeleton = bvhSkeleton('data/bvhs/03_03.bvh')
         self.__skeleton.updateFrame(-1)
         self.__skeletonMesh = None
@@ -430,7 +428,7 @@ class BvhView(gui3d.TaskView):
         if 'bone' in event.group.name:
             self.bone = event.group
             self.bone.setColor([0, 255, 0, 255])
-            self.status.setText(event.group.name)
+            gui3d.app.statusPersist("%s", event.group.name)
         gui3d.app.redraw()
 
     def onMouseExited(self, event):
@@ -439,7 +437,7 @@ class BvhView(gui3d.TaskView):
         
         if self.bone:
             self.bone.setColor([255, 255, 255, 255])
-            self.status.setText('')
+            gui3d.app.statusPersist("")
         gui3d.app.redraw()
         
     def onMouseMoved(self, event):
@@ -450,7 +448,7 @@ class BvhView(gui3d.TaskView):
             self.bone.setColor([255, 255, 255, 255])
             self.bone = event.group
             self.bone.setColor([0, 255, 0, 255])
-            self.status.setText(event.group.name)
+            gui3d.app.statusPersist("%s", event.group.name)
         gui3d.app.redraw()
 
 def load(app):

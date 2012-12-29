@@ -411,15 +411,20 @@ class TaskPanel(qtgui.VScrollArea):
     def removeWidget(self, widget):
         self.layout.removeWidget(widget)
 
-class Frame(QtGui.QWidget):
-    Bottom      = 0
-    Top         = 1
-    LeftTop     = 2
-    LeftBottom  = 3
-    RightTop    = 4
-    RightBottom = 5
-    Center      = 6
+class CategoryPanel(QtGui.QWidget, qtgui.Widget):
+    def __init__(self):
+        super(CategoryPanel, self).__init__()
+        qtgui.Widget.__init__(self)
+        self.layout = QtGui.QBoxLayout(QtGui.QBoxLayout.BottomToTop, self)
 
+    def addWidget(self, widget, *args, **kwargs):
+        self.layout.addWidget(widget, *args, **kwargs)
+        return widget
+
+    def removeWidget(self, widget):
+        self.layout.removeWidget(widget)
+
+class Frame(QtGui.QWidget):
     title = "MakeHuman"
 
     def __init__(self, app, size):
@@ -492,9 +497,7 @@ class Frame(QtGui.QWidget):
 
         self.left_top    = QtGui.QStackedLayout()
         self.l_layout.addLayout(self.left_top, 0, 0)
-        self.l_layout.setRowStretch(0, 0)
-
-        self.l_layout.setRowStretch(1, 1)
+        self.l_layout.setRowStretch(0, 1)
 
         self.left_bottom  = QtGui.QBoxLayout(QtGui.QBoxLayout.BottomToTop)
         self.l_layout.addLayout(self.left_bottom, 2, 0)
@@ -502,41 +505,47 @@ class Frame(QtGui.QWidget):
 
         self.right_top    = QtGui.QStackedLayout()
         self.r_layout.addLayout(self.right_top, 0, 0)
-        self.r_layout.setRowStretch(0, 0)
+        self.r_layout.setRowStretch(0, 1)
 
-        self.r_layout.setRowStretch(1, 1)
-
-        self.right_bottom = QtGui.QBoxLayout(QtGui.QBoxLayout.BottomToTop)
-        self.r_layout.addLayout(self.right_bottom, 2, 0)
+        self.right_bottom = CategoryPanel()
+        self.r_layout.addWidget(self.right_bottom, 2, 0)
         self.r_layout.setRowStretch(2, 0)
 
-        self.sides = {
-            self.Bottom:      self.bottom,
-            self.Top:         self.top,
-            self.LeftBottom:  self.left_bottom,
-            self.RightBottom: self.right_bottom,
-            }
-
-    def addPanel(self, parent):
-        panel = TaskPanel()
-        parent.addWidget(panel)
-        return panel
+        self.statusBar = self.bottom.addWidget(qtgui.StatusBar())
+        self.progressBar = self.bottom.addWidget(qtgui.ProgressBar())
 
     def addPanels(self):
-        left = self.addPanel(self.left_top)
-        right = self.addPanel(self.right_top)
+        left = TaskPanel()
+        right = TaskPanel()
+        self.left_top.addWidget(left)
+        self.right_top.addWidget(right)
         return left, right
 
     def showPanels(self, left, right):
         self.left_top.setCurrentWidget(left)
         self.right_top.setCurrentWidget(right)
 
-    def addWidget(self, edge, widget, *args, **kwargs):
-        self.sides[edge].addWidget(widget, *args, **kwargs)
+    def addPanelBottomLeft(self):
+        panel = CategoryPanel()
+        self.left_bottom.addWidget(panel)
+        return panel
+
+    def showPanelBottomLeft(self, panel):
+        for widget in [self.left_bottom.itemAt(i).widget()
+                       for i in xrange(self.left_bottom.count())]:
+            if widget is not panel:
+                widget.hide()
+        panel.show()
+
+    def getPanelBottomRight(self):
+        return self.right_bottom
+
+    def addTopWidget(self, widget, *args, **kwargs):
+        self.top.addWidget(widget, *args, **kwargs)
         return widget
 
-    def removeWidget(self, edge, widget):
-        self.sides[edge].removeWidget(widget)
+    def removeTopWidget(self, widget):
+        self.top.removeWidget(widget)
 
     def update(self):
         super(Frame, self).update()
@@ -546,15 +555,27 @@ class Frame(QtGui.QWidget):
         ev.ignore()
         self.app.onQuitCallback()
 
+    def refreshLayout(self, widget=None):
+        if widget is None:
+            widget = self
+        widget.updateGeometry()
+        for child in QtGui.QWidget.children(widget):
+            if child.isWidgetType():
+                self.refreshLayout(child)
+
 class Application(QtGui.QApplication, events3d.EventHandler):
     def __init__(self):
         super(Application, self).__init__(sys.argv)
-        self.splash = None
+        self.mainwin = None
         self.log_window = None
         self.statusBar = None
+        self.progressBar = None
+        self.splash = None
 
     def OnInit(self):
         self.mainwin = Frame(self, (G.windowWidth, G.windowHeight))
+        self.statusBar = self.mainwin.statusBar
+        self.progressBar = self.mainwin.progressBar
         self.mainwin.show()
         self.log_window = qtgui.DocumentEdit()
         
@@ -593,9 +614,6 @@ g_timers = {}
 def getKeyModifiers():
     return int(QtGui.QApplication.keyboardModifiers())
 
-def setCaption(caption):
-    G.app.mainwin.setWindowTitle(caption)
-
 def addTimer(milliseconds, callback):
     timer_id = G.app.mainwin.canvas.startTimer(milliseconds)
     g_timers[timer_id] = callback
@@ -613,29 +631,3 @@ def handleTimer(id):
 
 def callAsync(callback):
     QtCore.QTimer.singleShot(0, callback)
-
-def addWidget(edge, widget, *args, **kwargs):
-    return G.app.mainwin.addWidget(edge, widget, *args, **kwargs)
-
-def removeWidget(edge, widget):
-    return G.app.mainwin.removeWidget(edge, widget)
-
-def changeCategory(category):
-    G.app.mainwin.tabs.changeTab(category)
-
-def changeTask(category, task):
-    G.app.mainwin.tabs.findTab(category).child.changeTab(task)
-
-def refreshLayout(widget=None):
-    if widget is None:
-        widget = G.app.mainwin
-    widget.updateGeometry()
-    for child in QtGui.QWidget.children(widget):
-        if child.isWidgetType():
-            refreshLayout(child)
-
-def addPanels():
-    return G.app.mainwin.addPanels()
-
-def showPanels(left, right):
-    return G.app.mainwin.showPanels(left, right)

@@ -458,7 +458,8 @@ class View(events3d.EventHandler):
     def onKeyUp(self, event):
         self.parent.callEvent('onKeyUp', event)
 
-    def addWidget(self, widget):
+    def addTopWidget(self, widget):
+        mh.addTopWidget(widget)
         self.widgets.append(widget)
         widget._parent = self
         if self.isVisible():
@@ -467,8 +468,9 @@ class View(events3d.EventHandler):
             widget.hide()
         return widget
 
-    def removeWidget(self, widget):
+    def removeTopWidget(self, widget):
         self.widgets.remove(widget)
+        mh.removeTopWidget(widget)
 
     def showWidgets(self):
         for w in self.widgets:
@@ -526,6 +528,7 @@ class Category(View):
         self.tasksByName = {}
         self.tab = None
         self.tabs = None
+        self.panel = mh.addPanelBottomLeft()
 
     def _taskTab(self, task):
         if task.tab is None:
@@ -551,6 +554,16 @@ class Category(View):
 
     def getTaskByName(self, name):
         return self.tasksByName.get(name)
+
+    def showWidgets(self):
+        super(Category, self).showWidgets()
+        mh.showPanelBottomLeft(self.panel)
+
+    def addBottomWidget(self, widget):
+        return self.panel.addWidget(widget)
+
+    def removeBottomWidget(self, widget):
+        self.panel.removeWidget(widget)
  
 # The application
 app = None

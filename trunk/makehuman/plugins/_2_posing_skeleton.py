@@ -33,8 +33,6 @@ class SkeletonView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Skeleton')
         
-        self.status = self.addWidget(mh.addWidget(mh.Frame.Bottom, gui.TextView()))
-        
         self.__skeleton = Skeleton()
         self.__skeletonMesh = None
         self.__skeletonObject = None
@@ -243,7 +241,7 @@ class SkeletonView(gui3d.TaskView):
         
         self.bone = event.group
         self.bone.setColor([0, 255, 0, 255])
-        self.status.setText(event.group.name)
+        gui3d.app.statusPersist("%s", event.group.name)
         gui3d.app.redraw()
 
     def onMouseExited(self, event):
@@ -251,7 +249,7 @@ class SkeletonView(gui3d.TaskView):
         gui3d.TaskView.onMouseExited(self, event)
         
         self.bone.setColor([255, 255, 255, 255])
-        self.status.setText('')
+        gui3d.app.statusPersist("")
         gui3d.app.redraw()
         
     def onMouseMoved(self, event):
@@ -262,7 +260,7 @@ class SkeletonView(gui3d.TaskView):
             self.bone.setColor([255, 255, 255, 255])
             self.bone = event.group
             self.bone.setColor([0, 255, 0, 255])
-            self.status.setText(event.group.name)
+            gui3d.app.statusPersist("%s", event.group.name)
         gui3d.app.redraw()
 
 def load(app):

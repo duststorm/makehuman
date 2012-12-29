@@ -52,32 +52,41 @@ def removeTimer(id):
 def callAsync(callback):
     ui.callAsync(callback)
 
-def addWidget(edge, widget, *args, **kwargs):
-    return ui.addWidget(edge, widget, *args, **kwargs)
+Application = ui.Application
+
+def setCaption(caption):
+    G.app.mainwin.setWindowTitle(caption)
 
 def removeWidget(edge, widget):
-    return ui.removeWidget(edge, widget)
-
-def addPanels():
-    return ui.addPanels()
-
-def showPanels(left, right):
-    return ui.showPanels(left, right)
-
-class Frame:
-    Bottom      = ui.Frame.Bottom
-    Top         = ui.Frame.Top
-    LeftBottom  = ui.Frame.LeftBottom
-    RightBottom = ui.Frame.RightBottom
+    return G.app.mainwin.removeWidget(edge, widget)
 
 def changeCategory(category):
-    ui.changeCategory(category)
+    G.app.mainwin.tabs.changeTab(category)
 
 def changeTask(category, task):
-    ui.changeCategory(category)
-    ui.changeTask(category, task)
+    changeCategory(category)
+    G.app.mainwin.tabs.findTab(category).child.changeTab(task)
 
 def refreshLayout():
-    ui.refreshLayout()
+    G.app.mainwin.refreshLayout()
 
-Application = ui.Application
+def addPanels():
+    return G.app.mainwin.addPanels()
+
+def showPanels(left, right):
+    return G.app.mainwin.showPanels(left, right)
+
+def addPanelBottomLeft():
+    return G.app.mainwin.addPanelBottomLeft()
+
+def showPanelBottomLeft(panel):
+    return G.app.mainwin.showPanelBottomLeft(panel)
+
+def getPanelBottomRight():
+    return G.app.mainwin.getPanelBottomRight()
+
+def addTopWidget(widget, *args, **kwargs):
+    return G.app.mainwin.addTopWidget(widget, *args, **kwargs)
+
+def removeTopWidget(widget):
+    return G.app.mainwin.removeTopWidget(widget)

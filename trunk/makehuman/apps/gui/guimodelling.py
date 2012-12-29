@@ -45,13 +45,13 @@ class ModellingCategory(gui3d.Category):
     def __init__(self):
         super(ModellingCategory, self).__init__('Modelling')
 
-        self.viewBox = self.addWidget(mh.addWidget(mh.Frame.LeftBottom, gui.GroupBox('View settings')))
+        self.viewBox = self.addBottomWidget(gui.GroupBox('View settings'))
         
         self.anaglyphsButton = self.viewBox.addWidget(gui.ToggleButton('Anaglyphs'))
         self.wireButton = self.viewBox.addWidget(gui.ToggleButton('Wireframe'))
         self.subdivisionButton = self.viewBox.addWidget(gui.ToggleButton('Smooth'))
 
-        self.symmetryBox = self.addWidget(mh.addWidget(mh.Frame.LeftBottom, gui.GroupBox('Symmetry')))
+        self.symmetryBox = self.addBottomWidget(gui.GroupBox('Symmetry'))
 
         self.rightSymmetryButton = self.symmetryBox.addWidget(gui.Button('Sym<'))
         self.leftSymmetryButton = self.symmetryBox.addWidget(gui.Button('Sym>'))

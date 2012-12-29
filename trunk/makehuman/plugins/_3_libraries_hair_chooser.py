@@ -31,7 +31,7 @@ class HairTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, "Hair")
         self.human = None
-        self.filechooser = self.addWidget(mh.addWidget(mh.Frame.Top, fc.FileChooser("data/hairs", "hair", "png")))
+        self.filechooser = self.addTopWidget(fc.FileChooser("data/hairs", "hair", "png"))
         self.default = True
         self.saveAsCurves = True
         self.path = None
@@ -45,9 +45,11 @@ class HairTaskView(gui3d.TaskView):
         self.interpolationRadius = 0.09
         self.clumpInterpolationNumber = 0
         #self.app.categories["Rendering"].hairsClass = self
-        
+
+        self.addLeftWidget(self.filechooser.sortBox)
+
         hairTexture = self.app.selectedHuman.hairFile.replace('.hair', '.png')
-        self.currentHair = self.addWidget(mh.addWidget(mh.Frame.RightBottom, gui.Button(self.app.categories['Modelling'])))
+        self.currentHair = self.addRightWidget(gui.Button(self.app.categories['Modelling']))
         self.currentHair.setTexture(hairTexture)
 
         @self.currentHair.mhEvent

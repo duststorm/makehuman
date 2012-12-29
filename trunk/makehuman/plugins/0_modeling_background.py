@@ -192,6 +192,9 @@ class BackgroundTaskView(gui3d.TaskView):
             else:
                 mh.changeTask('Library', 'Background')
 
+        self.filechooser = self.addTopWidget(fc.FileChooser(self.backgroundsFolder, ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None))
+        self.addLeftWidget(self.filechooser.sortBox)
+
         self.backgroundBox = self.addLeftWidget(gui.GroupBox('Background 2 settings'))
 
         self.radioButtonGroup = []
@@ -201,8 +204,6 @@ class BackgroundTaskView(gui3d.TaskView):
         self.bgImageRightRadioButton  = self.backgroundBox.addWidget(gui.RadioButton(self.radioButtonGroup, label='Right'))
         self.bgImageTopRadioButton    = self.backgroundBox.addWidget(gui.RadioButton(self.radioButtonGroup, label='Top'))
         self.bgImageBottomRadioButton = self.backgroundBox.addWidget(gui.RadioButton(self.radioButtonGroup, label='Bottom'))
-
-        self.filechooser = self.addWidget(mh.addWidget(mh.Frame.Top, fc.FileChooser(self.backgroundsFolder, ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None)))
 
         @self.filechooser.mhEvent
         def onFileSelected(filename):

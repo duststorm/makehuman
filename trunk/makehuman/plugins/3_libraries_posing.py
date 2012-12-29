@@ -72,7 +72,8 @@ class PoseLoadTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Poses')
         if not os.path.exists(self.userPoses):
             os.makedirs(self.userPoses)
-        self.filechooser = self.addWidget(mh.addWidget(mh.Frame.Top, fc.FileChooser([self.systemPoses, self.userPoses], 'mhp', 'png', 'data/clothes/notfound.png')))
+        self.filechooser = self.addTopWidget(fc.FileChooser([self.systemPoses, self.userPoses], 'mhp', 'png', 'data/clothes/notfound.png'))
+        self.addLeftWidget(self.filechooser.sortBox)
         self.update = self.filechooser.sortBox.addWidget(gui.Button('Check for updates'))
         self.mediaSync = None
 

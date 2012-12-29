@@ -39,7 +39,7 @@ class PluginsTaskView(gui3d.TaskView):
 
         self.pluginsBox = self.addLeftWidget(gui.GroupBox('Plugins'))
 
-        for module in gui3d.app.modules:
+        for module in sorted(gui3d.app.modules):
             check = self.pluginsBox.addWidget(PluginCheckBox(module))
 
 class MHApplication(gui3d.Application, mh.Application):
@@ -140,19 +140,19 @@ class MHApplication(gui3d.Application, mh.Application):
         pass
 
     def loadBackground(self):
-        self.progressBar.setProgress(0.1)
+        self.progress(0.1)
         mh.setClearColor(0.5, 0.5, 0.5, 1.0)
 
     def loadHuman(self):
 
-        self.progressBar.setProgress(0.2)
+        self.progress(0.2)
         #hairObj = hair.loadHairsFile(self.scene3d, path="./data/hairs/default", update = False)
         #self.scene3d.clear(hairObj)
         self.selectedHuman = self.addObject(human.Human(files3d.loadMesh("data/3dobjs/base.obj")))
 
     def loadMainGui(self):
 
-        self.progressBar.setProgress(0.3)
+        self.progress(0.3)
 
         self.tool = None
         self.selectedGroup = None
@@ -265,7 +265,7 @@ class MHApplication(gui3d.Application, mh.Application):
 
     def loadPlugins(self):
 
-        self.progressBar.setProgress(0.4)
+        self.progress(0.4)
 
         # Load plugins not starting with _
         self.modules = {}
@@ -282,7 +282,7 @@ class MHApplication(gui3d.Application, mh.Application):
 
         alreadyLoaded = len(self.modules)
         stillToLoad = len(self.pluginsToLoad)
-        self.progressBar.setProgress(0.4 + (float(alreadyLoaded) / float(alreadyLoaded + stillToLoad)) * 0.4)
+        self.progress(0.4 + (float(alreadyLoaded) / float(alreadyLoaded + stillToLoad)) * 0.4)
 
         if not stillToLoad:
             return
@@ -315,7 +315,7 @@ class MHApplication(gui3d.Application, mh.Application):
 
     def loadGui(self):
 
-        self.progressBar.setProgress(0.9)
+        self.progress(0.9)
 
         category = self.getCategory('Settings')
         category.addTask(PluginsTaskView(category))
@@ -326,7 +326,8 @@ class MHApplication(gui3d.Application, mh.Application):
         def onClicked(event):
             self.promptAndExit()
 
-        self.buttonBox = mh.addWidget(mh.Frame.RightBottom, gui.GroupBox('Edit'))
+        panel = mh.getPanelBottomRight()
+        self.buttonBox = panel.addWidget(gui.GroupBox('Edit'))
         self.undoButton  = self.buttonBox.addWidget(gui.Button("Undo"),  0, 0)
         self.redoButton  = self.buttonBox.addWidget(gui.Button("Redo"),  0, 1)
         self.resetButton = self.buttonBox.addWidget(gui.Button("Reset"), 2, 0)
@@ -381,7 +382,7 @@ class MHApplication(gui3d.Application, mh.Application):
 
         self.switchCategory("Modelling")
 
-        self.progressBar.setProgress(1.0)
+        self.progress(1.0)
         # self.progressBar.hide()
 
     def loadFinish(self):
@@ -1083,13 +1084,6 @@ class MHApplication(gui3d.Application, mh.Application):
 
         self.splash = gui.SplashScreen(gui3d.app.getThemeResource('images', 'splash.png'))
         self.splash.show()
-
-        # Display the initial splash screen and the progress bar during startup
-        # mesh = gui3d.RectangleMesh(800, 600, gui3d.app.getThemeResource('images', 'splash.png'))
-        # self.splash = self.addObject(gui3d.Object([0, 0, 9.8], mesh))
-        self.statusBar = mh.addWidget(mh.Frame.Bottom, gui.StatusBar())
-        self.statusBar.show()
-        self.progressBar = mh.addWidget(mh.Frame.Bottom, gui.ProgressBar())
 
         self.tabs = self.mainwin.tabs
 

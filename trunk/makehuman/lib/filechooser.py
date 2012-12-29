@@ -162,14 +162,14 @@ class FileSort(object):
         return [filename for size, i, filename in decorated]
 
 class FileSortRadioButton(RadioButton):
-    def __init__(self, group, selected, field):
+    def __init__(self, chooser, group, selected, field):
         RadioButton.__init__(self, group, "By %s" % field, selected)
         self.field = field
+        self.chooser = chooser
         
     def onClicked(self, event):
-        parent = self.parentWidget().parentWidget()
-        parent.sortBy = self.field
-        parent.refresh()
+        self.chooser.sortBy = self.field
+        self.chooser.refresh()
 
 class FileChooser(QtGui.QWidget, Widget):
     """
@@ -232,7 +232,7 @@ class FileChooser(QtGui.QWidget, Widget):
 
         self.refreshButton = self.sortBox.addWidget(Button('Refresh'))
         for i, field in enumerate(self.sort.fields()):
-            self.sortBox.addWidget(FileSortRadioButton(self.sortgroup, i == 0, field))
+            self.sortBox.addWidget(FileSortRadioButton(self, self.sortgroup, i == 0, field))
         
         @self.refreshButton.mhEvent
         def onClicked(value):

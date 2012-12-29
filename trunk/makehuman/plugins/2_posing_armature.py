@@ -107,13 +107,10 @@ class PoseArmatureTaskView(gui3d.TaskView):
         self.cube = cubeLayer.object
         self.cube.hide()
 
-        self.status = self.addWidget(mh.addWidget(mh.Frame.Bottom, gui.TextView()))
-        log.debug("PoseArmatureTaskView: Status: %s", self.status)
-
         # Main box
         self.mainBox = self.addLeftWidget(gui.GroupBox('Rotation'))
-        self.eulerBox = self.addWidget(mh.addWidget(mh.Frame.LeftBottom, gui.GroupBox('Euler')))
-        self.quatBox = self.addWidget(mh.addWidget(mh.Frame.LeftBottom, gui.GroupBox('Quaternion')))
+        self.eulerBox = self.addLeftWidget(gui.GroupBox('Euler'))
+        self.quatBox = self.addLeftWidget(gui.GroupBox('Quaternion'))
 
         self.QWslider = self.quatBox.addWidget(gui.Slider(value = 1000.0, min = -1000.0, max = 1000.0, label = "W: %d"))
         self.QXslider = self.quatBox.addWidget(gui.Slider(value = 0.0, min = -1000.0, max = 1000.0, label = "X: %d"))
@@ -141,9 +138,9 @@ class PoseArmatureTaskView(gui3d.TaskView):
         self.zeroAllButton = self.mainBox.addWidget(gui.Button("Zero All"))
         self.poseButton = self.mainBox.addWidget(gui.Button("Pose"))
         self.testButton = self.mainBox.addWidget(gui.Button("Test bones"))
-        self.mainBox.hide()
-        self.quatBox.hide()
-        self.eulerBox.hide()
+        # self.mainBox.hide()
+        # self.quatBox.hide()
+        # self.eulerBox.hide()
 
         # Rig select box        
         self.rigBox = self.addLeftWidget(gui.GroupBox('Rig'))
@@ -431,8 +428,8 @@ class PoseArmatureTaskView(gui3d.TaskView):
 
 
     def onShow(self, event):
-        if not self.rigtype:
-            self.selectRig("Prism", "rigid")       
+        # if not self.rigtype:
+        #     self.selectRig("Prism", "rigid")       
         if self.armature:
             self.cube.show()
         self.activeBone = None

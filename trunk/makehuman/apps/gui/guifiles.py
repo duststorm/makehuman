@@ -48,7 +48,7 @@ class SaveTaskView(gui3d.TaskView):
 
         modelPath = mh.getPath('models')
 
-        self.fileentry = self.addWidget(mh.addWidget(mh.Frame.Top, gui.FileEntryView('Save')))
+        self.fileentry = self.addTopWidget(gui.FileEntryView('Save'))
         self.fileentry.setDirectory(modelPath)
         self.fileentry.setFilter('MakeHuman Models (*.mhm)')
 
@@ -211,7 +211,8 @@ class LoadTaskView(gui3d.TaskView):
         
         modelPath = mh.getPath('models')
         gui3d.TaskView.__init__(self, category, 'Load', )
-        self.filechooser = self.addWidget(mh.addWidget(mh.Frame.Top, fc.FileChooser(modelPath, 'mhm', sort=HumanFileSort())))
+        self.filechooser = self.addTopWidget(fc.FileChooser(modelPath, 'mhm', sort=HumanFileSort()))
+        self.addLeftWidget(self.filechooser.sortBox)
 
         @self.filechooser.mhEvent
         def onFileSelected(filename):
@@ -258,7 +259,7 @@ class ExportTaskView(gui3d.TaskView):
 
         exportPath = mh.getPath('exports')
 
-        self.fileentry = self.addWidget(mh.addWidget(mh.Frame.Top, gui.FileEntryView('Export')))
+        self.fileentry = self.addTopWidget(gui.FileEntryView('Export'))
         self.fileentry.setDirectory(exportPath)
         self.fileentry.setFilter('All Files (*.*)')
 

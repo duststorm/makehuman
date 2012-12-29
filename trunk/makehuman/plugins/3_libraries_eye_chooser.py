@@ -30,7 +30,8 @@ class EyesTaskView(gui3d.TaskView):
     def __init__(self, category):
         
         gui3d.TaskView.__init__(self, category, 'Eyes')
-        self.filechooser = self.addWidget(mh.addWidget(mh.Frame.Top, fc.FileChooser('data/eyes', 'mhstx', 'png', 'data/eyes/notfound.png')))
+        self.filechooser = self.addTopWidget(fc.FileChooser('data/eyes', 'mhstx', 'png', 'data/eyes/notfound.png'))
+        self.addLeftWidget(self.filechooser.sortBox)
 
         @self.filechooser.mhEvent
         def onFileSelected(filename):

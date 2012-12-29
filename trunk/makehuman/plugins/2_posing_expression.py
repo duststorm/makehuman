@@ -207,7 +207,8 @@ class MhmLoadTaskView(gui3d.TaskView):
         if not os.path.exists(self.mhmPath):
             os.makedirs(self.mhmPath)
 
-        self.filechooser = self.addWidget(mh.addWidget(mh.Frame.Top, fc.FileChooser([self.globalMhmPath, self.mhmPath], 'mhm', 'png')))
+        self.filechooser = self.addTopWidget(fc.FileChooser([self.globalMhmPath, self.mhmPath], 'mhm', 'png'))
+        self.addLeftWidget(self.filechooser.sortBox)
 
         @self.filechooser.mhEvent
         def onFileSelected(filename):

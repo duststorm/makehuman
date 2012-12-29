@@ -46,13 +46,13 @@ class TexturesTaskView(gui3d.TaskView):
         if not os.path.exists(self.userTextures):
             os.makedirs(self.userTextures)
 
-        self.filewidget = mh.addWidget(mh.Frame.Top, fc.FileChooser(self.defaultTextures, 'png', 'png'))
-        self.filechooser = self.addWidget(self.filewidget)
+        self.filechooser = self.addTopWidget(fc.FileChooser(self.defaultTextures, 'png', 'png'))
+        self.addLeftWidget(self.filechooser.sortBox)
         self.update = self.filechooser.sortBox.addWidget(gui.Button('Check for updates'))
         self.mediaSync = None
         self.activeClothing = None
         
-        #self.clothesBox = mh.addWidget(mh.Frame.LeftTop, gui.GroupBox('Textures'))
+        #self.clothesBox = self.addLeftWidget(gui.GroupBox('Textures'))
         #self.cloGroup = []
         #for i, uuid in enumerate(theClothesList):
         #    filepath = human.clothesProxies[uuid].file
@@ -125,19 +125,18 @@ class TexturesTaskView(gui3d.TaskView):
             uuid = self.activeClothing
             clo = human.clothesObjs[uuid]
             filepath = human.clothesProxies[uuid].file
-            log.debug("onShow %s %s" % (clo, filepath) )
+            log.debug("onShow %s %s", clo, filepath)
             self.textures = [os.path.dirname(filepath)] + self.defaultTextures            
         else:
             # TODO maybe dont show anything?
             self.textures = self.defaultTextures            
             
             fc = self.filechooser
-            log.debug("  fc %s %s %s" % (fc, fc.children.count(), str(fc.files)) )
-            log.debug("  added")
+            log.debug("fc %s %s %s added", fc, fc.children.count(), str(fc.files))
 
         # Reload filechooser
-        self.filewidget.paths = self.textures
-        self.filewidget.refresh()
+        self.filechooser.paths = self.textures
+        self.filechooser.refresh()
         self.filechooser.setFocus()
 
     def onHide(self, event):
