@@ -35,20 +35,17 @@ def getFaces(me):
 #    class VIEW3D_OT_PrintVnumsButton(bpy.types.Operator):
 #
  
-def printVertNums(context):
-    ob = context.object
-    print("Verts in ", ob)
-    for v in ob.data.vertices:
-        if v.select:
-            print("  ", v.index)
-    print("End")
-
 class VIEW3D_OT_PrintVnumsButton(bpy.types.Operator):
     bl_idname = "mhw.print_vnums"
     bl_label = "Print vnums"
 
     def execute(self, context):
-        printVertNums(context)
+        ob = context.object
+        print("Verts in ", ob)
+        for v in ob.data.vertices:
+            if v.select:
+                print("  ", v.index)
+        print("End")
         return{'FINISHED'}    
      
 
@@ -61,9 +58,11 @@ class VIEW3D_OT_PrintVnumsToFileButton(bpy.types.Operator):
         scn = context.scene
         path = os.path.expanduser(scn['MhxVertexGroupFile'])
         fp = open(path, "w")
+        fp.write("  [")
         for v in ob.data.vertices:
             if v.select:
-                fp.write("%d\n" % v.index)
+                fp.write("%d, " % v.index)
+        fp.write("]\n")
         fp.close()
         print(path, "written")
         return{'FINISHED'}    

@@ -47,7 +47,7 @@ class CProxy:
         return ("<CProxy %s %d\n  %s\n  x %s\n  y %s\n  z %s>" % 
             (self.name, self.firstVert, self.obj_file, self.xScale, self.yScale, self.zScale))
         
-    def update(self, srcVerts, trgVerts):
+    def update(self, srcVerts, trgVerts, skipBefore=0, skipAfter=100000):
         rlen = len(self.refVerts)
         mlen = len(trgVerts)
         first = self.firstVert
@@ -58,6 +58,8 @@ class CProxy:
         s2 = getScale(self.zScale, srcVerts, 1)
         #print("Scales", s0, s1, s2)
         for n in range(rlen):
+            if n < skipBefore or n >= skipAfter:
+                continue
             trgVert = trgVerts[n+first]
             refVert = self.refVerts[n]
             if type(refVert) == tuple:
