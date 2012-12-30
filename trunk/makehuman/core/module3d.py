@@ -56,7 +56,7 @@ def reloadTextures():
         try:
             textureCache[path].loadImage(path)
         except RuntimeError, text:
-            log.error("%s", text, exc_info=True)
+            log.error("Error loading texture %s", path, exc_info=True)
 
 class FaceGroup(object):
     """
