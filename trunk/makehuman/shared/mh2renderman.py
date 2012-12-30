@@ -914,9 +914,37 @@ class RMRScene:
 
         renderThread = RenderThread(self.app, filesTorender)
         renderThread.renderPath = os.path.join(self.ribsPath, self.renderResult).replace('\\', '/')
+        renderManager = RenderManager(self.app, renderThread)
         renderThread.start()
+        renderManager.start()
 
-from threading import Thread
+from threading import Thread, Lock
+
+class RenderManager(object):
+    def __init__(self, app, thread):
+        self.app = app
+        self.thread = thread
+        self.timer = None
+
+    def start(self):
+        self.timer = mh.addTimer(100, self.update)
+
+    def stop(self):
+        mh.removeTimer(self.timer)
+        self.timer = None
+        self.app.prompt("Render finished", "The image is saved in {0}".format(self.thread.renderPath),
+                        "OK", helpId="'renderFinishedPrompt'")
+
+    def update(self):
+        if not self.thread.is_alive():
+            self.stop()
+            return
+
+        if self.thread.lock.acquire(False):
+            for progress, status in self.thread.updates:
+                self.app.progress(progress, status)
+            self.thread.updates = []
+        self.thread.lock.release()
 
 class RenderThread(Thread):
 
@@ -926,6 +954,13 @@ class RenderThread(Thread):
         self.app = app
         self.filenames = filenames
         self.renderPath = ""
+        self.lock = Lock()
+        self.updates = []
+
+    def progress(self, progress, status=None):
+        self.lock.acquire()
+        self.updates.append((progress, status))
+        self.lock.release()
 
     def run(self):
         
@@ -933,7 +968,7 @@ class RenderThread(Thread):
             command = '%s "%s"' % ('aqsis -Progress', filename)            
             renderProc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
 
-            mh.callAsync(lambda:self.app.progress(0.0, status))
+            self.progress(0.0, status)
 
             try:
                 while True:
@@ -942,13 +977,11 @@ class RenderThread(Thread):
                         break
                    
                     progress = line.split()[1][0:-1]
-                    mh.callAsync(lambda:self.app.progress(float(progress)/100.0))
+                    self.progress(float(progress)/100.0)
             except:
                 pass
 
-            mh.callAsync(lambda:self.app.progress(1.0))
-            
-        gui3d.app.prompt("Render finished", "The image is saved in {0}".format(self.renderPath), "OK", helpId="'renderFinishedPrompt'")
+            self.progress(1.0)
             
             
 
