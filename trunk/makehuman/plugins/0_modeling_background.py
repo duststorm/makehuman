@@ -344,7 +344,7 @@ class BackgroundTaskView(gui3d.TaskView):
         gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'projection.tga'))
 
     @staticmethod
-    def RasterizeTriangles(dst, coords, colors):
+    def RasterizeTriangles(dst, coords, colors, progress = None):
         cmin = np.floor(np.amin(coords, axis=1)).astype(int)
         cmax = np.ceil( np.amax(coords, axis=1)).astype(int)
 
@@ -376,6 +376,8 @@ class BackgroundTaskView(gui3d.TaskView):
         c3 = dy31 * x3 - dx31 * y3
 
         for i in xrange(len(coords)):
+            if progress is not None and i % 100 == 0:
+                progress(i, len(coords))
             row, col = np.mgrid[miny[i]:maxy[i],minx[i]:maxx[i]]
             x = col + 0.5
             y = row + 0.5
@@ -430,8 +432,12 @@ class BackgroundTaskView(gui3d.TaskView):
 
         # log.debug("projectLighting: begin render")
 
-        self.RasterizeTriangles(dstImg, coords[:,[0,1,2],:], colors[:,[0,1,2],:][...,:3])
-        self.RasterizeTriangles(dstImg, coords[:,[2,3,0],:], colors[:,[2,3,0],:][...,:3])
+        def progress(base, i, n):
+            gui3d.app.progress(base + 0.5 * i / n)
+
+        self.RasterizeTriangles(dstImg, coords[:,[0,1,2],:], colors[:,[0,1,2],:][...,:3], progress = lambda i,n: progress(0.0,i,n))
+        self.RasterizeTriangles(dstImg, coords[:,[2,3,0],:], colors[:,[2,3,0],:][...,:3], progress = lambda i,n: progress(0.5,i,n))
+        gui3d.app.progress(1.0)
 
         # log.debug("projectLighting: end render")
 
