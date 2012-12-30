@@ -106,7 +106,7 @@ class FaceGroup(object):
 
     @property
     def faces(self):
-        for f in self.object.getFacesForGroups([self.name]):
+        for f in np.argwhere(self.object.group == self.idx)[...,0]:
             yield FaceProxy(self.object, f)
 
 class Object3D(object):
