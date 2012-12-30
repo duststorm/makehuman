@@ -5,7 +5,7 @@ B{Product Home Page:} U{http://www.makehuman.org/}
 
 B{Code Home Page:}    U{http://code.google.com/p/makehuman/}
 
-B{Authors:}           Marc Flerackers
+B{Authors:}           Marc Flerackers, Jonas Hauquier
 
 B{Copyright(c):}      MakeHuman Team 2001-2012
 
@@ -65,12 +65,10 @@ class TexturesTaskView(gui3d.TaskView):
 
         @self.filechooser.mhEvent
         def onFileSelected(filename):
-            human = gui3d.app.selectedHuman
             if not self.activeClothing:
                 return
             uuid = self.activeClothing
-            clo = human.clothesObjs[uuid]
-            clo.mesh.setTexture(filename)
+            self.applyTexture(uuid, filename)
             mh.changeCategory('Modelling')
 
         #@self.clothesBox.mhEvent
@@ -119,6 +117,11 @@ class TexturesTaskView(gui3d.TaskView):
         #if not os.path.isdir(self.userClothes) or not len([filename for filename in os.listdir(self.userClothes) if filename.lower().endswith('mhclo')]):    
         #    gui3d.app.prompt('No user clothes found', 'You don\'t seem to have any user clothes, download them from the makehuman media repository?\nNote: this can take some time depending on your connection speed.', 'Yes', 'No', self.syncMedia)
 
+    def applyTexture(self, uuid, filename):
+        human = gui3d.app.selectedHuman
+        clo = human.clothesObjs[uuid]
+        clo.mesh.setTexture(filename)
+
     def reloadTextureChooser(self):
         human = gui3d.app.selectedHuman
         if self.activeClothing:
@@ -151,14 +154,33 @@ class TexturesTaskView(gui3d.TaskView):
             # TODO
 
     def onHumanChanged(self, event):
-        pass        
+        pass
 
     def loadHandler(self, human, values):
-        pass
-        
+        uuid = values[1]
+        filepath = values[2]
+        if not uuid in human.clothesProxies.keys():
+            log.error("Could not load texture for object with uuid %s!" % uuid)
+            return
+        proxy = human.clothesProxies[uuid]
+        if not os.path.dirname(filepath):
+            proxy = human.clothesProxies[uuid]
+            clothesPath = os.path.dirname(proxy.file)
+            filepath = os.path.join(clothesPath, filepath)
+        self.applyTexture(uuid, filepath)
+
     def saveHandler(self, human, file):
-        pass
-        
+        for name, clo in human.clothesObjs.items():
+            if clo:
+                proxy = human.clothesProxies[name]
+                if clo.mesh.texture != proxy.texture[0]+"/"+proxy.texture[1]:
+                    clothesPath = os.path.dirname(proxy.file)
+                    if os.path.dirname(clo.mesh.texture) == clothesPath:
+                        texturePath = os.path.basename(clo.mesh.texture)
+                    else:
+                        texturePath = clo.mesh.texture
+                    file.write('textures %s %s\n' % (proxy.getUuid(), texturePath))
+
     def syncMedia(self):
         
         if self.mediaSync:
