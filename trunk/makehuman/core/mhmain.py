@@ -306,6 +306,8 @@ class MHApplication(gui3d.Application, mh.Application):
     def unloadPlugins(self):
 
         for name, module in self.modules.iteritems():
+            if module is None:
+                continue
             try:
                 log.message('Unloading plugin %s', name)
                 module.unload(self)
