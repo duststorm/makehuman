@@ -43,7 +43,7 @@ def getTexture(path, cache=None):
             texture = Texture(img)
             #texture.loadSubImage('data/themes/default/images/slider_focused.png', 0, 0)
         except RuntimeError, text:
-            log.error("%s", text, exc_info=True)
+            log.error("Error loading texture %s", path, exc_info=True)
         else:
             texture.modified = os.stat(path).st_mtime
             cache[path] = texture
