@@ -102,6 +102,7 @@ def loadMesh(path, locX=0, locY=0, locZ=0, loadColors=1):
     groups = []
     has_uv = False
     mtls = []
+    faceGroups = {}
 
     for objData in objFile:
 
@@ -118,7 +119,9 @@ def loadMesh(path, locX=0, locY=0, locZ=0, loadColors=1):
 
             elif command == 'f':
                 if not fg:
-                    fg =  obj.createFaceGroup('default-dummy-group')
+                    if 0 not in faceGroups:
+                        faceGroups[0] = obj.createFaceGroup('default-dummy-group')
+                    fg = faceGroups[0]
                     
                 uvIndices = []
                 vIndices = []
@@ -149,8 +152,10 @@ def loadMesh(path, locX=0, locY=0, locZ=0, loadColors=1):
                 mtls.append(mtl)
 
             elif command == 'g':
-                
-                fg =  obj.createFaceGroup(lineData[1])
+                fgName = lineData[1]
+                if fgName not in faceGroups:
+                    faceGroups[fgName] = obj.createFaceGroup(fgName)
+                fg =  faceGroups[fgName]
                 
             elif command == 'usemtl':
             
