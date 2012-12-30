@@ -31,21 +31,17 @@ class DebugDump:
         this.home = os.path.expanduser('~')
         this.debugpath = this.home
         if sys.platform == 'win32':
-            try:
-                k = _winreg.HKEY_CURRENT_USER
-                for x in ['Software', 'Microsoft', 'Windows', 'CurrentVersion', 'Explorer', 'Shell Folders']:
-                    k = _winreg.OpenKey(k, x)
-                name, type = _winreg.QueryValueEx(k, 'Personal')
-                if type == 1:
-                    this.debugpath = name
-            except StandardError:
-                pass
+            this.debugpath = os.path.join(os.environ['MYDOCUMENTS'],'makehuman')
+
+        if sys.platform == 'linux2':
+            this.debugpath = os.path.join(this.debugpath,"makehuman")
         
         if sys.platform.startswith("darwin"):
             this.debugpath = os.path.join(this.debugpath,"Documents")
             this.debugpath = os.path.join(this.debugpath,"MakeHuman")
-            if not os.path.exists(this.debugpath):
-                os.makedirs(this.debugpath)
+
+        if not os.path.exists(this.debugpath):
+            os.makedirs(this.debugpath)
             
         this.debugpath = os.path.join(this.debugpath, "makehuman-debug.txt")
 

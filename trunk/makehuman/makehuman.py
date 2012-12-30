@@ -13,6 +13,23 @@ import subprocess
 
 # print os.getcwd()
 
+def find_mydocuments():
+    os.environ['MYDOCUMENTS'] = os.path.expanduser('~')
+    if sys.platform == 'win32':
+        import _winreg
+        try:
+            k = _winreg.HKEY_CURRENT_USER
+            for x in ['Software', 'Microsoft', 'Windows', 'CurrentVersion', 'Explorer', 'Shell Folders']:
+                k = _winreg.OpenKey(k, x)
+
+            name, type = _winreg.QueryValueEx(k, 'Personal')
+
+            if type == 1:
+                os.environ['MYDOCUMENTS'] = name
+        except Exception as e:
+            print "error: " + format(str(e))
+
+
 def get_svn_revision():
     # Default fallback to use if we can't figure out SVN revision in any other
     # way: Use this file's svn revision.
@@ -75,7 +92,13 @@ if __name__ == '__main__':
         mfile = './main.py'
 
     if sys.platform == 'win32':
-        home = os.path.expanduser('~')
+        find_mydocuments()
+        home = os.environ['MYDOCUMENTS']
+        home = os.path.join(home,'makehuman')
+
+        if not os.path.exists(home):
+            os.makedirs(home)
+
         fo = open(os.path.join(home, "python_out.txt"), "w")
         sys.stdout = fo
         fe = open(os.path.join(home, "python_err.txt"), "w")
