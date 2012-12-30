@@ -489,16 +489,17 @@ def saveMhpFile(context, filepath):
 def writeMhpBones(fp, pb):
     b = pb.bone
     if pb.parent:
+        string = "quat"
         mat = b.matrix_local.inverted() * b.parent.matrix_local * pb.parent.matrix.inverted() * pb.matrix
     else:
-        mat = b.matrix_local.inverted() * pb.matrix
-    #mat = pb.matrix_basis.copy()
-    maty = list(mat[2])
-    matz = list(mat[3])
-    #mat[2] = matz
-    #mat[3] = maty
+        string = "gquat"
+        mat = pb.matrix.copy()
+        maty = mat[1].copy()
+        matz = mat[2].copy()
+        mat[1] = matz
+        mat[2] = -maty
     q = mat.to_quaternion()
-    fp.write("%s\tquat\t%.4f\t%.4f\t%.4f\t%.4f\n" % (pb.name, q.w, q.x, q.y, q.z))
+    fp.write("%s\t%s\t%.4f\t%.4f\t%.4f\t%.4f\n" % (pb.name, string, q.w, q.x, q.y, q.z))
     for child in pb.children:
         writeMhpBones(fp, child)
 
@@ -516,15 +517,20 @@ def loadMhpFile(context, filepath):
             words = line.split()
             if len(words) < 5:
                 continue
-            if words[1] == "quat":
+            elif words[1] == "quat":
                 q = Quaternion((float(words[2]), float(words[3]), float(words[4]), float(words[5])))
                 mat = q.to_matrix().to_4x4()
-                #maty = list(mat[2])
-                #matz = list(mat[3])
-                #mat[2] = matz
-                #mat[3] = maty
                 pb = rig.pose.bones[words[0]]
                 pb.matrix_basis = mat
+            elif words[1] == "gquat":
+                q = Quaternion((float(words[2]), float(words[3]), float(words[4]), float(words[5])))
+                mat = q.to_matrix().to_4x4()
+                maty = mat[1].copy()
+                matz = mat[2].copy()
+                mat[1] = -matz
+                mat[2] = maty
+                pb = rig.pose.bones[words[0]]
+                pb.matrix_basis = pb.bone.matrix_local.inverted() * mat
         fp.close()
         print("Mhp file %s loaded" % mhppath)
                 

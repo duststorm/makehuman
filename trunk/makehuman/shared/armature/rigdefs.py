@@ -362,10 +362,12 @@ class CArmature:
             words = line.split()
             if len(words) < 5:
                 continue
-            if words[1] == "quat":
+            elif words[1] in ["quat", "gquat"]:
                 bone = self.bones[words[0]]
                 quat = float(words[2]),float(words[3]),float(words[4]),float(words[5])
                 mat = tm.quaternion_matrix(quat)
+                if words[1] == "gquat":
+                    mat = dot(dot(inv(bone.matrixRest), mat), bone.matrixRest)
                 bone.matrixPose[:3,:3] = mat[:3,:3]
         fp.close()
         self.update()                    
