@@ -40,7 +40,7 @@ class SplashLogHandler(logging.Handler):
 class StatusLogHandler(logging.Handler):
     def emit(self, record):
         if G.app is not None and G.app.statusBar is not None:
-            G.app.statusBar.showMessage(self.format(record))
+            G.app.statusBar.showMessage("%s", self.format(record))
 
 class ApplicationLogHandler(logging.Handler):
     def emit(self, record):
