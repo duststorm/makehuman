@@ -25,6 +25,8 @@ TO DO
 
 __docformat__ = 'restructuredtext'
 
+import numpy as np
+
 import gui3d
 import events3d
 import mh
@@ -33,6 +35,7 @@ from aljabr import vnorm, vsub, vadd, vdot, mtransform
 from math import floor, ceil, pi, sqrt, exp
 import gui
 import filechooser as fc
+import log
 
 def pointInRect(point, rect):
 
@@ -340,34 +343,97 @@ class BackgroundTaskView(gui3d.TaskView):
         dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'projection.tga'))
         gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'projection.tga'))
 
+    @staticmethod
+    def RasterizeTriangles(dst, coords, colors):
+        cmin = np.floor(np.amin(coords, axis=1)).astype(int)
+        cmax = np.ceil( np.amax(coords, axis=1)).astype(int)
+
+        x1 = coords[:,0,0]
+        x2 = coords[:,1,0]
+        x3 = coords[:,2,0]
+
+        y1 = coords[:,0,1]
+        y2 = coords[:,1,1]
+        y3 = coords[:,2,1]
+
+        dx12 = x1 - x2
+        dx23 = x2 - x3
+        dx31 = x3 - x1
+
+        dy12 = y1 - y2
+        dy23 = y2 - y3
+        dy31 = y3 - y1
+
+        d = - dy23 * dx31 + dx23 * dy31
+
+        minx = cmin[:,0]
+        maxx = cmax[:,0]
+        miny = cmin[:,1]
+        maxy = cmax[:,1]
+
+        c1 = dy12 * x1 - dx12 * y1
+        c2 = dy23 * x2 - dx23 * y2
+        c3 = dy31 * x3 - dx31 * y3
+
+        for i in xrange(len(coords)):
+            row, col = np.mgrid[miny[i]:maxy[i],minx[i]:maxx[i]]
+            x = col + 0.5
+            y = row + 0.5
+
+            cx1 = c1[i] + dx12[i] * y - dy12[i] * x
+            cx2 = c2[i] + dx23[i] * y - dy23[i] * x
+            cx3 = c3[i] + dx31[i] * y - dy31[i] * x
+
+            mask = (cx1 > 0) * (cx2 > 0) * (cx3 > 0)
+
+            u = (dy23[i] * (x - x3[i]) - dx23[i] * (y - y3[i])) / d[i]
+            v = (dy31[i] * (x - x3[i]) - dx31[i] * (y - y3[i])) / d[i]
+            w = 1.0 - u - v
+
+            col = np.sum(colors[i][:,None,None,:] * np.array([u,v,w])[:,:,:,None], axis=0)
+
+            # log.debug('dst: %s', dst._data[miny[i]:maxy[i],minx[i]:maxx[i]].shape)
+            # log.debug('src: %s', col.shape)
+            dst._data[miny[i]:maxy[i],minx[i]:maxx[i]][mask] = col[mask]
+
     def projectLighting(self):
 
         mesh = gui3d.app.selectedHuman.mesh
         mesh.setShadeless(1)
 
         dstImg = mh.Image(width=1024, height=1024, bitsPerPixel=24)
+        dstImg._data[...] = 0
 
         dstW = dstImg.width
         dstH = dstImg.height
 
-        for v in mesh.verts:
+        delta = (-10.99, 20.0, 20.0) - mesh.coord
+        ld = delta / np.sqrt(np.sum(delta ** 2, axis=-1))[...,None]
+        del delta
+        s = np.sum(ld * mesh.vnorm, axis=-1)
+        del ld
+        s = np.maximum(0, np.minimum(255, (s * 256))).astype(np.uint8)
+        mesh.color[...,:3] = s[...,None]
+        mesh.color[...,3] = 255
+        del s
 
-            ld = vnorm(vsub((-10.99, 20.0, 20.0,), v.co))
-            s = vdot(v.no, ld)
-            s = max(0, min(255, int(s*255)))
-            v.setColor([s, s, s, 255])
+        group_mask = np.ones(len(mesh._faceGroups), dtype=bool)
+        for g in mesh._faceGroups:
+            if g.name.startswith('joint') or g.name.startswith('helper'):
+                group_mask[g.idx] = False
+        faces = np.argwhere(group_mask[mesh.group])[...,0]
+        del group_mask
 
-        for g in mesh.faceGroups:
+        coords = np.asarray([0,dstH])[None,None,:] + mesh.texco[mesh.fuvs[faces]] * np.asarray([dstW,-dstH])[None,None,:]
+        colors = mesh.color[mesh.fvert[faces]]
+        # log.debug("projectLighting: %s %s %s", faces.shape, coords.shape, colors.shape)
 
-            if g.name.startswith("joint") or g.name.startswith("helper"):
-                continue
+        # log.debug("projectLighting: begin render")
 
-            for f in g.faces:
+        self.RasterizeTriangles(dstImg, coords[:,[0,1,2],:], colors[:,[0,1,2],:][...,:3])
+        self.RasterizeTriangles(dstImg, coords[:,[2,3,0],:], colors[:,[2,3,0],:][...,:3])
 
-                co = [(mesh.texco[i][0]*dstW, dstH-(mesh.texco[i][1]*dstH)) for i in f.uv]
-                c = [v.color for v in f.verts]
-                RasterizeTriangle(dstImg, co[0], co[1], co[2], ColorShader(c[:3]))
-                RasterizeTriangle(dstImg, co[2], co[3], co[0], ColorShader((c[2], c[3], c[0])))
+        # log.debug("projectLighting: end render")
 
         #dstImg.resize(128, 128);
 
