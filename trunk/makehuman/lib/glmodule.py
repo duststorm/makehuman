@@ -52,22 +52,53 @@ def createShader(vertexShader, fragmentShader):
 
     return program
 
-def grabScreen(x, y, width, height, filename):
+def grabScreen(x, y, width, height, filename = None):
     if width <= 0 or height <= 0:
         raise RuntimeError("width or height is 0")
+
+    log.debug('grabScreen: %d %d %d %d', x, y, width, height)
 
     # Draw before grabbing, to make sure we grab a rendering and not a picking buffer
     draw()
 
-    rwidth = (width + 3) / 4 * 4
+    sx0 = x
+    sy0 = G.windowHeight - y - height
+    sx1 = sx0 + width
+    sy1 = sy0 + height
 
-    surface = np.empty((height, rwidth, 3), dtype = np.uint8)
+    sx0 = max(sx0, 0)
+    sx1 = min(sx1, G.windowWidth)
+    sy0 = max(sy0, 0)
+    sy1 = min(sy1, G.windowHeight)
 
-    glReadPixels(x, G.windowHeight - y - height, rwidth, height, GL_RGB, GL_UNSIGNED_BYTE, surface)
-    surface = Image(data = surface[:,:width,:])
-    surface = surface.flip_vertical()
+    rwidth = sx1 - sx0
+    rwidth -= rwidth % 4
+    sx1 = sx0 + rwidth
+    rheight = sy1 - sy0
 
-    surface.save(filename)
+    surface = np.empty((rheight, rwidth, 3), dtype = np.uint8)
+
+    log.debug('glReadPixels: %d %d %d %d', sx0, sy0, rwidth, rheight)
+
+    glReadPixels(sx0, sy0, rwidth, rheight, GL_RGB, GL_UNSIGNED_BYTE, surface)
+
+    if width != rwidth or height != rheight:
+        surf = np.zeros((height, width, 3), dtype = np.uint8) + 127
+        surf[...] = surface[:1,:1,:]
+        dx0 = (width - rwidth) / 2
+        dy0 = (height - rheight) / 2
+        dx1 = dx0 + rwidth
+        dy1 = dy0 + rheight
+        surf[dy0:dy1,dx0:dx1] = surface
+        surface = surf
+
+    surface = np.ascontiguousarray(surface[::-1,:,:])
+    surface = Image(data = surface)
+
+    if filename is not None:
+        surface.save(filename)
+
+    return surface
 
 pickingBuffer = None
 
