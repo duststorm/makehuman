@@ -1,6 +1,6 @@
 import sys
 import atexit
-import logging
+import log
 
 from PyQt4 import QtCore, QtGui, QtOpenGL
 
@@ -252,7 +252,7 @@ class Canvas(QtOpenGL.QGLWidget):
             gg_mouse_pos = x, y
 
         if g_mouse_pos is None:
-            QtCore.QTimer.singleShot(0, self.idle)
+            callAsync(self.idle)
 
         g_mouse_pos = (x, y)
 
@@ -611,6 +611,12 @@ class Application(QtGui.QApplication, events3d.EventHandler):
     def processEvents(self, flags = QtCore.QEventLoop.ExcludeUserInputEvents):
         super(Application, self).processEvents(flags)
 
+    def event(self, event):
+        if event.type() == QtCore.QEvent.User:
+            event.callback()
+            return True
+        return super(Application, self).event(event)
+
 g_timers = {}
 
 def getKeyModifiers():
@@ -631,5 +637,13 @@ def handleTimer(id):
     callback = g_timers[id]
     callback()
 
+class AsyncEvent(QtCore.QEvent):
+    def __init__(self, callback):
+        super(AsyncEvent, self).__init__(QtCore.QEvent.User)
+        self.callback = callback
+
 def callAsync(callback):
-    QtCore.QTimer.singleShot(0, callback)
+    if G.app is None:
+        log.notice('callAsync with no application')
+        return
+    G.app.postEvent(G.app, AsyncEvent(callback))
