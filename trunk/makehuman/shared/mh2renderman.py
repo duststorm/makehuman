@@ -936,15 +936,15 @@ class RenderManager(object):
                         "OK", helpId="'renderFinishedPrompt'")
 
     def update(self):
-        if not self.thread.is_alive():
-            self.stop()
-            return
-
         if self.thread.lock.acquire(False):
             for progress, status in self.thread.updates:
                 self.app.progress(progress, status)
             self.thread.updates = []
         self.thread.lock.release()
+
+        if not self.thread.is_alive():
+            self.stop()
+            return
 
 class RenderThread(Thread):
 
