@@ -869,7 +869,6 @@ class Viewport(QtGui.QWidget):
         if widget is None:
             self._layout.removeWidget(self._child)
         else:
-            widget.setContentsMargins(0, 0, 0, 0)
             self._layout.addWidget(widget)
         self._child = widget
         self.updateGeometry()

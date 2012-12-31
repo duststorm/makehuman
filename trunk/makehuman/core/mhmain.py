@@ -37,7 +37,10 @@ class PluginsTaskView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Plugins')
 
-        self.pluginsBox = self.addLeftWidget(gui.GroupBox('Plugins'))
+        self.scroll = self.addTopWidget(gui.VScrollArea())
+        self.pluginsBox = gui.GroupBox('Plugins')
+        self.pluginsBox.setSizePolicy(gui.QtGui.QSizePolicy.MinimumExpanding, gui.QtGui.QSizePolicy.MinimumExpanding)
+        self.scroll.setWidget(self.pluginsBox)
 
         for module in sorted(gui3d.app.modules):
             check = self.pluginsBox.addWidget(PluginCheckBox(module))
