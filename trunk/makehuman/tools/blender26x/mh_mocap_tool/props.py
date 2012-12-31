@@ -250,9 +250,7 @@ def initInterface(context):
 
     bpy.types.Scene.McpGuessTargetRig = BoolProperty(
         name = "Guess target rig",
-        default = True)
-        
-        
+        default = True)        
 
     # Manage actions
     
@@ -277,76 +275,11 @@ def initInterface(context):
     bpy.types.Scene.McpSecondAction = EnumProperty(
         items = [],
         name = "Second Action")
-        
- 
-    scn = context.scene
-    if False and scn:        
-        # Load and retarget
-        
-        scn.McpBvhScale = 0.65
-        scn.McpAutoScale = True
-        scn.McpStartFrame = 1
-        scn.McpEndFrame = 250
-        scn.McpRot90Anim = True
-        scn.McpDoSimplify = False
-        scn.McpNewIkRetarget = False
-
-        # Subsample and rescale
-        
-        scn.McpSubsample = True
-        scn.McpSSFactor = 1
-        scn.McpDefaultSS = True
-        scn.McpRescaleFactor = 1
-        scn.McpRescale = False
-        
-        # Simplify
-        
-        scn.McpSimplifyVisible = False
-        scn.McpSimplifyMarkers = False
-        scn.McpApplyFixes = True
-        scn.McpErrorLoc = 0.01
-        scn.McpErrorRot = 0.1
-        
-        # Loop
-    
-        scn.McpLoopBlendRange = 5
-        scn.McpLoopLoc = True
-        scn.McpLoopRot = True
-        scn.McpLoopInPlace = False
-        scn.McpLoopZInPlace = False
-        scn.McpRepeatNumber = 1
-        scn.McpFirstEndFrame = 1
-        scn.McpSecondStartFrame = 1
-        scn.McpFirstAction = 0
-        scn.McpSecondAction = 0
-        scn.McpUseNewOutputAction = False
-        scn.McpOutputActionName = ""
-    
-        # Plant
-        
-        scn.McpPlantCurrent = True
-        scn.McpPlantLoc = True
-        scn.McpPlantRot = False
-
-        # Props
-        
-        scn.McpPrefix = "Female1_A"
-        scn.McpDirectory = "~/makehuman/bvh/Female1_bvh"
-        
-        # Manage actions            
-        
-        scn.McpFilterActions = False
-        scn.McpReallyDelete = False
-        action.listAllActions(context)
-        print("Default scene properties set")
-    else:
-        print("Warning - no scene - scene properties not set")
-
-    bpy.types.Object.McpArmature = StringProperty()
-    
+            
+    bpy.types.Object.McpArmature = StringProperty()    
     bpy.types.Object.McpLimitsOn = BoolProperty(default=True)
     bpy.types.Object.McpChildOfsOn = BoolProperty(default=False)
-
+ 
 
 #
 #    ensureInited(context):
