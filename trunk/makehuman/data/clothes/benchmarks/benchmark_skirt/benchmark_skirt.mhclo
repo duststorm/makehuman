@@ -1,20 +1,20 @@
 # author Thomas Larsson
 # license GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 # homepage http://www.makehuman.org/
-# uuid 0176f1a7-2321-4da1-9773-3b1d3c4df9d5
+# uuid dda6dffa-04b1-46d8-b3d5-6aaa390bbd3c
 # basemesh alpha_7
 
 # name Benchmark_Skirt
 # obj_file benchmark_skirt.obj
-# x_scale 3936 3972 1.3517
-# z_scale 3840 3957 1.6316
-# y_scale 14165 14175 7.8300
+# x_scale 3464 10305 2.5128
+# z_scale 6930 7245 1.6554
+# y_scale 14022 14040 4.5292
 # z_depth 30
 # uvtex_layer 0 base
 # objfile_layer 0
-# texture mono_blue.png 0
-# material MonoBlue
-diffuse_color 0.7874 0.8000 0.0000
+# texture uvgrid.png 0
+# material Material
+diffuse_color 0.0304 0.0000 0.8000
 diffuse_intensity 0.8
 specular_color 1.0000 1.0000 1.0000
 specular_intensity 0.5
