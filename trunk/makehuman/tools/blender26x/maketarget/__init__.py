@@ -87,8 +87,16 @@ class MakeTargetPanel(bpy.types.Panel):
         scn = context.scene
         if not utils.drawConfirm(layout, scn):
             return
+            
         settings.drawDirectories(layout, scn)
-        #layout.operator("mh.prune_target_file")
+
+        if False:
+            layout.label("Pruning")
+            row = layout.row()
+            row.prop(ob, "MhPruneEnabled")
+            row.prop(ob, "MhPruneWholeDir")
+            row.prop(ob, "MhPruneRecursively")
+            layout.operator("mh.prune_target_file")
 
         layout.label("Load materials from")
         layout.prop(scn, "MhLoadMaterial", expand=True)
@@ -98,26 +106,18 @@ class MakeTargetPanel(bpy.types.Panel):
             layout.operator("mh.import_base_obj", text="Reimport Base Obj").delete = True
             #layout.operator("mh.delete_clothes")
             #layout.operator("mh.tights_only")
-            if ob.MhIrrelevantDeleted:
-                layout.label("Only %s Affected" % ob.MhAffectOnly)
-            else:
-                layout.label("Affect Only:")
-                layout.prop(ob, "MhAffectOnly", expand=True)
-                layout.operator("mh.delete_irrelevant")  
-            if ob.MhAffectOnly == 'Skirt':
-                layout.operator("mh.snap_waist")
-                layout.operator("mh.straighten_skirt")
-
             layout.separator()
         else:
             layout.operator("mh.import_base_mhclo", text="Import Base Mhclo").delete = False
             layout.operator("mh.import_base_obj", text="Import Base Obj").delete = False
             if rig and rig.type == 'ARMATURE':
                 layout.operator("mh.make_base_obj")
+
         if utils.isBase(ob):
             layout.operator("mh.new_target")
             layout.operator("mh.load_target")            
             layout.operator("mh.load_target_from_mesh")                        
+
         elif utils.isTarget(ob):
             if not ob.data.shape_keys:
                 layout.label("Warning: Internal inconsistency")
@@ -139,29 +139,52 @@ class MakeTargetPanel(bpy.types.Panel):
                 row.label("", icon=icon)
                 row.prop(skey, "value", text=skey.name)
                 n += 1
+
             layout.separator()
             layout.operator("mh.new_target", text="New Secondary Target")
             layout.operator("mh.load_target", text="Load Secondary From File")            
             layout.operator("mh.load_target_from_mesh", text="Load Secondary From Mesh")                        
             layout.operator("mh.fit_target")
             layout.separator()
+            layout.operator("mh.discard_target")
+            layout.operator("mh.discard_all_targets")
+            layout.operator("mh.apply_targets")
+
+            layout.separator()
+            if ob.MhIrrelevantDeleted:
+                layout.label("Only %s Affected" % ob.MhAffectOnly)
+            else:
+                layout.label("Affect Only:")
+                layout.prop(ob, "MhAffectOnly", expand=True)
+                layout.operator("mh.delete_irrelevant")  
+            row = layout.row()
+            row.prop(ob, "SelectedOnly")
+            row.prop(ob, "MhZeroOtherTargets")
+            if ob["FilePath"]:
+                layout.operator("mh.save_target")           
+            layout.operator("mh.saveas_target")       
+            
+            layout.separator()
+            layout.label("Editing")
             layout.operator("mh.symmetrize_target", text="Symm Left->Right").action = "Left"
             layout.operator("mh.symmetrize_target", text="Symm Right->Left").action = "Right"
             layout.operator("mh.symmetrize_target", text="Mirror Target").action = "Mirror"
-            #layout.separator()
-            #layout.prop(scn, '["Relax"]')
-            #layout.operator("mh.relax_target")
-            layout.separator()
-            layout.operator("mh.discard_target")
-            layout.operator("mh.discard_all_targets")
-            layout.separator()
-            layout.operator("mh.apply_targets")
-            layout.separator()
-            layout.prop(ob, "SelectedOnly")
-            layout.prop(ob, "MhZeroOtherTargets")
-            if ob["FilePath"]:
-                layout.operator("mh.save_target")           
-            layout.operator("mh.saveas_target")           
+            if ob.MhAffectOnly == 'Skirt':
+                layout.operator("mh.snap_waist")
+                layout.operator("mh.straighten_skirt")
+                
+            layout.operator("mh.relax_selected")
+            if ob.MhRelaxing:
+                layout.prop(ob, "MhRelaxAmount")
+                row = layout.row()
+                row.prop(ob, "MhRelaxX")
+                row.prop(ob, "MhRelaxY")
+                row.prop(ob, "MhRelaxZ")
+                layout.operator("mh.test_relax")
+                layout.operator("mh.discard_relax")
+                layout.operator("mh.commit_relax")
+                layout.operator("mh.commit_and_relax_more")
+                return
 
         if rig and rig.type == 'ARMATURE':
             layout.separator()

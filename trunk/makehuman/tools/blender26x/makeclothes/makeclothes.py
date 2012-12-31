@@ -2237,16 +2237,16 @@ def addHelperVerts(me, htype, verts):
         for vn in range(FirstTightsVert, NTotalVerts):
             verts[vn] = me.vertices[vn]
     elif htype == 'Coat':
-        zmin = 1e6
+        zmax = -1e6
         for vn in TopOfSkirt1:
             zn = me.vertices[vn].co[2]
-            if zn < zmin:
-                zmin = zn
+            if zn > zmax:
+                zmax = zn
         for vn in range(FirstSkirtVert, FirstTightsVert):
             verts[vn] = me.vertices[vn]
         for vn in range(FirstTightsVert, NTotalVerts):
             zn = me.vertices[vn].co[2]
-            if zn >= zmin:
+            if zn > zmax:
                 verts[vn] = me.vertices[vn]
 
     
