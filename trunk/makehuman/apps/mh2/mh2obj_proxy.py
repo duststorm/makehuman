@@ -5,9 +5,9 @@
 
 **Code Home Page:**    http://code.google.com/p/makehuman/
 
-**Authors:**           Thomas Larsson
+**Authors:**           Thomas Larsson, Jonas Hauquier
 
-**Copyright(c):**      MakeHuman Team 2001-2009
+**Copyright(c):**      MakeHuman Team 2001-2012
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -119,7 +119,14 @@ def writeMaterial(fp, stuff, human, cfg):
     )
     
     if stuff.proxy:
-        writeTexture(fp, "map_Kd", stuff.proxy.texture, human, cfg)
+        uuid = stuff.proxy.getUuid()
+        if uuid in human.clothesObjs.keys() and human.clothesObjs[uuid]:
+            clothesObj = human.clothesObjs[uuid]
+            texture = clothesObj.mesh.texture
+            texPath = (os.path.dirname(texture), os.path.basename(texture))
+            writeTexture(fp, "map_Kd", texPath, human, cfg)
+        else:
+            writeTexture(fp, "map_Kd", stuff.proxy.texture, human, cfg)
         #writeTexture(fp, "map_Tr", stuff.proxy.translucency, human, cfg)
         writeTexture(fp, "map_Disp", stuff.proxy.normal, human, cfg)
         writeTexture(fp, "map_Disp", stuff.proxy.displacement, human, cfg)
