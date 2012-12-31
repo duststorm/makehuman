@@ -10,7 +10,7 @@
 
 **Authors:**           Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2009
+**Copyright(c):**      MakeHuman Team 2001-2012
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -874,7 +874,15 @@ def writeProxyMaterial(fp, mat, proxy, config, proxyData):
     displacement = None
     transparency = None
     if proxy.texture:
-        (tex,texname) = writeProxyTexture(fp, proxy.texture, mat, "", config)
+        uuid = proxy.getUuid()
+        human = gui3d.app.selectedHuman
+        if uuid in human.clothesObjs.keys() and human.clothesObjs[uuid]:
+            clothesObj = human.clothesObjs[uuid]
+            texture = clothesObj.mesh.texture
+            texPath = (os.path.dirname(texture), os.path.basename(texture))
+            (tex,texname) = writeProxyTexture(fp, texPath, mat, "", config)
+        else:
+            (tex,texname) = writeProxyTexture(fp, proxy.texture, mat, "", config)
     if proxy.bump:
         (bump,bumpname) = writeProxyTexture(fp, proxy.bump, mat, "", config)
     if proxy.normal:
