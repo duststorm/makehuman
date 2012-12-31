@@ -31,11 +31,18 @@ import gui3d
 import events3d
 import mh
 import os
-from aljabr import vnorm, vsub, vadd, vdot, mtransform
+from aljabr import vsub, vadd, vdot, mtransform
 from math import floor, ceil, pi, sqrt, exp
 import gui
 import filechooser as fc
 import log
+
+def v4to3(v):
+    v = np.asarray(v)
+    return v[:3,0] / v[3:,0]
+
+def vnorm(v):
+    return v / np.sqrt(np.sum(v ** 2, axis=-1))[...,None]
 
 def pointInRect(point, rect):
 
@@ -43,125 +50,6 @@ def pointInRect(point, rect):
         return False
     else:
         return True
-
-class Shader(object):
-
-    def __init__(self):
-
-        pass
-
-    def shade(self, x, y, u, v, w):
-
-        return (255, 255, 255, 0)
-
-class ColorShader(Shader):
-
-    def __init__(self, colors):
-
-        self.colors = colors
-
-    def shade(self, x, y, u, v, w):
-
-        col = [self.colors[0][i] * u + self.colors[1][i] * v + self.colors[2][i] * w for i in xrange(3)]
-        return tuple(map(int, col))
-
-class UvShader(Shader):
-
-    def __init__(self, texture, uv):
-
-        self.texture = texture
-        self.width = texture.width
-        self.height = texture.height
-        self.uv = uv
-
-    def shade(self, x, y, u, v, w):
-
-        x, y = [self.uv[0][i] * u + self.uv[1][i] * v + self.uv[2][i] * w for i in xrange(2)]
-        try:
-            return self.texture[int(x*self.width), int(y*self.height)]
-        except:
-            return (255, 255, 255, 255)
-
-class UvAlphaShader(Shader):
-
-    def __init__(self, dst, texture, uva):
-
-        self.dst = dst
-        self.texture = texture
-        self.width = texture.width
-        self.height = texture.height
-        self.uva = uva
-
-    def shade(self, x, y, u, v, w):
-
-        dst = self.dst[x, y]
-        x, y, a = [self.uva[0][i] * u + self.uva[1][i] * v + self.uva[2][i] * w for i in xrange(3)]
-        try:
-            src = self.texture[int(x*self.width), int(y*self.height)]
-            return tuple([int(a * (src[i] - dst[i]) + dst[i]) for i in xrange(4)])
-        except:
-            return dst
-
-# Not really fast since it checks every pixel in the bounding rectangle
-# http://www.devmaster.net/codespotlight/show.php?id=17
-def RasterizeTriangle(dst, p0, p1, p2, shader):
-
-    y1 = round(p0[1])
-    y2 = round(p1[1])
-    y3 = round(p2[1])
-
-    x1 = round(p0[0])
-    x2 = round(p1[0])
-    x3 = round(p2[0])
-
-    dx12 = x1 - x2
-    dx23 = x2 - x3
-    dx31 = x3 - x1
-
-    dy12 = y1 - y2
-    dy23 = y2 - y3
-    dy31 = y3 - y1
-
-    minx = min([x1, x2, x3])
-    maxx = max([x1, x2, x3])
-    miny = min([y1, y2, y3])
-    maxy = max([y1, y2, y3])
-
-    c1 = dy12 * x1 - dx12 * y1
-    c2 = dy23 * x2 - dx23 * y2
-    c3 = dy31 * x3 - dx31 * y3
-
-    if (dy12 < 0 or (dy12 == 0 and dx12 > 0)): c1+=1
-    if (dy23 < 0 or (dy23 == 0 and dx23 > 0)): c2+=1
-    if (dy31 < 0 or (dy31 == 0 and dx31 > 0)): c3+=1
-
-    cy1 = c1 + dx12 * miny - dy12 * minx
-    cy2 = c2 + dx23 * miny - dy23 * minx
-    cy3 = c3 + dx31 * miny - dy31 * minx
-
-    for y in xrange(int(miny), int(maxy)):
-
-        cx1 = cy1
-        cx2 = cy2
-        cx3 = cy3
-
-        for x in xrange(int(minx), int(maxx)):
-
-            if cx1 > 0 and cx2 > 0 and cx3 > 0:
-
-                d = - dy23 * dx31 + dx23 * dy31
-                u = (dy23 * (x - x3) - dx23 * (y - y3)) / d
-                v = (dy31 * (x - x3) - dx31 * (y - y3)) / d
-                w = 1.0 - u - v
-                dst[x, y] = shader.shade(x, y, u, v, w)
-
-            cx1 -= dy12
-            cx2 -= dy23
-            cx3 -= dy31
-
-        cy1 += dx12
-        cy2 += dx23
-        cy3 += dx31
 
 class BackgroundTaskView(gui3d.TaskView):
 
@@ -250,7 +138,7 @@ class BackgroundTaskView(gui3d.TaskView):
             gui3d.app.redraw()
 
             # Switch to orthogonal view
-            gui3d.app.modelCamera.switchToOrtho()
+            # gui3d.app.modelCamera.switchToOrtho()
 
     def fixateBackground(self):
 
@@ -279,13 +167,68 @@ class BackgroundTaskView(gui3d.TaskView):
 
             self.reference = reference
 
-    def projectBackground(self):
+    class Shader(object):
+        pass
 
+    class UvAlphaShader(Shader):
+        def __init__(self, dst, texture, uva):
+            self.dst = dst
+            self.texture = texture
+            self.size = np.array([texture.width, texture.height])
+            self.uva = uva
+
+        def shade(self, i, xy, uvw):
+            dst = self.dst._data[xy[...,1],xy[...,0]][...,:3]
+            uva = np.sum(self.uva[i][None,None,:,:] * uvw[...,[1,2,0]][:,:,:,None], axis=2)
+            ix = np.floor(uva[:,:,:2] * self.size[None,None,:]).astype(int)
+            src = self.texture._data[ix[...,1], ix[...,0]][...,:3]
+            a = uva[:,:,2]
+            return a[:,:,None] * (src.astype(float) - dst) + dst
+
+    class ColorShader(Shader):
+        def __init__(self, colors):
+            self.colors = colors
+
+        def shade(self, i, xy, uvw):
+            return np.sum(self.colors[i][None,None,:,:] * uvw[...,[1,2,0]][:,:,:,None], axis=2)
+
+    @staticmethod
+    def RasterizeTriangles(dst, coords, shader, progress = None):
+        delta = coords - coords[:,[1,2,0],:]
+        perp = np.concatenate((delta[:,:,1,None], -delta[:,:,0,None]), axis=-1)
+        dist = np.sum(perp[:,0,:] * delta[:,2,:], axis=-1)
+        perp /= dist[:,None,None]
+        base = np.sum(perp * coords, axis=-1)
+
+        cmin = np.floor(np.amin(coords, axis=1)).astype(int)
+        cmax = np.ceil( np.amax(coords, axis=1)).astype(int)
+
+        minx = cmin[:,0]
+        maxx = cmax[:,0]
+        miny = cmin[:,1]
+        maxy = cmax[:,1]
+
+        for i in xrange(len(coords)):
+            if progress is not None and i % 100 == 0:
+                progress(i, len(coords))
+
+            ixy = np.mgrid[miny[i]:maxy[i],minx[i]:maxx[i]].transpose([1,2,0])[:,:,::-1]
+            xy = ixy + 0.5
+            uvw = np.sum(perp[i,None,None,:,:] * xy[:,:,None,:], axis=-1) - base[i,None,None,:]
+            mask = np.all(uvw > 0, axis=-1)
+            col = shader.shade(i, ixy, uvw)
+            # log.debug('dst: %s', dst._data[miny[i]:maxy[i],minx[i]:maxx[i]].shape)
+            # log.debug('src: %s', col.shape)
+            dst._data[miny[i]:maxy[i],minx[i]:maxx[i],:3][mask] = col[mask]
+
+    def projectBackground(self):
         if not hasattr(self, "leftTop"):
             gui3d.app.prompt("Warning", "You need to load a background before you can project it.", "OK")
             return
 
         mesh = gui3d.app.selectedHuman.getSeedMesh()
+
+        self.fixateBackground()
 
         # for all quads, project vertex to screen
         # if one vertex falls in bg rect, project screen quad into uv quad
@@ -293,110 +236,76 @@ class BackgroundTaskView(gui3d.TaskView):
         leftTop = gui3d.app.modelCamera.convertToScreen(*self.leftTop)
         rightBottom = gui3d.app.modelCamera.convertToScreen(*self.rightBottom)
 
-        r = [leftTop[0], leftTop[1], rightBottom[0], rightBottom[1]]
-
         srcImg = mh.Image(self.backgroundImage.getTexture())
         dstImg = mh.Image(gui3d.app.selectedHuman.getTexture())
 
-        srcW = srcImg.width
-        srcH = srcImg.height
         dstW = dstImg.width
         dstH = dstImg.height
 
-        eye = gui3d.app.modelCamera.eye
-        focus = gui3d.app.modelCamera.focus
+        ex, ey, ez = gui3d.app.modelCamera.eye
+        eye = np.matrix([ex,ey,ez,1]).T
+        fx, fy, fz = gui3d.app.modelCamera.focus
+        focus = np.matrix([fx,fy,fz,1]).T
         transform = mesh.object3d.transform
-        eye = mtransform(transform, eye)
-        focus = mtransform(transform, focus)
-        camera = vnorm(vsub(eye, focus))
+        eye = v4to3(transform * eye)
+        focus = v4to3(transform * focus)
+        camera = vnorm(eye - focus)
+        # log.debug('%s %s %s', eye, focus, camera)
 
-        for g in mesh.faceGroups:
+        group_mask = np.ones(len(mesh._faceGroups), dtype=bool)
+        for g in mesh._faceGroups:
+            if g.name.startswith('joint') or g.name.startswith('helper'):
+                group_mask[g.idx] = False
+        faces = np.argwhere(group_mask[mesh.group])[...,0]
+        del group_mask
 
-            if g.name.startswith("joint") or g.name.startswith("helper"):
-                continue
+        # log.debug('matrix: %s', gui3d.app.modelCamera.camera.getConvertToScreenMatrix())
 
-            for f in g.faces:
-                # From hdusel in regard of issue 183: As agreed with marc I'll change the
-                # call from packed to discrete because packed structs
-                # are not available on Python 2.6.1 which is mandatory for MakeHuman to run
-                # on OS X 10.5.x
-                #
-                # src = [gui3d.app.modelCamera.convertToScreen(*v.co, obj=mesh.object3d) for v in f.verts]
-                #
-                src = [gui3d.app.modelCamera.convertToScreen(v.co[0], v.co[1], v.co[2], obj=mesh.object3d) for v in f.verts]
+        texco = np.asarray([0,dstH])[None,None,:] + mesh.texco[mesh.fuvs[faces]] * np.asarray([dstW,-dstH])[None,None,:]
+        matrix = np.asarray(gui3d.app.modelCamera.camera.getConvertToScreenMatrix(mesh))
+        coord = np.concatenate((mesh.coord[mesh.fvert[faces]], np.ones((len(faces),4,1))), axis=-1)
+        # log.debug('texco: %s, coord: %s', texco.shape, coord.shape)
+        coord = np.sum(matrix[None,None,:,:] * coord[:,:,None,:], axis = -1)
+        # log.debug('coord: %s', coord.shape)
+        coord = coord[:,:,:2] / coord[:,:,3:]
+        # log.debug('coord: %s', coord.shape)
+        # log.debug('coords: %f-%f, %f-%f',
+        #           np.amin(coord[...,0]), np.amax(coord[...,0]),
+        #           np.amin(coord[...,1]), np.amax(coord[...,1]))
+        # log.debug('rect: %s %s', leftTop, rightBottom)
+        coord -= np.asarray([leftTop[0], leftTop[1]])[None,None,:]
+        coord /= np.asarray([rightBottom[0] - leftTop[0], rightBottom[1] - leftTop[1]])[None,None,:]
+        alpha = np.sum(mesh.vnorm[mesh.fvert[faces]] * np.asarray(camera)[None,None,:], axis=-1)
+        alpha = np.maximum(0, alpha)
+        # alpha[...] = 1 # debug
+        # log.debug('alpha: %s', alpha.shape)
+        # log.debug('coords: %f-%f, %f-%f',
+        #           np.amin(coord[...,0]), np.amax(coord[...,0]),
+        #           np.amin(coord[...,1]), np.amax(coord[...,1]))
+        uva = np.concatenate((coord, alpha[...,None]), axis=-1)
+        # log.debug('uva: %s', uva.shape)
+        valid = np.any(alpha >= 0, axis=1)
+        # log.debug('valid: %s', valid.shape)
+        texco = texco[valid,:,:]
+        uva = uva[valid,:,:]
 
-                if any([pointInRect(p, r) for p in src]):
+        # log.debug('%s %s', texco.shape, uva.shape)
 
-                    for i, v in enumerate(f.verts):
-                        src[i][2] = max(0.0, vdot(v.no, camera))
+        def progress(base, i, n):
+            gui3d.app.progress(base + 0.5 * i / n)
 
-                    if any([v[2] >= 0.0 for v in src]):
+        # log.debug('src: %s, dst: %s', srcImg._data.shape, dstImg._data.shape)
 
-                        for i, v in enumerate(f.verts):
-                            src[i][2] = max(0.0, vdot(v.no, camera))
+        log.debug("projectBackground: begin render")
 
-                        co = [(mesh.texco[i][0]*dstW, dstH-(mesh.texco[i][1]*dstH)) for i in f.uv]
-                        uva = [((v[0]-leftTop[0])/(rightBottom[0] - leftTop[0]), (v[1]-leftTop[1])/(rightBottom[1] - leftTop[1]), v[2]) for v in src]
-                        RasterizeTriangle(dstImg, co[0], co[1], co[2], UvAlphaShader(dstImg, srcImg, (uva[:3])))
-                        RasterizeTriangle(dstImg, co[2], co[3], co[0], UvAlphaShader(dstImg, srcImg, ((uva[2], uva[3], uva[0]))))
+        self.RasterizeTriangles(dstImg, texco[:,[0,1,2],:], self.UvAlphaShader(dstImg, srcImg, uva[:,[0,1,2],:]), progress = lambda i,n: progress(0.0,i,n))
+        self.RasterizeTriangles(dstImg, texco[:,[2,3,0],:], self.UvAlphaShader(dstImg, srcImg, uva[:,[2,3,0],:]), progress = lambda i,n: progress(0.5,i,n))
+        gui3d.app.progress(1.0)
 
-        dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'projection.tga'))
-        gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'projection.tga'))
+        log.debug("projectBackground: end render")
 
-    @staticmethod
-    def RasterizeTriangles(dst, coords, colors, progress = None):
-        cmin = np.floor(np.amin(coords, axis=1)).astype(int)
-        cmax = np.ceil( np.amax(coords, axis=1)).astype(int)
-
-        x1 = coords[:,0,0]
-        x2 = coords[:,1,0]
-        x3 = coords[:,2,0]
-
-        y1 = coords[:,0,1]
-        y2 = coords[:,1,1]
-        y3 = coords[:,2,1]
-
-        dx12 = x1 - x2
-        dx23 = x2 - x3
-        dx31 = x3 - x1
-
-        dy12 = y1 - y2
-        dy23 = y2 - y3
-        dy31 = y3 - y1
-
-        d = - dy23 * dx31 + dx23 * dy31
-
-        minx = cmin[:,0]
-        maxx = cmax[:,0]
-        miny = cmin[:,1]
-        maxy = cmax[:,1]
-
-        c1 = dy12 * x1 - dx12 * y1
-        c2 = dy23 * x2 - dx23 * y2
-        c3 = dy31 * x3 - dx31 * y3
-
-        for i in xrange(len(coords)):
-            if progress is not None and i % 100 == 0:
-                progress(i, len(coords))
-            row, col = np.mgrid[miny[i]:maxy[i],minx[i]:maxx[i]]
-            x = col + 0.5
-            y = row + 0.5
-
-            cx1 = c1[i] + dx12[i] * y - dy12[i] * x
-            cx2 = c2[i] + dx23[i] * y - dy23[i] * x
-            cx3 = c3[i] + dx31[i] * y - dy31[i] * x
-
-            mask = (cx1 > 0) * (cx2 > 0) * (cx3 > 0)
-
-            u = (dy23[i] * (x - x3[i]) - dx23[i] * (y - y3[i])) / d[i]
-            v = (dy31[i] * (x - x3[i]) - dx31[i] * (y - y3[i])) / d[i]
-            w = 1.0 - u - v
-
-            col = np.sum(colors[i][:,None,None,:] * np.array([u,v,w])[:,:,:,None], axis=0)
-
-            # log.debug('dst: %s', dst._data[miny[i]:maxy[i],minx[i]:maxx[i]].shape)
-            # log.debug('src: %s', col.shape)
-            dst._data[miny[i]:maxy[i],minx[i]:maxx[i]][mask] = col[mask]
+        dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'projection.png'))
+        gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'projection.png'))
 
     def projectLighting(self):
 
@@ -410,7 +319,7 @@ class BackgroundTaskView(gui3d.TaskView):
         dstH = dstImg.height
 
         delta = (-10.99, 20.0, 20.0) - mesh.coord
-        ld = delta / np.sqrt(np.sum(delta ** 2, axis=-1))[...,None]
+        ld = vnorm(delta)
         del delta
         s = np.sum(ld * mesh.vnorm, axis=-1)
         del ld
@@ -430,16 +339,16 @@ class BackgroundTaskView(gui3d.TaskView):
         colors = mesh.color[mesh.fvert[faces]]
         # log.debug("projectLighting: %s %s %s", faces.shape, coords.shape, colors.shape)
 
-        # log.debug("projectLighting: begin render")
+        log.debug("projectLighting: begin render")
 
         def progress(base, i, n):
             gui3d.app.progress(base + 0.5 * i / n)
 
-        self.RasterizeTriangles(dstImg, coords[:,[0,1,2],:], colors[:,[0,1,2],:][...,:3], progress = lambda i,n: progress(0.0,i,n))
-        self.RasterizeTriangles(dstImg, coords[:,[2,3,0],:], colors[:,[2,3,0],:][...,:3], progress = lambda i,n: progress(0.5,i,n))
+        self.RasterizeTriangles(dstImg, coords[:,[0,1,2],:], self.ColorShader(colors[:,[0,1,2],:][...,:3]), progress = lambda i,n: progress(0.0,i,n))
+        self.RasterizeTriangles(dstImg, coords[:,[2,3,0],:], self.ColorShader(colors[:,[2,3,0],:][...,:3]), progress = lambda i,n: progress(0.5,i,n))
         gui3d.app.progress(1.0)
 
-        # log.debug("projectLighting: end render")
+        log.debug("projectLighting: end render")
 
         #dstImg.resize(128, 128);
 
