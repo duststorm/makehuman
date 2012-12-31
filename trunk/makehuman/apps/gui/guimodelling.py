@@ -53,9 +53,9 @@ class ModellingCategory(gui3d.Category):
 
         self.symmetryBox = self.addBottomWidget(gui.GroupBox('Symmetry'))
 
-        self.rightSymmetryButton = self.symmetryBox.addWidget(gui.Button('Sym<'))
-        self.leftSymmetryButton = self.symmetryBox.addWidget(gui.Button('Sym>'))
-        self.symmetryButton = self.symmetryBox.addWidget(gui.ToggleButton('Sym'))
+        self.rightSymmetryButton = self.symmetryBox.addWidget(gui.Button('Sym<'), 0, 0)
+        self.leftSymmetryButton = self.symmetryBox.addWidget(gui.Button('Sym>'), 0, 1)
+        self.symmetryButton = self.symmetryBox.addWidget(gui.ToggleButton('Sym'), 1, 0, 1, -1)
 
         @self.anaglyphsButton.mhEvent
         def onClicked(event):
