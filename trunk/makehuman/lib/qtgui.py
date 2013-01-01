@@ -935,3 +935,44 @@ class VScrollArea(QtGui.QWidget, Widget):
             #           event.size().width(), event.size().height())
             self._updateScrollSize()
         return False
+
+class TreeItem(QtGui.QTreeWidgetItem):
+    def __init__(self, text, parent=None, isDir=False):
+        super(TreeItem, self).__init__([text])
+        self.text = text
+        self.parent = parent
+        if isDir:
+            self.setIcon(0, TreeView._dirIcon)
+        else:
+            self.setIcon(0, TreeView._fileIcon)
+
+    def addChild(self, text, isDir=False):
+        item = TreeItem(text, self, isDir)
+        super(TreeItem, self).addChild(item)
+        return item
+
+    def addChildren(self, strings):
+        items = [TreeItem(text, self) for text in strings]
+        super(TreeItem, self).addChildren(items)
+        return items
+
+class TreeView(QtGui.QTreeWidget, Widget):
+    _dirIcon = None
+    _fileIcon = None
+
+    def __init__(self, parent = None):
+        super(TreeView, self).__init__(parent)
+        Widget.__init__(self)
+        self.connect(self, QtCore.SIGNAL('itemDoubleClicked(QTreeWidgetItem *,int)'), self._activate)
+        if TreeView._dirIcon is None:
+            TreeView._dirIcon = self.style().standardIcon(QtGui.QStyle.SP_DirIcon)
+        if TreeView._fileIcon is None:
+            TreeView._fileIcon = self.style().standardIcon(QtGui.QStyle.SP_FileIcon)
+
+    def addTopLevel(self, text, isDir=True):
+        item = TreeItem(text, None, isDir)
+        self.addTopLevelItem(item)
+        return item
+
+    def _activate(self, item, column):
+        self.callEvent('onActivate', item)
