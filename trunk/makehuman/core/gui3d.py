@@ -528,7 +528,7 @@ class Category(View):
         self.tasksByName = {}
         self.tab = None
         self.tabs = None
-        self.panel = mh.addPanelBottomLeft()
+        self.panel = None
 
     def _taskTab(self, task):
         if task.tab is None:
@@ -560,6 +560,8 @@ class Category(View):
         mh.showPanelBottomLeft(self.panel)
 
     def addBottomWidget(self, widget):
+        if self.panel is None:
+            self.panel = mh.addPanelBottomLeft()
         return self.panel.addWidget(widget)
 
     def removeBottomWidget(self, widget):

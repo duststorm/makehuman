@@ -537,7 +537,8 @@ class Frame(QtGui.QWidget):
                        for i in xrange(self.left_bottom.count())]:
             if widget is not panel:
                 widget.hide()
-        panel.show()
+        if panel is not None:
+            panel.show()
 
     def getPanelBottomRight(self):
         return self.right_bottom
