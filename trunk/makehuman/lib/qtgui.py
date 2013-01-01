@@ -941,10 +941,13 @@ class TreeItem(QtGui.QTreeWidgetItem):
         super(TreeItem, self).__init__([text])
         self.text = text
         self.parent = parent
-        if isDir:
+        self.isDir = isDir
+        if self.isDir:
             self.setIcon(0, TreeView._dirIcon)
+            self.setChildIndicatorPolicy(QtGui.QTreeWidgetItem.ShowIndicator)
         else:
             self.setIcon(0, TreeView._fileIcon)
+            self.setChildIndicatorPolicy(QtGui.QTreeWidgetItem.DontShowIndicator)
 
     def addChild(self, text, isDir=False):
         item = TreeItem(text, self, isDir)
@@ -964,6 +967,7 @@ class TreeView(QtGui.QTreeWidget, Widget):
         super(TreeView, self).__init__(parent)
         Widget.__init__(self)
         self.connect(self, QtCore.SIGNAL('itemDoubleClicked(QTreeWidgetItem *,int)'), self._activate)
+        self.connect(self, QtCore.SIGNAL('itemExpanded(QTreeWidgetItem *)'), self._expand)
         if TreeView._dirIcon is None:
             TreeView._dirIcon = self.style().standardIcon(QtGui.QStyle.SP_DirIcon)
         if TreeView._fileIcon is None:
@@ -975,4 +979,9 @@ class TreeView(QtGui.QTreeWidget, Widget):
         return item
 
     def _activate(self, item, column):
-        self.callEvent('onActivate', item)
+        if not item.isDir:
+            self.callEvent('onActivate', item)
+
+    def _expand(self, item):
+        if item.isDir:
+            self.callEvent('onExpand', item)

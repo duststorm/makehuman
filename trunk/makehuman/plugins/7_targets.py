@@ -15,16 +15,24 @@ class TargetsTree(gui.TreeView):
     def __init__(self):
         super(TargetsTree, self).__init__()
         self.root = self.addTopLevel('targets')
-        self.populate(self.root, os.path.join('data', 'targets'))
 
-    def populate(self, root, path):
-        for name in os.listdir(path):
+    @staticmethod
+    def getItemPath(item):
+        path = []
+        while item is not None:
+            path.append(item.text)
+            item = item.parent
+        path = os.path.join('data', *reversed(path))
+        return path
+
+    def populate(self, item):
+        path = self.getItemPath(item)
+        for name in sorted(os.listdir(path)):
             pathname = os.path.join(path, name)
             if os.path.isdir(pathname):
-                item = root.addChild(name, True)
-                self.populate(item, pathname)
+                item.addChild(name, True)
             elif name.lower().endswith('.target') and os.path.isfile(pathname):
-                root.addChild(name)
+                item.addChild(name, False)
 
 class TargetsTaskView(gui3d.TaskView):
     def __init__(self, category):
@@ -34,14 +42,14 @@ class TargetsTaskView(gui3d.TaskView):
 
         @self.targets.mhEvent
         def onActivate(item):
-            path = []
-            while item is not None:
-                path.append(item.text)
-                item = item.parent
-            path = os.path.join('data', *reversed(path))
+            path = self.targets.getItemPath(item)
             log.message('target: %s', path)
             self.showTarget(path)
             mh.changeCategory('Modelling')
+
+        @self.targets.mhEvent
+        def onExpand(item):
+            self.targets.populate(item)
 
         @self.clear.mhEvent
         def onClicked(event):
