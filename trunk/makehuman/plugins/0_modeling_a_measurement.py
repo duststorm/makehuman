@@ -241,6 +241,14 @@ class MeasureTaskView(gui3d.TaskView):
 
         self.updateMeshes()
 
+    def onHumanTranslated(self, event):
+
+        self.measureObject.setPosition(gui3d.app.selectedHuman.getPosition())
+
+    def onHumanRotated(self, event):
+
+        self.measureObject.setRotation(gui3d.app.selectedHuman.getRotation())
+
     def syncSliders(self):
 
         for slider in self.sliders:

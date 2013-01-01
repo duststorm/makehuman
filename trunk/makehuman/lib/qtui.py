@@ -140,7 +140,7 @@ class Canvas(QtOpenGL.QGLWidget):
 
     def create(self):
         G.swapBuffers = self.swapBuffers
-        self.setFocusPolicy(QtCore.Qt.StrongFocus)
+        self.setFocusPolicy(QtCore.Qt.TabFocus)
         self.setFocus()
         self.setAutoBufferSwap(False)
         self.setAutoFillBackground(False)
