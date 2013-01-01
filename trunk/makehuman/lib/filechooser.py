@@ -6,28 +6,43 @@ from PyQt4 import QtCore, QtGui
 import gui3d
 from qtgui import *
 import qtui
+import os
 
-class FileChooserRectangle(Button):
-    _imageCache = {}
-    _size = (128, 128)
-    _aspect_mode = QtCore.Qt.KeepAspectRatioByExpanding
-    _scale_mode = QtCore.Qt.SmoothTransformation
+class ThumbnailCache(object):
+    aspect_mode = QtCore.Qt.KeepAspectRatioByExpanding
+    scale_mode = QtCore.Qt.SmoothTransformation
 
-    @classmethod
-    def _getImage(cls, path):
-        if path in cls._imageCache:
-            return cls._imageCache[path]
+    def __init__(self, size):
+        self.cache = {}
+        self.size = size
+
+    def __getitem__(self, name):
+        nstat = os.stat(name)
+        if name in self.cache:
+            stat, pixmap = self.cache[name]
+            if stat.st_size == nstat.st_size and stat.st_mtime == nstat.st_mtime:
+                return pixmap
+            else:
+                del self.cache[name]
+        pixmap = self.loadImage(name)
+        self.cache[name] = (nstat, pixmap)
+        return pixmap
+
+    def loadImage(self, path):
         pixmap = QtGui.QPixmap(path)
-        width, height = cls._size
-        pixmap = pixmap.scaled(width, height, cls._aspect_mode, cls._scale_mode)
+        width, height = self.size
+        pixmap = pixmap.scaled(width, height, self.aspect_mode, self.scale_mode)
         pwidth = pixmap.width()
         pheight = pixmap.height()
         if pwidth > width or pheight > height:
             x0 = max(0, (pwidth - width) / 2)
             y0 = max(0, (pheight - height) / 2)
             pixmap = pixmap.copy(x0, y0, width, height)
-        cls._imageCache[path] = pixmap
         return pixmap
+
+class FileChooserRectangle(Button):
+    _size = (128, 128)
+    _imageCache = ThumbnailCache(_size)
 
     def __init__(self, owner, file, label, imagePath):
         super(FileChooserRectangle, self).__init__()
@@ -38,7 +53,7 @@ class FileChooserRectangle(Button):
         self.layout = QtGui.QGridLayout(self)
         self.layout.setSizeConstraint(QtGui.QLayout.SetMinimumSize)
 
-        image = self._getImage(imagePath)
+        image = self._imageCache[imagePath]
         self.preview = QtGui.QLabel()
         self.preview.setPixmap(image)
         self.layout.addWidget(self.preview, 0, 0)
