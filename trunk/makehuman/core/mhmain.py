@@ -121,6 +121,17 @@ class MHApplication(gui3d.Application, mh.Application):
         self.dialog = None
         self.helpIds = set()
 
+        self.tool = None
+        self.selectedGroup = None
+
+        self.undoStack = []
+        self.redoStack = []
+        self.modified = False
+
+        self.modules = {}
+
+        self.selectedHuman = None
+
         self.modelCamera = Camera(self)
 
         @self.modelCamera.mhEvent
@@ -156,13 +167,6 @@ class MHApplication(gui3d.Application, mh.Application):
     def loadMainGui(self):
 
         self.progress(0.3)
-
-        self.tool = None
-        self.selectedGroup = None
-
-        self.undoStack = []
-        self.redoStack = []
-        self.modified = False
 
         @self.selectedHuman.mhEvent
         def onMouseDown(event):
@@ -271,8 +275,6 @@ class MHApplication(gui3d.Application, mh.Application):
         self.progress(0.4)
 
         # Load plugins not starting with _
-        self.modules = {}
-
         self.pluginsToLoad = glob.glob(join("plugins/",'[!_]*.py'))
         self.pluginsToLoad.sort()
         self.pluginsToLoad.reverse()
