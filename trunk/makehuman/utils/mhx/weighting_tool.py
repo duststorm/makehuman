@@ -17,6 +17,22 @@ Abstract
 Bone weighting utility
 
 """
+
+bl_info = {
+    "name": "Weighting Tools",
+    "author": "Thomas Larsson",
+    "version": "1.0",
+    "blender": (2, 6, 5),
+    "location": "View3D > Properties > MH Weighting Tools",
+    "description": "MakeHuman Utilities",
+    "warning": "",
+    'wiki_url': "http://www.makehuman.org",
+    "category": "MakeHuman"}
+
+#
+#
+#
+
 import bpy, os, mathutils
 import math
 from mathutils import *
@@ -541,6 +557,7 @@ class VIEW3D_OT_CreateLeftRightButton(bpy.types.Operator):
 
 def setupVertexPairs(context):
     ob = context.object
+    scn = context.scene
     verts = []
     for v in ob.data.vertices:
         x = v.co[0]
@@ -559,40 +576,41 @@ def setupVertexPairs(context):
         n2 = n + 20
         if n1 < 0: n1 = 0
         if n2 >= nmax: n2 = nmax
-        vmir = findVert(verts[n1:n2], vn, -x, y, z, notfound)
+        vmir = findVert(verts[n1:n2], vn, -x, y, z, notfound, scn)
         if vmir < 0:
             mverts[vn] = vn
-        elif x > Epsilon:
+        elif x > scn.MhxEpsilon:
             rverts[vn] = vmir
-        elif x < -Epsilon:
+        elif x < -scn.MhxEpsilon:
             lverts[vn] = vmir
         else:
             mverts[vn] = vmir
     if notfound:            
-        print("Did not find mirror image for vertices:")
-        for msg in notfound:
-            print(msg)
+        print("Did not find mirror image for vertices:")        
+        for data in notfound:
+            print("  %d at (%.4f %.4f %.4f) mindist %.4f" % tuple(data))
     print("Left-right-mid", len(lverts.keys()), len(rverts.keys()), len(mverts.keys()))
     return (lverts, rverts, mverts)
     
-def findVert(verts, v, x, y, z, notfound):
+def findVert(verts, v, x, y, z, notfound, scn):
+    mindist = 1e6
     for (z1,y1,x1,v1) in verts:
         dx = x-x1
         dy = y-y1
         dz = z-z1
         dist = math.sqrt(dx*dx + dy*dy + dz*dz)
-        if dist < Epsilon:
+        if dist < scn.MhxEpsilon:
             return v1
-    if abs(x) > Epsilon:            
-        notfound.append("  %d at (%.4f %.4f %.4f)" % (v, x, y, z))
+        if dist < mindist:
+            mindist = dist
+    if abs(x) > scn.MhxEpsilon:            
+        notfound.append((v, x, y, z, mindist))
     return -1                    
 
 #
 #    symmetrizeWeights(context):
 #    class VIEW3D_OT_SymmetrizeWeightsButton(bpy.types.Operator):
 #
-
-Epsilon = 1e-3
 
 def symmetrizeWeights(context, left2right):
     ob = context.object
@@ -796,6 +814,41 @@ class VIEW3D_OT_SymmetrizeShapesButton(bpy.types.Operator):
     def execute(self, context):
         n = symmetrizeShapes(context, self.left2right)
         print("Shapes symmetrized, %d vertices" % n)
+        return{'FINISHED'}    
+
+
+def symmetrizeVerts(context, left2right):
+    ob = context.object
+    bpy.ops.object.mode_set(mode='OBJECT')
+    scn = context.scene
+    (lverts, rverts, mverts) = setupVertexPairs(context)
+    if not left2right:
+        rverts = lverts
+                
+    for v in ob.data.vertices:
+        try:
+            rvn = rverts[v.index]
+        except KeyError:
+            rvn = None
+        if rvn:
+            rco = v.co.copy()
+            rco[0] = -rco[0]
+            print(rvn, ob.data.vertices[rvn].co, rco)
+            ob.data.vertices[rvn].co = rco
+            print("   ", ob.data.vertices[rvn].co)
+
+    return len(rverts)
+
+
+class VIEW3D_OT_SymmetrizeVertsButton(bpy.types.Operator):
+    bl_idname = "mhw.symmetrize_verts"
+    bl_label = "Symmetrize verts"
+    bl_options = {'UNDO'}
+    left2right = BoolProperty()
+
+    def execute(self, context):
+        n = symmetrizeVerts(context, self.left2right)
+        print("Verts symmetrized, %d vertices" % n)
         return{'FINISHED'}    
 
 #
@@ -1097,6 +1150,7 @@ class VIEW3D_OT_ExportSumGroupsButton(bpy.types.Operator):
 #
 
 def exportShapeKeys(context):
+    scn = context.scene
     filePath = context.scene['MhxVertexGroupFile']
     fileName = os.path.expanduser(filePath)
     fp = open(fileName, "w")
@@ -1114,7 +1168,7 @@ def exportShapeKeys(context):
         for (n,pt) in enumerate(skey.data):
            vert = me.vertices[n]
            dv = pt.co - vert.co
-           if dv.length > Epsilon:
+           if dv.length > scn.MhxEpsilon:
                fp.write("    sv %d %.4f %.4f %.4f ;\n" %(n, dv[0], dv[1], dv[2]))
         fp.write("  end ShapeKey\n")
         print(skey)
@@ -1137,7 +1191,8 @@ class VIEW3D_OT_ExportShapeKeysButton(bpy.types.Operator):
 #
 
 def listVertPairs(context):
-    filePath = context.scene['MhxVertexGroupFile']
+    scn = context.scene
+    filePath = scn['MhxVertexGroupFile']
     fileName = os.path.expanduser(filePath)
     print("Open %s" % fileName)
     fp = open(fileName, "w")
@@ -1160,9 +1215,9 @@ def listVertPairs(context):
         y2 = v2.co[1]
         print("%d (%.4f %.4f %.4f)" % (v1.index, x1,y1,z1))
         print("%d (%.4f %.4f %.4f)\n" % (v2.index, x2,y2,z2))
-        if ((abs(z1-z2) > Epsilon) or
-            (abs(x1+x2) > Epsilon) or
-            (abs(y1-y2) > Epsilon)):
+        if ((abs(z1-z2) > scn.MhxEpsilon) or
+            (abs(x1+x2) > scn.MhxEpsilon) or
+            (abs(y1-y2) > scn.MhxEpsilon)):
             raise NameError("Verts %d and %d not a pair:\n  %s\n  %s\n" % (v1.index, v2.index, v1.co, v2.co))
         if x1 > x2:
             fp.write("    (%d, %d),\n" % (v1.index, v2.index))            
@@ -1476,7 +1531,7 @@ class VIEW3D_OT_ProjectWeightsButton(bpy.types.Operator):
 
 #
 #   exportObjFile(context):
-#   setupTexVerts(ob):
+#   setupTexVerts(ob, scn):
 #
 
 def exportObjFile(context):
@@ -1490,7 +1545,7 @@ def exportObjFile(context):
         fp.write("vn %.4f %.4f %.4f\n" % (v.normal[0], v.normal[2], -v.normal[1]))
         
     if me.uv_textures:
-        (uvFaceVerts, texVerts, nTexVerts) = setupTexVerts(me)
+        (uvFaceVerts, texVerts, nTexVerts) = setupTexVerts(me, scn)
         for vtn in range(nTexVerts):
             vt = texVerts[vtn]
             fp.write("vt %.4f %.4f\n" % (vt[0], vt[1]))
@@ -1517,7 +1572,7 @@ def exportObjFile(context):
     print("base3.obj written")
     return
     
-def setupTexVerts(me):
+def setupTexVerts(me, scn):
     vertEdges = {}
     vertFaces = {}
     for v in me.vertices:
@@ -1563,18 +1618,18 @@ def setupTexVerts(me):
     texVerts = {}    
     for f in me.faces:
         uvf = uvtex.data[f.index]
-        vtn = findTexVert(uvf.uv1, vtn, f, faceNeighbors, uvFaceVerts, texVerts)
-        vtn = findTexVert(uvf.uv2, vtn, f, faceNeighbors, uvFaceVerts, texVerts)
-        vtn = findTexVert(uvf.uv3, vtn, f, faceNeighbors, uvFaceVerts, texVerts)
+        vtn = findTexVert(uvf.uv1, vtn, f, faceNeighbors, uvFaceVerts, texVerts, scn)
+        vtn = findTexVert(uvf.uv2, vtn, f, faceNeighbors, uvFaceVerts, texVerts, scn)
+        vtn = findTexVert(uvf.uv3, vtn, f, faceNeighbors, uvFaceVerts, texVerts, scn)
         if len(f.vertices) > 3:
-            vtn = findTexVert(uvf.uv4, vtn, f, faceNeighbors, uvFaceVerts, texVerts)
+            vtn = findTexVert(uvf.uv4, vtn, f, faceNeighbors, uvFaceVerts, texVerts, scn)
     return (uvFaceVerts, texVerts, vtn)     
 
-def findTexVert(uv, vtn, f, faceNeighbors, uvFaceVerts, texVerts):
+def findTexVert(uv, vtn, f, faceNeighbors, uvFaceVerts, texVerts, scn):
     for (e,f1) in faceNeighbors[f.index]:
         for (vtn1,uv1) in uvFaceVerts[f1.index]:
             vec = uv - uv1
-            if vec.length < Epsilon:
+            if vec.length < scn.MhxEpsilon:
                 uvFaceVerts[f.index].append((vtn1,uv))                
                 return vtn
     uvFaceVerts[f.index].append((vtn,uv))
@@ -1596,6 +1651,12 @@ class VIEW3D_OT_ExportBaseObjButton(bpy.types.Operator):
 #
 
 def initInterface(context):
+    bpy.types.Scene.MhxEpsilon = FloatProperty(
+        name="Epsilon", 
+        description="Maximal distance for identification", 
+        default=1.0e-3,
+        min=0, max=1)
+
     bpy.types.Scene.MhxVertNum = IntProperty(
         name="Vert number", 
         description="Vertex number to select")
@@ -1603,17 +1664,18 @@ def initInterface(context):
     bpy.types.Scene.MhxWeight = FloatProperty(
         name="Weight", 
         description="Weight of bone1, 1-weight of bone2", 
+        default=1.0,
         min=0, max=1)
 
     bpy.types.Scene.MhxBone1 = StringProperty(
         name="Bone 1", 
         maxlen=40,
-        default='')
+        default='Bone1')
 
     bpy.types.Scene.MhxBone2 = StringProperty(
         name="Bone 2", 
         maxlen=40,
-        default='')
+        default='Bone2')
 
     bpy.types.Scene.MhxExportAsWeightFile = BoolProperty(
         name="Export as weight file", 
@@ -1625,42 +1687,22 @@ def initInterface(context):
 
     bpy.types.Scene.MhxVertexOffset = IntProperty(
         name="Offset", 
+        default=0,
         description="Export vertex numbers with offset")
 
     bpy.types.Scene.MhxVertexGroupFile = StringProperty(
         name="Vertex group file", 
         maxlen=100,
-        default='')
+        default="/home/vgroups.txt")
 
 
-
-    scn = context.scene
-    print("init", scn)
-    if scn:
-        scn['MhxWeight'] = 1.0
-        scn['MhxBone1'] = 'Bone1'
-        scn['MhxBone2'] = 'Bone2'
-        scn['MhxExportAsWeightFile'] = False
-        scn['MhxExportSelectedOnly'] = False
-        scn['MhxVertexOffset'] = 0
-        scn['MhxVertexGroupFile'] = '/home/vgroups.txt'
-        
-        scn['MhxVG0'] = ""
-        scn['MhxVG1'] = ""
-        scn['MhxVG2'] = ""
-        scn['MhxVG3'] = ""
-        scn['MhxVG4'] = ""
+    bpy.types.Scene.MhxVG0 = StringProperty(name="MhxVG0", maxlen=40, default='')
+    bpy.types.Scene.MhxVG1 = StringProperty(name="MhxVG1", maxlen=40, default='')
+    bpy.types.Scene.MhxVG2 = StringProperty(name="MhxVG2", maxlen=40, default='')
+    bpy.types.Scene.MhxVG3 = StringProperty(name="MhxVG3", maxlen=40, default='')
+    bpy.types.Scene.MhxVG4 = StringProperty(name="MhxVG4", maxlen=40, default='')
 
     return
-
-class VIEW3D_OT_InitInterfaceButton(bpy.types.Operator):
-    bl_idname = "mhw.init_interface"
-    bl_label = "Initialize"
-
-    def execute(self, context):
-        initInterface(context)
-        print("Interface initialized")
-        return{'FINISHED'}    
 
 #
 #   class VIEW3D_OT_LocalizeFilesButton(bpy.types.Operator):
@@ -1759,42 +1801,61 @@ class MhxWeightToolsPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         scn = context.scene
-        layout.operator("mhw.init_interface")
-        layout.separator()
+        
+        layout.label("Mesh Stats")
         layout.operator("mhw.print_vnums")
         layout.operator("mhw.print_first_vnum")
         layout.operator("mhw.print_enums")
         layout.operator("mhw.print_fnums")
         layout.operator("mhw.select_quads")
+        layout.prop(scn, 'MhxVertNum')
+        layout.operator("mhw.select_vnum")
         
         layout.separator()
-        layout.operator("mhw.copy_vertex_groups")
-        layout.operator("mhw.remove_vertex_groups")
+        layout.label("Vertex Groups And Diamonds")
         layout.operator("mhw.unvertex_selected")
         layout.operator("mhw.unvertex_diamonds")
         layout.operator("mhw.delete_diamonds")
         layout.operator("mhw.recover_diamonds")
         layout.operator("mhw.integer_vertex_groups")
+        layout.operator("mhw.copy_vertex_groups")
+        layout.operator("mhw.remove_vertex_groups")
 
         layout.separator()
-        layout.prop(scn, 'MhxVertNum')
-        layout.operator("mhw.select_vnum")
+        layout.label("Symmetrization")
+        layout.prop(scn, "MhxEpsilon")
+        row = layout.row()
+        row.label("Weights")
+        row.operator("mhw.symmetrize_weights", text="L=>R").left2right = True
+        row.operator("mhw.symmetrize_weights", text="R=>L").left2right = False
+
+        row = layout.row()
+        row.label("Clean")
+        row.operator("mhw.clean_right", text="Right side of left vgroups").doRight = True
+        row.operator("mhw.clean_right", text="Left side of right vgroups").doRight = False
+
+        row = layout.row()
+        row.label("Shapes")
+        row.operator("mhw.symmetrize_shapes", text="L=>R").left2right = True    
+        row.operator("mhw.symmetrize_shapes", text="R=>L").left2right = False
+
+        #row = layout.row()
+        #row.label("Verts")
+        #row.operator("mhw.symmetrize_verts", text="L=>R").left2right = True    
+        #row.operator("mhw.symmetrize_verts", text="R=>L").left2right = False    
+
+        row = layout.row()
+        row.label("Selection")
+        row.operator("mhw.symmetrize_selection", text="L=>R").left2right = True    
+        row.operator("mhw.symmetrize_selection", text="R=>L").left2right = False
 
         layout.separator()
-        layout.operator("mhw.symmetrize_weights", text="Symm weights L=>R").left2right = True
-        layout.operator("mhw.symmetrize_weights", text="Symm weights R=>L").left2right = False
-        layout.operator("mhw.clean_right", text="Clean right side of left vgroups").doRight = True
-        layout.operator("mhw.clean_right", text="Clean left side of right vgroups").doRight = False
-        layout.operator("mhw.symmetrize_shapes", text="Symm shapes L=>R").left2right = True    
-        layout.operator("mhw.symmetrize_shapes", text="Symm shapes R=>L").left2right = False
-        layout.operator("mhw.symmetrize_selection", text="Symm sel L=>R").left2right = True    
-        layout.operator("mhw.symmetrize_selection", text="Symm sel R=>L").left2right = False
-
-        layout.separator()
-        layout.prop(context.scene, 'MhxVertexGroupFile')
-        layout.prop(context.scene, 'MhxExportAsWeightFile')
-        layout.prop(context.scene, 'MhxExportSelectedOnly')
-        layout.prop(context.scene, 'MhxVertexOffset')
+        layout.label("Export")
+        layout.prop(scn, 'MhxVertexGroupFile', text="File")
+        row = layout.row()
+        row.prop(scn, 'MhxExportAsWeightFile', text="As Weight File")
+        row.prop(scn, 'MhxExportSelectedOnly', text="Selected Only")
+        row.prop(scn, 'MhxVertexOffset', text="Offset")
         layout.operator("mhw.export_vertex_groups")    
         layout.operator("mhw.export_sum_groups")    
         layout.operator("mhw.print_vnums_to_file")
@@ -1819,11 +1880,11 @@ class MhxWeightExtraPanel(bpy.types.Panel):
         scn = context.scene
         layout.operator("mhw.statistics")    
 
-        layout.prop(scn, '["MhxVG0"]')
-        layout.prop(scn, '["MhxVG1"]')
-        layout.prop(scn, '["MhxVG2"]')
-        layout.prop(scn, '["MhxVG3"]')
-        layout.prop(scn, '["MhxVG4"]')
+        layout.prop(scn, "MhxVG0")
+        layout.prop(scn, "MhxVG1")
+        layout.prop(scn, "MhxVG2")
+        layout.prop(scn, "MhxVG3")
+        layout.prop(scn, "MhxVG4")
         layout.operator("mhw.merge_vertex_groups")
 
         layout.operator("mhw.list_vert_pairs")            

@@ -367,7 +367,7 @@ class CArmature:
                 quat = float(words[2]),float(words[3]),float(words[4]),float(words[5])
                 mat = tm.quaternion_matrix(quat)
                 if words[1] == "gquat":
-                    mat = dot(dot(inv(bone.matrixRest), mat), bone.matrixRest)
+                    mat = dot(inv(bone.matrixRelative), mat)
                 bone.matrixPose[:3,:3] = mat[:3,:3]
         fp.close()
         self.update()                    
@@ -719,7 +719,11 @@ class CBone:
             self.matrixGlobal = dot(self.parent.matrixGlobal, dot(self.matrixRelative, self.matrixPose))
         else:
             self.matrixGlobal = dot(self.matrixRelative, self.matrixPose)
-
+        """    
+        pquat = tm.quaternion_from_matrix(self.matrixPose)
+        gquat = tm.quaternion_from_matrix(self.matrixGlobal)
+        print("%s (%.4f %.4f %.4f %.4f) (%.4f %.4f %.4f %.4f)" % (self.name, pquat[0], pquat[1], pquat[2], pquat[3], gquat[0], gquat[1], gquat[2], gquat[3]))
+        """
 
     def updateConstraints(self):
         for cns in self.constraints:
