@@ -307,13 +307,14 @@ class ExportTaskView(gui3d.TaskView):
         #self.version25 = self.mhxOptions.addWidget(gui.CheckBox("Version 2.5", True))
         self.mhxSeparateFolder = self.mhxOptions.addWidget(gui.CheckBox("Separate folder", False))
         self.mhxFeetOnGround = self.mhxOptions.addWidget(gui.CheckBox("Feet on ground", True))
-        self.mhxHidden = self.mhxOptions.addWidget(gui.CheckBox("Keep hidden faces", True))
         self.mhxExpressionUnits = self.mhxOptions.addWidget(gui.CheckBox("Expressions", False))
         #self.mhxFaceShapes = self.mhxOptions.addWidget(gui.CheckBox("Face shapes", True))
         self.mhxBodyShapes = self.mhxOptions.addWidget(gui.CheckBox("Body shapes", True))
         self.mhxCustomShapes = self.mhxOptions.addWidget(gui.CheckBox("Custom shapes", False))
         #self.mhxFacePanel = self.mhxOptions.addWidget(gui.CheckBox("Face panel", True))
         self.mhxClothes = self.mhxOptions.addWidget(gui.CheckBox("Clothes", True))
+        self.mhxMasks = self.mhxOptions.addWidget(gui.CheckBox("Clothes masks", False))
+        self.mhxHidden = self.mhxOptions.addWidget(gui.CheckBox("Keep hidden faces", True))
         self.mhxClothesRig = self.mhxOptions.addWidget(gui.CheckBox("Clothes rig", True))
         self.mhxCage = self.mhxOptions.addWidget(gui.CheckBox("Cage", False))
         self.mhxAdvancedSpine = self.mhxOptions.addWidget(gui.CheckBox("Advanced spine", False))
@@ -441,6 +442,7 @@ class ExportTaskView(gui3d.TaskView):
                         break
                 options = {
                     'mhxversion': ["25"],  #mhxversion,
+                    'usemasks':self.mhxMasks.selected,
                     'hidden':self.mhxHidden.selected,
                     #'expressions':False,    #self.mhxExpressions.selected,
                     'expressionunits':self.mhxExpressionUnits.selected,

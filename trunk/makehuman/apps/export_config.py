@@ -90,6 +90,7 @@ class CExportConfig:
         self.outFolder = None
         self.texFolder = None
         self.proxyList = []
+        self.usemasks = False
         self.hidden = True
         #self.expressions = False
         self.expressionunits = False
@@ -226,6 +227,7 @@ def exportConfig(human, useHair, options=None):
     if options:
         log.message("%s", options)
         cfg.mhxversion = options['mhxversion']
+        cfg.usemasks = options['usemasks']
         cfg.hidden = options['hidden']
         #cfg.expressions = options['expressions']
         cfg.expressionunits = options['expressionunits']
@@ -293,7 +295,7 @@ def exportConfig(human, useHair, options=None):
                 except:
                     pass
             elif key in [
-                'separatefolder', 'feetonground', "hidden",
+                'separatefolder', 'feetonground', "hidden", "usemasks",
                 #'expressions', 'faceshapes', 
                 'expressionunits', 'bodyshapes', 'customshapes', 'facepanel',
                 'advancedspine', 'malerig', 

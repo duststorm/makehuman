@@ -89,8 +89,12 @@ class ClothesTaskView(gui3d.TaskView):
         uuid = proxy.getUuid()
         
         if proxy.clothings:
+            t = 0
+            dt = 1.0/len(proxy.clothings)
             folder = os.path.dirname(filepath)
             for piece in proxy.clothings:
+                gui3d.app.progress(t, text="Loading %s" % piece)
+                t += dt
                 piecedir = os.path.join(folder, piece)
                 log.message("Find %s", piecedir)
                 if os.path.exists(piecedir):
@@ -98,6 +102,7 @@ class ClothesTaskView(gui3d.TaskView):
                 else:
                     piecefile = piecedir + ".mhclo"
                 self.setClothes(human, piecefile)
+            gui3d.app.progress(1, text="%s loaded" % proxy.name)
             return
             
         #folder = os.path.dirname(filepath)

@@ -187,13 +187,13 @@ def scanProxies(obj, config, proxyData):
     return
     
 #
-#    proxyCopy(name, human, config, proxyData, fp, t0, t1)
+#    proxyCopy(type, human, config, proxyData, fp, t0, t1)
 #
 
-def proxyCopy(name, human, config, proxyData, fp, t0, t1):
+def proxyCopy(type, human, config, proxyData, fp, t0, t1):
     n = 0
     for proxy in proxyData.values():
-        if proxy.type == name:
+        if proxy.type == type:
             n += 1
     if n == 0:
         return
@@ -201,8 +201,8 @@ def proxyCopy(name, human, config, proxyData, fp, t0, t1):
     dt = (t1-t0)/n
     t = t0
     for proxy in proxyData.values():
-        if proxy.type == name:
-            gui3d.app.progress(t, text="Exporting %s" % name)
+        if proxy.type == type:
+            gui3d.app.progress(t, text="Exporting %s" % proxy.name)
             fp.write("#if toggle&T_%s\n" % proxy.type)
             copyFile25(human, "shared/mhx/templates/proxy25.mhx", fp, proxy, config, proxyData)    
             fp.write("#endif\n")
@@ -429,7 +429,7 @@ def copyFile25(human, tmplName, fp, proxy, config, proxyData):
 
             elif key == 'MTex':
                 n = nMasks + int(words[2])
-                fp.write("  MTex %d %s %s %s\n" % (n+1, words[3], words[4], words[5]))
+                fp.write("  MTex %d %s %s %s\n" % (n, words[3], words[4], words[5]))
 
             elif key == 'SkinStart':
                 nMasks = writeSkinStart(fp, proxy, config, proxyData)
@@ -448,7 +448,7 @@ def copyFile25(human, tmplName, fp, proxy, config, proxyData):
                     fp.write("  DefProp Float %s 0 %s  min=-1.0,max=2.0 ;\n" % (name, name[3:]))
 
             elif key == 'material-drivers':
-                fp.write("  use_textures Array 0")
+                fp.write("  use_textures Array")
                 for n in range(nMasks):
                     fp.write(" 1")
                 for n in range(3):
@@ -456,7 +456,7 @@ def copyFile25(human, tmplName, fp, proxy, config, proxyData):
                 fp.write(" ;\n")
                 fp.write("  AnimationData %sMesh True\n" % the.Human)
                 #armature.drivers.writeTextureDrivers(fp, rig_panel_25.BodyLanguageTextureDrivers)
-                writeMaskDrivers(fp, proxyData)
+                writeMaskDrivers(fp, config, proxyData)
                 fp.write("  end AnimationData\n")
 
             elif key == 'Filename':
@@ -593,7 +593,7 @@ def addMaskMTex(fp, mask, proxy, blendtype, n):
 
     (dir, file) = mask
     fp.write(
-"  MTex %d %s UV ALPHA\n" % (n+1, file) +
+"  MTex %d %s UV ALPHA\n" % (n, file) +
 "    texture Refer Texture %s ;\n" % file +
 "    use_map_alpha True ;\n" +
 "    use_map_color_diffuse False ;\n" +
@@ -613,9 +613,14 @@ def addMaskMTex(fp, mask, proxy, blendtype, n):
 #
 
 def writeSkinStart(fp, proxy, config, proxyData):
+    if not config.usemasks:
+        fp.write("Material %sSkin\n" % the.Human)
+        return 0
+        
     if proxy:
         fp.write("Material %s%sSkin\n" % (the.Human, proxy.name))
         return 0
+
     nMasks = 0
     prxList = list(proxyData.values())
     
@@ -623,10 +628,10 @@ def writeSkinStart(fp, proxy, config, proxyData):
         if prx.mask:
             addMaskImage(fp, config, prx.mask)
             nMasks += 1
-    fp.write("Material %sSkin\n" % the.Human +
-"  MTex 0 diffuse UV COLOR\n" +
-#"    texture Refer Texture diffuse ;\n" +
-"  end MTex\n")
+    fp.write("Material %sSkin\n" % the.Human)
+             #"  MTex 0 diffuse UV COLOR\n" +
+             #"    texture Refer Texture diffuse ;\n" +
+             #"  end MTex\n"
 
     n = 0    
     for prx in prxList:
@@ -635,13 +640,15 @@ def writeSkinStart(fp, proxy, config, proxyData):
             
     return nMasks
                
-def writeMaskDrivers(fp, proxyData):
+def writeMaskDrivers(fp, config, proxyData):
+    if not config.usemasks:
+        return
     fp.write("#if toggle&T_Clothes\n")
     n = 0
     for prx in proxyData.values():
         if prx.type == 'Clothes' and prx.mask:
             (dir, file) = prx.mask
-            armature.drivers.writePropDriver(fp, ["Mhh%s" % prx.name], "1-x1", 'use_textures', n+1)
+            armature.drivers.writePropDriver(fp, ["Mhh%s" % prx.name], "1-x1", 'use_textures', n)
             n += 1            
     fp.write("#endif\n")
     return
@@ -805,7 +812,7 @@ def writeHideAnimationData(fp, prefix, name):
 #
 
 def copyProxyMaterialFile(fp, pair, mat, proxy, config, proxyData):
-    prxList = sortedMasks(proxyData)
+    prxList = sortedMasks(config, proxyData)
     nMasks = countMasks(proxy, prxList)
     tex = None
     
@@ -894,7 +901,7 @@ def writeProxyMaterial(fp, mat, proxy, config, proxyData):
     if proxy.transparency:
         (transparency,transname) = writeProxyTexture(fp, proxy.transparency, mat, "", config)
            
-    prxList = sortedMasks(proxyData)
+    prxList = sortedMasks(config, proxyData)
     nMasks = countMasks(proxy, prxList)
     slot = nMasks
     
@@ -1000,7 +1007,9 @@ def addProxyMaskMTexs(fp, mat, proxy, prxList, tex):
         n = addMaskMTex(fp, (None,'solid'), proxy, 'MIX', n)
     return   
     
-def sortedMasks(proxyData):
+def sortedMasks(config, proxyData):
+    if not config.usemasks:
+        return []
     prxList = []
     for prx in proxyData.values():
         if prx.type == 'Clothes' and prx.mask:

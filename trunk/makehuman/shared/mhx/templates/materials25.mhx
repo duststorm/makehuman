@@ -139,8 +139,6 @@ end Texture
     scale 0.008*theScale ;
     texture_factor 0 ;
   end SSS
-  active_texture Refer Texture diffuse ;
-  active_texture_index 0 ;
   alpha 0 ;
   ambient 1 ;
   use_cast_approximate True ;
