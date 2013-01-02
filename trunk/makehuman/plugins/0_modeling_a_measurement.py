@@ -63,6 +63,7 @@ class GroupBoxRadioButton(gui.RadioButton):
 
     def onClicked(self, event):
         self.task.groupBox.showWidget(self.groupBox)
+        self.task.onSliderFocus(self.groupBox.children[0])
 
 class MeasureSlider(humanmodifier.ModifierSlider):
     def __init__(self, label, task, measure, modifier):
