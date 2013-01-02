@@ -231,7 +231,7 @@ class MeasureTaskView(gui3d.TaskView):
 
         vertidx = self.ruler.Measures[self.active_slider.measure]
 
-        coords = human.mesh.coord[vertidx]
+        coords = human.meshData.coord[vertidx]
         self.measureMesh.coord[:len(vertidx),:] = coords
         self.measureMesh.coord[len(vertidx):,:] = coords[-1:]
         self.measureMesh.markCoords(coor = True)
