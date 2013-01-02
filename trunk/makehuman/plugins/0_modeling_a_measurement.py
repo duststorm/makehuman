@@ -163,7 +163,7 @@ class MeasureTaskView(gui3d.TaskView):
             self.groupBoxes[name] = box
 
             # Create radiobutton
-            radio = self.categoryBox.addWidget(GroupBoxRadioButton(self, self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0))
+            box.radio = self.categoryBox.addWidget(GroupBoxRadioButton(self, self.radioButtons, name.capitalize(), box, selected=len(self.radioButtons) == 0))
 
             # Create sliders
             for subname in subnames:
@@ -189,6 +189,7 @@ class MeasureTaskView(gui3d.TaskView):
         self.groupBox.showWidget(self.groupBoxes['neck'])
 
     def showGroup(self, name):
+        self.groupBoxes[name].radio.setSelected(True)
         self.groupBox.showWidget(self.groupBoxes[name])
         self.groupBoxes[name].children[0].setFocus()
 
