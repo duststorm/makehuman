@@ -28,6 +28,8 @@ class TargetsTree(gui.TreeView):
     def populate(self, item):
         path = self.getItemPath(item)
         for name in sorted(os.listdir(path)):
+            if name[0] == '.':
+                continue
             pathname = os.path.join(path, name)
             if os.path.isdir(pathname):
                 item.addChild(name, True)
