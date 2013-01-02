@@ -120,7 +120,7 @@ class TorsoTaskView(gui3d.TaskView):
                     ('hip-trans', 'forward', 'backward', 'setGlobalCamera'),
 
                 ]]),
-            ('Stomack', [('data/targets/stomach/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/stomach/images/', i[3]) for i in
+            ('Stomach', [('data/targets/stomach/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/stomach/images/', i[3]) for i in
                 [
                     ('stomach-tone', 'decr', 'incr', 'setGlobalCamera'),
                 ]]),
@@ -167,22 +167,6 @@ class TorsoTaskView(gui3d.TaskView):
 
                 slider = box.addWidget(TorsoSlider(modifier, '%s%s-%s-%s.png' % (template[4], template[1], template[2], template[3]), template[5]))
                 self.sliders.append(slider)
-
-        self.specialModifiers = {}
-
-        self.specialModifiers['pelvisTone'] = AsymmetricDetailModifier('data/targets/details/${gender}-${age}-pelvis-tone${pelvisTone}.target', 'pelvisTone', '1', '2', False)
-        self.specialModifiers['buttocks'] = AsymmetricDetailModifier('data/targets/details/${gender}-${age}-nates${buttocks}.target', 'buttocks', '1', '2', False)
-        self.specialModifiers['stomach'] = StomachModifier()
-
-        slider = DetailSlider(0.0, -1.0, 1.0, "Pelvis tone", self.specialModifiers['pelvisTone']);
-        self.sliders.append(slider)
-        self.categoryBox.addWidget(slider);
-        slider = DetailSlider(0.0, -1.0, 1.0, "Stomach", self.specialModifiers['stomach']);
-        self.sliders.append(slider)
-        self.categoryBox.addWidget(slider);
-        slider = DetailSlider(0.0, -1.0, 1.0, "Buttocks", self.specialModifiers['buttocks']);
-        self.sliders.append(slider)
-        self.categoryBox.addWidget(slider);
 
         self.groupBox.showWidget(self.groupBoxes[0])
         # self.hideAllBoxes()
