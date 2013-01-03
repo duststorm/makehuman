@@ -991,14 +991,14 @@ class MHApplication(gui3d.Application, mh.Application):
     def rotateDown(self):
         self.rotateCamera(0, 5.0)
 
-    def rotateLeft(self):
+    def rotateUp(self):
         self.rotateCamera(0, -5.0)
+
+    def rotateLeft(self):
+        self.rotateCamera(1, -5.0)
 
     def rotateRight(self):
         self.rotateCamera(1, 5.0)
-
-    def rotateUp(self):
-        self.rotateCamera(1, -5.0)
 
     def panUp(self):
         self.panCamera(1, 0.05)
