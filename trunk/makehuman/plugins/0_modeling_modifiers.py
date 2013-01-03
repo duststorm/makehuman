@@ -133,6 +133,8 @@ class GenericSlider(humanmodifier.ModifierSlider):
             self.view()
 
 class ModifierTaskView(gui3d.TaskView):
+    _group = None
+
     def __init__(self, category):
         super(ModifierTaskView, self).__init__(category, self._name)
 
@@ -495,18 +497,88 @@ class ArmsLegsTaskView(ModifierTaskView):
                 ('r-upperleg-trans', 'in', 'out', 'setRightLegFrontCamera'),
                 ('r-upperleg-trans', 'down', 'up', 'setRightLegFrontCamera'),
                 ('r-upperleg-trans', 'forward', 'backward', 'setRightLegRightCamera'),
-
             ])
         ]
 
+class GenderTaskView(ModifierTaskView):
+    _name = 'Gender'
+    _features = [
+        ('genitals', 'genitals', [
+            ('genitals', 'feminine', 'masculine', 'noSetCamera'),
+            ]),
+        ('breast', 'breast', [
+            ('breast', 'down', 'up', 'noSetCamera'),
+            ('breast-dist', 'min', 'max', 'noSetCamera'),
+            ('breast-point', 'min', 'max', 'noSetCamera'),
+            ]),
+        ]
+
+class AsymmTaskView(ModifierTaskView):
+    _name = 'Asymmetry'
+    _features = [
+        ('brow', 'asym', [
+            ('asym-brown-1', 'l', 'r', 'setFaceCamera'),
+            ('asym-brown-2', 'l', 'r', 'setFaceCamera'),
+            ]),
+        ('cheek', 'asym', [
+            ('asym-cheek-1', 'l', 'r', 'setFaceCamera'),
+            ('asym-cheek-2', 'l', 'r', 'setFaceCamera'),
+            ]),
+        ('ear', 'asym', [
+            ('asym-ear-1', 'l', 'r', 'setFaceCamera'),
+            ('asym-ear-2', 'l', 'r', 'setFaceCamera'),
+            ('asym-ear-3', 'l', 'r', 'setFaceCamera'),
+            ('asym-ear-4', 'l', 'r', 'setFaceCamera'),
+            ]),
+        ('eye', 'asym', [
+            ('asym-eye-1', 'l', 'r', 'setFaceCamera'),
+            ('asym-eye-2', 'l', 'r', 'setFaceCamera'),
+            ('asym-eye-3', 'l', 'r', 'setFaceCamera'),
+            ('asym-eye-4', 'l', 'r', 'setFaceCamera'),
+            ('asym-eye-5', 'l', 'r', 'setFaceCamera'),
+            ('asym-eye-6', 'l', 'r', 'setFaceCamera'),
+            ('asym-eye-7', 'l', 'r', 'setFaceCamera'),
+            ('asym-eye-8', 'l', 'r', 'setFaceCamera'),
+            ]),
+        ('jaw', 'asym', [
+            ('asym-jaw-1', 'l', 'r', 'setFaceCamera'),
+            ('asym-jaw-2', 'l', 'r', 'setFaceCamera'),
+            ('asym-jaw-3', 'l', 'r', 'setFaceCamera'),
+            ]),
+        ('mouth', 'asym', [
+            ('asym-mouth-1', 'l', 'r', 'setFaceCamera'),
+            ('asym-mouth-2', 'l', 'r', 'setFaceCamera'),
+            ]),
+        ('nose', 'asym', [
+            ('asym-nose-1', 'l', 'r', 'setFaceCamera'),
+            ('asym-nose-2', 'l', 'r', 'setFaceCamera'),
+            ('asym-nose-3', 'l', 'r', 'setFaceCamera'),
+            ('asym-nose-4', 'l', 'r', 'setFaceCamera'),
+            ]),
+        ('temple', 'asym', [
+            ('asym-temple-1', 'l', 'r', 'setFaceCamera'),
+            ('asym-temple-2', 'l', 'r', 'setFaceCamera'),
+            ]),
+        ('top', 'asym', [
+            ('asym-top-1', 'l', 'r', 'setFaceCamera'),
+            ('asym-top-2', 'l', 'r', 'setFaceCamera'),
+            ]),
+        ('body', 'asymm', [
+            ('asymm-breast-1', 'l', 'r', 'setGlobalCamera'),
+            ('asymm-trunk-1', 'l', 'r', 'setGlobalCamera'),
+            ]),
+        ]
+
 def load(app):
-    return
     category = app.getCategory('Modelling2')
 
-    for type in [FaceTaskView, TorsoTaskView, ArmsLegsTaskView]:
+    gui3d.app.noSetCamera = (lambda: None)
+
+    for type in [FaceTaskView, TorsoTaskView, ArmsLegsTaskView, GenderTaskView, AsymmTaskView]:
         taskview = category.addTask(type(category))
-        app.addLoadHandler(taskview._group, taskview.loadHandler)
-        app.addSaveHandler(taskview.saveHandler)
+        if taskview._group is not None:
+            app.addLoadHandler(taskview._group, taskview.loadHandler)
+            app.addSaveHandler(taskview.saveHandler)
 
 def unload(app):
     pass
