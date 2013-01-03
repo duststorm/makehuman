@@ -888,6 +888,7 @@ class VScrollArea(QtGui.QWidget, Widget):
         self._scrollbar = QtGui.QScrollBar(QtCore.Qt.Vertical)
         self._scrollbar.setRange(0, 0)
         self._scrollbar.setMinimumHeight(0)
+        self._scrollbar.setSingleStep(10)
         self._layout = QtGui.QBoxLayout(QtGui.QBoxLayout.RightToLeft, self)
         self._layout.addWidget(self._scrollbar, 0)
         self._layout.addWidget(self._viewport, 1)
