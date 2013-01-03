@@ -98,12 +98,42 @@ class GenericModifier(humanmodifier.GenericModifier):
             'cup2': max(0.0, human.breastSize)
             }
 
+        return factors
+
+class UniversalModifier(GenericModifier):
+    def getFactors(self, human, value):
+        factors = GenericModifier.getFactors(self, human, value)
+
         if self.left is not None:
             factors[self.left] = -min(value, 0.0)
         if self.center is not None:
             factors[self.center] = 1.0 - abs(value)
         factors[self.right] = max(0.0, value)
 
+        return factors
+
+class MacroModifier(GenericModifier):
+    def __init__(self, name, variable, left, right):
+        self.name = name
+        self.variable = variable
+        self.left = left
+        self.right = right
+
+        self.targets = self.findTargets(name)
+
+        self.verts = None
+        self.faces = None
+
+    def getValue(self, human):
+        return getattr(human, self.variable)
+
+    def setValue(self, human, value):
+        setattr(human, self.variable, value)
+        GenericModifier.setValue(self, human, value)
+
+    def getFactors(self, human, value):
+        factors = GenericModifier.getFactors(self, human, value)
+        factors[self.name] = 1.0
         return factors
 
 class GroupBoxRadioButton(gui.RadioButton):
@@ -169,7 +199,7 @@ class ModifierTaskView(gui3d.TaskView):
                     right = '-'.join([base, tname])
 
                 # Create sliders
-                modifier = GenericModifier(left, right)
+                modifier = UniversalModifier(left, right)
 
                 modifierName = tpath
                 clashIndex = 0
@@ -513,6 +543,25 @@ class GenderTaskView(ModifierTaskView):
             ]),
         ]
 
+    def __init__(self, category):
+        super(GenderTaskView, self).__init__(category)
+        # Create box
+        box = self.groupBox.addWidget(gui.GroupBox("Macro"))
+        self.groupBoxes.append(box)
+
+        # Create radiobutton
+        radio = self.categoryBox.addWidget(GroupBoxRadioButton(self, self.radioButtons, "Macro", box))
+
+        modifier = MacroModifier('breast', 'breastSize', 'cup1', 'cup2')
+        self.modifiers['cup'] = modifier
+        slider = box.addWidget(GenericSlider(modifier, 'breast.png', 'setGlobalCamera'))
+        self.sliders.append(slider)
+
+        modifier = MacroModifier('breast', 'breastFirmness', 'firmness0', 'firmness1')
+        self.modifiers['firmness'] = modifier
+        slider = box.addWidget(GenericSlider(modifier, 'breast.png', 'setGlobalCamera'))
+        self.sliders.append(slider)
+
 class AsymmTaskView(ModifierTaskView):
     _name = 'Asymmetry'
     _features = [
@@ -563,7 +612,7 @@ class AsymmTaskView(ModifierTaskView):
             ('asym-top-1', 'l', 'r', 'setFaceCamera'),
             ('asym-top-2', 'l', 'r', 'setFaceCamera'),
             ]),
-        ('body', 'asymm', [
+        ('body', 'asym', [
             ('asymm-breast-1', 'l', 'r', 'setGlobalCamera'),
             ('asymm-trunk-1', 'l', 'r', 'setGlobalCamera'),
             ]),
