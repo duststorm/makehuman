@@ -214,6 +214,17 @@ class MeasureTaskView(gui3d.TaskView):
         gui3d.TaskView.onShow(self, event)
         self.groupBoxes['neck'].children[0].setFocus()
         self.syncSliders()
+        human = gui3d.app.selectedHuman
+        self.cloPickableProps = dict()
+        for uuid, clo in human.clothesObjs.items():
+            self.cloPickableProps[uuid] = clo.mesh.pickable
+            clo.mesh.setPickable(False)
+
+    def onHide(self, event):
+        human = gui3d.app.selectedHuman
+        for uuid, pickable in self.cloPickableProps.items():
+            clo = human.clothesObjs[uuid]
+            clo.mesh.setPickable(pickable)
 
     def onSliderFocus(self, slider):
         self.active_slider = slider
