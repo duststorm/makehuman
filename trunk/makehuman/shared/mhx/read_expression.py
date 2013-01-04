@@ -54,12 +54,9 @@ def setupExpressions(folder, prefix):
     return(expressions)
 
 
-Expressions = setupExpressions("data/targets/expression/female_young", 
-                               "neutral_female_young_")
+#Expressions = setupExpressions("./data/targets/expression/female_young", "neutral_female_young_")
                                
-#Expressions = ["laughing1"]                               
-
-ExpressionUnits = setupExpressions("data/targets/expression/units/caucasian/female_young", "")
+ExpressionUnits = setupExpressions("./data/targets/expression/units/caucasian/female_young", "")
 
 #----------------------------------------------------------
 #   Loop
@@ -142,9 +139,9 @@ def loopGendersAges(name, human, typ):
 
 
 def targetFileName(typ, name, gender, age):                
-    if typ == "Expressions":        
-        return ('data/targets/expression/%s_%s/neutral_%s_%s_%s.target' % (gender, age, gender, age, name) )
-    elif typ == "ExpressionUnits":        
+    #if typ == "Expressions":        
+    #    return ('data/targets/expression/%s_%s/neutral_%s_%s_%s.target' % (gender, age, gender, age, name) )
+    if typ == "ExpressionUnits":        
         return ('data/targets/expression/units/caucasian/%s_%s/%s.target' %  (gender, age, name) )
     elif typ == "Corrective":
         (part, pose) = name
