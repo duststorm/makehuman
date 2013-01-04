@@ -37,6 +37,7 @@ import export_config
 import object_collection
 import mhx
 from mhx import the, read_rig
+import log
 
 #
 #    Size of end bones = 1 mm
@@ -57,14 +58,14 @@ def exportCollada(human, filename, options):
     outfile = export_config.getOutFileFolder(filename, the.Config)        
     try:
         fp = open(outfile, 'w')
-        print("Writing Collada file", outfile)
+        log.message("Writing Collada file %s" % outfile)
     except:
-        print("Unable to open file for writing", outfile)
+        log.error("Unable to open file for writing %s" % outfile)
     (name,ext) = os.path.splitext(os.path.basename(outfile))
     exportDae(human, name, fp)
     fp.close()
     time2 = time.clock()
-    print("Wrote Collada file in %g s:" % (time2-time1), outfile)
+    log.message("Wrote Collada file in %g s: %s" % (time2-time1, outfile))
     return
 
 #
@@ -161,7 +162,7 @@ def boneOK(flags, bone, parent):
 def readSkinWeights(weights, tmplName):
     tmpl = open(tmplName, "rU")
     if tmpl == None:
-        print("Cannot open template "+tmplName)
+        log.warning("Cannot open template %s" % tmplName)
         return
     for line in tmpl:
         lineSplit= line.split()
@@ -294,7 +295,7 @@ def exportDae(human, name, fp):
     cfg = export_config.exportConfig(human, True)
     obj = human.meshData
     rigfile = "data/rigs/%s.rig" % the.Options["daerig"]
-    print("Using rig file %s" % rigfile)
+    log.message("Using rig file %s" % rigfile)
     amt = getArmatureFromRigFile(rigfile, obj)
 
     stuffs = object_collection.setupObjects(
@@ -975,7 +976,7 @@ def writeNode(obj, fp, pad, stuff):
 def loadShapeKeys(tmplName):
     tmpl = open(tmplName, "rU")
     if tmpl == None:
-        print("Cannot open template "+tmplName)
+        log.warning("Cannot open template %s" % tmplName)
         return []
 
     targets = []
