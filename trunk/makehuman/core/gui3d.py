@@ -529,6 +529,7 @@ class Category(View):
         self.tab = None
         self.tabs = None
         self.panel = None
+        self.task = None
 
     def _taskTab(self, task):
         if task.tab is None:
@@ -540,6 +541,7 @@ class Category(View):
 
         @self.tabs.mhEvent
         def onTabSelected(tab):
+            self.task = tab.name
             app.switchTask(tab.name)
 
     def addTask(self, task):
@@ -550,6 +552,8 @@ class Category(View):
         self.addView(task)
         if self.tabs is not None:
             self._taskTab(task)
+        if self.task is None:
+            self.task = task.name
         return task
 
     def getTaskByName(self, name):
@@ -735,7 +739,7 @@ class Application(events3d.EventHandler):
         self.currentCategory.show()
         self.currentCategory.showWidgets()
 
-        self.switchTask(category.tasks[0].name)
+        self.switchTask(category.task)
 
     # called from native
 
