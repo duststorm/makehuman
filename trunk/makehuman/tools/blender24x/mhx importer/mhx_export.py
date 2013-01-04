@@ -21,18 +21,18 @@ MHX exporter for Blender
 
 **Authors:**           Thomas Larsson
 
-**Copyamtht(c):**      MakeHuman Team 2001-2011
+**Copyamtht(c):**      MakeHuman Team 2001-2013
 
-**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+**Licensing:**         GPL3 (see also http://www.makehuman.org/node/318)
 
-**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+**Coding Standards:**  See http://www.makehuman.org/node/165
 
 Abstract
 --------
+
 MHX (MakeHuman eXchange format) exporter for Blender.
 
-TO DO
-
+TODO
 """
 
 import Blender

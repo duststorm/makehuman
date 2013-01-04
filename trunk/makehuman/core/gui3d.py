@@ -1,14 +1,23 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""
-:Authors:
-    Manuel Bastioni,
-    Marc Flerackers
+""" 
+**Project Name:**      MakeHuman
 
-:Version: 1.0
-:Copyright: MakeHuman Team 2001-2011
-:License: GPL3 
+**Product Home Page:** http://www.makehuman.org/
+
+**Code Home Page:**    http://code.google.com/p/makehuman/
+
+**Authors:**           Manuel Bastioni, Marc Flerackers
+
+**Copyright(c):**      MakeHuman Team 2001-2013
+
+**Licensing:**         AGPL3 (see also http://www.makehuman.org/node/318)
+
+**Coding Standards:**  See http://www.makehuman.org/node/165
+
+Abstract
+--------
 
 This module contains classes defined to implement widgets that provide utility functions
 to the graphical user interface.

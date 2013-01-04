@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 """ 
 **Project Name:**      MakeHuman
 
@@ -7,7 +10,7 @@
 
 **Authors:**           Thomas Larsson
 
-**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+**Coding Standards:**  See http://www.makehuman.org/node/165
 
 **Adapted from:**
 /* dqconv.c
@@ -42,7 +45,6 @@ Abstract
 Dual quaternions
 
 """
-
 
 import math
 import numpy

@@ -1,13 +1,23 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""
-:Authors:
-    Joel Palmius
+""" 
+**Project Name:**      MakeHuman
 
-:Version: 1.0
-:Copyright: MakeHuman Team 2001-2012
-:License: GPL3 
+**Product Home Page:** http://www.makehuman.org/
+
+**Code Home Page:**    http://code.google.com/p/makehuman/
+
+**Authors:**           Joel Palmius
+
+**Copyright(c):**      MakeHuman Team 2001-2013
+
+**Licensing:**         AGPL3 (see also http://www.makehuman.org/node/318)
+
+**Coding Standards:**  See http://www.makehuman.org/node/165
+
+Abstract
+--------
 
 This module dumps important debug information to a text file in the user's home directory
 """

@@ -8,8 +8,8 @@ Module File Location:        utils/blendersaveobj.py
 Product Home Page:           http://www.makehuman.org/                                      
 SourceForge Home Page:       http://sourceforge.net/projects/makehuman/                     
 Authors:                     Manuel Bastioni                                     
-Copyright(c):                MakeHuman Team 2001-2011                                       
-Licensing:                   GPL3 (see also http://makehuman.wiki.sourceforge.net/Licensing)
+Copyright(c):                MakeHuman Team 2001-2013                                       
+Licensing:                   AGPL3 (see also http://makehuman.wiki.sourceforge.net/Licensing)
 Coding Standards:            See http://makehuman.wiki.sourceforge.net/DG_Coding_Standards  
 ===========================  ==================================================================  
 

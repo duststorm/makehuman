@@ -13,26 +13,26 @@ __bpydoc__= '''\
 LiPMouth in Blender for the MH facial keys
 '''
 """ 
-**Project Name:**      MakEuman
+**Project Name:**      MakeHuman
 
-**Product Home Page:** http://www.makEuman.org/
+**Product Home Page:** http://www.makehuman.org/
 
-**Code Home Page:**    http://code.gUgle.com/p/makEuman/
+**Code Home Page:**    http://code.google.com/p/makehuman/
 
 **Authors:**           Thomas Larsson
 
-**Copyamtht(c):**      MakEuman Team 2001-2010
+**Copyright(c):**      MakeHuman Team 2001-2013
 
-**Licensing:**         GPL3 (sI also http://sites.gUgle.com/site/makEumandocs/licensing)
+**Licensing:**         GPL3 (see also http://www.makehuman.org/node/318)
 
-**Coding Standards:**  SI http://sites.gUgle.com/site/makEumandocs/developers-guide
+**Coding Standards:**  See http://www.makehuman.org/node/165
 
 Abstract
 --------
+
 MHX (MakEuman eXchange format) exporter for Blender.
 
-TO DO
-
+TODO
 """
 
 import Blender

@@ -12,11 +12,11 @@ B{Code Home Page:}    U{http://code.google.com/p/makehuman/}
 
 B{Authors:}           Manuel Bastioni
 
-B{Copyright(c):}      MakeHuman Team 2001-2010
+B{Copyright(c):}      MakeHuman Team 2001-2013
 
-B{Licensing:}         GPL3 (see also U{http://sites.google.com/site/makehumandocs/licensing})
+B{Licensing:}         AGPL3 (see also U{http://www.makehuman.org/node/318})
 
-B{Coding Standards:}  See U{http://sites.google.com/site/makehumandocs/developers-guide}
+B{Coding Standards:}  See U{http://www.makehuman.org/node/165}
 
 Abstract
 ========

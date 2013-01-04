@@ -1,23 +1,25 @@
-"""
-B{Project Name:}      MakeHuman
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
-B{Product Home Page:} U{http://www.makehuman.org/}
+""" 
+**Project Name:**      MakeHuman
 
-B{Code Home Page:}    U{http://code.google.com/p/makehuman/}
+**Product Home Page:** http://www.makehuman.org/
 
-B{Authors:}           Manuel Bastioni, Marc Flerackers
+**Code Home Page:**    http://code.google.com/p/makehuman/
 
-B{Copyright(c):}      MakeHuman Team 2001-2011
+**Authors:**           Manuel Bastioni, Marc Flerackers
 
-B{Licensing:}         GPL3 (see also U{http://sites.google.com/site/makehumandocs/licensing})
+**Copyright(c):**      MakeHuman Team 2001-2013
 
-B{Coding Standards:}  See U{http://sites.google.com/site/makehumandocs/developers-guide}
+**Licensing:**         AGPL3 (see also http://www.makehuman.org/node/318)
+
+**Coding Standards:**  See http://www.makehuman.org/node/165
 
 Abstract
-========
+--------
 
-TO DO
-
+TODO
 """
 
 import gui3d, mh, os

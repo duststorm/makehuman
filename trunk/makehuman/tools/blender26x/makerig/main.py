@@ -20,8 +20,8 @@
 # Product Home Page:   http://www.makehuman.org/
 # Code Home Page:      http://code.google.com/p/makehuman/
 # Authors:             Thomas Larsson
-# Script copyright (C) MakeHuman Team 2001-2011
-# Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
+# Script copyright (C) MakeHuman Team 2001-2013
+# Coding Standards:    See http://www.makehuman.org/node/165
 #
 #
 # Abstract: 
@@ -863,7 +863,7 @@ def initInterface():
     
     bpy.types.Scene.MRLicense = StringProperty(
         name="License", 
-        default="GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)",
+        default="GPL3 (see also http://www.makehuman.org/node/318)",
         maxlen=256)
     
     bpy.types.Scene.MRHomePage = StringProperty(

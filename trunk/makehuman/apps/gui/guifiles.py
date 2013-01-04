@@ -1,34 +1,30 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# You may use, modify and redistribute this module under the terms of the GNU GPL.
 
-""" 
-Class for handling File mode in the GUI.
+"""
+**Project Name:**      MakeHuman
 
-B{Project Name:}      MakeHuman
+**Product Home Page:** http://www.makehuman.org/
 
-B{Product Home Page:} U{http://www.makehuman.org/}
+**Code Home Page:**    http://code.google.com/p/makehuman/
 
-B{Code Home Page:}    U{http://code.google.com/p/makehuman/}
+**Authors:**           Marc Flerackers
 
-B{Authors:}           Marc Flerackers
+**Copyright(c):**      MakeHuman Team 2001-2013
 
-B{Copyright(c):}      MakeHuman Team 2001-2011
+**Licensing:**         AGPL3 (see also http://www.makehuman.org/node/318)
 
-B{Licensing:}         GPL3 (see also U{http://sites.google.com/site/makehumandocs/licensing})
-
-B{Coding Standards:}  See U{http://sites.google.com/site/makehumandocs/developers-guide}
+**Coding Standards:**  See http://www.makehuman.org/node/165
 
 Abstract
-========
+--------
 
 This module implements the 'guifiles' class structures and methods to support GUI 
 File mode operations.
 File mode is invoked by selecting the File mode icon from the main GUI control bar at the top of
 the screen. While in this mode, user actions (keyboard and mouse events) are passed into 
 this class for processing. Having processed an event this class returns control to the 
-main OpenGL/SDL/Application event handling loop.  
-
+main OpenGL/Application event handling loop.
 """
 
 import mh

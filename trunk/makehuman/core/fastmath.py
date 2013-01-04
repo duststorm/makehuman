@@ -1,25 +1,25 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""
+""" 
 Common 3D Algebric functions.
 
-B{Project Name:}      MakeHuman
+**Project Name:**      MakeHuman
 
-B{Product Home Page:} U{http://www.makehuman.org/}
+**Product Home Page:** http://www.makehuman.org/
 
-B{Code Home Page:}    U{http://code.google.com/p/makehuman/}
+**Code Home Page:**    http://code.google.com/p/makehuman/
 
-B{Authors:}           Manuel Bastioni, Marc Flerackers
+**Authors:**           Manuel Bastioni, Marc Flerackers
 
-B{Copyright(c):}      MakeHuman Team 2001-2011
+**Copyright(c):**      MakeHuman Team 2001-2013
 
-B{Licensing:}         GPL3 (see also U{http://sites.google.com/site/makehumandocs/licensing})
+**Licensing:**         AGPL3 (see also http://www.makehuman.org/node/318)
 
-B{Coding Standards:}  See U{http://sites.google.com/site/makehumandocs/developers-guide}
+**Coding Standards:**  See http://www.makehuman.org/node/165
 
 Abstract
-========
+--------
 
 This module contains some specific versions of often used vector methods which are faster than the ones in aljabr.
 """

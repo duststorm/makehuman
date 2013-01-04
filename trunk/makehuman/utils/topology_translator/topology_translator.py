@@ -1,4 +1,4 @@
-# You may use, modify and redistribute this module under the terms of the GNU GPL3.0.
+# You may use, modify and redistribute this module under the terms of the GNU AGPL3.0.
 """
 Translate a  morph target from a mesh with topology 1 to a mesh with topology 2
 The shape of old and new objs must be similar. We assume the new mesh is done using a retopology tool.
@@ -8,9 +8,9 @@ Project Name:                **MakeHuman**
 Module File Location:        utils/topology_translator/topology_translator.py
 Product Home Page:           http://www.makehuman.org/
 Authors:                     Manuel Bastioni
-Copyright(c):                MakeHuman Team 2001-2011
-Licensing:                   GPL3 (see also: http://sites.google.com/site/makehumandocs/licensing)
-Coding Standards:            See http://sites.google.com/site/makehumandocs/developers-guide#TOC-Coding-Style
+Copyright(c):                MakeHuman Team 2001-2013
+Licensing:                   AGPL3 (see also: http://www.makehuman.org/node/318)
+Coding Standards:            See http://www.makehuman.org/node/165#TOC-Coding-Style
 ===========================  ==================================================================
 
 

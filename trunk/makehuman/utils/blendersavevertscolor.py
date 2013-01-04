@@ -8,8 +8,8 @@ Module File Location:        utils/blendersavevertscolor.py
 Product Home Page:           http://www.makehuman.org/                                      
 SourceForge Home Page:       http://sourceforge.net/projects/makehuman/                     
 Authors:                     Manuel Bastioni (individual developers look into the AUTHORS file)                                       
-Copyright(c):                MakeHuman Team 2001-2008                                       
-Licensing:                   GPL3 (see also http://makehuman.wiki.sourceforge.net/Licensing)
+Copyright(c):                MakeHuman Team 2001-2013                                       
+Licensing:                   AGPL3 (see also http://makehuman.wiki.sourceforge.net/Licensing)
 Coding Standards:            See http://makehuman.wiki.sourceforge.net/DG_Coding_Standards  
 ===========================  ==================================================================  
 

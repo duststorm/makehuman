@@ -1,4 +1,6 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 # transformations.py
 
 # Copyright (c) 2006-2012, Christoph Gohlke
@@ -30,19 +32,32 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""Homogeneous Transformation Matrices and Quaternions.
+"""
+Homogeneous Transformation Matrices and Quaternions.
+
+**Project Name:**      MakeHuman
+
+**Product Home Page:** http://www.makehuman.org/
+
+**Code Home Page:**    http://code.google.com/p/makehuman/
+
+**Authors:**           `Christoph Gohlke <http://www.lfd.uci.edu/~gohlke/>`__,
+  Laboratory for Fluorescence Dynamics, University of California, Irvine
+
+**Copyright(c):**      MakeHuman Team 2001-2013
+
+**Licensing:**         AGPL3 (see also http://www.makehuman.org/node/318)
+
+**Coding Standards:**  See http://www.makehuman.org/node/165
+
+Abstract
+--------
 
 A library for calculating 4x4 matrices for translating, rotating, reflecting,
 scaling, shearing, projecting, orthogonalizing, and superimposing arrays of
 3D homogeneous coordinates as well as for converting between rotation matrices,
 Euler angles, and quaternions. Also includes an Arcball control object and
 functions to decompose transformation matrices.
-
-:Authors:
-  `Christoph Gohlke <http://www.lfd.uci.edu/~gohlke/>`__,
-  Laboratory for Fluorescence Dynamics, University of California, Irvine
-
-:Version: 2012.01.01
 
 Requirements
 ------------

@@ -6,8 +6,8 @@ Utility function for creating a morph target (part of the development functional
 Project Name:                **MakeHuman**
 Product Home Page:           http://www.makehuman.org/
 Authors:                     Manuel Bastioni
-Copyright(c):                MakeHuman Team 2001-2011
-Licensing:                   GPL3
+Copyright(c):                MakeHuman Team 2001-2013
+Licensing:                   AGPL3
 ===========================  ===============================================================
 
 The MakeHuman application uses predefined morph target files to distort

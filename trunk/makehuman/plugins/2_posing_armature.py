@@ -12,17 +12,14 @@
 
 **Copyright(c):**      MakeHuman Team 2001-2013
 
-**Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
+**Licensing:**         AGPL3 (see also http://www.makehuman.org/node/318)
 
-**Coding Standards:**  See http://sites.google.com/site/makehumandocs/developers-guide
+**Coding Standards:**  See http://www.makehuman.org/node/165
 
 Abstract
 --------
-MakeHuman to Collada (MakeHuman eXchange format) exporter. Collada files can be loaded into
-Blender by collada_import.py.
 
-TO DO
-
+TODO
 """
 
 import os

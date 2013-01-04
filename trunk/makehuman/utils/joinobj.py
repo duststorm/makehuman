@@ -7,9 +7,9 @@ Project Name:                **MakeHuman**
 Module File Location:        utils/joinobj.py
 Product Home Page:           http://www.makehuman.org/
 Authors:                     Manuel Bastioni
-Copyright(c):                MakeHuman Team 2001-2011
-Licensing:                   GPL3 (see also: http://sites.google.com/site/makehumandocs/licensing)
-Coding Standards:            See http://sites.google.com/site/makehumandocs/developers-guide#TOC-Coding-Style
+Copyright(c):                MakeHuman Team 2001-2013
+Licensing:                   AGPL3 (see also: http://www.makehuman.org/node/318)
+Coding Standards:            See http://www.makehuman.org/node/165#TOC-Coding-Style
 ===========================  ==================================================================
 
 This module implements a utility function to join to wavefront obj, without alter the vert order of them.
