@@ -76,6 +76,7 @@ class GenericModifier(humanmodifier.GenericModifier):
 
     def getFactors(self, human, value):
         ethnics = [val for val in [human.africanVal, human.asianVal] if val > 0.0]
+        height = human.getHeight()
         
         factors = {
             'female': human.femaleVal,
@@ -92,6 +93,8 @@ class GenericModifier(humanmodifier.GenericModifier):
             'light': human.underweightVal,
             'heavy': human.overweightVal,
             'averageWeight': 1.0 - (human.underweightVal + human.overweightVal),
+            'dwarf': -min(height, 0.0),
+            'giant': max(0.0, height),
             'firmness0': 1.0 - human.breastFirmness,
             'firmness1': human.breastFirmness,
             'cup1': -min(human.breastSize, 0.0),
@@ -113,23 +116,37 @@ class UniversalModifier(GenericModifier):
         return factors
 
 class MacroModifier(GenericModifier):
-    def __init__(self, name, variable, left, right):
-        self.name = name
+    def __init__(self, base, name, variable, min, max):
+        self.name = '-'.join(atom
+                             for atom in (base, name)
+                             if atom is not None)
         self.variable = variable
-        self.left = left
-        self.right = right
+        self.min = min
+        self.max = max
 
-        self.targets = self.findTargets(name)
+        self.targets = self.findTargets(self.name)
 
         self.verts = None
         self.faces = None
 
     def getValue(self, human):
-        return getattr(human, self.variable)
+        getter = 'get' + self.variable
+        if hasattr(human, getter):
+            return getattr(human, getter)()
+        else:
+            return getattr(human, self.variable)
 
     def setValue(self, human, value):
-        setattr(human, self.variable, value)
+        value = self.clampValue(value)
+        setter = 'set' + self.variable
+        if hasattr(human, setter):
+            getattr(human, setter)(value)
+        else:
+            setattr(human, self.variable, value)
         GenericModifier.setValue(self, human, value)
+
+    def clampValue(self, value):
+        return max(self.min, min(self.max, value))
 
     def getFactors(self, human, value):
         factors = GenericModifier.getFactors(self, human, value)
@@ -148,13 +165,14 @@ class GroupBoxRadioButton(gui.RadioButton):
 class GenericSlider(humanmodifier.ModifierSlider):
     @staticmethod
     def findImage(name):
+        if name is None:
+            return None
         name = name.lower()
         return getTargets().images.get(name, name)
 
-    def __init__(self, modifier, image, view):
-        min = -1.0 if modifier.left is not None else 0.0
+    def __init__(self, min, max, modifier, label, image, view):
         image = self.findImage(image)
-        super(GenericSlider, self).__init__(min=min, max=1.0, modifier=modifier, image=image)
+        super(GenericSlider, self).__init__(min=min, max=1.0, label=label, modifier=modifier, image=image)
         self.view = getattr(gui3d.app, view)
 
     def onFocus(self, event):
@@ -162,11 +180,17 @@ class GenericSlider(humanmodifier.ModifierSlider):
         if gui3d.app.settings.get('cameraAutoZoom', True):
             self.view()
 
+class UniversalSlider(GenericSlider):
+    def __init__(self, modifier, label, image, view):
+        min = -1.0 if modifier.left is not None else 0.0
+        super(UniversalSlider, self).__init__(min, 1.0, modifier, label, image, view)
+
 class ModifierTaskView(gui3d.TaskView):
     _group = None
+    _label = None
 
     def __init__(self, category):
-        super(ModifierTaskView, self).__init__(category, self._name)
+        super(ModifierTaskView, self).__init__(category, self._name, label=self._label)
 
         self.groupBoxes = []
         self.radioButtons = []
@@ -186,32 +210,39 @@ class ModifierTaskView(gui3d.TaskView):
             # Create radiobutton
             radio = self.categoryBox.addWidget(GroupBoxRadioButton(self, self.radioButtons, title, box, selected = len(self.radioButtons) == 0))
 
+            # Create sliders
             for index, template in enumerate(templates):
-                tname = template[0]
-                tpath = '-'.join(template[:-1])
-                tview = template[-1]
-                paired = len(template) == 4
-                if paired:
-                    left  = '-'.join([base, tname, template[1]])
-                    right = '-'.join([base, tname, template[2]])
+                macro = len(template) > 4
+                if macro:
+                    tname, tvar, tlabel, tmin, tmax, tview = template
+                    modifier = MacroModifier(base, tname, tvar, tmin, tmax)
+                    self.modifiers[tname] = modifier
+                    slider = GenericSlider(tmin, tmax, modifier, tlabel, None, tview)
                 else:
-                    left = None
-                    right = '-'.join([base, tname])
+                    paired = len(template) == 4
+                    if paired:
+                        tname, tleft, tright, tview = template
+                        left  = '-'.join([base, tname, tleft])
+                        right = '-'.join([base, tname, tright])
+                    else:
+                        tname, tview = template
+                        left = None
+                        right = '-'.join([base, tname])
 
-                # Create sliders
-                modifier = UniversalModifier(left, right)
+                    modifier = UniversalModifier(left, right)
 
-                modifierName = tpath
-                clashIndex = 0
-                while modifierName in self.modifiers:
-                    log.debug('modifier clash: %s', modifierName)
-                    modifierName = '%s%d' % (tpath, clashIndex)
-                    clashIndex += 1
+                    tpath = '-'.join(template[:-1])
+                    modifierName = tpath
+                    clashIndex = 0
+                    while modifierName in self.modifiers:
+                        log.debug('modifier clash: %s', modifierName)
+                        modifierName = '%s%d' % (tpath, clashIndex)
+                        clashIndex += 1
 
-                #self.modifiers['%s%d' % (name, index + 1)] = modifier
-                self.modifiers[modifierName] = modifier
+                    self.modifiers[modifierName] = modifier
+                    slider = UniversalSlider(modifier, None, '%s.png' % tpath, tview)
 
-                slider = box.addWidget(GenericSlider(modifier, '%s.png' % tpath, tview))
+                box.addWidget(slider)
                 self.sliders.append(slider)
 
         self.groupBox.showWidget(self.groupBoxes[0])
@@ -533,34 +564,19 @@ class ArmsLegsTaskView(ModifierTaskView):
 class GenderTaskView(ModifierTaskView):
     _name = 'Gender'
     _features = [
-        ('genitals', 'genitals', [
+        ('Genitals', 'genitals', [
             ('genitals', 'feminine', 'masculine', 'noSetCamera'),
             ]),
-        ('breast', 'breast', [
+        ('Breast', 'breast', [
             ('breast', 'down', 'up', 'noSetCamera'),
             ('breast-dist', 'min', 'max', 'noSetCamera'),
             ('breast-point', 'min', 'max', 'noSetCamera'),
             ]),
+        ('Macro', 'breast', [
+            (None, 'breastSize', 'Breast size', -1.0, 1.0, 'noSetCamera'),
+            (None, 'breastFirmness', 'Breast firmness', 0.0, 1.0, 'noSetCamera'),
+            ]),
         ]
-
-    def __init__(self, category):
-        super(GenderTaskView, self).__init__(category)
-        # Create box
-        box = self.groupBox.addWidget(gui.GroupBox("Macro"))
-        self.groupBoxes.append(box)
-
-        # Create radiobutton
-        radio = self.categoryBox.addWidget(GroupBoxRadioButton(self, self.radioButtons, "Macro", box))
-
-        modifier = MacroModifier('breast', 'breastSize', 'cup1', 'cup2')
-        self.modifiers['cup'] = modifier
-        slider = box.addWidget(GenericSlider(modifier, 'breast.png', 'setGlobalCamera'))
-        self.sliders.append(slider)
-
-        modifier = MacroModifier('breast', 'breastFirmness', 'firmness0', 'firmness1')
-        self.modifiers['firmness'] = modifier
-        slider = box.addWidget(GenericSlider(modifier, 'breast.png', 'setGlobalCamera'))
-        self.sliders.append(slider)
 
 class AsymmTaskView(ModifierTaskView):
     _name = 'Asymmetry'
@@ -618,12 +634,28 @@ class AsymmTaskView(ModifierTaskView):
             ]),
         ]
 
+class MacroTaskView(ModifierTaskView):
+    _name = 'Macro modelling'
+    _label = 'Macro'
+
+    _features = [
+        ('Macro', 'macrodetails', [
+            (None, 'Gender', 'Gender', 0.0, 1.0, 'noSetCamera'),
+            (None, 'Age', 'Age', 0.0, 1.0, 'noSetCamera'),
+            ('universal', 'Muscle', 'Tone', 0.0, 1.0, 'noSetCamera'),
+            ('universal', 'Weight', 'Weight', 0.0, 1.0, 'noSetCamera'),
+            ('universal-stature', 'Height', 'Height', -1.0, 1.0, 'noSetCamera'),
+            (None, 'African', 'Afro', 0.0, 1.0, 'noSetCamera'),
+            (None, 'Asian', 'Asian', 0.0, 1.0, 'noSetCamera'),
+            ]),
+        ]
+
 def load(app):
     category = app.getCategory('Modelling2')
 
     gui3d.app.noSetCamera = (lambda: None)
 
-    for type in [FaceTaskView, TorsoTaskView, ArmsLegsTaskView, GenderTaskView, AsymmTaskView]:
+    for type in [MacroTaskView, GenderTaskView, FaceTaskView, TorsoTaskView, ArmsLegsTaskView, AsymmTaskView]:
         taskview = category.addTask(type(category))
         if taskview._group is not None:
             app.addLoadHandler(taskview._group, taskview.loadHandler)
