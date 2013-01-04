@@ -9,6 +9,80 @@ import humanmodifier
 import log
 import targets
 
+# Gender[0..1]
+# -
+# maleVal = Gender
+# femaleVal = 1 - Gender
+# -
+# male : maleVal
+# female : femaleVal
+
+# Age [0..1]
+# -
+# childVal = max(0, 1 - 2 * Age)
+# youngVal = 1 - abs(2 * Age - 1)
+# oldVal = max(0, 2 * Age - 1)
+# -
+# child : childVal
+# young : youngVal
+# old : oldVal
+
+# Weight [0..1]
+# -
+# underweightVal = max(0, 1 - 2 * Weight)
+# overweightVal = max(0, 2 * Weight - 1)
+# -
+# heavy : overweightVal
+# [averageWeight] : 1 - underweightVal - overweightVal
+# light : underweightVal
+
+# Muscle [0..1]
+# -
+# muscleVal = max(0, 2 * Muscle - 1)
+# flaccidVal = max(0, 1 - 2 * weight)
+# -
+# flaccid : flaccidVal
+# [averageTone] : 1 - flaccidVal - muscleVal
+# muscle : muscleVal
+
+# African [0..1]
+# -
+# africanVal = african
+# -
+# african : africanVal / len(ethnics)
+
+# Asian [0..1]
+# -
+# asianVal = asian
+# -
+# asian : asianVal / len(ethnics)
+
+# ... [0..1]
+# -
+# ...
+# -
+# caucasian : (1 - (africanVal + asianVal) / len(ethnics))
+
+# Height [-1..1]
+# ...
+# -
+# dwarf : -min(0, height)
+# giant :  max(0, height)
+
+# ... [0..1]
+# -
+# breastFirmness
+# -
+# firmness0 : 1 - breastFirmness
+# firmness1 : breastFirmness
+
+# ... [-1..1]
+# -
+# breastSize
+# -
+# cup1 : -min(0, breastSize)
+# cup2 :  max(0, breastSize)
+
 _targets = None
 
 def getTargets():
@@ -651,6 +725,7 @@ class MacroTaskView(ModifierTaskView):
         ]
 
 def load(app):
+    return
     category = app.getCategory('Modelling2')
 
     gui3d.app.noSetCamera = (lambda: None)
