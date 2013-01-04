@@ -105,14 +105,14 @@ class VertProxy(object):
     class FaceList(list):
         def __init__(self, callback, it):
             self.__callback = callback
-            super(FaceList, self).__init__(it)
+            super(VertProxy.FaceList, self).__init__(it)
 
         def append(self, value):
-            super(FaceList, self).append(value)
+            super(VertProxy.FaceList, self).append(value)
             self.__callback(self)
 
     def get_faces(self):
-        faces = self.object.vface[self.idx,:self.object.nfaces]
+        faces = self.object.vface[self.idx,:self.object.nfaces[self.idx]]
         return self.FaceList(self.set_faces, [FaceProxy(self.object, idx) for idx in faces])
 
     def set_faces(self, faces):
@@ -248,6 +248,9 @@ class VertProxy(object):
     def __str__(self):
 
         return 'vert num %s, coord(%s,%s,%s)' % (self.idx, self.co[0], self.co[1], self.co[2])
+
+    def __eq__(self, other):
+        return self.object is other.object and self.idx == other.idx
 
 class FaceProxy(object):
 
