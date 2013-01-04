@@ -10,7 +10,7 @@
 
 **Authors:**           Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2012
+**Copyright(c):**      MakeHuman Team 2001-2013
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -32,6 +32,7 @@ import gui3d
 import os
 import time
 import numpy
+import log
 
 #import cProfile
 
@@ -76,16 +77,16 @@ def exportMhx(human, filename, options):
         outfile = export_config.getOutFileFolder(filename, config)        
         try:
             fp = open(outfile, 'w')
-            print("Writing MHX 2.5x file",  outfile )
+            log.message("Writing MHX 2.5x file %s" % outfile )
         except:
-            print("Unable to open file for writing", outfile)
+            log.message("Unable to open file for writing %s" % outfile)
             fp = 0
         if fp:
             #cProfile.runctx( 'exportMhx_25(human, config, fp)', globals(), locals())
             exportMhx_25(human, config, fp)
             fp.close()
             time2 = time.clock()
-            print("Wrote MHX 2.5x file in %g s:" % (time2-time1), outfile)
+            log.message("Wrote MHX 2.5x file in %g s: %s" % (time2-time1, outfile))
 
     posemode.exitPoseMode()        
     return        
@@ -97,7 +98,7 @@ def exportMhx(human, filename, options):
 def exportMhx_25(human, config, fp):
     gui3d.app.progress(0, text="Exporting MHX")
     config.mhx25 = True
-    print "Export MHX"
+    log.message("Export MHX")
     
     fp.write(
 "# MakeHuman exported MHX\n" +
@@ -215,7 +216,7 @@ def proxyCopy(type, human, config, proxyData, fp, t0, t1):
 def copyFile25(human, tmplName, fp, proxy, config, proxyData):
     tmpl = open(tmplName)
     if tmpl == None:
-        print("*** Cannot open "+tmplName)
+        log.error("*** Cannot open %s" % tmplName)
         return
 
     obj = human.meshData
@@ -263,7 +264,7 @@ def copyFile25(human, tmplName, fp, proxy, config, proxyData):
 
             elif key == 'if-true':
                 value = eval(words[2])
-                print "if", words[2], value
+                log.debug("if %s %s" % (words[2], value))
                 fp.write("#if %s\n" % value)
 
             elif key == 'rig-drivers':
@@ -468,7 +469,7 @@ def copyFile25(human, tmplName, fp, proxy, config, proxyData):
         else:
             fp.write(line)
 
-    print("    %s copied" % tmplName)
+    log.message("    %s copied" % tmplName)
     tmpl.close()
 
     return
@@ -857,7 +858,7 @@ def writeProxyTexture(fp, texture, mat, extra, config):
     (folder,name) = texture
     tex = os.path.join(folder,name)
     #print(the.Human)
-    print("Tex", tex)
+    log.debug("Tex %s" % tex)
     texname = the.Human + os.path.basename(tex)
     fromDir = os.path.dirname(tex)
     texfile = export_config.getOutFileName(tex, fromDir, True, None, config)
@@ -1150,7 +1151,7 @@ def writeShapeKeys(fp, human, name, config, proxy):
 
     if not proxy:
         for path,name in config.customShapeFiles:
-            print("    %s" % path)
+            log.message("    %s" % path)
             shape = mhx_custom.readCustomTarget(path)
             writeShape(fp, name, "Sym", shape, -1, 2, proxy)                        
 
@@ -1231,7 +1232,7 @@ TexInfo = {
 
 def writeMultiMaterials(uvset, human, config, fp):
     folder = os.path.dirname(human.uvset.filename)
-    print("Folder", folder)
+    log.debug("Folder %s" % folder)
     for mat in uvset.materials:
         for tex in mat.textures:
             name = os.path.basename(tex.file)

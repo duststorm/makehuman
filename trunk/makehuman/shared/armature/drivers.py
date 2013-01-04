@@ -7,7 +7,7 @@
 
 **Authors:**           Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2012
+**Copyright(c):**      MakeHuman Team 2001-2013
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -21,6 +21,7 @@ Constraints
 
 from mhx import the
 from the import *
+import log
 
 class CTarget:
     def __init__(self, var, target):
@@ -35,7 +36,7 @@ class CTarget:
             (self.idtype, self.object, self.datapath) = target
         
     def display(self):
-        print "      <CTarget %s %s>" % (self.idtype, self.object)
+        log.debug("      <CTarget %s %s>" % (self.idtype, self.object))
                         
     def write25(self, fp):
         fp.write("          Target %s %s\n" % (self.object, self.idtype))
@@ -75,10 +76,10 @@ class CVariable:
             raise NameError("Unknown driver var type %s" % self.type)
         
     def display(self):
-        print "    <CVariable %s %s" % (self.name, self.type)
+        log.debug("    <CVariable %s %s" % (self.name, self.type))
         for target in self.targets:
             target.display()
-        print "    >"
+        log.debug("    >")
                                 
     def write25(self, fp):
         fp.write("        DriverVariable %s %s\n" % (self.name, self.type))
@@ -106,10 +107,10 @@ class CDriver:
             self.variables.append( CVariable(var, self, type, targets) )    
 
     def display(self):
-        print "  <CDriver %s %d" % (self.channel, self.index)
+        log.debug("  <CDriver %s %d" % (self.channel, self.index))
         for var in self.variables:
             var.display()
-        print "  >"
+        log.debug("  >")
     
     def write25(self, fp):        
         fp.write("\n"+
@@ -317,7 +318,7 @@ def writeDrivers(fp, cond, drivers):
         elif typ == 'SCALE':
             drv = writeDriver(fp, cond, drvdata, "", "pose.bones[\"%s\"].scale" % bone, index, coeffs, variables)
         else:
-            print drv
+            log.message(drv)
             raise NameError("Unknown driver type %s" % typ)
         driverList.append(drv)
     return driverList

@@ -10,7 +10,7 @@
 
 **Authors:**           Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2009
+**Copyright(c):**      MakeHuman Team 2001-2013
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -30,6 +30,7 @@ import mh2bvh
 import os
 import sys
 import time
+import log
 
 import mh2proxy
 from . import the, mhxbones
@@ -47,15 +48,15 @@ def exportMhx(human, filename, options, config):
     filename = name+"-24"+ext
     try:
         fp = open(filename, 'w')
-        print("Writing MHX 2.4x file",  filename )
+        log.message("Writing MHX 2.4x file %s" % filename )
     except:
-        print("Unable to open file for writing", filename)
+        log.message("Unable to open file for writing %s" % filename)
         fp = 0
     if fp:
         exportMhx_24(human.meshData, config, fp)
         fp.close()
         time2 = time.clock()
-        print("Wrote MHX 2.4x file in %g s:" % (time2-time1), filename)
+        log.message("Wrote MHX 2.4x file in %g s: %s" % (time2-time1, filename))
     return
  
  #
@@ -171,7 +172,7 @@ def copyVertGroups(tmplName, fp, proxy):
     vgroups = []
 
     if tmpl == None:
-        print("*** Cannot open "+tmplName)
+        log.error("*** Cannot open %s" % tmplName)
         return
     if not proxy:
         for line in tmpl:
@@ -203,7 +204,7 @@ def copyVertGroups(tmplName, fp, proxy):
                     fp.write(line)
             else:    
                 fp.write(line)
-    print("    %s copied" % tmplName)
+    log.message("    %s copied" % tmplName)
     tmpl.close()
     return
 
@@ -511,7 +512,7 @@ def writeIpo(fp):
     try:
         tmpl = open(mhxFile, "rU")
     except:
-        print("*** Cannot open "+mhxFile)
+        log.error("*** Cannot open %s" % mhxFile)
         tmpl = None
 
     if tmpl and splitLeftRight:
@@ -530,7 +531,7 @@ def writeIpo(fp):
         fp.write("end ipo\n")
     
     if tmpl:
-        print("    %s copied" % mhxFile)
+        log.message("    %s copied" % mhxFile)
         tmpl.close()
 
     return
@@ -558,7 +559,7 @@ def copyShapeKeys(tmplName, fp, proxy, doScale):
     scale = 1.0
 
     if tmpl == None:
-        print("*** Cannot open "+tmplName)
+        log.error("*** Cannot open %s" % tmplName)
         return
     if not proxy:
         for line in tmpl:
@@ -610,7 +611,7 @@ def copyShapeKeys(tmplName, fp, proxy, doScale):
                 fp.write(line)
             else:    
                 fp.write(line)
-    print("    %s copied" % tmplName)
+    log.message("    %s copied" % tmplName)
     tmpl.close()
     return
 

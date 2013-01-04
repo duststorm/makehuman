@@ -7,13 +7,15 @@ Actually it's just a random collection of functions...and
 IT NOT WORK
 """
 
+import log
+
 
 def testAnimation(self):
 
     # TODO: move this in a test module
 
     x = self.basemesh.x + .01
-    print 'animation test ', x
+    log.message('animation test %s' % x)
     self.basemesh.setLoc(x, self.basemesh.y, self.basemesh.z)
     self.scene.redraw()
 
@@ -22,7 +24,7 @@ def testUPArrowsEvent(self):
 
     # TODO: move this in a test module
 
-    print 'test up arrow'
+    log.message('test up arrow')
     self.basemesh.y += .25
     self.basemesh.setLoc(self.basemesh.x, self.basemesh.y, self.basemesh.z)
     self.scene.redraw()

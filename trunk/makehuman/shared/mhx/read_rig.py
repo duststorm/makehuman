@@ -10,7 +10,7 @@
 
 **Authors:**           Thomas Larsson
 
-**Copyright(c):**     MakeHuman Team 2001-2011
+**Copyright(c):**     MakeHuman Team 2001-2013
 
 **Licensing:**       GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -28,6 +28,7 @@ import aljabr
 from aljabr import *
 import os
 import mh2proxy
+import log
 
 from . import the
 from the import *
@@ -95,7 +96,7 @@ def readRigFile(filename, obj, verts=None):
     try:
         fp = open(path, "rU")
     except:
-        print("*** Cannot open %s" % path)
+        log.error("*** Cannot open %s" % path)
         return
 
     doLocations = 1

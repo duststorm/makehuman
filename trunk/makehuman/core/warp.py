@@ -10,7 +10,7 @@
 
 **Authors:**           Thomas Larsson, Alexis Mignon
 
-**Copyright(c):**      MakeHuman Team 2001-2012
+**Copyright(c):**      MakeHuman Team 2001-2013
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -87,6 +87,7 @@ import numpy
 import sys
 import imp
 import os
+import log
 
 #----------------------------------------------------------
 #   class CWarp
@@ -297,13 +298,13 @@ def test_warp():
     ymorph2 = warp_target2(morph, points, points * (1,3,1), landmarks )
     t2 = time.time()
     
-    print "time warp 1", t1 - t0
-    print "time warp 2", t2 - t1
-    print "t1/t2", (t1 - t0)/(t2 - t1)
+    log.message("time warp 1 %s" % (t1 - t0) )
+    log.message("time warp 2 %s" % (t2 - t1) )
+    log.message("t1/t2 %s" % (t1 - t0)/(t2 - t1) )
         
-    print "difference morph1/morph2", numpy.abs(numpy.array(ymorph.values()) - numpy.array(ymorph2.values())).mean()
-    print "morph error 1", numpy.abs(numpy.array(morph.values()) * (1,3,1) - numpy.array(ymorph.values())).mean()
-    print "morph error 2", numpy.abs(numpy.array(morph.values()) * (1,3,1) - numpy.array(ymorph2.values())).mean()
+    log.message("difference morph1/morph2 %s" % numpy.abs(numpy.array(ymorph.values()) - numpy.array(ymorph2.values())).mean() )
+    log.message("morph error 1 %s" % numpy.abs(numpy.array(morph.values()) * (1,3,1) - numpy.array(ymorph.values())).mean() )
+    log.message("morph error 2 %s" % numpy.abs(numpy.array(morph.values()) * (1,3,1) - numpy.array(ymorph2.values())).mean() )
 
 if __name__ == '__main__':
     test_warp() 

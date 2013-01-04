@@ -7,7 +7,7 @@
 
 **Authors:**           Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2009
+**Copyright(c):**      MakeHuman Team 2001-2013
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -26,6 +26,7 @@ import os
 import numpy
 from aljabr import *
 import export_config
+import log
 
 import mhx
 from mhx import the
@@ -117,7 +118,7 @@ class CProxy:
                 verts.append( parent.verts[refVert].co )
                 
         obj.changeCoords(verts)      
-        print "clo", (xScale, yScale, zScale)
+        log.debug("clo %s" % str((xScale, yScale, zScale)) )
         
 
     def getUuid(self):
@@ -207,7 +208,7 @@ def readProxyFile(obj, file, evalOnLoad):
     except:
         tmpl = None
     if tmpl == None:
-        print ("*** Cannot open", pfile.file)
+        log.error("*** Cannot open %s" % pfile.file)
         return None
         return CProxy(None, pfile.type, pfile.layer)
 
@@ -504,7 +505,7 @@ def copyObjFile(proxy):
     try:
         tmpl = open(objpath, "rU")
     except:
-        print ("*** Cannot open", objpath)
+        log.error("*** Cannot open %s" % objpath)
         return False
 
     proxy.texVerts = []
@@ -651,7 +652,7 @@ class CUvSet:
         for line in self.faceNumbers:
             words = line.split()
             if len(words) < 2:
-                print line
+                log.debug(line)
                 halt
             elif words[0] == "ft":        
                 self.faceMaterials[fn] = int(words[1])

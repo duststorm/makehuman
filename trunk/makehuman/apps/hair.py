@@ -7,7 +7,7 @@ B{Code Home Page:}    U{http://code.google.com/p/makehuman/}
 
 B{Authors:}           Manuel Bastioni, Marc Flerackers
 
-B{Copyright(c):}      MakeHuman Team 2001-2011
+B{Copyright(c):}      MakeHuman Team 2001-2013
 
 B{Licensing:}         GPL3 (see also U{http://sites.google.com/site/makehumandocs/licensing})
 
@@ -29,6 +29,7 @@ from math import radians
 from os import path
 from random import random, randint
 from simpleoctree import SimpleOctree
+import log
 
 class Hairs:
     def __init__(self, human):
@@ -158,7 +159,7 @@ class Hairs:
             #objFile = files.open(files.namelist()[0])
             fileDescriptor = open(name+".hair")
         except:
-            print 'Unable to load .obj and .hair file of %s' % name
+            log.error('Unable to load .obj and .hair file of %s' % name)
             return
         
         #self.resetHairs()
@@ -212,7 +213,7 @@ class Hairs:
                 guidePoints=[]
                 guideIndex=guideIndex+1
         objFile.close()
-        print "Loaded", len(self.guides), "strands"
+        log.message("Loaded %s strands" % len(self.guides))
 
     def generateHairToRender(self):
         hairs = self.multiStrandInterpolation()
@@ -270,7 +271,7 @@ class Hairs:
              tempStrand.append(tempV)
            hairs.append(tempStrand)
          
-       print len(hairs), "generated hair through multistrand interpolation"
+       log.message("%s generated hair through multistrand interpolation" % len(hairs))
        return hairs
 
 def loadStrands(obj,curve,widthFactor=1.0,res=0.04):

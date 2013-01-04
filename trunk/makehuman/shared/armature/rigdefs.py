@@ -7,7 +7,7 @@
 
 **Authors:**           Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2012
+**Copyright(c):**      MakeHuman Team 2001-2013
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -26,6 +26,7 @@ import warp
 import numpy
 import gui3d
 import warpmodifier
+import log
 
 from numpy import dot
 from numpy.linalg import inv
@@ -111,10 +112,10 @@ class CArmature:
         return ("  <CArmature %s>" % self.name)
         
     def display(self):
-        print "<CArmature %s" % self.name
+        log.debug("<CArmature %s" % self.name)
         for bone in self.boneList:
             bone.display()
-        print ">"
+        log.debug(">")
         
 
     def printLocs(self, words):
@@ -122,12 +123,12 @@ class CArmature:
         string = ""
         for word in words:
             string += ("%s " % word)
-        print(string)
+        log.debug(string)
         verts = self.human.meshData.verts
         for vn in [3825]:
             x = verts[vn].co
             y = self.restCoords[vn]
-            print("   %d (%.4f %.4f %.4f) (%.4f %.4f %.4f)" % (vn, x[0], x[1], x[2], y[0], y[1], y[2]))
+            log.debug("   %d (%.4f %.4f %.4f) (%.4f %.4f %.4f)" % (vn, x[0], x[1], x[2], y[0], y[1], y[2]))
 
 
     def assignDrivers(self, drivers):
@@ -141,11 +142,11 @@ class CArmature:
     def listPose(self):
         for bone in self.boneList:
             quat = tm.quaternion_from_matrix(bone.matrixPose)
-            print "  ", bone.name, quat
+            log.debug("  %s %s" % (bone.name, quat))
 
 
     def clear(self, update=False):
-        print "Clear armature"
+        log.message("Clear armature")
         for bone in self.boneList:
             bone.matrixPose = tm.identity_matrix()
         if update:
@@ -177,15 +178,15 @@ class CArmature:
         
 
     def rebuild(self, update=True):   
-        print "Rebuild", self, update, self.config.rigtype
+        log.message("Rebuild %s %s %s" % (self, update, self.config.rigtype))
         obj = self.human.meshData
         proxyData = {}
         mhx.mhx_rig.setupRig(obj, self.config, proxyData)
-        print "RHT", the.RigHead["Root"], the.RigTail["Root"]
+        log.debug("RHT %s %s" % (the.RigHead["Root"], the.RigTail["Root"]))
         for bone in self.boneList:
             bone.rebuild()
             if bone.name in []:
-                print bone.name, bone.head, bone.tail
+                log.debug("%s %s %s" % (bone.name, bone.head, bone.tail))
                 #print "R", bone.matrixRest
                 #print "P", bone.matrixPose
                 #print "G", bone.matrixGlobal
@@ -197,7 +198,7 @@ class CArmature:
 
 
     def syncRestVerts(self, caller):
-        print "Synch rest verts: ", caller        
+        log.message("Synch rest verts: %s" % caller)
         #nVerts = len(self.restVerts)
         self.restCoords[:,:3] = warpmodifier.getWarpedCoords()
         #for n in range(nVerts):
@@ -349,14 +350,14 @@ class CArmature:
                     if bname:
                         target = self.bones[bname]
                         if not target.dirty:
-                            print "Dirty %s before %s" % (bone.name, target.name)
+                            log.debug("Dirty %s before %s" % (bone.name, target.name))
                             dirty = True
         if dirty:
             raise NameError("Dirty bones encountered") 
             
             
     def readMhpFile(self, filepath):
-        print "Mhp", filepath
+        log.message("Mhp %s" % filepath)
         fp = open(filepath, "rU")
         for line in fp:
             words = line.split()
@@ -374,7 +375,7 @@ class CArmature:
 
 
     def readBvhFile(self, filepath):
-        print "Bvh", filepath
+        log.message("Bvh %s" % filepath)
         fp = open(filepath, "rU")
         bones = []
         motion = False
@@ -457,14 +458,14 @@ class CArmature:
                     bone.matrixPose[2,3] = rz
 
             if bone.name in []:
-                print bone.name, order
-                print channels
-                print (ax/D,ay/D,az/D)
-                print "R ", bone.matrixRest
-                print "M1", mat1
-                print "M2", mat2
-                print "P ", bone.matrixPose
-                print "G ", bone.matrixGlobal
+                log.debug("%s %s" % (bone.name, order))
+                log.debug(str(channels))
+                log.debug("%s %s %s" % (ax/D, ay/D, az/D))
+                log.debug("R %s" % bone.matrixRest)
+                log.debug("M1 %s" % mat1)
+                log.debug("M2 %s" % mat2)
+                log.debug("P %s" % bone.matrixPose)
+                log.debug("G %s" % bone.matrixGlobal)
 
         self.update()                    
 
@@ -555,8 +556,8 @@ class CBone:
         try:
             self.matrixVerts = dot(self.matrixGlobal, inv(self.matrixRest))
         except:
-            print self.name, self.head, self.tail
-            print self.matrixRest
+            log.debug(self.name, self.head, self.tail)
+            log.debug(self.matrixRest)
             halt
                        
 
@@ -597,11 +598,11 @@ class CBone:
     def setRotationIndex(self, index, angle, useQuat):
         if useQuat:
             quat = tm.quaternion_from_matrix(self.matrixPose)
-            print quat
+            log.debug(str(quat))
             quat[index] = angle/1000
-            print quat
+            log.debug(str(quat))
             normalizeQuaternion(quat)
-            print quat
+            log.debug(str(quat))
             self.matrixPose = tm.quaternion_matrix(quat)
             return quat[0]*1000    
         else:
@@ -642,10 +643,10 @@ class CBone:
         pose = self.getPoseFromGlobal()
 
         if 0 and self.name in ["DfmKneeBack_L", "DfmLoLeg_L"]:
-            print "Stretch", self.name
-            print "G", goal
-            print "M1", self.matrixGlobal
-            print "P1", pose
+            log.debug("Stretch %s" % self.name)
+            log.debug("G %s" % goal)
+            log.debug("M1 %s" % self.matrixGlobal)
+            log.debug("P1 %s" % pose)
 
         az,ay,ax = tm.euler_from_matrix(pose, axes='szyx')
         rot = tm.rotation_matrix(-ay + self.roll, CBone.Axes[1])
@@ -653,11 +654,11 @@ class CBone:
         pose2 = self.getPoseFromGlobal()
         
         if 0 and self.name in ["DfmKneeBack_L", "DfmLoLeg_L"]:
-            print "A", ax, ay, az
-            print "R", rot
-            print "M2", self.matrixGlobal
-            print "P2", pose
-            print ""
+            log.debug("A %s %s %s" % (ax, ay, az))
+            log.debug("R %s" % rot)
+            log.debug("M2 %s" % self.matrixGlobal)
+            log.debug("P2 %s" % pose)
+            log.debug("")
 
 
     def poleTargetCorrect(self, head, goal, pole, angle):
@@ -677,16 +678,16 @@ class CBone:
             self.matrixGlobal[:3,:3] = dot(self.matrixGlobal[:3,:3], rot[:3,:3])
             
             if 0 and self.name == "DfmUpArm2_L":
-                print ""
-                print "IK", self.name
-                print "X", xvec
-                print "Y", yvec
-                print "Z", zvec
-                print "A0", angle0
-                print "A", angle
-                print "R", rot
-                print "M0", m0
-                print "M", self.matrixGlobal
+                log.debug("")
+                log.debug("IK %s" % self.name)
+                log.debug("X %s" % xvec)
+                log.debug("Y %s" % yvec)
+                log.debug("Z %s" % zvec)
+                log.debug("A0 %s" % angle0)
+                log.debug("A %s" % angle)
+                log.debug("R %s" % rot)
+                log.debug("M0 %s" % m0)
+                log.debug("M %s" % self.matrixGlobal)
 
 
     def getPoseFromGlobal(self):
@@ -809,35 +810,35 @@ class CBone:
     #
     
     def display(self):
-        print "  <CBone %s" % self.name
-        print "    head: (%.4g %.4g %.4g)" % (self.head[0], self.head[1], self.head[2])
-        print "    tail: (%.4g %.4g %.4g)" % (self.tail[0], self.tail[1], self.tail[2])
-        print "    roll: %s" % self.roll
-        print "    parent: %s" % self.parent
-        print "    conn: %s" % self.conn
-        print "    deform: %s" % self.deform
+        log.debug("  <CBone %s" % self.name)
+        log.debug("    head: (%.4g %.4g %.4g)" % (self.head[0], self.head[1], self.head[2]))
+        log.debug("    tail: (%.4g %.4g %.4g)" % (self.tail[0], self.tail[1], self.tail[2]))
+        log.debug("    roll: %s" % self.roll)
+        log.debug("    parent: %s" % self.parent)
+        log.debug("    conn: %s" % self.conn)
+        log.debug("    deform: %s" % self.deform)
 
-        print "    constraints: ["        
+        log.debug("    constraints: [")
         for cns in self.constraints:
             cns.display()        
-        print "    ]"
-        print "    drivers: ["
+        log.debug("    ]")
+        log.debug("    drivers: [")
         for drv in self.drivers:
             drv.display()
-        print "    ]"            
-        print "  >"
+        log.debug("    ]")
+        log.debug("  >")
 
 
     def printMats(self):
-        print self.name
-        print "H4", self.head4
-        print "T4", self.tail4
-        print "RM", self.matrixRest
-        print "RV", dot(self.matrixRest, self.yvector4)
-        print "P", self.matrixPose
-        print "Rel", self.matrixRelative
-        print "G", self.matrixGlobal
-        print "GV", dot(self.matrixGlobal, self.yvector4)
+        log.debug(self.name)
+        log.debug("H4 %s" % self.head4)
+        log.debug("T4 %s" % self.tail4)
+        log.debug("RM %s" % self.matrixRest)
+        log.debug("RV %s" % dot(self.matrixRest, self.yvector4))
+        log.debug("P %s" % self.matrixPose)
+        log.debug("Rel %s" % self.matrixRelative)
+        log.debug("G %s" % self.matrixGlobal)
+        log.debug("GV %s" % dot(self.matrixGlobal, self.yvector4))
             
 #
 #

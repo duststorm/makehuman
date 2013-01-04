@@ -10,7 +10,7 @@
 
 **Authors:**           Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2009
+**Copyright(c):**      MakeHuman Team 2001-2013
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -31,6 +31,7 @@ import gui3d
 import warp
 import warpmodifier
 import algos3d
+import log
 
 from . import the
 from the import *
@@ -155,7 +156,7 @@ def readShape(filename):
     try:
         fp = open(filename, "rU")
     except:
-        print("*** Cannot open %s" % filename)
+        log.error("*** Cannot open %s" % filename)
         return None
         
     shape = {}                    
@@ -165,7 +166,7 @@ def readShape(filename):
         if n < algos3d.NMHVerts:
             shape[n] = (float(words[1]), float(words[2]), float(words[3]))    
     fp.close()
-    print("    %s copied" % filename)
+    log.message("    %s copied" % filename)
     return shape
 
 #----------------------------------------------------------

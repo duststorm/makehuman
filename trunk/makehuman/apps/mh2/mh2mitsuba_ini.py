@@ -12,7 +12,7 @@ Mitsuba Export parameters.
 
 **Authors:**           Pedro Alcaide, aka povmaniaco
 
-**Copyright(c):**      MakeHuman Team 2001-2011
+**Copyright(c):**      MakeHuman Team 2001-2013
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -26,8 +26,11 @@ These parameters can be changed while the MakeHuman application is running witho
 to reload the application.
 
 """
+
+import log
+
 #
-print 'Mitsuba Renderer Parameter File'
+log.message('Mitsuba Renderer Parameter File')
        
 # The output path defines the standard output directory and the generated include file name.
 # The default directory is mitsuba_output, within the MakeHuman installation directory.

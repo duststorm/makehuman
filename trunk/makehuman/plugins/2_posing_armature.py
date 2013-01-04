@@ -10,7 +10,7 @@
 
 **Authors:**           Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2011
+**Copyright(c):**      MakeHuman Team 2001-2013
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -795,10 +795,10 @@ def writeMat(fp, string, mat):
         
 
 def printArray(array):
-    print "["
+    log.debug("[")
     for row in array:
-        print " ", row
-    print "]"
+        log.debug(" %s" % row)
+    log.debug("]")
 
 #
 #   Loading

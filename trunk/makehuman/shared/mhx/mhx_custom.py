@@ -10,7 +10,7 @@
 
 **Authors:**           Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2009
+**Copyright(c):**      MakeHuman Team 2001-2013
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -25,6 +25,7 @@ import sys
 import os
 import mh
 from . import the
+import log
 
 
 def listCustomFiles(config):                    
@@ -72,7 +73,7 @@ def setupCustomRig(config):
     props = []
     
     for (path, modname) in config.customrigs:
-        print("Custom rig %s %s" % (path, modname))
+        log.message("Custom rig %s %s" % (path, modname))
         if path not in sys.path:
             sys.path.append(path)
             #print(sys.path)
@@ -82,18 +83,18 @@ def setupCustomRig(config):
         except:
             imported = False
         if True or not imported:    
-            print("Importing module %s" % modname)
+            log.message("Importing module %s" % modname)
             mod = __import__(modname)
             sys.modules[modname] = mod
-            print("%s imported" % mod)
+            log.message("%s imported" % mod)
         mod = sys.modules[modname]                
-        print("Adding %s.Joints" % modname)
+        log.message("Adding %s.Joints" % modname)
         joints += mod.Joints
-        print("Adding %s.HeadsTails" % modname)
+        log.message("Adding %s.HeadsTails" % modname)
         headsTails += mod.HeadsTails
-        print("Adding %s.Armature" % modname)
+        log.message("Adding %s.Armature" % modname)
         armature += mod.Armature
-        print("Adding %s.Properties" % modname)
+        log.message("Adding %s.Properties" % modname)
         props += mod.Properties
         
         

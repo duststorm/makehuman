@@ -11,7 +11,7 @@
 
 **Authors:**           Pedro Alcaide, aka povmaniaco
 
-**Copyright(c):**      MakeHuman Team 2001-2012
+**Copyright(c):**      MakeHuman Team 2001-2013
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -37,11 +37,12 @@ import mh
 from os.path import basename
 #
 import sys
+import log
 
 
 def MitsubaExport(obj, app, settings):
 
-    print 'Mitsuba Export object: ', obj.name
+    log.message('Mitsuba Export object: %s' % obj.name)
 
     # Read settings from an ini file. This reload enables the settings to be changed dynamically 
     # without forcing the user to restart the MH application for the changes to take effect.
@@ -183,7 +184,7 @@ def exportPly(obj, filename, exportGroups = True, groupFilter=None):
     f.write("end_header\n")
    
     uvs =[u for u in obj.uvValues]
-    print uvs[24]
+    log.debug(uvs[24])
     
     for v in obj.verts:
         # vertex

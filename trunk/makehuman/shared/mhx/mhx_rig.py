@@ -7,7 +7,7 @@
 
 **Authors:**           Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2009
+**Copyright(c):**      MakeHuman Team 2001-2013
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -28,6 +28,7 @@ import os
 import sys
 import mh2proxy
 import armature
+import log
 
 from . import the
 from the import *
@@ -256,7 +257,7 @@ def addBone24(bone, cond, roll, parent, flags, layers, bbone, fp):
 #
 
 def writeBoneGroups(fp, config):
-    print "BG", config.boneGroups
+    log.message("BG %s" % config.boneGroups)
     if not fp:
         return
     for (name, the.me) in config.boneGroups:
@@ -467,7 +468,7 @@ def setupRig(obj, config, proxyData):
     config.customShapes = {}
     config.poseInfo = {}
 
-    print "setupRig", config.rigtype
+    log.message("setupRig %s" % config.rigtype)
     if config.rigtype == 'mhx':
         config.boneGroups = [
             ('Master', 'THEME13'),
@@ -594,7 +595,7 @@ def setupRig(obj, config, proxyData):
             the.RigTail[bone] = findLocation(tail)
 
         appendRigBones(boneList, obj, "", L_MAIN, [], config)
-        print("BL", boneList[0])
+        log.debug("BL %s" % str(boneList[0]))
         config.boneGroups = []
         config.recalcRoll = []              
         config.vertexGroupFiles = []
@@ -603,7 +604,7 @@ def setupRig(obj, config, proxyData):
         config.objectProps = [("MhxRig", '"%s"' % config.rigtype)]
         config.armatureProps = []
         config.customProps = []
-        print("Default rig %s" % config.rigtype)
+        log.message("Default rig %s" % config.rigtype)
         return
 
     """        
@@ -695,7 +696,7 @@ def appendRigBones(boneList, obj, prefix, layer, body, config):
                         pt = options["-pt"]
                     except KeyError:
                         pt = None
-                    print(value, pt)
+                    log.debug("%s %s" % (value, pt))
                     value.append(pt)
                     addPoseInfo(bone, ("IK", value), config)
                 elif key == "-ik":
@@ -757,7 +758,7 @@ def writeControlPoses(fp, config):
                 inf = float(value[2])
                 pt = value[3]
                 if pt:
-                    print(goal, n, inf, pt)
+                    log.debug("%s %s %s" % (goal, n, inf, pt))
                     subtar = pt[0]
                     poleAngle = float(pt[1])
                     pt = (poleAngle, subtar)

@@ -12,7 +12,7 @@ POV-Ray Export parameters.
 
 **Authors:**           Chris Bartlett
 
-**Copyright(c):**      MakeHuman Team 2001-2011
+**Copyright(c):**      MakeHuman Team 2001-2013
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -27,7 +27,9 @@ to reload the application.
 
 """
 
-print 'POV-Ray Export Parameter File'
+import log
+
+log.message('POV-Ray Export Parameter File')
 
 # The output path defines the standard output directory and the generated include file name.
 # The default directory is pov_output, within the MakeHuman installation directory.

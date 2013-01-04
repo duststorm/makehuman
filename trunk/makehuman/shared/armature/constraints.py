@@ -7,7 +7,7 @@
 
 **Authors:**           Thomas Larsson
 
-**Copyright(c):**      MakeHuman Team 2001-2012
+**Copyright(c):**      MakeHuman Team 2001-2013
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -24,6 +24,7 @@ import numpy
 from numpy import dot
 from numpy.linalg import inv
 import transformations as tm
+import log
 
 import mhx
 from mhx import the
@@ -68,7 +69,7 @@ class CConstraint:
 
 
     def display(self):
-        print ("    <Constraint %s %s %.3g>" % (self.type, self.name, self.influence))
+        log.debug("    <Constraint %s %s %.3g>" % (self.type, self.name, self.influence))
         
 
     def write25(self, fp):
@@ -219,12 +220,12 @@ class CCopyRotConstraint(CConstraint):
                 az += self.influence*(bz-az)
             testbones = ["DfmUpArm1_L", "DfmUpArm2_L", "DfmLoArm1_L", "DfmLoArm2_L", "DfmLoArm3_L"]
             if bone.name in testbones:
-                print bone.name, target.name
-                print bone.matrixPose
-                print target.matrixPose
+                log.debug("%s %s" % (bone.name, target.name))
+                log.debug(str(bone.matrixPose))
+                log.debug(str(target.matrixPose))
             bone.matrixPose = tm.euler_matrix(ay, ax, az, axes='syxz')
             if bone.name in testbones:
-                print bone.matrixPose
+                log.debug(str(bone.matrixPose))
             bone.updateBone()
         
 
@@ -476,12 +477,12 @@ class CTransformConstraint(CConstraint):
             bone.matrixPose[:3,:3] = mat[:3,:3]
             bone.updateBone()
         return            
-        print "Transform", bone.name, target.name
-        print "Arad", arad
-        print "Brad", brad
-        print "P", bone.matrixPose
-        print "R", bone.matrixRest
-        print "G", bone.matrixGlobal
+        log.debug("Transform %s %s" % (bone.name, target.name))
+        log.debug("Arad %s" % arad)
+        log.debug("Brad %s" % brad)
+        log.debug("P %s" % bone.matrixPose)
+        log.debug("R %s" % bone.matrixRest)
+        log.debug("G %s" % bone.matrixGlobal)
         pass
 
 
@@ -797,8 +798,8 @@ def writeConstraints(fp, config, bname, constraints, lockLoc, lockRot):
             cns = CFloorConstraint(flags, inf, data)
             cns.write25(fp)
         else:
-            print(label)
-            print(typ)
+            log.message(label)
+            log.message(typ)
             raise NameError("Unknown constraint type %s" % typ)
     return (uses, mins, maxs)
 
@@ -856,8 +857,8 @@ def getConstraints(bname, cdefs, lockLoc, lockRot):
         elif typ == 'Floor':
             cns = CFloorConstraint(flags, inf, data)
         else:
-            print(label)
-            print(typ)
+            log.message(label)
+            log.message(typ)
             raise NameError("Unknown constraint type %s" % typ)
             
         constraints.append(cns)

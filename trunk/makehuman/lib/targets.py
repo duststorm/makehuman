@@ -1,5 +1,6 @@
 
 import os
+import log
 
 class Component(object):
     _cat_data = [
@@ -188,11 +189,11 @@ class TargetsExt(Targets):
         for name, group in self.groups.iteritems():
             categories = self.analyze_group(group)
             if categories:
-                print '%s: ' % (name,)
+                log.message('%s: ' % (name,))
                 for category, counts in categories:
-                    print ' %s: ' % category
+                    log.message(' %s: ' % category)
                     for value, count in counts:
-                        print '  %s: %d' % (value, count)
+                        log.message('  %s: %d' % (value, count))
 
     def tails(self):
         groups = {}

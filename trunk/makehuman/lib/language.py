@@ -1,5 +1,6 @@
 
 import os
+import log
 
 class Language(object):
     def __init__(self):
@@ -19,7 +20,7 @@ class Language(object):
             except:
                 import traceback
                 traceback.print_exc()
-                print('Error in language file %s' % language)
+                log.error('Error in language file %s' % language)
                 self.languageStrings = None
         self.language = language
         self.rtl = False

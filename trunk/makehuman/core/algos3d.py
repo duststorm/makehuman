@@ -12,7 +12,7 @@ MakeHuman 3D Transformation functions.
 
 **Authors:**           Manuel Bastioni, Marc Flerackers
 
-**Copyright(c):**      MakeHuman Team 2001-2011
+**Copyright(c):**      MakeHuman Team 2001-2013
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -861,9 +861,9 @@ def printBox(file, obj):
         if dz[0] > vert[2] : dz[0] = vert[2]
         if dz[1] < vert[2] : dz[1] = vert[2]
   
-   print " dx : ", dx
-   print " dy : ", dy
-   print " dz : ", dz
+   log.message(" dx : %s" % dx)
+   log.message(" dy : %s" % dy)
+   log.message(" dz : %s" % dz)
 
 def computeScale(oBox, file, obj):
    dx = []
