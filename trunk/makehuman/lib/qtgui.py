@@ -523,6 +523,7 @@ class ShortcutEdit(QtGui.QLabel, Widget):
             return
         self.setText(self.shortcutToLabel(mod, key))
         self.callEvent('onChanged', (mod, key))
+        event.accept()
 
     def shortcutToLabel(self, mod, key):
         seq = QtGui.QKeySequence(key + mod)

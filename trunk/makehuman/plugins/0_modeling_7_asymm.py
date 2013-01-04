@@ -186,16 +186,6 @@ class AsymmTaskView(gui3d.TaskView):
         self.asymmTopSlider.setValue(self.getSliderValue('top'))
         self.asymmTrunkSlider.setValue(self.getSliderValue('trunk'))
         self.asymmBreastSlider.setValue(self.getSliderValue('breast'))
-        
-    def onKeyDown(self, event):
-
-        # Undo redo
-        if event.key == mh.Keys.y:
-            gui3d.app.redo()
-        elif event.key == mh.Keys.z:
-            gui3d.app.undo()
-            
-        gui3d.TaskView.onKeyDown(self, event)
 
 def load(app):
     """

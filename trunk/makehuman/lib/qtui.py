@@ -256,43 +256,6 @@ class Canvas(QtOpenGL.QGLWidget):
 
         g_mouse_pos = (x, y)
 
-    def keyDown(self, key, character, modifiers):
-        self.callback('KeyDown', key, character, modifiers)
-
-    def keyUp(self, key, character, modifiers):
-        self.callback('KeyUp', key, character, modifiers)
-        gl.updatePickingBuffer()
-
-    def keyPressEvent(self, ev):
-        key = ev.key()
-        characters = ev.text()
-
-        if key in Keys._all:
-            self.keyDown(key, unicode(characters[:1]), getKeyModifiers())
-        elif characters:
-            for character in characters:
-                # ev.text() may hold multiple characters regardless of
-                #  WA_KeyCompression setting
-                character = unicode(character)
-                key = ord(character)
-                self.keyDown(key, character, getKeyModifiers())
-        else:
-            super(Canvas, self).keyPressEvent(ev)
-
-    def keyReleaseEvent(self, ev):
-        key = ev.key()
-        characters = ev.text()
-
-        if key in Keys._all:
-            self.keyUp(key, unicode(characters[:1]), getKeyModifiers())
-        elif characters:
-            character = characters[0]
-            character = unicode(character)
-            key = ord(character)
-            self.keyUp(key, character, getKeyModifiers())
-        else:
-            super(Canvas, self).keyReleaseEvent(ev)
-
     def initializeGL(self):
         gl.OnInit()
 
@@ -430,6 +393,9 @@ class Frame(QtGui.QWidget):
     def __init__(self, app, size):
         self.app = app
         super(Frame, self).__init__()
+
+        self.shortcuts = {}
+
         self.setWindowTitle(self.title)
         self.setAttribute(QtCore.Qt.WA_PaintOnScreen)
         self.setAttribute(QtCore.Qt.WA_OpaquePaintEvent)
@@ -565,6 +531,18 @@ class Frame(QtGui.QWidget):
         for child in QtGui.QWidget.children(widget):
             if child.isWidgetType():
                 self.refreshLayout(child)
+
+    def setShortcut(self, modifier, key, method):
+        sequence = QtGui.QKeySequence(modifier + key)
+
+        if method in self.shortcuts:
+            self.shortcuts[method].setKey(sequence)
+            return
+                
+        shortcut = QtGui.QShortcut(sequence, self)
+        shortcut.setContext(QtCore.Qt.ApplicationShortcut)
+        self.connect(shortcut, QtCore.SIGNAL("activated()"), method)
+        self.shortcuts[method] = shortcut
 
 class Application(QtGui.QApplication, events3d.EventHandler):
     def __init__(self):

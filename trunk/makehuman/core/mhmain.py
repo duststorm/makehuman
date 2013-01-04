@@ -487,22 +487,6 @@ class MHApplication(gui3d.Application, mh.Application):
             else:
                 self.zoomIn()
 
-    def onKeyDown(self, event):
-
-        # Normalize modifiers
-        modifiers = event.modifiers & (mh.Modifiers.CTRL | mh.Modifiers.ALT)
-
-        if modifiers & mh.Modifiers.CTRL:
-            modifiers |= mh.Modifiers.CTRL
-        if modifiers & mh.Modifiers.ALT:
-            modifiers |= mh.Modifiers.ALT
-
-        # Normalize key
-        key = event.key
-
-        if (modifiers, key) in self.shortcuts:
-            self.shortcuts[(modifiers, key)]()
-
     # Undo-redo
     def do(self, action):
         if action.do():
@@ -831,6 +815,7 @@ class MHApplication(gui3d.Application, mh.Application):
                 break
 
         self.shortcuts[shortcut] = method
+        mh.setShortcut(modifier, key, method)
 
         #for shortcut, m in self.shortcuts.iteritems():
         #    print shortcut, m
@@ -1080,6 +1065,10 @@ class MHApplication(gui3d.Application, mh.Application):
         else:
             self.stop()
 
+    def createShortcuts(self):
+        for (modifier, key), method in self.shortcuts.iteritems():
+            mh.setShortcut(modifier, key, method)
+
     def OnInit(self):
         mh.Application.OnInit(self)
 
@@ -1088,6 +1077,7 @@ class MHApplication(gui3d.Application, mh.Application):
         self.setLanguage("english")
 
         self.loadSettings()
+        self.createShortcuts()
 
         self.splash = gui.SplashScreen(gui3d.app.getThemeResource('images', 'splash.png'))
         self.splash.show()

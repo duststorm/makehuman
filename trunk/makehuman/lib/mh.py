@@ -95,3 +95,6 @@ def addObject(obj):
 
 def removeObject(obj):
     G.world.remove(obj)
+
+def setShortcut(modifier, key, method):
+    G.app.mainwin.setShortcut(modifier, key, method)

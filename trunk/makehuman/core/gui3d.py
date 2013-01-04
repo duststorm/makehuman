@@ -269,12 +269,6 @@ class Object(events3d.EventHandler):
     def onMouseWheel(self, event):
         self._view().callEvent('onMouseWheel', event)
 
-    def onKeyDown(self, event):
-        self._view().callEvent('onKeyDown', event)
-
-    def onKeyUp(self, event):
-        self._view().callEvent('onKeyDown', event)
-
 class View(events3d.EventHandler):
 
     """
@@ -451,12 +445,6 @@ class View(events3d.EventHandler):
 
     def onMouseWheel(self, event):
         self.parent.callEvent('onMouseWheel', event)
-
-    def onKeyDown(self, event):
-        self.parent.callEvent('onKeyDown', event)
-
-    def onKeyUp(self, event):
-        self.parent.callEvent('onKeyUp', event)
 
     def addTopWidget(self, widget):
         mh.addTopWidget(widget)
@@ -815,16 +803,6 @@ class Application(events3d.EventHandler):
         event = events3d.MouseWheelEvent(wheelDelta)
         if self.currentTask:
             self.currentTask.callEvent('onMouseWheel', event)
-
-    def onKeyDownCallback(self, key, character, modifiers):
-        event = events3d.KeyEvent(key, character, modifiers)
-        if self.currentTask:
-            self.currentTask.callEvent('onKeyDown', event)
-
-    def onKeyUpCallback(self, key, character, modifiers):
-        event = events3d.KeyEvent(key, character, modifiers)
-        if self.currentTask:
-            self.currentTask.callEvent('onKeyUp', event)
             
     def onResizedCallback(self, width, height, fullscreen):
         if self.fullscreen != fullscreen:
