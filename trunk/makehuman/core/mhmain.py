@@ -443,7 +443,10 @@ class MHApplication(gui3d.Application, mh.Application):
         yield None
 
         sys.stdout = old_stdout
-        self.splash.finish(self.mainwin)
+        if sys.platform.startswith("darwin"):
+            self.splash.hide()
+        else:
+            self.splash.finish(self.mainwin)
 
     def nextStartupTask(self):
         if not next(self.tasks, True):
