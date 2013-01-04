@@ -91,7 +91,7 @@ class Targets(object):
     def walk(self, root, base = None):
         dirs = os.listdir(root)
         for name in sorted(dirs):
-            path = os.path.join(root, name)
+            path = os.path.join(root, name).replace('\\','/')
             if os.path.isfile(path) and not path.lower().endswith('.target'):
                 if path.lower().endswith('.png'):
                     self.images[name.lower()] = path

@@ -725,7 +725,6 @@ class MacroTaskView(ModifierTaskView):
         ]
 
 def load(app):
-    return
     category = app.getCategory('Modelling2')
 
     gui3d.app.noSetCamera = (lambda: None)
