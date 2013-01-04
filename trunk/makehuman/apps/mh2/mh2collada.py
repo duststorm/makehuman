@@ -8,9 +8,9 @@
 
 **Code Home Page:**    http://code.google.com/p/makehuman/
 
-**Authors:**           Thomas Larsson
+**Authors:**           Thomas Larsson, Jonas Hauquier
 
-**Copyright(c):**      MakeHuman Team 2001-2011
+**Copyright(c):**      MakeHuman Team 2001-2013
 
 **Licensing:**         GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)
 
@@ -383,7 +383,18 @@ def exportDae(human, name, fp):
 def writeImages(obj, fp, stuff, human):
     if stuff.type:
         if stuff.texture:
-            textures = [stuff.texture]
+            if stuff.proxy:
+                proxy = stuff.proxy
+                uuid = proxy.getUuid()
+                if uuid in human.clothesObjs.keys() and human.clothesObjs[uuid]:
+                    clothesObj = human.clothesObjs[uuid]
+                    texture = clothesObj.mesh.texture
+                    texPath = (os.path.dirname(texture), os.path.basename(texture))
+                    textures = [texPath]
+                else:
+                    textures = [stuff.texture]
+            else:
+                textures = [stuff.texture]
         else:
             return
         human = None
