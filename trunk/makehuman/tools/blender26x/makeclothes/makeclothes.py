@@ -1887,10 +1887,20 @@ def exportImage(img, matname, fp):
     imgName = img.name
     if imgName == 'Render_Result':
         return
+
+    (major, minor, rev) = bpy.app.version
+    if major == 2 and minor == 65 and rev < 5:
+        if img.use_premultiply:
+            alphaMode = 'PREMUL'
+        else:
+            alphaMode = 'SKY'
+    else:
+        alphaMode = img.alpha_mode
+
     fp.write(
 "Image %s\n" % imgName +
 "  Filename %s ;\n" % os.path.basename(img.filepath) +
-"  alpha_mode '%s' ;\n" %  img.alpha_mode +
+"  alpha_mode '%s' ;\n" %  alphaMode +
 "end Image\n\n")
     return
 

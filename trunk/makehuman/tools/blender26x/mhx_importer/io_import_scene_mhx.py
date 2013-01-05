@@ -2353,11 +2353,28 @@ def defaultKey(ext, args, tokens, var, exclude, glbals, lcals):
 
     #print(var, ext, data)
     expr = "%s = %s" % (nvar, data)
+    expr = compat(expr)
     try:
         exec(expr, glbals, lcals)
     except:
         pushOnTodoList(var, expr, glbals, lcals)
     return
+
+#
+# Translation of expressions to be compatible with older Blender APIs
+#
+
+def compat(expression):
+    (major, minor, rev) = bpy.app.version
+    if major == 2 and minor == 65 and rev < 5:
+        if expression == "img.alpha_mode = 'PREMUL'":
+            return "img.use_premultiply = True"
+        if expression == "img.alpha_mode = 'STRAIGHT'":
+            return "img.use_premultiply = False"
+        if expression == "img.alpha_mode = 'SKY'":
+            return "img.use_premultiply = False"
+
+    return expression
 
 #
 #
