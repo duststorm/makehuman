@@ -125,6 +125,9 @@ class ClothesTaskView(gui3d.TaskView):
             return
 
         mesh = files3d.loadMesh(obj)
+        if not mesh:
+            log.error("Could not load mesh for clothing object %s", proxy.name)
+            return
         if proxy.texture:
             (dir, name) = proxy.texture
             tex = os.path.join(folder, name)
