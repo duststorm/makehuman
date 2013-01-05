@@ -74,7 +74,7 @@ def povrayExport(obj, app, settings):
   
   """
 
-    log.message('POV-Ray Export of object: %s' % obj.name)
+    log.message('POV-Ray Export of object: %s', obj.name)
 
     # Read settings from an ini file. This reload enables the settings to be
     # changed dynamically without forcing the user to restart the MH
@@ -101,7 +101,7 @@ def povrayExport(obj, app, settings):
 
     outputDirectory = os.path.dirname(path)
     #
-    log.debug('out folder: %s' % outputDirectory)
+    log.debug('out folder: %s', outputDirectory)
 
     # Export the hair model as a set of spline definitions.
     # Load the test hair data and write it out in POV-Ray format.
@@ -129,7 +129,7 @@ def povrayExport(obj, app, settings):
         elif exetype == 'linux':
             povray_bin += '/povray'
         #
-        log.debug('Povray path: %s' % povray_bin)
+        log.debug('Povray path: %s', povray_bin)
         #TO-DO: que hacer si el path es demasiado largo? Hay una opcion grafica en SDL para buscar archivos?
         #~[en]: what to do if the path is too long? Is there any graphic option in SDL to browse for files?
 
@@ -900,8 +900,8 @@ def povrayWriteHairs(outputDirectory, mesh):
 
     hairFile.write('}')
     hairFile.close()
-    log.message('Totals hairs written: %s' % totalNumberOfHairs)
-    log.message('Number of tufts %s' % len(hairsClass.hairStyle))
+    log.message('Totals hairs written: %s', totalNumberOfHairs)
+    log.message('Number of tufts %s', len(hairsClass.hairStyle))
 
 
 #--------------------------------------------------------------------------

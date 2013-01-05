@@ -212,11 +212,11 @@ class TargetsExt(Targets):
         for name, group in self.groups.iteritems():
             categories = self.analyze_group(group)
             if categories:
-                log.message('%s: ' % (name,))
+                log.message('%s: ', (name,))
                 for category, counts in categories:
-                    log.message(' %s: ' % category)
+                    log.message(' %s: ', category)
                     for value, count in counts:
-                        log.message('  %s: %d' % (value, count))
+                        log.message('  %s: %d', (value, count))
 
     def tails(self):
         groups = {}

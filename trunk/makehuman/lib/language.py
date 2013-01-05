@@ -45,7 +45,7 @@ class Language(object):
             except:
                 import traceback
                 traceback.print_exc()
-                log.error('Error in language file %s' % language)
+                log.error('Error in language file %s', language)
                 self.languageStrings = None
         self.language = language
         self.rtl = False

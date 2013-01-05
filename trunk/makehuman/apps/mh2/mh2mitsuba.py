@@ -42,7 +42,7 @@ import log
 
 def MitsubaExport(obj, app, settings):
 
-    log.message('Mitsuba Export object: %s' % obj.name)
+    log.message('Mitsuba Export object: %s', obj.name)
 
     # Read settings from an ini file. This reload enables the settings to be changed dynamically 
     # without forcing the user to restart the MH application for the changes to take effect.

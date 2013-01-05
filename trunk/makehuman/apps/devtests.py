@@ -34,7 +34,7 @@ def testAnimation(self):
     # TODO: move this in a test module
 
     x = self.basemesh.x + .01
-    log.message('animation test %s' % x)
+    log.message('animation test %s', x)
     self.basemesh.setLoc(x, self.basemesh.y, self.basemesh.z)
     self.scene.redraw()
 

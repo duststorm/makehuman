@@ -161,7 +161,7 @@ class Hairs:
             #objFile = files.open(files.namelist()[0])
             fileDescriptor = open(name+".hair")
         except:
-            log.error('Unable to load .obj and .hair file of %s' % name)
+            log.error('Unable to load .obj and .hair file of %s', name)
             return
         
         #self.resetHairs()
