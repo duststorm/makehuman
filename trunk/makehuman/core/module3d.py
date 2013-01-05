@@ -480,6 +480,8 @@ class Object3D(object):
     def _update_faces(self):
         for i, f in enumerate(self.fvert):
             for v in f:
+                if i in self.vface[v,:self.nfaces[v]]:
+                    continue
                 self.vface[v, self.nfaces[v]] = i
                 self.nfaces[v] += 1
 
