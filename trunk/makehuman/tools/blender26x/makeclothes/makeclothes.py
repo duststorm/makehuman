@@ -20,8 +20,8 @@
 # Product Home Page:   http://www.makehuman.org/
 # Code Home Page:      http://code.google.com/p/makehuman/
 # Authors:             Thomas Larsson
-# Script copyright (C) MakeHuman Team 2001-2013
-# Coding Standards:    See http://www.makehuman.org/node/165
+# Script copyright (C) MakeHuman Team 2001-2011
+# Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
 #
 # Abstract
 # Utility for making clothes to MH characters.
@@ -1890,7 +1890,7 @@ def exportImage(img, matname, fp):
     fp.write(
 "Image %s\n" % imgName +
 "  Filename %s ;\n" % os.path.basename(img.filepath) +
-"    use_premultiply %s ;\n" %  img.use_premultiply +
+"  alpha_mode '%s' ;\n" %  img.alpha_mode +
 "end Image\n\n")
     return
 
@@ -2603,7 +2603,7 @@ def initInterface():
     
     bpy.types.Scene.MCLicense = StringProperty(
         name="License", 
-        default="GPL3 (see also http://www.makehuman.org/node/318)",
+        default="GPL3 (see also http://sites.google.com/site/makehumandocs/licensing)",
         maxlen=256)
     
     bpy.types.Scene.MCHomePage = StringProperty(

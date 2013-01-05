@@ -578,7 +578,7 @@ def addMaskImage(fp, config, mask):
     fp.write(
 "Image %s\n" % file +
 "  Filename %s ;\n" % path +
-"  use_premultiply True ;\n" +
+"  alpha_mode 'PREMUL' ;\n" +
 "end Image\n\n" +
 "Texture %s IMAGE\n" % file  +
 "  Image %s ;\n" % file +
@@ -865,7 +865,7 @@ def writeProxyTexture(fp, texture, mat, extra, config):
     fp.write(
 "Image %s\n" % texname +
 "  Filename %s ;\n" % texfile +
-"  use_premultiply True ;\n" +
+"  alpha_mode 'PREMUL' ;\n" +
 "end Image\n\n" +
 "Texture %s IMAGE\n" % texname +
 "  Image %s ;\n" % texname)
@@ -1241,7 +1241,7 @@ def writeMultiMaterials(uvset, human, config, fp):
             file = export_config.getOutFileName(name, folder, True, human, config)
             fp.write(
                 "  Filename %s ;\n" % file +
-                "  use_premultiply True ;\n" +
+                "  alpha_mode 'PREMUL' ;\n" +
                 "end Image\n\n" +
                 "Texture %s IMAGE\n" % name +
                 "  Image %s ;\n" % name +

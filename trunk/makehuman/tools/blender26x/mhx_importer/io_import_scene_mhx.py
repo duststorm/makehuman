@@ -20,8 +20,8 @@
 # Product Home Page:   http://www.makehuman.org/
 # Code Home Page:      http://code.google.com/p/makehuman/
 # Authors:             Thomas Larsson
-# Script copyright (C) MakeHuman Team 2001-2013
-# Coding Standards:    See http://www.makehuman.org/node/165
+# Script copyright (C) MakeHuman Team 2001-2011
+# Coding Standards:    See http://sites.google.com/site/makehumandocs/developers-guide
 
 """
 Abstract
@@ -840,7 +840,7 @@ def parseTexture(args, tokens):
             tex.use_nodes = True
             parseNodeTree(tex.node_tree, val, sub)
         else:
-            defaultKey(key, val,  sub, "tex", ['use_nodes', 'use_textures', 'contrast'], globals(), locals())
+            defaultKey(key, val,  sub, "tex", ['use_nodes', 'use_textures', 'contrast', 'use_alpha'], globals(), locals())
 
     return tex
 
@@ -998,7 +998,7 @@ def parseImage(args, tokens):
                 return None
             img.name = imgName
         else:
-            defaultKey(key, val,  sub, "img", ['depth', 'dirty', 'has_data', 'size', 'type'], globals(), locals())
+            defaultKey(key, val,  sub, "img", ['depth', 'dirty', 'has_data', 'size', 'type', 'use_premultiply'], globals(), locals())
     print ("Image %s" % img )
     loadedData['Image'][imgName] = img
     return img
