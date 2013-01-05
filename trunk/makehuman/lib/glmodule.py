@@ -211,7 +211,7 @@ def OnInit():
         debugdump.appendMessage("GL.RENDERER: " + glGetString(GL_RENDERER))
         debugdump.appendMessage("GL.VERSION: " + glGetString(GL_VERSION))
     except Exception as e:
-        log.error("Failed to GL debug info to debug dump: %s" % format(str(e)))
+        log.error("Failed to GL debug info to debug dump: %s", format(str(e)))
 
     # Lights and materials
     lightPos = A( -10.99, 20.0, 20.0, 1.0)  # Light - Position

@@ -152,7 +152,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
 
     def compileWarpTarget(self, human):
         global ShadowCoords
-        log.message("Compile %s" % self)
+        log.message("Compile %s", self)
         landmarks = theLandMarks[self.bodypart]
         objectChanged = self.getRefObject(human)
         self.getRefTarget(human, objectChanged)    
@@ -202,7 +202,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
         for data in self.paths:
             cval = reduce(mul, [factors[factor] for factor in data[1]])
             if cval > 0:
-                log.debug("  reftrg %s %s" % (data[0], cval))
+                log.debug("  reftrg %s %s", data[0], cval)
                 madeRefTarget = True
                 verts = self.getTargetInsist(data[0])
                 if verts is not None:
@@ -218,7 +218,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
             
         for string in ["flaccid", "muscle", "light", "heavy"]:
             if string in target:
-                log.message("  Did not find %s" % target)
+                log.message("  Did not find %s", target)
                 return None
     
         target1 = target.replace("asian", "caucasian").replace("neutral", "caucasian").replace("african", "caucasian")
@@ -226,14 +226,14 @@ class WarpModifier (humanmodifier.SimpleModifier):
         verts = self.getTarget(target1)
         if verts is not None:
             self.refTargets[target] = verts
-            log.message("   Replaced %s\n  -> %s" % (target, target1))
+            log.message("   Replaced %s\n  -> %s", target, target1)
             return verts
             
         target2 = target1.replace("child", "young").replace("old", "young")
         verts = self.getTarget(target2)
         if verts is not None:
             self.refTargets[target] = verts
-            log.message("   Replaced %s\n  -> %s" % (target, target2))
+            log.message("   Replaced %s\n  -> %s", target, target2)
             return verts
             
         target3 = target2.replace("male", "female")
@@ -241,9 +241,9 @@ class WarpModifier (humanmodifier.SimpleModifier):
         verts = self.getTarget(target3)
         self.refTargets[target] = verts
         if verts is None:
-            log.message("Warning: Found none of:\n    %s\n    %s\n    %s\n    %s" % (target, target1, target2, target3))
+            log.message("Warning: Found none of:\n    %s\n    %s\n    %s\n    %s", target, target1, target2, target3)
         else:
-            log.message("   Replaced %s\n  -> %s" % (target, target3))        
+            log.message("   Replaced %s\n  -> %s", target, target3)        
         return verts
 
 
@@ -265,7 +265,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
     
         if target:
             if not hasattr(target, "isWarp"):
-                log.message("Found non-warp target: %s. Deleted" % target.name)
+                log.message("Found non-warp target: %s. Deleted", target.name)
                 del algos3d.targetBuffer[self.warppath]
                 return None
                 #raise NameError("%s should be warp" % target)
@@ -295,7 +295,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
             for char in theRefObjects.keys():
                 cval = human.getDetail(char)
                 if cval:
-                    log.debug("  refobj %s %s" % (os.path.basename(char), cval))
+                    log.debug("  refobj %s %s", os.path.basename(char), cval)
                     verts = self.getRefObjectVerts(char)
                     if verts is not None:
                         refverts = addVerts(refverts, cval, verts)
@@ -357,7 +357,7 @@ def removeAllWarpTargets(human):
     log.message("Removing all warp targets")
     for target in algos3d.targetBuffer.values():
         if hasattr(target, "isWarp"):
-            log.message("  %s" % target)
+            log.message("  %s", target)
             target.isDirty = True
             target.isObsolete = True
             human.setDetail(target.name, 0)

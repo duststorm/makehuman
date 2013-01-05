@@ -119,7 +119,7 @@ class CProxy:
                 verts.append( parent.verts[refVert].co )
                 
         obj.changeCoords(verts)      
-        log.debug("clo %s" % str((xScale, yScale, zScale)) )
+        log.debug("clo %s", str((xScale, yScale, zScale)) )
         
 
     def getUuid(self):
@@ -209,7 +209,7 @@ def readProxyFile(obj, file, evalOnLoad):
     except:
         tmpl = None
     if tmpl == None:
-        log.error("*** Cannot open %s" % pfile.file)
+        log.error("*** Cannot open %s", pfile.file)
         return None
         return CProxy(None, pfile.type, pfile.layer)
 
@@ -506,7 +506,7 @@ def copyObjFile(proxy):
     try:
         tmpl = open(objpath, "rU")
     except:
-        log.error("*** Cannot open %s" % objpath)
+        log.error("*** Cannot open %s", objpath)
         return False
 
     proxy.texVerts = []

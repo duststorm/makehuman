@@ -115,7 +115,7 @@ class CArmature:
         return ("  <CArmature %s>" % self.name)
         
     def display(self):
-        log.debug("<CArmature %s" % self.name)
+        log.debug("<CArmature %s", self.name)
         for bone in self.boneList:
             bone.display()
         log.debug(">")
@@ -126,12 +126,12 @@ class CArmature:
         string = ""
         for word in words:
             string += ("%s " % word)
-        log.debug(string)
+        log.debug("%s", string)
         verts = self.human.meshData.verts
         for vn in [3825]:
             x = verts[vn].co
             y = self.restCoords[vn]
-            log.debug("   %d (%.4f %.4f %.4f) (%.4f %.4f %.4f)" % (vn, x[0], x[1], x[2], y[0], y[1], y[2]))
+            log.debug("   %d (%.4f %.4f %.4f) (%.4f %.4f %.4f)", vn, x[0], x[1], x[2], y[0], y[1], y[2])
 
 
     def assignDrivers(self, drivers):
@@ -145,7 +145,7 @@ class CArmature:
     def listPose(self):
         for bone in self.boneList:
             quat = tm.quaternion_from_matrix(bone.matrixPose)
-            log.debug("  %s %s" % (bone.name, quat))
+            log.debug("  %s %s", bone.name, quat)
 
 
     def clear(self, update=False):
@@ -181,15 +181,15 @@ class CArmature:
         
 
     def rebuild(self, update=True):   
-        log.message("Rebuild %s %s %s" % (self, update, self.config.rigtype))
+        log.message("Rebuild %s %s %s", self, update, self.config.rigtype)
         obj = self.human.meshData
         proxyData = {}
         mhx.mhx_rig.setupRig(obj, self.config, proxyData)
-        log.debug("RHT %s %s" % (the.RigHead["Root"], the.RigTail["Root"]))
+        log.debug("RHT %s %s", the.RigHead["Root"], the.RigTail["Root"])
         for bone in self.boneList:
             bone.rebuild()
             if bone.name in []:
-                log.debug("%s %s %s" % (bone.name, bone.head, bone.tail))
+                log.debug("%s %s %s", bone.name, bone.head, bone.tail)
                 #print "R", bone.matrixRest
                 #print "P", bone.matrixPose
                 #print "G", bone.matrixGlobal
@@ -201,7 +201,7 @@ class CArmature:
 
 
     def syncRestVerts(self, caller):
-        log.message("Synch rest verts: %s" % caller)
+        log.message("Synch rest verts: %s", caller)
         #nVerts = len(self.restVerts)
         self.restCoords[:,:3] = warpmodifier.getWarpedCoords()
         #for n in range(nVerts):
@@ -360,7 +360,7 @@ class CArmature:
             
             
     def readMhpFile(self, filepath):
-        log.message("Mhp %s" % filepath)
+        log.message("Mhp %s", filepath)
         fp = open(filepath, "rU")
         for line in fp:
             words = line.split()
@@ -378,7 +378,7 @@ class CArmature:
 
 
     def readBvhFile(self, filepath):
-        log.message("Bvh %s" % filepath)
+        log.message("Bvh %s", filepath)
         fp = open(filepath, "rU")
         bones = []
         motion = False
@@ -461,14 +461,14 @@ class CArmature:
                     bone.matrixPose[2,3] = rz
 
             if bone.name in []:
-                log.debug("%s %s" % (bone.name, order))
-                log.debug(str(channels))
-                log.debug("%s %s %s" % (ax/D, ay/D, az/D))
-                log.debug("R %s" % bone.matrixRest)
-                log.debug("M1 %s" % mat1)
-                log.debug("M2 %s" % mat2)
-                log.debug("P %s" % bone.matrixPose)
-                log.debug("G %s" % bone.matrixGlobal)
+                log.debug("%s %s", bone.name, order)
+                log.debug("%s", str(channels))
+                log.debug("%s %s %s", ax/D, ay/D, az/D)
+                log.debug("R %s", bone.matrixRest)
+                log.debug("M1 %s", mat1)
+                log.debug("M2 %s", mat2)
+                log.debug("P %s", bone.matrixPose)
+                log.debug("G %s", bone.matrixGlobal)
 
         self.update()                    
 
@@ -559,8 +559,8 @@ class CBone:
         try:
             self.matrixVerts = dot(self.matrixGlobal, inv(self.matrixRest))
         except:
-            log.debug(self.name, self.head, self.tail)
-            log.debug(self.matrixRest)
+            log.debug("%s %s %s", self.name, self.head, self.tail)
+            log.debug("%s", self.matrixRest)
             halt
                        
 
@@ -601,11 +601,11 @@ class CBone:
     def setRotationIndex(self, index, angle, useQuat):
         if useQuat:
             quat = tm.quaternion_from_matrix(self.matrixPose)
-            log.debug(str(quat))
+            log.debug("%s", str(quat))
             quat[index] = angle/1000
-            log.debug(str(quat))
+            log.debug("%s", str(quat))
             normalizeQuaternion(quat)
-            log.debug(str(quat))
+            log.debug("%s", str(quat))
             self.matrixPose = tm.quaternion_matrix(quat)
             return quat[0]*1000    
         else:
@@ -646,10 +646,10 @@ class CBone:
         pose = self.getPoseFromGlobal()
 
         if 0 and self.name in ["DfmKneeBack_L", "DfmLoLeg_L"]:
-            log.debug("Stretch %s" % self.name)
-            log.debug("G %s" % goal)
-            log.debug("M1 %s" % self.matrixGlobal)
-            log.debug("P1 %s" % pose)
+            log.debug("Stretch %s", self.name)
+            log.debug("G %s", goal)
+            log.debug("M1 %s", self.matrixGlobal)
+            log.debug("P1 %s", pose)
 
         az,ay,ax = tm.euler_from_matrix(pose, axes='szyx')
         rot = tm.rotation_matrix(-ay + self.roll, CBone.Axes[1])
@@ -657,10 +657,10 @@ class CBone:
         pose2 = self.getPoseFromGlobal()
         
         if 0 and self.name in ["DfmKneeBack_L", "DfmLoLeg_L"]:
-            log.debug("A %s %s %s" % (ax, ay, az))
-            log.debug("R %s" % rot)
-            log.debug("M2 %s" % self.matrixGlobal)
-            log.debug("P2 %s" % pose)
+            log.debug("A %s %s %s", ax, ay, az)
+            log.debug("R %s", rot)
+            log.debug("M2 %s", self.matrixGlobal)
+            log.debug("P2 %s", pose)
             log.debug("")
 
 
@@ -682,15 +682,15 @@ class CBone:
             
             if 0 and self.name == "DfmUpArm2_L":
                 log.debug("")
-                log.debug("IK %s" % self.name)
-                log.debug("X %s" % xvec)
-                log.debug("Y %s" % yvec)
-                log.debug("Z %s" % zvec)
-                log.debug("A0 %s" % angle0)
-                log.debug("A %s" % angle)
-                log.debug("R %s" % rot)
-                log.debug("M0 %s" % m0)
-                log.debug("M %s" % self.matrixGlobal)
+                log.debug("IK %s", self.name)
+                log.debug("X %s", xvec)
+                log.debug("Y %s", yvec)
+                log.debug("Z %s", zvec)
+                log.debug("A0 %s", angle0)
+                log.debug("A %s", angle)
+                log.debug("R %s", rot)
+                log.debug("M0 %s", m0)
+                log.debug("M %s", self.matrixGlobal)
 
 
     def getPoseFromGlobal(self):
@@ -813,13 +813,13 @@ class CBone:
     #
     
     def display(self):
-        log.debug("  <CBone %s" % self.name)
-        log.debug("    head: (%.4g %.4g %.4g)" % (self.head[0], self.head[1], self.head[2]))
-        log.debug("    tail: (%.4g %.4g %.4g)" % (self.tail[0], self.tail[1], self.tail[2]))
-        log.debug("    roll: %s" % self.roll)
-        log.debug("    parent: %s" % self.parent)
-        log.debug("    conn: %s" % self.conn)
-        log.debug("    deform: %s" % self.deform)
+        log.debug("  <CBone %s", self.name)
+        log.debug("    head: (%.4g %.4g %.4g)", self.head[0], self.head[1], self.head[2])
+        log.debug("    tail: (%.4g %.4g %.4g)", self.tail[0], self.tail[1], self.tail[2])
+        log.debug("    roll: %s", self.roll)
+        log.debug("    parent: %s", self.parent)
+        log.debug("    conn: %s", self.conn)
+        log.debug("    deform: %s", self.deform)
 
         log.debug("    constraints: [")
         for cns in self.constraints:
@@ -834,14 +834,14 @@ class CBone:
 
     def printMats(self):
         log.debug(self.name)
-        log.debug("H4 %s" % self.head4)
-        log.debug("T4 %s" % self.tail4)
-        log.debug("RM %s" % self.matrixRest)
-        log.debug("RV %s" % dot(self.matrixRest, self.yvector4))
-        log.debug("P %s" % self.matrixPose)
-        log.debug("Rel %s" % self.matrixRelative)
-        log.debug("G %s" % self.matrixGlobal)
-        log.debug("GV %s" % dot(self.matrixGlobal, self.yvector4))
+        log.debug("H4 %s", self.head4)
+        log.debug("T4 %s", self.tail4)
+        log.debug("RM %s", self.matrixRest)
+        log.debug("RV %s", dot(self.matrixRest, self.yvector4))
+        log.debug("P %s", self.matrixPose)
+        log.debug("Rel %s", self.matrixRelative)
+        log.debug("G %s", self.matrixGlobal)
+        log.debug("GV %s", dot(self.matrixGlobal, self.yvector4))
             
 #
 #

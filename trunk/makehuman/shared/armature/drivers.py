@@ -39,7 +39,7 @@ class CTarget:
             (self.idtype, self.object, self.datapath) = target
         
     def display(self):
-        log.debug("      <CTarget %s %s>" % (self.idtype, self.object))
+        log.debug("      <CTarget %s %s>", self.idtype, self.object)
                         
     def write25(self, fp):
         fp.write("          Target %s %s\n" % (self.object, self.idtype))
@@ -79,7 +79,7 @@ class CVariable:
             raise NameError("Unknown driver var type %s" % self.type)
         
     def display(self):
-        log.debug("    <CVariable %s %s" % (self.name, self.type))
+        log.debug("    <CVariable %s %s", self.name, self.type)
         for target in self.targets:
             target.display()
         log.debug("    >")
@@ -110,7 +110,7 @@ class CDriver:
             self.variables.append( CVariable(var, self, type, targets) )    
 
     def display(self):
-        log.debug("  <CDriver %s %d" % (self.channel, self.index))
+        log.debug("  <CDriver %s %d", self.channel, self.index)
         for var in self.variables:
             var.display()
         log.debug("  >")
@@ -322,7 +322,7 @@ def writeDrivers(fp, cond, drivers):
             drv = writeDriver(fp, cond, drvdata, "", "pose.bones[\"%s\"].scale" % bone, index, coeffs, variables)
         else:
             log.message(drv)
-            raise NameError("Unknown driver type %s" % typ)
+            raise NameError("Unknown driver type %s", typ)
         driverList.append(drv)
     return driverList
 

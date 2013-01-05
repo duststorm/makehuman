@@ -794,7 +794,7 @@ def writeMat(fp, string, mat):
 def printArray(array):
     log.debug("[")
     for row in array:
-        log.debug(" %s" % row)
+        log.debug(" %s", row)
     log.debug("]")
 
 #

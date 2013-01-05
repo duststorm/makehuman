@@ -32,7 +32,6 @@ import math
 import re
 import numpy as np
 import gui
-import log
 
 class DetailAction:
 
