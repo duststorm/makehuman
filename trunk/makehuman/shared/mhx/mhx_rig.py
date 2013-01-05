@@ -260,7 +260,7 @@ def addBone24(bone, cond, roll, parent, flags, layers, bbone, fp):
 #
 
 def writeBoneGroups(fp, config):
-    log.message("BG %s" % config.boneGroups)
+    log.message("BG %s", config.boneGroups)
     if not fp:
         return
     for (name, the.me) in config.boneGroups:
@@ -471,7 +471,7 @@ def setupRig(obj, config, proxyData):
     config.customShapes = {}
     config.poseInfo = {}
 
-    log.message("setupRig %s" % config.rigtype)
+    log.message("setupRig %s", config.rigtype)
     if config.rigtype == 'mhx':
         config.boneGroups = [
             ('Master', 'THEME13'),
@@ -598,7 +598,7 @@ def setupRig(obj, config, proxyData):
             the.RigTail[bone] = findLocation(tail)
 
         appendRigBones(boneList, obj, "", L_MAIN, [], config)
-        log.debug("BL %s" % str(boneList[0]))
+        log.debug("BL %s", str(boneList[0]))
         config.boneGroups = []
         config.recalcRoll = []              
         config.vertexGroupFiles = []
@@ -607,7 +607,7 @@ def setupRig(obj, config, proxyData):
         config.objectProps = [("MhxRig", '"%s"' % config.rigtype)]
         config.armatureProps = []
         config.customProps = []
-        log.message("Default rig %s" % config.rigtype)
+        log.message("Default rig %s", config.rigtype)
         return
 
     """        
@@ -699,7 +699,7 @@ def appendRigBones(boneList, obj, prefix, layer, body, config):
                         pt = options["-pt"]
                     except KeyError:
                         pt = None
-                    log.debug("%s %s" % (value, pt))
+                    log.debug("%s %s", value, pt)
                     value.append(pt)
                     addPoseInfo(bone, ("IK", value), config)
                 elif key == "-ik":
@@ -761,7 +761,7 @@ def writeControlPoses(fp, config):
                 inf = float(value[2])
                 pt = value[3]
                 if pt:
-                    log.debug("%s %s %s" % (goal, n, inf, pt))
+                    log.debug("%s %s %s %s", goal, n, inf, pt)
                     subtar = pt[0]
                     poleAngle = float(pt[1])
                     pt = (poleAngle, subtar)

@@ -74,7 +74,7 @@ def setupCustomRig(config):
     props = []
     
     for (path, modname) in config.customrigs:
-        log.message("Custom rig %s %s" % (path, modname))
+        log.message("Custom rig %s %s", path, modname)
         if path not in sys.path:
             sys.path.append(path)
             #print(sys.path)
@@ -84,18 +84,18 @@ def setupCustomRig(config):
         except:
             imported = False
         if True or not imported:    
-            log.message("Importing module %s" % modname)
+            log.message("Importing module %s", modname)
             mod = __import__(modname)
             sys.modules[modname] = mod
-            log.message("%s imported" % mod)
+            log.message("%s imported", mod)
         mod = sys.modules[modname]                
-        log.message("Adding %s.Joints" % modname)
+        log.message("Adding %s.Joints", modname)
         joints += mod.Joints
-        log.message("Adding %s.HeadsTails" % modname)
+        log.message("Adding %s.HeadsTails", modname)
         headsTails += mod.HeadsTails
-        log.message("Adding %s.Armature" % modname)
+        log.message("Adding %s.Armature", modname)
         armature += mod.Armature
-        log.message("Adding %s.Properties" % modname)
+        log.message("Adding %s.Properties", modname)
         props += mod.Properties
         
         

@@ -154,7 +154,7 @@ def readShape(filename):
     try:
         fp = open(filename, "rU")
     except:
-        log.error("*** Cannot open %s" % filename)
+        log.error("*** Cannot open %s", filename)
         return None
         
     shape = {}                    
@@ -164,7 +164,7 @@ def readShape(filename):
         if n < algos3d.NMHVerts:
             shape[n] = (float(words[1]), float(words[2]), float(words[3]))    
     fp.close()
-    log.message("    %s copied" % filename)
+    log.message("    %s copied", filename)
     return shape
 
 #----------------------------------------------------------
