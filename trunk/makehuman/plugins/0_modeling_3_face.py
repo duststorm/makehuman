@@ -137,7 +137,7 @@ class FaceTaskView(gui3d.TaskView):
                     ('nose-width', 'min', 'max', 'frontView'),
                                         
                 ]]),
-            ('nose size', [('data/targets/nose/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/nose/images/', i[3]) for i in
+            ('nose size and pos', [('data/targets/nose/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/nose/images/', i[3]) for i in
                 [
                     ('nose-trans', 'up', 'down', 'frontView'),
                     ('nose-trans', 'forward', 'backward', 'rightView'),
@@ -146,7 +146,7 @@ class FaceTaskView(gui3d.TaskView):
                     ('nose-scale-horiz', 'incr', 'decr', 'frontView'),
                     ('nose-scale-depth', 'incr', 'decr', 'rightView'),
                 ]]),
-            ('mouth size', [('data/targets/mouth/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/mouth/images/', i[3]) for i in
+            ('mouth size and pos', [('data/targets/mouth/${ethnic}/${gender}_${age}/%s-${value}.target' % (i[0]), i[0], i[1], i[2], 'data/targets/mouth/images/', i[3]) for i in
                 [
                     ('mouth-scale-horiz', 'incr', 'decr', 'frontView'),
                     ('mouth-scale-vert', 'incr', 'decr', 'frontView'),
@@ -170,8 +170,7 @@ class FaceTaskView(gui3d.TaskView):
                     ('mouth-lowerlip-middle', 'up', 'down', 'frontView'),                    
                     ('mouth-lowerlip', 'deflate', 'inflate', 'rightView'),
                     ('mouth-philtrum', 'up', 'down', 'frontView'),
-                    ('mouth-philtrum', 'increase', 'decrease', 'rightView'),
-                    ('mouth', 'up', 'down', 'frontView'),
+                    ('mouth-philtrum', 'increase', 'decrease', 'rightView'),                    
                     ('mouth-upperlip', 'deflate', 'inflate', 'rightView'),
                     ('mouth-upperlip-ext', 'up', 'down', 'frontView'),                    
                     ('mouth-upperlip-middle', 'up', 'down', 'frontView'),                    
