@@ -23,7 +23,7 @@ MHX exporter for Blender
 
 **Copyamtht(c):**      MakeHuman Team 2001-2013
 
-**Licensing:**         GPL3 (see also http://www.makehuman.org/node/318)
+**Licensing:**         GPL3 (see also http://www.makehuman.org/node/319)
 
 **Coding Standards:**  See http://www.makehuman.org/node/165
 
