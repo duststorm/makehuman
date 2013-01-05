@@ -330,9 +330,9 @@ class Slider(QtGui.QWidget, Widget):
     def setValue(self, value):
         if self._f2i(value) == self.slider.value():
             return
-        self.blockSignals(True)
+        self.slider.blockSignals(True)
         self.slider.setValue(self._f2i(value))
-        self.blockSignals(False)
+        self.slider.blockSignals(False)
 
     def getValue(self):
         return self._i2f(self.slider.value())
