@@ -6,8 +6,7 @@
 
 echo Copy files to %1
 
-mkdir %1\mhx_importer
-copy .\tools\blender26x\mhx_importer\*.py %1\mhx_importer
+copy .\tools\blender26x\mhx_importer\*.py %1
 
 mkdir %1\makeclothes
 copy .\tools\blender26x\makeclothes\*.py %1\makeclothes
