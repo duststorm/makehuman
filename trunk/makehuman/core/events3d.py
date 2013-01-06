@@ -21,6 +21,7 @@ Abstract
 
 This module contains classes to allow an object to handle events.
 """
+import log
 
 class Event:
     """
@@ -172,9 +173,11 @@ class EventHandler(object):
     def callEvent(self, eventType, event):
 
         #print("Sending %s to %s" % (eventType, self))
-
-        if hasattr(self, eventType):
-            getattr(self, eventType)(event)
+        try:
+            if hasattr(self, eventType):
+                getattr(self, eventType)(event)
+        except Exception, e:
+            log.warning('Exception during event %s', eventType, exc_info=True)
 
     def attachEvent(self, eventName, eventMethod):
         setattr(self, eventName, eventMethod)
