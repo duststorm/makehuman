@@ -706,7 +706,7 @@ def povrayExportMesh2(obj, camera, resolution, path, settings):
     log.message('Sample POV-Ray scene file generated')
 
 
-def povrayCameraData(camera, resolution, outputFileDescriptor):
+def povrayCameraData(camera, resolution, outputFileDescriptor, settings):
     """
   This function outputs standard camera data common to all POV-Ray format exports. 
 
@@ -725,9 +725,14 @@ def povrayCameraData(camera, resolution, outputFileDescriptor):
   """
 
     outputFileDescriptor.write('// MakeHuman Camera and Viewport Settings. \n')
-    outputFileDescriptor.write('#declare MakeHuman_LightX      = %s;\n' % camera.eyeX)
-    outputFileDescriptor.write('#declare MakeHuman_LightY      = %s;\n' % camera.eyeY)
-    outputFileDescriptor.write('#declare MakeHuman_LightZ      = %s;\n' % camera.eyeZ)
+    if settings['SSS'] == True:
+        outputFileDescriptor.write('#declare MakeHuman_LightX      = %s;\n' % 11)
+        outputFileDescriptor.write('#declare MakeHuman_LightY      = %s;\n' % 20)
+        outputFileDescriptor.write('#declare MakeHuman_LightZ      = %s;\n' % 20)
+    else:
+        outputFileDescriptor.write('#declare MakeHuman_LightX      = %s;\n' % camera.eyeX)
+        outputFileDescriptor.write('#declare MakeHuman_LightY      = %s;\n' % camera.eyeY)
+        outputFileDescriptor.write('#declare MakeHuman_LightZ      = %s;\n' % camera.eyeZ)
     outputFileDescriptor.write('#declare MakeHuman_EyeX        = %s;\n' % camera.eyeX)
     outputFileDescriptor.write('#declare MakeHuman_EyeY        = %s;\n' % camera.eyeY)
     outputFileDescriptor.write('#declare MakeHuman_EyeZ        = %s;\n' % camera.eyeZ)
@@ -935,7 +940,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
   # files into the output files.
 
     headerFile = 'data/povray/headercontent_mesh2only.inc'
-    staticFile = 'data/povray/staticcontent_mesh2only_tl.inc'
+    staticFile = 'data/povray/staticcontent_mesh2only_fsss.inc' if settings['SSS'] == True else 'data/povray/staticcontent_mesh2only_tl.inc'
     sceneFile = 'data/povray/makehuman_mesh2only_tl.pov'
     pigmentMap = 'data/textures/texture.png'
 
@@ -985,7 +990,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
 
   # Declare POV_Ray variables containing the current makehuman camera.
 
-    povrayCameraData(camera, resolution, outputFileDescriptor)
+    povrayCameraData(camera, resolution, outputFileDescriptor, settings)
     
     outputFileDescriptor.write('#declare MakeHuman_TranslateX      = %s;\n' % -obj.x)
     outputFileDescriptor.write('#declare MakeHuman_TranslateY      = %s;\n' % obj.y)
@@ -1101,8 +1106,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
         log.error('Error opening file to read static content.')
         return 0
     staticContentLines = staticContentFileDescriptor.read()
-    staticContentLines = string.replace(staticContentLines, '%%SSS%%', '' if settings['SSS'] == True else '//')
-    staticContentLines = string.replace(staticContentLines, '%%SSSQ%%', str(settings['SSSQ']))    
+    staticContentLines = string.replace(staticContentLines, '%%skinoil%%', str(settings['skinoil']))    
     outputFileDescriptor.write(staticContentLines)
     outputFileDescriptor.write('\n')
     staticContentFileDescriptor.close()

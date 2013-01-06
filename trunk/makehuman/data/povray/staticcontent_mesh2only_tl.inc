@@ -1,7 +1,6 @@
 // Some global settings about the model.
 global_settings {
-    %%SSS%%subsurface { samples %%SSSQ%%, %%SSSQ%% }    // Enable SSS if set.
-    mm_per_unit 9581.7       // Adjust this for more accuracy.      
+    mm_per_unit 100       // Adjust this for more accuracy.      
 }
 
 // Create a camera definition based on the MakeHuman camera settings when this 
@@ -41,7 +40,7 @@ global_settings {
     }
  
     #declare FINISH = finish { 
-        specular 0            // Max highlight intensity: 0 -> 1
+        specular %%skinoil%%  // Max highlight intensity: 0 -> 1
         roughness 0.02203444  // surface roughness: 0.0005 -> 1
         phong 0 phong_size 0  // Phong specular disabled
 

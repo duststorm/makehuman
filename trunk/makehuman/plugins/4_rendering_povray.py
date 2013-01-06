@@ -59,7 +59,7 @@ class PovrayTaskView(gui3d.TaskView):
         # Options box
         optionsBox = self.addLeftWidget(gui.GroupBox('Options'))
         self.useSSS = optionsBox.addWidget(gui.CheckBox('Use S.S. Scattering', False))
-        self.SSSQ = optionsBox.addWidget(gui.Slider(value=0.5, label="SSS Quality"))
+        self.skinoil = optionsBox.addWidget(gui.Slider(value=0.1, label="Skin oil"))
         
         # box
         #optionsBox = self.addLeftWidget(gui.GroupBox('Options'))
@@ -103,7 +103,7 @@ class PovrayTaskView(gui3d.TaskView):
                                     'action':'render',      # 'export' if self.exportButton.selected else 'render',
                                     'bintype': binarie,
                                     'SSS': True if self.useSSS.selected else False,
-                                    'SSSQ':50 * self.SSSQ.getValue()}) 
+                                    'skinoil':0.5 * self.skinoil.getValue()}) 
 
     def onShow(self, event):
         self.renderButton.setFocus()
