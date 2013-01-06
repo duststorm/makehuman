@@ -2613,7 +2613,7 @@ def initInterface():
     
     bpy.types.Scene.MCLicense = StringProperty(
         name="License", 
-        default="GPL3 (see also http://www.makehuman.org/node/320)",
+        default="AGPL3 (see also http://www.makehuman.org/node/320)",
         maxlen=256)
     
     bpy.types.Scene.MCHomePage = StringProperty(
