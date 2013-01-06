@@ -28,13 +28,65 @@ import mh2proxy
 import export_config
 import gui
 import filechooser as fc
+import log
+
+class ProxyFileSort(fc.FileSort):
+    
+    def __init__(self):
+        
+        super(ProxyFileSort, self).__init__()
+        self.meta = {}
+    
+    def fields(self):
+
+        return list(super(ProxyFileSort, self).fields()) + ["faces"]
+        
+    def sortFaces(self, filenames):
+
+        self.updateMeta(filenames)
+        decorated = [(self.meta[filename]['faces'], i, filename) for i, filename in enumerate(filenames)]
+        decorated.sort()
+        return [filename for gender, i, filename in decorated]
+        
+    def updateMeta(self, filenames):
+        
+        for filename in filenames:
+            
+            if filename in self.meta:
+                
+                if self.meta[filename]['modified'] < os.path.getmtime(filename):
+                
+                    self.meta[filename] = self.getMeta(filename)
+                
+            else:
+                
+                self.meta[filename] = self.getMeta(filename)
+                
+    def getMeta(self, filename):
+
+        meta = {}
+                
+        meta['modified'] = os.path.getmtime(filename)
+        faces = 0
+        try:
+            f = open(filename.replace('.proxy', '.obj'))
+            for line in f:
+                lineData = line.split()
+                if lineData and lineData[0] == 'f':
+                    faces += 1
+            f.close()
+        except:
+            pass
+        meta['faces'] = faces
+
+        return meta
 
 class ProxyTaskView(gui3d.TaskView):
     
     def __init__(self, category):
         
         gui3d.TaskView.__init__(self, category, 'Proxies')
-        self.filechooser = self.addTopWidget(fc.FileChooser('data/proxymeshes', 'proxy', 'png', 'data/proxymeshes/notfound.png'))
+        self.filechooser = self.addTopWidget(fc.FileChooser('data/proxymeshes', 'proxy', 'png', 'data/proxymeshes/notfound.png', sort=ProxyFileSort()))
         self.addLeftWidget(self.filechooser.sortBox)
 
         @self.filechooser.mhEvent
