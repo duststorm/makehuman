@@ -475,7 +475,6 @@ class FaceTaskView(ModifierTaskView):
             ('mouth-lowerlip', 'deflate', 'inflate', 'rightView'),
             ('mouth-philtrum', 'up', 'down', 'frontView'),
             ('mouth-philtrum', 'increase', 'decrease', 'rightView'),
-            ('mouth', 'up', 'down', 'frontView'),
             ('mouth-upperlip', 'deflate', 'inflate', 'rightView'),
             ('mouth-upperlip-ext', 'up', 'down', 'frontView'),
             ('mouth-upperlip-middle', 'up', 'down', 'frontView'),
