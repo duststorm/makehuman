@@ -168,7 +168,6 @@ def mapImage(srcImg):
 def mapLighting():
 
     mesh = gui3d.app.selectedHuman.mesh
-    mesh.setShadeless(1) #reset?
 
     W = 1024
     H = 1024

@@ -181,12 +181,12 @@ class BackgroundTaskView(gui3d.TaskView):
 
     def projectLighting(self):
         dstImg = projection.mapLighting()
-
-        #dstImg.resize(128, 128);
-
+        #dstImg.resize(128, 128)
         dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.png'))
-        gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.png'))
 
+        gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.png'))
+        mesh.setShadeless(1) # Remember to reset this when lighting projection is done.
+        
     def onShow(self, event):
 
         gui3d.TaskView.onShow(self, event)
