@@ -181,6 +181,8 @@ class BackgroundTaskView(gui3d.TaskView):
             dst = self.dst._data[xy[...,1],xy[...,0]][...,:3]
             uva = np.sum(self.uva[i][None,None,:,:] * uvw[...,[1,2,0]][:,:,:,None], axis=2)
             ix = np.floor(uva[:,:,:2] * self.size[None,None,:]).astype(int)
+            ix = np.minimum(ix, self.size - 1)
+            ix = np.maximum(ix, 0)
             src = self.texture._data[ix[...,1], ix[...,0]][...,:3]
             a = uva[:,:,2]
             return a[:,:,None] * (src.astype(float) - dst) + dst
