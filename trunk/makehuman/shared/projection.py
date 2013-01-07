@@ -208,4 +208,6 @@ def mapLighting():
 
     log.debug("mapLighting: end render")
 
+    mesh.setColor([255, 255, 255, 255])
+
     return dstImg

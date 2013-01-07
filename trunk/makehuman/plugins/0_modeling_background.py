@@ -187,8 +187,6 @@ class BackgroundTaskView(gui3d.TaskView):
         dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.png'))
         gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.png'))
 
-        mesh.setColor([255, 255, 255, 255])
-
     def onShow(self, event):
 
         gui3d.TaskView.onShow(self, event)
