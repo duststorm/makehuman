@@ -265,14 +265,22 @@ class ExportTaskView(gui3d.TaskView):
         self.exportBodyGroup = []
         self.exportHairGroup = []
         
-        # Formats
-        self.formatBox = self.addLeftWidget(gui.GroupBox('Format'))
+        # Mesh Formats
+        self.formatBox = self.addLeftWidget(gui.GroupBox('Mesh Format'))
         self.wavefrontObj = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, "Wavefront obj", True))
         self.mhx = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Blender exchange (mhx)"))
         self.collada = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Collada (dae)"))
         self.md5 = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="MD5"))
         self.stl = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Stereolithography (stl)"))
-        self.skel = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Skeleton (skel)"))
+
+        # Rig formats
+        self.rigBox = self.addLeftWidget(gui.GroupBox('Rig format'))
+        self.skel = self.rigBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Skeleton (skel)"))
+
+        # Map formats
+        self.mapsBox = self.addLeftWidget(gui.GroupBox('Maps'))
+        self.lightmap = self.mapsBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Lightmap"))
+        self.uvmap = self.mapsBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="UV map"))
 
         self.optionsBox = self.addRightWidget(gui.StackedBox())
 
@@ -347,6 +355,16 @@ class ExportTaskView(gui3d.TaskView):
         self.md5Options = self.optionsBox.addWidget(gui.GroupBox('Options'))
         self.skelOptions = self.optionsBox.addWidget(gui.GroupBox('Options'))
 
+        # Lightmap options
+        self.lightmapOptions = self.optionsBox.addWidget(gui.GroupBox('Options'))
+        lightmapOptions = []
+        self.lightmapDisplay = self.lightmapOptions.addWidget(gui.RadioButton(lightmapOptions,  "Display on human", selected=False))
+
+        # Lightmap options
+        self.uvmapOptions = self.optionsBox.addWidget(gui.GroupBox('Options'))
+        uvmapOptions = []
+        self.uvmapDisplay = self.uvmapOptions.addWidget(gui.RadioButton(uvmapOptions,  "Display on human", selected=False))
+
         self.updateGui()
 
         """                    
@@ -396,6 +414,16 @@ class ExportTaskView(gui3d.TaskView):
         def onClicked(event):
             self.updateGui()
             self.fileentry.setFilter('Skeleton (*.skel)')
+
+        @self.lightmap.mhEvent
+        def onClicked(event):
+            self.updateGui()
+            self.fileentry.setFilter('PNG (*.png)')
+
+        @self.uvmap.mhEvent
+        def onClicked(event):
+            self.updateGui()
+            self.fileentry.setFilter('PNG (*.png)')
         
         @self.fileentry.mhEvent
         def onFileSelected(filename):
@@ -484,7 +512,24 @@ class ExportTaskView(gui3d.TaskView):
             elif self.skel.selected:
                 mesh = gui3d.app.selectedHuman.getSubdivisionMesh() if self.exportSmooth.selected else gui3d.app.selectedHuman.meshData
                 mh2skel.exportSkel(mesh, filename("skel"))
-                    
+            elif self.lightmap.selected:
+                import projection
+                human = gui3d.app.selectedHuman
+                dstImg = projection.mapLighting()
+                filepath = filename("png")
+                dstImg.save(filepath)
+                if self.lightmapDisplay:
+                    human.setTexture(filepath)
+                    log.debug("Enabling shadeless rendering on body")
+                    human.mesh.setShadeless(True)
+            elif self.uvmap.selected:
+                log.debug("UV export not yet implemented (TODO)")
+                mh.changeCategory('Modelling')
+                return
+            else:
+                log.error("Unknown export format selected!")
+                return
+
             gui3d.app.prompt('Info', u'The mesh has been exported to %s.' % dir, 'OK', helpId='exportHelp')
 
             mh.changeCategory('Modelling')
@@ -502,6 +547,10 @@ class ExportTaskView(gui3d.TaskView):
             self.optionsBox.showWidget(self.stlOptions)
         elif self.skel.selected:
             self.optionsBox.showWidget(self.skelOptions)
+        elif self.lightmap.selected:
+            self.optionsBox.showWidget(self.lightmapOptions)
+        elif self.uvmap.selected:
+            self.optionsBox.showWidget(self.uvmapOptions)
 
     def onShow(self, event):
 
