@@ -187,7 +187,7 @@ def filterMesh(mesh1, obj, deleteGroups, deleteVerts, eyebrows, lashes):
 #   setupObjects(name, human, armature):
 #
 
-def setupObjects(name, human, armature=None, helpers=False, hidden=True, eyebrows=True, lashes=True):
+def setupObjects(name, human, armature=None, helpers=False, hidden=True, eyebrows=True, lashes=True, subdivide = False):
     global theStuff, theTextures, theTexFiles, theMaterials
     
     cfg = export_config.exportConfig(human, True)

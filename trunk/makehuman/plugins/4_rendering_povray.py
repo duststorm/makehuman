@@ -104,6 +104,7 @@ class PovrayTaskView(gui3d.TaskView):
                                    {'source':'gui',         # 'ini' if self.iniButton.selected else 'gui',
                                     'format':'mesh2',       # 'array' if self.arrayButton.selected else 'mesh2',
                                     'action':'render',      # 'export' if self.exportButton.selected else 'render',
+                                    'subdivide':True,
                                     'bintype': binarie,
                                     'SSS': True if self.useSSS.selected else False,
                                     'SSSA': 2**(10-6*self.SSSA.getValue()),  # exponential slider
