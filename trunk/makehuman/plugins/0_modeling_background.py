@@ -61,7 +61,6 @@ class BackgroundTaskView(gui3d.TaskView):
         self.opacity = 100
         mesh.setColor([255, 255, 255, self.opacity])
         mesh.setPickable(False)
-        log.debug("Enabling shadeless rendering on body")
         mesh.setShadeless(True)
         mesh.setDepthless(True)
         mesh.priority = -90
@@ -186,7 +185,8 @@ class BackgroundTaskView(gui3d.TaskView):
         dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.png'))
 
         gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'lighting.png'))
-        mesh.setShadeless(1) # Remember to reset this when lighting projection is done.
+        log.debug("Enabling shadeless rendering on body")
+        gui3d.app.selectedHuman.mesh.setShadeless(1) # Remember to reset this when lighting projection is done.
         
     def onShow(self, event):
 
