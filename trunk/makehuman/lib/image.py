@@ -76,10 +76,10 @@ class Image(object):
 
     def resized_(self, width, height):
         dw, dh = width, height
-        sw, sh, _ = self.size
+        sw, sh = self.size
         xmap = np.floor((np.arange(dw) + 0.5) * sw / dw).astype(int)
         ymap = np.floor((np.arange(dh) + 0.5) * sh / dh).astype(int)
-        return self._data[ymap, xmap]
+        return self._data[ymap,:][:,xmap]
 
     def resized(self, width, height):
         return Image(data = self.resized_(width, height))
