@@ -61,6 +61,7 @@ class BackgroundTaskView(gui3d.TaskView):
         self.opacity = 100
         mesh.setColor([255, 255, 255, self.opacity])
         mesh.setPickable(False)
+        log.debug("Enabling shadeless rendering on body")
         mesh.setShadeless(True)
         mesh.setDepthless(True)
         mesh.priority = -90

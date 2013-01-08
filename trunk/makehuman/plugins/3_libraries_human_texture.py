@@ -43,6 +43,7 @@ class Action:
 
     def do(self):
         self.human.setTexture(self.after)
+        self.human.mesh.setShadeless(False)
         if self.postAction:
             self.postAction()
         return True
