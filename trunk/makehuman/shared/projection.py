@@ -49,12 +49,12 @@ class UvAlphaShader(Shader):
         self.uva = uva
 
     def shade(self, i, xy, uvw):
-        dst = self.dst._data[xy[...,1],xy[...,0]][...,:3]
+        dst = self.dst._data[xy[...,1],xy[...,0]]
         uva = np.sum(self.uva[i][None,None,:,:] * uvw[...,[1,2,0]][:,:,:,None], axis=2)
         ix = np.floor(uva[:,:,:2] * self.size[None,None,:]).astype(int)
         ix = np.minimum(ix, self.size - 1)
         ix = np.maximum(ix, 0)
-        src = self.texture._data[ix[...,1], ix[...,0]][...,:3]
+        src = self.texture._data[ix[...,1], ix[...,0]]
         a = uva[:,:,2]
         return a[:,:,None] * (src.astype(float) - dst) + dst
 
@@ -91,14 +91,41 @@ def RasterizeTriangles(dst, coords, shader, progress = None):
         col = shader.shade(i, ixy, uvw)
         # log.debug('dst: %s', dst._data[miny[i]:maxy[i],minx[i]:maxx[i]].shape)
         # log.debug('src: %s', col.shape)
-        dst._data[miny[i]:maxy[i],minx[i]:maxx[i],:3][mask] = col[mask]
+        dst._data[miny[i]:maxy[i],minx[i]:maxx[i],:][mask] = col[mask]
 
+def convertFormat(srcImg, dstImg):
+    if srcImg.components == dstImg.components:
+        return srcImg
 
-def mapImage(srcImg):
+    if dstImg.components in (3,4) and srcImg.components in (1,2):
+        luma = srcImg._data[...,0]
+        chroma = np.dstack((luma, luma, luma))
+    elif dstImg.components in (1,2) and srcImg.components in (3,4):
+        chroma = np.sum(srcImg._data[...,:3].astype(np.uint16), axis=-1) / 3
+        chroma = chroma.astype(np.uint8)[...,None]
+    elif srcImg.components in (2,4):
+        chroma = srcImg._data[...,-1]
+    else:
+        chroma = srcImg._data
+
+    if dstImg.components in (2,4):
+        if srcImg.components in (2,4):
+            alpha = srcImg._data[...,-1]
+        else:
+            alpha = np.zeros_like(srcImg._data[...,0]) + 255
+        data = np.dstack((chroma, alpha))
+    else:
+        data = chroma
+
+    return mh.Image(data = data)
+
+def mapImage(srcImg, mesh, leftTop, rightBottom):
     dstImg = mh.Image(gui3d.app.selectedHuman.getTexture())
 
     dstW = dstImg.width
     dstH = dstImg.height
+
+    srcImg = convertFormat(srcImg, dstImg)
 
     ex, ey, ez = gui3d.app.modelCamera.eye
     eye = np.matrix([ex,ey,ez,1]).T
@@ -156,14 +183,39 @@ def mapImage(srcImg):
 
     log.debug("mapImage: begin render")
 
-    self.RasterizeTriangles(dstImg, texco[:,[0,1,2],:], UvAlphaShader(dstImg, srcImg, uva[:,[0,1,2],:]), progress = lambda i,n: progress(0.0,i,n))
-    self.RasterizeTriangles(dstImg, texco[:,[2,3,0],:], UvAlphaShader(dstImg, srcImg, uva[:,[2,3,0],:]), progress = lambda i,n: progress(0.5,i,n))
+    RasterizeTriangles(dstImg, texco[:,[0,1,2],:], UvAlphaShader(dstImg, srcImg, uva[:,[0,1,2],:]), progress = lambda i,n: progress(0.0,i,n))
+    RasterizeTriangles(dstImg, texco[:,[2,3,0],:], UvAlphaShader(dstImg, srcImg, uva[:,[2,3,0],:]), progress = lambda i,n: progress(0.5,i,n))
     gui3d.app.progress(1.0)
 
     log.debug("mapImage: end render")
 
     return dstImg
 
+def fixSeams(img):
+    h,w,c = img._data.shape
+    neighbors = np.empty((3,3,h,w,c), dtype=np.uint8)
+
+    neighbors[1,1,:,:,:] = img._data
+
+    neighbors[1,0,:,:,:] = np.roll(neighbors[1,1,:,:,:], -1, axis=-2)
+    neighbors[1,2,:,:,:] = np.roll(neighbors[1,1,:,:,:],  1, axis=-2)
+
+    neighbors[0,:,:,:,:] = np.roll(neighbors[1,:,:,:,:], -1, axis=-3)
+    neighbors[2,:,:,:,:] = np.roll(neighbors[1,:,:,:,:],  1, axis=-3)
+
+    chroma = neighbors[...,:-1]
+    alpha = neighbors[...,-1]
+
+    chroma_f = chroma.reshape(9,h,w,c-1)
+    alpha_f = alpha.reshape(9,h,w)
+
+    border = np.logical_and(alpha[1,1,:,:] == 0, np.any(alpha_f[:,:,:] != 0, axis=0))
+
+    alpha_f = alpha_f.astype(np.float32)[...,None]
+    fill = np.sum(chroma_f[:,:,:,:] * alpha_f[:,:,:,:], axis=0) / np.sum(alpha_f[:,:,:,:], axis=0)
+
+    img._data[...,:-1][border] = fill.astype(np.uint8)[border]
+    img._data[...,-1:][border] = 255
 
 def mapLighting():
 
@@ -172,7 +224,7 @@ def mapLighting():
     W = 1024
     H = 1024
     
-    dstImg = mh.Image(width=W, height=H, bitsPerPixel=24)
+    dstImg = mh.Image(width=W, height=H, components=4)
     dstImg._data[...] = 0
 
     delta = (-10.99, 20.0, 20.0) - mesh.coord
@@ -201,9 +253,11 @@ def mapLighting():
     def progress(base, i, n):
         gui3d.app.progress(base + 0.5 * i / n)
 
-    RasterizeTriangles(dstImg, coords[:,[0,1,2],:], ColorShader(colors[:,[0,1,2],:][...,:3]), progress = lambda i,n: progress(0.0,i,n))
-    RasterizeTriangles(dstImg, coords[:,[2,3,0],:], ColorShader(colors[:,[2,3,0],:][...,:3]), progress = lambda i,n: progress(0.5,i,n))
+    RasterizeTriangles(dstImg, coords[:,[0,1,2],:], ColorShader(colors[:,[0,1,2],:]), progress = lambda i,n: progress(0.0,i,n))
+    RasterizeTriangles(dstImg, coords[:,[2,3,0],:], ColorShader(colors[:,[2,3,0],:]), progress = lambda i,n: progress(0.5,i,n))
     gui3d.app.progress(1.0)
+
+    fixSeams(dstImg)
 
     log.debug("mapLighting: end render")
 
