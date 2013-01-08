@@ -74,7 +74,7 @@ class Image(object):
     def save(self, path):
         image_qt.save(path, self._data)
 
-    def resized(self, width, height):
+    def resized_(self, width, height):
         dw, dh = width, height
         sw, sh, _ = self.size
         xmap = np.floor((np.arange(dw) + 0.5) * sw / dw).astype(int)
