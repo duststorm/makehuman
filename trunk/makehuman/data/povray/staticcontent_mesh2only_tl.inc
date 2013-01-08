@@ -36,12 +36,12 @@ global_settings {
     }
 
     #declare NORMAL = normal {
-        wrinkles 0.23 scale 0.0002
+        wrinkles %%wrinkles%% scale 0.0002
     }
  
     #declare FINISH = finish { 
         specular %%skinoil%%  // Max highlight intensity: 0 -> 1
-        roughness 0.02203444  // surface roughness: 0.0005 -> 1
+        roughness %%rough%%  // surface roughness: 0.0005 -> 1
         phong 0 phong_size 0  // Phong specular disabled
 
         ambient 0.3 // rgb <0.00,0.00,0.00>

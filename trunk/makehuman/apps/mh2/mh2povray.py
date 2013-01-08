@@ -10,7 +10,7 @@ POV-Ray Export functions.
 
 **Code Home Page:**    http://code.google.com/p/makehuman/
 
-**Authors:**           Chris Bartlett
+**Authors:**           Chris Bartlett, Thanasis Papoutsidakis
 
 **Copyright(c):**      MakeHuman Team 2001-2013
 
@@ -43,6 +43,7 @@ import os
 import string
 import shutil
 import subprocess
+import projection
 import mh2povray_ini
 import random
 import mh
@@ -130,8 +131,7 @@ def povrayExport(obj, app, settings):
             povray_bin += '/povray'
         #
         log.debug('Povray path: %s', povray_bin)
-        #TO-DO: que hacer si el path es demasiado largo? Hay una opcion grafica en SDL para buscar archivos?
-        #~[en]: what to do if the path is too long? Is there any graphic option in SDL to browse for files?
+        #TODO: what to do if the path is too long? Is there any graphic option in QT to browse for files?
 
     #
     if action == 'render':
@@ -919,41 +919,38 @@ import object_collection
 
 def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
     """
-  This function exports data in the form of a mesh2 humanoid object. The POV-Ray 
-  file generated is fairly inflexible, but is highly efficient. 
-  
-  Parameters
-  ----------
-  
-  obj:
+    This function exports data in the form of a mesh2 humanoid object. The POV-Ray 
+    file generated is fairly inflexible, but is highly efficient. 
+
+    Parameters
+    ----------
+
+    obj:
       *3D object*. The object to export. This should be the humanoid object with
       uv-mapping data and Face Groups defined.
-  
-  camera:
+
+    camera:
       *Camera object*. The camera to render from. 
-  
-  path:
+
+    path:
       *string*. The file system path to the output files that need to be generated. 
-  """
+    """
 
-  # Certain blocks of SDL are mostly static and can be copied directly from reference
-  # files into the output files.
-
+    # Certain blocks of SDL are mostly static and can be copied directly from reference
+    # files into the output files.
     headerFile = 'data/povray/headercontent_mesh2only.inc'
     staticFile = 'data/povray/staticcontent_mesh2only_fsss.inc' if settings['SSS'] == True else 'data/povray/staticcontent_mesh2only_tl.inc'
     sceneFile = 'data/povray/makehuman_mesh2only_tl.pov'
     pigmentMap = 'data/textures/texture.png'
 
-  # Define some additional file locations
-
+    # Define some additional file locations
     outputSceneFile = path.replace('.inc', '.pov')
     baseName = os.path.basename(path)
     nameOnly = string.replace(baseName, '.inc', '')
     underScores = ''.ljust(len(baseName), '-')
     outputDirectory = os.path.dirname(path)
 
-  # Make sure the directory exists
-
+    # Make sure the directory exists
     if not os.path.isdir(outputDirectory):
         try:
             os.makedirs(outputDirectory)
@@ -961,21 +958,25 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
             log.error('Error creating export directory.')
             return 0
 
-  # Open the output file in Write mode
+    # If fake SSS is enabled, render lightmaps there. # TODO: if they aren't already rendered.
+    if settings['SSS'] == True:
+        lmap = projection.mapLighting()
+        lmap.save(os.path.join(outputDirectory, 'lighthi.png'))
+        lmap.resize(settings['SSSA'],settings['SSSA'])
+        lmap.save(os.path.join(outputDirectory, 'lightlo.png'))
 
+    # Open the output file in Write mode
     try:
         outputFileDescriptor = open(path, 'w')
     except:
         log.error('Error opening file to write data.')
         return 0
 
-  # Write the file name into the top of the comment block that starts the file.
-
+    # Write the file name into the top of the comment block that starts the file.
     outputFileDescriptor.write('// %s\n' % baseName)
     outputFileDescriptor.write('// %s\n' % underScores)
 
-  # Copy the header file SDL straight across to the output file
-
+    # Copy the header file SDL straight across to the output file
     try:
         headerFileDescriptor = open(headerFile, 'r')
     except:
@@ -988,8 +989,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
 ''')
     headerFileDescriptor.close()
 
-  # Declare POV_Ray variables containing the current makehuman camera.
-
+    # Declare POV_Ray variables containing the current makehuman camera.
     povrayCameraData(camera, resolution, outputFileDescriptor, settings)
     
     outputFileDescriptor.write('#declare MakeHuman_TranslateX      = %s;\n' % -obj.x)
@@ -1000,22 +1000,20 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
     outputFileDescriptor.write('#declare MakeHuman_RotateY         = %s;\n' % -obj.ry)
     outputFileDescriptor.write('#declare MakeHuman_RotateZ         = %s;\n\n' % obj.rz)
 
-  # Calculate some useful values and add them to the output as POV-Ray variable
-  # declarations so they can be readily accessed from a POV-Ray scene file.
+    # Calculate some useful values and add them to the output as POV-Ray variable
+    # declarations so they can be readily accessed from a POV-Ray scene file.
 
     povraySizeData(obj, outputFileDescriptor)
 
     stuffs = object_collection.setupObjects("MakeHuman", gui3d.app.selectedHuman, helpers=False, hidden=False, eyebrows=False, lashes=False)
 
-  # Mesh2 Object - Write the initial part of the mesh2 object declaration
-  
+    # Mesh2 Object - Write the initial part of the mesh2 object declaration
     for stuff in stuffs:
 
         outputFileDescriptor.write('// Humanoid mesh2 definition\n')
         outputFileDescriptor.write('#declare %s_Mesh2Object = mesh2 {\n' % stuff.name)
 
-  # Vertices - Write a POV-Ray array to the output stream
-
+        # Vertices - Write a POV-Ray array to the output stream
         outputFileDescriptor.write('  vertex_vectors {\n  ')
         outputFileDescriptor.write('    %s\n  ' % len(stuff.verts))
         for v in stuff.verts:
@@ -1025,8 +1023,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
 
 ''')
 
-  # Normals - Write a POV-Ray array to the output stream
-
+        # Normals - Write a POV-Ray array to the output stream
         outputFileDescriptor.write('  normal_vectors {\n  ')
         outputFileDescriptor.write('    %s\n  ' % len(stuff.verts))
         for vno in stuff.vnormals:
@@ -1037,8 +1034,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
 
 ''')
     
-  # UV Vectors - Write a POV-Ray array to the output stream
-
+        # UV Vectors - Write a POV-Ray array to the output stream
         outputFileDescriptor.write('  uv_vectors {\n  ')
         outputFileDescriptor.write('    %s\n  ' % len(stuff.uvValues))
         for uv in stuff.uvValues:
@@ -1049,8 +1045,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
 
 ''')
 
-  # Faces - Write a POV-Ray array of arrays to the output stream
-
+        # Faces - Write a POV-Ray array of arrays to the output stream
         nTriangles = 0
         for f in stuff.faces:
             nTriangles += len(f)-2
@@ -1072,8 +1067,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
 ''')
 
 
-  # UV Indices for each face - Write a POV-Ray array to the output stream
-
+        # UV Indices for each face - Write a POV-Ray array to the output stream
         outputFileDescriptor.write('  uv_indices {\n  ')
         outputFileDescriptor.write('    %s\n  ' % nTriangles)
 
@@ -1089,8 +1083,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
   }
 ''')
 
-  # Mesh2 Object - Write the end squiggly bracket for the mesh2 object declaration
-
+        # Mesh2 Object - Write the end squiggly bracket for the mesh2 object declaration
         outputFileDescriptor.write('''
       uv_mapping
 ''')
@@ -1098,8 +1091,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
 
 ''')
 
-  # Copy texture definitions straight across to the output file.
-
+    # Copy texture definitions straight across to the output file.
     try:
         staticContentFileDescriptor = open(staticFile, 'r')
     except:
@@ -1107,21 +1099,20 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
         return 0
     staticContentLines = staticContentFileDescriptor.read()
     staticContentLines = string.replace(staticContentLines, '%%skinoil%%', str(settings['skinoil']))    
+    staticContentLines = string.replace(staticContentLines, '%%rough%%', str(settings['rough']))    
+    staticContentLines = string.replace(staticContentLines, '%%wrinkles%%', str(settings['wrinkles']))    
     outputFileDescriptor.write(staticContentLines)
     outputFileDescriptor.write('\n')
     staticContentFileDescriptor.close()
     
-  # Write clothes materials
-  
+    # Write clothes materials 
     writeClothesMaterials(outputFileDescriptor, stuffs)
              
-  # The POV-Ray include file is complete
-
+    # The POV-Ray include file is complete
     outputFileDescriptor.close()
     log.message("POV-Ray '#include' file generated.")
 
-  # Copy a sample scene file across to the output directory
-
+    # Copy a sample scene file across to the output directory
     try:
         sceneFileDescriptor = open(sceneFile, 'r')
     except:
@@ -1149,13 +1140,11 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
             "   material {%s_Material} \n" % stuff.name +
             "}  \n")
 
-  # Job done
-
+    # Job done, clean up
     outputSceneFileDescriptor.close()
     sceneFileDescriptor.close()
 
-  # Copy the texture files into the output directory
-
+    # Copy the texture files into the output directory
     copyFile(pigmentMap, outputDirectory)
 
     for stuff in stuffs[1:]:

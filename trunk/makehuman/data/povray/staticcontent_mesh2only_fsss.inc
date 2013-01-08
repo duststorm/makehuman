@@ -34,10 +34,10 @@ global_settings {
 #declare TEXTURE = 
     texture {
         pigment { image_map {png "lightlo.png" interpolate 2} }
-        normal  { wrinkles 0.23 scale 0.0002 }
+        normal  { wrinkles %%wrinkles%% scale 0.0002 }
         finish { 
             specular 0
-            roughness 0.02203444
+            roughness 0.01
             phong 0 phong_size 0
             ambient rgb <3,0,0> // Apply blur to red channel.
             diffuse 0 //2.0
@@ -47,10 +47,10 @@ global_settings {
     }
     texture {
         pigment { image_map {png "lighthi.png" interpolate 2 transmit all 1/3} }
-        normal  { wrinkles 0.23 scale 0.0002 }
+        normal  { wrinkles %%wrinkles%% scale 0.0002 }
         finish { 
             specular 0
-            roughness 0.02203444
+            roughness 0.01
             phong 0 phong_size 0
             ambient rgb <0,1.5,1.5>
             diffuse 0 //2.0
@@ -60,10 +60,10 @@ global_settings {
     }
     texture {
         pigment { image_map {png "texture.png" filter all 1} }
-        normal  { wrinkles 0.23 scale 0.0002 }
+        normal  { wrinkles %%wrinkles%% scale 0.0002 }
         finish { 
             specular %%skinoil%%  // Max highlight intensity: 0 -> 1
-            roughness 0.02203444  // surface roughness: 0.0005 -> 1
+            roughness %%rough%%  // surface roughness: 0.0005 -> 1
             phong 0 phong_size 0  // Phong specular disabled
             ambient 0
             diffuse 0

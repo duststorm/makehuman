@@ -59,7 +59,10 @@ class PovrayTaskView(gui3d.TaskView):
         # Options box
         optionsBox = self.addLeftWidget(gui.GroupBox('Options'))
         self.useSSS = optionsBox.addWidget(gui.CheckBox('Use S.S. Scattering', False))
-        self.skinoil = optionsBox.addWidget(gui.Slider(value=0.1, label="Skin oil"))
+        self.SSSA = optionsBox.addWidget(gui.Slider(value=0.5, label="SSS Amount"))
+        self.skinoil = optionsBox.addWidget(gui.Slider(value=0.5, label="Skin oil"))
+        self.rough = optionsBox.addWidget(gui.Slider(value=0.5, label="Skin roughness"))
+        self.wrinkles = optionsBox.addWidget(gui.Slider(value=0.1, label="Skin wrinkles"))
         
         # box
         #optionsBox = self.addLeftWidget(gui.GroupBox('Options'))
@@ -69,9 +72,9 @@ class PovrayTaskView(gui3d.TaskView):
         #source=[]
         #self.iniButton = optionsBox.addWidget(gui.RadioButton(source, 'Use ini settings'))
         #self.guiButton = optionsBox.addWidget(gui.RadioButton(source, 'Use gui settings', selected = True))
-        format=[]
-        self.arrayButton = optionsBox.addWidget(gui.RadioButton(format, 'Array  format'))
-        self.mesh2Button = optionsBox.addWidget(gui.RadioButton(format, 'Mesh2 format', selected = True))
+        #format=[]
+        #self.arrayButton = optionsBox.addWidget(gui.RadioButton(format, 'Array  format'))
+        #self.mesh2Button = optionsBox.addWidget(gui.RadioButton(format, 'Mesh2 format', selected = True))
         #action=[]
         #self.exportButton = optionsBox.addWidget(gui.RadioButton(action , 'Export only', selected = True))
         #self.exportandrenderButton = optionsBox.addWidget(gui.RadioButton(action , 'Export and render'))
@@ -99,11 +102,14 @@ class PovrayTaskView(gui3d.TaskView):
             #
             mh2povray.povrayExport(gui3d.app.selectedHuman.mesh, gui3d.app,
                                    {'source':'gui',         # 'ini' if self.iniButton.selected else 'gui',
-                                    'format':'array' if self.arrayButton.selected else 'mesh2',
+                                    'format':'mesh2',       # 'array' if self.arrayButton.selected else 'mesh2',
                                     'action':'render',      # 'export' if self.exportButton.selected else 'render',
                                     'bintype': binarie,
                                     'SSS': True if self.useSSS.selected else False,
-                                    'skinoil':0.5 * self.skinoil.getValue()}) 
+                                    'SSSA': 2**(10-6*self.SSSA.getValue()),  # exponential slider
+                                    'skinoil': 0.001 *(10**(4*self.skinoil.getValue())), # exponential slider
+                                    'rough':0.001 *(10**(2*self.rough.getValue())), # exponential slider
+                                    'wrinkles': self.wrinkles.getValue()}) 
 
     def onShow(self, event):
         self.renderButton.setFocus()
