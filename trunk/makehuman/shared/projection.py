@@ -251,7 +251,7 @@ def mapLighting():
     log.debug("mapLighting: begin render")
 
     def progress(base, i, n):
-        gui3d.app.progress(base + 0.5 * i / n)
+        gui3d.app.progress(base + 0.5 * i / n, "Projecting lightmap")
 
     RasterizeTriangles(dstImg, coords[:,[0,1,2],:], ColorShader(colors[:,[0,1,2],:]), progress = lambda i,n: progress(0.0,i,n))
     RasterizeTriangles(dstImg, coords[:,[2,3,0],:], ColorShader(colors[:,[2,3,0],:]), progress = lambda i,n: progress(0.5,i,n))
