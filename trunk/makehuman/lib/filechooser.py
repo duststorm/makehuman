@@ -234,7 +234,8 @@ class FileChooser(QtGui.QWidget, Widget):
         self.path = path if isinstance(path, basestring) else path[0]
         self.paths = path if isinstance(path, list) else [path]
         self.extension = extension
-        self.previewExtension = previewExtension
+        self.previewExtension = previewExtension if isinstance(previewExtension, basestring) else previewExtension[0]
+        self.previewExtensions = previewExtension if isinstance(previewExtension, list) else [previewExtension]
 
         self.sort = sort
         self.selection = ''
@@ -291,6 +292,10 @@ class FileChooser(QtGui.QWidget, Widget):
         
         if self.previewExtension:
             preview = filename.replace('.' + self.extension, '.' + self.previewExtension)
+            i = 1
+            while not os.path.exists(preview) and i < len(self.previewExtensions):
+                preview = filename.replace('.' + self.extension, '.' + self.previewExtensions[i])
+                i = i + 1
         else:
             preview = filename
             
