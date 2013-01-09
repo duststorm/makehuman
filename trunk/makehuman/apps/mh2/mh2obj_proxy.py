@@ -40,7 +40,8 @@ def exportProxyObj(human, name, options):
         helpers=options["helpers"], 
         hidden=options["hidden"], 
         eyebrows=options["eyebrows"], 
-        lashes=options["lashes"])
+        lashes=options["lashes"],
+        subdivide=options["subdivide"])
     
     (scale, unit) = options["scale"]   
     #name = export_config.goodName(name)

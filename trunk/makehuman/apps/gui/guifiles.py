@@ -451,6 +451,7 @@ class ExportTaskView(gui3d.TaskView):
                     "eyebrows" : self.exportEyebrows.selected,
                     "lashes" : self.exportLashes.selected,
                     "scale": self.getScale(self.objScales),
+                    "subdivide": self.exportSmooth.selected
                 }                    
                 mh2obj_proxy.exportProxyObj(human, filename("obj"), options)
                 
