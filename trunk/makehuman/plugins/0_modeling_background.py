@@ -188,6 +188,15 @@ class BackgroundTaskView(gui3d.TaskView):
         log.debug("Enabling shadeless rendering on body")
         gui3d.app.selectedHuman.mesh.setShadeless(1) # Remember to reset this when lighting projection is done.
         
+    def projectUV(self):
+        dstImg = projection.mapUV()
+        #dstImg.resize(128, 128)
+        dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'uvtopo.png'))
+
+        gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'uvtopo.png'))
+        log.debug("Enabling shadeless rendering on body")
+        gui3d.app.selectedHuman.mesh.setShadeless(1) # Remember to reset this when lighting projection is done.
+        
     def onShow(self, event):
 
         gui3d.TaskView.onShow(self, event)
@@ -312,6 +321,12 @@ class settingsTaskView(gui3d.TaskView) :
         @self.projectLightingButton.mhEvent
         def onClicked(event):
             taskview.projectLighting()
+
+        self.projectUVButton = self.backgroundBox.addWidget(gui.Button('Project UV topology'))
+
+        @self.projectUVButton.mhEvent
+        def onClicked(event):
+            taskview.projectUV()
 
     def onShow(self, event):
 

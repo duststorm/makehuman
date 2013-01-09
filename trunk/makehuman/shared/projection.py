@@ -93,39 +93,13 @@ def RasterizeTriangles(dst, coords, shader, progress = None):
         # log.debug('src: %s', col.shape)
         dst._data[miny[i]:maxy[i],minx[i]:maxx[i],:][mask] = col[mask]
 
-def convertFormat(srcImg, dstImg):
-    if srcImg.components == dstImg.components:
-        return srcImg
-
-    if dstImg.components in (3,4) and srcImg.components in (1,2):
-        luma = srcImg._data[...,0]
-        chroma = np.dstack((luma, luma, luma))
-    elif dstImg.components in (1,2) and srcImg.components in (3,4):
-        chroma = np.sum(srcImg._data[...,:3].astype(np.uint16), axis=-1) / 3
-        chroma = chroma.astype(np.uint8)[...,None]
-    elif srcImg.components in (2,4):
-        chroma = srcImg._data[...,-1]
-    else:
-        chroma = srcImg._data
-
-    if dstImg.components in (2,4):
-        if srcImg.components in (2,4):
-            alpha = srcImg._data[...,-1]
-        else:
-            alpha = np.zeros_like(srcImg._data[...,0]) + 255
-        data = np.dstack((chroma, alpha))
-    else:
-        data = chroma
-
-    return mh.Image(data = data)
-
 def mapImage(srcImg, mesh, leftTop, rightBottom):
     dstImg = mh.Image(gui3d.app.selectedHuman.getTexture())
 
     dstW = dstImg.width
     dstH = dstImg.height
 
-    srcImg = convertFormat(srcImg, dstImg)
+    srcImg = srcImg.convert(dstImg.components)
 
     ex, ey, ez = gui3d.app.modelCamera.eye
     eye = np.matrix([ex,ey,ez,1]).T
@@ -264,3 +238,114 @@ def mapLighting():
     mesh.setColor([255, 255, 255, 255])
 
     return dstImg
+
+def rasterizeHLines(dstImg, edges, delta, progress = None):
+    flip = delta[:,0] < 0
+    p = np.where(flip[:,None,None], edges[:,::-1,:], edges[:,:,:])
+    del edges
+    d = np.where(flip[:,None], -delta, delta)
+    del delta, flip
+    x0 = p[:,0,0]
+    x1 = p[:,1,0]
+    y0 = p[:,0,1]
+    del p
+    dx = d[:,0]
+    dy = d[:,1]
+    m = dy / dx
+    del dx, dy, d
+    c = y0 - m * x0
+    x0 = np.floor(x0).astype(int)
+    x1 = np.ceil(x1).astype(int)
+    del y0
+
+    data = dstImg._data[::-1]
+
+    for i in xrange(len(x0)):
+        if progress is not None and i % 100 == 0:
+            progress(i, len(x0))
+        x = np.arange(x0[i], x1[i])
+        y = m[i] * (x + 0.5) + c[i]
+        data[np.floor(y).astype(int),x,:] = 255
+
+def rasterizeVLines(dstImg, edges, delta, progress = None):
+    flip = delta[:,1] < 0
+    p = np.where(flip[:,None,None], edges[:,::-1,:], edges[:,:,:])
+    del edges
+    d = np.where(flip[:,None], -delta, delta)
+    del delta, flip
+    x0 = p[:,0,0]
+    y0 = p[:,0,1]
+    y1 = p[:,1,1]
+    del p
+    dx = d[:,0]
+    dy = d[:,1]
+    m = dx / dy
+    del dx, dy, d
+    c = x0 - m * y0
+    y0 = np.floor(y0).astype(int)
+    y1 = np.ceil(y1).astype(int)
+    del x0
+
+    data = dstImg._data[::-1]
+
+    for i in xrange(len(y0)):
+        if progress is not None and i % 100 == 0:
+            progress(i, len(y0))
+        y = np.arange(y0[i], y1[i]) + 0.5
+        x = m[i] * y + c[i]
+        data[y.astype(int),np.floor(x).astype(int),:] = 255
+
+def mapUV():
+
+    mesh = gui3d.app.selectedHuman.mesh
+
+    W = 2048
+    H = 2048
+    
+    dstImg = mh.Image(width=W, height=H, components=3)
+    dstImg._data[...] = 0
+
+    group_mask = np.ones(len(mesh._faceGroups), dtype=bool)
+    for g in mesh._faceGroups:
+        if g.name.startswith('joint') or g.name.startswith('helper'):
+            group_mask[g.idx] = False
+    faces = np.argwhere(group_mask[mesh.group])[...,0]
+    del group_mask
+
+    log.debug("mapUV: begin setup")
+
+    fuvs = mesh.fuvs[faces]
+    del faces
+    edges = np.array([fuvs, np.roll(fuvs, 1, axis=-1)]).transpose([1,2,0]).reshape((-1,2))
+    del fuvs
+    edges = np.where((edges[:,0] < edges[:,1])[:,None], edges, edges[:,::-1])
+    ec = edges[:,0] + (edges[:,1] << 16)
+    del edges
+    ec = np.unique(ec)
+    edges = np.array([ec & 0xFFFF, ec >> 16]).transpose()
+    del ec
+    edges = mesh.texco[edges] * (W, H)
+
+    delta = edges[:,1,:] - edges[:,0,:]
+    vertical = np.abs(delta[:,1]) > np.abs(delta[:,0])
+    horizontal = -vertical
+
+    hdelta = delta[horizontal]
+    vdelta = delta[vertical]
+    del delta
+    hedges = edges[horizontal]
+    vedges = edges[vertical]
+    del edges, horizontal, vertical
+
+    log.debug("mapUV: begin render")
+
+    def progress(base, i, n):
+        gui3d.app.progress(base + 0.5 * i / n)
+
+    rasterizeHLines(dstImg, hedges, hdelta, progress = lambda i,n: progress(0.0,i,n))
+    rasterizeVLines(dstImg, vedges, vdelta, progress = lambda i,n: progress(0.5,i,n))
+    gui3d.app.progress(1.0)
+
+    log.debug("mapUV: end render")
+
+    return dstImg.convert(3)

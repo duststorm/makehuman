@@ -143,3 +143,35 @@ class Image(object):
 
         self._data[y,x,:] = color
 
+    def convert(self, components):
+        if self.components == components:
+            return self
+
+        hasAlpha = self.components in (2,4)
+        needAlpha = components in (2,4)
+
+        if hasAlpha:
+            alpha = self._data[...,-1]
+            color = self._data[...,:-1]
+        else:
+            alpha = None
+            color = self._data
+
+        isMono = self.components in (1,2)
+        toMono = components in (1,2)
+
+        if isMono and not toMono:
+            color = np.dstack((color, color, color))
+        elif toMono and not isMono:
+            color = np.sum(color.astype(np.uint16), axis=-1) / 3
+            color = color.astype(np.uint8)[...,None]
+
+        if needAlpha and alpha is None:
+            alpha = np.zeros_like(color[...,:1]) + 255
+
+        if needAlpha:
+            data = np.dstack((color, alpha))
+        else:
+            data = color
+
+        return type(self)(data = data)
