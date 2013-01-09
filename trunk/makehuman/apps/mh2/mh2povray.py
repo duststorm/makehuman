@@ -201,7 +201,7 @@ def povrayExportArray(obj, camera, resolution, path):
     staticFile = 'data/povray/staticcontent.inc'
     sceneFile = 'data/povray/makehuman.pov'
     groupingsFile = 'data/povray/makehuman_groupings.inc'
-    pigmentMap = 'data/textures/texture.tif'
+    pigmentMap = gui3d.app.selectedHuman.mesh.texture
 
   # Define some additional file related strings
 
@@ -421,10 +421,10 @@ def povrayExportArray(obj, camera, resolution, path):
     sceneLines = string.replace(sceneLines, 'xxLowercaseFileNamexx', nameOnly.lower())
     outputSceneFileDescriptor.write(sceneLines)
 
-  # Copy the textures.tif file into the output directory
+  # Copy the skin texture file into the output directory
 
     try:
-        shutil.copy(pigmentMap, outputDirectory)
+        shutil.copy(pigmentMap, os.path.join(outputDirectory, "texture.png"))
     except (IOError, os.error), why:
         log.error("Can't copy %s" % str(why))
 
@@ -467,7 +467,7 @@ def povrayExportMesh2(obj, camera, resolution, path, settings):
     headerFile = 'data/povray/headercontent_mesh2only.inc'
     staticFile = 'data/povray/staticcontent_mesh2only.inc'
     sceneFile = 'data/povray/makehuman_mesh2only.pov'
-    pigmentMap = 'data/textures/texture.png'
+    pigmentMap = gui3d.app.selectedHuman.mesh.texture
 
   # Define some additional file locations
 
@@ -692,10 +692,10 @@ def povrayExportMesh2(obj, camera, resolution, path, settings):
     sceneLines = string.replace(sceneLines, 'xxLowercaseFileNamexx', nameOnly.lower())
     outputSceneFileDescriptor.write(sceneLines)
 
-  # Copy the textures.tif file into the output directory
+  # Copy the skin texture file into the output directory
 
     try:
-        shutil.copy(pigmentMap, outputDirectory)
+        shutil.copy(pigmentMap, os.path.join(outputDirectory, "texture.png"))
     except (IOError, os.error), why:
         log.error("Can't copy %s" % str(why))
 
@@ -941,7 +941,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
     headerFile = 'data/povray/headercontent_mesh2only.inc'
     staticFile = 'data/povray/staticcontent_mesh2only_fsss.inc' if settings['SSS'] == True else 'data/povray/staticcontent_mesh2only_tl.inc'
     sceneFile = 'data/povray/makehuman_mesh2only_tl.pov'
-    pigmentMap = 'data/textures/texture.png'
+    pigmentMap = gui3d.app.selectedHuman.mesh.texture
 
     # Define some additional file locations
     outputSceneFile = path.replace('.inc', '.pov')
@@ -1146,13 +1146,12 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
     outputSceneFileDescriptor.close()
     sceneFileDescriptor.close()
 
-    # Copy the texture files into the output directory
-    copyFile(pigmentMap, outputDirectory)
+    # Copy the skin texture file into the output directory
+    copyFile(pigmentMap, os.path.join(outputDirectory, "texture.png"))
 
     for stuff in stuffs[1:]:
-        proxy = stuff.proxy
-        if proxy.texture:
-            copyFile(proxy.texture, outputDirectory)
+        if stuff.texture:
+            copyFile(stuff.texture, outputDirectory)
         """
         if proxy.normal:
             copyFile(proxy.normal, outputDirectory)
@@ -1170,7 +1169,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
 def writeClothesMaterials(outputFileDescriptor, stuffs):
     for stuff in stuffs[1:]:
         proxy = stuff.proxy
-        texdata = getChannelData(proxy.texture)                        
+        texdata = getChannelData(stuff.texture)                        
         if texdata:                
             outputFileDescriptor.write(
                 "#ifndef (%s_Material)\n" % stuff.name)

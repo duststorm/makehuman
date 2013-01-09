@@ -232,19 +232,42 @@ def setupObjects(name, human, armature=None, helpers=False, hidden=True, eyebrow
             stuff.setMesh(mesh2)
         stuffs = [stuff] + stuffs
 
+    # Apply custom textures if applicable
+    for stuff in stuffs:
+        if stuff.proxy and stuff.proxy.type == 'Clothes':
+            proxy = stuff.proxy
+            uuid = proxy.getUuid()
+            if uuid and uuid in human.clothesObjs.keys() and human.clothesObjs[uuid]:
+                # Clothes
+                clothesObj = human.clothesObjs[uuid]
+                texture = clothesObj.mesh.texture
+                stuff.texture = (os.path.dirname(texture), os.path.basename(texture))
+            elif uuid and uuid == human.hairProxy.getUuid():
+                # Hair
+                texture = human.hairObj.mesh.texture
+                stuff.texture = (os.path.dirname(texture), os.path.basename(texture))
+        elif stuff.proxy and stuff.proxy.type == 'Proxy':
+            # Proxy
+            texture = human.mesh.texture
+            stuff.texture = (os.path.dirname(texture), os.path.basename(texture))
+
+    # Subdivide proxy meshes if requested
     if subdivide:
         for stuff in stuffs:
-            if stuff.proxy and stuff.proxy.type == 'Clothes' and stuff.proxy.getUuid():
+            if stuff.proxy and stuff.proxy.type == 'Clothes':
                 uuid = stuff.proxy.getUuid()
-                if uuid in human.clothesObjs.keys():
+                if uuid and uuid in human.clothesObjs.keys():
+                    # Subdivide clothes
                     clo = human.clothesObjs[uuid]
                     subMesh = clo.getSubdivisionMesh()
                     stuff.setObject3dMesh(subMesh, stuff.rawWeights, rawTargets)
-                elif uuid == human.hairProxy.getUuid():
+                elif uuid and uuid == human.hairProxy.getUuid():
+                    # Subdivide hair
                     hair = human.hairObj
                     subMesh = hair.getSubdivisionMesh()
                     stuff.setObject3dMesh(subMesh, stuff.rawWeights, rawTargets)
             elif stuff.proxy and stuff.proxy.type == 'Proxy':
+                # Subdivide proxy
                 subMesh = human.getSubdivisionMesh()
                 stuff.setObject3dMesh(subMesh, stuff.rawWeights, rawTargets)
     

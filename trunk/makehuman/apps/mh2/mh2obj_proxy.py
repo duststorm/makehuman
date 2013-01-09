@@ -123,14 +123,7 @@ def writeMaterial(fp, stuff, human, cfg):
     )
     
     if stuff.proxy:
-        uuid = stuff.proxy.getUuid()
-        if uuid in human.clothesObjs.keys() and human.clothesObjs[uuid]:
-            clothesObj = human.clothesObjs[uuid]
-            texture = clothesObj.mesh.texture
-            texPath = (os.path.dirname(texture), os.path.basename(texture))
-            writeTexture(fp, "map_Kd", texPath, human, cfg)
-        else:
-            writeTexture(fp, "map_Kd", stuff.proxy.texture, human, cfg)
+        writeTexture(fp, "map_Kd", stuff.texture, human, cfg)
         #writeTexture(fp, "map_Tr", stuff.proxy.translucency, human, cfg)
         writeTexture(fp, "map_Disp", stuff.proxy.normal, human, cfg)
         writeTexture(fp, "map_Disp", stuff.proxy.displacement, human, cfg)

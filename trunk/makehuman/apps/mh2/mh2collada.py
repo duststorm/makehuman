@@ -384,18 +384,7 @@ def exportDae(human, name, fp):
 def writeImages(obj, fp, stuff, human):
     if stuff.type:
         if stuff.texture:
-            if stuff.proxy:
-                proxy = stuff.proxy
-                uuid = proxy.getUuid()
-                if uuid in human.clothesObjs.keys() and human.clothesObjs[uuid]:
-                    clothesObj = human.clothesObjs[uuid]
-                    texture = clothesObj.mesh.texture
-                    texPath = (os.path.dirname(texture), os.path.basename(texture))
-                    textures = [texPath]
-                else:
-                    textures = [stuff.texture]
-            else:
-                textures = [stuff.texture]
+            textures = [stuff.texture]
         else:
             return
         human = None

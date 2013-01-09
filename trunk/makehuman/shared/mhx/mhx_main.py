@@ -885,6 +885,7 @@ def writeProxyMaterial(fp, mat, proxy, config, proxyData):
         uuid = proxy.getUuid()
         human = gui3d.app.selectedHuman
         if uuid in human.clothesObjs.keys() and human.clothesObjs[uuid]:
+            # Apply custom texture
             clothesObj = human.clothesObjs[uuid]
             texture = clothesObj.mesh.texture
             texPath = (os.path.dirname(texture), os.path.basename(texture))
