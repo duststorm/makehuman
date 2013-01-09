@@ -85,7 +85,7 @@ class Image(object):
         return Image(data = self.resized_(width, height))
 
     def resize(self, width, height):
-        self.data_ = self.resized_(width, height)
+        self._data = self.resized_(width, height)
 
     def blit(self, other, x, y):
         dh, dw, dc = self._data.shape
