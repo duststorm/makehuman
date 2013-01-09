@@ -30,7 +30,7 @@ from os.path import join, basename, splitext
 from core import G
 import mh
 import files3d
-import gui3d, font3d, animation3d
+import gui3d, animation3d
 import human
 import guimodelling, guifiles
 from aljabr import centroid
@@ -670,13 +670,6 @@ class MHApplication(gui3d.Application, mh.Application):
 
     def dumpMissingStrings(self):
         lang.language.dumpMissingStrings()
-
-    # Font resources
-    def getFont(self, fontFamily):
-        if fontFamily not in self.fonts:
-            self.fonts[fontFamily] = font3d.Font("data/fonts/%s.fnt" % fontFamily)
-
-        return self.fonts[fontFamily]
 
     # Caption
     def setCaption(self, caption):

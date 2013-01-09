@@ -27,7 +27,6 @@ import algos3d
 import gui3d
 import os
 import humanmodifier
-import hair
 import events3d
 import warp
 import log
@@ -71,9 +70,6 @@ class Human(gui3d.Object):
 
         self.meshStored = []
         self.meshStoredNormals = []
-        self.hairs = hair.Hairs(self)
-        self.hairFile = 'data/hairs/default.hair'
-        self.hairColor = [0.41, 0.23, 0.04]
 
         self.childVal = 0.0  # child
         self.oldVal = 0.0  # old
@@ -358,9 +354,6 @@ class Human(gui3d.Object):
 
     def getDetail(self, name):
         return self.targetsDetailStack.get(name, 0.0)
-
-    def setHairFile(self, filename):
-        self.hairFile = filename
 
     def getSymmetryGroup(self, group):
         if group.name.find('l-', 0, 2) != -1:
