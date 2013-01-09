@@ -340,11 +340,6 @@ class BaseModifier(object):
         human.warpNeedReset = True
 
 class SimpleModifier(BaseModifier):
-
-    def __init__(self, template):
-        
-        GenericModifier.__init__(self, template)
-        
     # overrides
     def expandTemplate(self, targets):
         
