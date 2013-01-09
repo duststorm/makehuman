@@ -124,7 +124,7 @@ class ModifierTaskView(gui3d.TaskView):
         for slider in self.sliders:
             slider.update()
 
-        if event.change == 'reset':
+        if event.change in ('reset', 'load'):
             self.updateMacro()
 
     def loadHandler(self, human, values):

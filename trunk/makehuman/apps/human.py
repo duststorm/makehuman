@@ -591,6 +591,8 @@ class Human(gui3d.Object):
 
         f.close()
 
+        self.callEvent('onChanged', HumanEvent(self, 'load'))
+
         if update:
             self.applyAllTargets(progressCallback)
 
