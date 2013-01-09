@@ -58,8 +58,8 @@ class PovrayTaskView(gui3d.TaskView):
         filter = []
         # Options box
         optionsBox = self.addLeftWidget(gui.GroupBox('Options'))
-        self.useSSS = optionsBox.addWidget(gui.CheckBox('Use S.S. Scattering', False))
         self.doSubdivide = optionsBox.addWidget(gui.CheckBox('Subdivide mesh', True))
+        self.useSSS = optionsBox.addWidget(gui.CheckBox('Use S.S. Scattering', False))
         self.SSSA = optionsBox.addWidget(gui.Slider(value=0.5, label="SSS Amount"))
         self.skinoil = optionsBox.addWidget(gui.Slider(value=0.5, label="Skin oil"))
         self.rough = optionsBox.addWidget(gui.Slider(value=0.5, label="Skin roughness"))

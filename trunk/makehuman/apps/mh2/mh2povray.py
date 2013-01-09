@@ -962,7 +962,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
     if settings['SSS'] == True:
         lmap = projection.mapLighting()
         lmap.save(os.path.join(outputDirectory, 'lighthi.png'))
-        print settings['SSSA']
+        log.debug('SSS: Low-Res map resolution: %s',settings['SSSA'])
         lmap.resize(int(settings['SSSA']),int(settings['SSSA']))
         lmap.save(os.path.join(outputDirectory, 'lightlo.png'))
 
