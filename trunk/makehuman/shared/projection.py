@@ -192,6 +192,9 @@ def fixSeams(img):
     img._data[...,-1:][border] = 255
 
 def mapLighting():
+    """
+    Create a lightmap for the selected human.
+    """
 
     mesh = gui3d.app.selectedHuman.mesh
 
@@ -296,6 +299,9 @@ def rasterizeVLines(dstImg, edges, delta, progress = None):
         data[y.astype(int),np.floor(x).astype(int),:] = 255
 
 def mapUV():
+    """
+    Project the UV map topology of the selected human mesh onto a texture.
+    """
 
     mesh = gui3d.app.selectedHuman.mesh
 
@@ -340,7 +346,7 @@ def mapUV():
     log.debug("mapUV: begin render")
 
     def progress(base, i, n):
-        gui3d.app.progress(base + 0.5 * i / n)
+        gui3d.app.progress(base + 0.5 * i / n, "Projecting UV map")
 
     rasterizeHLines(dstImg, hedges, hdelta, progress = lambda i,n: progress(0.0,i,n))
     rasterizeVLines(dstImg, vedges, vdelta, progress = lambda i,n: progress(0.5,i,n))

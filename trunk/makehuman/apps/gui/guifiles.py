@@ -523,9 +523,15 @@ class ExportTaskView(gui3d.TaskView):
                     log.debug("Enabling shadeless rendering on body")
                     human.mesh.setShadeless(True)
             elif self.uvmap.selected:
-                log.debug("UV export not yet implemented (TODO)")
-                mh.changeCategory('Modelling')
-                return
+                import projection
+                human = gui3d.app.selectedHuman
+                dstImg = projection.mapUV()
+                filepath = filename("png")
+                dstImg.save(filepath)
+                if self.uvmapDisplay:
+                    human.setTexture(filepath)
+                    log.debug("Enabling shadeless rendering on body")
+                    human.mesh.setShadeless(True)
             else:
                 log.error("Unknown export format selected!")
                 return
