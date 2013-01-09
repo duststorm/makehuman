@@ -30,224 +30,6 @@ import humanmodifier
 import log
 import targets
 
-# Gender[0..1]
-# -
-# maleVal = Gender
-# femaleVal = 1 - Gender
-# -
-# male : maleVal
-# female : femaleVal
-
-# Age [0..1]
-# -
-# childVal = max(0, 1 - 2 * Age)
-# youngVal = 1 - abs(2 * Age - 1)
-# oldVal = max(0, 2 * Age - 1)
-# -
-# child : childVal
-# young : youngVal
-# old : oldVal
-
-# Weight [0..1]
-# -
-# underweightVal = max(0, 1 - 2 * Weight)
-# overweightVal = max(0, 2 * Weight - 1)
-# -
-# heavy : overweightVal
-# [averageWeight] : 1 - underweightVal - overweightVal
-# light : underweightVal
-
-# Muscle [0..1]
-# -
-# muscleVal = max(0, 2 * Muscle - 1)
-# flaccidVal = max(0, 1 - 2 * weight)
-# -
-# flaccid : flaccidVal
-# [averageTone] : 1 - flaccidVal - muscleVal
-# muscle : muscleVal
-
-# African [0..1]
-# -
-# africanVal = african
-# -
-# african : africanVal / len(ethnics)
-
-# Asian [0..1]
-# -
-# asianVal = asian
-# -
-# asian : asianVal / len(ethnics)
-
-# ... [0..1]
-# -
-# ...
-# -
-# caucasian : (1 - (africanVal + asianVal) / len(ethnics))
-
-# Height [-1..1]
-# ...
-# -
-# dwarf : -min(0, height)
-# giant :  max(0, height)
-
-# ... [0..1]
-# -
-# breastFirmness
-# -
-# firmness0 : 1 - breastFirmness
-# firmness1 : breastFirmness
-
-# ... [-1..1]
-# -
-# breastSize
-# -
-# cup1 : -min(0, breastSize)
-# cup2 :  max(0, breastSize)
-
-_targets = None
-
-def getTargets():
-    global _targets
-    if _targets is None:
-        _targets = targets.Targets('data/targets')
-    return _targets
-
-class GenericModifier(humanmodifier.GenericModifier):
-    @staticmethod
-    def findTargets(path):
-        if path is None:
-            return []
-        path = tuple(path.split('-'))
-        targets = []
-        if path not in getTargets().groups:
-            log.debug('missing target %s', path)
-        for target in getTargets().groups.get(path, []):
-            keys = [var
-                    for var in target.data.itervalues()
-                    if var is not None]
-            keys.append('-'.join(target.key))
-            targets.append((target.path, keys))
-        return targets
-
-    def __init__(self, left, right, center=None):
-        self.left = left
-        self.right = right
-        self.center = center
-
-        self.l_targets = self.findTargets(left)
-        self.r_targets = self.findTargets(right)
-        self.c_targets = self.findTargets(center)
-
-        self.targets = self.l_targets + self.r_targets + self.c_targets
-
-        self.verts = None
-        self.faces = None
-
-    def clampValue(self, value):
-        value = min(1.0, value)
-        if self.left is not None:
-            value = max(-1.0, value)
-        else:
-            value = max( 0.0, value)
-        return value
-
-    def setValue(self, human, value):
-        value = self.clampValue(value)
-        factors = self.getFactors(human, value)
-
-        for tpath, tfactors in self.targets:
-            human.setDetail(tpath, reduce((lambda x, y: x * y), [factors[factor] for factor in tfactors]))
-
-    @staticmethod
-    def parseTarget(target):
-        return target[0].split('/')[-1].split('.')[0].split('-')
-
-    def getValue(self, human):
-        right = sum([human.getDetail(target[0]) for target in self.r_targets])
-        if right:
-            return right
-        else:
-            return -sum([human.getDetail(target[0]) for target in self.l_targets])
-
-    def getFactors(self, human, value):
-        ethnics = [val for val in [human.africanVal, human.asianVal] if val > 0.0]
-        height = human.getHeight()
-        
-        factors = {
-            'female': human.femaleVal,
-            'male': human.maleVal,
-            'child': human.childVal,
-            'young': human.youngVal,
-            'old': human.oldVal,
-            'african': human.africanVal / len(ethnics) if ethnics else human.africanVal,
-            'asian': human.asianVal / len(ethnics) if ethnics else human.asianVal,
-            'caucasian': (1.0 - sum(ethnics) / len(ethnics)) if ethnics else 1.0,
-            'flaccid': human.flaccidVal,
-            'muscle': human.muscleVal,
-            'averageTone': 1.0 - (human.flaccidVal + human.muscleVal),
-            'light': human.underweightVal,
-            'heavy': human.overweightVal,
-            'averageWeight': 1.0 - (human.underweightVal + human.overweightVal),
-            'dwarf': -min(height, 0.0),
-            'giant': max(0.0, height),
-            'firmness0': 1.0 - human.breastFirmness,
-            'firmness1': human.breastFirmness,
-            'cup1': -min(human.breastSize, 0.0),
-            'cup2': max(0.0, human.breastSize)
-            }
-
-        return factors
-
-class UniversalModifier(GenericModifier):
-    def getFactors(self, human, value):
-        factors = GenericModifier.getFactors(self, human, value)
-
-        if self.left is not None:
-            factors[self.left] = -min(value, 0.0)
-        if self.center is not None:
-            factors[self.center] = 1.0 - abs(value)
-        factors[self.right] = max(0.0, value)
-
-        return factors
-
-class MacroModifier(GenericModifier):
-    def __init__(self, base, name, variable, min, max):
-        self.name = '-'.join(atom
-                             for atom in (base, name)
-                             if atom is not None)
-        self.variable = variable
-        self.min = min
-        self.max = max
-
-        self.targets = self.findTargets(self.name)
-
-        self.verts = None
-        self.faces = None
-
-    def getValue(self, human):
-        getter = 'get' + self.variable
-        if hasattr(human, getter):
-            return getattr(human, getter)()
-        else:
-            return getattr(human, self.variable)
-
-    def setValue(self, human, value):
-        value = self.clampValue(value)
-        setter = 'set' + self.variable
-        if hasattr(human, setter):
-            getattr(human, setter)(value)
-        else:
-            setattr(human, self.variable, value)
-        GenericModifier.setValue(self, human, value)
-
-    def clampValue(self, value):
-        return max(self.min, min(self.max, value))
-
-    def getFactors(self, human, value):
-        factors = GenericModifier.getFactors(self, human, value)
-        factors[self.name] = 1.0
-        return factors
-
 class GroupBoxRadioButton(gui.RadioButton):
     def __init__(self, task, group, label, groupBox, selected=False):
         super(GroupBoxRadioButton, self).__init__(group, label, selected)
@@ -256,29 +38,6 @@ class GroupBoxRadioButton(gui.RadioButton):
 
     def onClicked(self, event):
         self.task.groupBox.showWidget(self.groupBox)
-
-class GenericSlider(humanmodifier.ModifierSlider):
-    @staticmethod
-    def findImage(name):
-        if name is None:
-            return None
-        name = name.lower()
-        return getTargets().images.get(name, name)
-
-    def __init__(self, min, max, modifier, label, image, view):
-        image = self.findImage(image)
-        super(GenericSlider, self).__init__(min=min, max=1.0, label=label, modifier=modifier, image=image)
-        self.view = getattr(gui3d.app, view)
-
-    def onFocus(self, event):
-        super(GenericSlider, self).onFocus(event)
-        if gui3d.app.settings.get('cameraAutoZoom', True):
-            self.view()
-
-class UniversalSlider(GenericSlider):
-    def __init__(self, modifier, label, image, view):
-        min = -1.0 if modifier.left is not None else 0.0
-        super(UniversalSlider, self).__init__(min, 1.0, modifier, label, image, view)
 
 class ModifierTaskView(gui3d.TaskView):
     _group = None
@@ -310,9 +69,9 @@ class ModifierTaskView(gui3d.TaskView):
                 macro = len(template) > 4
                 if macro:
                     tname, tvar, tlabel, tmin, tmax, tview = template
-                    modifier = MacroModifier(base, tname, tvar, tmin, tmax)
+                    modifier = humanmodifier.MacroModifier(base, tname, tvar, tmin, tmax)
                     self.modifiers[tname] = modifier
-                    slider = GenericSlider(tmin, tmax, modifier, tlabel, None, tview)
+                    slider = humanmodifier.GenericSlider(tmin, tmax, modifier, tlabel, None, tview)
                 else:
                     paired = len(template) == 4
                     if paired:
@@ -324,7 +83,7 @@ class ModifierTaskView(gui3d.TaskView):
                         left = None
                         right = '-'.join([base, tname])
 
-                    modifier = UniversalModifier(left, right)
+                    modifier = humanmodifier.UniversalModifier(left, right)
 
                     tpath = '-'.join(template[:-1])
                     modifierName = tpath
@@ -335,12 +94,20 @@ class ModifierTaskView(gui3d.TaskView):
                         clashIndex += 1
 
                     self.modifiers[modifierName] = modifier
-                    slider = UniversalSlider(modifier, None, '%s.png' % tpath, tview)
+                    slider = humanmodifier.UniversalSlider(modifier, None, '%s.png' % tpath, tview)
 
                 box.addWidget(slider)
                 self.sliders.append(slider)
 
+        self.updateMacro()
+
         self.groupBox.showWidget(self.groupBoxes[0])
+
+    def updateMacro(self):
+        human = gui3d.app.selectedHuman
+        for modifier in self.modifiers.itervalues():
+            if isinstance(modifier, humanmodifier.MacroModifier):
+                modifier.setValue(human, modifier.getValue(human))
 
     def onShow(self, event):
         gui3d.TaskView.onShow(self, event)
@@ -356,6 +123,9 @@ class ModifierTaskView(gui3d.TaskView):
 
         for slider in self.sliders:
             slider.update()
+
+        if event.change == 'reset':
+            self.updateMacro()
 
     def loadHandler(self, human, values):
         if values[0] == self._group:
@@ -745,7 +515,7 @@ class MacroTaskView(ModifierTaskView):
         ]
 
 def load(app):
-    category = app.getCategory('Modelling2')
+    category = app.getCategory('Modelling')
 
     gui3d.app.noSetCamera = (lambda: None)
 

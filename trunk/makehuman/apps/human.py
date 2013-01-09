@@ -86,6 +86,8 @@ class Human(gui3d.Object):
         self.underweightVal = 0.0
         self.asianVal = 0.0
         self.africanVal = 0.0
+        self.dwarfVal = 0.0
+        self.giantVal = 0.0
         self.genitals = 0.0
         self.breastSize = 0.0
         self.breastFirmness = 0.5
@@ -102,9 +104,6 @@ class Human(gui3d.Object):
         self.stomach = 0.0
         self.bodyZones = ['l-eye','r-eye', 'jaw', 'nose', 'mouth', 'head', 'neck', 'torso', 'hip', 'pelvis', 'r-upperarm', 'l-upperarm', 'r-lowerarm', 'l-lowerarm', 'l-hand',
                           'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 'l-foot', 'r-foot', 'ear']
-
-        self.muscleWeightModifier = humanmodifier.GenderAgeMuscleWeightModifier('data/targets/macrodetails/universal-${gender}-${age}-${tone}-${weight}.target')
-        self.baseModifier = humanmodifier.GenderAgeEthnicModifier('data/targets/macrodetails/${ethnic}-${gender}-${age}.target')
         
         self.setTexture("data/textures/texture.png")        
 
@@ -327,18 +326,30 @@ class Human(gui3d.Object):
         return self.asianVal
             
     def setHeight(self, height):
-        modifier = humanmodifier.Modifier(
-            'data/targets/macrodetails/universal-stature-dwarf.target',
-            'data/targets/macrodetails/universal-stature-giant.target')
-        modifier.setValue(self, height, 0)
+        height = min(max(height, -1.0), 1.0)
+        self._setHeightVals(height)
         self.callEvent('onChanging', HumanEvent(self, 'height'))
-        
-    def getHeight(self):
-        modifier = humanmodifier.Modifier(
-            'data/targets/macrodetails/universal-stature-dwarf.target',
-            'data/targets/macrodetails/universal-stature-giant.target')
-        return modifier.getValue(self)
 
+    def getHeight(self):
+        if self.giantVal:
+            return self.giantVal
+        elif self.dwarfVal:
+            return -self.dwarfVal
+        else:
+            return 0.0
+
+    def _setHeightVals(self, amount):
+        if amount >= 0:
+            if self.giantVal == amount and self.dwarfVal == 0:
+                return
+            self.giantVal = amount
+            self.dwarfVal = 0
+        else:
+            if self.dwarfVal == -amount and self.giantVal == 0:
+                return
+            self.dwarfVal = -amount
+            self.giantVal = 0
+            
     def setDetail(self, name, value):
         if value:
             self.targetsDetailStack[name] = value
@@ -374,9 +385,6 @@ class Human(gui3d.Object):
         **Parameters:** None.
 
         """        
-        self.muscleWeightModifier.setValue(self, 1.0)
-        self.baseModifier.setValue(self, 1.0)
-
         algos3d.resetObj(self.meshData)
 
         if progressCallback:
@@ -528,6 +536,8 @@ class Human(gui3d.Object):
         self.underweightVal = 0.0
         self.asianVal = 0.0
         self.africanVal = 0.0
+        self.dwarfVal = 0.0
+        self.giantVal = 0.0
         self.genitals = 0.0
         self.breastSize = 0.0
         self.breastFirmness = 0.5
@@ -548,6 +558,7 @@ class Human(gui3d.Object):
         self.setTexture("data/textures/texture.png")
         
         self.callEvent('onChanging', HumanEvent(self, 'reset'))
+        self.callEvent('onChanged', HumanEvent(self, 'reset'))
 
     def load(self, filename, update=True, progressCallback=None):
         
@@ -577,9 +588,7 @@ class Human(gui3d.Object):
                 elif lineData[0] == 'asian':
                     self.setAsian(float(lineData[1]))
                 elif lineData[0] == 'height':
-                    modifier = humanmodifier.Modifier('data/targets/macrodetails/universal-stature-dwarf.target',
-                                                      'data/targets/macrodetails/universal-stature-giant.target')
-                    modifier.setValue(self, float(lineData[1]), 0)
+                    self.setHeight(float(lineData[1]))
                 elif lineData[0] == 'asymmetry':
                     self.targetsDetailStack['data/targets/asym/' + lineData[1] + '.target'] = float(lineData[2])
                 elif lineData[0] in gui3d.app.loadHandlers:
@@ -604,9 +613,7 @@ class Human(gui3d.Object):
         f.write('weight %f\n' % self.getWeight())
         f.write('african %f\n' % self.getAfrican())
         f.write('asian %f\n' % self.getAsian())
-
-        modifier = humanmodifier.Modifier('data/targets/macrodetails/universal-stature-dwarf.target', 'data/targets/macrodetails/universal-stature-giant.target')
-        f.write('height %f\n' % modifier.getValue(self))
+        f.write('height %f\n' % self.getHeight())
 
         for t in self.targetsDetailStack.keys():
             if '/asym' in t:

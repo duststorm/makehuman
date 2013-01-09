@@ -79,7 +79,7 @@ class RandomTaskView(gui3d.TaskView):
                     value = random.gauss( 0, 0.5 ) 
                     # non-asymmetric modifiers should only go 0..1
                     m = modifiers[modName]
-                    if not isinstance(m, humanmodifier.GenderAgeEthnicAsymmetricModifier):
+                    if m.clampValue(-1.0) >= 0:
                         value = abs(value)
                     # store for later
                     self.storeLastRandom(modName, 0, value)
@@ -122,7 +122,7 @@ class RandomTaskView(gui3d.TaskView):
                     value = random.gauss( 0, 0.5 ) 
                     # non-asymmetric modifiers should only go 0..1
                     m = modifiers[modName]
-                    if not isinstance(m, humanmodifier.GenderAgeEthnicAsymmetricModifier):
+                    if m.clampValue(-1.0) >= 0:
                         value = abs(value)
                     # store for later
                     self.storeLastRandom(modName, modifiers[modName].getValue(human), value)

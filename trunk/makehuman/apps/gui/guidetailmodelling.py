@@ -33,180 +33,6 @@ import mh
 import gui
 import log
 
-class RangeDetailModifier(humanmodifier.GenderAgeRangeModifier):
-    
-    def __init__(self, template, parameterName, parameterRange, always=True):
-    
-        humanmodifier.GenderAgeRangeModifier.__init__(self, template, parameterName, parameterRange, always)
-        
-    def getValue(self, human):
-        
-        return getattr(human, self.parameterName)
-        
-    def setValue(self, human, value):
-        
-        setattr(human, self.parameterName, value)
-        humanmodifier.GenderAgeRangeModifier.setValue(self, human, value)
-        
-class AsymmetricDetailModifier(humanmodifier.GenderAgeAsymmetricModifier):
-    
-    def __init__(self, template, parameterName, left, right, always=True):
-    
-        humanmodifier.GenderAgeAsymmetricModifier.__init__(self, template, parameterName, left, right, always)
-        
-    def getValue(self, human):
-        
-        return getattr(human, self.parameterName)
-        
-    def setValue(self, human, value):
-        
-        setattr(human, self.parameterName, value)
-        humanmodifier.GenderAgeAsymmetricModifier.setValue(self, human, value)
-
-class StomachModifier(AsymmetricDetailModifier):
-    # This needs a custom modifier because tone and weight also need to be included
-    
-    def __init__(self):
-    
-        AsymmetricDetailModifier.__init__(self, 'data/targets/details/${gender}-${age}-${tone}-${weight}-stomach${stomach}.target', 'stomach', '1', '2', False)
-        
-    def expandTemplate(self, targets):
-        
-        # Build target list of (targetname, [factors])
-        targets = [(Template(target[0]).safe_substitute(gender=value), target[1] + [value]) for target in targets for value in ['female', 'male']]
-        targets = [(Template(target[0]).safe_substitute(age=value), target[1] + [value]) for target in targets for value in ['child', 'young', 'old']]
-        targets = [(Template(target[0]).safe_substitute(tone=value), target[1] + [value or 'averageTone']) for target in targets for value in ['flaccid', '', 'muscle']]
-        targets = [(Template(target[0]).safe_substitute(weight=value), target[1] + [value or 'averageWeight']) for target in targets for value in ['light', '', 'heavy']]
-        targets = [(Template(target[0]).safe_substitute({self.parameterName:value}), target[1] + [value]) for target in targets for value in [self.left, self.right]]
-
-        # Cleanup multiple hyphens and remove a possible hyphen before a dot.
-        doubleHyphen = re.compile(r'-+')
-        hyphenDot = re.compile(r'-\.')
-        
-        targets = [(re.sub(hyphenDot, '.', re.sub(doubleHyphen, '-', target[0])), target[1]) for target in targets]
-        
-        return targets
-        
-    def getFactors(self, human, value):
-        
-        factors = {
-            'female': human.femaleVal,
-            'male': human.maleVal,
-            'child': human.childVal,
-            'young': human.youngVal,
-            'old': human.oldVal,
-            'flaccid':human.flaccidVal,
-            'muscle':human.muscleVal,
-            'averageTone':1.0 - (human.flaccidVal + human.muscleVal),
-            'light':human.underweightVal,
-            'heavy':human.overweightVal,
-            'averageWeight':1.0 - (human.underweightVal + human.overweightVal),
-            self.left: -min(value, 0.0),
-            self.right: max(0.0, value)
-        }
-        
-        return factors
-        
-class BreastsModifier(humanmodifier.GenericModifier):
-    # This needs a custom modifier because it has two extra dimensions
-    
-    def __init__(self):
-    
-        self.breastSizes = ['breastSize%d' % size for size in xrange(1, 3)]
-        humanmodifier.GenericModifier.__init__(self,
-            'data/targets/breast/female-${age}-${tone}-${weight}-cup${breastSize}-firmness${breastFirmness}.target')
-            
-    def setValue(self, human, value):
-    
-        value = self.clampValue(value)
-        factors = self.getFactors(human, value)
-        
-        for target in self.targets:
-            human.setDetail(target[0], human.femaleVal * reduce(mul, [factors[factor] for factor in target[1]]))
-        
-    def expandTemplate(self, targets):
-        
-        # Build target list of (targetname, [factors])
-        targets = [(Template(target[0]).safe_substitute(age=value), target[1] + [value]) for target in targets for value in ['child', 'young', 'old']]
-        targets = [(Template(target[0]).safe_substitute(tone=value), target[1] + [value or 'averageTone']) for target in targets for value in ['flaccid', '', 'muscle']]
-        targets = [(Template(target[0]).safe_substitute(weight=value), target[1] + [value or 'averageWeight']) for target in targets for value in ['light', '', 'heavy']]
-        targets = [(Template(target[0]).safe_substitute(breastFirmness=value), target[1] + ['breastFirmness%d' % value]) for target in targets for value in xrange(0, 2)]
-        targets = [(Template(target[0]).safe_substitute(breastSize=value), target[1] + ['breastSize%d' % value]) for target in targets for value in xrange(1, 3)]
-
-        # Cleanup multiple hyphens and remove a possible hyphen before a dot.
-        doubleHyphen = re.compile(r'-+')
-        hyphenDot = re.compile(r'-\.')
-        
-        targets = [(re.sub(hyphenDot, '.', re.sub(doubleHyphen, '-', target[0])), target[1]) for target in targets]
-        
-        return targets
-        
-    def getFactors(self, human, value):
-        
-        factors = {
-            'child': human.childVal,
-            'young': human.youngVal,
-            'old': human.oldVal,
-            'flaccid':human.flaccidVal,
-            'muscle':human.muscleVal,
-            'averageTone':1.0 - (human.flaccidVal + human.muscleVal),
-            'light':human.underweightVal,
-            'heavy':human.overweightVal,
-            'averageWeight':1.0 - (human.underweightVal + human.overweightVal),
-            'breastFirmness0': 1.0 - human.breastFirmness,
-            'breastFirmness1': human.breastFirmness,
-            'breastSize1': -min(human.breastSize, 0.0),
-            'breastSize2': max(0.0, human.breastSize)
-        }
-        '''
-        for factor in self.breastSizes:
-            factors[factor] = 0.0
-        
-        v = human.breastSize * (len(self.breastSizes) - 1)
-        index = int(math.floor(v))
-        v = v - index
-        factors[self.breastSizes[index]] = 1.0 - v
-        if index+1 < len(self.breastSizes):
-            factors[self.breastSizes[index+1]] = v
-        '''
-        return factors
-
-class BreastSizeModifier(BreastsModifier):
-    
-    def __init__(self):
-        
-        BreastsModifier.__init__(self)
-        
-    def getValue(self, human):
-        
-        return human.breastSize
-        
-    def setValue(self, human, value):
-        
-        human.breastSize = value
-        BreastsModifier.setValue(self, human, value)
-        
-    def clampValue(self, value):
-        return max(0.0, min(1.0, value))
-        
-class BreastFirmnessModifier(BreastsModifier):
-    
-    def __init__(self):
-        
-        BreastsModifier.__init__(self)
-    
-    def getValue(self, human):
-        
-        return human.breastFirmness
-        
-    def setValue(self, human, value):
-        
-        human.breastFirmness = value
-        BreastsModifier.setValue(self, human, value)
-        
-    def clampValue(self, value):
-        return max(0.0, min(1.0, value))
-
 class DetailTool(events3d.EventHandler):
 
     def __init__(self, app, micro, left, right):
@@ -507,50 +333,15 @@ class Detail3dTool(events3d.EventHandler):
         self.selectedGroups = []
         gui3d.app.redraw()
 
-class DetailSlider(humanmodifier.ModifierSlider):
-    
-    def __init__(self, value, min, max, label, modifier):
-        
-        humanmodifier.ModifierSlider.__init__(self, value, min, max, label, modifier=modifier)
-
 class DetailModelingTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Detail modelling', label='Micro')
         self.tool = None
         
-        self.modifiers = {}
-        self.oldModifiers = {}
-        
-        self.modifiers['genitals'] = AsymmetricDetailModifier('data/targets/genitals/genitals_${gender}_${genitals}_${age}.target', 'genitals', 'feminine', 'masculine', False)
-        
-        self.modifiers['breastSize'] = BreastSizeModifier()
-        self.modifiers['breastFirmness'] = BreastFirmnessModifier()
-        self.modifiers['breastPosition'] = humanmodifier.Modifier('data/targets/breast/breast-down.target',
-            'data/targets/breast/breast-up.target')
-        self.modifiers['breastDistance'] = humanmodifier.Modifier('data/targets/breast/breast-dist-min.target',
-            'data/targets/breast/breast-dist-max.target')
-        self.modifiers['breastPoint'] = humanmodifier.Modifier('data/targets/breast/breast-point-min.target',
-            'data/targets/breast/breast-point-max.target')
-        
-        self.oldModifiers['nose'] = RangeDetailModifier('data/targets/details/neutral_${gender}-${age}-nose${nose}.target', 'nose', xrange(1, 13), False)
-        self.oldModifiers['mouth'] = RangeDetailModifier('data/targets/details/neutral_${gender}-${age}-mouth${mouth}.target', 'mouth', xrange(1, 14), False)
-        self.oldModifiers['eyes'] = RangeDetailModifier('data/targets/details/neutral_${gender}-${age}-eye${eyes}.target', 'eyes', xrange(1, 31), False)
-        self.oldModifiers['ears'] = RangeDetailModifier('data/targets/details/${gender}-${age}-ears${ears}.target', 'ears', xrange(1, 9), False)
-        self.oldModifiers['jaw'] = RangeDetailModifier('data/targets/details/${gender}-${age}-jaw${jaw}.target', 'jaw', xrange(1, 8), False)
-        
-        self.oldModifiers['head'] = RangeDetailModifier('data/targets/details/neutral_${gender}-${age}-head${head}.target', 'head', xrange(1, 9), False)
-        
-        self.modifiers['pelvisTone'] = AsymmetricDetailModifier('data/targets/details/${gender}-${age}-pelvis-tone${pelvisTone}.target', 'pelvisTone', '1', '2', False)
-        self.modifiers['buttocks'] = AsymmetricDetailModifier('data/targets/details/${gender}-${age}-nates${buttocks}.target', 'buttocks', '1', '2', False)
-        self.modifiers['stomach'] = StomachModifier()
-        
         gui3d.app.addLoadHandler('detail', self.loadHandler)
         gui3d.app.addLoadHandler('microdetail', self.loadHandler)
-        for modifier in self.modifiers:
-            gui3d.app.addLoadHandler(modifier, self.loadHandler)
-        for modifier in self.oldModifiers:
-            gui3d.app.addLoadHandler(modifier, self.loadHandler)
+
         gui3d.app.addSaveHandler(self.saveHandler)
         
         self.sliders = []
@@ -599,9 +390,6 @@ class DetailModelingTaskView(gui3d.TaskView):
     def onHumanChanged(self, event):
         
         human = event.human
-        
-        for modifier in self.modifiers.itervalues():
-            modifier.setValue(human, modifier.getValue(human))
             
         if self.isVisible():
             self.syncSliders()
@@ -612,14 +400,6 @@ class DetailModelingTaskView(gui3d.TaskView):
             human.setDetail('data/targets/details/' + values[1] + '.target', float(values[2]))
         elif values[0] == 'microdetail':
             human.setDetail('data/targets/microdetails/' + values[1] + '.target', float(values[2]))
-        else:
-            modifier = self.modifiers.get(values[0], None)
-            if modifier:
-                modifier.setValue(human, float(values[1]))
-            else:
-                modifier = self.oldModifiers.get(values[0], None)
-                if modifier:
-                    modifier.setValue(human, float(values[1]))
        
     def saveHandler(self, human, file):
         
@@ -628,7 +408,3 @@ class DetailModelingTaskView(gui3d.TaskView):
                 file.write('detail %s %f\n' % (os.path.basename(t).replace('.target', ''), human.targetsDetailStack[t]))
             elif '/microdetails' in t:
                 file.write('microdetail %s %f\n' % (os.path.basename(t).replace('.target', ''), human.targetsDetailStack[t]))
-                
-        for name, modifier in self.modifiers.iteritems():
-            value = modifier.getValue(human)
-            file.write('%s %f\n' % (name, value))
