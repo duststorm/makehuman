@@ -209,6 +209,18 @@ class Object(events3d.EventHandler):
             self.mesh.setVisibility(1)
             
     def getSubdivisionMesh(self, update=True, progressCallback=None):
+        """
+        Create or update the Catmull-Clark subdivided (or smoothed) mesh for 
+        this mesh.
+        This does not change the status of isSubdivided(), use setSubdivided()
+        for that.
+
+        If this mesh is doubled by a proxy, when isProxied() is true, a
+        subdivision mesh for the proxy is used.
+
+        Returns the subdivided mesh data.
+
+        """
         
         if self.isProxied():
             if not self.__proxySubdivisionMesh:
@@ -230,10 +242,21 @@ class Object(events3d.EventHandler):
             return self.__subdivisionMesh
 
     def isSubdivided(self):
+        """
+        Returns whether this mesh is currently set to be subdivided 
+        (or smoothed).
+
+        """
 
         return self.mesh == self.__subdivisionMesh or self.mesh == self.__proxySubdivisionMesh
             
     def setSubdivided(self, flag, update=True, progressCallback=None):
+        """
+        Set whether this mesh is to be subdivided (or smoothed).
+        When set to true, the subdivision mesh is automatically created or
+        updated.
+
+        """
 
         if flag == self.isSubdivided():
             return

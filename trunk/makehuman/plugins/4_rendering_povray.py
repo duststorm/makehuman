@@ -38,7 +38,7 @@ class PovrayTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Povray')
         
         # for path to PovRay binaries file
-        binarie = ''
+        binary = ''
 
         bintype = []
         pathBox = self.addLeftWidget(gui.GroupBox('Povray  bin  path'))
@@ -59,6 +59,7 @@ class PovrayTaskView(gui3d.TaskView):
         # Options box
         optionsBox = self.addLeftWidget(gui.GroupBox('Options'))
         self.useSSS = optionsBox.addWidget(gui.CheckBox('Use S.S. Scattering', False))
+        self.doSubdivide = optionsBox.addWidget(gui.CheckBox('Subdivide mesh', True))
         self.SSSA = optionsBox.addWidget(gui.Slider(value=0.5, label="SSS Amount"))
         self.skinoil = optionsBox.addWidget(gui.Slider(value=0.5, label="Skin oil"))
         self.rough = optionsBox.addWidget(gui.Slider(value=0.5, label="Skin roughness"))
@@ -89,23 +90,23 @@ class PovrayTaskView(gui3d.TaskView):
             if os.name == 'nt':
                 #
                 if os.environ['PROCESSOR_ARCHITECTURE'] == "x86":
-                    binarie = 'win32'
+                    binary = 'win32'
                     #
                     if self.win32sse2Button.selected:
-                        binarie = 'win32sse2'
+                        binary = 'win32sse2'
                 #
                 else:
-                    binarie = 'win64'
+                    binary = 'win64'
             # for Ubuntu.. atm
             if sys.platform == 'linux2':
-                binarie = 'linux'
+                binary = 'linux'
             #
             mh2povray.povrayExport(gui3d.app.selectedHuman.mesh, gui3d.app,
                                    {'source':'gui',         # 'ini' if self.iniButton.selected else 'gui',
                                     'format':'mesh2',       # 'array' if self.arrayButton.selected else 'mesh2',
                                     'action':'render',      # 'export' if self.exportButton.selected else 'render',
-                                    'subdivide':True,
-                                    'bintype': binarie,
+                                    'subdivide':True if self.doSubdivide.selected else False,
+                                    'bintype': binary,
                                     'SSS': True if self.useSSS.selected else False,
                                     'SSSA': 2**(10-6*self.SSSA.getValue()),  # exponential slider
                                     'skinoil': 0.001 *(10**(4*self.skinoil.getValue())), # exponential slider

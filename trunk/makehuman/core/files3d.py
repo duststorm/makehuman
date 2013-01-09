@@ -60,8 +60,9 @@ originalVertexCache = {}
 
 def loadMesh(path, locX=0, locY=0, locZ=0, loadColors=1):
     """
-    This function loads the specified mesh objects into internal MakeHuman data structures,
-    and return it.
+    This function loads the specified mesh object into internal MakeHuman data 
+    structures, and returns it. The loaded file should be in Wavefront OBJ 
+    format.
     
     Parameters:
     -----------

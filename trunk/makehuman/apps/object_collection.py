@@ -91,6 +91,17 @@ class CStuff:
         self.targets = targets
         return
 
+    def setObject3dMesh(self, object3d, rawWeights, rawShapes):
+        self.verts = [tuple(v) for v in object3d.coord]
+        self.vnormals = [tuple(n) for n in object3d.vnorm]
+        self.uvValues = [tuple(t) for t in object3d.texco]
+
+        self.faces = mh2proxy.oldStyleFaces(object3d)
+
+        self.weights = rawWeights
+        self.targets = rawShapes
+        
+
 #
 #    filterMesh(mesh1, obj, groups, deleteVerts, eyebrows, lashes):
 #
@@ -214,8 +225,29 @@ def setupObjects(name, human, armature=None, helpers=False, hidden=True, eyebrow
             mesh2 = mesh1
         else:
             mesh2 = filterMesh(mesh1, obj, deleteGroups, deleteVerts, eyebrows, lashes)
-        stuff.setMesh(mesh2)
+        if subdivide:
+            subMesh = human.getSubdivisionMesh()
+            stuff.setObject3dMesh(subMesh, stuff.rawWeights, rawTargets)
+        else:
+            stuff.setMesh(mesh2)
         stuffs = [stuff] + stuffs
+
+    if subdivide:
+        for stuff in stuffs:
+            if stuff.proxy and stuff.proxy.type == 'Clothes' and stuff.proxy.getUuid():
+                uuid = stuff.proxy.getUuid()
+                if uuid in human.clothesObjs.keys():
+                    clo = human.clothesObjs[uuid]
+                    subMesh = clo.getSubdivisionMesh()
+                    stuff.setObject3dMesh(subMesh, stuff.rawWeights, rawTargets)
+                elif uuid == human.hairProxy.getUuid():
+                    hair = human.hairObj
+                    subMesh = hair.getSubdivisionMesh()
+                    stuff.setObject3dMesh(subMesh, stuff.rawWeights, rawTargets)
+            elif stuff.proxy and stuff.proxy.type == 'Proxy':
+                subMesh = human.getSubdivisionMesh()
+                stuff.setObject3dMesh(subMesh, stuff.rawWeights, rawTargets)
+    
     return stuffs
 
 #
@@ -247,8 +279,10 @@ def setupProxies(typename, name, obj, stuffs, armature, rawTargets, proxyList, d
                         stuffname = theStuff.name
                     else:
                         stuffname = None
+
                     mesh = mh2proxy.getMeshInfo(obj, proxy, stuff.rawWeights, rawTargets, stuffname)
                     stuff.setMesh(mesh)
+
                     stuffs.append(stuff)
     return foundProxy, deleteVerts
 

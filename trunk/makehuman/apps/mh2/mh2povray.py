@@ -516,7 +516,7 @@ def povrayExportMesh2(obj, camera, resolution, path, settings):
                                    '    subsurface { \n' +
                                    '        samples 50, 50 \n' +
                                    '        radiosity off }\n' +
-                                   'mm_per_unit 25 \n' +
+                                   '    mm_per_unit 25 \n' +
                                    '} \n'
                                    )
         
@@ -962,7 +962,8 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
     if settings['SSS'] == True:
         lmap = projection.mapLighting()
         lmap.save(os.path.join(outputDirectory, 'lighthi.png'))
-        lmap.resize(settings['SSSA'],settings['SSSA'])
+        print settings['SSSA']
+        lmap.resize(int(settings['SSSA']),int(settings['SSSA']))
         lmap.save(os.path.join(outputDirectory, 'lightlo.png'))
 
     # Open the output file in Write mode
@@ -1016,6 +1017,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
         # Vertices - Write a POV-Ray array to the output stream
         outputFileDescriptor.write('  vertex_vectors {\n  ')
         outputFileDescriptor.write('    %s\n  ' % len(stuff.verts))
+
         for v in stuff.verts:
             outputFileDescriptor.write('<%s,%s,%s>' % (-v[0],v[1],v[2]))
         outputFileDescriptor.write('''
