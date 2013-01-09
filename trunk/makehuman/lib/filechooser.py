@@ -234,8 +234,12 @@ class FileChooser(QtGui.QWidget, Widget):
         self.path = path if isinstance(path, basestring) else path[0]
         self.paths = path if isinstance(path, list) else [path]
         self.extension = extension
-        self.previewExtension = previewExtension if isinstance(previewExtension, basestring) else previewExtension[0]
-        self.previewExtensions = previewExtension if isinstance(previewExtension, list) else [previewExtension]
+        if previewExtension:
+            self.previewExtension = previewExtension if isinstance(previewExtension, basestring) else previewExtension[0]
+            self.previewExtensions = previewExtension if isinstance(previewExtension, list) else [previewExtension]
+        else:
+            self.previewExtension = None
+            self.previewExtensions = None
 
         self.sort = sort
         self.selection = ''
