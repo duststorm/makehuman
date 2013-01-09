@@ -22,6 +22,8 @@ Abstract
 Python compatibility layer replacing the old C functions of MakeHuman.
 """
 
+import json
+
 from core import G
 from getpath import getPath
 import glmodule as gl
@@ -122,3 +124,15 @@ def removeObject(obj):
 
 def setShortcut(modifier, key, method):
     G.app.mainwin.setShortcut(modifier, key, method)
+
+def parse_ini(s):
+    try:
+        return dict([(str(key), str(val) if isinstance(val, unicode) else val)
+                     for key, val in json.loads(s).iteritems()])
+    except ValueError:
+        s = s.replace("'",'"').replace(": True",": true").replace(": False",": false").replace(": None",": null")
+        return dict([(str(key), str(val) if isinstance(val, unicode) else val)
+                     for key, val in json.loads(s).iteritems()])
+
+def format_ini(d):
+    return json.dumps(d, indent=4, ensure_ascii=True, encoding='iso-8859-1') + '\n'

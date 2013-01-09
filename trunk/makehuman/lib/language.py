@@ -26,6 +26,7 @@ Language file loading and translation.
 
 import os
 import log
+import json
 
 class Language(object):
     def __init__(self):
@@ -41,11 +42,9 @@ class Language(object):
             return
         with open(path, 'rU') as f:
             try:
-                self.languageStrings = eval(f.read(), {"__builtins__":None}, {'True':True, 'False':False})
+                self.languageStrings = json.loads(f.read())
             except:
-                import traceback
-                traceback.print_exc()
-                log.error('Error in language file %s', language)
+                log.error('Error in language file %s', language, exc_info=True)
                 self.languageStrings = None
         self.language = language
         self.rtl = False
