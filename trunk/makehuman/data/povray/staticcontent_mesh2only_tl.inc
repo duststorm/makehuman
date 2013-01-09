@@ -1,8 +1,3 @@
-// Some global settings about the model.
-global_settings {
-    mm_per_unit 100       // Adjust this for more accuracy.      
-}
-
 // Create a camera definition based on the MakeHuman camera settings when this 
 // file was generated. We need to convert between the OpenGL vertical FOV and 
 // the horizontal POV-Ray camera angle. We also need to account for the way 
