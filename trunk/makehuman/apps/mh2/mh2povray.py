@@ -657,7 +657,7 @@ def povrayExportMesh2(obj, camera, resolution, path, settings):
     outputFileGeometry.close()
     log.message("POV-Ray 'geometry' file generated.")
     
-  # Copy texture definitions straight across to the output file.
+    # Copy texture definitions straight across to the output file.
 
     try:
         staticContentFileDescriptor = open(staticFile, 'r')
@@ -669,12 +669,12 @@ def povrayExportMesh2(obj, camera, resolution, path, settings):
     outputFileDescriptor.write('\n')
     staticContentFileDescriptor.close()
 
-  # The POV-Ray include file is complete
+    # The POV-Ray include file is complete
 
     outputFileDescriptor.close()
     log.message("POV-Ray '#include' file generated.")
 
-  # Copy a sample scene file across to the output directory
+    # Copy a sample scene file across to the output directory
 
     try:
         sceneFileDescriptor = open(sceneFile, 'r')
@@ -692,14 +692,14 @@ def povrayExportMesh2(obj, camera, resolution, path, settings):
     sceneLines = string.replace(sceneLines, 'xxLowercaseFileNamexx', nameOnly.lower())
     outputSceneFileDescriptor.write(sceneLines)
 
-  # Copy the skin texture file into the output directory
+    # Copy the skin texture file into the output directory
 
     try:
         shutil.copy(pigmentMap, os.path.join(outputDirectory, "texture.png"))
     except (IOError, os.error), why:
         log.error("Can't copy %s" % str(why))
 
-  # Job done
+    # Job done
 
     outputSceneFileDescriptor.close()
     sceneFileDescriptor.close()
@@ -990,13 +990,13 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
 ''')
     headerFileDescriptor.close()
 
-    # Declare POV_Ray variables containing the current makehuman camera.
+    # Declare POV Ray variables containing the current makehuman camera.
     povrayCameraData(camera, resolution, outputFileDescriptor, settings)
     
+    # Declare POV Ray variables containing the current object position and rotation.
     outputFileDescriptor.write('#declare MakeHuman_TranslateX      = %s;\n' % -obj.x)
     outputFileDescriptor.write('#declare MakeHuman_TranslateY      = %s;\n' % obj.y)
     outputFileDescriptor.write('#declare MakeHuman_TranslateZ      = %s;\n\n' % obj.z)
-    
     outputFileDescriptor.write('#declare MakeHuman_RotateX         = %s;\n' % obj.rx)
     outputFileDescriptor.write('#declare MakeHuman_RotateY         = %s;\n' % -obj.ry)
     outputFileDescriptor.write('#declare MakeHuman_RotateZ         = %s;\n\n' % obj.rz)
@@ -1093,7 +1093,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
 
 ''')
 
-    # Copy texture definitions straight across to the output file.
+    # Copy texture definitions to the output file.
     try:
         staticContentFileDescriptor = open(staticFile, 'r')
     except:
@@ -1169,77 +1169,49 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
 def writeClothesMaterials(outputFileDescriptor, stuffs):
     for stuff in stuffs[1:]:
         proxy = stuff.proxy
+        outputFileDescriptor.write("#ifndef (%s_Material)\n" % stuff.name +
+                                   "#declare %s_Texture =\n" % stuff.name +
+                                   "    texture {\n")
         texdata = getChannelData(stuff.texture)                        
         if texdata:                
             outputFileDescriptor.write(
-                "#ifndef (%s_Material)\n" % stuff.name)
-            writeChannel(outputFileDescriptor, "DIFFUSE", "pigment", stuff, texdata)
-
-            """
-            # Ick! Povray doesn't support image maps except for pigment???
-            
-            normaldata = getChannelData(proxy.normal)                
-            if normaldata:
-                writeChannel(outputFileDescriptor, "NORMAL", "normal", stuff, normaldata)
-                
-            bumpdata = getChannelData(proxy.bump)                
-            if bumpdata:
-                writeChannel(outputFileDescriptor, "BUMP", "normal", stuff, bumpdata)
-                
-            dispdata = None # getChannelData(proxy.displacement)              
-            if dispdata:
-                writeChannel(outputFileDescriptor, "DISPLACEMENT", "displacement", stuff, dispdata)
-                
-            transdata = None # getChannelData(proxy.transparency)                
-            if transdata:
-                writeChannel(outputFileDescriptor, "TRANSPARENCY", "transparency", stuff, transdata)
-            """
-            
+                    '        pigment { image_map {%s "%s" interpolate 2} }\n' % (texdata[1], texdata[0]))
+        else:
             outputFileDescriptor.write(
-                "    #declare FINISH_%s = finish {  \n" % stuff.name +
-                "        specular 0  \n" +
-                "        phong 0 phong_size 0 \n" +
-                "     \n" +
-                "        ambient 0.3 \n" +
-                "        diffuse 2.0 \n" +
-                "        reflection{0 } conserve_energy \n" +
-                "    } \n" +
-                "     \n" +
-                "    #declare %s_Material = material { \n" % stuff.name +
-                "        texture { uv_mapping \n" +
-                "                pigment { DIFFUSE_%s } \n" % stuff.name)
-
-            """                
-            if normaldata:
-                outputFileDescriptor.write(
-                "                normal { NORMAL_%s } \n" % stuff.name)
-                
-            if bumpdata:
-                outputFileDescriptor.write(
-                "                normal { bumps BUMP_%s }} \n" % stuff.name)
-                
-            if dispdata:
-                outputFileDescriptor.write(
-                "                displacement { DISPLACEMENT_%s } \n" % stuff.name)
-                
-            if transdata:
-                outputFileDescriptor.write(
-                "                transparency { TRANSPARENCY_%s } \n" % stuff.name)
-            """
-            
-            outputFileDescriptor.write(    
-                "                finish  { FINISH_%s } \n" % stuff.name +
-                "       } \n" +
-                "       interior{ior 1.33} \n" +
-                "    } \n" +
-                "#end\n")
+                    '        pigment { rgb <1,1,1> }\n')
+        bumpdata = getChannelData(proxy.bump)
+        if bumpdata:
+           outputFileDescriptor.write(
+                    '        normal { bump_map {%s "%s" interpolate 2} }\n' % (bumpdata[1], bumpdata[0]))
+        else:
+            outputFileDescriptor.write(
+                    '        normal { wrinkles 0.2 scale 0.0001 }\n')
+        
+        outputFileDescriptor.write ("        finish {\n" +
+                                    "            specular 0.05\n" +
+                                    "            roughness 0.2\n" +
+                                    "            phong 0 phong_size 0 \n" +
+                                    "            ambient 0.1\n" +
+                                    "            diffuse 0.9\n" +
+                                    "            reflection {0}\n" +
+                                    "            conserve_energy\n" +
+                                    "        }\n" +
+                                    "    }\n\n" +
+                                    "#declare %s_Material = material {\n" % stuff.name +
+                                    "    texture {\n" +
+                                    "        uv_mapping\n" +
+                                    "        %s_Texture\n" % stuff.name +
+                                    "    }\n"
+                                    "    interior {ior 1.33}\n" +
+                                    "}\n\n" +
+                                    "#end\n")
 
 
 def writeChannel(outputFileDescriptor, var, channel, stuff, data):
     (path, type) = data
     outputFileDescriptor.write(
             "    #declare %s_%s = %s { \n" % (var, stuff.name, channel) +
-            '       image_map { %s "%s"} \n' % (type, path) +
+            '       image_map { %s "%s" interpolate 2} \n' % (type, path) +
             "    } \n" +
             "     \n")            
 
