@@ -44,7 +44,7 @@ class TexturesTaskView(gui3d.TaskView):
         self.defaultTextures = [self.systemTextures, self.userTextures]  
         self.textures = self.defaultTextures
 
-        gui3d.TaskView.__init__(self, category, 'Textures')
+        gui3d.TaskView.__init__(self, category, 'Clothes Textures')
         if not os.path.exists(self.userTextures):
             os.makedirs(self.userTextures)
 
@@ -83,11 +83,6 @@ class TexturesTaskView(gui3d.TaskView):
 
     def onShow(self, event):
         human = gui3d.app.selectedHuman
-
-        log.debug("onShow %s" % str(human.clothesObjs))
-        #if human.activeClothing is None:
-        #    self.onHide(event)
-        #    return
 
         for radioBtn in self.appliedClothes:
             radioBtn.hide()
@@ -148,12 +143,8 @@ class TexturesTaskView(gui3d.TaskView):
         gui3d.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
         
-    def onHumanChanging(self, event):        
-        human = event.human
-        if event.change == 'reset':
-            log.message("deleting textures")
-            # self.clothesButton.setTexture('data/clothes/clear.png')
-            # TODO
+    def onHumanChanging(self, event):
+	pass
 
     def onHumanChanged(self, event):
         pass
