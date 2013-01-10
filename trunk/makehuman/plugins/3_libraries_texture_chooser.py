@@ -161,10 +161,12 @@ class TextureTaskView(gui3d.TaskView):
         Builds a list of all available clothes.
         """
         human = gui3d.app.selectedHuman
+        # Only keep first 3 radio btns (human body parts)
         for radioBtn in self.objectSelector[3:]:
             radioBtn.hide()
             radioBtn.destroy()
-        self.objectSelector = self.objectSelector[:3] # Only keep first 3 radio btns (human body parts)
+        del self.objectSelector[3:]
+
         self.clothesSelections = []
         theClothesList = human.clothesObjs.keys()
         self.activeClothing = None
@@ -178,9 +180,6 @@ class TextureTaskView(gui3d.TaskView):
             def onClicked(event):
                 for radio, uuid in self.clothesSelections:
                     if radio.selected:
-                        for bodyRdio in self.objectSelector[:3]:
-                            print bodyRdio
-                            bodyRdio.setChecked(False) # Because radiobuttons group gets disconnected after repopulating
                         self.activeClothing = uuid
                         log.debug( 'Selected clothing "%s" (%s)' % (radio.text(), uuid) )
                         self.reloadTextureChooser()
