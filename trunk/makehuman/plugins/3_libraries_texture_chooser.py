@@ -275,7 +275,8 @@ class TextureTaskView(gui3d.TaskView):
                     proxy = human.hairProxy
                     hairPath = os.path.dirname(proxy.file)
                     filepath = os.path.join(hairPath, filepath)
-                human.hairObj.mesh.setTexture(filePath)
+                human.hairObj.mesh.setTexture(filepath)
+                return
             elif not uuid in human.clothesProxies.keys():
                 log.error("Could not load texture for object with uuid %s!" % uuid)
                 return
@@ -285,6 +286,7 @@ class TextureTaskView(gui3d.TaskView):
                 clothesPath = os.path.dirname(proxy.file)
                 filepath = os.path.join(clothesPath, filepath)
             self.applyClothesTexture(uuid, filepath)
+            return
         elif values[0] == 'eyeTexture':
             self.setEyes(human, values[1])
        
@@ -301,8 +303,10 @@ class TextureTaskView(gui3d.TaskView):
                     else:
                         texturePath = clo.mesh.texture
                     file.write('textures %s %s\n' % (proxy.getUuid(), texturePath))
+        if human.hairObj and human.hairProxy:
+            file.write('textures %s %s\n' % (human.hairProxy.getUuid(), human.hairObj.mesh.texture))
         if self.eyeTexture:
-            file.write('eyeTexture %s' % self.eyeTexture)
+            file.write('eyeTexture %s\n' % self.eyeTexture)
 
     def syncMedia(self):
         
