@@ -63,20 +63,20 @@ def load(path):
 def save(path, data):
     h, w, d = data.shape
 
-    pixels = np.empty((h, w), dtype = np.uint32)
+    data = data.astype(np.uint32)
 
     if d == 1:
         fmt = QtGui.QImage.Format_RGB32
-        pixels[...] = data[...,0] * 0x10101
+        pixels = data[...,0] * 0x10101
     elif d == 2:
         fmt = QtGui.QImage.Format_ARGB32
-        pixels[...] = data[...,1] * 0x1000000 + data[...,0] * 0x10101
+        pixels = data[...,1] * 0x1000000 + data[...,0] * 0x10101
     elif d == 3:
         fmt = QtGui.QImage.Format_RGB32
-        pixels[...] = 0xFF000000 + data[...,0] * 0x10000 + data[...,1] * 0x100 + data[...,2]
+        pixels = 0xFF000000 + data[...,0] * 0x10000 + data[...,1] * 0x100 + data[...,2]
     elif d == 4:
         fmt = QtGui.QImage.Format_ARGB32
-        pixels[...] = data[...,3] * 0x1000000 + data[...,0] * 0x10000 + data[...,1] * 0x100 + data[...,2]
+        pixels = data[...,3] * 0x1000000 + data[...,0] * 0x10000 + data[...,1] * 0x100 + data[...,2]
 
     im = QtGui.QImage(pixels.tostring(), w, h, w * 4, fmt)
     format = "PNG" if path.lower().endswith('.thumb') else None
