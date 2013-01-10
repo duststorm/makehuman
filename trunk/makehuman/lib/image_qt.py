@@ -79,5 +79,6 @@ def save(path, data):
         pixels[...] = data[...,3] * 0x1000000 + data[...,0] * 0x10000 + data[...,1] * 0x100 + data[...,2]
 
     im = QtGui.QImage(pixels.tostring(), w, h, w * 4, fmt)
-    if not im.save(path):
+    format = "PNG" if path.lower().endswith('.thumb') else None
+    if not im.save(path, format):
         raise RuntimeError('error saving image %s' % path)

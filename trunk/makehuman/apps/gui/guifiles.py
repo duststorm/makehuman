@@ -30,7 +30,6 @@ main OpenGL/Application event handling loop.
 import mh
 import gui3d
 import os
-from shutil import copyfile, move
 from os.path import basename
 import gui
 import filechooser as fc
@@ -81,8 +80,7 @@ class SaveTaskView(gui3d.TaskView):
             x0,y0,z0 = gui3d.app.guiCamera.convertToScreen(x0, y0, 0)
             x1,y1,z1 = gui3d.app.guiCamera.convertToScreen(x1, y1, 0)
             log.debug('grab rectangle: %d %d %d %d', x0, y0, x1, y1)
-            mh.grabScreen(int(x0+1), int(y1+1), int(x1-x0-1), int(y0-y1-1), os.path.join(dir, name + '.png'))
-            move(os.path.join(dir, name + '.png'), os.path.join(dir, name + '.thumb'))
+            mh.grabScreen(int(x0+1), int(y1+1), int(x1-x0-1), int(y0-y1-1), os.path.join(dir, name + '.thumb'))
 
             # Save the model
 
