@@ -101,11 +101,14 @@ class EyesTaskView(gui3d.TaskView):
 
 
 def load(app):
+    pass
+    '''
     category = app.getCategory('Library')
     taskview = category.addTask(EyesTaskView(category))
 
     app.addLoadHandler('eyes', taskview.loadHandler)
     app.addSaveHandler(taskview.saveHandler)
+    '''
 
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
