@@ -140,8 +140,11 @@ class HumanTextureTaskView(gui3d.TaskView):
 
 
 def load(app):
+	return  # Disabled in favour of the new texture chooser plugin
+	'''
     category = app.getCategory('Library')
     taskview = category.addTask(HumanTextureTaskView(category))
+	'''
 
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
