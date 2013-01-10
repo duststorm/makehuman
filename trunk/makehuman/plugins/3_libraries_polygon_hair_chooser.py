@@ -39,7 +39,7 @@ class HairTaskView(gui3d.TaskView):
         hairDir = os.path.join(mh.getPath(''), 'data', 'hairstyles')
         if not os.path.exists(hairDir):
             os.makedirs(hairDir)
-        self.filechooser = self.addTopWidget(fc.FileChooser([hairDir , 'data/hairstyles'], 'obj', 'png', 'data/hairstyles/notfound.png'))
+        self.filechooser = self.addTopWidget(fc.FileChooser([hairDir , 'data/hairstyles'], 'obj', 'thumb', 'data/hairstyles/notfound.thumb'))
         self.addLeftWidget(self.filechooser.sortBox)
       
         self.oHeadCentroid = [0.0, 7.436, 0.03 + 0.577]
