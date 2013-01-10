@@ -195,8 +195,8 @@ def load(app):
     category = app.getCategory('Library')
     taskview = category.addTask(TexturesTaskView(category))
 
-    app.addLoadHandler('textures', taskview.loadHandler)
-    app.addSaveHandler(taskview.saveHandler)
+    #app.addLoadHandler('textures', taskview.loadHandler)
+    #app.addSaveHandler(taskview.saveHandler)
 
 # This method is called when the plugin is unloaded from makehuman
 # At the moment this is not used, but in the future it will remove the added GUI elements
