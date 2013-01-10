@@ -107,8 +107,6 @@ class Camera(events3d.EventHandler):
     def setEyeZ(self, value):
     
         self.camera.eyeZ = value
-        if self.camera.projection == 0:
-            self.switchToOrtho()
         self.changed()
         
     eyeZ = property(getEyeZ, setEyeZ)
@@ -146,8 +144,6 @@ class Camera(events3d.EventHandler):
     def setFocusZ(self, value):
     
         self.camera.focusZ = value
-        if self.camera.projection == 0:
-            self.switchToOrtho()
         self.changed()
         
     focusZ = property(getFocusZ, setFocusZ)
@@ -190,53 +186,18 @@ class Camera(events3d.EventHandler):
     upZ = property(getUpZ, setUpZ)
     
     @property
-    def focus(self):
+    def up(self):
         return (self.camera.upX, self.camera.upY, self.camera.upZ)
-        
-    def getLeft(self):
     
-        return self.camera.left
+    def getScale(self):
+        return self.camera.scale
 
-    def setLeft(self, value):
-    
-        self.camera.left = value
+    def setScale(self, value):
+        self.camera.scale = value
         self.changed()
-        
-    left = property(getLeft, setLeft)
-    
-    def getRight(self):
-    
-        return self.camera.right
 
-    def setRight(self, value):
-    
-        self.camera.right = value
-        self.changed()
-        
-    right = property(getRight, setRight)
-    
-    def getBottom(self):
-    
-        return self.camera.bottom
+    scale = property(getScale, setScale)
 
-    def setBottom(self, value):
-    
-        self.camera.bottom = value
-        self.changed()
-        
-    bottom = property(getBottom, setBottom)
-    
-    def getTop(self):
-    
-        return self.camera.top
-
-    def setTop(self, value):
-    
-        self.camera.top = value
-        self.changed()
-        
-    top = property(getTop, setTop)
-    
     def getStereoMode(self):
     
         return self.camera.stereoMode
@@ -270,25 +231,14 @@ class Camera(events3d.EventHandler):
         self.changedPending = False
         
     def switchToOrtho(self):
-    
-        self.camera.projection = 0
-        
-        self.camera.nearPlane = 0.001
-            
-        width, height = self.app.getWindowSize()
-        aspect = float(width) / float(height)
         fov = math.tan(self.camera.fovAngle * 0.5 * math.pi / 180.0)
-        y = aljabr.vdist(self.eye, self.focus) * fov
-        x = y * aspect
-        
-        self.camera.left = -x
-        self.camera.right = x
-        self.camera.bottom = -y
-        self.camera.top = y
-        
+        scale = aljabr.vdist(self.eye, self.focus) * fov
+
+        self.camera.projection = 0
+        self.camera.scale = scale
         self.camera.nearPlane = -100.0
         
     def switchToPerspective(self):
     
-        self.camera.projection = 0
-
+        self.camera.projection = 1
+        self.camera.nearPlane = 0.1

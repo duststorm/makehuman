@@ -114,12 +114,16 @@ class BackgroundTaskView(gui3d.TaskView):
             bg = self.backgroundImage
             bg.mesh.setTexture(os.path.join(self.backgroundsFolder, filename))
 
-            bg.setPosition([80, 80, 8])
-            bg.mesh.resize(self.texture.width, self.texture.height)
+            aspect = 1.0 * self.texture.width / self.texture.height
+            bg.setPosition([-aspect, -1, 0])
+            bg.mesh.resize(2.0 * aspect, 2.0)
             self.backgroundWidth = self.texture.width
             self.backgroundHeight = self.texture.height
             self.originalWidth = self.texture.width
             self.originalHeight = self.texture.height
+
+            # Switch to orthogonal view
+            gui3d.app.modelCamera.switchToOrtho()
 
             self.fixateBackground()
 
@@ -128,9 +132,6 @@ class BackgroundTaskView(gui3d.TaskView):
 
             mh.changeTask('Modelling', 'Background')
             gui3d.app.redraw()
-
-            # Switch to orthogonal view
-            # gui3d.app.modelCamera.switchToOrtho()
 
     def fixateBackground(self):
 

@@ -271,6 +271,8 @@ class CameraAction(Action):
         self.endParams = endParams or (self.cam.eyeX, self.cam.eyeY, self.cam.eyeZ, self.cam.focusX, self.cam.focusY, self.cam.focusZ, self.cam.upX, self.cam.upY, self.cam.upZ)
 
     def set(self, alpha):
+        if self.cam.projection == 0:
+            self.cam.switchToPerspective()
         value = lerpVector(self.startParams, self.endParams, alpha)
         self.cam.eyeX, self.cam.eyeY, self.cam.eyeZ, self.cam.focusX, self.cam.focusY, self.cam.focusZ, self.cam.upX, self.cam.upY, self.cam.upZ = value
 

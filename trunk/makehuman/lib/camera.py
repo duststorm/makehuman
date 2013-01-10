@@ -53,10 +53,7 @@ class Camera(object):
         self.upX = 0.0
         self.upY = 1.0
         self.upZ = 0.0
-        self.left = 0.0
-        self.right = 0.0
-        self.bottom = 0.0
-        self.top = 0.0
+        self.scale = 1.0
 
         return self
 
@@ -74,21 +71,23 @@ class Camera(object):
         if eye:
             stereoMode = self.stereoMode
 
+        aspect = float(max(1, G.windowWidth)) / float(max(1, G.windowHeight))
+
         if stereoMode == 0:
             # No stereo
             if self.projection:
-                proj = matrix.perspective(self.fovAngle, float(max(1, G.windowWidth)) / float(max(1, G.windowHeight)), self.nearPlane, self.farPlane)
-            elif self.left == self.right and self.top == self.bottom:
-                proj = matrix.ortho(0.0, max(1, G.windowWidth), max(1, G.windowHeight), 0.0, self.nearPlane, self.farPlane)
+                proj = matrix.perspective(self.fovAngle, aspect, self.nearPlane, self.farPlane)
             else:
-                proj = matrix.ortho(self.left, self.right, self.bottom, self.top, self.nearPlane, self.farPlane)
+                height = self.scale
+                width = self.scale * aspect
+                proj = matrix.ortho(-width, width, -height, height, self.nearPlane, self.farPlane)
 
             mv = lookat(self.eyeX, self.eyeY, self.eyeZ,       # Eye
                         self.focusX, self.focusY, self.focusZ, # Focus
                         self.upX, self.upY, self.upZ)          # Up
         elif stereoMode == 1:
             # Toe-in method, uses different eye positions, same focus point and projection
-            proj = matrix.perspective(self.fovAngle, float(max(1, G.windowWidth)) / float(max(1, G.windowHeight)), self.nearPlane, self.farPlane)
+            proj = matrix.perspective(self.fovAngle, aspect, self.nearPlane, self.farPlane)
 
             if eye == 1:
                 mv = lookat(self.eyeX - 0.5 * self.eyeSeparation, self.eyeY, self.eyeZ, # Eye
@@ -100,10 +99,9 @@ class Camera(object):
                             self.upX, self.upY, self.upZ)                               # Up
         elif stereoMode == 2:
             # Off-axis method, uses different eye positions, focus points and projections
-            aspectratio = float(max(1, G.windowWidth)) / float(max(1, G.windowHeight))
             widthdiv2 = math.tan(math.radians(self.fovAngle) / 2) * self.nearPlane
-            left  = - aspectratio * widthdiv2
-            right = aspectratio * widthdiv2
+            left  = - aspect * widthdiv2
+            right = aspect * widthdiv2
             top = widthdiv2
             bottom = -widthdiv2
 
