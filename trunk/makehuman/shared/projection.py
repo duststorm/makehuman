@@ -105,7 +105,7 @@ def mapImage(srcImg, mesh, leftTop, rightBottom):
     eye = np.matrix([ex,ey,ez,1]).T
     fx, fy, fz = gui3d.app.modelCamera.focus
     focus = np.matrix([fx,fy,fz,1]).T
-    transform = mesh.object3d.transform
+    transform = gui3d.app.modelCamera.camera.getObjectMatrix(mesh).I
     eye = v4to3(transform * eye)
     focus = v4to3(transform * focus)
     camera = vnorm(eye - focus)
@@ -134,7 +134,7 @@ def mapImage(srcImg, mesh, leftTop, rightBottom):
     # log.debug('rect: %s %s', leftTop, rightBottom)
     coord -= np.asarray([leftTop[0], leftTop[1]])[None,None,:]
     coord /= np.asarray([rightBottom[0] - leftTop[0], rightBottom[1] - leftTop[1]])[None,None,:]
-    alpha = np.sum(mesh.vnorm[mesh.fvert[faces]] * np.asarray(camera)[None,None,:], axis=-1)
+    alpha = np.sum(mesh.vnorm[mesh.fvert[faces]] * camera[None,None,:], axis=-1)
     alpha = np.maximum(0, alpha)
     # alpha[...] = 1 # debug
     # log.debug('alpha: %s', alpha.shape)
