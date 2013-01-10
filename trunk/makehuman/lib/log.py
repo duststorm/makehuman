@@ -57,6 +57,24 @@ except:
 logging.addLevelName(NOTICE, "NOTICE")
 logging.addLevelName(MESSAGE, "MESSAGE")
 
+def _splitpath(path):
+    
+    head, tail = os.path.split(path)
+    if tail == '':
+        return [head]
+    return _splitpath(head) + [tail]
+
+class NoiseFilter(logging.Filter):
+    def filter(self, record):
+        try:
+            if record.msg.endswith(':\n%s'):
+                record.msg = record.msg[:-4]
+                record.args = record.args[:-1]
+        except:
+            import traceback
+            traceback.print_exc()
+        return True
+
 class SplashLogHandler(logging.Handler):
     def emit(self, record):
         if G.app is not None and G.app.splash is not None:
@@ -73,25 +91,34 @@ class ApplicationLogHandler(logging.Handler):
             G.app.log_window.addText(self.format(record) + '\n')
 
 def init():
-    userDir = getPath('')
-    defaults = dict(mhUserDir = userDir.replace('\\','/'))
+    def config():
+        userDir = getPath('')
+        defaults = dict(mhUserDir = userDir.replace('\\','/'))
 
-    try:
-        filename = os.path.join(userDir, "logging.ini")
-        if os.path.isfile(filename):
-            logging.config.fileConfig(filename, defaults)
+        try:
+            filename = os.path.join(userDir, "logging.ini")
+            if os.path.isfile(filename):
+                logging.config.fileConfig(filename, defaults)
+                return
+        except Exception:
+            pass
+
+        try:
+            logging.config.fileConfig(os.path.join('data','logging.ini'), defaults)
             return
-    except Exception:
-        pass
+        except Exception:
+            pass
+
+        try:
+            logging.basicConfig(level = logging.DEBUG)
+            return
+        except Exception:
+            pass
+
+    config()
 
     try:
-        logging.config.fileConfig(os.path.join('data','logging.ini'), defaults)
-        return
+        logging.getLogger('OpenGL.formathandler').addFilter(NoiseFilter())
     except Exception:
-        pass
-
-    try:
-        logging.basicConfig(level = logging.DEBUG)
-        return
-    except Exception:
-        pass
+        import traceback
+        traceback.print_exc()

@@ -97,6 +97,14 @@ if not os.path.isdir(userDir):
 
 import log
 log.init()
+log.message('Initialized logging')
+
+try:
+    from debugdump import DebugDump
+    debugdump = DebugDump()
+    debugdump.reset()
+except Exception as e:
+    log.error("Could not create debug dump", exc_info=True)
 
 from mhmain import MHApplication
 

@@ -28,10 +28,6 @@ import sys
 import os
 import string
 import re
-
-sys.path.append('core')
-
-from debugdump import DebugDump
 import subprocess 
 
 # print os.getcwd()
@@ -138,12 +134,6 @@ if __name__ == '__main__':
         sys.stderr = fe
 
     get_svn_revision()
-
-    try:
-        debugdump = DebugDump()
-        debugdump.reset()
-    except Exception as e:
-        print "Could not create debug dump -- " + format(str(e))
 
     os.environ["STARTEDCORRECTLY"] = "1"
     execfile(mfile)
