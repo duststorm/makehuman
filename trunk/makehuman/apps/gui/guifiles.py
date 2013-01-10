@@ -30,7 +30,7 @@ main OpenGL/Application event handling loop.
 import mh
 import gui3d
 import os
-from shutil import copyfile
+from shutil import copyfile, move
 from os.path import basename
 import gui
 import filechooser as fc
@@ -73,7 +73,8 @@ class SaveTaskView(gui3d.TaskView):
             # Save the thumbnail
 
             leftTop = self.selection.getPosition()
-            mh.grabScreen(int(leftTop[0]+1), int(leftTop[1]+1), int(self.selection.width-1), int(self.selection.height-1), os.path.join(dir, name + '.bmp'))
+            mh.grabScreen(int(leftTop[0]+1), int(leftTop[1]+1), int(self.selection.width-1), int(self.selection.height-1), os.path.join(dir, name + '.png'))
+            move(os.path.join(dir, name + '.png'), os.path.join(dir, name + '.thumb'))
 
             # Save the model
 
@@ -210,7 +211,7 @@ class LoadTaskView(gui3d.TaskView):
         
         modelPath = mh.getPath('models')
         gui3d.TaskView.__init__(self, category, 'Load', )
-        self.filechooser = self.addTopWidget(fc.FileChooser(modelPath, 'mhm', sort=HumanFileSort()))
+        self.filechooser = self.addTopWidget(fc.FileChooser(modelPath, 'mhm', 'thumb', 'data/notfound.thumb', sort=HumanFileSort()))
         self.addLeftWidget(self.filechooser.sortBox)
 
         @self.filechooser.mhEvent
