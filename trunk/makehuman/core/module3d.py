@@ -718,6 +718,7 @@ class Object3D(object):
         texture = getTexture(path, cache)
         
         if texture:
+            self.textureId = texture.textureId
             self.object3d.texture = texture.textureId
 
     def clearTexture(self):

@@ -284,7 +284,8 @@ class UpdateAction(Action):
         self.app = app
 
     def set(self, alpha):
-        self.app.redrawNow()
+        self.app.redraw()
+        self.app.processEvents()
 
 
 class Timeline:

@@ -600,9 +600,6 @@ class Application(QtGui.QApplication, events3d.EventHandler):
     def redraw(self):
         self.mainwin.update()
         
-    def redrawNow(self):
-        gl.draw()
-        
     def getWindowSize(self):
         return G.windowWidth, G.windowHeight
 

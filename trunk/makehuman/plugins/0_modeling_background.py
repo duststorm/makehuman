@@ -56,8 +56,8 @@ class BackgroundTaskView(gui3d.TaskView):
 
         self.filenames = {}
 
-        mesh = gui3d.RectangleMesh(420, 420)
-        self.backgroundImage = gui3d.app.categories['Modelling'].addObject(gui3d.Object([190, 90, 1], mesh, visible=False))
+        mesh = gui3d.RectangleMesh(1, 1)
+        self.backgroundImage = gui3d.app.categories['Modelling'].addObject(gui3d.Object([0, 0, 1], mesh, visible=False))
         self.opacity = 100
         mesh.setColor([255, 255, 255, self.opacity])
         mesh.setPickable(False)
@@ -94,8 +94,6 @@ class BackgroundTaskView(gui3d.TaskView):
         @self.filechooser.mhEvent
         def onFileSelected(filename):
 
-            self.reference = gui3d.app.selectedHuman.getPosition()
-
             if self.bgImageFrontRadioButton.selected:
                 self.filenames['front'] = filename
             elif self.bgImageBackRadioButton.selected:
@@ -117,63 +115,32 @@ class BackgroundTaskView(gui3d.TaskView):
             aspect = 1.0 * self.texture.width / self.texture.height
             bg.setPosition([-aspect, -1, 0])
             bg.mesh.resize(2.0 * aspect, 2.0)
-            self.backgroundWidth = self.texture.width
-            self.backgroundHeight = self.texture.height
-            self.originalWidth = self.texture.width
-            self.originalHeight = self.texture.height
 
             # Switch to orthogonal view
             gui3d.app.modelCamera.switchToOrtho()
-
-            self.fixateBackground()
 
             bg.show()
             self.backgroundImageToggle.setSelected(True)
 
             mh.changeTask('Modelling', 'Background')
             gui3d.app.redraw()
-
-    def fixateBackground(self):
-
-        self.reference = gui3d.app.selectedHuman.getPosition()
-        _, _, z = gui3d.app.modelCamera.convertToScreen(*self.reference)
-        x, y, _ = self.backgroundImage.getPosition()
-        self.leftTop = gui3d.app.modelCamera.convertToWorld3D(x, y, z)
-        self.rightBottom = gui3d.app.modelCamera.convertToWorld3D(x + self.backgroundWidth, y + self.backgroundHeight, z)
-
-    def updateBackground(self):
-
-        if self.backgroundImage.hasTexture():
-
-            reference = gui3d.app.selectedHuman.getPosition()
-            diff = vsub(reference, self.reference)
-            self.leftTop = vadd(self.leftTop, diff)
-            self.rightBottom = vadd(self.rightBottom, diff)
-
-            leftTop = gui3d.app.modelCamera.convertToScreen(*self.leftTop)
-            rightBottom = gui3d.app.modelCamera.convertToScreen(*self.rightBottom)
-
-            self.backgroundImage.setPosition([leftTop[0], leftTop[1], 8])
-            self.backgroundWidth = rightBottom[0]-leftTop[0]
-            self.backgroundHeight = rightBottom[1]-leftTop[1]
-            self.backgroundImage.mesh.resize(self.backgroundWidth, self.backgroundHeight)
-
-            self.reference = reference
         
     def projectBackground(self):
-        if not hasattr(self, "leftTop"):
+        if not self.backgroundImage.isVisible():
             gui3d.app.prompt("Warning", "You need to load a background before you can project it.", "OK")
             return
 
         mesh = gui3d.app.selectedHuman.getSeedMesh()
 
-        self.fixateBackground()
-
         # for all quads, project vertex to screen
         # if one vertex falls in bg rect, project screen quad into uv quad
         # warp image region into texture
-        leftTop = gui3d.app.modelCamera.convertToScreen(*self.leftTop)
-        rightBottom = gui3d.app.modelCamera.convertToScreen(*self.rightBottom)
+        ((x0,y0,z0), (x1,y1,z1)) = self.backgroundImage.mesh.calcBBox()
+        camera = mh.cameras[self.backgroundImage.mesh.cameraMode]
+        x0, y0, _ = camera.convertToScreen(x0, y0, z0, self.backgroundImage.mesh)
+        x1, y1, _ = camera.convertToScreen(x1, y1, z1, self.backgroundImage.mesh)
+        leftTop = (x0, y1)
+        rightBottom = (x1, y0)
 
         dstImg = projection.mapImage(mh.Image(self.backgroundImage.getTexture()), mesh, leftTop, rightBottom)
 
@@ -212,8 +179,7 @@ class BackgroundTaskView(gui3d.TaskView):
         gui3d.TaskView.onHide(self, event)
 
     def onHumanTranslated(self, event):
-
-        self.updateBackground()
+        pass
 
     def setBackgroundImage(self, side):
         filename = self.filenames.get(side)
@@ -235,14 +201,11 @@ class BackgroundTaskView(gui3d.TaskView):
         elif rot==[-90,0,0]:
             self.setBackgroundImage('bottom')
 
-        self.updateBackground()
-
     def onCameraChanged(self, event):
-
-        self.updateBackground()
+        pass
 
     def onResized(self, event):
-        self.updateBackground()
+        pass
 
 # This method is called when the plugin is loaded into makehuman
 # The app reference is passed so that a plugin can attach a new category, task, or other GUI elements
@@ -292,24 +255,37 @@ class settingsTaskView(gui3d.TaskView) :
         def onMouseDragged(event):
 
             if event.button == mh.Buttons.LEFT_MASK:
+                ((x0,y0,z0),(x1,y1,z1)) = self.backgroundImage.mesh.calcBBox()
+                x, y, z = gui3d.app.guiCamera.convertToScreen(x0, y0, z0, self.backgroundImage.mesh)
+                x += event.dx
+                y += event.dy
+                x, y, z = gui3d.app.guiCamera.convertToWorld3D(x, y, z, self.backgroundImage.mesh)
+                dx, dy = x - x0, y - y0
                 x, y, z = self.backgroundImage.getPosition()
-                self.backgroundImage.setPosition([x + event.dx, y + event.dy, z])
-                taskview.fixateBackground()
+                self.backgroundImage.setPosition([x + dx, y + dy, z])
             elif event.button == mh.Buttons.RIGHT_MASK:
+                ((x0,y0,z0),(x1,y1,z1)) = self.backgroundImage.mesh.calcBBox()
+                x0, y0, z0 = gui3d.app.guiCamera.convertToScreen(x0, y0, z0, self.backgroundImage.mesh)
+                x1, y1, z1 = gui3d.app.guiCamera.convertToScreen(x1, y1, z1, self.backgroundImage.mesh)
+                dx, dy = x1 - x0, y0 - y1
                 if abs(event.dx) > abs(event.dy):
-                    taskview.backgroundWidth += event.dx
-                    taskview.backgroundHeight = taskview.originalHeight * taskview.backgroundWidth / taskview.originalWidth
+                    dx += event.dx
+                    dy = dx * self.texture.height / self.texture.width
                 else:
-                    taskview.backgroundHeight += event.dy
-                    taskview.backgroundWidth = taskview.originalWidth * taskview.backgroundHeight / taskview.originalHeight
-                self.backgroundImage.mesh.resize(taskview.backgroundWidth, taskview.backgroundHeight)
-                taskview.fixateBackground()
+                    dy += event.dy
+                    dx = dy * self.texture.width / self.texture.height
+                x1, y0 = x0 + dx, y1 + dy
+                x0, y0, z0 = gui3d.app.guiCamera.convertToWorld3D(x0, y0, z0, self.backgroundImage.mesh)
+                x1, y1, z1 = gui3d.app.guiCamera.convertToWorld3D(x1, y1, z1, self.backgroundImage.mesh)
+                self.backgroundImage.mesh.resize(x1 - x0, y1 - y0)
+                self.backgroundImage.mesh.move(x0, y0)
 
         self.dragButton = self.backgroundBox.addWidget(gui.ToggleButton('Move && Resize'))
 
         @self.dragButton.mhEvent
         def onClicked(event):
             self.backgroundImage.mesh.setPickable(self.dragButton.selected)
+            mh.updatePickingBuffer()
 
         self.projectBackgroundButton = self.backgroundBox.addWidget(gui.Button('Project background'))
 

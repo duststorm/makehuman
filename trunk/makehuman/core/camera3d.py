@@ -210,13 +210,14 @@ class Camera(events3d.EventHandler):
     stereoMode = property(getStereoMode, setStereoMode)
         
     def convertToScreen(self, x, y, z, obj=None):
-    
         return self.camera.convertToScreen(x, y, z, obj)
         
-    def convertToWorld3D(self, x, y, z):
-    
-        return self.camera.convertToWorld3D(x, y, z)
+    def convertToWorld3D(self, x, y, z, obj=None):
+        return self.camera.convertToWorld3D(x, y, z, obj)
         
+    def convertToWorld2D(self, x, y, z, obj=None):
+        return self.camera.convertToWorld2D(x, y, z, obj)
+
     def changed(self):
         
         if self.changedPending:

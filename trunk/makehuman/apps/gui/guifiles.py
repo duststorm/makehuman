@@ -35,6 +35,7 @@ from os.path import basename
 import gui
 import filechooser as fc
 import log
+import numpy as np
 
 class SaveTaskView(gui3d.TaskView):
 
@@ -48,7 +49,11 @@ class SaveTaskView(gui3d.TaskView):
         self.fileentry.setDirectory(modelPath)
         self.fileentry.setFilter('MakeHuman Models (*.mhm)')
 
-        mesh = gui3d.FrameMesh(100, 100)
+        self.selection_width = 1.2
+        self.selection_height = 1.3
+        mesh = gui3d.FrameMesh(self.selection_width, self.selection_height)
+        mesh.move(-self.selection_width/2, -self.selection_height/2)
+
         self.selection = gui3d.app.addObject(gui3d.Object([0, 0, 9], mesh))
         mesh.setColor([0, 0, 0, 255])
         mesh.setPickable(False)
@@ -72,8 +77,11 @@ class SaveTaskView(gui3d.TaskView):
 
             # Save the thumbnail
 
-            leftTop = self.selection.getPosition()
-            mh.grabScreen(int(leftTop[0]+1), int(leftTop[1]+1), int(self.selection.width-1), int(self.selection.height-1), os.path.join(dir, name + '.png'))
+            ((x0,y0,z0),(x1,y1,z1)) = self.selection.mesh.calcBBox()
+            x0,y0,z0 = gui3d.app.guiCamera.convertToScreen(x0, y0, 0)
+            x1,y1,z1 = gui3d.app.guiCamera.convertToScreen(x1, y1, 0)
+            log.debug('grab rectangle: %d %d %d %d', x0, y0, x1, y1)
+            mh.grabScreen(int(x0+1), int(y1+1), int(x1-x0-1), int(y0-y1-1), os.path.join(dir, name + '.png'))
             move(os.path.join(dir, name + '.png'), os.path.join(dir, name + '.thumb'))
 
             # Save the model
@@ -104,14 +112,6 @@ class SaveTaskView(gui3d.TaskView):
         gui3d.app.setGlobalCamera();
         gui3d.app.modelCamera.eyeZ = 70
         gui3d.app.selectedHuman.setRotation([0.0, 0.0, 0.0])
-        
-        leftTop = gui3d.app.modelCamera.convertToScreen(-10, 9, 0)
-        rightBottom = gui3d.app.modelCamera.convertToScreen(10, -10, 0)
-        
-        self.selection.setPosition([int(leftTop[0]) + 0.5, int(leftTop[1]) + 0.5, 9])
-        self.selection.width = int(rightBottom[0] - leftTop[0])
-        self.selection.height = int(rightBottom[1] - leftTop[1])
-        self.selection.mesh.resize(self.selection.width, self.selection.height)
         self.selection.show()
 
     def onHide(self, event):
@@ -128,14 +128,7 @@ class SaveTaskView(gui3d.TaskView):
         self.selection.hide()
         
     def onResized(self, event):
-    
-        leftTop = gui3d.app.modelCamera.convertToScreen(-10, 9, 0)
-        rightBottom = gui3d.app.modelCamera.convertToScreen(10, -10, 0)
-        
-        self.selection.setPosition([int(leftTop[0]) + 0.5, int(leftTop[1]) + 0.5, 9])
-        self.selection.width = int(rightBottom[0] - leftTop[0])
-        self.selection.height = int(rightBottom[1] - leftTop[1])
-        self.selection.mesh.resize(self.selection.width, self.selection.height)
+        pass
         
 class HumanFileSort(fc.FileSort):
     

@@ -122,7 +122,7 @@ class RectangleMesh(module3d.Object3D):
         uv = ((0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0))
         
         # The face
-        fv = [(3,2,1,0)]
+        fv = [(0,1,2,3)]
         fuv = [(0,1,2,3)]
 
         self.setCoords(v)
@@ -133,6 +133,11 @@ class RectangleMesh(module3d.Object3D):
         self.setCameraProjection(1)
         self.setShadeless(1)
         self.updateIndexBuffer()
+
+    def move(self, dx, dy):
+        self.coord += (dx, dy, 0)
+        self.markCoords(coor=True)
+        self.update()     
         
     def resize(self, width, height):
         v = [
@@ -174,7 +179,7 @@ class FrameMesh(module3d.Object3D):
         uv = ((0.0, 0.0), (1.0, 0.0), (1.0, 1.0), (0.0, 1.0))
         
         # The faces
-        f = [(3,2),(2,1),(1,0),(0,3)]
+        f = [(0,3),(1,0),(2,1),(3,2)]
 
         self.setCoords(v)
         self.setUVs(uv)
@@ -183,7 +188,12 @@ class FrameMesh(module3d.Object3D):
         self.setCameraProjection(1)
         self.setShadeless(1)
         self.updateIndexBuffer()
-        
+
+    def move(self, dx, dy):
+        self.coord += (dx, dy, 0)
+        self.markCoords(coor=True)
+        self.update()
+
     def resize(self, width, height):
         v = [
             (0.0, 0.0, 0.0),

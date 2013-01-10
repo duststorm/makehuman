@@ -959,7 +959,7 @@ class MHApplication(gui3d.Application, mh.Application):
         if not os.path.exists(grabPath):
             os.makedirs(grabPath)
         # TODO: use bbox to choose grab region
-        mh.grabScreen(180, 80, 440, 440, os.path.join(grabPath, 'grab.bmp'))
+        mh.grabScreen(0, 0, G.windowWidth, G.windowHeight, os.path.join(grabPath, 'grab.png'))
 
     # Camera navigation
     def rotateCamera(self, axis, amount):

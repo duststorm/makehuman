@@ -150,7 +150,7 @@ class Camera(object):
         viewport = matrix.viewport(0, 0, G.windowWidth, G.windowHeight)
         projection, modelview = self.getMatrices(0)
         m = viewport * projection * modelview
-        if obj and isinstance(obj, Object3D):
+        if obj:
             m = m * self.getObjectMatrix(obj)
         return self.getFlipMatrix() * m
 
@@ -160,33 +160,17 @@ class Camera(object):
         sx, sy, sz = matrix.transform3(m, [x, y, z])
         return [sx, sy, sz]
 
-    def convertToWorld2D(self, sx, sy):
+    def convertToWorld2D(self, sx, sy, obj = None):
         "Convert 2D (x, y) screen coordinates to OpenGL world coordinates."
 
-        viewport = matrix.viewport(0, 0, G.windowWidth, G.windowHeight)
-        projection, modelview = self.getMatrices(0)
-
-        sy = G.windowHeight - sy
-
         sz = c_double(0)
-        glReadPixels(sx, sy, 1, 1, GL_DEPTH_COMPONENT, GL_DOUBLE, byref(sz))
+        glReadPixels(sx, G.windowHeight - sy, 1, 1, GL_DEPTH_COMPONENT, GL_DOUBLE, byref(sz))
         sz = sz.value
 
-        m = viewport * projection * modelview
-        x, y, z = matrix.transform3(m.I, [sx, sy, sz])
+        return convertToWorld3D(sx, sy, sz, obj)
 
-        return [x, y, z]
-
-    def convertToWorld3D(self, sx, sy, sz):
+    def convertToWorld3D(self, sx, sy, sz, obj = None):
         "Convert 3D (x, y, depth) screen coordinates to 3D OpenGL world coordinates."
-
-        viewport = matrix.viewport(0, 0, G.windowWidth, G.windowHeight)
-        projection, modelview = self.getMatrices(0)
-
-        sy = G.windowHeight - sy
-
-        m = viewport * projection * modelview
-
+        m = self.getConvertToScreenMatrix(obj)
         x, y, z = matrix.transform3(m.I, [sx, sy, sz])
-
         return [x, y, z]
