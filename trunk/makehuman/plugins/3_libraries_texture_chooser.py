@@ -225,7 +225,7 @@ class TextureTaskView(gui3d.TaskView):
             self.textures = [self.systemSkins, self.userSkins] + self.defaultTextures
         elif self.hairRadio.selected:
             proxy = human.hairProxy
-            self.textures = [os.path.dirname(proxy.file)] + self.defaultTextures
+            self.textures = [os.path.dirname(proxy.file)]
         elif self.eyesRadio.selected:
             self.filechooser.previewExtension = 'png'
             self.filechooser.previewExtensions = ['png']
