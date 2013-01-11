@@ -650,6 +650,17 @@ class MHApplication(gui3d.Application, mh.Application):
                 elif lineData[0] == "color":
                     if lineData[1] == "clear":
                         mh.setClearColor(float(lineData[2]), float(lineData[3]), float(lineData[4]), float(lineData[5]))
+        try:
+            f = open('data/themes/%s.qss' % theme, 'r')
+            qStyle = "\n".join(f.readlines())
+            self.setStyleSheet(qStyle)
+            log.debug("Loaded Qt style %s", 'data/themes/'+theme+'.qss')
+        except:
+            self.setStyleSheet("")
+            '''
+            if theme != "default":
+                log.warning('Could not open Qt style file %s.', 'data/themes/'+theme+'.qss')
+            '''
 
         self.theme = theme
 
@@ -1103,11 +1114,15 @@ class MHApplication(gui3d.Application, mh.Application):
     def OnInit(self):
         mh.Application.OnInit(self)
 
-        self.setTheme("default")
-        #self.setTheme("3d")
+        self.loadSettings()
+
+        try:
+            self.setTheme(self.settings.get('guiTheme', 'default'))
+        except:
+            self.setTheme("default")
+
         self.setLanguage("english")
 
-        self.loadSettings()
         self.createShortcuts()
 
         self.splash = gui.SplashScreen(gui3d.app.getThemeResource('images', 'splash.png'))
