@@ -34,21 +34,34 @@
             specular 0
             roughness 0.01
             phong 0 phong_size 0
-            ambient rgb <3,0,0> // Apply blur to red channel.
-            diffuse 0 //2.0
+            ambient rgb <3,0,0> // Apply high blur to red channel.
+            diffuse 0
             reflection {0}
             conserve_energy
         }
     }
     texture {
-        pigment { image_map {png "lighthi.png" interpolate 2 transmit all 1/3} }
+        pigment { image_map {png "lightmid.png" interpolate 2 transmit all 1/2} }
         normal  { wrinkles %%wrinkles%% scale 0.0002 }
         finish { 
             specular 0
             roughness 0.01
             phong 0 phong_size 0
-            ambient rgb <0,1.5,1.5>
-            diffuse 0 //2.0
+            ambient rgb <0,3,0> // Apply medium blur to green channel.
+            diffuse 0
+            reflection {0}
+            conserve_energy
+        }
+    }
+    texture {
+        pigment { image_map {png "lighthi.png" interpolate 2 transmit all 2/3} }
+        normal  { wrinkles %%wrinkles%% scale 0.0002 }
+        finish { 
+            specular 0
+            roughness 0.01
+            phong 0 phong_size 0
+            ambient rgb <0,0,3> // Apply no blur to blue channel.
+            diffuse 0
             reflection {0}
             conserve_energy
         }
