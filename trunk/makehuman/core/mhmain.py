@@ -378,7 +378,8 @@ class MHApplication(gui3d.Application, mh.Application):
             human.applyAllTargets(self.progress)
 
 
-            mh.setCaption("MakeHuman r" + os.environ['SVNREVISION'] + " - [Untitled]")
+            gui3d.app.setFilenameCaption("Untitled")
+            self.setFileModified(False)
 
         self.globalButton = self.buttonBox.addWidget(gui.Button("Global cam"), 3, 0, 1, -1)
         self.faceButton = self.buttonBox.addWidget(gui.Button("Face cam"), 4, 0, 1, -1)
@@ -425,7 +426,8 @@ class MHApplication(gui3d.Application, mh.Application):
             'OK', helpId='alphaWarning')
         # self.splash.hide()
 
-        mh.setCaption("MakeHuman r" + os.environ['SVNREVISION'] + " - [Untitled]")
+        gui3d.app.setFilenameCaption("Untitled")
+        self.setFileModified(False)
 
         #printtree(self)
 
@@ -519,13 +521,13 @@ class MHApplication(gui3d.Application, mh.Application):
         if action.do():
             self.undoStack.append(action)
             del self.redoStack[:]
-            self.modified = True
+            self.setFileModified(True)
             log.message('do %s', action.name)
             self.redraw()
 
     def did(self, action):
         self.undoStack.append(action)
-        self.modified = True
+        self.setFileModified(True)
         del self.redoStack[:]
         log.message('did %s', action.name)
         self.redraw()
@@ -536,7 +538,7 @@ class MHApplication(gui3d.Application, mh.Application):
             log.message('undo %s', action.name)
             action.undo()
             self.redoStack.append(action)
-            self.modified = True
+            self.setFileModified(True)
             self.redraw()
 
     def redo(self):
@@ -545,7 +547,7 @@ class MHApplication(gui3d.Application, mh.Application):
             log.message('redo %s', action.name)
             action.do()
             self.undoStack.append(action)
-            self.modified = True
+            self.setFileModified(True)
             self.redraw()
 
     # Settings
@@ -673,6 +675,13 @@ class MHApplication(gui3d.Application, mh.Application):
     # Caption
     def setCaption(self, caption):
         mh.setCaption(caption.encode('utf8'))
+
+    def setFilenameCaption(self, filename):
+        self.setCaption("MakeHuman r%s - [%s][*]" % (os.environ['SVNREVISION'], filename))
+
+    def setFileModified(self, modified):
+        self.modified = modified
+        self.mainwin.setWindowModified(self.modified)
 
     # Global status bar
     def status(self, text, *args):
