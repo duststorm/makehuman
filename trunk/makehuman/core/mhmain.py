@@ -711,6 +711,13 @@ class MHApplication(gui3d.Application, mh.Application):
         log.debug("Setting font %s", font)
     '''
 
+    def getLookAndFeelStyles(self):
+        return [ str(style) for style in gui.QtGui.QStyleFactory.keys() ]
+
+    def setLookAndFeel(self, platform):
+        style = gui.QtGui.QStyleFactory.create(platform)
+        self.setStyle(style)
+
     def getThemeResource(self, folder, id):
         if '/' in id:
             return id

@@ -48,6 +48,16 @@ class ThemeRadioButton(gui.RadioButton):
     def onClicked(self, event):
         gui3d.app.settings['guiTheme'] = self.theme
         gui3d.app.setTheme(self.theme)
+
+class PlatformRadioButton(gui.RadioButton):
+
+    def __init__(self, group, looknfeel, selected=False):
+    
+        super(PlatformRadioButton, self).__init__(group, looknfeel, selected)
+        self.looknfeel = looknfeel
+        
+    def onClicked(self, event):
+        gui3d.app.setLookAndFeel(self.looknfeel)
         
 class LanguageRadioButton(gui.RadioButton):
 
@@ -97,6 +107,12 @@ class SettingsTaskView(gui3d.TaskView):
         themesBox = self.themesBox = self.addRightWidget(gui.GroupBox('Theme'))
         self.themeNative = themesBox.addWidget(ThemeRadioButton(themes, "Native look", "default"))
         self.themeMH = themesBox.addWidget(ThemeRadioButton(themes, "MakeHuman", "makehuman"))
+
+        # For debugging themes on multiple platforms
+        platforms = []
+        platformsBox = self.platformsBox = self.addRightWidget(gui.GroupBox('Look and feel'))
+        for platform in gui3d.app.getLookAndFeelStyles():
+            platformsBox.addWidget(PlatformRadioButton(platforms, platform))
 
         '''
         fonts = []
