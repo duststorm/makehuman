@@ -152,6 +152,8 @@ class MHApplication(gui3d.Application, mh.Application):
         self.redoStack = []
         self.modified = False
 
+        self.clearColor = [0.5, 0.5, 0.5]
+
         self.modules = {}
 
         self.selectedHuman = None
@@ -177,20 +179,16 @@ class MHApplication(gui3d.Application, mh.Application):
         # dummy method used for checking the shortcuts.ini version
         pass
 
-    def loadBackground(self):
-        self.progress(0.1)
-        mh.setClearColor(0.5, 0.5, 0.5, 1.0)
-
     def loadHuman(self):
 
-        self.progress(0.2)
+        self.progress(0.1)
         #hairObj = hair.loadHairsFile(self.scene3d, path="./data/hairs/default", update = False)
         #self.scene3d.clear(hairObj)
         self.selectedHuman = self.addObject(human.Human(files3d.loadMesh("data/3dobjs/base.obj")))
 
     def loadMainGui(self):
 
-        self.progress(0.3)
+        self.progress(0.2)
 
         @self.selectedHuman.mhEvent
         def onMouseDown(event):
@@ -440,16 +438,16 @@ class MHApplication(gui3d.Application, mh.Application):
         sys.stdout = self.splash
         yield None
 
-        log.message('Loading background')
-        self.loadBackground()
-        yield None
-
         log.message('Loading human')
         self.loadHuman()
         yield None
 
         log.message('Loading main GUI')
         self.loadMainGui()
+        yield None
+
+        log.message('Loading fonts')
+        self.loadFonts()
         yield None
 
         log.message('Loading plugins')
@@ -459,6 +457,13 @@ class MHApplication(gui3d.Application, mh.Application):
 
         log.message('Loading GUI')
         self.loadGui()
+        yield None
+
+        log.message('Loading theme')
+        try:
+            self.setTheme(self.settings.get('guiTheme', 'default'))
+        except:
+            self.setTheme("default")
         yield None
 
         log.message('Loading done')
@@ -649,7 +654,10 @@ class MHApplication(gui3d.Application, mh.Application):
                     log.message('Version %s', lineData[1])
                 elif lineData[0] == "color":
                     if lineData[1] == "clear":
-                        mh.setClearColor(float(lineData[2]), float(lineData[3]), float(lineData[4]), float(lineData[5]))
+                        self.clearColor[:] = [float(val) for val in lineData[2:5]]
+                        mh.setClearColor(float(lineData[2]), float(lineData[3]), float(lineData[4]), 1.0)
+        log.debug("Loaded theme %s", 'data/themes/'+theme+'.mht')
+
         try:
             f = open('data/themes/%s.qss' % theme, 'r')
             qStyle = "\n".join(f.readlines())
@@ -663,6 +671,45 @@ class MHApplication(gui3d.Application, mh.Application):
             '''
 
         self.theme = theme
+        self.redraw()
+
+    def loadFonts(self):
+        """
+        Load custom fonts from data/fonts folder to make them available for theming.
+        """
+        self.customFonts = []
+        fontFiles = [os.path.join('data/fonts', filename) for filename in os.listdir('data/fonts') if filename.split(os.extsep)[-1] == "ttf"]
+        for font in fontFiles:
+            try:
+                fontHandle = gui.QtGui.QFontDatabase.addApplicationFont(font)
+                log.debug("Loading font file %s", font)
+                if fontHandle != -1:
+                    fontFamilies = gui.QtGui.QFontDatabase.applicationFontFamilies(fontHandle)
+                    for f in fontFamilies:
+                        self.customFonts.append(str(f))
+                        log.debug("Added font family %s", f)
+            except:
+                log.warning("Error loading font file %s", font)
+
+    def getCustomFonts(self):
+        """
+        Returns the font family names of all custom fonts loaded from the
+        data/fonts folder. These fonts can be used in custom styles.
+        """
+        return self.customFonts
+
+    '''
+    # Does not work well with custom themes
+    def setFont(self, font):
+        if font == "Default":
+            return # TODO
+        if font not in self.customFonts:
+            log.warning("No font family with name %s loaded from data/fonts", font)
+            return
+        qfont = gui.QtGui.QFont(font)
+        self.setFont(qfont)
+        log.debug("Setting font %s", font)
+    '''
 
     def getThemeResource(self, folder, id):
         if '/' in id:
@@ -945,7 +992,7 @@ class MHApplication(gui3d.Application, mh.Application):
             mh.setClearColor(0.0, 0.0, 0.0, 1.0)
             self.categories["Modelling"].anaglyphsButton.setSelected(True)
         else:
-            mh.setClearColor(0.5, 0.5, 0.5, 1.0)
+            mh.setClearColor(self.clearColor[0], self.clearColor[1], self.clearColor[2], 1.0)
             self.categories["Modelling"].anaglyphsButton.setSelected(False)
 
         self.redraw()
@@ -1116,10 +1163,8 @@ class MHApplication(gui3d.Application, mh.Application):
 
         self.loadSettings()
 
-        try:
-            self.setTheme(self.settings.get('guiTheme', 'default'))
-        except:
-            self.setTheme("default")
+        # Necessary because otherwise setting back to default theme causes crash
+        self.setTheme("default")
 
         self.setLanguage("english")
 

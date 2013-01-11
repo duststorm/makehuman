@@ -30,13 +30,12 @@ class FontRadioButton(gui.RadioButton):
 
     def __init__(self, group, font):
     
-        super(FontRadioButton, self).__init__(group, font.capitalize(), gui3d.app.settings.get('font', 'arial') == font)
+        super(FontRadioButton, self).__init__(group, font.capitalize(), gui3d.app.settings.get('font', 'Ubuntu') == font)
         self.font = font
         
     def onClicked(self, event):
-    
         gui3d.app.settings['font'] = self.font
-        gui3d.app.prompt('Info', 'You need to restart for your font changes to be applied.', 'OK', helpId='fontHelp')
+        gui3d.app.setFont(self.font)
 
 class ThemeRadioButton(gui.RadioButton):
 
@@ -90,29 +89,24 @@ class SettingsTaskView(gui3d.TaskView):
             "Shift: %d"))
             
         modes = [] 
-               
         unitBox = self.unitsBox = self.addLeftWidget(gui.GroupBox('Units'))
         metric = unitBox.addWidget(gui.RadioButton(modes, 'Metric', gui3d.app.settings.get('units', 'metric') == 'metric'))
         imperial = unitBox.addWidget(gui.RadioButton(modes, 'Imperial', gui3d.app.settings.get('units', 'metric') == 'imperial'))
         
-        '''
-        fonts = []
-        
-        fontsBox = self.fontsBox = self.addRightWidget(gui.GroupBox('Font'))
-        
-        fontFiles = [os.path.basename(filename).replace('.fnt', '') for filename in os.listdir('data/fonts') if filename.split(os.extsep)[-1] == "fnt"]
-        for font in fontFiles:
-            fontsBox.addWidget(FontRadioButton(fonts, font))
-        '''
-
         themes = []
-        
         themesBox = self.themesBox = self.addRightWidget(gui.GroupBox('Theme'))
         self.themeNative = themesBox.addWidget(ThemeRadioButton(themes, "Native look", "default"))
         self.themeMH = themesBox.addWidget(ThemeRadioButton(themes, "MakeHuman", "makehuman"))
+
+        '''
+        fonts = []
+        fontsBox = self.fontsBox = self.addRightWidget(gui.GroupBox('Font'))
+        fontsBox.addWidget(FontRadioButton(fonts, "Default"))
+        for font in gui3d.app.getCustomFonts():
+            fontsBox.addWidget(FontRadioButton(fonts, font))
+        '''
         
         languages = []
-        
         languageBox = self.languageBox = self.addRightWidget(gui.GroupBox('Language'))
         languageBox.addWidget(LanguageRadioButton(languages, 'english'))
         
