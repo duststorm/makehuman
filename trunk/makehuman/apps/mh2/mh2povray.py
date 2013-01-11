@@ -1118,8 +1118,8 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
     outputFileDescriptor.write('\n')
     staticContentFileDescriptor.close()
     
-    # Write clothes materials 
-    writeClothesMaterials(outputFileDescriptor, stuffs)
+    # Write items' materials 
+    writeItemsMaterials(outputFileDescriptor, stuffs)
              
     # The POV-Ray include file is complete
     outputFileDescriptor.close()
@@ -1176,10 +1176,20 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
 
     log.message('Sample POV-Ray scene file generated')
 
-
-def writeClothesMaterials(outputFileDescriptor, stuffs):
+"""
+Item types
+(Negative value) - Error code
+0   - Nothing
+1   - Generic
+2   - Hair
+"""
+def writeItemsMaterials(outputFileDescriptor, stuffs):
     for stuff in stuffs[1:]:
         proxy = stuff.proxy
+        if proxy.type == 'Clothes' and proxy.getUuid() == gui3d.app.selectedHuman.hairProxy.getUuid():
+            itemtype = 2
+        else:
+            itemtype = 1
         outputFileDescriptor.write("#ifndef (%s_Material)\n" % stuff.name +
                                    "#declare %s_Texture =\n" % stuff.name +
                                    "    texture {\n")
@@ -1195,27 +1205,50 @@ def writeClothesMaterials(outputFileDescriptor, stuffs):
            outputFileDescriptor.write(
                     '        normal { bump_map {%s "%s" interpolate 2} }\n' % (bumpdata[1], bumpdata[0]))
         else:
-            outputFileDescriptor.write(
-                    '        normal { wrinkles 0.2 scale 0.0001 }\n')
-        
-        outputFileDescriptor.write ("        finish {\n" +
-                                    "            specular 0.05\n" +
-                                    "            roughness 0.2\n" +
-                                    "            phong 0 phong_size 0 \n" +
-                                    "            ambient 0.1\n" +
-                                    "            diffuse 0.9\n" +
-                                    "            reflection {0}\n" +
-                                    "            conserve_energy\n" +
-                                    "        }\n" +
-                                    "    }\n\n" +
-                                    "#declare %s_Material = material {\n" % stuff.name +
-                                    "    texture {\n" +
-                                    "        uv_mapping\n" +
-                                    "        %s_Texture\n" % stuff.name +
-                                    "    }\n"
-                                    "    interior {ior 1.33}\n" +
-                                    "}\n\n" +
-                                    "#end\n")
+            if itemtype == 2:
+                outputFileDescriptor.write(
+                        '        normal { ripples 0 scale 0.005 }\n')
+            else:
+                outputFileDescriptor.write(
+                        '        normal { wrinkles 0.2 scale 0.0001 }\n')
+        if itemtype == 2:
+            outputFileDescriptor.write ("        finish {\n" +
+                                "            specular 0\n" +
+                                "            roughness 0.5\n" +
+                                "            phong 0 phong_size 0 \n" +
+                                "            ambient 0\n" +
+                                "            diffuse 1\n" +
+                                "            reflection {0}\n" +
+                                "            conserve_energy\n" +
+                                "        }\n" +
+                                "    }\n\n" +
+                                "#declare %s_Material = material {\n" % stuff.name +
+                                "    texture {\n" +
+                                "        uv_mapping\n" +
+                                "        %s_Texture\n" % stuff.name +
+                                "    }\n"
+                                "    interior {ior 1}\n" +
+                                "}\n\n" +
+                                "#end\n")
+        else:
+            outputFileDescriptor.write ("        finish {\n" +
+                                "            specular 0.05\n" +
+                                "            roughness 0.2\n" +
+                                "            phong 0 phong_size 0 \n" +
+                                "            ambient 0.1\n" +
+                                "            diffuse 0.9\n" +
+                                "            reflection {0}\n" +
+                                "            conserve_energy\n" +
+                                "        }\n" +
+                                "    }\n\n" +
+                                "#declare %s_Material = material {\n" % stuff.name +
+                                "    texture {\n" +
+                                "        uv_mapping\n" +
+                                "        %s_Texture\n" % stuff.name +
+                                "    }\n"
+                                "    interior {ior 1.33}\n" +
+                                "}\n\n" +
+                                "#end\n")
 
 
 def writeChannel(outputFileDescriptor, var, channel, stuff, data):
