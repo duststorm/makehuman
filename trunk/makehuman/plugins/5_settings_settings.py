@@ -51,9 +51,9 @@ class ThemeRadioButton(gui.RadioButton):
 
 class PlatformRadioButton(gui.RadioButton):
 
-    def __init__(self, group, looknfeel, selected=False):
+    def __init__(self, group, looknfeel):
     
-        super(PlatformRadioButton, self).__init__(group, looknfeel, selected)
+        super(PlatformRadioButton, self).__init__(group, looknfeel, gui3d.app.getLookAndFeel().lower() == looknfeel.lower())
         self.looknfeel = looknfeel
         
     def onClicked(self, event):

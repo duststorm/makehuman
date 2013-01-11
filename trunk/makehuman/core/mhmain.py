@@ -718,6 +718,9 @@ class MHApplication(gui3d.Application, mh.Application):
         style = gui.QtGui.QStyleFactory.create(platform)
         self.setStyle(style)
 
+    def getLookAndFeel(self):
+        return str(self.style().objectName())
+
     def getThemeResource(self, folder, id):
         if '/' in id:
             return id
@@ -1172,6 +1175,7 @@ class MHApplication(gui3d.Application, mh.Application):
 
         # Necessary because otherwise setting back to default theme causes crash
         self.setTheme("default")
+        log.debug("Using Qt system style %s", self.getLookAndFeel())
 
         self.setLanguage("english")
 
