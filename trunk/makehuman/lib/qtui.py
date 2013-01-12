@@ -421,7 +421,7 @@ class Frame(QtGui.QWidget):
         self.shortcuts = {}
 
         self.setWindowTitle(self.title)
-        self.setAttribute(QtCore.Qt.WA_PaintOnScreen)
+        #self.setAttribute(QtCore.Qt.WA_PaintOnScreen)  # Causes flickering and bg bleeds through rounded edges
         self.setAttribute(QtCore.Qt.WA_OpaquePaintEvent)
         self.setAttribute(QtCore.Qt.WA_KeyCompression, False)
         self.resize(*size)
@@ -509,6 +509,8 @@ class Frame(QtGui.QWidget):
     def addPanels(self):
         left = TaskPanel()
         right = TaskPanel()
+        left.setObjectName("LeftTaskPanel")
+        right.setObjectName("RightTaskPanel")
         self.left_top.addWidget(left)
         self.right_top.addWidget(right)
         return left, right

@@ -961,6 +961,12 @@ class VScrollArea(QtGui.QWidget, Widget):
             self._updateScrollSize()
         return False
 
+    def getClassName(self):
+        """
+        Classname for this widet, useful for styling using qss.
+        """
+        return str(self.metaObject().className())
+
 class TreeItem(QtGui.QTreeWidgetItem):
     def __init__(self, text, parent=None, isDir=False):
         super(TreeItem, self).__init__([text])
