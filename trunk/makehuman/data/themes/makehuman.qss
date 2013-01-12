@@ -13,7 +13,7 @@ QToolTip
 
 QWidget
 {
-    color: #b1b1b1;
+    color: #ffffff;
     background-color: #323232;
 }
 
