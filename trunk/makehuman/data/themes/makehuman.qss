@@ -173,7 +173,7 @@ QGroupBox {
      border-radius: 10px;
      border-top-left-radius: 0px;
      /*border-bottom-right-radius: 0px;*/
-     margin-top: 1.4ex; /* leave space at the top for the title */
+     margin-top: 1.6ex; /* leave space at the top for the title */
 }
 
 QGroupBox::title {
@@ -463,6 +463,10 @@ QTabBar::tab:selected
     margin-bottom: 0px;
     border: 1px solid #ffaa00;
     border-bottom: 0px;
+    /*background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #8f8f8f, stop:1 #454545);*/
+    /*background-color: #d7801a;*/
+    /*background-color: QLinearGradient(x1:0, y1:0, x2:0, y2:1, stop:1 #d7801a, stop:.4 #ffaa00);*/
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #6c6c6c, stop:1 #323232);
 }
 
 QTabBar::tab:!selected:hover
