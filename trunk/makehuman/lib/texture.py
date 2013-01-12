@@ -117,7 +117,7 @@ class Texture(object):
         if isinstance(image, (str, unicode)):
             image = Image(image)
 
-        internalFormat, format = self.getFormat(components)
+        internalFormat, format = self.getFormat(image.components)
 
         pixels = image.flip_vertical().data
 
