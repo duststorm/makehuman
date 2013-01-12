@@ -142,7 +142,7 @@ class BackgroundTaskView(gui3d.TaskView):
         leftTop = (x0, y1)
         rightBottom = (x1, y0)
 
-        dstImg = projection.mapImage(mh.Image(self.backgroundImage.getTexture()), mesh, leftTop, rightBottom)
+        dstImg = projection.mapImage(self.backgroundImage, mesh, leftTop, rightBottom)
 
         dstImg.save(os.path.join(mh.getPath(''), 'data', 'skins', 'projection.png'))
         gui3d.app.selectedHuman.setTexture(os.path.join(mh.getPath(''), 'data', 'skins', 'projection.png'))

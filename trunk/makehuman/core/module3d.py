@@ -148,6 +148,7 @@ class Object3D(object):
         self.visibility = True
         self.pickable = True
         self.texture = None
+        self.textureTex = None
         self.textureId = 0
         self.shader = 0
         self.shaderParameters = {}
@@ -715,11 +716,11 @@ class Object3D(object):
         if not self.object3d:
             return
         
-        texture = getTexture(path, cache)
+        self.textureTex = getTexture(path, cache)
         
-        if texture:
-            self.textureId = texture.textureId
-            self.object3d.texture = texture.textureId
+        if self.textureTex:
+            self.textureId = self.textureTex.textureId
+            self.object3d.texture = self.textureId
 
     def clearTexture(self):
         """

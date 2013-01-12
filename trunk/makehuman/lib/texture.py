@@ -38,9 +38,12 @@ class Texture(object):
 
         return self
 
-    def __init__(self, image = None):
+    def __init__(self, image = None, size = None, components = 4):
         if image is not None:
-            self.loadTexture(image, self.textureId, self)
+            self.loadImage(image)
+        elif size is not None:
+            width, height = size
+            self.initTexture(width, height, components)
 
     def __del__(self):
         try:
@@ -48,38 +51,26 @@ class Texture(object):
         except StandardError:
             pass
 
-    def loadImage(self, image):
-        self.loadTexture(image, self.textureId, self)
-
-    def loadSubImage(self, image, x, y):
-        self.loadSubTexture(image, self.textureId, x, y)
-
     @staticmethod
-    def loadTexture(image, texture, texobj):
+    def getFormat(components):
+        if components == 1:
+            return (GL_ALPHA8, GL_ALPHA)
+        elif components == 3:
+            return (3, GL_RGB)
+        elif components == 4:
+            return (4, GL_RGBA)
+        else:
+            raise RuntimeError("Unsupported pixel format")
+
+    def initTexture(self, width, height, components = 4, pixels = None):
         mipmaps = not glInitTextureNonPowerOfTwoARB()
 
-        if isinstance(image, (str, unicode)):
-            image = Image(image)
-
-        if image.components == 1:
-            internalFormat = GL_ALPHA8
-            format = GL_ALPHA
-        elif image.components == 3:
-            internalFormat = 3
-            format = GL_RGB
-        elif image.components == 4:
-            internalFormat = 4
-            format = GL_RGBA
-        else:
-            raise RuntimeError("Could not load image, unsupported pixel format")
-
-        image = image.flip_vertical()
-        pixels = image.data
+        internalFormat, format = self.getFormat(components)
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
 
-        if image.height == 1:
-            glBindTexture(GL_TEXTURE_1D, texture)
+        if height == 0:
+            glBindTexture(GL_TEXTURE_1D, self.textureId)
             glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
             glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
             if mipmaps:
@@ -89,12 +80,12 @@ class Texture(object):
             glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
             if mipmaps:
-                gluBuild1DMipmaps(GL_TEXTURE_1D, internalFormat, image.width, format, GL_UNSIGNED_BYTE, pixels)
+                gluBuild1DMipmaps(GL_TEXTURE_1D, internalFormat, width, format, GL_UNSIGNED_BYTE, pixels)
             else:
-                glTexImage1D(GL_TEXTURE_1D, 0, internalFormat, image.width, 0, format, GL_UNSIGNED_BYTE, pixels)
+                glTexImage1D(GL_TEXTURE_1D, 0, internalFormat, width, 0, format, GL_UNSIGNED_BYTE, pixels)
             glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
         else:
-            glBindTexture(GL_TEXTURE_2D, texture)
+            glBindTexture(GL_TEXTURE_2D, self.textureId)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
             if mipmaps:
@@ -104,39 +95,35 @@ class Texture(object):
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
             if mipmaps:
-                gluBuild2DMipmaps(GL_TEXTURE_2D, internalFormat, image.width, image.height, format, GL_UNSIGNED_BYTE, pixels)
+                gluBuild2DMipmaps(GL_TEXTURE_2D, internalFormat, width, height, format, GL_UNSIGNED_BYTE, pixels)
             else:
-                glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, image.width, image.height, 0, format, GL_UNSIGNED_BYTE, pixels)
+                glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, pixels)
             glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
 
-        texobj.width, texobj.height = image.size
+        self.width, self.height = width, height
 
-    @staticmethod
-    def loadSubTexture(image, texture, x, y):
-        if not texture:
+    def loadImage(self, image):
+        if isinstance(image, (str, unicode)):
+            image = Image(image)
+
+        pixels = image.flip_vertical().data
+
+        self.initTexture(image.width, image.height, image.components, pixels)
+
+    def loadSubImage(self, image, x, y):
+        if not self.textureId:
             raise RuntimeError("Texture is empty, cannot load a sub texture into it")
 
         if isinstance(image, (str, unicode)):
             image = Image(image)
 
-        if image.components == 1:
-            internalFormat = GL_ALPHA8
-            format = GL_ALPHA
-        elif image.components == 3:
-            internalFormat = 3
-            format = GL_RGB
-        elif image.components == 4:
-            internalFormat = 4
-            format = GL_RGBA
-        else:
-            raise RuntimeError("Could not load image, unsupported pixel format")
+        internalFormat, format = self.getFormat(components)
 
-        image = image.flip_vertical()
-        pixels = image.data
+        pixels = image.flip_vertical().data
 
-        if image.height == 1:
-            glBindTexture(GL_TEXTURE_1D, texture)
+        if image.height == 0:
+            glBindTexture(GL_TEXTURE_1D, self.textureId)
             glTexSubImage1D(GL_TEXTURE_1D, 0, x, image.width, format, GL_UNSIGNED_BYTE, pixels)
         else:
-            glBindTexture(GL_TEXTURE_2D, texture)
+            glBindTexture(GL_TEXTURE_2D, self.textureId)
             glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, image.width, image.height, format, GL_UNSIGNED_BYTE, pixels)

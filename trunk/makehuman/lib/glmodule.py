@@ -32,12 +32,15 @@ OpenGL.ERROR_CHECKING = False
 OpenGL.ERROR_ON_COPY = True
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from OpenGL.GL.framebufferobjects import *
+from OpenGL.GL.ARB.transpose_matrix import *
 
 from core import G
 from image import Image
 import matrix
 from debugdump import DebugDump
 import log
+from texture import Texture
 
 g_primitiveMap = [GL_POINTS, GL_LINES, GL_TRIANGLES, GL_QUADS]
 
@@ -447,6 +450,126 @@ def drawOrPick(pickMode, obj):
     else:
         if hasattr(obj, 'draw'):
             obj.draw()
+
+_hasRenderSkin = None
+def hasRenderSkin():
+    global _hasRenderSkin
+    if _hasRenderSkin is None:
+        _hasRenderSkin = all([
+            bool(glGenRenderbuffers), bool(glBindRenderbuffer), bool(glRenderbufferStorage),
+            bool(glGenFramebuffers), bool(glBindFramebuffer), bool(glFramebufferRenderbuffer)])
+    return _hasRenderSkin
+               
+def renderSkin(dst, vertsPerPrimitive, verts, index = None, objectMatrix = None,
+               texture = None, UVs = None, textureMatrix = None,
+               color = None, clearColor = None):
+
+    if isinstance(dst, Texture):
+        glBindTexture(GL_TEXTURE_2D, dst.textureId)
+    elif isinstance(dst, Image):
+        dst = Texture(image = dst)
+    elif isinstance(dst, tuple):
+        dst = Texture(size = dst)
+    else:
+        raise RuntimeError('Unsupported destination: %r' % dst)
+
+    width, height = dst.width, dst.height
+
+    framebuffer = glGenFramebuffers(1)
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer)
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, dst.textureId, 0)
+    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, dst.textureId, 0)
+
+    if clearColor is not None:
+        glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3])
+        glClear(GL_COLOR_BUFFER_BIT)
+
+    glVertexPointer(verts.shape[-1], GL_FLOAT, 0, verts)
+
+    if texture is not None and UVs is not None:
+        if isinstance(texture, Image):
+            tex = Texture()
+            tex.loadImage(texture)
+            texture = tex
+        if isinstance(texture, Texture):
+            texture = texture.textureId
+        glEnable(GL_TEXTURE_2D)
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY)
+        glBindTexture(GL_TEXTURE_2D, texture)
+        glTexCoordPointer(UVs.shape[-1], GL_FLOAT, 0, UVs)
+
+    if color is not None:
+        glColorPointer(color.shape[-1], GL_UNSIGNED_BYTE, 0, color)
+        glEnableClientState(GL_COLOR_ARRAY)
+    else:
+        glDisableClientState(GL_COLOR_ARRAY)
+        glColor4f(1, 1, 1, 1)
+
+    glDisableClientState(GL_NORMAL_ARRAY)
+    glDisable(GL_LIGHTING)
+
+    glDepthMask(GL_FALSE)
+    glDisable(GL_DEPTH_TEST)
+    # glDisable(GL_CULL_FACE)
+
+    glPushAttrib(GL_VIEWPORT_BIT)
+    glViewport(0, 0, width, height)
+
+    glMatrixMode(GL_MODELVIEW)
+    glPushMatrix()
+    if objectMatrix is not None:
+        glLoadTransposeMatrixd(objectMatrix)
+    else:
+        glLoadIdentity()
+
+    glMatrixMode(GL_PROJECTION)
+    glPushMatrix()
+    glLoadIdentity()
+    glOrtho(0, 1, 0, 1, -100, 100)
+
+    if textureMatrix is not None:
+        glMatrixMode(GL_TEXTURE)
+        glPushMatrix()
+        glLoadTransposeMatrixd(textureMatrix)
+
+    if index is not None:
+        glDrawElements(g_primitiveMap[vertsPerPrimitive-1], index.size, GL_UNSIGNED_INT, index)
+    else:
+        glDrawArrays(g_primitiveMap[vertsPerPrimitive-1], 0, verts[:,:,0].size)
+
+    if textureMatrix is not None:
+        glMatrixMode(GL_TEXTURE)
+        glPopMatrix()
+
+    glMatrixMode(GL_PROJECTION)
+    glPopMatrix()
+
+    glMatrixMode(GL_MODELVIEW)
+    glPopMatrix()
+
+    glPopAttrib(GL_VIEWPORT_BIT)
+
+    glEnable(GL_DEPTH_TEST)
+    glDepthMask(GL_TRUE)
+
+    glEnable(GL_LIGHTING)
+    glEnableClientState(GL_NORMAL_ARRAY)
+
+    glEnableClientState(GL_COLOR_ARRAY)
+
+    glDisable(GL_TEXTURE_2D)
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY)
+
+    surface = np.empty((height, width, 4), dtype = np.uint8)
+    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, surface)
+    surface = Image(data = np.ascontiguousarray(surface[::-1,:,:]))
+
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0)
+    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0)
+    glBindFramebuffer(GL_FRAMEBUFFER, 0)
+    glDeleteFramebuffers(np.array([framebuffer]))
+
+    return surface
 
 def drawMeshes(pickMode):
     if G.world is None:

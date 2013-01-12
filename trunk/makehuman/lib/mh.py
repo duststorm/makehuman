@@ -35,47 +35,21 @@ from texture import Texture
 from object3d import Object3D
 from camera import Camera
 
+from qtui import getKeyModifiers, addTimer, removeTimer, callAsync
+from glmodule import createVertexShader, createFragmentShader, createShader
+from glmodule import updatePickingBuffer, grabScreen, hasRenderSkin, renderSkin
+
 cameras = G.cameras
 
 Keys = ui.Keys
 Buttons = ui.Buttons
 Modifiers = ui.Modifiers
 
-def updatePickingBuffer():
-    gl.updatePickingBuffer()
-
 def getColorPicked():
     return G.color_picked
 
-def getKeyModifiers():
-    return ui.getKeyModifiers()
-
-def setCaption(caption):
-    ui.setCaption(caption)
-
 def setClearColor(r, g, b, a):
     G.clearColor = (r, g, b, a)
-
-def createVertexShader(source):
-    return gl.createVertexShader(source)
-
-def createFragmentShader(source):
-    return gl.createFragmentShader(source)
-
-def createShader(vertexShader, fragmentShader):
-    return gl.createShader(vertexShader, fragmentShader)
-
-def grabScreen(x, y, width, height, path):
-    gl.grabScreen(x, y, width, height, path)
-
-def addTimer(milliseconds, callback):
-    return ui.addTimer(milliseconds, callback)
-
-def removeTimer(id):
-    ui.removeTimer(id)
-
-def callAsync(callback):
-    ui.callAsync(callback)
 
 Application = ui.Application
 
