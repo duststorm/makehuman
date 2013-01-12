@@ -194,7 +194,7 @@ class TextureTaskView(gui3d.TaskView):
         # TODO this will change, for now eyes might only be compatible with the original skin
         f = open(mhstx, 'rU')
         try:
-            subTextures = eval(f.read(), {"__builtins__":None}, {'True':True, 'False':False})
+            subTextures = mh.parseINI(f.read(), [("(","["), (")","]")])
         except:
             log.warning("setEyes(%s)", mhstx, exc_info=True)
             f.close()

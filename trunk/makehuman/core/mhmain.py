@@ -563,7 +563,7 @@ class MHApplication(gui3d.Application, mh.Application):
         try:
             if os.path.isfile(os.path.join(mh.getPath(''), "settings.ini")):
                 with open(os.path.join(mh.getPath(''), "settings.ini"), 'r') as f:
-                    settings = mh.parse_ini(f.read())
+                    settings = mh.parseINI(f.read())
                 self.settings.update(settings)
         except:
             log.error('Failed to load settings')
@@ -619,7 +619,7 @@ class MHApplication(gui3d.Application, mh.Application):
                 os.makedirs(mh.getPath(''))
 
             f = open(os.path.join(mh.getPath(''), "settings.ini"), 'w')
-            f.write(mh.format_ini(self.settings))
+            f.write(mh.formatINI(self.settings))
             f.close()
 
             f = open(os.path.join(mh.getPath(''), "shortcuts.ini"), 'w')

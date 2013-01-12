@@ -99,14 +99,24 @@ def removeObject(obj):
 def setShortcut(modifier, key, method):
     G.app.mainwin.setShortcut(modifier, key, method)
 
-def parse_ini(s):
-    try:
-        return dict([(str(key), str(val) if isinstance(val, unicode) else val)
-                     for key, val in json.loads(s).iteritems()])
-    except ValueError:
-        s = s.replace("'",'"').replace(": True",": true").replace(": False",": false").replace(": None",": null")
-        return dict([(str(key), str(val) if isinstance(val, unicode) else val)
-                     for key, val in json.loads(s).iteritems()])
+def _u2s(value):
+    if isinstance(value, unicode):
+        return str(value)
+    elif isinstance(value, dict):
+        return dict([(str(key), _u2s(val)) for key, val in value.iteritems()])
+    elif isinstance(value, list):
+        return [_u2s(val) for val in value]
+    else:
+        return value
 
-def format_ini(d):
+def parseINI(s, replace = []):
+    try:
+        result = json.loads(s)
+    except ValueError:
+        for src, dst in [("'",'"'), (": True",": true"), (": False",": false"), (": None",": null")] + replace:
+            s = s.replace(src, dst)
+        result = json.loads(s)
+    return _u2s(result)
+
+def formatINI(d):
     return json.dumps(d, indent=4, ensure_ascii=True, encoding='iso-8859-1') + '\n'
