@@ -663,9 +663,17 @@ class MHApplication(gui3d.Application, mh.Application):
             f = open('data/themes/%s.qss' % theme, 'r')
             qStyle = "\n".join(f.readlines())
             self.setStyleSheet(qStyle)
+            # Also set stylesheet on custom slider style
+            for widget in self.allWidgets():
+                if isinstance(widget, gui.Slider):
+                    widget.setStyleSheet(qStyle)
             log.debug("Loaded Qt style %s", 'data/themes/'+theme+'.qss')
         except:
             self.setStyleSheet("")
+            # Also set stylesheet on custom slider style
+            for widget in self.allWidgets():
+                if isinstance(widget, gui.Slider):
+                    widget.setStyleSheet("")
             '''
             if theme != "default":
                 log.warning('Could not open Qt style file %s.', 'data/themes/'+theme+'.qss')
