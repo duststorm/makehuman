@@ -443,7 +443,7 @@ class Object3D(object):
             if self.utexc is not True:
                 self.utexc[indices] = True
 
-    def setFaces(self, verts, uvs = None, groups = None):
+    def setFaces(self, verts, uvs = None, groups = None, skipUpdate = False):
         nfaces = len(verts)
 
         self.fvert = np.empty((nfaces, self.vertsPerPrimitive), dtype=np.uint32)
@@ -460,7 +460,8 @@ class Object3D(object):
 
         self.has_uv = uvs is not None
 
-        self._update_faces()
+        if not skipUpdate:
+            self._update_faces()
 
     def hasUVs(self):
         return self.has_uv

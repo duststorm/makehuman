@@ -58,43 +58,113 @@ import log
 
 originalVertexCache = {}
 
-def loadMesh(path, locX=0, locY=0, locZ=0, loadColors=1):
-    """
-    This function loads the specified mesh object into internal MakeHuman data 
-    structures, and returns it. The loaded file should be in Wavefront OBJ 
-    format.
-    
-    Parameters:
-    -----------
-   
-    path:     
-      *String*.  The file system path to the file containing the object to load.
+def packStringList(strings):
+    text = ''
+    index = []
+    for string in strings:
+        index.append(len(text))
+        text += string
+    text = np.fromstring(text, dtype='S1')
+    index = np.array(index, dtype=np.uint32)
+    return text, index
 
-    locX:
-      *float* X location of loaded obj, default = 0
+def unpackStringList(text, index):
+    strings = []
+    last = None
+    for i in index:
+        if last is not None:
+            name = text[last:i].tostring()
+            strings.append(name)
+        last = i
+    if last is not None:
+        name = text[last:].tostring()
+        strings.append(name)
 
-    locY:
-      *float* Y location of loaded obj, default = 0
+    return strings
 
-    locZ:
-      *float* Z location of loaded obj, default = 0
-    """
-    name = os.path.basename(path)
-    obj = module3d.Object3D(name)
+def saveBinaryMesh(obj, path):
+    fgstr, fgidx = packStringList(fg.name for fg in obj._faceGroups)
 
-    obj.path = path
-    obj.x = locX
-    obj.y = locY
-    obj.z = locZ
+    face_materials = []
+    materials_fwd = []
+    materials_rev = {}
+    for face, material in obj.materials.iteritems():
+        if material not in materials_rev:
+            materials_rev[material] = len(materials_fwd)
+            materials_fwd.append(material)
+        face_materials.append(materials_rev[material])
+    fmtls = np.array(face_materials, dtype=np.uint16)
+    mtlstr, mtlidx = packStringList(materials_fwd)
+
+    vars = dict(
+        coord = obj.coord,
+        vface = obj.vface,
+        nfaces = obj.nfaces,
+        texco = obj.texco,
+        fvert = obj.fvert,
+        group = obj.group,
+        fmtls = fmtls,
+        fgstr = fgstr,
+        fgidx = fgidx,
+        mtlstr = mtlstr,
+        mtlidx = mtlidx)
+
+    if obj.has_uv:
+        vars['fuvs']  = obj.fuvs
+
+    np.savez(path, **vars)
+
+def loadBinaryMesh(obj, path):
+    log.debug('loadBinaryMesh: np.load()')
+
+    npzfile = np.load(path)
+
+    log.debug('loadBinaryMesh: loading arrays')
+    coord = npzfile['coord']
+    vface = npzfile['vface']
+    nfaces = npzfile['nfaces']
+    texco = npzfile['texco']
+
+    fvert = npzfile['fvert']
+    group = npzfile['group']
+    fuvs = npzfile['fuvs'] if 'fuvs' in npzfile.files else None
+    fmtls = npzfile['fmtls']
+
+    fgstr = npzfile['fgstr']
+    fgidx = npzfile['fgidx']
+    mtlstr = npzfile['mtlstr']
+    mtlidx = npzfile['mtlidx']
+
+    log.debug('loadBinaryMesh: loaded arrays')
+
+    for name in unpackStringList(fgstr, fgidx):
+        obj.createFaceGroup(name)
+    del fgstr, fgidx
+
+    log.debug('loadBinaryMesh: unpacked facegroups')
+
+    mtlnames = unpackStringList(mtlstr, mtlidx)
+    materials = {}
+    for face, mtl in enumerate(fmtls):
+        materials[face] = mtlnames[mtl]
+    del mtlstr, mtlidx, mtlnames, fmtls
+
+    log.debug('loadBinaryMesh: unpacked materials')
+
+    obj.setCoords(coord)
+    obj.setUVs(texco)
+    obj.setFaces(fvert, fuvs, group, skipUpdate=True)
+    obj.vface = vface
+    obj.nfaces = nfaces
+
+    log.debug('loadBinaryMesh: created objects')
+
+def loadTextMesh(obj, path):
+    log.debug('loadTextMesh: begin')
+    objFile = open(path)
 
     fg = None
     mtl = ''
-
-    try:
-        objFile = open(path)
-    except:
-        log.warning('Warning: obj file not found: %s', path)
-        return False
 
     verts = []
     uvs = []
@@ -166,21 +236,72 @@ def loadMesh(path, locX=0, locY=0, locZ=0, loadColors=1):
                 
                 obj.name = lineData[1]
 
+    objFile.close()
+
     obj.setCoords(verts)
     obj.setUVs(uvs)
     obj.setFaces(fverts, fuvs if has_uv else None, groups)
-
-    originalVertexCache[path] = obj.coord.copy()
-
-    obj.updateIndexBuffer()
-    obj.calcNormals()
     
     # Used by mhx export
     obj.materials = {}
     for fn,mtl in enumerate(mtls):
     	obj.materials[fn] = mtl
 
-    objFile.close()
+    log.debug('loadTextMesh: end')
+
+def loadMesh(path, locX=0, locY=0, locZ=0, loadColors=1):
+    """
+    This function loads the specified mesh object into internal MakeHuman data 
+    structures, and returns it. The loaded file should be in Wavefront OBJ 
+    format.
+    
+    Parameters:
+    -----------
+   
+    path:     
+      *String*.  The file system path to the file containing the object to load.
+
+    locX:
+      *float* X location of loaded obj, default = 0
+
+    locY:
+      *float* Y location of loaded obj, default = 0
+
+    locZ:
+      *float* Z location of loaded obj, default = 0
+    """
+    name = os.path.basename(path)
+    obj = module3d.Object3D(name)
+
+    obj.path = path
+    obj.x = locX
+    obj.y = locY
+    obj.z = locZ
+
+    try:
+        npzpath = os.path.splitext(path)[0] + '.npz'
+        try:
+            if not os.path.isfile(npzpath):
+                log.message('compiled file missing: %s', npzpath)
+                raise RuntimeError()
+            if os.path.isfile(path) and os.path.getmtime(path) > os.path.getmtime(npzpath):
+                log.message('compiled file out of date: %s', npzpath)
+                raise RuntimeError()
+            loadBinaryMesh(obj, npzpath)
+        except:
+            loadTextMesh(obj, path)
+            try:
+                saveBinaryMesh(obj, npzpath)
+            except StandardError:
+                log.notice('unable to save compiled mesh: %s', npzpath)
+    except:
+        log.error('Unable to load obj file: %s', path, exc_info=True)
+        return False
+
+    obj.updateIndexBuffer()
+    obj.calcNormals()
+
+    originalVertexCache[path] = obj.coord.copy()
 
     if loadColors:
         colorPath = path + '.colors'
