@@ -46,7 +46,7 @@ class EyesTaskView(gui3d.TaskView):
         
         f = open(mhstx, 'rU')
         try:
-            subTextures = eval(f.read(), {"__builtins__":None}, {'True':True, 'False':False})
+            subTextures = mh.parseINI(f.read(), [("(","["), (")","]")])
         except:
             log.warning("setEyes(%s)", mhstx, exc_info=True)
             f.close()
