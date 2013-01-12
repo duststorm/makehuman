@@ -129,7 +129,7 @@ class ModifierTaskView(gui3d.TaskView):
 
     def loadHandler(self, human, values):
         if values[0] == self._group:
-            modifier = self.modifiers.get(values[1].replace("-", " "), None)
+            modifier = self.modifiers.get(values[1], None)
             if modifier:
                 modifier.setValue(human, float(values[2]))
 
@@ -137,7 +137,7 @@ class ModifierTaskView(gui3d.TaskView):
         for name, modifier in self.modifiers.iteritems():
             value = modifier.getValue(human)
             if value:
-                file.write('%s %s %f\n' % (self._group, name.replace(" ", "-"), value))
+                file.write('%s %s %f\n' % (self._group, name, value))
 
     def setCamera(self):
         pass
