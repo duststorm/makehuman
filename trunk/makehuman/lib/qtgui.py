@@ -262,7 +262,7 @@ class Slider(QtGui.QWidget, Widget):
         label = (self.text % value) if '%' in self.text else self.text
         self.label = QtGui.QLabel(label)
         # Decrease vertical gap between label and slider
-        self.label.setContentsMargins(0, 0, 0, -1)
+        #self.label.setContentsMargins(0, 0, 0, -1)
         self.layout = QtGui.QGridLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.addWidget(self.label, 1, 0)
