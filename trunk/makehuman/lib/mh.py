@@ -113,7 +113,7 @@ def parseINI(s, replace = []):
     try:
         result = json.loads(s)
     except ValueError:
-        for src, dst in [("'",'"'), (": True",": true"), (": False",": false"), (": None",": null")] + replace:
+        for src, dst in replace + [("'",'"'), (": True",": true"), (": False",": false"), (": None",": null")]:
             s = s.replace(src, dst)
         result = json.loads(s)
     return _u2s(result)
