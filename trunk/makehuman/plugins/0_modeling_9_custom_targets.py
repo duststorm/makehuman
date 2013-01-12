@@ -147,6 +147,9 @@ class CustomTargetsTaskView(gui3d.TaskView):
                 button.groupBox.hide()
         self.syncStatus()
 
+    def onHide(self, event):
+        gui3d.app.statusPersist('')
+
     def loadHandler(self, human, values):
         
         modifier = self.modifiers.get(values[1], None)
