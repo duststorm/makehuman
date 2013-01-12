@@ -974,30 +974,27 @@ class MHApplication(gui3d.Application, mh.Application):
     # Shortcut methods
 
     def goToModelling(self):
-        self.switchCategory("Modelling")
+        mh.changeCategory("Modelling")
         self.redraw()
 
     def goToSave(self):
-        self.switchCategory("Files")
-        self.switchTask("Save")
+        mh.changeTask("Files", "Save")
         self.redraw()
 
     def goToLoad(self):
-        self.switchCategory("Files")
-        self.switchTask("Load")
+        mh.changeTask("Files", "Load")
         self.redraw()
 
     def goToExport(self):
-        self.switchCategory("Files")
-        self.switchTask("Export")
+        mh.changeTask("Files", "Export")
         self.redraw()
 
     def goToRendering(self):
-        self.switchCategory("Rendering")
+        mh.changeCategory("Rendering")
         self.redraw()
 
     def goToHelp(self):
-        self.switchCategory("Help")
+        mh.changeCategory("Help")
 
     def toggleStereo(self):
         stereoMode = self.modelCamera.stereoMode
