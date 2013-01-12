@@ -478,7 +478,8 @@ class MHApplication(gui3d.Application, mh.Application):
         if sys.platform.startswith("darwin"):
             self.splash.resize(0,0) # work-around for mac splash-screen closing bug
 
-        self.splash.finish(self.mainwin)
+        self.splash.hide()
+        # self.splash.finish(self.mainwin)
 
     def nextStartupTask(self):
         if not next(self.tasks, True):

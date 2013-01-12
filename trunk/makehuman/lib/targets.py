@@ -98,7 +98,6 @@ class Targets(object):
 
     @staticmethod
     def is_fake(name, dirs):
-        dirs = [dir.replace('-','_') for dir in dirs]
         if name == 'caucasian':
             for race in ("asian", "african"):
                 if race in dirs:
@@ -114,6 +113,7 @@ class Targets(object):
 
     def walk(self, root, base = None):
         dirs = os.listdir(root)
+        xdirs = [dir.replace('-','_') for dir in dirs]
         for name in sorted(dirs):
             path = os.path.join(root, name).replace('\\','/')
             if os.path.isfile(path) and not path.lower().endswith('.target'):
@@ -121,7 +121,7 @@ class Targets(object):
                     self.images[name.lower()] = path
                 continue
             item = base.clone()
-            if not self.is_fake(name, dirs):
+            if not self.is_fake(name, xdirs):
                 parts = name.replace('_','-').replace('.','-').split('-')
                 if root.endswith('macrodetails') and parts[0] == 'neutral':
                     parts[0] = 'caucasian'
