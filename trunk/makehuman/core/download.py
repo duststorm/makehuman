@@ -80,12 +80,13 @@ class DownloadCache():
         self.path = path
             
         cachePath = os.path.join(self.path, 'cache.ini')
+        self.cache = {}
         if os.path.exists(cachePath):
-            f = open(cachePath, 'r')
-            self.cache = eval(f.read(), {"__builtins__":None}, {'True':True, 'False':False})
-            f.close()
-        else:
-            self.cache = {}
+            try:
+                with open(cachePath, 'r') as f:
+                    self.cache = mh.parseINI(f.read())
+            except ValueError:
+                os.remove(cachePath)
             
     def download(self, url):
         
@@ -103,16 +104,14 @@ class DownloadCache():
             return False, e.code
                 
         if downloaded:
-            f = open(os.path.join(self.path, filename), 'wb')
-            f.write(data)
-            f.close()
+            with open(os.path.join(self.path, filename), 'wb') as f:
+                f.write(data)
             self.cache[filename] = (etag, modified)
             
         cachePath = os.path.join(self.path, 'cache.ini')
-        f = open(cachePath, 'w')
-        f.write(repr(self.cache))
-        f.close()
-        
+        with open(cachePath, 'w') as f:
+            f.write(mh.formatINI(self.cache))
+
         return True, (200 if downloaded else 304)
         
     @classmethod
