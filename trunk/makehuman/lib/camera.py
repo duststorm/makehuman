@@ -24,10 +24,7 @@ TODO
 
 import math
 import numpy as np
-from OpenGL.GL import *
-from OpenGL.GLU import *
 from core import G
-from object3d import Object3D
 import glmodule as gl
 import matrix
 
@@ -162,11 +159,7 @@ class Camera(object):
 
     def convertToWorld2D(self, sx, sy, obj = None):
         "Convert 2D (x, y) screen coordinates to OpenGL world coordinates."
-
-        sz = c_double(0)
-        glReadPixels(sx, G.windowHeight - sy, 1, 1, GL_DEPTH_COMPONENT, GL_DOUBLE, byref(sz))
-        sz = sz.value
-
+        sz = gl.queryDepth(sx, sy)
         return convertToWorld3D(sx, sy, sz, obj)
 
     def convertToWorld3D(self, sx, sy, sz, obj = None):

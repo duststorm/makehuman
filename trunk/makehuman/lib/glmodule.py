@@ -78,6 +78,11 @@ def createShader(vertexShader, fragmentShader):
 
     return program
 
+def queryDepth(sx, sy):
+    sz = c_double(0)
+    glReadPixels(sx, G.windowHeight - sy, 1, 1, GL_DEPTH_COMPONENT, GL_DOUBLE, byref(sz))
+    return sz.value
+
 def grabScreen(x, y, width, height, filename = None):
     if width <= 0 or height <= 0:
         raise RuntimeError("width or height is 0")

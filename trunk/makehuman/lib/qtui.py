@@ -33,21 +33,6 @@ import glmodule as gl
 import events3d
 import qtgui
 
-import traceback
-def catching(func):
-    def wrapper(*args, **kwargs):
-        # if func.func_name != 'idleFunc':
-        #     print func
-        try:
-            return func(*args, **kwargs)
-        except StandardError, e:
-            traceback.print_exc()
-
-    # def wrapper(*args, **kwargs):
-    #     return func(*args, **kwargs)
-
-    return wrapper
-
 class Modifiers:
     SHIFT = int(QtCore.Qt.ShiftModifier)
     CTRL  = int(QtCore.Qt.ControlModifier)
@@ -191,66 +176,29 @@ class Canvas(QtOpenGL.QGLWidget):
         else:
             func(*args)
 
-    def mouseButtonDown(self, b, x, y):
-        # Check which object/group was hit
-        if b in (1,2,3):
-            gl.getPickedColor(x, y)
+    def mousePressEvent(self, ev):
+        self.mouseUpDownEvent(ev, "MouseDown")
 
-        # Notify python
-        self.callback('MouseDown', b, x, y)
+    def mouseReleaseEvent(self, ev):
+        self.mouseUpDownEvent(ev, "MouseUp")
 
-        # Update screen
-        self.update()
+    def mouseUpDownEvent(self, ev, direction):
+        global gg_mouse_pos
 
-        if b in (1,2,3):
-            gl.updatePickingBuffer()
+        x = ev.x()
+        y = ev.y()
+        b = ev.button()
 
-    def mouseButtonUp(self, b, x, y):
-        # Check which object/group was hit
-        if b in (1,2,3):
-            gl.getPickedColor(x, y)
+        gg_mouse_pos = x, y
 
-        # Notify python
-        self.callback('MouseUp', b, x, y)
+        gl.getPickedColor(x, y)
+
+        self.callback(direction, b, x, y)
 
         # Update screen
         self.update()
 
         gl.updatePickingBuffer()
-
-    def mouseMotion(self, s, x, y, xrel, yrel):
-        # Check which object/group was hit
-        if not s:
-            gl.getPickedColor(x, y)
-
-        # Notify python
-        self.callback('MouseMoved', s, x, y, xrel, yrel, accum = True)
-
-        # Update screen
-        if s:
-            self.update()
-
-    def mousePressEvent(self, ev):
-        global gg_mouse_pos
-
-        x = ev.x()
-        y = ev.y()
-        b = ev.button()
-
-        gg_mouse_pos = x, y
-
-        self.mouseButtonDown(b, x, y)
-
-    def mouseReleaseEvent(self, ev):
-        global gg_mouse_pos
-
-        x = ev.x()
-        y = ev.y()
-        b = ev.button()
-
-        gg_mouse_pos = x, y
-
-        self.mouseButtonUp(b, x, y)
 
     def wheelEvent(self, ev):
         global gg_mouse_pos
@@ -275,9 +223,32 @@ class Canvas(QtOpenGL.QGLWidget):
             gg_mouse_pos = x, y
 
         if g_mouse_pos is None:
-            callAsync(self.idle)
+            callAsync(self.handleMouse)
 
         g_mouse_pos = (x, y)
+
+    def handleMouse(self):
+        global gg_mouse_pos, g_mouse_pos
+
+        if g_mouse_pos is None:
+            return
+
+        ox, oy = gg_mouse_pos
+        (x, y) = g_mouse_pos
+        g_mouse_pos = None
+        xrel = x - ox
+        yrel = y - oy
+        gg_mouse_pos = x, y
+
+        buttons = int(G.app.mouseButtons())
+
+        if not buttons:
+            gl.getPickedColor(x, y)
+
+        self.callback('MouseMoved', buttons, x, y, xrel, yrel, accum = True)
+
+        if buttons:
+            self.update()
 
     def initializeGL(self):
         gl.OnInit()
@@ -290,25 +261,6 @@ class Canvas(QtOpenGL.QGLWidget):
         G.windowWidth = w
         gl.reshape(w, h)
         self.callback('Resized', w, h, False)
-
-    def handleMouse(self):
-        global gg_mouse_pos, g_mouse_pos
-
-        if g_mouse_pos is not None:
-            # print 'mouse motion'
-            ox, oy = gg_mouse_pos
-            (x, y) = g_mouse_pos
-            g_mouse_pos = None
-            xrel = x - ox
-            yrel = y - oy
-            gg_mouse_pos = x, y
-
-            buttons = int(G.app.mouseButtons())
-
-            self.mouseMotion(buttons, x, y, xrel, yrel)
-
-    def idle(self, *args):
-        self.handleMouse()
 
     def timerEvent(self, ev):
         handleTimer(ev.timerId())
