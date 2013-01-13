@@ -262,6 +262,7 @@ class ExportTaskView(gui3d.TaskView):
         # Mesh Formats
         self.formatBox = self.addLeftWidget(gui.GroupBox('Mesh Format'))
         self.wavefrontObj = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, "Wavefront obj", True))
+        self.fbx = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, "Filmbox (fbx)"))
         self.mhx = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Blender exchange (mhx)"))
         self.collada = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Collada (dae)"))
         self.md5 = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="MD5"))
@@ -288,6 +289,17 @@ class ExportTaskView(gui3d.TaskView):
         self.exportSmooth = self.objOptions.addWidget(gui.CheckBox( "Subdivide", False))
         scales = []
         self.objScales = self.addScales(self.objOptions, scales, "Obj", True)
+
+        # FBX options
+        self.fbxOptions = self.optionsBox.addWidget(gui.GroupBox('Options'))
+        self.fbxEyebrows = self.fbxOptions.addWidget(gui.CheckBox("Eyebrows", True))
+        self.fbxLashes = self.fbxOptions.addWidget(gui.CheckBox("Eyelashes", True))
+        self.fbxHelpers = self.fbxOptions.addWidget(gui.CheckBox("Helper geometry", False))
+        self.fbxHidden = self.fbxOptions.addWidget(gui.CheckBox("Keep hidden faces", True))
+        self.fbxSkeleton = self.fbxOptions.addWidget(gui.CheckBox("Skeleton", True))
+        self.fbxSmooth = self.fbxOptions.addWidget(gui.CheckBox( "Subdivide", False))
+        scales = []
+        self.fbxScales = self.addScales(self.fbxOptions, scales, "Obj", True)
 
         # MHX options
         """
@@ -384,6 +396,11 @@ class ExportTaskView(gui3d.TaskView):
             self.updateGui()
             self.fileentry.setFilter('Wavefront (*.obj)')
             
+        @self.fbx.mhEvent
+        def onClicked(event):
+            self.updateGui()
+            self.fileentry.setFilter('Filmbox (*.fbx)')
+
         @self.mhx.mhEvent
         def onClicked(event):
             self.updateGui()
@@ -421,7 +438,7 @@ class ExportTaskView(gui3d.TaskView):
         
         @self.fileentry.mhEvent
         def onFileSelected(filename):
-            import mh2obj, mh2bvh, mh2mhx, mh2obj_proxy, mh2collada, mh2md5, mh2stl, mh2skel
+            import mh2obj, mh2bvh, mh2mhx, mh2obj_proxy, mh2collada, mh2md5, mh2stl, mh2skel, mh2fbx
 
             path = os.path.normpath(os.path.join(exportPath, filename))
             dir, name = os.path.split(path)
@@ -452,6 +469,20 @@ class ExportTaskView(gui3d.TaskView):
                 if self.exportSkeleton.selected:
                     mh2bvh.exportSkeleton(human.meshData, filename("bvh", True))
                     
+            elif self.fbx.selected:
+                
+                human = gui3d.app.selectedHuman
+
+                options = {
+                    "helpers" : self.fbxHelpers.selected,
+                    "hidden" : self.fbxHidden.selected,
+                    "eyebrows" : self.fbxEyebrows.selected,
+                    "lashes" : self.fbxLashes.selected,
+                    "scale": self.getScale(self.fbxScales),
+                    "subdivide": self.fbxSmooth.selected
+                }                    
+                mh2fbx.exportFbx(human, filename("fbx"), options)
+            
             elif self.mhx.selected:
                 #mhxversion = []
                 #if self.version24.selected: mhxversion.append('24')
