@@ -84,17 +84,7 @@ def unpackStringList(text, index):
 
 def saveBinaryMesh(obj, path):
     fgstr, fgidx = packStringList(fg.name for fg in obj._faceGroups)
-
-    face_materials = []
-    materials_fwd = []
-    materials_rev = {}
-    for face, material in obj.materials.iteritems():
-        if material not in materials_rev:
-            materials_rev[material] = len(materials_fwd)
-            materials_fwd.append(material)
-        face_materials.append(materials_rev[material])
-    fmtls = np.array(face_materials, dtype=np.uint16)
-    mtlstr, mtlidx = packStringList(materials_fwd)
+    mtlstr, mtlidx = packStringList(obj._materials)
 
     vars = dict(
         coord = obj.coord,
@@ -103,7 +93,7 @@ def saveBinaryMesh(obj, path):
         texco = obj.texco,
         fvert = obj.fvert,
         group = obj.group,
-        fmtls = fmtls,
+        fmtls = obj.fmtls,
         fgstr = fgstr,
         fgidx = fgidx,
         mtlstr = mtlstr,
@@ -121,58 +111,52 @@ def loadBinaryMesh(obj, path):
 
     log.debug('loadBinaryMesh: loading arrays')
     coord = npzfile['coord']
-    vface = npzfile['vface']
-    nfaces = npzfile['nfaces']
+    obj.setCoords(coord)
+
     texco = npzfile['texco']
+    obj.setUVs(texco)
 
     fvert = npzfile['fvert']
-    group = npzfile['group']
     fuvs = npzfile['fuvs'] if 'fuvs' in npzfile.files else None
+    group = npzfile['group']
     fmtls = npzfile['fmtls']
+    obj.setFaces(fvert, fuvs, group, fmtls, skipUpdate=True)
 
-    fgstr = npzfile['fgstr']
-    fgidx = npzfile['fgidx']
-    mtlstr = npzfile['mtlstr']
-    mtlidx = npzfile['mtlidx']
+    obj.vface = npzfile['vface']
+    obj.nfaces = npzfile['nfaces']
 
     log.debug('loadBinaryMesh: loaded arrays')
 
+    fgstr = npzfile['fgstr']
+    fgidx = npzfile['fgidx']
     for name in unpackStringList(fgstr, fgidx):
         obj.createFaceGroup(name)
     del fgstr, fgidx
 
     log.debug('loadBinaryMesh: unpacked facegroups')
 
-    mtlnames = unpackStringList(mtlstr, mtlidx)
-    materials = {}
-    for face, mtl in enumerate(fmtls):
-        materials[face] = mtlnames[mtl]
-    del mtlstr, mtlidx, mtlnames, fmtls
+    mtlstr = npzfile['mtlstr']
+    mtlidx = npzfile['mtlidx']
+    obj._materials = unpackStringList(mtlstr, mtlidx)
+    del mtlstr, mtlidx
 
     log.debug('loadBinaryMesh: unpacked materials')
-
-    obj.setCoords(coord)
-    obj.setUVs(texco)
-    obj.setFaces(fvert, fuvs, group, skipUpdate=True)
-    obj.vface = vface
-    obj.nfaces = nfaces
-
-    log.debug('loadBinaryMesh: created objects')
 
 def loadTextMesh(obj, path):
     log.debug('loadTextMesh: begin')
     objFile = open(path)
 
     fg = None
-    mtl = ''
+    mtl = None
 
     verts = []
     uvs = []
     fverts = []
     fuvs = []
     groups = []
+    fmtls = []
     has_uv = False
-    mtls = []
+    materials = {}
     faceGroups = {}
 
     for objData in objFile:
@@ -193,6 +177,11 @@ def loadTextMesh(obj, path):
                     if 0 not in faceGroups:
                         faceGroups[0] = obj.createFaceGroup('default-dummy-group')
                     fg = faceGroups[0]
+
+                if not mtl:
+                    if 0 not in materials:
+                        materials[0] = obj.createMaterial('')
+                    mtl = materials[0]
                     
                 uvIndices = []
                 vIndices = []
@@ -220,7 +209,7 @@ def loadTextMesh(obj, path):
 
                 groups.append(fg.idx)
                 
-                mtls.append(mtl)
+                fmtls.append(mtl)
 
             elif command == 'g':
                 fgName = lineData[1]
@@ -229,8 +218,10 @@ def loadTextMesh(obj, path):
                 fg =  faceGroups[fgName]
                 
             elif command == 'usemtl':
-            
-                mtl = lineData[1]
+                mtlName = lineData[1]
+                if mtlName not in materials:
+                    materials[mtlName] = obj.createMaterial(mtlName)
+                mtl =  materials[mtlName]
                 
             elif command == 'o':
                 
@@ -240,12 +231,7 @@ def loadTextMesh(obj, path):
 
     obj.setCoords(verts)
     obj.setUVs(uvs)
-    obj.setFaces(fverts, fuvs if has_uv else None, groups)
-    
-    # Used by mhx export
-    obj.materials = {}
-    for fn,mtl in enumerate(mtls):
-    	obj.materials[fn] = mtl
+    obj.setFaces(fverts, fuvs if has_uv else None, groups, fmtls)
 
     log.debug('loadTextMesh: end')
 

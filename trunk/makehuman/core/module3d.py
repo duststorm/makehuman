@@ -28,7 +28,7 @@ import weakref
 import numpy as np
 
 import mh
-from compat import VertProxy, FaceProxy, VertsProxy, FacesProxy
+from compat import VertProxy, FaceProxy, VertsProxy, FacesProxy, MaterialsProxy
 import log
 
 class Texture(mh.Texture):
@@ -142,8 +142,8 @@ class Object3D(object):
         self.rot = np.zeros(3)
         self.scale = np.ones(3)
         self._faceGroups = []
+        self._materials = []
         self._groups_rev = {}
-        self.materials = {}	# TL: used by mhx export
         self.cameraMode = 1
         self.visibility = True
         self.pickable = True
@@ -287,6 +287,10 @@ class Object3D(object):
     @property
     def faceGroupCount(self):
         return len(self._faceGroups)
+
+    @property
+    def materials(self):
+        return MaterialsProxy(self)
 
     def clear(self):
         """
@@ -443,13 +447,14 @@ class Object3D(object):
             if self.utexc is not True:
                 self.utexc[indices] = True
 
-    def setFaces(self, verts, uvs = None, groups = None, skipUpdate = False):
+    def setFaces(self, verts, uvs = None, groups = None, materials = None, skipUpdate = False):
         nfaces = len(verts)
 
         self.fvert = np.empty((nfaces, self.vertsPerPrimitive), dtype=np.uint32)
         self.fnorm = np.zeros((nfaces, 3), dtype=np.float32)
         self.fuvs = np.zeros(self.fvert.shape, dtype=np.uint32)
         self.group = np.zeros(nfaces, dtype=np.uint16)
+        self.fmtls = np.zeros(nfaces, dtype=np.uint16)
 
         if nfaces != 0:
             self.fvert[...] = verts
@@ -457,6 +462,8 @@ class Object3D(object):
                 self.fuvs[...] = uvs
             if groups is not None:
                 self.group[...] = groups
+            if materials is not None:
+                self.fmtls[...] = materials
 
         self.has_uv = uvs is not None
 
@@ -623,6 +630,11 @@ class Object3D(object):
         self._groups_rev[name] = fg
         self._faceGroups.append(fg)
         return fg
+
+    def createMaterial(self, name):
+        idx = len(self._materials)
+        self._materials.append(name)
+        return idx
 
     def setColor(self, color):
         """
