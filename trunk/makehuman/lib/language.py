@@ -66,6 +66,6 @@ class Language(object):
         path = os.path.join("data", "languages", self.language + ".missing")
         with open(path, 'w') as f:
             for string in self.missingStrings:
-                f.write("'%s':'',\n" % string.encode('utf8'))
+                f.write('"%s": "",\n' % string.encode('utf8'))
 
 language = Language()
