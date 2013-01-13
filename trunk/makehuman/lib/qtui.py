@@ -421,7 +421,7 @@ class Frame(QtGui.QWidget):
         self.shortcuts = {}
 
         self.setWindowTitle(self.title)
-        #self.setAttribute(QtCore.Qt.WA_PaintOnScreen)  # Causes flickering and bg bleeds through rounded edges
+        self.setAttribute(QtCore.Qt.WA_PaintOnScreen)  # Causes flickering and bg bleeds through rounded edges
         self.setAttribute(QtCore.Qt.WA_OpaquePaintEvent)
         self.setAttribute(QtCore.Qt.WA_KeyCompression, False)
         self.resize(*size)
