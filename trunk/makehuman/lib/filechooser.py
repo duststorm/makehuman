@@ -231,15 +231,11 @@ class FileChooser(QtGui.QWidget, Widget):
         super(FileChooser, self).__init__()
         Widget.__init__(self)
 
-        self.path = path if isinstance(path, basestring) else path[0]
-        self.paths = path if isinstance(path, list) else [path]
+        self.location = None
+
+        self.paths = path
         self.extension = extension
-        if previewExtension:
-            self.previewExtension = previewExtension if isinstance(previewExtension, basestring) else previewExtension[0]
-            self.previewExtensions = previewExtension if isinstance(previewExtension, list) else [previewExtension]
-        else:
-            self.previewExtension = None
-            self.previewExtensions = None
+        self.previewExtensions = previewExtension
 
         self.sort = sort
         self.selection = ''
@@ -271,7 +267,6 @@ class FileChooser(QtGui.QWidget, Widget):
         self.children = FlowLayout(self.files)
         self.children.setSizeConstraint(QtGui.QLayout.SetMinimumSize)
 
-        self.location = TextView(os.path.abspath(self.path))
         self.layout.addWidget(self.location, 2, 0, 1, -1)
         self.layout.setRowStretch(2, 0)
 
@@ -282,6 +277,38 @@ class FileChooser(QtGui.QWidget, Widget):
         @self.refreshButton.mhEvent
         def onClicked(value):
             self.refresh()
+
+    @property
+    def paths(self):
+        return self._paths
+
+    @paths.setter
+    def paths(self, value):
+        self._paths = value if isinstance(value, list) else [value]
+        locationLbl = "  |  ".join(self.paths)
+        if not self.location:
+            self.location = TextView(os.path.abspath(locationLbl))
+        else:
+            self.location.setText(os.path.abspath(localtionLbl))
+
+    @property
+    def previewExtensions(self):
+        return self._previewExtensions
+
+    @previewExtensions.setter
+    def previewExtensions(self, value):
+        if value:
+            self._previewExtensions = value if isinstance(value, list) else [value]
+        else:
+            self._previewExtensions = None
+
+    @property
+    def extension(self):
+        return self._extension
+
+    @extension.setter
+    def extension(self,value):
+        self._extension = value
 
     def _updateScrollBar(self):
         pass
@@ -294,8 +321,8 @@ class FileChooser(QtGui.QWidget, Widget):
     def getPreview(self, filename):
         preview = filename
         
-        if self.previewExtension:
-            preview = filename.replace('.' + self.extension, '.' + self.previewExtension)
+        if self.previewExtensions:
+            preview = filename.replace('.' + self.extension, '.' + self.previewExtensions[0])
             i = 1
             while not os.path.exists(preview) and i < len(self.previewExtensions):
                 preview = filename.replace('.' + self.extension, '.' + self.previewExtensions[i])

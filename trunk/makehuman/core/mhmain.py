@@ -741,6 +741,7 @@ class MHApplication(gui3d.Application, mh.Application):
             return os.path.join("data/themes/default/", folder, id)
 
     def setLanguage(self, language):
+        log.debug("Setting language to %s", language)
         lang.language.setLanguage(language)
         self.settings['rtl'] = lang.language.rtl
 
