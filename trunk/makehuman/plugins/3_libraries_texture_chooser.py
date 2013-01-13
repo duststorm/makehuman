@@ -78,8 +78,7 @@ class TextureTaskView(gui3d.TaskView):
         self.activeClothing = None
         self.eyeTexture = None
 
-        # TODO
-        self.filechooser = self.addTopWidget(fc.FileChooser(self.defaultTextures, 'png', ['thumb', 'png'], 'data/skins/notfound.thumb'))
+        self.filechooser = self.addTopWidget(fc.FileChooser(self.userSkins, 'png', ['thumb', 'png'], 'data/skins/notfound.thumb'))
         #self.filechooser = self.addTopWidget(fc.FileChooser([self.systemSkins, self.userSkins], 'png', 'thumb', 'data/skins/notfound.thumb'))
         self.addLeftWidget(self.filechooser.sortBox)
         self.update = self.filechooser.sortBox.addWidget(gui.Button('Check for updates'))
@@ -222,7 +221,7 @@ class TextureTaskView(gui3d.TaskView):
             self.filechooser.extension = 'png'
             
         if self.skinRadio.selected:
-            self.textures = [self.systemSkins, self.userSkins] + self.defaultTextures
+            self.textures = [self.systemSkins, self.userSkins]
         elif self.hairRadio.selected:
             proxy = human.hairProxy
             self.textures = [os.path.dirname(proxy.file)]
