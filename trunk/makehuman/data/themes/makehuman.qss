@@ -428,7 +428,7 @@ QTabBar::tab {
     padding-right: 10px;
     padding-top: 3px;
     padding-bottom: 2px;
-    margin-right: -1px;
+    margin-bottom: -2px;
 }
 
 QTabWidget::pane {
@@ -524,3 +524,4 @@ QCheckBox::indicator:disabled, QRadioButton::indicator:disabled
 {
     border: 1px solid #444;
 }
+

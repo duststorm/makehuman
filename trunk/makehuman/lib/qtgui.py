@@ -133,6 +133,7 @@ class TabBar(QtGui.QTabBar, TabsBase):
     def __init__(self, parent = None):
         QtGui.QTabBar.__init__(self, parent)
         TabsBase.__init__(self)
+        self.setDrawBase(False)
 
     def tabBar(self):
         return self
