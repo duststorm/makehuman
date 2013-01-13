@@ -109,11 +109,14 @@ class SettingsTaskView(gui3d.TaskView):
         self.themeMH = themesBox.addWidget(ThemeRadioButton(themes, "MakeHuman", "makehuman"))
 
         # For debugging themes on multiple platforms
+        '''
         platforms = []
         platformsBox = self.platformsBox = self.addRightWidget(gui.GroupBox('Look and feel'))
         for platform in gui3d.app.getLookAndFeelStyles():
             platformsBox.addWidget(PlatformRadioButton(platforms, platform))
+        '''
 
+        # We might allow overriding the font from the style, but for now loaded fonts can be used from a style
         '''
         fonts = []
         fontsBox = self.fontsBox = self.addRightWidget(gui.GroupBox('Font'))
