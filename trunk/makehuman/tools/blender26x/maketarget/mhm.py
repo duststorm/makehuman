@@ -256,7 +256,7 @@ MhmNameProps = {
 def updateSlider(context, prop, name):
     me = context.object.data
     mhm = CMhmFile()
-    mhm.setSlider(name, eval("me.%s" % prop))
+    mhm.setSlider(name, getattr(me, prop))
     print(mhm)
     mhm.setAllItems(context)              
     return
@@ -279,7 +279,7 @@ def updateAllSliders(context):
     mhm = CMhmFile()
     maketarget.discardAllTargets(context)
     for name,prop in MhmNameProps.items():
-        mhm.setSlider(name, eval("me.%s" % prop))
+        mhm.setSlider(name, getattr(me, prop))
     print(mhm)
     mhm.setAllItems(context)              
     return

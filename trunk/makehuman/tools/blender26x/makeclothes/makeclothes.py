@@ -31,6 +31,7 @@ import bpy
 import os
 import random
 import uuid
+import ast
 from bpy.props import *
 from mathutils import Vector
 from . import base_uv
@@ -563,7 +564,7 @@ def printClothesHeader(fp, scn):
 "# uuid %s\n" % uuid.uuid4() +
 "# basemesh %s\n" % BaseMeshVersion)
     for n in range(1,6):
-        tag = eval("scn.MCTag%d" % n)
+        tag = getattr(scn, "MCTag%d" % n)
         if tag:
             fp.write("# tag %s\n" % tag)
     fp.write("\n")            
@@ -773,7 +774,7 @@ def printStuff(fp, pob, context):
             fp.write("# solidify %.3f %.3f\n" % (mod.thickness, mod.offset))
             
     for skey in ShapeKeys:            
-        if eval("scn.MC" + skey):
+        if getattr(scn, "MC" + skey):
             fp.write("# shapekey %s\n" % skey)            
             
     me = pob.data            
@@ -1086,7 +1087,9 @@ def storeData(pob, bob, data):
     fp.close()
     return
     
-    
+def parse(string):
+    return ast.literal_eval(string)
+
 def restoreData(context): 
     (bob, pob) = getObjectPair(context)
     fname = settingsFile("stored")
@@ -1115,17 +1118,17 @@ def restoreData(context):
             exact = int(words[1])
             status = 2
         elif status == 2:
-            verts = eval(line)
+            verts = parse(line)
             if exact:
                 data.append((pv, exact, verts, 0, 0))
                 status = 1
             else:
                 status = 3
         elif status == 3:
-            wts = eval(line)
+            wts = parse(line)
             status = 4
         elif status == 4:
-            diff = Vector( eval(line) )
+            diff = Vector( parse(line) )
             data.append((pv, exact, verts, wts, diff))
             status = 1
     bob = context.scene.objects[bname]
@@ -1856,7 +1859,7 @@ def exportMTex(index, mtex, use, fp):
     mapto = None
     prio = []
     for ext in MapToTypes.keys():
-        if eval("mtex.%s" % ext):
+        if getattr(mtex, ext):
             if mapto == None:
                 mapto = MapToTypes[ext]
             prio.append(ext)    
@@ -1924,11 +1927,11 @@ def exportRamp(ramp, name, fp):
 
 def writePrio(data, prio, pad, fp):
     for ext in prio:
-        writeExt(ext, "data", [], pad, 0, fp, globals(), locals())
+        writeExt(ext, data, [], pad, 0, fp)
 
 def writeDir(data, exclude, pad, fp):
     for ext in dir(data):
-        writeExt(ext, "data", exclude, pad, 0, fp, globals(), locals())
+        writeExt(ext, data, exclude, pad, 0, fp)
 
 def writeQuoted(arg, fp):
     typ = type(arg)
@@ -1962,20 +1965,12 @@ def stringQuote(string):
         
             
 #
-#    writeExt(ext, name, exclude, pad, depth, fp, globals, locals):        
+#    writeExt(ext, data, exclude, pad, depth, fp):        
 #
 
-def writeExt(ext, name, exclude, pad, depth, fp, globals, locals):        
-    expr = name+"."+ext
-    try:
-        arg = eval(expr, globals, locals)
-        success = True
-    except:
-        success = False
-        arg = None
-    if success:
-        writeValue(ext, arg, exclude, pad, depth, fp)
-    return
+def writeExt(ext, data, exclude, pad, depth, fp):        
+    if hasattr(data, ext):
+        writeValue(ext, getattr(data, ext), exclude, pad, depth, fp)
 
 #
 #    writeValue(ext, arg, exclude, pad, depth, fp):

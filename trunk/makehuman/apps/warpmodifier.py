@@ -102,7 +102,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
             fp.close()
             
         humanmodifier.SimpleModifier.__init__(self, warppath)
-        self.fallback = eval( "humanmodifier.%s('%s')" % (fallback, template))
+        self.fallback = getattr(humanmodifier, fallback)(template)
         self.modtype = fallback
 
         self.warppath = warppath

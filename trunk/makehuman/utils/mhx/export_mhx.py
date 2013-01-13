@@ -330,11 +330,11 @@ def initLocalData():
 
 def writePrio(data, prio, pad, fp):
     for ext in prio:
-        writeExt(ext, "data", [], pad, 0, fp, globals(), locals())
+        writeExt(ext, data, [], pad, 0, fp)
 
 def writeDir(data, exclude, pad, fp):
     for ext in dir(data):
-        writeExt(ext, "data", exclude, pad, 0, fp, globals(), locals())
+        writeExt(ext, data, exclude, pad, 0, fp)
     try:
         props = data.items()
     except:
@@ -356,7 +356,7 @@ def writeSubDir(data, exclude, pad, depth, fp):
         fp.write(msg)
         return
     for ext in dir(data):
-        writeExt(ext, "data", exclude, pad, depth, fp, globals(), locals())
+        writeExt(ext, data, exclude, pad, depth, fp)
     return
 
 def writeQuoted(arg, fp):
@@ -391,22 +391,14 @@ def stringQuote(string):
         
             
 #
-#    writeExt(ext, name, exclude, pad, depth, fp, globals, locals):        
+#    writeExt(ext, data, exclude, pad, depth, fp):        
 #
 
-def writeExt(ext, name, exclude, pad, depth, fp, globals, locals):        
-    expr = name+"."+ext
+def writeExt(ext, data, exclude, pad, depth, fp):
     if verbosity > 2:
         print(pad, ext)
-    try:
-        arg = eval(expr, globals, locals)
-        success = True
-    except:
-        success = False
-        arg = None
-    if success:
-        writeValue(ext, arg, exclude, pad, depth, fp)
-    return
+    if hasattr(data, ext):
+        writeValue(ext, getattr(data, ext), exclude, pad, depth, fp)
 
 #
 #    writeValue(ext, arg, exclude, pad, depth, fp):
@@ -867,7 +859,7 @@ def exportMTex(index, mtex, use, fp):
     mapto = None
     prio = []
     for ext in MapToTypes.keys():
-        if eval("mtex.%s" % ext):
+        if getattr(mtex, ext):
             if mapto == None:
                 mapto = MapToTypes[ext]
             prio.append(ext)    

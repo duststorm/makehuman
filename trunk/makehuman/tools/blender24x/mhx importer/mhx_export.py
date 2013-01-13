@@ -72,17 +72,17 @@ def getString(name):
 		return "None"
 
 #
-#	writeList(name, list, fp, n, globals, locals):
+#	writeList(var, list, fp, n):
 #
 
-def writeList(name, list, fp, n, globals, locals):
+def writeList(var, list, fp, n):
 	for elt in list:
 		(type,ext) = elt
 		save = True
 		try:
 			(test, ext1) = ext
 			save = False
-			if eval(name+"."+test, globals, locals):
+			if getattr(var, test)
 				ext = ext1
 				save = True
 		except:
@@ -90,9 +90,7 @@ def writeList(name, list, fp, n, globals, locals):
 		
 		if save:
 			try:
-				expr = name+"."+ext
-				arg = eval(expr, globals, locals)
-				writeTyped(type, ext, arg, fp, n)
+				writeTyped(type, ext, getattr(var, ext), fp, n)
 			except:
 				pass
 
@@ -291,7 +289,7 @@ def exportMaterial(mat, fp):
 		exportIpo(mat.ipo, fp, True)
 	listColorBand(mat.colorbandDiffuse, "colorbandDiffuse", fp)
 	listColorBand(mat.colorbandSpecular, "colorbandSpecular", fp)
-	writeList("mat", materialList, fp, 2, globals(), locals())
+	writeList(mat, materialList, fp, 2)
 	fp.write("end material\n\n")
 
 materialList = [
@@ -412,7 +410,7 @@ def exportTexture(tx, fp):
 	if tx.ipo:
 		exportIpo(tx.ipo, fp, True)
 	listColorBand(tx.colorband, "colorband", fp)
-	writeList("tx", textureList, fp, 2, globals(), locals())
+	writeList(tx, textureList, fp, 2)
 	fp.write("end texture\n\n")
 	return
 
@@ -480,7 +478,7 @@ def exportMTex(index, mtex, fp):
 	fp.write("  mtex %d %s\n" % (index, name))
 	fp.write("    texco 0x%x ;\n" % mtex.texco)
 	fp.write("    mapto 0x%x ;\n" % mtex.mapto)    
-	writeList("mtex", mTexList, fp, 2, globals(), locals())
+	writeList(mtex, mTexList, fp, 2)
 	fp.write("  end mtex\n")
 	return
 
@@ -522,7 +520,7 @@ def exportImage(img, fp):
 	(filepath, filename) = os.path.split(img.filename)
 	fp.write("    filename %s ;\n" % (filename))
 	if not toggleGeoOnly:
-		writeList("img", imageList, fp, 2, globals(), locals())
+		writeList(img, imageList, fp, 2)
 	fp.write("  end image\n")
 	return
 	
@@ -549,7 +547,7 @@ imageList = [
 def exportParticle(par, fp):
 	name = par.getName().replace(' ','_')
 	fp.write("  particle %s \n" % name)
-	writeList("par", particleList, fp, 3, globals(), locals())
+	writeList(par, particleList, fp, 3)
 
 	'''
 	for loc in par.getLoc():
@@ -722,7 +720,7 @@ def exportIcu(icu, fp):
 		fp.write("    bz2 %f %f %f %f %f %f  ;\n" % \
 			(h1[0], h1[1], p[0], p[1], h2[0], h2[1]))
 
-	writeList("icu", icuList, fp, 3, globals(), locals())
+	writeList(icu, icuList, fp, 3)
 	if icu.driver:
 		print "icu ", icu.driverObject, icu.driverBone, icu.driverChannel
 	fp.write("    end icu\n")
@@ -756,7 +754,7 @@ def exportAction(act, fp):
 
 def exportActionStrip(strip, fp):
 	fp.write("\nactionstrip %s \n" % strip.name.replace(' ','_'))
-	writeList("strip", actionStripList, fp, 2, globals(), locals())
+	writeList(strip, actionStripList, fp, 2)
 	fp.write("    end actionstrip\n")
 	return
 
@@ -846,7 +844,7 @@ def exportObject(ob, fp):
 		fp.write("  ipo %s ;\n" % ob.ipo.name.replace(' ','_'))
 	
 	if not toggleGeoOnly:
-		writeList("ob", objectList, fp, 2, globals(), locals())
+		writeList(ob, objectList, fp, 2)
 
 	for cns in ob.constraints:
 		exportConstraint(cns, fp)
@@ -1089,7 +1087,7 @@ def exportMesh(ob, fp):
 		exportShapeKeys(fp, me)
 
 	if not toggleGeoOnly:
-		writeList("me", meshList, fp, 2, globals(), locals())
+		writeList(me, meshList, fp, 2)
 	fp.write("end mesh\n")
 	return # exportMesh
 
@@ -1155,7 +1153,7 @@ def exportArmature(ob, fp):
 			exportBone(fp, 2, b)
 			fp.write("\n")
 	if not toggleGeoOnly:
-		writeList("amt", armatureList, fp, 2, globals(), locals())
+		writeList(amt, armatureList, fp, 2)
 	fp.write("end armature\n")
 
 	fp.write("pose %s \n" % (obName))	
@@ -1219,7 +1217,7 @@ def exportBone(fp, n, bone):
 	tail = bone.tail['ARMATURESPACE']
 	fp.write("    tail %6.3f %6.3f %6.3f ;\n" % (tail[0], tail[1], tail[2]))
 	if not toggleGeoOnly:
-		writeList("bone", editboneList, fp, n+2, globals(), locals())
+		writeList(bone, editboneList, fp, n+2)
 	fp.write("  end bone\n\n")
 	
 	if bone.children:
@@ -1247,7 +1245,7 @@ def exportPoseBone(fp, pb):
 	flags |= (pb.lockXRot <<3) | (pb.lockYRot <<4) | (pb.lockZRot <<5)
 	fp.write("\n  posebone %s %x \n" % (pb.name.replace(' ', '_'), flags))
 	if not toggleGeoOnly:
-		writeList("pb", poseboneList, fp, 2, globals(), locals())	
+		writeList(pb, poseboneList, fp, 2)	
 	for cns in pb.constraints:
 		exportConstraint(cns, fp)
 	fp.write("  end posebone\n")
@@ -1363,7 +1361,7 @@ def exportLattice(ob,fp):
 	fp.write("lattice %s \n" % lat.name.replace(' ', '_'))
 	fp.write("  partitions %d %d %d ;\n" % (lat.width, lat.height, lat.depth))
 	fp.write("  keytypes %s %s %s ;\n" % (lat.widthType, lat.heightType, lat.depthType))
-	writeList("lat", latticeList, fp, 2, globals(), locals())
+	writeList(lat, latticeList, fp, 2)
 	fp.write("end lattice\n")
 
 latticeList = [
@@ -1389,7 +1387,7 @@ def exportLamp(ob,fp):
 	#if la.ipo:
 	#	exportIpo(la.ipo, fp, True)
 
-	writeList("la", lampList, fp, 2, globals(), locals())
+	writeList(la, lampList, fp, 2)
 	fp.write("end lamp\n")
 
 
@@ -1433,7 +1431,7 @@ def exportCamera(ob,fp):
 	fp.write("camera %s %s\n" % (ca.type, ca.name.replace(' ', '_')))
 	#if ca.ipo:
 	#	exportIpo(ca.ipo, fp, True)
-	writeList("ca", cameraList, fp, 2, globals(), locals())
+	writeList(ca, cameraList, fp, 2)
 	fp.write("end camera\n")
  
 cameraList = [
@@ -1487,7 +1485,7 @@ def exportCurve(ob,fp):
 	for mat in cu.materials:
 		fp.write("  material %s\n" % mat)
 
-	writeList("cu", curveList, fp, 2, globals(), locals())
+	writeList(cu, curveList, fp, 2)
 	fp.write("end curve\n")
 
 curveList = [
@@ -1516,7 +1514,7 @@ def exportText(ob,fp):
 	fp.write("text %s \n" % (te.name.replace(' ', '_')))
 	line = te.getText()
 	fp.write('    line "%s" ;\n' % line)
-	writeList("te", textList, fp, 2, globals(), locals())
+	writeList(te, textList, fp, 2)
 	fp.write("end text\n")
 
 textList = [
@@ -1537,7 +1535,7 @@ def exportGroup(grp, fp):
 	for ob in grp.objects:
 		fp.write("  object %s ;\n" % ob.name.replace(' ','_'))
 	if not toggleGeoOnly:
-		writeList("grp", groupList, fp, 2, globals(), locals())
+		writeList(grp, groupList, fp, 2)
 	fp.write("end group\n")
 	return
 
@@ -1557,7 +1555,7 @@ def exportKey(key, fp):
 		exportKeyBlock(b, fp)
 	if key.ipo:
 		exportIpo(key.ipo, fp, True)
-	writeList("key", keyList, fp, 2, globals(), locals())
+	writeList(key, keyList, fp, 2)
 	fp.write("end key\n")
 	return
 

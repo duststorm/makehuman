@@ -72,7 +72,7 @@ def setupRigJoint (words, obj, verts, locations):
         raw = locations[words[2]]
         head = locations[words[3]]
         tail = locations[words[4]]
-        offs = eval(words[5])
+        offs = map(float, words[5].strip().lstrip('[').rstrip(']').split(','))
         vec = aljabr.vsub(tail, head)
         vec2 = aljabr.vdot(vec, vec)
         vraw = aljabr.vsub(raw, head)

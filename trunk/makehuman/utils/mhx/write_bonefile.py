@@ -371,7 +371,7 @@ def closestVert(loc, me):
 #
 def addToSpace(cns, cond, flag):
     try:
-        res = eval("cns."+cond)
+        res = getattr(cns, cond)
     except:
         res = False
     if res:

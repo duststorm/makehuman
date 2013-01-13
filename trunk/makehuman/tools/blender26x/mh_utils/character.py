@@ -146,7 +146,7 @@ class CCharacter:
         else:
             for word in words:
                 try:
-                    prop = eval("self.%s" % table[word])
+                    prop = getattr(self, table[word])
                 except KeyError:
                     continue
                 if prop == "caucasian":

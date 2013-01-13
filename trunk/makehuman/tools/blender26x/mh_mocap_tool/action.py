@@ -175,7 +175,7 @@ class VIEW3D_OT_McpDeleteHashButton(bpy.types.Operator):
 
 def setCurrentAction(context, prop):
     listAllActions(context)
-    name = eval("context.scene." + prop)
+    name = getattr(context.scene, prop)
     act = getAction(name)
     context.object.animation_data.action = act
     print("Action set to %s" % act)
