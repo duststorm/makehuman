@@ -1178,13 +1178,13 @@ class MHApplication(gui3d.Application, mh.Application):
     def OnInit(self):
         mh.Application.OnInit(self)
 
+        self.setLanguage("english")
+
         self.loadSettings()
 
         # Necessary because otherwise setting back to default theme causes crash
         self.setTheme("default")
         log.debug("Using Qt system style %s", self.getLookAndFeel())
-
-        self.setLanguage("english")
 
         self.createShortcuts()
 
