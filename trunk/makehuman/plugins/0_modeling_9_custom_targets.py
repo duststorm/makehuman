@@ -106,6 +106,8 @@ class CustomTargetsTaskView(gui3d.TaskView):
         self.syncStatus()
 
     def syncStatus(self):
+        if not self.isVisible():
+            return
         if self.sliders:
             gui3d.app.statusPersist('')
         else:
