@@ -193,9 +193,9 @@ def mapImageGL(srcImg, mesh, leftTop, rightBottom):
 
     texco = mesh.r_coord
 
-    alpha = np.sum(mesh.r_vnorm * camera[None,None,:], axis=-1)
+    alpha = np.sum(mesh.r_vnorm * camera[None,:], axis=-1)
     alpha = np.maximum(alpha, 0)
-    color = np.concatenate((np.ones(alpha.shape + (3,), dtype=alpha.dtype), alpha[...,None]), axis=-1) * 255
+    color = (np.array([0, 0, 0, 0])[None,...] + alpha[...,None]) * 255
 
     color = np.ascontiguousarray(color, dtype=np.uint8)
     texco = np.ascontiguousarray(texco, dtype=np.float32)

@@ -26,6 +26,7 @@ import sys
 import math
 import atexit
 import numpy as np
+from ctypes import c_double, byref
 
 import OpenGL
 OpenGL.ERROR_CHECKING = False
@@ -516,6 +517,7 @@ def renderSkin(dst, vertsPerPrimitive, verts, index = None, objectMatrix = None,
     glDepthMask(GL_FALSE)
     glDisable(GL_DEPTH_TEST)
     # glDisable(GL_CULL_FACE)
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
     glPushAttrib(GL_VIEWPORT_BIT)
     glViewport(0, 0, width, height)
@@ -552,8 +554,9 @@ def renderSkin(dst, vertsPerPrimitive, verts, index = None, objectMatrix = None,
     glMatrixMode(GL_MODELVIEW)
     glPopMatrix()
 
-    glPopAttrib(GL_VIEWPORT_BIT)
+    glPopAttrib()
 
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     glEnable(GL_DEPTH_TEST)
     glDepthMask(GL_TRUE)
 
