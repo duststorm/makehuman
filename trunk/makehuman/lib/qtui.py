@@ -168,7 +168,6 @@ class Canvas(QtOpenGL.QGLWidget):
         self.setFocus()
         self.setAutoBufferSwap(False)
         self.setAutoFillBackground(False)
-        # self.setAttribute(QtCore.Qt.WA_PaintOnScreen)
         self.setAttribute(QtCore.Qt.WA_NoSystemBackground, False)
         self.setAttribute(QtCore.Qt.WA_OpaquePaintEvent)
         self.setAttribute(QtCore.Qt.WA_KeyCompression, False)
@@ -421,7 +420,6 @@ class Frame(QtGui.QWidget):
         self.shortcuts = {}
 
         self.setWindowTitle(self.title)
-        self.setAttribute(QtCore.Qt.WA_PaintOnScreen)  # Causes flickering and bg bleeds through rounded edges
         self.setAttribute(QtCore.Qt.WA_OpaquePaintEvent)
         self.setAttribute(QtCore.Qt.WA_KeyCompression, False)
         self.resize(*size)
@@ -429,7 +427,6 @@ class Frame(QtGui.QWidget):
 
     def panel(self):
         widget = QtGui.QWidget()
-        # widget.setAttribute(QtCore.Qt.WA_PaintOnScreen, False)
         widget.setAttribute(QtCore.Qt.WA_OpaquePaintEvent, False)
         widget.setAutoFillBackground(True)
         widget.setContentsMargins(0, 0, 0, 0)
