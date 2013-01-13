@@ -525,3 +525,10 @@ QCheckBox::indicator:disabled, QRadioButton::indicator:disabled
     border: 1px solid #444;
 }
 
+FileChooser > QWidget {
+    padding: -2px -2px;
+}
+
+FileChooserRectangle {
+    margin: 2px 2px;
+}
