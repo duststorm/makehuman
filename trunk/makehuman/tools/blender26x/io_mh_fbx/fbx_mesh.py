@@ -81,13 +81,6 @@ class CGeometry(CConnection):
         return CConnection.parseNodes(self, rest)
 
     
-    def activate(self):
-        self.active = True
-        for mat in self.materials:
-            if mat:
-                fbx.nodes.materials[mat.name].activate()
-        
-        
     def make(self, ob):        
         me = ob.data
         CConnection.make(self, me)
@@ -105,13 +98,18 @@ class CGeometry(CConnection):
         self.faces.make(faces)
 
         for index,uvloop in enumerate(me.uv_layers):
-            uvloop = me.uv_layers[index]
-            n = 0
-            uvfaces = []
-            for f in me.polygons:
-                m = len(f.vertices)
-                uvfaces += [k for k in range(n, n+m)]
-                n += m
+            if fbx.usingMakeHuman:
+                uvlayer = me.uv_layers[index]
+                uvloop = uvlayer.uvloop
+                uvfaces = uvlayer.uvfaces
+            else:
+                uvloop = me.uv_layers[index]
+                n = 0
+                uvfaces = []
+                for f in me.polygons:
+                    m = len(f.vertices)
+                    uvfaces += [k for k in range(n, n+m)]
+                    n += m
             self.uvLayers.append(LayerElementUVNode().make(uvloop, index, uvfaces))
         
         tn = 0
@@ -173,8 +171,7 @@ class CGeometry(CConnection):
         
     def build(self):
         me = fbx.data[self.id]
-        verts = [v in self.vertices.values]
-        me.from_pydata(verts, [], self.faces.values)
+        me.from_pydata(self.vertices.values, [], self.faces.values)
 
         ob = self.getParent('OBJECT')
         matNodes = ob.getChildren('MATERIAL')
@@ -258,7 +255,13 @@ class LayerElementUVNode(LayerElementNode):
         
     def make(self, layer, index, faces):
         LayerElementNode.make(self, layer, index)
-        self.vertices.make( [list(data.uv) for data in layer.data])
+        if fbx.usingMakeHuman:
+            verts = layer.data
+        else:
+            verts = [list(data.uv) for data in layer.data]
+        print("V", verts[:10])
+        print("F", faces[:10])
+        self.vertices.make(verts)
         self.faces.make(faces)
         return self
         

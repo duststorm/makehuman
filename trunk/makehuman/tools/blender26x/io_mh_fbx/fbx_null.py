@@ -33,22 +33,17 @@ class CNull(CModel):
         self.node = None
 
     def getBtype(self):
-        print("getBtype", self, self.children)
         for child in self.children:
             print("  ", child)
             if child.subtype == 'LimbNode':
-                print(" x ARM")
                 self.node = child
                 return 'ARMATURE'
             elif child.ftype == 'Model':
-                print(" x SCE")
                 return 'SCENE'
-        print(" x EMP")
         return 'EMPTY'
         
     def build(self):
         btype = self.getBtype()
-        print("BNull", self, btype)
         if btype == 'ARMATURE':
             return fbx_armature.CArmature().buildArmature(self)
         elif btype == 'SCENE':

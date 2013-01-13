@@ -36,12 +36,6 @@ class CScene(CModel):
         self.objects = []
 
 
-    def activate(self):
-        self.active = True
-        for ob in self.objects:
-            fbx.nodes.objects[ob.name].activate()
-            
-            
     def make(self, scn):
         CModel.make(self, scn)
         for ob in scn.objects:            
@@ -58,6 +52,7 @@ class CScene(CModel):
     def build(self):
         print("BScn", self)
         scn = fbx.data[self.id]
+        return scn
         objects = self.getChildren('OBJECT')
         for node in objects:
             ob = fbx.data[node.id]

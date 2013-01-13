@@ -68,8 +68,8 @@ class FbxLex(shlex.shlex):
 
     def __init__(self, stream):
         shlex.shlex.__init__(self, stream)
-        self.commenters = ''
-        self.wordchars += ':;-.'
+        self.commenters = ';'
+        self.wordchars += ':-.'
         self.quotes = '"'
         
 
@@ -78,6 +78,7 @@ def tokenizeFbxFile(filepath):
     fp = open(filepath, "rU")
     
     for line in fp:
+        #print(line)
         if len(line) > 0 and line[0] != ';':
             tokens = list(FbxLex(line))
             if len(tokens) > 0:

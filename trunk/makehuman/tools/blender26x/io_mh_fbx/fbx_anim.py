@@ -84,12 +84,6 @@ class CAnimationStack(CConnection):
         self.alayers = []
                 
 
-    def activate(self):
-        self.active = True
-        for alayer in self.alayers:
-            alayer.activate()
-            
-    
     def make(self, act):        
         CConnection.make(self, act)
         self.name = act.name
@@ -156,12 +150,6 @@ class CAnimationLayer(CConnection):
         self.acnodes = {}
                 
     
-    def activate(self):
-        self.active = True
-        for acnode in self.acnodes.values():
-            acnode.activate()
-            
-            
     def make(self, act):        
         CConnection.make(self, act)
         groups = groupFcurves(act)            
@@ -264,12 +252,6 @@ class CAnimationCurveNode(CConnection):
         self.acurves = {}
 
 
-    def activate(self):
-        self.active = True
-        for acu in self.acurves.values():
-            acu.activate()
-            
-            
     def make(self, group):        
         CConnection.make(self, group)
         self.name, self.proptype = Channels[self.name]

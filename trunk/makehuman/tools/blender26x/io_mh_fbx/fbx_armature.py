@@ -42,9 +42,6 @@ class CArmature(CConnection):
         self.deformers = []
         self.object = None
 
-    def activate(self):
-        self.active = True
-        
     def make(self, ob):
         CConnection.make(self, ob)
         self.object = fbx.nodes.objects[ob.name]

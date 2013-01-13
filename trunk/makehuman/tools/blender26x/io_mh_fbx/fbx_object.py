@@ -59,25 +59,6 @@ class CObject(CModel):
         return CModel.parseNodes(self, pnodes)
         
 
-    def activate(self):
-        self.active = True
-        if self.dataBtype == 'MESH':
-            node = fbx.nodes.meshes[self.data.name]
-        elif self.dataBtype == 'ARMATURE':
-            return
-            node = fbx.nodes.armatures[self.data.name]
-        elif self.dataBtype == 'LAMP':
-            node = fbx.nodes.lamps[self.data.name]
-        elif self.dataBtype == 'CAMERA':
-            node = fbx.nodes.cameras[self.data.name]
-        elif self.dataBtype == 'EMPTY':
-            node = None 
-        else:
-            print(self, self.dataBtype, self.dataFtype)
-            halt
-        node.activate()
-            
-    
     def make(self, ob):
         CModel.make(self, ob)
         self.data = ob.data

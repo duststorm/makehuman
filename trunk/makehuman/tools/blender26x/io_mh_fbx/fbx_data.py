@@ -49,6 +49,8 @@ class NodeStruct:
         self.images = {}
         self.objects = {}
         self.scenes = {}
+        self.actions = {}
+        
         self.astacks = {}
         self.alayers = {}
         self.anodes = {}
@@ -68,6 +70,8 @@ class NodeStruct:
             list(self.armatures.values()) +
             list(self.lamps.values()) +
             list(self.cameras.values()) +
+            list(self.actions.values()) +
+
             list(self.astacks.values()) +
             list(self.alayers.values()) +
             list(self.anodes.values()) +
@@ -180,7 +184,7 @@ def buildObjects(context):
 
     fbx.data = {}
     
-    print("Creating")
+    print("CREATING")
     
     for node in fbx.nodes.values():
         print("  ", node)
@@ -218,7 +222,6 @@ def buildObjects(context):
 
     for node in fbx.nodes.values():
         if node.ftype == "Model":
-            print("MODEL", node.subtype, node)
             if node.subtype in ["LimbNode"]:
                 continue
             elif node.subtype == "Null":
@@ -232,8 +235,6 @@ def buildObjects(context):
                     data = bpy.data.objects.new(node.name, None)
                     fbx.data[node.id] = data
             else:
-                print("DATA", node, node.children)
-                print(fbx.data.items())
                 for child in node.children:
                     print("  ", child.subtype, node.subtype)
                     if child.subtype == node.subtype:
@@ -243,30 +244,90 @@ def buildObjects(context):
                         break
                 fbx.data[node.id] = data
                     
-    print("Building")
+    print("BUILDING")
     for node in fbx.nodes.values():
         if node.ftype == "Video":
-            print("  ", node.ftype, node.btype)
+            print("  ", node)
             node.build()
 
     for node in fbx.nodes.values():
         if node.ftype != "Video":
-            print("  ", node.ftype, node.btype)
+            print("  ", node)
             node.build()
         
+
+#------------------------------------------------------------------
+#   Activating
+#------------------------------------------------------------------
+
+def activateData(datum):
+
+    if isinstance(datum, bpy.types.Object):
+        fbx.active.objects[datum.name] = datum        
+        activateData(datum.data)
+
+    elif isinstance(datum, bpy.types.Mesh):
+        fbx.active.meshes[datum.name] = datum        
+        for mat in datum.materials:
+            activateData(mat)
+
+    elif isinstance(datum, bpy.types.Armature):
+        fbx.active.armatures[datum.name] = datum        
+
+    elif isinstance(datum, bpy.types.Material):
+        fbx.active.materials[datum.name] = datum        
+        for mtex in datum.texture_slots:
+            tex = mtex.texture
+            if tex and tex.type == 'IMAGE':
+                activateData(tex)
+
+    elif isinstance(datum, bpy.types.Texture):
+        fbx.active.textures[datum.name] = datum      
+        img = datum.image
+        if img:
+            activateData(img)
+
+    elif isinstance(datum, bpy.types.Image):
+        fbx.active.images[datum.name] = datum        
+
+    elif isinstance(datum, bpy.types.Camera):
+        fbx.active.cameras[datum.name] = datum        
+
+    elif isinstance(datum, bpy.types.Lamp):
+        fbx.active.lamps[datum.name] = datum        
+
+    elif isinstance(datum, bpy.types.Scene):
+        fbx.active.scenes[datum.name] = datum     
+        for ob in datum.objects:
+            activateData(ob)
+
+    if datum.animation_data:
+        act = datum.animation_data.action
+        if act:
+            fbx.active.actions[datum.name] = datum        
 
 #------------------------------------------------------------------
 #   Making
 #------------------------------------------------------------------
 
-def makeNodes():
+def makeNodes(context):
 
     fbx.root = RootNode()
     fbx.nodes = NodeStruct()
+    fbx.active = NodeStruct()
     
-    # First pass: create nodes
+    # First pass: activate
     
-    for ob in bpy.data.objects:
+    activateData(context.scene)
+    
+    print("OB", fbx.active.objects)
+    print("SC", fbx.active.scenes)
+    print("ME", fbx.active.meshes)
+    
+
+    # Second pass: create nodes
+    
+    for ob in fbx.active.objects.values():
         if ob.type == 'MESH':
             fbx.nodes.meshes[ob.data.name] = fbx_mesh.CGeometry()
         elif ob.type == 'ARMATURE':
@@ -281,25 +342,28 @@ def makeNodes():
             continue
         fbx.nodes.objects[ob.name] = fbx_object.CObject(ob.type)
         
-    for mat in bpy.data.materials:
+    for mat in fbx.active.materials.values():
         fbx.nodes.materials[mat.name] = fbx_material.CMaterial()
-    for tex in bpy.data.textures:
+
+    for tex in fbx.active.textures.values():
         if tex.type == 'IMAGE':
             fbx.nodes.textures[tex.name] = fbx_texture.CTexture()
-    for img in bpy.data.images:
+
+    for img in fbx.active.images.values():
         fbx.nodes.images[img.name] = fbx_image.CImage()
-    for scn in bpy.data.scenes:
+
+    for scn in fbx.active.scenes.values():
         fbx.nodes.scenes[scn.name] = fbx_scene.CScene()
         
-    for act in bpy.data.actions:        
+    for act in fbx.active.actions.values():        
         fbx.nodes.astacks[act.name] = fbx_anim.CAnimationStack()
 
-    # Second pass: make the nodes
+    # Third pass: make the nodes
     
-    for act in bpy.data.actions:        
+    for act in fbx.active.actions.values():        
         fbx.nodes.astacks[act.name].make(act)
             
-    for ob in bpy.data.objects:
+    for ob in fbx.active.objects.values():
         if ob.type == 'MESH':
             node = fbx.nodes.meshes[ob.data.name]
             node.make(ob)
@@ -308,12 +372,12 @@ def makeNodes():
             if rig and rig.type == 'ARMATURE':
                 fbx.nodes.armatures[rig.data.name].addDeformer(node, ob)             
 
-    for ob in bpy.data.objects:
+    for ob in fbx.active.objects.values():
         if ob.type == 'ARMATURE':
             fbx.nodes.armatures[ob.data.name].make(ob)
             fbx.nodes.objects[ob.name].make(ob)
 
-    for ob in bpy.data.objects:
+    for ob in fbx.active.objects.values():
         if ob.type == 'LAMP':
             fbx.nodes.lamps[ob.data.name].make(ob)
         elif ob.type == 'CAMERA':
@@ -324,34 +388,27 @@ def makeNodes():
             continue
         fbx.nodes.objects[ob.name].make(ob)
             
-    for mat in bpy.data.materials:
+    for mat in fbx.active.materials.values():
         fbx.nodes.materials[mat.name].make(mat)
 
-    for tex in bpy.data.textures:
+    for tex in fbx.active.textures.values():
         if tex.type == 'IMAGE':
             fbx.nodes.textures[tex.name].make(tex)
 
-    for img in bpy.data.images:
+    for img in fbx.active.images.values():
         fbx.nodes.images[img.name].make(img)
 
-    for scn in bpy.data.scenes:
+    for scn in fbx.active.scenes.values():
         fbx.nodes.scenes[scn.name].make(scn)
         
-    # Third pass: activate
-    
-    for scn in bpy.data.scenes:
-        fbx.nodes.scenes[scn.name].activate()
-        
-    for act in bpy.data.actions:        
-        fbx.nodes.astacks[act.name].activate()
 
 
-def makeTakes():
+def makeTakes(context):
 
     fbx.takes = {}
     
-    for act in bpy.data.actions:   
-        fbx.takes[act.name] = fbx_anim.CTake().make(bpy.context.scene, act)
+    for act in fbx.active.actions:   
+        fbx.takes[act.name] = fbx_anim.CTake().make(context.scene, act)
     
 
 

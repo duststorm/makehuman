@@ -214,7 +214,7 @@ def transformProps(mat):
     return [
         CLclTranslation().make("Lcl Translation", loc),
         CLclRotation().make("Lcl Rotation", euler),
-        CLclScaling().make("Lcl Scaling", scale),
+        CLclScaling().make("Lcl Scaling", (1,1,1)),
     ]
 
 

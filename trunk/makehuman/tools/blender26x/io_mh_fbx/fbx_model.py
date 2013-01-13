@@ -91,10 +91,6 @@ class CConnection(CFbx):
         return self
         
                 
-    def activate(self):
-        self.active = True
-        return
-
     def makeLink(self, parent):
         if self == parent:
             print("Linking to self", self)

@@ -173,10 +173,10 @@ Definitions:  {
 #------------------------------------------------------------------
     
 def exportFbxFile(context, filepath):
-    filepath = filepath
+    filepath = filepath.replace('\\','/')
     print("Export", filepath)
-    fbx_data.makeNodes()
-    fbx_data.makeTakes()
+    fbx_data.makeNodes(context)
+    fbx_data.makeTakes(context)
 
     fp = open(filepath, "w")
     fp.write(Header1)    

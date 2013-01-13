@@ -64,12 +64,6 @@ class CMaterial(CConnection):
         self.textures = []
 
 
-    def activate(self):
-        self.active = True
-        for tex in self.textures:
-            fbx.nodes.textures[tex.name].activate()
-            
-        
     def make(self, mat):
         CConnection.make(self, mat)
         

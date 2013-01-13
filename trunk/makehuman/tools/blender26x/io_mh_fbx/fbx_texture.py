@@ -69,13 +69,6 @@ class CTexture(CConnection):
         return  CConnection.parseNodes(self, rest)     
 
 
-    def activate(self):
-        self.active = True
-        img = self.image
-        if img:
-            fbx.nodes.images[img.name].activate()
-        
-                
     def make(self, tex):
         CConnection.make(self, tex)
         img = tex.image
