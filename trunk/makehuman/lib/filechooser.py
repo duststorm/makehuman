@@ -289,7 +289,7 @@ class FileChooser(QtGui.QWidget, Widget):
         if not self.location:
             self.location = TextView(os.path.abspath(locationLbl))
         else:
-            self.location.setText(os.path.abspath(localtionLbl))
+            self.location.setText(os.path.abspath(locationLbl))
 
     @property
     def previewExtensions(self):
