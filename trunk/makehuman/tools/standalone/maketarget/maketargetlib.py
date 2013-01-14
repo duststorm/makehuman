@@ -276,7 +276,7 @@ class Target(object):
             fd.close()
         return
         
-    def formatFloat(f):
+    def formatFloat(self, f):
         """
         Optimally format floats for writing in ASCII .target files.
         """
