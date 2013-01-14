@@ -13,6 +13,7 @@ if __name__ == '__main__':
             for name in files:
                 try:
                     base, ext = os.path.splitext(name)
+                    ext = ext.lower()
                     if ext != '.target':
                         continue
                     path = os.path.join(root, name)
@@ -24,3 +25,13 @@ if __name__ == '__main__':
                     os.remove(vname)
                 except StandardError, e:
                     log.error('converting target %s', name, exc_info=True)
+
+    with open('data/images.list', 'w') as f:
+        for root, dirs, files in os.walk('data/targets'):
+            for name in files:
+                base, ext = os.path.splitext(name)
+                ext = ext.lower()
+                if ext != '.png':
+                    continue
+                path = os.path.join(root, name).replace('\\','/')
+                f.write(path + '\n')

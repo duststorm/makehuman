@@ -24,6 +24,7 @@ TODO
 
 import os
 import log
+import zipfile
 
 class Component(object):
     _cat_data = [
@@ -111,7 +112,7 @@ class Targets(object):
             return True
         return False
 
-    def walk(self, root, base = None):
+    def walk_dirs(self, root, base):
         dirs = os.listdir(root)
         xdirs = [dir.replace('-','_') for dir in dirs]
         for name in sorted(dirs):
@@ -137,6 +138,97 @@ class Targets(object):
                 if key not in self.groups:
                     self.groups[key] = []
                 self.groups[key].append(item)
+
+    _files = None
+
+    @classmethod
+    def buildTree(cls):
+        cls._files = {}
+
+        def add_file(dir, path):
+            head, tail = path[0], path[1:]
+            if not tail:
+                dir[head] = None
+            else:
+                if head not in dir:
+                    dir[head] = {}
+                add_file(dir[head], tail)
+
+        with zipfile.ZipFile('data/targets.npz', 'r') as npzfile:
+            for file in npzfile.infolist():
+                name = file.filename
+                if not name.endswith('.index.npy'):
+                    continue
+                name = name[:-10] + '.target'
+                path = name.split('/')
+                add_file(cls._files, path)
+
+        with open('data/images.list', 'r') as imgfile:
+            for line in imgfile:
+                name = line.rstrip()
+                if not name.endswith('.png'):
+                    continue
+                path = name.split('/')
+                add_file(cls._files, path)
+
+    @classmethod
+    def namei(cls, path):
+        if isinstance(path, str):
+            path = list(reversed(path.split('/')))
+        else:
+            path = list(reversed(path))
+        dir = cls._files
+        while path:
+            dir = dir[path.pop()]
+        return dir
+
+    @classmethod
+    def listdir(cls, path):
+        if cls._files is None:
+            cls.buildTree()
+        return cls.namei(path).keys()
+
+    @classmethod
+    def isfile(cls, path):
+        return cls.namei(path) is None
+
+    @classmethod
+    def isdir(cls, path):
+        return isinstance(cls.namei(path), dict)
+
+    def walk_zip(self, root, base):
+        dirs = self.listdir(root)
+        xdirs = [dir.replace('-','_') for dir in dirs]
+        for name in sorted(dirs):
+            path = root + [name]
+            if self.isfile(path) and not path[-1].lower().endswith('.target'):
+                if path[-1].lower().endswith('.png'):
+                    self.images[name.lower()] = os.path.join(*path)
+                continue
+            item = base.clone()
+            if not self.is_fake(name, xdirs):
+                parts = name.replace('_','-').replace('.','-').split('-')
+                if root[-1].endswith('macrodetails') and parts[0] == 'neutral':
+                    parts[0] = 'caucasian'
+                for part in parts[:-1]:
+                    item.update(part)
+                item.update(parts[-1], True)
+            if self.isdir(path):
+                self.walk_zip(path, item)
+            else:
+                item.finish(os.path.join(*path))
+                self.targets.append(item)
+                key = tuple(item.key)
+                if key not in self.groups:
+                    self.groups[key] = []
+                self.groups[key].append(item)
+
+    def walk(self, root, base):
+        try:
+            self.buildTree()
+            self.walk_zip(root.split('/'), base)
+        except StandardError:
+            self.walk(root, base)
 
 _targets = None
 
