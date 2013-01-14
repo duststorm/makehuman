@@ -112,6 +112,7 @@ class Target:
         self.data = raw['vector']
 
     def _load_binary_archive(self, name):
+        name = name.replace('\\', '/')
         bname = os.path.splitext(name)[0]
         iname = '%s.index' % bname
         vname = '%s.vector' % bname
