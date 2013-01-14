@@ -92,23 +92,9 @@ class Target:
 
         self.faces = obj.getFacesForVertices(self.verts)
 
-    @staticmethod
-    def convert_all():
-        obj = Target(None, None)
-        for root, dirs, files in os.walk('data'):
-            for name in files:
-                base, ext = os.path.splitext(name)
-                if ext != '.target':
-                    continue
-                path = os.path.join(root, name)
-                try:
-                    obj._load_text(path)
-                    obj._save_binary(path)
-                except StandardError, e:
-                    log.error('converting target %s', name, exc_info=True)
-
     dtype = [('index','u4'),('vector','(3,)f4')]
-    dtype_ext = [('index','<u4'),('vector','(3,)<f4')]
+    npzfile = None
+    npztime = None
 
     def _load_text(self, name):
         data = []
@@ -121,38 +107,78 @@ class Target:
                 translationVector = (float(translationData[1]), float(translationData[2]), float(translationData[3]))
                 data.append((vertIndex, translationVector))
 
-        self.raw = np.asarray(data, dtype=Target.dtype)
+        raw = np.asarray(data, dtype=Target.dtype)
+        self.verts = raw['index']
+        self.data = raw['vector']
+
+    def _load_binary_archive(self, name):
+        bname = os.path.splitext(name)[0]
+        iname = '%s.index' % bname
+        vname = '%s.vector' % bname
+        if Target.npztime < os.path.getmtime(name):
+            log.message('compiled file newer than archive: %s', name)
+            raise RuntimeError()
+        if iname not in Target.npzfile:
+            log.message('compiled file missing: %s', iname)
+            raise RuntimeError()
+        if vector not in Target.npzfile:
+            log.message('compiled file missing: %s', vname)
+            raise RuntimeError()
+        self.verts = Target.npzfile[iname]
+        self.data = Target.npzfile[vname] * 1e-3
+
+    def _load_binary_files(self, name):
+        bname = os.path.splitext(name)[0]
+        iname = '%s.index.npy' % bname
+        vname = '%s.vector.npy' % bname
+        if not os.path.exists(iname):
+            log.message('compiled file missing: %s', name)
+            raise RuntimeError()
+        if not os.path.exists(vname):
+            log.message('compiled file missing: %s', name)
+            raise RuntimeError()
+        if os.path.getmtime(iname) < path.getmtime(name):
+            log.message('compiled file out of date: %s', iname)
+            raise RuntimeError()
+        if os.path.getmtime(vname) < path.getmtime(name):
+            log.message('compiled file out of date: %s', vname)
+            raise RuntimeError()
+        self.verts = np.load(iname)
+        self.data = np.load(vname) * 1e-3
+
+    def _load_binary(self, name):
+        if Target.npzfile is None:
+            try:
+                npzname = 'data/targets.npz'
+                Target.npzfile = np.load(npzname)
+                Target.npztime = os.path.getmtime(npzname)
+            except:
+                log.message('no compressed targets found')
+                Target.npzfile = False
+        if Target.npzfile == False:
+            self._load_binary_files(name)
+        else:
+            self._load_binary_archive(name)
 
     def _save_binary(self, name):
         log.message('compiling %s', name)
         try:
-            name, ext = os.path.splitext(name)
-            name = '%s%s%s' % (name, os.path.extsep, 'bin')
-            np.asarray(self.raw, dtype=Target.dtype_ext).tofile(name)
+            bname, ext = os.path.splitext(name)
+            iname = '%s.index.npy' % bname
+            vname = '%s.vector.npy' % bname
+            index = np.ascontiguousarray(self.verts, dtype=np.uint16)
+            vector = np.ascontiguousarray(np.round(self.data * 1e3), dtype=np.int16)
+            np.save(iname, index)
+            np.save(vname, vector)
+            return iname, vname
         except StandardError, e:
-            log.error('error', exc_info=True)
-            # pass
-
-    def _load_binary(self, name):
-        if not os.path.exists(name):
-            raise RuntimeError()
-        bname = '%s%s%s' % (os.path.splitext(name)[0], os.path.extsep, 'bin')
-        if not os.path.exists(bname):
-            log.message('compiled file missing: %s', name)
-            raise RuntimeError()
-        if os.stat(bname).st_mtime < os.stat(name).st_mtime:
-            log.message('compiled file out of date: %s', bname)
-            raise RuntimeError()
-        self.raw = np.asarray(np.fromfile(bname, dtype=Target.dtype_ext), dtype=Target.dtype)
+            log.error('error saving %s', name)
 
     def _load(self, name):
         try:
             self._load_binary(name)
         except StandardError, e:
             self._load_text(name)
-            self._save_binary(name)
-        self.verts = self.raw['index']
-        self.data = self.raw['vector']
 
     def apply(self, obj, morphFactor, update=True, calcNormals=True, faceGroupToUpdateName=None, scale=(1.0,1.0,1.0)):
         global theHuman
