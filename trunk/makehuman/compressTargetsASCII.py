@@ -35,7 +35,7 @@ def getTargets(rootPath):
     return targetFiles
 
 def formatFloat(f):
-    f = round(f, 2)
+    f = round(f, 3)
     if f == 0:
         # Make sure -0.0 becomes 0
         return 0
