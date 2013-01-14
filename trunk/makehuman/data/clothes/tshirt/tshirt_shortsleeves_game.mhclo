@@ -18,6 +18,7 @@
 # texture tshirt_texture_blue.png 0
 # mask tshirt_mask.png 1
 # normal tshirt_normal.png 0 1.000
+# displacement tshirt_displacement.png 0 0.200
 # material TShirtMaterial
 diffuse_color 0.2946 0.4137 0.8000
 diffuse_intensity 0.8
