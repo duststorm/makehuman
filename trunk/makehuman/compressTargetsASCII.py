@@ -43,8 +43,10 @@ def formatFloat(f):
         # Make sure -0.0 becomes 0
         return "0"
     result = "%.3f" % f
-    result.rstrip("0")  # Remove trailing zeros
-    result.rstrip(".")  # Strip ending . if applicable
+    result = result.rstrip("0")  # Remove trailing zeros
+    result = result.lstrip("0")  # Remove leading zeros
+    result = result.replace('-0.', '-.') # Special case: one leading zero and negative
+    result = result.rstrip(".")  # Strip ending . if applicable
     if not result:
         result = "0" # In case it was "0", rstrip makes it an empty string
     return result
