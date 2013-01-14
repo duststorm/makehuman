@@ -130,7 +130,7 @@ class Targets(object):
                     item.update(part)
                 item.update(parts[-1], True)
             if os.path.isdir(path):
-                self.walk(path, item)
+                self.walk_dirs(path, item)
             else:
                 item.finish(path)
                 self.targets.append(item)
@@ -228,7 +228,7 @@ class Targets(object):
             self.buildTree()
             self.walk_zip(root.split('/'), base)
         except StandardError:
-            self.walk(root, base)
+            self.walk_dirs(root, base)
 
 _targets = None
 
