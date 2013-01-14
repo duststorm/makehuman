@@ -35,11 +35,19 @@ def getTargets(rootPath):
     return targetFiles
 
 def formatFloat(f):
+    """
+    Optimally format floats for writing in ASCII .target files.
+    """
     f = round(f, 3)
     if f == 0:
         # Make sure -0.0 becomes 0
-        return 0
-    return "%.3f" % f
+        return "0"
+    result = "%.3f" % f
+    result.rstrip("0")  # Remove trailing zeros
+    result.rstrip(".")  # Strip ending . if applicable
+    if not result:
+        result = "0" # In case it was "0", rstrip makes it an empty string
+    return result
 
 allTargets = getTargets('data/targets')
 for (i, targetPath) in enumerate(allTargets):
@@ -53,6 +61,8 @@ for (i, targetPath) in enumerate(allTargets):
         dx = formatFloat( float(fields[1]) )
         dy = formatFloat( float(fields[2]) )
         dz = formatFloat( float(fields[3]) )
+        if dx == dy == dz == "0":
+            continue
         newLine = "%d %s %s %s" % (idx, dx, dy, dz)
         newTarget.append(newLine)
     f = open(targetPath, 'wb')  # write binary to enforce unix line-endings on windows
