@@ -2,6 +2,7 @@
 # license AGPL3 (see also http://www.makehuman.org/node/320)
 # homepage http://www.makehuman.org/
 # name Rorkimaru
+# uuid bb03a674-00fe-400b-a821-cb634f876e99
 # obj_file rorkimaru.obj
 # material Skin
 texture ./data/textures/texture.png

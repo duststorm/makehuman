@@ -2,6 +2,7 @@
 # license AGPL3 (see also http://www.makehuman.org/node/320)
 # homepage http://www.makehuman.org/
 # name Male
+# uuid 75b34bae-e818-4d4e-bd75-3d310711f22e
 # obj_file male.obj
 # x_scale 4302 8697 1.2768
 # z_scale 8208 8220 1.8526

@@ -2,6 +2,7 @@
 # license AGPL3 (see also http://www.makehuman.org/node/320)
 # homepage http://www.makehuman.org/
 # name ascottk
+# uuid c8699c89-7735-4239-a982-8fdd54a439b2
 # obj_file ascottk.obj
 # material Skin
 texture ./data/textures/texture.png
