@@ -1,4 +1,4 @@
-# author Thomas Larsson
+# author Jonas Hauquier
 # license AGPL3 (see also http://www.makehuman.org/node/320)
 # homepage http://www.makehuman.org/
 # uuid c5588968-3edf-4d17-954f-4ed15af98040
@@ -15,10 +15,10 @@
 # uvtex_layer 0 Texture
 # uvtex_layer 1 Mask
 # objfile_layer 0
-# texture tshirt_shortsleeves_medium_texture.png 0
-# mask tshirt_shortsleeves_medium_mask.png 1
-# normal tshirt_shortsleeves_medium_normal.png 0 1.000
-# material ShortsleeveMat
+# texture tshirt_texture_blue.png 0
+# mask tshirt_mask.png 1
+# normal tshirt_normal.png 0 1.000
+# material TShirtMaterial
 diffuse_color 0.2946 0.4137 0.8000
 diffuse_intensity 0.8
 specular_color 1.0000 1.0000 1.0000

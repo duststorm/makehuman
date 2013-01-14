@@ -15,14 +15,14 @@
 # uvtex_layer 0 Texture
 # uvtex_layer 1 Mask
 # objfile_layer 0
-# texture tshirt_longsleeves_medium_texture.png 0
-# mask tshirt_longsleeves_medium_mask.png 1
-# normal tshirt_longsleeves_medium_normal.png 0 1.000
-# material LongsleeveMat.001
+# texture tshirt_texture.png 0
+# mask tshirt_mask.png 1
+# normal tshirt_normal.png 0 1.000
+# material TShirtMaterial
 diffuse_color 0.8000 0.8000 0.8000
 diffuse_intensity 0.8
 specular_color 1.0000 1.0000 1.0000
-specular_intensity 0.5
+specular_intensity 0.0
 alpha 1.0
 # use_projection 0
 # verts 0

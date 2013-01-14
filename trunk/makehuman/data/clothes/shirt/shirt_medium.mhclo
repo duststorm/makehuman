@@ -15,7 +15,7 @@
 # uvtex_layer 0 UVMap
 # uvtex_layer 1 Mask
 # objfile_layer 0
-# texture shirt_texture.png 0
+# texture shirt_texture5.png 0
 # mask shirt_mask.png 1
 # normal shirt_normal.png 0 1.000
 # displacement shirt_disp.png 0 0.200

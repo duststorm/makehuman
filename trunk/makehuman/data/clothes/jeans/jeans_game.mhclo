@@ -16,6 +16,8 @@
 # objfile_layer 0
 # texture jeans_texture.png 0
 # mask jeans_game_mask.png 1
+# normal jeans_normal.png 0 1.000
+# displacement jeans_displacement.png 0 0.200
 # material JeansMaterial
 diffuse_color 0.0426 0.0557 0.2079
 diffuse_intensity 0.5
