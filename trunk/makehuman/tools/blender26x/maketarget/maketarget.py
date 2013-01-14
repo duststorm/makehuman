@@ -54,6 +54,16 @@ from mh_utils import utils
 from mh_utils import proxy
 from mh_utils import import_obj
 
+
+#----------------------------------------------------------
+#   
+#----------------------------------------------------------
+
+def round(x):
+    return (0 if abs(x) < 1e-3 else x)
+        
+Epsilon = 1e-3
+
 #----------------------------------------------------------
 #   
 #----------------------------------------------------------
@@ -346,8 +356,8 @@ def saveVerts(fp, ob, verts, saveAll, first, last, offs):
         vco = verts[n-offs]
         bv = ob.data.vertices[n-offs]
         vec = vco - bv.co
-        if vec.length > the.Epsilon and (saveAll or bv.select):
-            fp.write("%d %.6f %.6f %.6f\n" % (n, vec[0], vec[2], -vec[1]))
+        if vec.length > Epsilon and (saveAll or bv.select):
+            fp.write("%d %.3g %.3g %.3g\n" % (n, round(vec[0]), round(vec[2]), round(-vec[1])))
 
           
 def evalVertLocations(ob):    
@@ -515,7 +525,7 @@ def writeMhpBones(fp, pb):
         mat[1] = matz
         mat[2] = -maty
     q = mat.to_quaternion()
-    fp.write("%s\t%s\t%.4f\t%.4f\t%.4f\t%.4f\n" % (pb.name, string, q.w, q.x, q.y, q.z))
+    fp.write("%s\t%s\t%.4f\t%.4f\t%.4f\t%.4f\n" % (pb.name, string, round(q.w), round(q.x), round(q.y), round(q.z)))
     for child in pb.children:
         writeMhpBones(fp, child)
 
@@ -1453,8 +1463,8 @@ def saveNewTarget(filepath, locs, nVerts):
     locList = list(locs.items())
     locList.sort()
     for (n, dr) in locList:
-        if dr.length > 1e-4:
-            fp.write("%d %.5f %.5f %.5f\n" % (n, dr[0], dr[2], -dr[1]))
+        if dr.length > Epsilon:
+            fp.write("%d %.3g %.3g %.3g\n" % (n, round(dr[0]), round(dr[2]), round(-dr[1])))
     fp.close()
     return
         
