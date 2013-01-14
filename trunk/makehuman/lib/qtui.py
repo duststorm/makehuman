@@ -362,6 +362,9 @@ class CategoryPanel(QtGui.QWidget, qtgui.Widget):
     def removeWidget(self, widget):
         self.layout.removeWidget(widget)
 
+def getQtVersion():
+    return [ int(versionNb) for versionNb in str(QtCore.qVersion()).split(".") ]
+
 class Frame(QtGui.QWidget):
     title = "MakeHuman"
 
@@ -372,6 +375,11 @@ class Frame(QtGui.QWidget):
         self.shortcuts = {}
 
         self.setWindowTitle(self.title)
+        qtVersion = getQtVersion()
+        if qtVersion[0] >= 4 and qtVersion[1] >= 2:
+            self.setWindowIcon(QtGui.QIcon("icons/makehuman_bg.svg"))
+        else:
+            self.setWindowIcon(QtGui.QIcon("icons/makehuman.bmp"))
         self.setAttribute(QtCore.Qt.WA_OpaquePaintEvent)
         self.setAttribute(QtCore.Qt.WA_KeyCompression, False)
         self.resize(*size)
