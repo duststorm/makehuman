@@ -82,7 +82,9 @@ def povrayExport(obj, app, settings):
     # application for the changes to take effect.
   
     camera = app.modelCamera
-    resolution = (app.settings.get('rendering_width', 800), app.settings.get('rendering_height', 600))
+    resW = app.settings.get('rendering_width', 800)
+    resH = app.settings.get('rendering_height', 600)
+    resolution = (resW,resH)
 
     reload(mh2povray_ini)
     
@@ -151,7 +153,7 @@ def povrayExport(obj, app, settings):
                 baseName = '"' + baseName + '"'
                 cmdLineOpt = ' /RENDER %s' % baseName
             #
-            cmdLineOpt += ' +W%d +H%d +a0.3 +am2' % resolution
+            cmdLineOpt += ' +W%d +H%d +a%s +am2' % (resW, resH, settings['AA'])
         
             #
             pathHandle = subprocess.Popen(cwd=outputDirectory, args = povray_bin + cmdLineOpt, shell=True)
@@ -917,7 +919,7 @@ import gui3d
 import mh2proxy
 import object_collection
 
-def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
+def povrayExportMesh2_TL(obj, camera, resolution, path, settings, progressCallback = None):
     """
     This function exports data in the form of a mesh2 humanoid object. The POV-Ray 
     file generated is fairly inflexible, but is highly efficient. 
@@ -933,11 +935,23 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
       *Camera object*. The camera to render from. 
 
     path:
-      *string*. The file system path to the output files that need to be generated. 
+      *string*. The file system path to the output files that need to be generated.
+
+    settings:
+      *dictionary*. Settings passed from the GUI.
     """
+
+    progbase = 0
+    def progress (base, prog, desc):
+        if progressCallback == None:
+            gui3d.app.progress(base + prog, desc)
+        else:
+            progressCallback(base + prog, desc)
 
     # Certain blocks of SDL are mostly static and can be copied directly from reference
     # files into the output files.
+    progress (progbase,0,"Parsing data")
+    progbase = progbase + 0.05
     headerFile = 'data/povray/headercontent_mesh2only.inc'
     staticFile = 'data/povray/staticcontent_mesh2only_fsss.inc' if settings['SSS'] == True else 'data/povray/staticcontent_mesh2only_tl.inc'
     sceneFile = 'data/povray/makehuman_mesh2only_tl.pov'
@@ -965,7 +979,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
         resgreen = 2**(10-resred/2) 
         resred = 2**(10-resred)
         # blue channel
-        lmap = projection.mapLighting()
+        lmap = projection.mapLighting(progressCallback = lambda p: progress(progbase,p*(0.55-progbase),"Rendering lightmaps"))
         log.debug('SSS: Hi-Res lightmap resolution: %s', lmap.width)
         lmap.save(os.path.join(outputDirectory, 'lighthi.png'))
         # green channel
@@ -976,8 +990,11 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
         lmap.resize(resred,resred)
         log.debug('SSS: Low-Res lightmap resolution: %s', lmap.width)
         lmap.save(os.path.join(outputDirectory, 'lightlo.png'))
+        progbase = 0.55
 
     # Open the output file in Write mode
+    progress(progbase,0,"Writing code")
+    progbase = progbase + 0.5
     try:
         outputFileDescriptor = open(path, 'w')
     except:
@@ -1017,9 +1034,13 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
 
     povraySizeData(obj, outputFileDescriptor)
 
-    stuffs = object_collection.setupObjects("MakeHuman", gui3d.app.selectedHuman, helpers=False, hidden=False, eyebrows=False, lashes=False, subdivide = settings['subdivide'])
+    stuffs = object_collection.setupObjects("MakeHuman", gui3d.app.selectedHuman, helpers=False, hidden=False,
+                                            eyebrows=False, lashes=False, subdivide = settings['subdivide'],
+                                            progressCallback = lambda p: progress(progbase,p*(0.75-progbase),"Preparing Objects"))
+    progbase = 0.75
 
     # Mesh2 Object - Write the initial part of the mesh2 object declaration
+    progress(progbase,0,"Writing objects")
     for stuff in stuffs:
 
         outputFileDescriptor.write('// Humanoid mesh2 definition\n')
@@ -1103,8 +1124,10 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
         outputFileDescriptor.write('''}
 
 ''')
-
+    progbase = 0.85
+                                            
     # Copy texture definitions to the output file.
+    progress(progbase,0,"Writing Materials")
     try:
         staticContentFileDescriptor = open(staticFile, 'r')
     except:
@@ -1124,8 +1147,10 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
     # The POV-Ray include file is complete
     outputFileDescriptor.close()
     log.message("POV-Ray '#include' file generated.")
+    progbase = 0.95
 
     # Copy a sample scene file across to the output directory
+    progress(progbase,0,"Writing Scene file")
     try:
         sceneFileDescriptor = open(sceneFile, 'r')
     except:
@@ -1156,8 +1181,10 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
     # Job done, clean up
     outputSceneFileDescriptor.close()
     sceneFileDescriptor.close()
+    progbase = 1
 
     # Copy the skin texture file into the output directory
+    progress(progbase,0,"Finishing")
     copyFile(pigmentMap, os.path.join(outputDirectory, "texture.png"))
 
     for stuff in stuffs[1:]:
@@ -1175,6 +1202,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings):
         """
 
     log.message('Sample POV-Ray scene file generated')
+    progress(0,0,"Finished. Pov-Ray project exported successfully at %s" % outputDirectory)
 
 """
 Item types

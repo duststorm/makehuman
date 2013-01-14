@@ -61,9 +61,12 @@ class PovrayTaskView(gui3d.TaskView):
         self.doSubdivide = optionsBox.addWidget(gui.CheckBox('Subdivide mesh', True))
         self.useSSS = optionsBox.addWidget(gui.CheckBox('Use S.S. Scattering', False))
         self.SSSA = optionsBox.addWidget(gui.Slider(value=0.5, label="SSS Amount"))
-        self.skinoil = optionsBox.addWidget(gui.Slider(value=0.5, label="Skin oil"))
-        self.rough = optionsBox.addWidget(gui.Slider(value=0.5, label="Skin roughness"))
-        self.wrinkles = optionsBox.addWidget(gui.Slider(value=0.1, label="Skin wrinkles"))
+        self.AA = optionsBox.addWidget(gui.Slider(value=0.4, label="AntiAliasing"))
+
+        materialsBox = self.addRightWidget(gui.GroupBox('Materials'))
+        self.skinoil = materialsBox.addWidget(gui.Slider(value=0.5, label="Skin oil"))
+        self.rough = materialsBox.addWidget(gui.Slider(value=0.5, label="Skin roughness"))
+        self.wrinkles = materialsBox.addWidget(gui.Slider(value=0.1, label="Skin wrinkles"))
         
         # box
         #optionsBox = self.addLeftWidget(gui.GroupBox('Options'))
@@ -106,6 +109,7 @@ class PovrayTaskView(gui3d.TaskView):
                                     'format':'mesh2',       # 'array' if self.arrayButton.selected else 'mesh2',
                                     'action':'render',      # 'export' if self.exportButton.selected else 'render',
                                     'subdivide':True if self.doSubdivide.selected else False,
+                                    'AA': 0.5-0.49*self.AA.getValue(),
                                     'bintype': binary,
                                     'SSS': True if self.useSSS.selected else False,
                                     'SSSA': 6*self.SSSA.getValue(), # power of 2

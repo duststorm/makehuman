@@ -8,7 +8,7 @@
 
 **Code Home Page:**    http://code.google.com/p/makehuman/
 
-**Authors:**           Marc Flerackers, Thanasis Papoutsidakis
+**Authors:**           Marc Flerackers, Glynn Clements, Thanasis Papoutsidakis
 
 **Copyright(c):**      MakeHuman Team 2001-2013
 
@@ -238,7 +238,7 @@ def fixSeams(img):
     img._data[...,:-1][border] = fill.astype(np.uint8)[border]
     img._data[...,-1:][border] = 255
 
-def mapLightingSoft():
+def mapLightingSoft(progressCallback = None):
     """
     Create a lightmap for the selected human.
     """
@@ -270,7 +270,10 @@ def mapLightingSoft():
     log.debug("mapLighting: begin render")
 
     def progress(base, i, n):
-        gui3d.app.progress(base + 0.5 * i / n, "Projecting lightmap")
+        if progressCallback == None:
+            gui3d.app.progress(base + 0.5 * i / n, "Projecting lightmap")
+        else:
+            progressCallback(base + 0.5 * i / n)
 
     RasterizeTriangles(dstImg, coords[:,[0,1,2],:], ColorShader(colors[:,[0,1,2],:]), progress = lambda i,n: progress(0.0,i,n))
     RasterizeTriangles(dstImg, coords[:,[2,3,0],:], ColorShader(colors[:,[2,3,0],:]), progress = lambda i,n: progress(0.5,i,n))
@@ -321,11 +324,11 @@ def mapLightingGL():
 
     return dstImg
 
-def mapLighting():
+def mapLighting(progressCallback = None):
     if mh.hasRenderSkin():
         return mapLightingGL()
     else:
-        return mapLightingSoft()
+        return mapLightingSoft(progressCallback)
 
 def rasterizeHLines(dstImg, edges, delta, progress = None):
     flip = delta[:,0] < 0

@@ -198,8 +198,14 @@ def filterMesh(mesh1, obj, deleteGroups, deleteVerts, eyebrows, lashes):
 #   setupObjects(name, human, armature):
 #
 
-def setupObjects(name, human, armature=None, helpers=False, hidden=True, eyebrows=True, lashes=True, subdivide = False):
+def setupObjects(name, human, armature=None, helpers=False, hidden=True, eyebrows=True, lashes=True, subdivide = False, progressCallback=None):
     global theStuff, theTextures, theTexFiles, theMaterials
+
+    def progress(base,prog):
+        if progressCallback == None:
+            pass
+        else:
+            progressCallback (base+prog)
     
     cfg = export_config.exportConfig(human, True)
     obj = human.meshData
@@ -220,57 +226,64 @@ def setupObjects(name, human, armature=None, helpers=False, hidden=True, eyebrow
     foundProxy,deleteVerts = setupProxies('Clothes', None, obj, stuffs, armature, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
     foundProxy,deleteVerts = setupProxies('Proxy', name, obj, stuffs, armature, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
     if not foundProxy:
-        mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
-        if helpers:     # helpers override everything
-            mesh2 = mesh1
-        else:
-            mesh2 = filterMesh(mesh1, obj, deleteGroups, deleteVerts, eyebrows, lashes)
         if subdivide:
-            subMesh = human.getSubdivisionMesh()
-            stuff.setObject3dMesh(subMesh, stuff.rawWeights, rawTargets)
+            stuff.setObject3dMesh(human.getSubdivisionMesh(False,progressCallback = lambda p: progress(0,p*0.5)),
+                                  stuff.rawWeights, rawTargets)
         else:
-            stuff.setMesh(mesh2)
+            mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
+            if helpers:     # helpers override everything
+                stuff.setMesh(mesh1)
+            else:
+                stuff.setMesh(filterMesh(mesh1, obj, deleteGroups, deleteVerts, eyebrows, lashes))
         stuffs = [stuff] + stuffs
+
+    clothKeys = human.clothesObjs.keys()
 
     # Apply custom textures if applicable
     for stuff in stuffs:
-        if stuff.proxy and stuff.proxy.type == 'Clothes':
-            proxy = stuff.proxy
-            uuid = proxy.getUuid()
-            if uuid and uuid in human.clothesObjs.keys() and human.clothesObjs[uuid]:
-                # Clothes
-                clothesObj = human.clothesObjs[uuid]
-                texture = clothesObj.mesh.texture
+        proxy = stuff.proxy
+        if proxy:
+            if proxy.type == 'Clothes':
+                uuid = proxy.getUuid()
+                if uuid:
+                    if uuid in clothKeys:
+                        # Clothes
+                        clothesObj = human.clothesObjs[uuid]
+                        if clothesObj:
+                            texture = clothesObj.mesh.texture
+                            stuff.texture = (os.path.dirname(texture), os.path.basename(texture))
+                    elif uuid == human.hairProxy.getUuid():
+                        # Hair
+                        texture = human.hairObj.mesh.texture
+                        stuff.texture = (os.path.dirname(texture), os.path.basename(texture))
+            elif proxy.type == 'Proxy':
+                # Proxy
+                texture = human.mesh.texture
                 stuff.texture = (os.path.dirname(texture), os.path.basename(texture))
-            elif uuid and uuid == human.hairProxy.getUuid():
-                # Hair
-                texture = human.hairObj.mesh.texture
-                stuff.texture = (os.path.dirname(texture), os.path.basename(texture))
-        elif stuff.proxy and stuff.proxy.type == 'Proxy':
-            # Proxy
-            texture = human.mesh.texture
-            stuff.texture = (os.path.dirname(texture), os.path.basename(texture))
 
     # Subdivide proxy meshes if requested
     if subdivide:
         for stuff in stuffs:
-            if stuff.proxy and stuff.proxy.type == 'Clothes':
-                uuid = stuff.proxy.getUuid()
-                if uuid and uuid in human.clothesObjs.keys():
-                    # Subdivide clothes
-                    clo = human.clothesObjs[uuid]
-                    subMesh = clo.getSubdivisionMesh()
+            proxy = stuff.proxy
+            if proxy:
+                if proxy.type == 'Clothes':
+                    uuid = proxy.getUuid()
+                    if uuid and uuid in clothKeys:
+                        # Subdivide clothes
+                        clo = human.clothesObjs[uuid]
+                        subMesh = clo.getSubdivisionMesh(False)
+                        stuff.setObject3dMesh(subMesh, stuff.rawWeights, rawTargets)
+                    elif uuid and uuid == human.hairProxy.getUuid():
+                        # Subdivide hair
+                        hair = human.hairObj
+                        subMesh = hair.getSubdivisionMesh(False)
+                        stuff.setObject3dMesh(subMesh, stuff.rawWeights, rawTargets)
+                elif proxy.type == 'Proxy':
+                    # Subdivide proxy
+                    subMesh = human.getSubdivisionMesh(False)
                     stuff.setObject3dMesh(subMesh, stuff.rawWeights, rawTargets)
-                elif uuid and uuid == human.hairProxy.getUuid():
-                    # Subdivide hair
-                    hair = human.hairObj
-                    subMesh = hair.getSubdivisionMesh()
-                    stuff.setObject3dMesh(subMesh, stuff.rawWeights, rawTargets)
-            elif stuff.proxy and stuff.proxy.type == 'Proxy':
-                # Subdivide proxy
-                subMesh = human.getSubdivisionMesh()
-                stuff.setObject3dMesh(subMesh, stuff.rawWeights, rawTargets)
-    
+
+    progress(1,0)
     return stuffs
 
 #
