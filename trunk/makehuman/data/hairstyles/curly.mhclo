@@ -2,6 +2,7 @@
 # license AGPL3 (see also http://www.makehuman.org/node/320)
 # homepage http://www.makehuman.org/
 # name curly
+# uuid a1dcdb86-4506-4368-bb7a-a208acf89b30
 # subsurf 1 1
 # texture curly_texture.png
 # material curly

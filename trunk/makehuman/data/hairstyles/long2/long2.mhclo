@@ -1,7 +1,8 @@
 # author Manuel Bastioni
 # license AGPL3 (see also http://www.makehuman.org/node/320)
 # homepage http://www.makehuman.org/
-# name HairLong2
+# name HairLong
+# uuid 96b009a8-119f-4e46-a6da-f5ab791dc305
 # subsurf 1 1
 # rig long2.rig
 # texture long2_texture.png
