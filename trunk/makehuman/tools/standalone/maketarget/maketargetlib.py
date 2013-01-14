@@ -276,11 +276,26 @@ class Target(object):
             fd.close()
         return
         
+    def formatFloat(f):
+        """
+        Optimally format floats for writing in ASCII .target files.
+        """
+        f = round(f, 3)
+        if f == 0:
+            # Make sure -0.0 becomes 0
+            return "0"
+        result = "%.3f" % f
+        result.rstrip("0")  # Remove trailing zeros
+        result.rstrip(".")  # Strip ending . if applicable
+        if not result:
+            result = "0" # In case it was "0", rstrip makes it an empty string
+        return result
+
     def write(self, outPath):
         '''Write this target to specified file.'''
-        outfile = open(outPath, 'w')
+        outfile = open(outPath, 'wb') # write binary to enforce unix line-endings on windows
         for index in self.verts:
             vert = self.verts[index]
-            outfile.write("%d %f %f %f\n"% (index, vert.x, vert.y, vert.z))
+            outfile.write("%d %s %s %s\n"% (index, self.formatFloat(vert.x), self.formatFloat(vert.y), self.formatFloat(vert.z)))
         outfile.close()
 
