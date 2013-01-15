@@ -1142,7 +1142,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings, progressCallba
     staticContentFileDescriptor.close()
     
     # Write items' materials 
-    writeItemsMaterials(outputFileDescriptor, stuffs)
+    writeItemsMaterials(outputFileDescriptor, stuffs, settings, outputDirectory)
              
     # The POV-Ray include file is complete
     outputFileDescriptor.close()
@@ -1211,54 +1211,49 @@ Item types
 1   - Generic
 2   - Hair
 """
-def writeItemsMaterials(outputFileDescriptor, stuffs):
+def writeItemsMaterials(outputFileDescriptor, stuffs, settings, outDir):
     for stuff in stuffs[1:]:
         proxy = stuff.proxy
         if proxy.type == 'Clothes' and proxy.getUuid() == gui3d.app.selectedHuman.hairProxy.getUuid():
-            itemtype = 2
+            itemtype = 2 # Hair.
+            texdata = getChannelData(stuff.texture)                        
+            if settings['hairSpec'] == True:
+                # Export transparency map.
+                hairtex = mh.Image(path = os.path.join(stuff.texture[0],stuff.texture[1]))
+                hairalpha = hairtex.alphaChannel()
+                hairalpha.save(path = os.path.join(outDir,"%s_TPOV.png" % stuff.name))
+                haircodeFD = open ("data/povray/hair_2.inc",'r')
+                haircodeLines = haircodeFD.read()
+                haircodeLines = string.replace (haircodeLines,"%%spec%%",str(settings['hspecA']))
+                haircodeLines = string.replace (haircodeLines,"%%thin%%",str(settings['hairThin']))
+            else:
+                haircodeFD = open ("data/povray/hair_0.inc",'r')
+                haircodeLines = haircodeFD.read()
+            haircodeLines = string.replace (haircodeLines,"%%name%%",stuff.name)
+            haircodeLines = string.replace (haircodeLines,"%%type%%",texdata[1])
+            haircodeLines = string.replace (haircodeLines,"%%file%%",texdata[0])
+            outputFileDescriptor.write(haircodeLines)
+            haircodeFD.close()
         else:
             itemtype = 1
-        outputFileDescriptor.write("#ifndef (%s_Material)\n" % stuff.name +
-                                   "#declare %s_Texture =\n" % stuff.name +
-                                   "    texture {\n")
-        texdata = getChannelData(stuff.texture)                        
-        if texdata:                
-            outputFileDescriptor.write(
-                    '        pigment { image_map {%s "%s" interpolate 2} }\n' % (texdata[1], texdata[0]))
-        else:
-            outputFileDescriptor.write(
-                    '        pigment { rgb <1,1,1> }\n')
-        bumpdata = getChannelData(proxy.bump)
-        if bumpdata:
-           outputFileDescriptor.write(
-                    '        normal { bump_map {%s "%s" interpolate 2} }\n' % (bumpdata[1], bumpdata[0]))
-        else:
-            if itemtype == 2:
+            
+            outputFileDescriptor.write("#ifndef (%s_Material)\n" % stuff.name +
+                                       "#declare %s_Texture =\n" % stuff.name +
+                                       "    texture {\n")
+            texdata = getChannelData(stuff.texture)                        
+            if texdata:                
                 outputFileDescriptor.write(
-                        '        normal { ripples 0 scale 0.005 }\n')
+                        '        pigment { image_map {%s "%s" interpolate 2} }\n' % (texdata[1], texdata[0]))
+            else:
+                outputFileDescriptor.write(
+                        '        pigment { rgb <1,1,1> }\n')
+            bumpdata = getChannelData(proxy.bump)
+            if bumpdata:
+               outputFileDescriptor.write(
+                        '        normal { bump_map {%s "%s" interpolate 2} }\n' % (bumpdata[1], bumpdata[0]))
             else:
                 outputFileDescriptor.write(
                         '        normal { wrinkles 0.2 scale 0.0001 }\n')
-        if itemtype == 2:
-            outputFileDescriptor.write ("        finish {\n" +
-                                "            specular 0\n" +
-                                "            roughness 0.5\n" +
-                                "            phong 0 phong_size 0 \n" +
-                                "            ambient 0\n" +
-                                "            diffuse 1\n" +
-                                "            reflection {0}\n" +
-                                "            conserve_energy\n" +
-                                "        }\n" +
-                                "    }\n\n" +
-                                "#declare %s_Material = material {\n" % stuff.name +
-                                "    texture {\n" +
-                                "        uv_mapping\n" +
-                                "        %s_Texture\n" % stuff.name +
-                                "    }\n"
-                                "    interior {ior 1}\n" +
-                                "}\n\n" +
-                                "#end\n")
-        else:
             outputFileDescriptor.write ("        finish {\n" +
                                 "            specular 0.05\n" +
                                 "            roughness 0.2\n" +

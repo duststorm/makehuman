@@ -60,14 +60,17 @@ class PovrayTaskView(gui3d.TaskView):
         optionsBox = self.addLeftWidget(gui.GroupBox('Options'))
         self.doSubdivide = optionsBox.addWidget(gui.CheckBox('Subdivide mesh', True))
         self.useSSS = optionsBox.addWidget(gui.CheckBox('Use S.S. Scattering', False))
-        self.SSSA = optionsBox.addWidget(gui.Slider(value=0.5, label="SSS Amount"))
+        self.SSSA = optionsBox.addWidget(gui.Slider(value=0.3, label="SSS Amount"))
         self.AA = optionsBox.addWidget(gui.Slider(value=0.4, label="AntiAliasing"))
 
         materialsBox = self.addRightWidget(gui.GroupBox('Materials'))
-        self.skinoil = materialsBox.addWidget(gui.Slider(value=0.5, label="Skin oil"))
+        self.skinoil = materialsBox.addWidget(gui.Slider(value=0.4, label="Skin oil"))
         self.rough = materialsBox.addWidget(gui.Slider(value=0.5, label="Skin roughness"))
-        self.wrinkles = materialsBox.addWidget(gui.Slider(value=0.1, label="Skin wrinkles"))
-        
+        self.wrinkles = materialsBox.addWidget(gui.Slider(value=0.2, label="Skin wrinkles"))
+        self.hairSpec = materialsBox.addWidget(gui.CheckBox('Hair shine', False))
+        self.hspecA = materialsBox.addWidget(gui.Slider(value=0.5, label="Shine strength"))
+        self.hairThin = materialsBox.addWidget(gui.Slider(value=0.33, label="Hair thinness"))
+
         # box
         #optionsBox = self.addLeftWidget(gui.GroupBox('Options'))
         
@@ -115,7 +118,10 @@ class PovrayTaskView(gui3d.TaskView):
                                     'SSSA': 6*self.SSSA.getValue(), # power of 2
                                     'skinoil': 0.001 *(10**(4*self.skinoil.getValue())), # exponential slider
                                     'rough':0.001 *(10**(2*self.rough.getValue())), # exponential slider
-                                    'wrinkles': self.wrinkles.getValue()}) 
+                                    'wrinkles': 0.5*self.wrinkles.getValue(),
+                                    'hairSpec':True if self.hairSpec.selected else False,
+                                    'hspecA': 0.1*(10**(2*self.hspecA.getValue())), # exponential slider
+                                    'hairThin': 5**(2*self.hairThin.getValue())}) # exponential slider 
 
     def onShow(self, event):
         self.renderButton.setFocus()
