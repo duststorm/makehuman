@@ -154,6 +154,8 @@ class ModifierTaskView(gui3d.TaskView):
 
     def saveHandler(self, human, file):
         for name, modifier in self.modifiers.iteritems():
+            if name is None:
+                continue
             value = modifier.getValue(human)
             if value:
                 file.write('%s %s %f\n' % (self._group, name, value))
@@ -439,6 +441,7 @@ class ArmsLegsTaskView(ModifierTaskView):
 
 class GenderTaskView(ModifierTaskView):
     _name = 'Gender'
+    _group = 'gendered'
     _features = [
         ('Genitals', 'genitals', [
             (None, 'genitals', 'feminine', 'masculine', 'noSetCamera'),
@@ -456,6 +459,7 @@ class GenderTaskView(ModifierTaskView):
 
 class AsymmTaskView(ModifierTaskView):
     _name = 'Asymmetry'
+    _group = 'asymmetry'
     _features = [
         ('brow', 'asym', [
             (None, 'asym-brown-1', 'l', 'r', 'setFaceCamera'),
