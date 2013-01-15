@@ -437,37 +437,20 @@ class RadioButton(QtGui.QRadioButton, ButtonBase):
             if radio.selected:
                 return radio
 
-""" This was taken from http://www.saltycrane.com/blog/2008/01/pyqt-43-simple-qabstractlistmodel/
-"""
-class ListModel(QtCore.QAbstractListModel): 
-    def __init__(self, datain, parent=None, *args): 
-        """ datain: a list where each item is a row
-        """
-        QtCore.QAbstractListModel.__init__(self, parent, *args) 
-        self.listdata = datain
- 
-    def rowCount(self, parent=QtCore.QModelIndex()): 
-        return len(self.listdata) 
- 
-    def data(self, index, role): 
-        if index.isValid() and role == QtCore.Qt.DisplayRole:
-            return QtCore.QVariant(self.listdata[index.row()])
-        else: 
-            return QtCore.QVariant()
-
-class ListView(QtGui.QListView, Widget):
+class ListView(QtGui.QListWidget, Widget):
     def __init__(self):
         super(ListView, self).__init__()
         Widget.__init__(self)
-    
-    def setData(self, data):
-        lm = ListModel(data,self)
-        self.setModel(lm)
+
+    def setData(self, items):
+        self.clear()
+        self.addItems(items)
 
     def getSelectedItem(self):
-        idx = self.selectionModel().selectedRows()
-        for rec in idx:
-            return rec.model().itemData(rec)[0].toString()
+        items = self.selectedItems()
+        if len(items) > 0:
+            return str(items[0].text())
+        return None
 
 class TextView(QtGui.QLabel, Widget):
     def __init__(self, label = ''):
