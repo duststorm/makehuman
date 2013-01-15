@@ -69,7 +69,7 @@ class PovrayTaskView(gui3d.TaskView):
         self.wrinkles = materialsBox.addWidget(gui.Slider(value=0.2, label="Skin wrinkles"))
         self.hairSpec = materialsBox.addWidget(gui.CheckBox('Hair shine', False))
         self.hspecA = materialsBox.addWidget(gui.Slider(value=0.5, label="Shine strength"))
-        self.hairThin = materialsBox.addWidget(gui.Slider(value=0.33, label="Hair thinness"))
+        self.hairThick = materialsBox.addWidget(gui.Slider(value=0.67, label="Hair thickness"))
 
         # box
         #optionsBox = self.addLeftWidget(gui.GroupBox('Options'))
@@ -121,7 +121,7 @@ class PovrayTaskView(gui3d.TaskView):
                                     'wrinkles': 0.5*self.wrinkles.getValue(),
                                     'hairSpec':True if self.hairSpec.selected else False,
                                     'hspecA': 0.1*(10**(2*self.hspecA.getValue())), # exponential slider
-                                    'hairThin': 5**(2*self.hairThin.getValue())}) # exponential slider 
+                                    'hairThin': 5**(2*(1-self.hairThick.getValue()))}) # exponential slider 
 
     def onShow(self, event):
         self.renderButton.setFocus()
