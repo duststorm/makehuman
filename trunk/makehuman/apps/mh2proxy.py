@@ -88,6 +88,7 @@ class CProxy:
         self.weights = None
         self.refVerts = []
         self.clothings = []
+        self.textures = []
         return
         
     def update(self, obj, parent):
@@ -349,6 +350,8 @@ def readProxyFile(obj, file, evalOnLoad):
                 else:
                     clothingPiece = (words[2], None)
                 proxy.clothings.append(clothingPiece)
+            elif key == 'textures':
+                proxy.textures.append( (words[2], words[3]) )
             elif key == 'subsurf':
                 levels = int(words[2])
                 if len(words) > 3:

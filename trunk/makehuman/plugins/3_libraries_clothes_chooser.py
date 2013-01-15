@@ -103,6 +103,18 @@ class ClothesTaskView(gui3d.TaskView):
                 else:
                     log.warning("Could not load clothing %s", pieceName)
             gui3d.app.progress(1, text="%s loaded" % proxy.name)
+            # Load custom textures
+            for (uuid, texPath) in proxy.textures:
+                if not uuid in human.clothesProxies.keys():
+                    log.warning("Could not load texture for object with uuid %s!" % uuid)
+                    continue
+                proxy = human.clothesProxies[uuid]
+                if not os.path.dirname(texPath):
+                    proxy = human.clothesProxies[uuid]
+                    clothesPath = os.path.dirname(proxy.file)
+                    texPath = os.path.join(clothesPath, texPath)
+                clo = human.clothesObjs[uuid]
+                clo.mesh.setTexture(texPath)
             return
             
         #folder = os.path.dirname(filepath)
