@@ -23,6 +23,7 @@ TODO
 """
 
 import gui3d, random, humanmodifier
+from human import HumanEvent
 import mh
 import gui
 
@@ -97,9 +98,7 @@ class RandomTaskView(gui3d.TaskView):
                 self.storeLastRandom( 'muscle', human.getMuscle(), random.random()-0.5 )
                 
             if self.height.selected:
-                modifier = humanmodifier.Modifier('data/targets/macrodetails/universal-stature-dwarf.target',
-                    'data/targets/macrodetails/universal-stature-giant.target')
-                self.storeLastRandom( 'height', modifier.getValue(human), random.random()-0.5)
+                self.storeLastRandom( 'height', human.getHeight(), random.random()-0.5)
             
             if self.face.selected:
                 category = gui3d.app.getCategory('Modelling')
@@ -149,9 +148,7 @@ class RandomTaskView(gui3d.TaskView):
             human.setMuscle( self.getRandom('muscle', 0, 1 ))
 
         if self.height.selected:
-            modifier = humanmodifier.Modifier('data/targets/macrodetails/universal-stature-dwarf.target',
-                'data/targets/macrodetails/universal-stature-giant.target')
-            modifier.setValue(human, self.getRandom('height'), 0 ) 
+            human.setHeight( self.getRandom('height', -1, 1 ))
 
         if self.face.selected:
             category = gui3d.app.getCategory('Modelling')
@@ -182,6 +179,7 @@ class RandomTaskView(gui3d.TaskView):
                 #print "applying "+modName
                 modifiers[modName].setValue(human, self.getRandom(modName) )
 
+        human.callEvent('onChanged', HumanEvent(human, 'random'))
         human.applyAllTargets(gui3d.app.progress)
         
     # get the stored random value for the given modifierName, applying amount slider

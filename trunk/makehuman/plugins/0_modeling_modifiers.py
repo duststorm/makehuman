@@ -109,6 +109,19 @@ class ModifierTaskView(gui3d.TaskView):
 
         self.groupBox.showWidget(self.groupBoxes[0])
 
+    def getModifiers(self):
+        return self.modifiers
+
+    def getSymmetricModifierPairNames(self):
+        return [dict(left = name, right = "l-" + name[2:])
+                for name in self.modifiers
+                if name.startswith("r-")]
+
+    def getSingularModifierNames(self):
+        return [name
+                for name in self.modifiers
+                if name[:2] not in ("r-", "l-")]
+
     def updateMacro(self):
         human = gui3d.app.selectedHuman
         for modifier in self.modifiers.itervalues():
@@ -130,7 +143,7 @@ class ModifierTaskView(gui3d.TaskView):
         for slider in self.sliders:
             slider.update()
 
-        if event.change in ('reset', 'load'):
+        if event.change in ('reset', 'load', 'random'):
             self.updateMacro()
 
     def loadHandler(self, human, values):
@@ -556,6 +569,7 @@ class MacroTaskView(ModifierTaskView):
     def onHumanChanged(self, event):
         if self.isVisible():
             self.syncStatus()
+        super(MacroTaskView, self).onHumanChanged(event)
 
 def load(app):
     category = app.getCategory('Modelling')
