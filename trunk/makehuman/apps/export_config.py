@@ -165,16 +165,14 @@ class CProxyFile:
 #
 #
         
-def getExistingProxyFile(words, category):
-    path = words[1]  
-    if len(words) <= 2:
+def getExistingProxyFile(path, uuid, category):
+    if not uuid:
         if not os.path.exists(os.path.realpath(path)):
             return None
         log.message("Found %s", path)
         return path
     else:
         file = os.path.basename(path)
-        uuid = words[2]
         paths = []
         folder = os.path.join(mh.getPath(''), 'data', category)
         addProxyFiles(file, folder, paths, 6)

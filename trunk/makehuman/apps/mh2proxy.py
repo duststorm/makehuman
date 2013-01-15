@@ -344,7 +344,11 @@ def readProxyFile(obj, file, evalOnLoad):
             elif key == 'obj_file':
                 proxy.obj_file = getFileName(folder, words[2], ".obj")
             elif key == 'clothing':
-                proxy.clothings.append(words[2])
+                if len(words) > 3:
+                    clothingPiece = (words[2], words[3])
+                else:
+                    clothingPiece = (words[2], None)
+                proxy.clothings.append(clothingPiece)
             elif key == 'subsurf':
                 levels = int(words[2])
                 if len(words) > 3:

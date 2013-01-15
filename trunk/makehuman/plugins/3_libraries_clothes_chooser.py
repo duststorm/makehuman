@@ -90,20 +90,18 @@ class ClothesTaskView(gui3d.TaskView):
 
         uuid = proxy.getUuid()
         
+        # For loading costumes (sets of individual clothes)
         if proxy.clothings:
             t = 0
             dt = 1.0/len(proxy.clothings)
-            folder = os.path.dirname(filepath)
-            for piece in proxy.clothings:
-                gui3d.app.progress(t, text="Loading %s" % piece)
+            for (pieceName, uuid) in proxy.clothings:
+                gui3d.app.progress(t, text="Loading %s" % pieceName)
                 t += dt
-                piecedir = os.path.join(folder, piece)
-                log.message("Find %s", piecedir)
-                if os.path.exists(piecedir):
-                    piecefile = os.path.join(piecedir, piece + ".mhclo")
+                mhclo = export_config.getExistingProxyFile(pieceName+".mhclo", uuid, "clothes")
+                if mhclo:
+                    self.setClothes(human, mhclo)
                 else:
-                    piecefile = piecedir + ".mhclo"
-                self.setClothes(human, piecefile)
+                    log.warning("Could not load clothing %s", pieceName)
             gui3d.app.progress(1, text="%s loaded" % proxy.name)
             return
             
@@ -227,7 +225,10 @@ class ClothesTaskView(gui3d.TaskView):
 
     def loadHandler(self, human, values):
 
-        mhclo = export_config.getExistingProxyFile(values, "clothes")
+        if len(values) >= 3:
+            mhclo = export_config.getExistingProxyFile(values[1], values[2], "clothes")
+        else:
+            mhclo = export_config.getExistingProxyFile(values[1], None, "clothes")
         if not mhclo:
             log.notice("%s does not exist. Skipping.", values[1])
         else:            
