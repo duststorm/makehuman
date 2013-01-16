@@ -4,34 +4,33 @@ sys.path = ["./core", "./lib"] + sys.path
 import algos3d
 import os
 import zipfile
+import fnmatch
+
+def getFiles(rootPath, filterStr):
+    foundFiles = []
+    for root, dirnames, filenames in os.walk(rootPath):
+        for filename in fnmatch.filter(filenames, filterStr):
+            foundFiles.append(os.path.join(root, filename))
+    return foundFiles
+
 
 if __name__ == '__main__':
     obj = algos3d.Target(None, None)
     with zipfile.ZipFile('data/targets.npz', mode='w', compression=zipfile.ZIP_DEFLATED) as zip:
-        for root, dirs, files in os.walk('data'):
-            for name in files:
-                try:
-                    base, ext = os.path.splitext(name)
-                    ext = ext.lower()
-                    if ext != '.target':
-                        continue
-                    path = os.path.join(root, name)
-                    obj._load_text(path)
-                    iname, vname = obj._save_binary(path)
-                    zip.write(iname)
-                    zip.write(vname)
-                    os.remove(iname)
-                    os.remove(vname)
-                    print 'converted target %s' % name
-                except StandardError, e:
-                    print 'error converting target %s' % name
+        allTargets = getFiles('data', '*.target')
+        for (i, path) in enumerate(allTargets):
+            try:
+                obj._load_text(path)
+                iname, vname = obj._save_binary(path)
+                zip.write(iname)
+                zip.write(vname)
+                os.remove(iname)
+                os.remove(vname)
+                print "[%.0f%% done] converted target %s" % (100*(float(i)/float(len(allTargets))), path)
+            except StandardError, e:
+                print 'error converting target %s' % path
 
     with open('data/images.list', 'w') as f:
-        for root, dirs, files in os.walk('data/targets'):
-            for name in files:
-                base, ext = os.path.splitext(name)
-                ext = ext.lower()
-                if ext != '.png':
-                    continue
-                path = os.path.join(root, name).replace('\\','/')
-                f.write(path + '\n')
+        for (i, path) in getFiles('data', '*.target'):
+            path = path.replace('\\','/')
+            f.write(path + '\n')
