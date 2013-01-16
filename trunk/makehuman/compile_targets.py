@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import sys
-sys.path.append("./core")
-sys.path.append("./lib")
+sys.path = ["./core", "./lib"] + sys.path
 import algos3d
 import os
 import zipfile
