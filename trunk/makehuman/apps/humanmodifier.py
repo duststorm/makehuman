@@ -287,10 +287,7 @@ class Modifier:
 
 class BaseModifier(object):
 
-    def __init__(self, template):
-        
-        self.template = template
-        self.targets = self.expandTemplate([(self.template, [])])
+    def __init__(self):
         self.verts = None
         self.faces = None
         
@@ -307,8 +304,7 @@ class BaseModifier(object):
         
         return sum([human.getDetail(target[0]) for target in self.targets])
 
-    def updateValue(self, human, value, updateNormals=1):
-        
+    def buildLists(self):
         # Collect vertex and face indices if we didn't yet
         if self.verts is None and self.faces is None:
             # Collect verts
@@ -321,6 +317,10 @@ class BaseModifier(object):
 
             # collect faces
             self.faces = human.meshData.getFacesForVertices(self.verts)
+
+    def updateValue(self, human, value, updateNormals=1):
+        if self.verts is None and self.faces is None:
+            self.buildLists()
 
         # Update detail state
         old_detail = [human.getDetail(target[0]) for target in self.targets]
@@ -341,6 +341,12 @@ class BaseModifier(object):
 
 class SimpleModifier(BaseModifier):
     # overrides
+
+    def __init__(self, template):
+        super(SimpleModifier, self).__init__()
+        self.template = template
+        self.targets = self.expandTemplate([(self.template, [])])
+
     def expandTemplate(self, targets):
         
         targets = [(target[0], target[1] + ['dummy']) for target in targets]
@@ -374,20 +380,6 @@ class GenericModifier(BaseModifier):
             keys.append('-'.join(target.key))
             targets.append((target.path, keys))
         return targets
-
-    def __init__(self, left, right, center=None):
-        self.left = left
-        self.right = right
-        self.center = center
-
-        self.l_targets = self.findTargets(left)
-        self.r_targets = self.findTargets(right)
-        self.c_targets = self.findTargets(center)
-
-        self.targets = self.l_targets + self.r_targets + self.c_targets
-
-        self.verts = None
-        self.faces = None
 
     def clampValue(self, value):
         value = min(1.0, value)
@@ -445,6 +437,19 @@ class GenericModifier(BaseModifier):
         return factors
 
 class UniversalModifier(GenericModifier):
+    def __init__(self, left, right, center=None):
+        super(UniversalModifier, self).__init__()
+
+        self.left = left
+        self.right = right
+        self.center = center
+
+        self.l_targets = self.findTargets(left)
+        self.r_targets = self.findTargets(right)
+        self.c_targets = self.findTargets(center)
+
+        self.targets = self.l_targets + self.r_targets + self.c_targets
+
     def getFactors(self, human, value):
         factors = super(UniversalModifier, self).getFactors(human, value)
 
@@ -458,6 +463,8 @@ class UniversalModifier(GenericModifier):
 
 class MacroModifier(GenericModifier):
     def __init__(self, base, name, variable, min, max):
+        super(MacroModifier, self).__init__()
+
         self.name = '-'.join(atom
                              for atom in (base, name)
                              if atom is not None)
@@ -467,9 +474,6 @@ class MacroModifier(GenericModifier):
 
         self.targets = self.findTargets(self.name)
         # log.debug('macro modifier %s.%s(%s): %s', base, name, variable, self.targets)
-
-        self.verts = None
-        self.faces = None
 
     def getValue(self, human):
         getter = 'get' + self.variable
@@ -494,3 +498,6 @@ class MacroModifier(GenericModifier):
         factors = super(MacroModifier, self).getFactors(human, value)
         factors[self.name] = 1.0
         return factors
+
+    def buildLists(self):
+        pass
