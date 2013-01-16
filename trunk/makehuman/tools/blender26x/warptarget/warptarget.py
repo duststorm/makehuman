@@ -230,7 +230,7 @@ def saveTarget(path, dxs, scn, first, last, active):
     print("RL", len(before), len(after), first, last)
     #halt
         
-    fp = open(path, "w")
+    fp = open(path, "wb")
     keys = list( dxs.keys() )
     keys.sort()
     

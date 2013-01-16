@@ -324,7 +324,7 @@ def doSaveTarget(context, filepath):
     if ob.MhAffectOnly != 'All':
         first,last = AffectedVerts[ob.MhAffectOnly]
         before,after = readLines(filepath, first,last)
-        fp = open(filepath, "w")  
+        fp = open(filepath, "wb")  
         for line in before:
             fp.write(line)
         if ob.MhMeshVertsDeleted:
@@ -335,7 +335,7 @@ def doSaveTarget(context, filepath):
         for (vn, string) in after:
             fp.write("%d %s" % (vn, string))
     else:
-        fp = open(filepath, "w")  
+        fp = open(filepath, "wb")  
         saveVerts(fp, ob, verts, saveAll, 0, the.NTotalVerts, 0)
     fp.close()    
     ob["FilePath"] = filepath
@@ -447,7 +447,7 @@ def pruneTarget(ob, filepath):
         if vn < the.NTotalVerts and ob.data.vertices[vn].select:
             lines.append((vn, string))
     print("Pruning", len(before), len(after), len(lines))
-    fp = open(filepath, "w")
+    fp = open(filepath, "wb")
     for vn,string in lines:            
         fp.write(str(vn) + " " + string)
     fp.close()
@@ -514,7 +514,7 @@ def saveMhpFile(context, filepath):
         (pname, ext) = os.path.splitext(filepath)
         mhppath = pname + ".mhp"
         
-        fp = open(mhppath, "w")
+        fp = open(mhppath, "wb")
         root = rig.pose.bones[roots[0]]
         writeMhpBones(fp, root)
         fp.close()
@@ -1468,7 +1468,7 @@ def subLocs(locs1, locs2, nVerts):
 
 
 def saveNewTarget(filepath, locs, nVerts):
-    fp = open(filepath, "w")
+    fp = open(filepath, "wb")
     locList = list(locs.items())
     locList.sort()
     for (n, dr) in locList:
