@@ -23,8 +23,9 @@ if __name__ == '__main__':
                     zip.write(vname)
                     os.remove(iname)
                     os.remove(vname)
+                    print 'converted target %s' % name
                 except StandardError, e:
-                    log.error('converting target %s', name, exc_info=True)
+                    print 'error converting target %s' % name
 
     with open('data/images.list', 'w') as f:
         for root, dirs, files in os.walk('data/targets'):
