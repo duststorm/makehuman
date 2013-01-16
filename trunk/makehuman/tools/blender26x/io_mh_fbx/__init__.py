@@ -33,6 +33,7 @@ if "bpy" in locals():
     print("Reloading FBX importer")
     import imp
     imp.reload(fbx)
+    imp.reload(fbx_token)
     imp.reload(fbx_basic)
     imp.reload(fbx_props)
     imp.reload(fbx_model)
@@ -59,6 +60,7 @@ else:
     import os
 
     from . import fbx
+    from . import fbx_token
     from . import fbx_basic
     from . import fbx_props
     from . import fbx_model

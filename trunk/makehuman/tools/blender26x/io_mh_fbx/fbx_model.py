@@ -38,47 +38,91 @@ Prefix = {
     "AnimationCurve" : "AnimCurve", 
     "NodeAttribute" : "NodeAttribute", 
     "Pose" : "Pose", 
-    "Deformer" : {"Skin" : "Deformer", "Cluster" : "SubDeformer"},
 
     "Null" : None
 }
     
+Prefix2 = {
+    "Deformer" : {
+        "Skin" : "Deformer", 
+        "Cluster" : "SubDeformer"
+    },
+}
+
 class CConnection(CFbx):
 
     def __init__(self, type, subtype, btype):
         CFbx.__init__(self, type)
         self.subtype = subtype
-        self.prefix = Prefix[type]
+        try:
+            self.prefix = Prefix[type]
+        except KeyError:
+            self.prefix = Prefix2[type][subtype]
         self.btype = btype
         self.links = []
         self.children = []
         self.active = False
         self.isObjectData = False
-        self.properties = None
+        self.properties = CProperties70()
+        self.template = {}
         self.struct = {}
         print("__init__", self)
 
+
     def __repr__(self):
         return ("<CNode %d %s %s %s %s %s %s>" % (self.id, self.ftype, self.subtype, self.name, self.isModel, self.active, self.btype))
+
+    # Struct        
+
+    def get(self, key):
+        return self.struct[key]
         
+    def set(self, key, value):
+        self.struct[key] = value
+        
+    def setMulti(self, list):
+        for key,value in list:
+            self.struct[key] = value
+            
+    # Properties
+
+    def setProp(self, key, value):
+        self.properties.setProp(key, value, self.template)
+        
+    def getProp(self, key):
+        return self.properties.getProp(key, self.template)
+        
+    def setProps(self, list):
+        for key,value in list:
+            self.setProp(key, value)
+            
+    def parseTemplate(self, ftype, template):
+        template = self.properties.parseTemplate(ftype, template)        
+        for key,value in template.items():
+            self.template[key] = value
+        
+    # Overwrites
+    
     def parse(self, pnode):     
-        print(self, pnode)
         self.parseNodes(pnode.values[3:])
         return self
 
+
     def parseNodes(self, pnodes): 
         for pnode in pnodes:
-            if pnode.key == 'Properties70':
-                self.properties = CProperties70().parse(pnode)
-                print("Props", self)
+            try:
+                elt = self.struct[pnode.key]
+            except KeyError:
+                elt = None
+            
+            if elt and isinstance(elt, CFbx):
+                elt.parse(pnode)
+            elif pnode.key == 'Properties70':
+                self.properties.parse(pnode)
             elif len(pnode.values) == 1:
                 self.struct[pnode.key] = pnode.values[0]
             elif len(pnode.values) > 1:
-                self.struct[pnode.key] = pnode.values
-            try:
-                print("  ", pnode.key, self.struct[pnode.key])
-            except:
-                pass
+                self.struct[pnode.key] = pnode.values                
         return self    
 
 
@@ -99,33 +143,45 @@ class CConnection(CFbx):
         self.links.append(parent)
         parent.children.append(self)
         
-    def getParent(self, btype):
+    def getBParent(self, btype):
         nodes = []
         for node in self.links:
             if node.btype == btype:
                 return node
-        halt                
+        return None                
         
-    def getChildren(self, btype):
+    def getFParent(self, ftype):
+        nodes = []
+        for node in self.links:
+            if node.ftype == ftype:
+                return node
+        return None                
+        
+    def getFParent2(self, ftype, subtype):
+        nodes = []
+        for node in self.links:
+            if (node.ftype == ftype) and (node.subtype == subtype):
+                return node
+        return None                
+        
+    def getBChildren(self, btype):
         nodes = []
         for node in self.children:
             if node.btype == btype:
                 nodes.append(node)
         return nodes                                
-        
-    def getProp(self, prop, default):
-        return self.properties.getProp(prop, default)
-
+                
     def writeHeader(self, fp):
         fp.write('    %s: %d, "%s::%s", "%s" {\n' % (self.ftype, self.id, self.prefix, self.name, self.subtype))
 
+    def writeProps(self, fp):        
+        self.properties.write(fp, self.template)
         
-    def writeProps(self, fp):
-        self.writeHeader(fp)
-        if self.properties:
-            self.properties.writeProps(fp)
+    def writeStruct(self, fp):
         for key,value in self.struct.items():
-            if isinstance(value, str):
+            if isinstance(value, CFbx):
+                value.writeFbx(fp)
+            elif isinstance(value, str):
                 fp.write('        %s: "%s"\n' % (key,value))
             elif isinstance(value, list) or isinstance(value, tuple):
                 fp.write('        %s' % key)
@@ -136,6 +192,12 @@ class CConnection(CFbx):
                 fp.write('\n')
             else:
                 fp.write('        %s: %s\n' % (key,value))
+    
+
+    def writeObject(self, fp):
+        self.writeHeader(fp)
+        self.writeProps(fp)
+        self.writeStruct(fp)
         fp.write('    }\n')
 
 
@@ -166,7 +228,7 @@ class RootNode(CConnection):
         fbx.idstruct[0] = self
         self.active = True
         
-    def writeProps(self, fp):
+    def writeObject(self, fp):
         return
 
     def writeLinks(self, fp):
@@ -177,142 +239,20 @@ class RootNode(CConnection):
 #------------------------------------------------------------------
 
 class CNodeAttribute(CConnection):
-    propertyTemplate = (
-"""    
-        PropertyTemplate: "FbxCamera" {
-            Properties70:  {
-                P: "Color", "ColorRGB", "Color", "",0.8,0.8,0.8
-                P: "Position", "Vector", "", "A",0,0,-50
-                P: "UpVector", "Vector", "", "A",0,1,0
-                P: "InterestPosition", "Vector", "", "A",0,0,0
-                P: "Roll", "Roll", "", "A",0
-                P: "OpticalCenterX", "OpticalCenterX", "", "A",0
-                P: "OpticalCenterY", "OpticalCenterY", "", "A",0
-                P: "BackgroundColor", "Color", "", "A",0.63,0.63,0.63
-                P: "TurnTable", "Number", "", "A",0
-                P: "DisplayTurnTableIcon", "bool", "", "",0
-                P: "UseMotionBlur", "bool", "", "",0
-                P: "UseRealTimeMotionBlur", "bool", "", "",1
-                P: "Motion Blur Intensity", "Number", "", "A",1
-                P: "AspectRatioMode", "enum", "", "",0
-                P: "AspectWidth", "double", "Number", "",320
-                P: "AspectHeight", "double", "Number", "",200
-                P: "PixelAspectRatio", "double", "Number", "",1
-                P: "FilmOffsetX", "Number", "", "A",0
-                P: "FilmOffsetY", "Number", "", "A",0
-                P: "FilmWidth", "double", "Number", "",0.816
-                P: "FilmHeight", "double", "Number", "",0.612
-                P: "FilmAspectRatio", "double", "Number", "",1.33333333333333
-                P: "FilmSqueezeRatio", "double", "Number", "",1
-                P: "FilmFormatIndex", "enum", "", "",0
-                P: "PreScale", "Number", "", "A",1
-                P: "FilmTranslateX", "Number", "", "A",0
-                P: "FilmTranslateY", "Number", "", "A",0
-                P: "FilmRollPivotX", "Number", "", "A",0
-                P: "FilmRollPivotY", "Number", "", "A",0
-                P: "FilmRollValue", "Number", "", "A",0
-                P: "FilmRollOrder", "enum", "", "",0
-                P: "ApertureMode", "enum", "", "",2
-                P: "GateFit", "enum", "", "",0
-                P: "FieldOfView", "FieldOfView", "", "A",25.1149997711182
-                P: "FieldOfViewX", "FieldOfViewX", "", "A",40
-                P: "FieldOfViewY", "FieldOfViewY", "", "A",40
-                P: "FocalLength", "Number", "", "A",34.8932762167263
-                P: "CameraFormat", "enum", "", "",0
-                P: "UseFrameColor", "bool", "", "",0
-                P: "FrameColor", "ColorRGB", "Color", "",0.3,0.3,0.3
-                P: "ShowName", "bool", "", "",1
-                P: "ShowInfoOnMoving", "bool", "", "",1
-                P: "ShowGrid", "bool", "", "",1
-                P: "ShowOpticalCenter", "bool", "", "",0
-                P: "ShowAzimut", "bool", "", "",1
-                P: "ShowTimeCode", "bool", "", "",0
-                P: "ShowAudio", "bool", "", "",0
-                P: "AudioColor", "Vector3D", "Vector", "",0,1,0
-                P: "NearPlane", "double", "Number", "",10
-                P: "FarPlane", "double", "Number", "",4000
-                P: "AutoComputeClipPanes", "bool", "", "",0
-                P: "ViewCameraToLookAt", "bool", "", "",1
-                P: "ViewFrustumNearFarPlane", "bool", "", "",0
-                P: "ViewFrustumBackPlaneMode", "enum", "", "",2
-                P: "BackPlaneDistance", "Number", "", "A",4000
-                P: "BackPlaneDistanceMode", "enum", "", "",1
-                P: "ViewFrustumFrontPlaneMode", "enum", "", "",2
-                P: "FrontPlaneDistance", "Number", "", "A",10
-                P: "FrontPlaneDistanceMode", "enum", "", "",1
-                P: "LockMode", "bool", "", "",0
-                P: "LockInterestNavigation", "bool", "", "",0
-                P: "BackPlateFitImage", "bool", "", "",0
-                P: "BackPlateCrop", "bool", "", "",0
-                P: "BackPlateCenter", "bool", "", "",1
-                P: "BackPlateKeepRatio", "bool", "", "",1
-                P: "BackgroundAlphaTreshold", "double", "Number", "",0.5
-                P: "ShowBackplate", "bool", "", "",1
-                P: "BackPlaneOffsetX", "Number", "", "A",0
-                P: "BackPlaneOffsetY", "Number", "", "A",0
-                P: "BackPlaneRotation", "Number", "", "A",0
-                P: "BackPlaneScaleX", "Number", "", "A",1
-                P: "BackPlaneScaleY", "Number", "", "A",1
-                P: "Background Texture", "object", "", ""
-                P: "FrontPlateFitImage", "bool", "", "",1
-                P: "FrontPlateCrop", "bool", "", "",0
-                P: "FrontPlateCenter", "bool", "", "",1
-                P: "FrontPlateKeepRatio", "bool", "", "",1
-                P: "Foreground Opacity", "double", "Number", "",1
-                P: "ShowFrontplate", "bool", "", "",1
-                P: "FrontPlaneOffsetX", "Number", "", "A",0
-                P: "FrontPlaneOffsetY", "Number", "", "A",0
-                P: "FrontPlaneRotation", "Number", "", "A",0
-                P: "FrontPlaneScaleX", "Number", "", "A",1
-                P: "FrontPlaneScaleY", "Number", "", "A",1
-                P: "Foreground Texture", "object", "", ""
-                P: "DisplaySafeArea", "bool", "", "",0
-                P: "DisplaySafeAreaOnRender", "bool", "", "",0
-                P: "SafeAreaDisplayStyle", "enum", "", "",1
-                P: "SafeAreaAspectRatio", "double", "Number", "",1.33333333333333
-                P: "Use2DMagnifierZoom", "bool", "", "",0
-                P: "2D Magnifier Zoom", "Number", "", "A",100
-                P: "2D Magnifier X", "Number", "", "A",50
-                P: "2D Magnifier Y", "Number", "", "A",50
-                P: "CameraProjectionType", "enum", "", "",0
-                P: "OrthoZoom", "double", "Number", "",1
-                P: "UseRealTimeDOFAndAA", "bool", "", "",0
-                P: "UseDepthOfField", "bool", "", "",0
-                P: "FocusSource", "enum", "", "",0
-                P: "FocusAngle", "double", "Number", "",3.5
-                P: "FocusDistance", "double", "Number", "",200
-                P: "UseAntialiasing", "bool", "", "",0
-                P: "AntialiasingIntensity", "double", "Number", "",0.77777
-                P: "AntialiasingMethod", "enum", "", "",0
-                P: "UseAccumulationBuffer", "bool", "", "",0
-                P: "FrameSamplingCount", "int", "Integer", "",7
-                P: "FrameSamplingType", "enum", "", "",1
-            }
-        }
-""")
 
     def __init__(self, subtype, btype, typeflags):
         CConnection.__init__(self, 'NodeAttribute', subtype, btype)
-        self.properties = None
         self.struct['TypeFlags'] = typeflags
 
 
     def parseNodes(self, pnodes):
         for pnode in pnodes:
             if pnode.key == 'Properties70':
-                self.properties = CProperties70().parse(pnode)
+                self.properties.parse(pnode)
             elif pnode.key == 'TypeFlags':
                 self.typeflags = pnode.values[0]
         return self    
 
-
-    def make(self, btype, props):
-        CConnection.make(self, btype)
-        if props:
-            self.properties = CProperties70().make(props)
-        if self.id == 0:
-            halt
-            
                     
             
 #------------------------------------------------------------------
@@ -401,22 +341,31 @@ class CModel(CConnection):
 
     def __init__(self, subtype, btype):
         CConnection.__init__(self, 'Model', subtype, btype)
-        self.properties = None
+        self.parseTemplate('Model', CModel.propertyTemplate)
+        self.setMulti([
+            ('Version', 232),
+            ('Shading', Y),
+            ('Culling', "CullingOff"),
+        ])
         self.rna = None
 
 
     def parseNodes(self, pnodes):
         for pnode in pnodes:
             if pnode.key == 'Properties70':
-                self.properties = CProperties70().parse(pnode)
+                self.properties.parse(pnode)
         return self    
 
 
     def make(self, rna):
         CConnection.make(self, rna)
         self.rna = rna
-        if rna.animation_data:
-            act = rna.animation_data.action
+        try:
+            adata = rna.animation_data
+        except AttributeError:
+            adata = None
+        if adata:
+            act = adata.action
             if act:
                 alayer = fbx.nodes.alayers[act.name]
                 CConnection.makeLink(alayer, self)

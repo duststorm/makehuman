@@ -45,6 +45,7 @@ class CGeometry(CConnection):
 
     def __init__(self, subtype='Mesh'):
         CConnection.__init__(self, 'Geometry', subtype, 'MESH')
+        self.parseTemplate('Mesh', CGeometry.propertyTemplate)
         self.isModel = True
         self.isObjectData = True
         self.mesh = None
@@ -85,6 +86,7 @@ class CGeometry(CConnection):
         me = ob.data
         CConnection.make(self, me)
         self.mesh = me
+        
         if fbx.usingMakeHuman:
             self.vertices.make( me.vertices )
             # self.normals.make( [v.no for v in me.vertices] )
@@ -137,17 +139,17 @@ class CGeometry(CConnection):
 
     def writeHeader(self, fp):
         CConnection.writeHeader(self, fp)            
-        self.vertices.writeProps(fp)
-        #self.normals.writeProps(fp)
-        self.faces.writeProps(fp)
+        self.vertices.writeObject(fp)
+        #self.normals.writeObject(fp)
+        self.faces.writeObject(fp)
         fp.write(
             '       GeometryVersion: 124\n')
         for layer in self.uvLayers:
-            layer.writeProps(fp)
+            layer.writeObject(fp)
         for layer in self.materialLayers:
-            layer.writeProps(fp)
+            layer.writeObject(fp)
         for layer in self.textureLayers:
-            layer.writeProps(fp)
+            layer.writeObject(fp)
 
         fp.write(
             '        Layer: 0 {\n' +
@@ -173,8 +175,8 @@ class CGeometry(CConnection):
         me = fbx.data[self.id]
         me.from_pydata(self.vertices.values, [], self.faces.values)
 
-        ob = self.getParent('OBJECT')
-        matNodes = ob.getChildren('MATERIAL')
+        obNode = self.getBParent('OBJECT')
+        matNodes = obNode.getBChildren('MATERIAL')
         for node in matNodes:
             mat = fbx.data[node.id]
             me.materials.append(mat)
@@ -265,10 +267,10 @@ class LayerElementUVNode(LayerElementNode):
         self.faces.make(faces)
         return self
         
-    def writeProps(self, fp):
+    def writeObject(self, fp):
         self.writeStart(fp)
-        self.vertices.writeProps(fp)
-        self.faces.writeProps(fp)
+        self.vertices.writeObject(fp)
+        self.faces.writeObject(fp)
         fp.write('        }\n')
 
     def build(self, me):
@@ -305,9 +307,9 @@ class LayerElementMaterialNode(LayerElementNode):
             self.materials.make(faces)
         return self
 
-    def writeProps(self, fp):
+    def writeObject(self, fp):
         self.writeStart(fp)
-        self.materials.writeProps(fp)
+        self.materials.writeObject(fp)
         fp.write('        }\n')
 
     def build(self, me):
@@ -345,7 +347,7 @@ class LayerElementTextureNode(LayerElementNode):
             self.textureAlpha = 1.0
         return self        
 
-    def writeProps(self, fp):
+    def writeObject(self, fp):
         self.writeStart(fp)
         if not self.hastex:
             fp.write(

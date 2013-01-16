@@ -60,6 +60,7 @@ class CMaterial(CConnection):
 
     def __init__(self, subtype=''):
         CConnection.__init__(self, 'Material', subtype, 'MATERIAL')        
+        self.parseTemplate('Material', CMaterial.propertyTemplate)
         self.isModel = True        
         self.textures = []
 
@@ -77,23 +78,16 @@ class CMaterial(CConnection):
         d = mat.diffuse_intensity
         s = mat.specular_intensity
        
-        self.properties = CProperties70().make([
-            CColorRGB().make("AmbientColor", (0,0,0)),
-            CColorRGB().make("DiffuseColor", d*mat.diffuse_color),
-            CColorRGB().make("TransparentColor", (1,1,1)),
-            CColorRGB().make("SpecularColor", s*mat.specular_color),
-            CVector3D().make("Emissive", (0,0,0)),
-            CVector3D().make("Ambient", (0,0,0)),
-            CVector3D().make("Diffuse", d*mat.diffuse_color),
-            CVector3D().make("Specular", s*mat.specular_color),
-            CDouble().make("Shininess", mat.specular_hardness),
-            CDouble().make("ShininessExponent", mat.specular_hardness),
-            CDouble().make("Opacity", mat.alpha),
-            CDouble().make("Reflectivity", 0),
+        self.setProps([
+            ("ShadingModel", "Phong"),
+            ("MultiLayer", 0),
+            ("DiffuseColor", mat.diffuse_color),
+            ("SpecularColor", mat.specular_color),
+            ("DiffuseFactor", mat.diffuse_intensity),
+            ("SpecularFactor", mat.specular_intensity),
+            ("ShininessExponent", mat.specular_hardness),
+            ("TransparencyFactor", mat.alpha),
         ])
-        
-        self.struct["ShadingModel"] = "phong"
-        self.struct["MultiLayer"] = 0
     
     
     def build(self):
@@ -112,7 +106,7 @@ class CMaterial(CConnection):
             elif node.name == "Opacity":
                 mat.alpha = value
 
-        texNodes = self.getChildren('TEXTURE')
+        texNodes = self.getBChildren('TEXTURE')
         for node in texNodes:
             tex = fbx.data[node.id]
             mtex = mat.texture_slots.add()

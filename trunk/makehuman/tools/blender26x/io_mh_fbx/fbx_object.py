@@ -55,7 +55,6 @@ class CObject(CModel):
 
 
     def parseNodes(self, pnodes):
-        print("Ob", pnodes)
         return CModel.parseNodes(self, pnodes)
         
 
@@ -64,9 +63,16 @@ class CObject(CModel):
         self.data = ob.data
         self.dataBtype = ob.type
 
+        self.setProps([
+            ("RotationActive", 1),
+            ("InheritType", 1),
+            ("ScalingMax", (0,0,0)),
+        ])    
+
         if ob.type == 'MESH':
             self.dataFtype = 'Mesh'
             self.datanode = fbx.nodes.meshes[ob.data.name]                  
+            self.setProp("DefaultAttributeIndex", 0)
         elif ob.type == 'ARMATURE':
             self.subtype = self.dataFtype = 'Null'
             self.datanode = fbx.nodes.armatures[ob.data.name]                  
@@ -81,32 +87,21 @@ class CObject(CModel):
         else:
             halt
             
-        props = [
-            CInt().make("DefaultAttributeIndex", 0),
-            ] + transformProps(ob.matrix_world)
-
-        self.properties = CProperties70().make(props)
-
         if self.datanode:
             self.datanode.makeLink(self)
             
-    
-    def getData(self):
-        for child in self.children:
-            print("  ", child)
-            if child.isObjectData:
-                return child.datum
-        halt                
-        return None
-        
+        if ob.parent:
+            parent = fbx.nodes.objects[ob.parent.name]
+            self.makeLink(parent)
+            
     
     def build(self):
         ob = fbx.data[self.id]
+        print("BLD", self, ob)
         if self.properties:
-            print("PROP", self)
-            ob.location = self.getProp("Lcl Translation", (0,0,0))
-            ob.rotation_euler = self.getProp("Lcl Rotation", (0,0,0))
-            ob.scale = self.getProp("Lcl Scaling", (1,1,1))
+            ob.location = self.getProp("Lcl Translation")
+            ob.rotation_euler = self.getProp("Lcl Rotation")
+            ob.scale = self.getProp("Lcl Scaling")
         return ob    
                 
 

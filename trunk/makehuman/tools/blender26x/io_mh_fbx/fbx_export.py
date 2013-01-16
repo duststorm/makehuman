@@ -202,7 +202,7 @@ Objects:  {
     for node in nodes:
         print("L", node)
         if node.active or fbx.settings.writeAllNodes:
-            node.writeProps(fp)
+            node.writeObject(fp)
 
     fp.write(
 """  

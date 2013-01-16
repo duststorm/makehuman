@@ -28,7 +28,6 @@ to believe that it runs under Blender when it is actually invoked by MakeHuman.
 from . import types
 from . import props
 from . import utils
-from .types import data
 
 #------------------------------------------------------------------
 #   Context
@@ -63,20 +62,38 @@ class Data:
 
 def initialize():
     global context, data
-    types.data = Data()
+    types.initialize()
+    data = Data()
     scn = types.Scene()
+    data.scenes.append(scn)
     context = Context(scn)
     
     
 def addMesh(name, mesh, isStuff=True):
+    global data
     me = types.Mesh(name)
+    data.meshes.append(me)
     if isStuff:
         me.fromStuff(mesh)
     else:
         me.fromMesh(mesh)
-    ob = types.Object(name, me)
-    scn = context.scene
-    scn.objects.append(ob)
+    ob = types.Object(name, me)    
+    data.objects.append(ob)
+    context.scene.objects.append(ob)
+    return ob
+    
+
+def addRig(name, rigData):
+    global data
+    (heads, tails, newHier, bones, weights) = rigData
+    
+    amt = types.Armature(name, rigData)
+    data.armatures.append(amt)
+    rig = types.Object(name, amt)
+    data.objects.append(rig)
+    print(amt, rig)
+    context.scene.objects.append(rig)
+    return rig
     
 
 initialize()

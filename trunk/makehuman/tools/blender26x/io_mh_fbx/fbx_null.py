@@ -32,15 +32,19 @@ class CNull(CModel):
         CModel.__init__(self, subtype, 'NULL')
         self.node = None
 
+
     def getBtype(self):
         for child in self.children:
-            print("  ", child)
             if child.subtype == 'LimbNode':
                 self.node = child
                 return 'ARMATURE'
-            elif child.ftype == 'Model':
+
+        for child in self.children:
+            if child.ftype == 'Model':
                 return 'SCENE'
+
         return 'EMPTY'
+
         
     def build(self):
         btype = self.getBtype()

@@ -26,6 +26,8 @@ import os
 import sys
 import export_config
 import object_collection
+import mh2collada
+
 
 fbxpath = "tools/blender26x"
 if fbxpath not in sys.path:
@@ -40,6 +42,10 @@ def exportFbx(human, filepath, options):
     cfg = export_config.exportConfig(human, True)
     cfg.separatefolder = True
 
+    rigfile = "data/rigs/%s.rig" % options["fbxrig"]
+    print("Using rig file %s" % rigfile)
+    amt = mh2collada.getArmatureFromRigFile(rigfile, human.meshData)
+
     stuffs = object_collection.setupObjects(os.path.splitext(filepath)[0], human,
         helpers=options["helpers"], 
         hidden=options["hidden"], 
@@ -52,13 +58,17 @@ def exportFbx(human, filepath, options):
     (path, ext) = os.path.splitext(outfile)
 
     bpy.initialize()
+    name = os.path.splitext(os.path.basename(filepath))[0]
+    rig = bpy.addRig(name, amt)
     for stuff in stuffs:
-    	bpy.addMesh(stuff.name, stuff, True)
-    	
+        ob = bpy.addMesh(stuff.name, stuff, True)
+        ob.parent = rig
+        
     #name = os.path.splitext(os.path.basename(filepath))[0]
     #bpy.addMesh(name, human.meshData, False)
     
     filename = "%s.fbx" % path
+    print("Mh2Fbx", bpy.context.scene.objects)
     io_mh_fbx.fbx_export.exportFbxFile(bpy.context, filename)
     return
 

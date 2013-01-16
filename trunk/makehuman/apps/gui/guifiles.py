@@ -300,6 +300,8 @@ class ExportTaskView(gui3d.TaskView):
         self.fbxSmooth = self.fbxOptions.addWidget(gui.CheckBox( "Subdivide", False))
         scales = []
         self.fbxScales = self.addScales(self.fbxOptions, scales, "Obj", True)
+        rigs = []
+        self.fbxRigs = self.addRigs(self.fbxOptions, rigs, "Fbx", True)
 
         # MHX options
         """
@@ -473,7 +475,11 @@ class ExportTaskView(gui3d.TaskView):
                 
                 human = gui3d.app.selectedHuman
 
+                for (button, rig) in self.fbxRigs:
+                    if button.selected:
+                        break                
                 options = {
+                    "fbxrig" : rig,
                     "helpers" : self.fbxHelpers.selected,
                     "hidden" : self.fbxHidden.selected,
                     "eyebrows" : self.fbxEyebrows.selected,

@@ -42,18 +42,18 @@ class CArmature(CConnection):
         self.deformers = []
         self.object = None
 
-    def make(self, ob):
-        CConnection.make(self, ob)
-        self.object = fbx.nodes.objects[ob.name]
-        for bone in ob.data.bones:
+    def make(self, rig):
+        CConnection.make(self, rig)
+        self.object = fbx.nodes.objects[rig.name]
+        for bone in rig.data.bones:
             if bone.parent == None:
                 self.roots.append(bone)                
         for root in self.roots:
             self.makeBones(root, self.object)
         if self.pose:
-            self.pose.make(ob, self.bones)
+            self.pose.make(rig, self.bones)
         for deformer in self.deformers:
-            deformer.make()
+            deformer.make(rig)
         return self            
         
         
@@ -66,9 +66,12 @@ class CArmature(CConnection):
 
 
     def addDeformer(self, node, ob):
+        deformer = CDeformer().set(self, node, ob)
+        if deformer is None:
+            halt
+        self.deformers.append(deformer)
         if not self.pose:
             self.pose = CPose()
-        self.deformers.append(CDeformer(self, node, ob))
     
     
     def addDefinition(self, definitions):            
@@ -77,17 +80,16 @@ class CArmature(CConnection):
         if self.pose:
             self.pose.addDefinition(definitions)
         for deformer in self.deformers:
-            print("DD", deformer)
             deformer.addDefinition(definitions)
 
 
-    def writeProps(self, fp):
+    def writeObject(self, fp):
         for bone in self.boneList:
-            bone.writeProps(fp)
+            bone.writeObject(fp)
         if self.pose:
-            self.pose.writeProps(fp)            
+            self.pose.writeObject(fp)  
         for deformer in self.deformers:
-            deformer.writeProps(fp)
+            deformer.writeObject(fp)
 
     
     def writeLinks(self, fp):
@@ -100,19 +102,20 @@ class CArmature(CConnection):
             
 
     def buildArmature(self, parent):
-        print("BA", self, parent)
         ob = fbx.data[parent.id]
         scn = bpy.context.scene
         old = scn.objects.active
         scn.objects.active = ob
 
         infos = {}
-        for root in parent.children:
-            BoneInfo(root, infos).collect(root, infos, None)
+        for child in parent.children:
+            if isinstance(child, CBone):
+                BoneInfo(child, infos).collect(child, infos, None)
 
         bpy.ops.object.mode_set(mode='EDIT')        
-        for root in parent.children:
-            root.buildBone(infos, ob.data)        
+        for child in parent.children:
+            if isinstance(child, CBone):
+                child.buildBone(infos, ob.data)        
         bpy.ops.object.mode_set(mode='OBJECT')        
         scn.objects.active = old
 
@@ -139,7 +142,7 @@ class CPose(CConnection):
             else:
                 rest.append(pnode)
 
-        return CFbx.parseNodes(self, rest)
+        return CConnection.parseNodes(self, rest)
 
 
     def make(self, ob, bones):
@@ -162,7 +165,7 @@ class CPose(CConnection):
             '        Version: 100\n' +
             '        NbPoseNodes: %d\n' % len(self.poses))
         for pose in self.poses:
-            pose.writeProps(fp)
+            pose.writeObject(fp)
                         
 
     def build(self):
@@ -174,9 +177,6 @@ class CPose(CConnection):
         bpy.ops.mode_set(mode='EDIT')        
         for bone in self.boneList:
             bone.build()
-        for bone in self.boneList:
-            for child in bone.children:
-                child.datum.parent = bone.datum
 
         scn.objects.active = old
         return poses
@@ -210,16 +210,16 @@ class CPoseNode(CFbx):
     def make(self, node, matrix):
         CFbx.make(self)
         self.node = node
-        self.matrix = CArray('PoseNode', float, 4).make(matrix, csys=(True,False))
+        self.matrix = CArray('PoseNode', float, 4, csys=(True,False)).make(matrix)
         fbx.matrices[self.node.id] = self.matrix
         return self
         
         
-    def writeProps(self, fp):
+    def writeObject(self, fp):
         fp.write(
             '        PoseNode:  {\n' +
             '            Node: %d\n' % (self.node.id))
-        self.matrix.writeProps(fp)
+        self.matrix.writeObject(fp)
         fp.write('        }\n')
         
 #------------------------------------------------------------------
@@ -228,7 +228,7 @@ class CPoseNode(CFbx):
 
 class CBoneAttribute(CNodeAttribute):
     def __init__(self, subtype='LimbNode'):
-        CNodeAttribute.__init__(self, subtype, 'BONE', "Skeleton")
+        CNodeAttribute.__init__(self, subtype, 'BONEATTR', "Skeleton")
 
 
 class CBone(CModel):
@@ -243,12 +243,32 @@ class CBone(CModel):
         CModel.make(self, bone)
         self.parent = parent
         if bone.parent:
-            mat = bone.parent.matrix_local.inverted() * bone.matrix_local
+            pmat = bone.parent.matrix_local.inverted()
+            if fbx.usingMakeHuman:
+                mat = pmat.mult(bone.matrix_local)
+            else:
+                mat = pmat * bone.matrix_local
         else:
             mat = bone.matrix_local
-        props = transformProps(mat) + defaultProps()
-        self.properties = CProperties70().make(props)
-        self.attribute.make(bone, [])
+        (loc,rot,scale) = mat.decompose()
+
+        if fbx.usingMakeHuman:
+            euler = Vector(rot.to_euler()).mult(D)
+        else:
+            euler = Vector(rot.to_euler())*D
+
+        self.setProps([
+            ("RotationActive", 1),
+            ("InheritType", 1),
+            ("ScalingMax", (0,0,0)),
+            ("DefaultAttributeIndex", 0),
+
+            ("Lcl Translation", loc),
+            ("Lcl Rotation", euler),
+            ("Lcl Scaling", (1,1,1))
+        ])
+
+        self.attribute.make(bone)
         return self
         
 
@@ -263,12 +283,11 @@ class CBone(CModel):
 
     
     def writeHeader(self, fp):
-        self.attribute.writeProps(fp)
+        self.attribute.writeObject(fp)
         CModel.writeHeader(self, fp)   
 
     
     def build(self):            
-        print("BB", self)
         return None
 
        
@@ -295,7 +314,7 @@ class BoneInfo:
         self.tail = None
         self.roll = None
         self.parent = None
-        self.matrix_local = None
+        self.restMat = None
         self.matrix = None
         self.children = []
         
@@ -304,42 +323,33 @@ class BoneInfo:
    
    
     def collect(self, node, infos, parent):   
-        trans = Vector(node.getProp("Lcl Translation", (0,0,0)))
-        rot = node.getProp("Lcl Rotation", (0,0,0))
-        scale = node.getProp("Lcl Scaling", (1,1,1))
+        trans = Vector(node.getProp("Lcl Translation"))
+        rot = node.getProp("Lcl Rotation")
+        scale = node.getProp("Lcl Scaling")
         euler = Euler(Vector(rot)*R)        
         quat = euler.to_quaternion()
         rmat = euler.to_matrix()
-        self.matrix_local = rmat.to_4x4() * Matrix.Translation(trans)
+
+        self.restMat = composeMatrix(trans,rmat,scale)
         if parent:
-            self.matrix = self.matrix_local * parent.matrix
+            self.matrix = parent.matrix * self.restMat
         else:
-            self.matrix = self.matrix_local
-        
-        if self.name in ["Root", "Torso", "Arm_L"]:
-            print("")        
-            print(self)
-            print(trans)
-            print(rot)
-            print(quat)
-            print(rmat)
-            print(self.matrix_local)
-            print(self.matrix)
+            self.matrix = self.restMat
+        self.head = Vector( self.matrix.col[3][:3] )
         
         self.parent = parent
-        self.head = Vector( self.matrix.col[3][0:3] )
 
         sum = Vector((0,0,0))
         nChildren = 0
         for child in node.children:
-            if isinstance(child, CBone):
+            if child.btype == 'BONE':
                 cinfo = BoneInfo(child, infos).collect(child, infos, self)
                 self.children.append(cinfo)
                 sum += cinfo.head
                 nChildren += 1
                     
         if nChildren > 0:                    
-            self.tail = self.head + sum/nChildren
+            self.tail = sum/nChildren
         else:
             self.tail = self.head + Vector( self.matrix.col[1][:3] )
 
@@ -348,11 +358,14 @@ class BoneInfo:
         else:
             self.roll = -2*math.atan(quat.y/quat.w)
         
-        print(self.name, self.head)
-        #print("  ", self.head)
-        #print("  ", self.tail)
         return self
 
+
+def composeMatrix(loc,rot,scale):
+    mat = rot.to_4x4()
+    mat.col[3][:3] = loc
+    mat.row[3][:3] = (0,0,0)
+    return mat
      
 #------------------------------------------------------------------
 #   Deformer
@@ -360,32 +373,37 @@ class BoneInfo:
 
 class CDeformer(CConnection):
 
-    def __init__(self, rigNode, meshNode, ob, subtype=''):
+    def __init__(self, subtype='Skin'):
         CConnection.__init__(self, 'Deformer', subtype, 'DEFORMER')
+        self.rigNode = None
+        self.meshNode = None
+        self.object = None
+        self.subdeformers = {}
+        
+   
+    def set(self, rigNode, meshNode, ob):
         self.rigNode = rigNode
         self.meshNode = meshNode
         self.object = ob
-        print("CD", rigNode, meshNode)
-        self.subdeformers = {}
-        
-        
-    def make(self):
-        CConnection.make(self, self.rigNode)
-        for vg in self.object.vertex_groups:
+        return self
+    
+    
+    def make(self, rig):
+        CConnection.make(self, rig)
+        for vgroup in self.object.vertex_groups:
             try:
-                bone = self.rigNode.bones[vg.name].datum
+                bone = rig.data.bones[vgroup.name]
             except KeyError:
-                continue
-                #bone = None
-            subdef = CSubDeformer().make(self.object, vg.index, bone)
-            self.subdeformers[vg.index] = subdef
+                bone = None
+            if bone:
+                subdef = CSubDeformer().make(vgroup, bone, self.object)
+                self.subdeformers[vgroup.index] = subdef
         return self
 
     
     def addDefinition(self, definitions):     
         CConnection.addDefinition(self, definitions)
         for subdef in self.subdeformers.values():
-            print("SD", subdef)
             subdef.addDefinition(definitions)
 
 
@@ -402,13 +420,25 @@ class CDeformer(CConnection):
     
     def writeHeader(self, fp):
         for subdef in self.subdeformers.values():
-            subdef.writeHeader(fp)
+            subdef.writeObject(fp)
         CConnection.writeHeader(self, fp)
         
 
-    def build(self, ob):        
-        for subdef in self.subdeformers.values():
-            subdef.build(ob)
+    def build(self):        
+        meNode = self.getBParent('MESH')
+        obNode = meNode.getBParent('OBJECT') 
+        ob = fbx.data[obNode.id]
+
+        rigNode = obNode.getFParent2('Model', 'Null')
+        if rigNode:
+            rig = fbx.data[rigNode.id]
+            mod = ob.modifiers.new(rig.name, 'ARMATURE')
+            mod.object = rig
+            mod.use_bone_envelopes = False
+            mod.use_vertex_groups = True
+        
+        for child in self.children:
+            child.buildVertGroups(ob)
             
  
  #------------------------------------------------------------------
@@ -417,8 +447,8 @@ class CDeformer(CConnection):
  
 class CSubDeformer(CConnection):
  
-    def __init__(self, subtype=''):
-         CConnection.__init__(self, 'SubDeformer', subtype, 'DEFORMER')
+    def __init__(self, subtype='Cluster'):
+         CConnection.__init__(self, 'Deformer', subtype, 'DEFORMER')
          self.indexes = CArray('Indexes', int, 1)
          self.weights = CArray('Weights', float, 1)
          self.transform = CArray('Transform', float, 4)
@@ -441,13 +471,13 @@ class CSubDeformer(CConnection):
         return CConnection.parseNodes(self, rest)
 
 
-    def make(self, ob, index, bone):
-        CConnection.make(self, bone)
+    def make(self, vgroup, bone, ob):
+        CConnection.make(self, vgroup)
         vnums = []
         weights = []
         for v in ob.data.vertices:
             for g in v.groups:
-                if g.group == index:
+                if g.group == vgroup.index:
                     vnums.append(v.index)
                     weights.append(g.weight)
         self.indexes.make(vnums)
@@ -460,18 +490,22 @@ class CSubDeformer(CConnection):
 
     def writeHeader(self, fp):
         CConnection.writeHeader(self, fp)
-        self.indexes.writeProps(fp)
-        self.weights.writeProps(fp)
-        self.transform.writeProps(fp)
-        self.transformLink.writeProps(fp)
+        self.indexes.writeObject(fp)
+        self.weights.writeObject(fp)
+        self.transform.writeObject(fp)
+        self.transformLink.writeObject(fp)
         
         
-    def build(self, ob):
+    def buildVertGroups(self, ob):
         vg = ob.vertex_groups.new(self.name)
-        for n,vn in enumerate(self.indexes.values):
+        for n,vn in enumerate(self.indexes.values):        
             w = self.weights.values[n]
             vg.add([vn], w, 'REPLACE')
 
+
+    def build(self):
+        return None
+        
 
 print("fbx_armature imported")
 

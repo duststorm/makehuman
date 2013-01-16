@@ -54,9 +54,9 @@ class CTexture(CConnection):
 
     def __init__(self, subtype=''):
         CConnection.__init__(self, 'Texture', subtype, 'TEXTURE')        
+        self.parseTemplate('Texture', CTexture.propertyTemplate)
         self.isModel = True 
         self.image = None
-        self.properties = CProperties70()
 
         
     def parseNodes(self, pnodes):
@@ -76,16 +76,18 @@ class CTexture(CConnection):
             self.image = fbx.nodes.images[img.name].make(img)
             fbx.nodes.images[img.name].makeLink(self)
             
-        self.struct["Version"] = 202           
-        self.struct["TextureName"] = "Texture::%s" % self.name           
-        self.struct["Media"] = "Video::%s" % self.image.name            
-        self.struct["Filename"] = self.image.struct["Filename"]           
-        self.struct["RelativeFilename"] = self.image.struct["RelativeFilename"]            
-        self.struct["ModelUVTranslation"] = 0,0           
-        self.struct["ModelUVScaling"] = 1,1           
-        self.struct["Texture_Alpha_Source"] = "None"          
-        self.struct["Cropping"] = 0,0           
-        self.struct["ModelUVTranslation"] = 0,0,0,0          
+        self.setMulti([
+            ("Version", 202),          
+            ("TextureName", "Texture::%s" % self.name),
+            ("Media", "Video::%s" % self.image.name),
+            ("Filename", self.image.struct["Filename"]),           
+            ("RelativeFilename", self.image.struct["RelativeFilename"]),
+            ("ModelUVTranslation", (0,0)),           
+            ("ModelUVScaling", (1,1)),
+            ("Texture_Alpha_Source", "None"),       
+            ("Cropping", (0,0)),
+            ("ModelUVTranslation", (0,0,0,0)),
+        ])
         
 
     def writeHeader(self, fp):   
@@ -94,7 +96,7 @@ class CTexture(CConnection):
 
     def build(self):
         tex = fbx.data[self.id]
-        nodes = self.getChildren('IMAGE')
+        nodes = self.getBChildren('IMAGE')
         node = nodes[0]
         print("B", node, node.image)
         #img = fbx.data[nodes[0].id]

@@ -29,6 +29,40 @@ from .fbx_model import *
 #------------------------------------------------------------------
 
 class CLamp(CNodeAttribute):
+    propertyTemplate = (
+"""    
+        PropertyTemplate: "FbxLight" {
+            Properties70:  {
+                P: "Color", "Color", "", "A",1,1,1
+                P: "LightType", "enum", "", "",0
+                P: "CastLightOnObject", "bool", "", "",1
+                P: "DrawVolumetricLight", "bool", "", "",1
+                P: "DrawGroundProjection", "bool", "", "",1
+                P: "DrawFrontFacingVolumetricLight", "bool", "", "",0
+                P: "Intensity", "Number", "", "A",100
+                P: "InnerAngle", "Number", "", "A",0
+                P: "OuterAngle", "Number", "", "A",45
+                P: "Fog", "Number", "", "A",50
+                P: "DecayType", "enum", "", "",0
+                P: "DecayStart", "Number", "", "A",0
+                P: "FileName", "KString", "", "", ""
+                P: "EnableNearAttenuation", "bool", "", "",0
+                P: "NearAttenuationStart", "Number", "", "A",0
+                P: "NearAttenuationEnd", "Number", "", "A",0
+                P: "EnableFarAttenuation", "bool", "", "",0
+                P: "FarAttenuationStart", "Number", "", "A",0
+                P: "FarAttenuationEnd", "Number", "", "A",0
+                P: "CastShadows", "bool", "", "",0
+                P: "ShadowColor", "Color", "", "A",0,0,0
+                P: "AreaLightShape", "enum", "", "",0
+                P: "LeftBarnDoor", "Float", "", "A",20
+                P: "RightBarnDoor", "Float", "", "A",20
+                P: "TopBarnDoor", "Float", "", "A",20
+                P: "BottomBarnDoor", "Float", "", "A",20
+                P: "EnableBarnDoor", "Bool", "", "A",0
+            }
+        }
+""")        
 
     def __init__(self):
         CNodeAttribute.__init__(self, "Light", "Light", 'LAMP')
@@ -37,11 +71,14 @@ class CLamp(CNodeAttribute):
             
     def make(self, ob):
         self.lamp = ob.data
-        props = [
-        ]            
-        CNodeAttribute.make(self, ob.data, props)
-        self.struct["GeometryVersion"] = 124
         
-    def writeProps(self, fp):
-        CNodeAttribute.writeProps(self, fp)
+        self.setProps([
+        ])
+        CNodeAttribute.make(self, ob.data)
+        self.struct["GeometryVersion"] = 124
+
+    def build(self):
+        lamp = fbx.data[self.id]
+        return lamp
+        
 

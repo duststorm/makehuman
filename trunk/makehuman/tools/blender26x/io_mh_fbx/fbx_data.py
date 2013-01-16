@@ -204,7 +204,9 @@ def buildObjects(context):
         elif node.ftype == "AnimationStack":
             data = bpy.data.actions.new(node.name)
         elif node.ftype == "AnimationCurve":
-            data = bpy.data.fcurve.new(node.name)
+            data = bpy.data.fcurves.new(node.name)
+        elif node.ftype == "Pose":
+            data = node
         else:
             continue
             
@@ -251,7 +253,12 @@ def buildObjects(context):
             node.build()
 
     for node in fbx.nodes.values():
-        if node.ftype != "Video":
+        if node.ftype not in ["Video", "Pose", "Deformer"]:
+            print("  ", node)
+            node.build()
+        
+    for node in fbx.nodes.values():
+        if node.ftype in ["Deformer"]:
             print("  ", node)
             node.build()
         
@@ -261,8 +268,12 @@ def buildObjects(context):
 #------------------------------------------------------------------
 
 def activateData(datum):
+    print("ACT", datum, isinstance(datum, bpy.types.Armature))
 
-    if isinstance(datum, bpy.types.Object):
+    if datum is None:
+        return
+        
+    elif isinstance(datum, bpy.types.Object):
         fbx.active.objects[datum.name] = datum        
         activateData(datum.data)
 
@@ -277,9 +288,10 @@ def activateData(datum):
     elif isinstance(datum, bpy.types.Material):
         fbx.active.materials[datum.name] = datum        
         for mtex in datum.texture_slots:
-            tex = mtex.texture
-            if tex and tex.type == 'IMAGE':
-                activateData(tex)
+            if mtex:
+                tex = mtex.texture
+                if tex and tex.type == 'IMAGE':
+                    activateData(tex)
 
     elif isinstance(datum, bpy.types.Texture):
         fbx.active.textures[datum.name] = datum      
@@ -297,14 +309,15 @@ def activateData(datum):
         fbx.active.lamps[datum.name] = datum        
 
     elif isinstance(datum, bpy.types.Scene):
-        fbx.active.scenes[datum.name] = datum     
+        if fbx.settings.makeSceneNode:
+            fbx.active.scenes[datum.name] = datum         
         for ob in datum.objects:
             activateData(ob)
 
     if datum.animation_data:
         act = datum.animation_data.action
         if act:
-            fbx.active.actions[datum.name] = datum        
+            fbx.active.actions[act.name] = act
 
 #------------------------------------------------------------------
 #   Making
@@ -339,8 +352,11 @@ def makeNodes(context):
         #elif ob.type == 'EMPTY':
         #    pass
         else:
+            print("Unrecognized object", ob)
+            halt
             continue
         fbx.nodes.objects[ob.name] = fbx_object.CObject(ob.type)
+        print("Create", fbx.nodes.objects[ob.name])
         
     for mat in fbx.active.materials.values():
         fbx.nodes.materials[mat.name] = fbx_material.CMaterial()
@@ -361,6 +377,7 @@ def makeNodes(context):
     # Third pass: make the nodes
     
     for act in fbx.active.actions.values():        
+        print("TA", act)
         fbx.nodes.astacks[act.name].make(act)
             
     for ob in fbx.active.objects.values():
@@ -370,11 +387,15 @@ def makeNodes(context):
             fbx.nodes.objects[ob.name].make(ob)
             rig = ob.parent
             if rig and rig.type == 'ARMATURE':
+                print("XX", rig, node, ob)
+                print(fbx.nodes.armatures.items())
                 fbx.nodes.armatures[rig.data.name].addDeformer(node, ob)             
 
     for ob in fbx.active.objects.values():
         if ob.type == 'ARMATURE':
-            fbx.nodes.armatures[ob.data.name].make(ob)
+            amt = fbx.nodes.armatures[ob.data.name]
+            print("AMT", amt)
+            amt.make(ob)
             fbx.nodes.objects[ob.name].make(ob)
 
     for ob in fbx.active.objects.values():
@@ -400,14 +421,24 @@ def makeNodes(context):
 
     for scn in fbx.active.scenes.values():
         fbx.nodes.scenes[scn.name].make(scn)
-        
+       
 
+    # Fourth pass: link actions
+    """
+    nodes = fbx.nodes.getAllNodes()
+    for node in nodes:
+        
+        if node.datum and node.datum.animation_data:
+            act = node.data.animation_data.action
+            if act:
+                fbx.nodes.astacks[act.name].makeLink(node)
+    """            
 
 def makeTakes(context):
 
     fbx.takes = {}
     
-    for act in fbx.active.actions:   
+    for act in fbx.active.actions.values():   
         fbx.takes[act.name] = fbx_anim.CTake().make(context.scene, act)
     
 

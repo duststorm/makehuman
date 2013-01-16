@@ -42,6 +42,19 @@ resetFbx()
 R = math.pi/180
 D = 180/math.pi
 
+class FbxBool:
+    def __init__(self, value):
+        self.value = value
+        
+    def __repr__(self):
+        if self.value:
+            return "Y"
+        else:
+            return "N"
+            
+Y = FbxBool(True)
+N = FbxBool(False)
+
 #------------------------------------------------------------------
 #   CFbx
 #------------------------------------------------------------------
@@ -63,15 +76,18 @@ class CFbx:
     def parse(self, pnode):
         return self
         
-    def make(self):
+    def identify(self):
         self.id = fbx.idnum
         fbx.idnum += 16
         return self
         
+    def make(self):
+        self.identify()        
+        
     def __repr__(self):
         return ("<Node %d %s %s %s>" % (self.id, self.ftype, self.name, self.isModel))
 
-    def writeProps(self, fp):
+    def writeObject(self, fp):
         return
               
     def writeLinks(self, fp):
@@ -86,9 +102,12 @@ class CFbx:
         except KeyError:
             defi = None
         if defi is None:
-            try:
-                template = self.propertyTemplate
-            except:
+            if fbx.settings.includePropertyTemplates:
+                try:
+                    template = self.propertyTemplate
+                except:
+                    template = "\n"
+            else:
                 template = "\n"
             defi = Definition(template, 0)
         defi.count += 1
@@ -164,6 +183,7 @@ class CArray(CFbx):
                     
 
     def make(self, values):
+        print("ARR", values)
         self.values = values
         self.size = len(self.flattenValues(values))
         return self
@@ -203,7 +223,7 @@ class CArray(CFbx):
             return values                    
 
 
-    def writeProps(self, fp):
+    def writeObject(self, fp):
         if self.csys and fbx.settings.changeCsys:
             self.changeCsys(csysB2F, csysF2B)
         vec = self.flattenValues(self.values)
@@ -216,6 +236,7 @@ class CArray(CFbx):
             fp.write(self.format % (c,x))
             c = ','
         fp.write('\n            }\n')
+        
 
 
 #------------------------------------------------------------------

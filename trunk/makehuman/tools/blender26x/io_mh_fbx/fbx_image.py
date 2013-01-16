@@ -54,6 +54,7 @@ class CImage(CConnection):
 
     def __init__(self, subtype=''):
         CConnection.__init__(self, 'Video', subtype, 'IMAGE')        
+        self.parseTemplate('Video', CImage.propertyTemplate)
         self.isModel = True    
         self.image = None
 
@@ -65,8 +66,8 @@ class CImage(CConnection):
         self.struct["Type"] = "Clip"
         self.struct["UseMipMap"] = 0
 
-        self.properties = CProperties70().make([
-            CString("KString", "XRefUrl").make("Path", self.struct["Filename"])
+        self.setProps([
+            ("Path", self.struct["Filename"])
         ])
         return self
     

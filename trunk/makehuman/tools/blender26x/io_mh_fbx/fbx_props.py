@@ -20,6 +20,7 @@ import bpy
 import sys
 import math
 from . import fbx
+from . import fbx_token
 from .fbx_basic import *
 
 #------------------------------------------------------------------
@@ -31,12 +32,66 @@ class CProperties70(CFbx):
         CFbx.__init__(self, "Properties70")
         self.properties = {}
         
+
+    def parseTemplate(self, ftype, template):
+        try:
+            return fbx.templates[ftype]
+        except KeyError:
+            pass
+        
+        proplist = fbx_token.tokenizePropertyString(template)
+        struct = {}
+        for prop in proplist:
+            struct[prop[0]] = CPropertyTemplate(prop)
+        
+        fbx.templates[ftype] = struct
+        return struct
+        
+    
+    def setProp(self, key, value, template):
+        try:
+            prop = self.properties[key]
+        except KeyError:
+            prop = None
+        if prop is None:
+            prop = self.properties[key] = template[key].newProp(key)
+        prop.value = value
+        prop.isSet = True
+        
+            
+            
+    def getProp(self, key, template):
+        try:
+            return self.properties[key].value
+        except KeyError:
+            pass         
+        return template[key].value
+
+    
+    def write(self, fp, template):
+        if not self.properties:
+            return
+        fp.write('        Properties70:  {\n')
+        for key,prop in self.properties.items():
+            if prop.isSet:
+                prop.write(fp)
+            else:
+                default = template[key].value
+                if prop.differ(template[key].value):
+                    prop.write(fp)
+        fp.write('        }\n')
+
+
     def parse(self, pnode0):    
         global TypedNode
         for pnode in pnode0.values:
             if pnode.key == "P":
-                nodeType = TypedNode[pnode.values[1]]
-                node = nodeType().parse(pnode)
+                name = pnode.values[0]
+                ftype = pnode.values[1]
+                supertype = pnode.values[2]
+                anim = pnode.values[3]
+                name = pnode.values[0]
+                node = newProp(name, ftype, supertype, anim).parse(pnode)
                 self.properties[node.name] = node
         return self                
 
@@ -46,56 +101,118 @@ class CProperties70(CFbx):
         for node in props:
             self.properties[node.name] = node
         return self
-        
-    def writeProps(self, fp):
-        fp.write('        Properties70:  {\n')
-        for prop in self.properties.values():
-            prop.writeProp(fp)
-        fp.write('        }\n')
+
 
     def nodes(self):        
         return self.properties.values()
+
+
+#------------------------------------------------------------------
+#   New prop
+#------------------------------------------------------------------
+
+SimpleTypes = [
+        "int", "float", "bool", "enum", "double", "Number",
+        "ULongLong",
+        "FieldOfView",
+        "Time", "KTime",
+        "Visibility", "Visibility Inheritance"
+]
+    
+StringTypes = [
+        "KString", "object", "Url", "DateTime"
+]
+    
+VectorTypes = [
+        "Vector", "Vector3D",
+        "Lcl Translation", "Lcl Rotation", "Lcl Scaling",
+        "Color", "ColorRGB"
+]
+    
+CompoundTypes = [
+        "Compound",
+]
+
+def newProp(name, ftype, supertype, anim):        
+    if ftype in SimpleTypes:
+       prop = CProperty(name, ftype, supertype, anim)
+    elif ftype in VectorTypes:
+        prop = CVectorProperty(name, ftype, supertype, anim)
+    elif ftype in StringTypes:
+        prop = CStringProperty(name, ftype, supertype, anim)
+    elif ftype in CompoundTypes:
+        prop = CCompoundProperty(name, ftype, supertype, anim)
+    else:
+        print("Unknown proptype", ftype)
+        halt
+    return prop
         
-    def getProp(self, name, default):
-        try:
-            return self.properties[name].value
-        except KeyError:
-            return default
+#------------------------------------------------------------------
+#   Property template node
+#------------------------------------------------------------------
+
+class CPropertyTemplate:
+    
+    def __init__(self, values):
+        self.name = values[0]
+        self.ftype = values[1]
+        self.supertype = values[2]
+        self.anim = values[3]
+        if len(values) == 5:
+            self.value = values[4]
+        else:
+            self.value = tuple(values[4:])
+        
+    def __repr__(self):
+        return ("<PropTemplate n %s t %s s %s a %s v %s>" % (self.name, self.ftype, self.supertype, self.anim, self.value))
             
+    def newProp(self, name):
+        return newProp(name, self.ftype, self.supertype, self.anim)
+        
+            
+        
 #------------------------------------------------------------------
 #   Property node
 #------------------------------------------------------------------
 
 class CProperty(CFbx):
 
-    def __init__(self, type, supertype):
-        CFbx.__init__(self, type)
+    def __init__(self, name, ftype, supertype, anim):
+        CFbx.__init__(self, ftype)
+        self.name = name
         self.value = None
         self.supertype = supertype
-        self.a = ""
+        self.anim = anim
+        self.isSet = False
         
+    def __repr__(self):
+        return ("<CProperty n:%s v:%s t:%s s:%s a:%s i:%s>" % 
+                (self.name, self.value, self.ftype, self.supertype, self.anim, self.isSet))     
+    
     def parse(self, pnode0):
         values = pnode0.values
         self.name = values[0]
         self.ftype = values[1]
         self.supertype = values[2]
-        self.a = values[3]
+        self.anim = values[3]
         if len(values) > 5:
             self.value = values[4:]
         else:
             self.value = values[4]
         return self    
 
-    def make(self, name, value, a=""):
+    def set(self, name, value, anim):
         self.name = name
         self.value = value
-        self.a = a
+        self.anim = anim
         return self
 
-    def writeProp(self, fp):
-        print(self.name, self.ftype, self.supertype, self.a)
-        print(self.value)
-        fp.write('            P: "%s", "%s", "%s", "%s", %s\n' % (self.name, self.ftype, self.supertype, self.a, self.flatten()))
+    def differ(self, value):
+        return (self.value != value)
+        
+        
+    def write(self, fp):
+        fp.write('            P: "%s", "%s", "%s", "%s", %s\n' % (self.name, self.ftype, self.supertype, self.anim, self.flatten()))
 
     def flatten(self):
         return self.value
@@ -104,127 +221,26 @@ class CProperty(CFbx):
         return self.value
 
 
-#------------------------------------------------------------------
-#   Property nodes
-#------------------------------------------------------------------
-
-class CInt(CProperty):
-
-    def __init__(self):
-        CProperty.__init__(self, "int", "Integer")
-
-    
-class CBool(CProperty):
-
-    def __init__(self):
-        CProperty.__init__(self, "bool", "")
-
-    
-class CEnum(CProperty):
-
-    def __init__(self):
-        CProperty.__init__(self, "enum", "")
-
-    
-class CDouble(CProperty):
-
-    def __init__(self, type="double", supertype="Number"):
-        CProperty.__init__(self, type, supertype)
-
-
-class CNumber(CProperty):
-
-    def __init__(self):
-        CProperty.__init__(self, "Number", "")
-
-
-class CFieldOfView(CProperty):
-
-    def __init__(self):
-        CProperty.__init__(self, "FieldOfView", "")
-
-    
-class CString(CProperty):
-
-    def __init__(self, type="KString", supertype=""):
-        CProperty.__init__(self, type, supertype)
+class CStringProperty(CProperty):
 
     def flatten(self):
         return '"%s"' % self.value
 
     
-class CVector(CProperty):
-    def __init__(self, type="Vector", supertype=""):
-        CProperty.__init__(self, type, supertype)
+class CVectorProperty(CProperty):
 
     def flatten(self):
-        print(self.value)
         return "%.3g,%.3g,%.3g" % tuple(self.value)
-        
-
-class CVector3D(CVector):
-    def __init__(self):
-        CVector.__init__(self, "Vector3D", "Vector")
 
 
-class CLclTranslation(CVector):
-    def __init__(self):
-        CVector.__init__(self, "Lcl Translation", "")
+class CCompoundProperty(CProperty):
 
+    def write(self, fp):
+        basetype = "Number"
+        fp.write('            P: "%s|X", "%s", "%s", "%s", %s\n' % (self.name, basetype, self.supertype, self.anim, self.value[0]))
+        fp.write('            P: "%s|Y", "%s", "%s", "%s", %s\n' % (self.name, basetype, self.supertype, self.anim, self.value[1]))
+        fp.write('            P: "%s|Z", "%s", "%s", "%s", %s\n' % (self.name, basetype, self.supertype, self.anim, self.value[2]))
 
-class CLclRotation(CVector):
-    def __init__(self):
-        CVector.__init__(self, "Lcl Rotation", "")
-
-
-class CLclScaling(CVector):
-    def __init__(self):
-        CVector.__init__(self, "Lcl Scaling", "")
-
-    
-class CColorRGB(CVector):
-
-    def __init__(self):
-        CVector.__init__(self, "ColorRGB", "Color")
-
-   
-TypedNode = {
-    "ColorRGB" : CColorRGB,
-    "Vector3D" : CVector3D,
-    "Vector" : CVector,
-    "double" : CDouble,
-    "int" : CInt,
-    "bool" : CBool,
-    "enum" : CEnum,
-    "KString" : CString,
-    "Lcl Translation" : CLclTranslation,
-    "Lcl Rotation" : CLclRotation,
-    "Lcl Scaling" : CLclScaling,
-    "FieldOfView" : CFieldOfView,
-}    
-
-
-#------------------------------------------------------------------
-#   Popular property lists
-#------------------------------------------------------------------
-
-def transformProps(mat):
-    (loc,rot,scale) = mat.decompose()
-    euler = tuple(a*D for a in rot.to_euler())
-    return [
-        CLclTranslation().make("Lcl Translation", loc),
-        CLclRotation().make("Lcl Rotation", euler),
-        CLclScaling().make("Lcl Scaling", (1,1,1)),
-    ]
-
-
-def defaultProps():
-    return [
-        CBool().make("RotationActive", 1),
-        CEnum().make("InheritType", 1),
-        CVector3D().make("ScalingMax", (0,0,0)),
-        CInt().make("DefaultAttributeIndex", 0),
-    ]
 
 print("fbx_props imported")
 

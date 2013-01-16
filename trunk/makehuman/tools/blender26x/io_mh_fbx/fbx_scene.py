@@ -53,7 +53,7 @@ class CScene(CModel):
         print("BScn", self)
         scn = fbx.data[self.id]
         return scn
-        objects = self.getChildren('OBJECT')
+        objects = self.getBChildren('OBJECT')
         for node in objects:
             ob = fbx.data[node.id]
             scn.objects.link(ob)

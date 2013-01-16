@@ -32,33 +32,44 @@ idnum = 1000
 idstruct = {}
 allNodes = {}
 
+templates = {}
+
 
 class Settings:
     def __init__(self):
         self.createNewScenes = False
         self.writeAllNodes = True
         self.changeCsys = False
+        self.includePropertyTemplates = True
+        self.makeSceneNode = False
        
 
     def getStruct(self):
         return {
             "createNewScenes" : self.createNewScenes,
             "writeAllNodes" : self.writeAllNodes,
-            "changeCsys" : self.changeCsys,        
+            "changeCsys" : self.changeCsys,    
+            "includePropertyTemplates" : self.includePropertyTemplates,
+            "makeSceneNode" : self.makeSceneNode,
         }
         
     def setStruct(self, struct):
         for key,value in struct.items():
-            self.set(key, value)
+            self.setSetting(key, value)
         
         
-    def set(self, key, value):
+    def setSetting(self, key, value):
         if key == "createNewScenes":
             self.createNewScenes = value
         elif key == "writeAllNodes":
             self.writeAllNodes = value
         elif key == "changeCsys":
             self.changeCsys = value
+        elif key == "includePropertyTemplates":
+            self.includePropertyTemplates = value
+        elif key == "makeSceneNode":
+            self.makeSceneNode = value
+            
             
 settings = Settings()
 
