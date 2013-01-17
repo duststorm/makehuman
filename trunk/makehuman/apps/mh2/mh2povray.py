@@ -108,15 +108,14 @@ def povrayExport(obj, app, settings):
 
     # Export the hair model as a set of spline definitions.
     # Load the test hair data and write it out in POV-Ray format.
-    # still unsupported
+    # still unsupported <-- HUMMM!! cleanupcleanupcleanup
     #povrayLoadHairsFile('data/hairs/test.hair')
     #povrayWriteHairs(outputDirectory, obj)
 
     # The ini action option defines whether or not to attempt to render the file once it's been written.
-    #
     povray_bin = (app.settings.get('povray_bin', ''))
    
-    # try for use better binarie 
+    # try to use the appropriate binary 
     if os.path.exists(povray_bin):
         exetype = settings['bintype']
         #
@@ -139,24 +138,27 @@ def povrayExport(obj, app, settings):
     if action == 'render':
         #
         if os.path.isfile(povray_bin):
-            #
+            # Get POV file name.
             if mh2povray_ini.renderscenefile == '':
                 outputSceneFile = path.replace('.inc', '.pov')
                 baseName = os.path.basename(outputSceneFile)
             else:
                 baseName = mh2povray_ini.renderscenefile
-            #
-            cmdLineOpt = ' +I%s' %  baseName
-            #
-            if os.name == 'nt':
-                povray_bin = '"' + povray_bin + '"'
-                baseName = '"' + baseName + '"'
-                cmdLineOpt = ' /RENDER %s' % baseName
-            #
-            cmdLineOpt += ' +W%d +H%d +a%s +am2' % (resW, resH, settings['AA'])
-        
-            #
-            pathHandle = subprocess.Popen(cwd=outputDirectory, args = povray_bin + cmdLineOpt, shell=True)
+            # Prepare command line.
+            cmdLine = (povray_bin, 'RENDER', '/EXIT')
+            
+            # Pass parameters by writing an .ini file.
+            try:
+                iniFD = open(os.path.join(outputDirectory, 'RENDER.ini'), 'w')
+            except:
+                log.error('Error opening .ini to write parameters.')
+                return
+            iniFD.write('Input_File_Name="%s"\n' % baseName +
+                        '+W%d +H%d +a%s +am2\n' % (resW, resH, settings['AA']))
+            iniFD.close()
+
+            # Run Pov-Ray
+            pathHandle = subprocess.Popen(cwd=outputDirectory, args=cmdLine)
         #
         else:
             app.prompt('POV-Ray not found',
