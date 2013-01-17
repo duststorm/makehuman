@@ -200,7 +200,7 @@ class TextureTaskView(gui3d.TaskView):
             return
         f.close()
         
-        texture = module3d.getTexture(human.getTexture())
+        texture = mh.getTexture(human.getTexture())
         img = mh.Image(human.getTexture())
         
         for subTexture in subTextures:

@@ -27,60 +27,8 @@ import weakref
 
 import numpy as np
 
-import mh
 from compat import VertProxy, FaceProxy, VertsProxy, FacesProxy, MaterialsProxy
 import log
-
-class Texture(mh.Texture):
-
-    """
-    A subclass of the base texture class extended to hold a modification date.
-    """
-
-    def __init__(self, *args, **kwargs):
-        mh.Texture.__init__(self, *args, **kwargs)
-        self.modified = None
-        
-textureCache = {}
-
-def getTexture(path, cache=None):
-    texture = None
-    cache = cache or textureCache
-    
-    if path in cache:
-        texture = cache[path]
-        
-        if os.stat(path).st_mtime != texture.modified:
-            log.message('reloading %s', path)	# TL: unicode problems unbracketed
-
-            try:
-                img = mh.Image(path=path)
-                texture.loadImage(img)
-            except RuntimeError, text:
-                log.error("%s", text, exc_info=True)
-                return
-            else:
-                texture.modified = os.stat(path).st_mtime
-    else:
-        try:
-            img = mh.Image(path=path)
-            texture = Texture(img)
-            #texture.loadSubImage('data/themes/default/images/slider_focused.png', 0, 0)
-        except RuntimeError, text:
-            log.error("Error loading texture %s", path, exc_info=True)
-        else:
-            texture.modified = os.stat(path).st_mtime
-            cache[path] = texture
-
-    return texture
-    
-def reloadTextures():
-    log.message('Reloading textures')
-    for path in textureCache:
-        try:
-            textureCache[path].loadImage(path)
-        except RuntimeError, text:
-            log.error("Error loading texture %s", path, exc_info=True)
 
 class FaceGroup(object):
     """
@@ -148,8 +96,6 @@ class Object3D(object):
         self.visibility = True
         self.pickable = True
         self.texture = None
-        self.textureTex = None
-        self.textureId = 0
         self.shader = 0
         self.shaderParameters = {}
         self.shadeless = False
@@ -323,32 +269,6 @@ class Object3D(object):
         self.grpix = None
         self.vmap = None
         self.tmap = None
-        
-    def attach(self):
-        """
-        Prepares the object for rendering.
-        """
-        if self.object3d:
-            return
-
-        nverts = len(self.vmap)
-
-        selectionColorMap.assignSelectionID(self)
-
-        self.object3d = mh.Object3D(self)
-        mh.addObject(self.object3d)
-
-        if self.texture:
-            self.setTexture(self.texture)
-        
-    def detach(self):
-        """
-        Detaches the object, clearing all remote data
-        """
-
-        if self.object3d:
-            mh.removeObject(self.object3d)
-            self.object3d = None
 
     def setCoords(self, coords):
         nverts = len(coords)
@@ -711,7 +631,7 @@ class Object3D(object):
 
         self.pickable = pickable
 
-    def setTexture(self, path, cache=None):
+    def setTexture(self, path):
         """
         This method is used to specify the path of a file on disk containing the object texture.
 
@@ -722,18 +642,6 @@ class Object3D(object):
         """
         
         self.texture = path
-        
-        if not path:
-            self.clearTexture()
-
-        if not self.object3d:
-            return
-        
-        self.textureTex = getTexture(path, cache)
-        
-        if self.textureTex:
-            self.textureId = self.textureTex.textureId
-            self.object3d.texture = self.textureId
 
     def clearTexture(self):
         """
@@ -741,10 +649,9 @@ class Object3D(object):
         """
 
         self.texture = None
-        self.textureId = 0
 
     def hasTexture(self):
-        return self.textureId != 0
+        return self.texture is not None
 
     def setShader(self, shader):
         """
@@ -936,138 +843,3 @@ class Object3D(object):
     def __str__(self):
         x, y, z = self.loc
         return 'object3D named: %s, nverts: %s, nfaces: %s, at |%s,%s,%s|' % (self.name, len(self.fvert), len(self.vface), x, y, z)
-
-class SelectionColorMap:
-
-    """
-    The objects support the use of a technique called *Selection Using Unique
-    Color IDs*, that internally uses color-coding of components within the
-    scene to support the selection of objects by the user using the mouse.
-
-    This technique generates a sequence of colors (color IDs), assigning a
-    unique color to each uniquely selectable object or component in the scene.
-    These colors are not displayed, but are used by MakeHuman to generates an
-    unseen image of the various selectable elements. This image uses the same
-    camera settings currently being used for the actual, on-screen image.
-    When the mouse is clicked, the position of the mouse is used with the
-    unseen image to retrieve a color. MakeHuman uses this color as an ID to
-    identify which object or component the user clicked with the mouse.
-
-    This technique uses glReadPixels() to read the single pixel at the
-    current mouse location, using the unseen, color-coded image.
-
-    For further information on this technique, see:
-
-      - http://www.opengl.org/resources/faq/technical/selection.htm and
-      - http://wiki.gamedev.net/index.php/OpenGL_Selection_Using_Unique_Color_IDs
-
-    **Note.** Because the 3D engine uses glDrawElements in a highly opimized
-    way and each vertex can have only one color ID, there there is a known
-    problem with selecting individual faces with very small FaceGroups using
-    this technique. However, this is not a major problem for MakeHuman, which
-    doesn't use such low polygon groupings.
-    
-    - **self.colorIDToFaceGroup**: *Dictionary of colors IDs* A dictionary of the color IDs used for
-      selection (see MakeHuman Selectors, above).
-    - **self.colorID**: *float list* A progressive color ID.
-    
-    The attributes *self.colorID* and *self.colorIDToFaceGroup*
-    support a technique called *Selection Using Unique Color IDs* to make each
-    FaceGroup independently clickable.
-
-    The attribute *self.colorID* stores a progressive color that is incremented for each successive
-    FaceGroup added to the scene.
-    The *self.colorIDToFaceGroup* attribute contains a list that serves as a directory to map
-    each color back to the corresponding FaceGroup by using its color ID.
-    """
-
-    def __init__(self):
-    
-        self.colorIDToFaceGroup = {}
-        self.colorID = 0
-
-    def assignSelectionID(self, obj):
-        """
-        This method generates a new, unique color ID for each FaceGroup,
-        within a particular Object3D object, that forms a part of this scene3D
-        object. This color ID can subsequently be used in a non-displayed
-        image map to determine the FaceGroup that a mouse click was made in.
-
-        This method loops through the FaceGroups, assigning the next color
-        in the sequence to each subsequent FaceGroup. The color value is
-        written into a 'dictionary' to serve as a color ID that can be
-        translated back into the corresponding FaceGroup name when a mouse
-        click is detected.
-        This is part of a technique called *Selection Using Unique Color IDs*
-        to make each FaceGroup independently clickable.
-
-        :param obj: The object3D object for which color dictionary entries need to be generated.
-        :type obj: module3d.Object 3D
-        """
-
-        # print "DEBUG COLOR AND GROUPS, obj", obj.name
-        # print "---------------------------"
-
-        for g in obj.faceGroups:
-            self.colorID += 1
-
-            # 555 to 24-bit rgb
-
-            idR = (self.colorID % 32) * 8
-            idG = ((self.colorID >> 5) % 32) * 8
-            idB = ((self.colorID >> 10) % 32) * 8
-
-            g.colorID = (idR, idG, idB)
-            
-            self.colorIDToFaceGroup[self.colorID] = g
-
-            # print "SELECTION DEBUG INFO: facegroup %s of obj %s has the colorID = %s,%s,%s or %s"%(g.name,obj.name,idR,idG,idB, self.colorID)
-
-    def getSelectedFaceGroup(self):
-        """
-        This method uses a non-displayed image containing color-coded faces
-        to return the index of the FaceGroup selected by the user with the mouse.
-        This is part of a technique called *Selection Using Unique Color IDs* to make each
-        FaceGroup independently clickable.
-
-        :return: The selected face group.
-        :rtype: :py:class:`module3d.FaceGroup`
-        """
-
-        picked = mh.getColorPicked()
-
-        IDkey = picked[0] / 8 | picked[1] / 8 << 5 | picked[2] / 8 << 10  # 555
-
-        # print "DEBUG COLOR PICKED: %s,%s,%s %s"%(picked[0], picked[1], picked[2], IDkey)
-
-        try:
-            groupSelected = self.colorIDToFaceGroup[IDkey]
-        except:
-
-            # print groupSelected.name
-            #this print should only come on while debugging color picking
-            #print 'Color %s (%s) not found' % (IDkey, picked)
-            groupSelected = None
-        return groupSelected
-
-    def getSelectedFaceGroupAndObject(self):
-        """
-        This method determines whether a FaceGroup or a non-selectable zone has been
-        clicked with the mouse. It returns a tuple, showing the FaceGroup and the parent
-        Object3D object, or None.
-        If no object is picked, this method will simply print \"no clickable zone.\"
-
-        :return: The selected face group and object.
-        :rtype: (:py:class:`module3d.FaceGroup`, :py:class:`module3d.Object3d`)
-        """
-
-        facegroupPicked = self.getSelectedFaceGroup()
-        if facegroupPicked:
-            objPicked = facegroupPicked.parent
-            return (facegroupPicked, objPicked)
-        else:
-            #this print should only be made while debugging picking
-            #print 'not a clickable zone'
-            return None
-    
-selectionColorMap = SelectionColorMap()

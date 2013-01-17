@@ -32,6 +32,8 @@ import weakref
 from catmull_clark_subdivision import createSubdivisionObject, updateSubdivisionObject
 from geometry3d import NineSliceMesh, RectangleMesh, FrameMesh
 import log
+import selection
+import object3d
 
 # Wrapper around Object3D
 class Object(events3d.EventHandler):
@@ -75,11 +77,20 @@ class Object(events3d.EventHandler):
             self.mesh.setVisibility(0)
 
         for mesh in self._meshes():
-            mesh.attach()
+            self.attachMesh(mesh)
             
     def _detach(self):
         for mesh in self._meshes():
-            mesh.detach()
+            self.detachMesh(mesh)
+
+    @staticmethod
+    def attachMesh(mesh):
+        selection.selectionColorMap.assignSelectionID(mesh)
+        object3d.Object3D.attach(mesh)
+
+    @staticmethod
+    def detachMesh(mesh):
+        object3d.Object3D.detach(mesh)
 
     def _meshes(self):
         for mesh in (self.__seedMesh,
@@ -202,7 +213,7 @@ class Object(events3d.EventHandler):
             self.proxy.update(self.__proxyMesh, self.__seedMesh)
             
             if self.__seedMesh.object3d:
-                self.__proxyMesh.attach()
+                self.attachMesh(self.__proxyMesh)
             
             self.mesh.setVisibility(0)
             self.mesh = self.__proxyMesh
@@ -226,7 +237,7 @@ class Object(events3d.EventHandler):
             if not self.__proxySubdivisionMesh:
                 self.__proxySubdivisionMesh = createSubdivisionObject(self.__proxyMesh, progressCallback)
                 if self.__seedMesh.object3d:
-                    self.__proxySubdivisionMesh.attach()
+                    self.attachMesh(self.__proxySubdivisionMesh)
             elif update:
                 updateSubdivisionObject(self.__proxySubdivisionMesh, progressCallback)
                 
@@ -235,7 +246,7 @@ class Object(events3d.EventHandler):
             if not self.__subdivisionMesh:
                 self.__subdivisionMesh = createSubdivisionObject(self.__seedMesh, progressCallback)
                 if self.__seedMesh.object3d:
-                    self.__subdivisionMesh.attach()
+                    self.attachMesh(self.__subdivisionMesh)
             elif update:
                 updateSubdivisionObject(self.__subdivisionMesh, progressCallback)
                 
@@ -689,12 +700,12 @@ class Application(events3d.EventHandler):
         return True
             
     def getSelectedFaceGroupAndObject(self):
-    
-        return module3d.selectionColorMap.getSelectedFaceGroupAndObject()
+        picked = mh.getColorPicked()
+        return selection.selectionColorMap.getSelectedFaceGroupAndObject(picked)
         
     def getSelectedFaceGroup(self):
-    
-        return module3d.selectionColorMap.getSelectedFaceGroup()
+        picked = mh.getColorPicked()
+        return selection.selectionColorMap.getSelectedFaceGroup(picked)
 
     def addCategory(self, category):
         if category.name in self.categories:

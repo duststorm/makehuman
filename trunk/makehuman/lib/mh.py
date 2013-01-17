@@ -31,7 +31,7 @@ import glmodule as gl
 import qtui as ui
 
 from image import Image
-from texture import Texture
+from texture import Texture, getTexture, reloadTextures
 from object3d import Object3D
 from camera import Camera
 
@@ -89,12 +89,6 @@ def addTopWidget(widget, *args, **kwargs):
 
 def removeTopWidget(widget):
     return G.app.mainwin.removeTopWidget(widget)
-
-def addObject(obj):
-    G.world.append(obj)
-
-def removeObject(obj):
-    G.world.remove(obj)
 
 def setShortcut(modifier, key, method):
     G.app.mainwin.setShortcut(modifier, key, method)

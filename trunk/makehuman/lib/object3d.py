@@ -25,14 +25,16 @@ TODO
 import math
 import numpy as np
 import glmodule as gl
+import texture
+import log
 from core import G
 
 class Object3D(object):
     def __init__(self, parent):
         self.parent = parent
-
-        self.texture = 0
         self.uniforms = None
+        self._texturePath = None
+        self._textureTex = None
 
     @property
     def verts(self):
@@ -223,3 +225,37 @@ class Object3D(object):
         indices2 = indices[order,:]
 
         indices[...] = indices2
+
+    @property
+    def textureTex(self):
+        if self._textureTex is None or self._texturePath != self.parent.texture:
+            self._texturePath = self.parent.texture
+            if self._texturePath is None:
+                self._textureTex = None
+            else:
+                self._textureTex = texture.getTexture(self._texturePath)
+        return self._textureTex
+
+    @property
+    def texture(self):
+        if self.textureTex is None:
+            return 0
+        return self.textureTex.textureId
+
+    @classmethod
+    def attach(cls, mesh):
+        if mesh.object3d:
+            log.debug('mesh is already attached')
+            return
+
+        mesh.object3d = cls(mesh)
+        G.world.append(mesh.object3d)
+
+    @classmethod
+    def detach(cls, mesh):
+        if not mesh.object3d:
+            log.debug('mesh is not attached')
+            return
+
+        G.world.remove(mesh.object3d)
+        mesh.object3d = None

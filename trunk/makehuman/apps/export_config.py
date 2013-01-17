@@ -429,8 +429,6 @@ def getOutFileName(filePath, fromDir, isTexture, human, config):
             done = False
         if not done:
             if 0 and human:
-                texture = module3d.getTexture(human.getTexture())
-                log.debug("%s", dir(texture))
                 img = mh.Image(human.getTexture())
                 log.debug("%s", dir(img))
                 img.save(toPath)

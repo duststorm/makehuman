@@ -22,11 +22,13 @@ Abstract
 TODO
 """
 
+import os.path
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GL.ARB.texture_non_power_of_two import *
 from core import G
 from image import Image
+import log
 
 class Texture(object):
     def __new__(cls, *args, **kwargs):
@@ -35,6 +37,7 @@ class Texture(object):
         self.textureId = glGenTextures(1)
         self.width = 0
         self.height = 0
+        self.modified = None
 
         return self
 
@@ -127,3 +130,44 @@ class Texture(object):
         else:
             glBindTexture(GL_TEXTURE_2D, self.textureId)
             glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, image.width, image.height, format, GL_UNSIGNED_BYTE, pixels)
+
+_textureCache = {}
+
+def getTexture(path, cache=None):
+    texture = None
+    cache = cache or _textureCache
+    
+    if path in cache:
+        texture = cache[path]
+
+        if os.path.getmtime(path) >= texture.modified:
+            log.message('reloading %s', path)   # TL: unicode problems unbracketed
+
+            try:
+                img = Image(path=path)
+                texture.loadImage(img)
+            except RuntimeError, text:
+                log.error("%s", text, exc_info=True)
+                return
+            else:
+                texture.modified = os.path.getmtime(path)
+    else:
+        try:
+            img = Image(path=path)
+            texture = Texture(img)
+        except RuntimeError, text:
+            log.error("Error loading texture %s", path, exc_info=True)
+        else:
+            texture.modified = os.path.getmtime(path)
+            cache[path] = texture
+
+    return texture
+    
+def reloadTextures():
+    log.message('Reloading textures')
+    for path in _textureCache:
+        try:
+            _textureCache[path].loadImage(path)
+        except RuntimeError, text:
+            log.error("Error loading texture %s", path, exc_info=True)
+

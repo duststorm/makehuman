@@ -175,7 +175,7 @@ def mapImageSoft(srcImg, mesh, leftTop, rightBottom):
 def mapImageGL(srcImg, mesh, leftTop, rightBottom):
     log.debug("mapImageGL: 1")
 
-    dstImg = gui3d.app.selectedHuman.meshData.textureTex
+    dstImg = gui3d.app.selectedHuman.meshData.object3d.textureTex
 
     dstW = dstImg.width
     dstH = dstImg.height
@@ -208,7 +208,7 @@ def mapImageGL(srcImg, mesh, leftTop, rightBottom):
 
 def mapImage(imgMesh, mesh, leftTop, rightBottom):
     if mh.hasRenderSkin():
-        return mapImageGL(imgMesh.mesh.textureTex, mesh, leftTop, rightBottom)
+        return mapImageGL(imgMesh.mesh.object3d.textureTex, mesh, leftTop, rightBottom)
     else:
         return mapImageSoft(mh.Image(imgMesh.getTexture()), mesh, leftTop, rightBottom)
 
