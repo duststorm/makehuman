@@ -305,6 +305,7 @@ class BaseModifier(object):
         return sum([human.getDetail(target[0]) for target in self.targets])
 
     def buildLists(self):
+        human = gui3d.app.selectedHuman
         # Collect vertex and face indices if we didn't yet
         if self.verts is None and self.faces is None:
             # Collect verts
