@@ -42,7 +42,7 @@ class ThemeRadioButton(gui.RadioButton):
     def __init__(self, group, label, theme):
     
         self.theme = theme
-        checked = (gui3d.app.settings.get('guiTheme', 'default') == self.theme)
+        checked = (gui3d.app.settings.get('guiTheme', 'makehuman') == self.theme)
         super(ThemeRadioButton, self).__init__(group, label, checked)
         
     def onClicked(self, event):
