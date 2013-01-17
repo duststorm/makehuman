@@ -80,24 +80,13 @@ class Human(gui3d.Object):
         self.muscleVal = 0.0
         self.overweightVal = 0.0
         self.underweightVal = 0.0
-        self.asianVal = 0.0
-        self.africanVal = 0.0
+        self.caucasianVal = 1.0/3
+        self.asianVal = 1.0/3
+        self.africanVal = 1.0/3
         self.dwarfVal = 0.0
         self.giantVal = 0.0
-        self.genitals = 0.0
         self.breastSize = 0.0
         self.breastFirmness = 0.5
-        self.nose = 0.0
-        self.mouth = 0.0
-        self.eyes = 0.0
-        self.ears = 0.0
-        self.jaw = 0.0
-        self.head = 0.0
-        self.headAge = 0.0
-        self.faceAngle = 0.0
-        self.pelvisTone = 0.0
-        self.buttocks = 0.0
-        self.stomach = 0.0
         self.bodyZones = ['l-eye','r-eye', 'jaw', 'nose', 'mouth', 'head', 'neck', 'torso', 'hip', 'pelvis', 'r-upperarm', 'l-upperarm', 'r-lowerarm', 'l-lowerarm', 'l-hand',
                           'r-hand', 'r-upperleg', 'l-upperleg', 'r-lowerleg', 'l-lowerleg', 'l-foot', 'r-foot', 'ear']
         
@@ -300,27 +289,71 @@ class Human(gui3d.Object):
                 return
             self.flaccidVal = -amount
             self.muscleVal = 0
-            
-    def setAfrican(self, african):
 
+    def setCaucasian(self, caucasian, sync=True):
+        caucasian = min(max(caucasian, 0.0), 1.0)
+        old = 1 - self.caucasianVal
+        self.caucasianVal = caucasian
+        if not sync:
+            return
+        new = 1 - self.caucasianVal
+        if old < 1e-6:
+            self.asianVal = new / 2
+            self.africanVal = new / 2
+        else:
+            self.asianVal *= new / old
+            self.africanVal *= new / old
+        self.callEvent('onChanging', HumanEvent(self, 'caucasian'))
+        
+    def getCaucasian(self):
+        return self.caucasianVal
+            
+    def setAfrican(self, african, sync=True):
         african = min(max(african, 0.0), 1.0)
+        old = 1 - self.africanVal
         self.africanVal = african
+        if not sync:
+            return
+        new = 1 - self.africanVal
+        if old < 1e-6:
+            self.caucasianVal = new / 2
+            self.asianVal = new / 2
+        else:
+            self.caucasianVal *= new / old
+            self.asianVal *= new / old
         self.callEvent('onChanging', HumanEvent(self, 'african'))
         
     def getAfrican(self):
-
         return self.africanVal
             
-    def setAsian(self, asian):
-
+    def setAsian(self, asian, sync=True):
         asian = min(max(asian, 0.0), 1.0)
+        old = 1 - self.asianVal
         self.asianVal = asian
+        if not sync:
+            return
+        new = 1 - self.asianVal
+        if old < 1e-6:
+            self.caucasianVal = new / 2
+            self.africanVal = new / 2
+        else:
+            self.caucasianVal *= new / old
+            self.africanVal *= new / old
         self.callEvent('onChanging', HumanEvent(self, 'asian'))
-        
-    def getAsian(self):
 
+    def getAsian(self):
         return self.asianVal
             
+    def syncRace(self):
+        total = self.caucasianVal + self.asianVal + self.africanVal
+        if total < 1e-6:
+            self.caucasianVal = self.asianVal = self.africanVal = 1.0/3
+        else:
+            scale = 1.0 / total
+            self.caucasianVal *= scale
+            self.asianVal *= scale
+            self.africanVal *= scale
+
     def setHeight(self, height):
         height = min(max(height, -1.0), 1.0)
         self._setHeightVals(height)
@@ -527,25 +560,13 @@ class Human(gui3d.Object):
         self.muscleVal = 0.0
         self.overweightVal = 0.0
         self.underweightVal = 0.0
-        self.asianVal = 0.0
-        self.africanVal = 0.0
+        self.caucasianVal = 1.0/3
+        self.asianVal = 1.0/3
+        self.africanVal = 1.0/3
         self.dwarfVal = 0.0
         self.giantVal = 0.0
-        self.genitals = 0.0
         self.breastSize = 0.0
         self.breastFirmness = 0.5
-        self.stomach = 0.0
-        self.nose = 0.0
-        self.mouth = 0.0
-        self.eyes = 0.0
-        self.ears = 0.0
-        self.head = 0.0
-        self.headAge = 0.0
-        self.faceAngle = 0.0
-        self.jaw = 0.0
-        self.pelvisTone = 0.0
-        self.buttocks = 0.0
-
         self.targetsDetailStack = {}
         
         self.setTexture("data/textures/texture.png")
@@ -576,10 +597,12 @@ class Human(gui3d.Object):
                     self.setMuscle(float(lineData[1]))
                 elif lineData[0] == 'weight':
                     self.setWeight(float(lineData[1]))
+                elif lineData[0] == 'caucasian':
+                    self.setCaucasian(float(lineData[1]), False)
                 elif lineData[0] == 'african':
-                    self.setAfrican(float(lineData[1]))
+                    self.setAfrican(float(lineData[1]), False)
                 elif lineData[0] == 'asian':
-                    self.setAsian(float(lineData[1]))
+                    self.setAsian(float(lineData[1]), False)
                 elif lineData[0] == 'height':
                     self.setHeight(float(lineData[1]))
                 elif lineData[0] == 'asymmetry':
@@ -590,6 +613,8 @@ class Human(gui3d.Object):
                     log.message('Could not load %s', lineData)
 
         f.close()
+
+        self.syncRace()
 
         self.callEvent('onChanged', HumanEvent(self, 'load'))
 
@@ -608,6 +633,7 @@ class Human(gui3d.Object):
         f.write('weight %f\n' % self.getWeight())
         f.write('african %f\n' % self.getAfrican())
         f.write('asian %f\n' % self.getAsian())
+        f.write('caucasian %f\n' % self.getCaucasian())
         f.write('height %f\n' % self.getHeight())
 
         for t in self.targetsDetailStack.keys():

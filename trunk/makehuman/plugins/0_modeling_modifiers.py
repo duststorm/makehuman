@@ -70,7 +70,7 @@ class ModifierTaskView(gui3d.TaskView):
                 if macro:
                     tlabel, tname, tvar, tmin, tmax, tview = template
                     modifier = humanmodifier.MacroModifier(base, tname, tvar, tmin, tmax)
-                    self.modifiers[tname] = modifier
+                    self.modifiers[tlabel] = modifier
                     slider = humanmodifier.GenericSlider(tmin, tmax, modifier, tlabel, None, tview)
                 else:
                     paired = len(template) == 5
@@ -527,8 +527,23 @@ class MacroTaskView(ModifierTaskView):
             ('Height', 'universal-stature', 'Height', -1.0, 1.0, 'noSetCamera'),
             ('African', None, 'African', 0.0, 1.0, 'noSetCamera'),
             ('Asian', None, 'Asian', 0.0, 1.0, 'noSetCamera'),
+            ('Caucasian', None, 'Caucasian', 0.0, 1.0, 'noSetCamera'),
             ]),
         ]
+
+    def __init__(self, category):
+        super(MacroTaskView, self).__init__(category)
+        for race, modifier, slider in self.raceSliders():
+            slider.setValue(1.0/3)
+
+    def raceSliders(self):
+        for slider in self.sliders:
+            modifier = slider.modifier
+            if not isinstance(modifier, humanmodifier.MacroModifier):
+                continue
+            variable = modifier.variable
+            if variable in ('African', 'Asian', 'Caucasian'):
+                yield (variable, modifier, slider)
 
     def syncStatus(self):
         human = gui3d.app.selectedHuman
@@ -559,6 +574,14 @@ class MacroTaskView(ModifierTaskView):
 
         self.setStatus('Gender: %s, Age: %d, Muscle: %.2f%%, Weight: %.2f%%, Height: %.2f %s', gender, age, muscle, weight, height, units)
 
+    def syncRaceSliders(self, event):
+        human = event.human
+        for race, modifier, slider in self.raceSliders():
+            slider.setValue(1.0/3)
+            value = modifier.getValue(human)
+            modifier.setValue(human, value)
+            slider.setValue(value)
+
     def setStatus(self, format, *args):
         gui3d.app.statusPersist(format, *args)
 
@@ -570,10 +593,17 @@ class MacroTaskView(ModifierTaskView):
         self.setStatus('')
         super(MacroTaskView, self).onHide(event)
 
+    def onHumanChaging(self, event):
+        super(MacroTaskView, self).onHumanChanging(event)
+        if event.change in ('caucasian', 'asian', 'african'):
+            self.syncRaceSliders(event)
+
     def onHumanChanged(self, event):
+        super(MacroTaskView, self).onHumanChanged(event)
         if self.isVisible():
             self.syncStatus()
-        super(MacroTaskView, self).onHumanChanged(event)
+        if event.change in ('caucasian', 'asian', 'african'):
+            self.syncRaceSliders(event)
 
 def load(app):
     category = app.getCategory('Modelling')

@@ -75,19 +75,19 @@ from targets import getTargets
 # -
 # africanVal = african
 # -
-# african : africanVal / len(ethnics)
+# african : africanVal
 
 # Asian [0..1]
 # -
 # asianVal = asian
 # -
-# asian : asianVal / len(ethnics)
+# asian : asianVal
 
-# ... [0..1]
+# Caucasian [0..1]
 # -
-# ...
+# caucasianVal = caucasian
 # -
-# caucasian : (1 - (africanVal + asianVal) / len(ethnics))
+# caucasian : caucasianVal
 
 # Height [-1..1]
 # ...
@@ -408,26 +408,23 @@ class GenericModifier(BaseModifier):
             return -sum([human.getDetail(target[0]) for target in self.l_targets])
 
     def getFactors(self, human, value):
-        ethnics = [val for val in [human.africanVal, human.asianVal] if val > 0.0]
-        height = human.getHeight()
-        
         factors = {
             'female': human.femaleVal,
             'male': human.maleVal,
             'child': human.childVal,
             'young': human.youngVal,
             'old': human.oldVal,
-            'african': human.africanVal / len(ethnics) if ethnics else human.africanVal,
-            'asian': human.asianVal / len(ethnics) if ethnics else human.asianVal,
-            'caucasian': (1.0 - sum(ethnics) / len(ethnics)) if ethnics else 1.0,
+            'african': human.africanVal,
+            'asian': human.asianVal,
+            'caucasian': human.caucasianVal,
             'flaccid': human.flaccidVal,
             'muscle': human.muscleVal,
             'averageTone': 1.0 - (human.flaccidVal + human.muscleVal),
             'light': human.underweightVal,
             'heavy': human.overweightVal,
             'averageWeight': 1.0 - (human.underweightVal + human.overweightVal),
-            'dwarf': -min(height, 0.0),
-            'giant': max(0.0, height),
+            'dwarf': human.dwarfVal,
+            'giant': human.giantVal,
             'firmness0': 1.0 - human.breastFirmness,
             'firmness1': human.breastFirmness,
             'cup1': -min(human.breastSize, 0.0),
