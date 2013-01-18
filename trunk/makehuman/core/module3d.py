@@ -106,6 +106,7 @@ class Object3D(object):
         self.vmap = None
         self.tmap = None
         self.priority = 0
+        self.cull = None
 
         self.__object = None
 
@@ -677,6 +678,15 @@ class Object3D(object):
         """
 
         self.shadeless = shadeless
+
+    def setCull(self, cull):
+        """
+        This method is used to specify whether or not the object is back-face culled.
+
+        :param cull: Whether and how to cull
+        :type cull: None => no culling, >0 => draw front faces, <0 => draw back faces
+        """
+        self.cull = cull
 
     def setDepthless(self, depthless):
         """

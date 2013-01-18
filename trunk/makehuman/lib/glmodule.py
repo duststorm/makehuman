@@ -353,6 +353,10 @@ def drawMesh(obj):
     if obj.shadeless:
         glDisable(GL_LIGHTING)
 
+    if obj.cull is not None:
+        glEnable(GL_CULL_FACE)
+        glCullFace(GL_BACK if obj.cull > 0 else GL_FRONT)
+
     # Enable the shader if the driver supports it and there is a shader assigned
     if obj.shader and obj.solid:
         if bool(glUseProgram):
@@ -408,6 +412,8 @@ def drawMesh(obj):
             glUseProgram(0)
         glActiveTexture(GL_TEXTURE0)
 
+    glDisable(GL_CULL_FACE)
+
     # Enable lighting if the object was shadeless
     if obj.shadeless:
         glEnable(GL_LIGHTING)
@@ -438,11 +444,17 @@ def pickMesh(obj):
     # Disable lighting
     glDisable(GL_LIGHTING)
 
+    if obj.cull is not None:
+        glEnable(GL_CULL_FACE)
+        glCullFace(GL_BACK if obj.cull > 0 else GL_FRONT)
+
     # draw the meshes
     for i, (start, count) in enumerate(obj.groups):
         glColor3ub(*obj.clrid(i))
         indices = obj.primitives[start:start+count,:]
         glDrawElements(g_primitiveMap[obj.vertsPerPrimitive-1], indices.size, GL_UNSIGNED_INT, indices)
+
+    glDisable(GL_CULL_FACE)
 
     glEnable(GL_LIGHTING)
     glEnableClientState(GL_COLOR_ARRAY)

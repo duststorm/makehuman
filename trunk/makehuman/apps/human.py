@@ -52,6 +52,7 @@ class Human(gui3d.Object):
         
         self.mesh.setCameraProjection(0)
         self.mesh.setShadeless(0)
+        self.mesh.setCull(1)
         self.meshData = self.mesh
         
         self.hairModelling = False #temporary variable for easier integration of makehair, will be cleaned later.

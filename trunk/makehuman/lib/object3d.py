@@ -160,6 +160,10 @@ class Object3D(object):
     def priority(self):
         return self.parent.priority
 
+    @property
+    def cull(self):
+        return self.parent.cull
+
     def clrid(self, idx):
         return self.parent._faceGroups[idx].colorID
 
