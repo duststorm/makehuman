@@ -77,7 +77,10 @@ class HairTaskView(gui3d.TaskView):
             human.hairObj.setRotation(human.getRotation())
             human.hairObj.mesh.setCameraProjection(0)
             human.hairObj.mesh.setSolid(human.mesh.solid)
-            human.hairObj.mesh.setCull(human.hairProxy.cull)
+            if human.hairProxy.cull:
+                human.hairObj.mesh.setCull(1)
+            else:
+                human.hairObj.mesh.setCull(None)
             human.hairObj.mesh.setTransparentPrimitives(len(human.hairObj.mesh.faces))
             human.hairObj.mesh.originalHairVerts = [v.co[:] for v in human.hairObj.mesh.verts]
             human.hairObj.mesh.priority = 20

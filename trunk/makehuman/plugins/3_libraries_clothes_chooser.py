@@ -151,7 +151,10 @@ class ClothesTaskView(gui3d.TaskView):
         clo.setRotation(human.getRotation())
         clo.mesh.setCameraProjection(0)
         clo.mesh.setSolid(human.mesh.solid)
-        clo.mesh.setCull(proxy.cull)
+        if proxy.cull:
+            clo.mesh.setCull(1)
+        else:
+            clo.mesh.setCull(None)
         clo.mesh.setTransparentPrimitives(len(clo.mesh.faces))
         clo.mesh.originalClothesVerts = [v.co[:] for v in clo.mesh.verts]
         clo.mesh.priority = 10
