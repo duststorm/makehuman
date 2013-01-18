@@ -580,7 +580,7 @@ def printClothes(context, bob, pob, data):
         firstVert = 0
         (outpath, outfile) = getFileName(pob, context, "mhclo")
     print("Creating clothes file %s" % outfile)
-    fp= open(outfile, "wb")
+    fp= open(outfile, "w", encoding="utf-8", newline="\n")
     printClothesHeader(fp, scn)
     fp.write("# name %s\n" % pob.name.replace(" ","_"))
     fp.write("# obj_file %s.obj\n" % goodName(pob.name))
@@ -682,7 +682,7 @@ def reexportMhclo(context):
     fp.close()        
             
     print("Creating new clothes file %s" % outfile)
-    fp = open(outfile, "wb")
+    fp = open(outfile, "w", encoding="utf-8", newline="\n")
     doingStuff = False
     for line in lines:
         words = line.split()
@@ -711,7 +711,7 @@ def reexportMhclo(context):
 def exportDeleteVerts(context):
     bob = getHuman(context)
     path = os.path.realpath(os.path.expanduser("~/killverts.txt"))
-    fp = open(path, "wb")
+    fp = open(path, "w", encoding="utf-8", newline="\n")
     printDeleteVerts(fp, bob)
     fp.close()
     print("Delete verts written to %s" % path)
@@ -888,7 +888,7 @@ def exportObjFile(context):
     deleteStrayVerts(context, ob)
     (objpath, objfile) = getFileName(ob, context, "obj")
     print("Open", objfile)
-    fp = open(objfile, "wb")
+    fp = open(objfile, "w", encoding="utf-8", newline="\n")
     fp.write("# Exported from make_clothes.py\n")
     
     scn = context.scene
@@ -1047,7 +1047,7 @@ def exportBaseUvsPy(context):
     folder = scn.MCMakeHumanDirectory
     fname = os.path.join(folder, "utils/makeclothes/base_uv.py")
     print("Creating", fname)
-    fp = open(fname, "wb")
+    fp = open(fname, "w", encoding="utf-8", newline="\n")
     fp.write("firstVert = %d\n" % NBodyVerts)
     fp.write("firstFace = %d\n" % NBodyFaces)
     fp.write("texFaces = [\n")
@@ -1071,7 +1071,7 @@ def exportBaseUvsPy(context):
 
 def storeData(pob, bob, data):
     fname = settingsFile("stored")
-    fp = open(fname, "wb")
+    fp = open(fname, "w", encoding="utf-8", newline="\n")
     fp.write("%s\n" % pob.name)
     fp.write("%s\n" % bob.name)
     for (pv, exact, verts, wts, diff) in data:
@@ -1694,7 +1694,7 @@ def offsetCloth(context):
     outfile = os.path.realpath(os.path.expanduser(outpath))
     print("Modifying clothes file %s => %s" % (infile, outfile))
     infp = open(infile, "r")
-    outfp = open(outfile, "wb")
+    outfp = open(outfile, "w", encoding="utf-8", newline="\n")
 
     status = 0
     alwaysOutside = context.scene['MCOutside']
@@ -1789,7 +1789,7 @@ def exportBlenderMaterial(me, path):
     mhxfile = "%s_material.mhx" % matname
     mhxpath = os.path.join(path, mhxfile)
     print("Open %s" % mhxpath)
-    fp = open(mhxpath, "wb")
+    fp = open(mhxpath, "w", encoding="utf-8", newline="\n")
     for tex in texs:
         exportTexture(tex, matname, fp)
     for mat in mats:
