@@ -48,7 +48,7 @@ class CTake(CFbx):
         return self
         
         
-    def writeObject(self, fp):
+    def writeFbx(self, fp):
         return
         
     def writeTake(self, fp):
@@ -95,9 +95,7 @@ class CAnimationStack(CConnection):
         self.action = act        
         alayer = CAnimationLayer().make(act)
         fbx.nodes.alayers[act.name] = alayer
-        print(alayer, alayer.links)
         alayer.makeLink(self)
-        print("  ", alayer.links)
         self.alayers.append(alayer)
         return self
                                 
@@ -110,16 +108,16 @@ class CAnimationStack(CConnection):
 
     def writeHeader(self, fp):
         for alayer in self.alayers:
-            alayer.writeObject(fp)
+            alayer.writeFbx(fp)
         CConnection.writeHeader(self, fp)   
 
-    """
+
     def writeLinks(self, fp):
         take = fbx.takes[self.name]
         #self.writeLink(fp, take)
         for alayer in self.alayers:
-            alayer.writeLink(fp, self)
-    """        
+            alayer.writeLinks(fp)
+
 
     def build(self):
         for alayer in self.alayers:
@@ -173,15 +171,15 @@ class CAnimationLayer(CConnection):
 
     def writeHeader(self, fp):
         for acnode in self.acnodes.values():
-            acnode.writeObject(fp)
+            acnode.writeFbx(fp)
         CConnection.writeHeader(self, fp)            
 
 
     def writeLinks(self, fp):
-        #CConnection.writeLinks(self, fp)
+        CConnection.writeLinks(self, fp)
         for acnode in self.acnodes.values():
-            acnode.writeLink(fp, self, "OP",  ', "%s"' % acnode.name)
-            
+            acnode.writeLink(fp, self)
+
 
     def build(self):
         act = bpy.data.actions.new(self.name)
@@ -235,10 +233,10 @@ def groupFcurves(act):
 #------------------------------------------------------------------
 
 Channels = {
-    'location' : ('T', 'Vector3', (0,0,0)),
-    'rotation_quaternion' : ('R', 'Vector3', (0,0,0)), 
-    'rotation_euler' : ('R', 'Vector3', (0,0,0)), 
-    'scale' : ('S', 'Vector3', (1,1,1)),
+    'location' : ('T', 'Lcl Translation', 'Vector3', (0,0,0)),
+    'rotation_quaternion' : ('R', 'Lcl Rotation', 'Vector3', (0,0,0)), 
+    'rotation_euler' : ('R', 'Lcl Rotation', 'Vector3', (0,0,0)), 
+    'scale' : ('S', 'Lcl Scaling', 'Vector3', (1,1,1)),
 }
 
 XYZ = ['X', 'Y', 'Z']
@@ -262,7 +260,7 @@ class CAnimationCurveNode(CConnection):
     def make(self, group):        
         CConnection.make(self, group)
         channel = self.name.split(".")[-1]
-        self.name, self.proptype, kvec = Channels[channel]
+        self.name, self.channel, self.proptype, kvec = Channels[channel]
         self.group = group
 
         for index,fcu in group.fcurves.items():
@@ -289,16 +287,16 @@ class CAnimationCurveNode(CConnection):
 
     def writeHeader(self, fp):
         for index,acu in self.acurves.items():
-            acu.writeObject(fp)        
+            acu.writeFbx(fp)        
         CConnection.writeHeader(self, fp)            
 
 
-    def writeLink(self, fp, node, oo, extra):
-        CConnection.writeLink(self, fp, node, oo, extra)
+    def writeLink(self, fp, node):
+        CConnection.writeChannelLink(self, fp, node, self.channel)
         print("L", self.acurves.items())
         for index,acu in self.acurves.items():
             print("WL", index, acu)
-            acu.writeLink(fp, self, "OP", ', "d|%s"' % XYZ[index])
+            acu.writeChannelLink(fp, self, '"d|%s"' % XYZ[index])
 
 
     def build(self):

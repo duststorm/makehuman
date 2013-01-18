@@ -123,7 +123,8 @@ class FbxTestPanel(bpy.types.Panel):
     
     def draw(self, context):    
         self.layout.operator("fbx.test_export")
-        self.layout.operator("fbx.test_import")
+        self.layout.operator("fbx.test_import").filepath="/home/myblends/fbx-stuff/test.fbx"
+        self.layout.operator("fbx.test_import", text="Test Import foo").filepath="/Users/Thomas/Documents/makehuman/exports/foo/foo.fbx"
         self.layout.operator("fbx.test_build")
 
 #

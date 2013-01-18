@@ -46,13 +46,13 @@ def exportFbx(human, filepath, options):
     print("Using rig file %s" % rigfile)
     amt = mh2collada.getArmatureFromRigFile(rigfile, human.meshData)
 
-    stuffs = object_collection.setupObjects(os.path.splitext(filepath)[0], human,
+    stuffs = object_collection.setupObjects(
+        os.path.splitext(filepath)[0], human, amt, 
         helpers=options["helpers"], 
         hidden=options["hidden"], 
         eyebrows=options["eyebrows"], 
-        lashes=options["lashes"],
-        subdivide=options["subdivide"])
-    
+        lashes=options["lashes"])
+
     (scale, unit) = options["scale"]   
     outfile = export_config.getOutFileFolder(filepath, cfg)   
     (path, ext) = os.path.splitext(outfile)

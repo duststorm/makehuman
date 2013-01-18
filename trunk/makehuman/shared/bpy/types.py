@@ -25,6 +25,8 @@ Blender API mockup: bpy.types
 from mathutils import *
 from math import *
 
+import mh2collada
+
 #------------------------------------------------------------------
 #   Blender UI
 #------------------------------------------------------------------
@@ -46,11 +48,9 @@ def initialize():
     RnaNames = {}
     for rnaType in ['OBJECT', 'MESH', 'ARMATURE', 'MATERIAL', 'TEXTURE', 'IMAGE', 'SCENE', 'BONE']:
         RnaNames[rnaType] = {}
-    print(RnaNames)
         
 def safeName(name, rnaType):
     global RnaNames 
-    print("safename?", name)
     names = RnaNames[rnaType]
     try:
         names[name]
@@ -89,6 +89,7 @@ class Lamp(Rna):
 
 
 class Armature(Rna):
+
     def __init__(self, name, rigData):
         Rna.__init__(self, name, 'ARMATURE')
         self.bones = []
@@ -99,25 +100,15 @@ class Armature(Rna):
         
 
     def addHierarchy(self, hier, parent):
-        print(hier)
-        
         (bname, children) = hier
-        print(bname, children)
         bone = Bone(bname)
         self.bones.append(bone)
         bone.head = Vector(self.heads[bname])
         bone.tail = Vector(self.tails[bname])
+        bone.roll = 0
         bone.parent = parent
-        
-        vec = bone.tail.sub(bone.head)
-        length = sqrt(vec.dot(vec))
-        axis = vec.div(length)
-        mat = Matrix().compose(bone.head, None, None)
-        if parent:
-            pmat = parent.matrix_local.inverted()
-            bone.matrix_local = pmat.mult(mat)
-        else:
-            bone.matrix_local = mat
+
+        bone.matrixLocalFromBone()
 
         bone.children = []
         for child in children:
@@ -126,6 +117,10 @@ class Armature(Rna):
         
 
 class Bone(Rna):
+    ex = Vector((1,0,0))
+    ey = Vector((0,1,0))
+    ez = Vector((0,0,1))
+
     def __init__(self, name):
         Rna.__init__(self, name, 'BONE')
         self.head = None
@@ -133,27 +128,79 @@ class Bone(Rna):
         self.parent = None
         self.roll = 0
         self.children = []
-        self.matrix_local = Matrix()
+        self.matrix_local = None
         
-        
+
+    def matrixLocalFromBone(self):        
+    
+        u = self.tail.sub(self.head)
+        length = sqrt(u.dot(u))
+        if length < 1e-3:
+            print("Zero-length bone %s. Removed" % self.name)
+            self.matrix_local = tm.identity(4)
+            self.matrix_local.matrix[:3,3] = self.head.vector
+            return
+        u = u.div(length)
+
+        yu = Bone.ey.dot(u)        
+        if abs(yu) > 0.999:
+            axis = Bone.ey
+            if yu > 0:
+                angle = 0
+            else:
+                angle = pi
+        else:        
+            axis = Bone.ey.cross(u)
+            length = sqrt(axis.dot(axis))
+            axis = axis.div(length)
+            angle = acos(yu)
+
+        mat = tm.rotation_matrix(angle,axis)
+        matrix = Matrix(mat)
+        if self.parent:
+            pmat = self.parent.matrix_local.inverted()
+            self.matrix_local = matrix.mult(pmat)
+        else:
+            self.matrix_local = matrix
+        self.matrix_local.matrix[:3,3] = self.head.vector
+
 
 class Mesh(Rna):
     def __init__(self, name):
         Rna.__init__(self, name, 'MESH')
         
     def fromMeshData(self, mesh):        
-        self.vertices = [v.co for v in mesh.verts]
+        self.vertices = [MeshVertex(v.idx, v.co) for v in mesh.verts]
         self.faces = [[v.idx for v in f.verts] for f in mesh.faces]
         self.uv_layers = []
         self.materials = []
 
-    def fromStuff(self, stuff):        
-        self.vertices = stuff.verts
-        self.faces = [[v[0] for v in f] for f in stuff.faces]
+    def fromStuff(self, stuff): 
+        stuff.bones = []
+        mh2collada.setStuffSkinWeights(stuff)
+        nVerts = len(stuff.verts)
+        nUvVerts = len(stuff.uvValues)
+        nNormals = nVerts
+        nFaces = len(stuff.faces)
+        nWeights = len(stuff.skinWeights)
+        nBones = len(stuff.bones)
+        nTargets = len(stuff.targets)
+
+        self.vertices = [MeshVertex(n, v) for (n,v) in enumerate(stuff.verts)]
+        self.polygons = [MeshPolygon(n, [v[0] for v in f]) for (n,f) in enumerate(stuff.faces)]
         self.uv_layers = []
         if stuff.uvValues:
             self.uv_layers.append(UvLayer(stuff.uvValues, stuff.faces))
         self.materials = []
+
+
+
+        print(stuff.rawWeights)
+        print(stuff.weights)
+        print(stuff.targets)
+        print(stuff.vertexWeights)
+        print(stuff.skinWeights)
+
         """
         print("Mat", stuff.material)
         print("Tex", stuff.texture)
@@ -169,6 +216,25 @@ class Mesh(Rna):
         nTargets = len(stuff.targets)
         """
             
+
+class MeshVertex:
+    def __init__(self, idx, co):
+        self.index = idx
+        self.co = co
+        self.normal = []
+        self.groups = []
+        
+class MeshGroup:
+    def __init__(self, gn, weight):
+        self.group = gn
+        self.weight = weight
+        
+class MeshPolygon:
+    def __init__(self, idx, verts):
+        self.index = idx
+        self.vertices = verts
+        self.material_index = 0
+        
         
 class UvLayer:
     def __init__(self, uvValues, faces):
@@ -222,6 +288,7 @@ class Object(Rna):
         self.type = content.rnaType
         self.parent = None
         self.matrix_world = Matrix()
+        self.select = True
         
         if self.data.rnaType == 'MESH':
             self.vertex_groups = []

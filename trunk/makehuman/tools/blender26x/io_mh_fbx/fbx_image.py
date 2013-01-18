@@ -31,7 +31,7 @@ from .fbx_model import *
 class CImage(CConnection):
     propertyTemplate = (         
 """
-        PropertyTemplate: "KFbxVideo" {
+        PropertyTemplate: "FbxVideo" {
             Properties70:  {
                 P: "ImageSequence", "bool", "", "",0
                 P: "ImageSequenceOffset", "int", "Integer", "",0

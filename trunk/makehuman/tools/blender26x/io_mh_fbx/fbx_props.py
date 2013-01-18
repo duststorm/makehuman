@@ -59,13 +59,24 @@ class CProperties70(CFbx):
         prop.isSet = True
         
             
-            
+    def getProp2(self, key, template):
+        if isinstance(key, list):
+            for key1 in key:
+                try:
+                    return True,self.properties[key1].value
+                except KeyError:
+                    pass
+        else:                   
+            try:
+                return True,self.properties[key].value
+            except KeyError:
+                pass
+        return False,template[key].value        
+
+
     def getProp(self, key, template):
-        try:
-            return self.properties[key].value
-        except KeyError:
-            pass         
-        return template[key].value
+        _,value = self.getProp2(key, template)
+        return value
 
     
     def write(self, fp, template):

@@ -195,8 +195,8 @@ def buildObjects(context):
         elif node.ftype == "Texture":
             data = bpy.data.textures.new(node.name, type='IMAGE')
         elif node.ftype == "Video":
-            #bpy.data.images.new(node.name)
-            pass
+            continue
+            bpy.data.images.new(node.name)
         elif node.ftype == "Light":
             data = bpy.data.lamps.new(node.name, type='POINT')
         elif node.ftype == "Camera":
@@ -237,7 +237,7 @@ def buildObjects(context):
                     data = bpy.data.objects.new(node.name, None)
                     fbx.data[node.id] = data
             else:
-                for child in node.children:
+                for child,channel in node.children:
                     print("  ", child.subtype, node.subtype)
                     if child.subtype == node.subtype:
                         data = bpy.data.objects.new(node.name, fbx.data[child.id])
@@ -274,8 +274,9 @@ def activateData(datum):
         return
         
     elif isinstance(datum, bpy.types.Object):
-        fbx.active.objects[datum.name] = datum        
-        activateData(datum.data)
+        if (not fbx.settings.selectedOnly) or datum.select:
+            fbx.active.objects[datum.name] = datum        
+            activateData(datum.data)
 
     elif isinstance(datum, bpy.types.Mesh):
         fbx.active.meshes[datum.name] = datum        
@@ -314,7 +315,7 @@ def activateData(datum):
         for ob in datum.objects:
             activateData(ob)
 
-    if datum.animation_data:
+    if hasattr(datum, "animation_data") and datum.animation_data:
         act = datum.animation_data.action
         if act:
             fbx.active.actions[act.name] = act

@@ -34,12 +34,12 @@ class CNull(CModel):
 
 
     def getBtype(self):
-        for child in self.children:
+        for child,channel in self.children:
             if child.subtype == 'LimbNode':
                 self.node = child
                 return 'ARMATURE'
 
-        for child in self.children:
+        for child,channel in self.children:
             if child.ftype == 'Model':
                 return 'SCENE'
 

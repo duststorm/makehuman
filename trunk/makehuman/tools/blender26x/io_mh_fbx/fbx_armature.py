@@ -83,13 +83,13 @@ class CArmature(CConnection):
             deformer.addDefinition(definitions)
 
 
-    def writeObject(self, fp):
+    def writeFbx(self, fp):
         for bone in self.boneList:
-            bone.writeObject(fp)
+            bone.writeFbx(fp)
         if self.pose:
-            self.pose.writeObject(fp)  
+            self.pose.writeFbx(fp)  
         for deformer in self.deformers:
-            deformer.writeObject(fp)
+            deformer.writeFbx(fp)
 
     
     def writeLinks(self, fp):
@@ -108,12 +108,13 @@ class CArmature(CConnection):
         scn.objects.active = ob
 
         infos = {}
-        for child in parent.children:
+        for child,_ in parent.children:
+            print("AMR", child)
             if isinstance(child, CBone):
                 BoneInfo(child, infos).collect(child, infos, None)
 
         bpy.ops.object.mode_set(mode='EDIT')        
-        for child in parent.children:
+        for child,_ in parent.children:
             if isinstance(child, CBone):
                 child.buildBone(infos, ob.data)        
         bpy.ops.object.mode_set(mode='OBJECT')        
@@ -165,7 +166,7 @@ class CPose(CConnection):
             '        Version: 100\n' +
             '        NbPoseNodes: %d\n' % len(self.poses))
         for pose in self.poses:
-            pose.writeObject(fp)
+            pose.writeFbx(fp)
                         
 
     def build(self):
@@ -215,11 +216,11 @@ class CPoseNode(CFbx):
         return self
         
         
-    def writeObject(self, fp):
+    def writeFbx(self, fp):
         fp.write(
             '        PoseNode:  {\n' +
             '            Node: %d\n' % (self.node.id))
-        self.matrix.writeObject(fp)
+        self.matrix.writeFbx(fp)
         fp.write('        }\n')
         
 #------------------------------------------------------------------
@@ -283,7 +284,7 @@ class CBone(CModel):
 
     
     def writeHeader(self, fp):
-        self.attribute.writeObject(fp)
+        self.attribute.writeFbx(fp)
         CModel.writeHeader(self, fp)   
 
     
@@ -299,7 +300,7 @@ class CBone(CModel):
         if info.parent:
             eb.parent = amt.edit_bones[info.parent.name]
         #eb.roll = info.roll
-        for child in self.children:
+        for child,_ in self.children:
             if isinstance(child, CBone):
                 child.buildBone(infos, amt)
         return eb
@@ -341,7 +342,7 @@ class BoneInfo:
 
         sum = Vector((0,0,0))
         nChildren = 0
-        for child in node.children:
+        for child,_ in node.children:
             if child.btype == 'BONE':
                 cinfo = BoneInfo(child, infos).collect(child, infos, self)
                 self.children.append(cinfo)
@@ -420,16 +421,16 @@ class CDeformer(CConnection):
     
     def writeHeader(self, fp):
         for subdef in self.subdeformers.values():
-            subdef.writeObject(fp)
+            subdef.writeFbx(fp)
         CConnection.writeHeader(self, fp)
         
 
     def build(self):        
-        meNode = self.getBParent('MESH')
-        obNode = meNode.getBParent('OBJECT') 
+        meNode,_ = self.getBParent('MESH')
+        obNode,_ = meNode.getBParent('OBJECT') 
         ob = fbx.data[obNode.id]
 
-        rigNode = obNode.getFParent2('Model', 'Null')
+        rigNode,_ = obNode.getFParent2('Model', 'Null')
         if rigNode:
             rig = fbx.data[rigNode.id]
             mod = ob.modifiers.new(rig.name, 'ARMATURE')
@@ -437,7 +438,7 @@ class CDeformer(CConnection):
             mod.use_bone_envelopes = False
             mod.use_vertex_groups = True
         
-        for child in self.children:
+        for child,_ in self.children:
             child.buildVertGroups(ob)
             
  
@@ -490,10 +491,10 @@ class CSubDeformer(CConnection):
 
     def writeHeader(self, fp):
         CConnection.writeHeader(self, fp)
-        self.indexes.writeObject(fp)
-        self.weights.writeObject(fp)
-        self.transform.writeObject(fp)
-        self.transformLink.writeObject(fp)
+        self.indexes.writeFbx(fp)
+        self.weights.writeFbx(fp)
+        self.transform.writeFbx(fp)
+        self.transformLink.writeFbx(fp)
         
         
     def buildVertGroups(self, ob):

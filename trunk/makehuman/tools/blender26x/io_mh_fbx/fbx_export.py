@@ -17,6 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+import os
 
 from . import fbx
 from .fbx_basic import *
@@ -172,9 +173,12 @@ Definitions:  {
 #   Export
 #------------------------------------------------------------------
     
-def exportFbxFile(context, filepath):
+def exportFbxFile(context, filepath):    
     filepath = filepath.replace('\\','/')
     print("Export", filepath)
+    fbx.filepath = filepath
+    fbx.folder = os.path.dirname(filepath)
+
     fbx_data.makeNodes(context)
     fbx_data.makeTakes(context)
 
@@ -202,7 +206,7 @@ Objects:  {
     for node in nodes:
         print("L", node)
         if node.active or fbx.settings.writeAllNodes:
-            node.writeObject(fp)
+            node.writeFbx(fp)
 
     fp.write(
 """  
@@ -244,7 +248,7 @@ class VIEW3D_OT_TestExportButton(bpy.types.Operator):
     bl_options = {'UNDO'}
 
     def execute(self, context):
-        exportFbxFile(context, "/home/myblends/test.fbx")
+        exportFbxFile(context, "/home/myblends/fbx-stuff/test.fbx")
         return {'FINISHED'}
 
 

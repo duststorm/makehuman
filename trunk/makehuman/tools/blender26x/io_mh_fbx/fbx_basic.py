@@ -87,7 +87,7 @@ class CFbx:
     def __repr__(self):
         return ("<Node %d %s %s %s>" % (self.id, self.ftype, self.name, self.isModel))
 
-    def writeObject(self, fp):
+    def writeFbx(self, fp):
         return
               
     def writeLinks(self, fp):
@@ -223,7 +223,7 @@ class CArray(CFbx):
             return values                    
 
 
-    def writeObject(self, fp):
+    def writeFbx(self, fp):
         if self.csys and fbx.settings.changeCsys:
             self.changeCsys(csysB2F, csysF2B)
         vec = self.flattenValues(self.values)
@@ -274,7 +274,10 @@ def nodeFromName(name):
     
     
 def nameName(string):
-    return string.split("::")[1]
+    if string is None:
+        return None
+    else:
+        return string.split("::")[1]
 
 
 def float2int(f):

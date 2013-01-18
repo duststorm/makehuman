@@ -75,7 +75,11 @@ class CConnection(CFbx):
     # Struct        
 
     def get(self, key):
-        return self.struct[key]
+        try:
+            return self.struct[key]
+        except KeyError:
+            #print("Unrecognized key", key)
+            return None
         
     def set(self, key, value):
         self.struct[key] = value
@@ -122,7 +126,11 @@ class CConnection(CFbx):
             elif len(pnode.values) == 1:
                 self.struct[pnode.key] = pnode.values[0]
             elif len(pnode.values) > 1:
-                self.struct[pnode.key] = pnode.values                
+                self.struct[pnode.key] = pnode.values  
+            else:
+                print(pnode)
+                pnode.write()
+                halt
         return self    
 
 
@@ -135,41 +143,45 @@ class CConnection(CFbx):
         return self
         
                 
-    def makeLink(self, parent):
+    def makeChannelLink(self, parent, channel):
         if self == parent:
             print("Linking to self", self)
             return
             halt
-        self.links.append(parent)
-        parent.children.append(self)
+        self.links.append((parent,channel))
+        parent.children.append((self,channel))
+
         
+    def makeLink(self, parent):
+        self.makeChannelLink(parent, None)
+
+
     def getBParent(self, btype):
-        nodes = []
-        for node in self.links:
-            if node.btype == btype:
-                return node
+        for link in self.links:
+            if link[0].btype == btype:
+                return link
         return None                
         
+
     def getFParent(self, ftype):
-        nodes = []
-        for node in self.links:
-            if node.ftype == ftype:
-                return node
+        for link in self.links:
+            if link[0].ftype == ftype:
+                return link
         return None                
         
+
     def getFParent2(self, ftype, subtype):
-        nodes = []
-        for node in self.links:
-            if (node.ftype == ftype) and (node.subtype == subtype):
-                return node
+        for link in self.links:
+            if (link[0].ftype == ftype) and (link[0].subtype == subtype):
+                return link
         return None                
         
     def getBChildren(self, btype):
-        nodes = []
-        for node in self.children:
-            if node.btype == btype:
-                nodes.append(node)
-        return nodes                                
+        links = []
+        for link in self.children:
+            if link[0].btype == btype:
+                links.append(link)
+        return links
                 
     def writeHeader(self, fp):
         fp.write('    %s: %d, "%s::%s", "%s" {\n' % (self.ftype, self.id, self.prefix, self.name, self.subtype))
@@ -194,7 +206,7 @@ class CConnection(CFbx):
                 fp.write('        %s: %s\n' % (key,value))
     
 
-    def writeObject(self, fp):
+    def writeFbx(self, fp):
         self.writeHeader(fp)
         self.writeProps(fp)
         self.writeStruct(fp)
@@ -205,15 +217,26 @@ class CConnection(CFbx):
         if self.links:
             links = self.links
         else:
-            links = [fbx.root]
-        for node in links:
-            self.writeLink(fp, node)
+            links = [(fbx.root, None)]
+        for link in links:
+            node,channel = link
+            if channel:
+                self.writeChannelLink(fp, node, channel)
+            else:
+                self.writeLink(fp, node)
             
 
-    def writeLink(self, fp, node, oo="OO", extra=""):
+    def writeChannelLink(self, fp, node, channel):
         fp.write(
             '    ;%s::%s, %s::%s\n' % (self.prefix, self.name, node.prefix, node.name) +
-            '    C: "%s",%d,%d%s\n\n' % (oo, self.id, node.id, extra) )
+            '    C: "OP",%d,%d, "%s"\n\n' % (self.id, node.id, channel) )
+
+
+    def writeLink(self, fp, node):
+        fp.write(
+            '    ;%s::%s, %s::%s\n' % (self.prefix, self.name, node.prefix, node.name) +
+            '    C: "OO",%d,%d\n\n' % (self.id, node.id) )
+
 
 #------------------------------------------------------------------
 #   Root node
@@ -228,7 +251,7 @@ class RootNode(CConnection):
         fbx.idstruct[0] = self
         self.active = True
         
-    def writeObject(self, fp):
+    def writeFbx(self, fp):
         return
 
     def writeLinks(self, fp):

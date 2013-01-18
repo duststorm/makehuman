@@ -30,7 +30,7 @@ from .fbx_model import *
 class CTexture(CConnection):
     propertyTemplate = ( 
 """
-        PropertyTemplate: "KFbxFileTexture" {
+        PropertyTemplate: "FbxFileTexture" {
             Properties70:  {
                 P: "TextureTypeUse", "enum", "", "",0
                 P: "Texture alpha", "Number", "", "A",1
@@ -58,7 +58,7 @@ class CTexture(CConnection):
         self.isModel = True 
         self.image = None
 
-        
+    """    
     def parseNodes(self, pnodes):
         rest = []
         for pnode in pnodes:
@@ -67,7 +67,7 @@ class CTexture(CConnection):
             else:
                 rest.append(pnode)
         return  CConnection.parseNodes(self, rest)     
-
+    """
 
     def make(self, tex):
         CConnection.make(self, tex)
@@ -77,16 +77,16 @@ class CTexture(CConnection):
             fbx.nodes.images[img.name].makeLink(self)
             
         self.setMulti([
+            ("Type", "TextureVideoClip"),
             ("Version", 202),          
             ("TextureName", "Texture::%s" % self.name),
             ("Media", "Video::%s" % self.image.name),
-            ("Filename", self.image.struct["Filename"]),           
-            ("RelativeFilename", self.image.struct["RelativeFilename"]),
+            ("Filename", self.image.get("Filename")),           
+            ("RelativeFilename", self.image.get("RelativeFilename")),
             ("ModelUVTranslation", (0,0)),           
             ("ModelUVScaling", (1,1)),
             ("Texture_Alpha_Source", "None"),       
             ("Cropping", (0,0)),
-            ("ModelUVTranslation", (0,0,0,0)),
         ])
         
 
@@ -95,13 +95,27 @@ class CTexture(CConnection):
 
 
     def build(self):
+        print("TEX", self)
         tex = fbx.data[self.id]
-        nodes = self.getBChildren('IMAGE')
-        node = nodes[0]
-        print("B", node, node.image)
-        #img = fbx.data[nodes[0].id]
-        #print(img)
-        tex.image = node.image
+        
+        type = self.get("Type")
+        texname = self.get("TextureName")
+        imgname = nameName(self.get("Media"))
+        filename = self.get("Filename")
+        relativeFilename = self.get("RelativeFilename")
+        _ = self.get("ModelUVTranslation")
+        _ = self.get("ModelUVScaling")
+        _ = self.get("Texture_Alpha_Source")
+        cropping = self.get("Cropping")
+        
+        imgNodes = self.getBChildren('IMAGE')
+        for node,_ in imgNodes:
+            print("IMG", node, imgname)
+            if node.name == imgname:
+                print(fbx.data.items())
+                tex.image = fbx.data[node.id]
+
+        print("Tex", tex, "Img", tex.image)
 
         return self
 

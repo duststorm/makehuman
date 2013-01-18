@@ -71,19 +71,42 @@ class CMaterial(CConnection):
         for mtex in mat.texture_slots:
             if mtex:
                 tex = mtex.texture
+                node = fbx.nodes.textures[tex.name]
                 if tex.type == 'IMAGE':
-                    self.textures.append(tex)
-                    fbx.nodes.textures[tex.name].makeLink(self)
+                    channels = [
+                        (mtex.use_map_diffuse, "DiffuseIntensity"),
+                        (mtex.use_map_color_diffuse, "DiffuseColor"),
+                        (mtex.use_map_alpha, "TransparencyFactor"),
+                        (mtex.use_map_translucency, "Translucency"),
 
-        d = mat.diffuse_intensity
-        s = mat.specular_intensity
-       
+                        (mtex.use_map_specular, "SpecularFactor"),
+                        (mtex.use_map_color_spec, "SpecularColor"),
+                        (mtex.use_map_hardness, "ShininessExponent"),
+
+                        (mtex.use_map_ambient, "Ambient"),
+                        (mtex.use_map_emit, "Emit"),
+                        (mtex.use_map_mirror, "Mirror"),
+                        (mtex.use_map_raymir, "Ray Mirror"),
+
+                        (mtex.use_map_normal, "Normal"),
+                        (mtex.use_map_warp, "Warp"),
+                        (mtex.use_map_displacement, "Displacement"),
+
+                    ]
+                    for use,ftype in channels:
+                        print("MCL", use, ftype, node, self)
+                        if use:     
+                            print("  LINK")
+                            node.makeChannelLink(self, ftype)
+
         self.setProps([
             ("ShadingModel", "Phong"),
             ("MultiLayer", 0),
-            ("DiffuseColor", mat.diffuse_color),
-            ("SpecularColor", mat.specular_color),
+
             ("DiffuseFactor", mat.diffuse_intensity),
+            ("DiffuseColor", mat.diffuse_color),
+
+            ("SpecularColor", mat.specular_color),
             ("SpecularFactor", mat.specular_intensity),
             ("ShininessExponent", mat.specular_hardness),
             ("TransparencyFactor", mat.alpha),
@@ -95,21 +118,50 @@ class CMaterial(CConnection):
         mat.diffuse_intensity = 1
         mat.specular_intensity = 1
 
-        for node in self.properties.nodes():
-            value = node.build()
-            if node.name == "DiffuseColor":
-                mat.diffuse_color = value
-            elif node.name == "SpecularColor":
-                mat.specular_color = value
-            elif node.name == "Shininess":
-                mat.specular_hardness = value
-            elif node.name == "Opacity":
-                mat.alpha = value
+        if self.properties:
+            mat.diffuse_color = self.getProp(["DiffuseColor","Diffuse"])
+            mat.specular_color = self.getProp(["SpecularColor","Specular"])
+            mat.diffuse_intensity = self.getProp("DiffuseFactor")
+            mat.specular_intensity = self.getProp("SpecularFactor")
+            mat.specular_hardness = self.getProp("ShininessExponent")
+            mat.alpha = self.getProp(["Opacity", "TransparencyFactor"])
 
         texNodes = self.getBChildren('TEXTURE')
-        for node in texNodes:
+        for node,channel in texNodes:
             tex = fbx.data[node.id]
             mtex = mat.texture_slots.add()
             mtex.texture = tex
+
+            if channel == "DiffuseIntensity":
+                mtex.use_map_diffuse = True
+            elif channel in ["DiffuseColor","Diffuse"]:
+                mtex.use_map_color_diffuse = True
+            elif channel in ["Opacity", "TransparencyFactor"]:
+                mtex.use_map_alpha = True
+            elif channel == "Translucency":
+                mtex.use_map_translucency = True
+
+            elif channel == "SpecularIntensity":
+                mtex.use_map_specular = True
+            elif channel == ["SpecularColor","Specular"]:
+                mtex.use_map_color_spec = True
+            elif channel == "ShininessExponent":
+                mtex.use_map_hardness = True
+            
+            elif channel == "Ambient":
+                mtex.use_map_ambient= True
+            elif channel == "Emit":
+                mtex.use_map_emit = True
+            elif channel == "Mirror":
+                mtex.use_map_mirror = True
+            elif channel == "Ray Mirror":
+                mtex.use_map_raymir = True
+
+            elif channel == "Normal":
+                mtex.use_map_normal = True
+            elif channel == "Warp":
+                mtex.use_map_warp = True
+            elif channel == "Displacement":
+                mtex.use_map_displacement = True
 
         return mat

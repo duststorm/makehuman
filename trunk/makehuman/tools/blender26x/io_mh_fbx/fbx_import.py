@@ -44,9 +44,10 @@ class VIEW3D_OT_TestImportButton(bpy.types.Operator):
     bl_idname = "fbx.test_import"
     bl_label = "Test Import"
     bl_options = {'UNDO'}
+    filepath = bpy.props.StringProperty()
 
     def execute(self, context):
-        importFbxFile(context, "/home/myblends/test.fbx")
+        importFbxFile(context, self.filepath)
         return {'FINISHED'}
 
 

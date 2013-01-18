@@ -77,14 +77,18 @@ class Vector:
     def div(self, denom):
         return Vector(self.vector/denom)
         
+    def cross(self, vec):
+    	return Vector(numpy.cross(self.vector, vec.vector))
+        
         
 
 class Matrix:        
-    def __init__(self, size=4, data=None):
-        self.size = size
+    def __init__(self, data=None):
         if data is None:
+            self.size = 4
             self.matrix = numpy.identity(4,float)
         else:
+            self.size = len(data)
             self.matrix = numpy.array(data)    
 
     def __repr__(self):

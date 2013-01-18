@@ -42,6 +42,7 @@ class Settings:
         self.changeCsys = False
         self.includePropertyTemplates = True
         self.makeSceneNode = False
+        self.selectedOnly = True
        
 
     def getStruct(self):
@@ -51,6 +52,7 @@ class Settings:
             "changeCsys" : self.changeCsys,    
             "includePropertyTemplates" : self.includePropertyTemplates,
             "makeSceneNode" : self.makeSceneNode,
+            "selectedOnly" : self.selectedOnly,
         }
         
     def setStruct(self, struct):
@@ -69,6 +71,8 @@ class Settings:
             self.includePropertyTemplates = value
         elif key == "makeSceneNode":
             self.makeSceneNode = value
+        elif key == "selectedOnly":
+            self.selectedOnly = value
             
             
 settings = Settings()
