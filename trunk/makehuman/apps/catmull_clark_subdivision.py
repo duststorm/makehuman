@@ -50,6 +50,7 @@ class SubdivisionObject(Object3D):
         self.object = object.object
         self.parent = object
         self.priority = object.priority
+        self.cull = object.cull
 
     def create(self, progressCallback):
         total = 19
