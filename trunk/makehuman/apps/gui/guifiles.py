@@ -299,7 +299,7 @@ class ExportTaskView(gui3d.TaskView):
         self.fbxSkeleton = self.fbxOptions.addWidget(gui.CheckBox("Skeleton", True))
         self.fbxSmooth = self.fbxOptions.addWidget(gui.CheckBox( "Subdivide", False))
         scales = []
-        self.fbxScales = self.addScales(self.fbxOptions, scales, "Obj", True)
+        self.fbxScales = self.addScales(self.fbxOptions, scales, "Fbx", True)
         rigs = []
         self.fbxRigs = self.addRigs(self.fbxOptions, rigs, "Fbx", True)
 
@@ -577,6 +577,8 @@ class ExportTaskView(gui3d.TaskView):
             self.optionsBox.showWidget(self.objOptions)
         elif self.mhx.selected:
             self.optionsBox.showWidget(self.mhxOptions)
+        elif self.fbx.selected:
+            self.optionsBox.showWidget(self.fbxOptions)
         elif self.collada.selected:
             self.optionsBox.showWidget(self.colladaOptions)
         elif self.md5.selected:

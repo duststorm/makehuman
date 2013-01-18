@@ -212,6 +212,10 @@ def setupObjects(name, human, rigfile=None, helpers=False, hidden=True, eyebrows
     if rigfile:
         stuff.boneInfo = getArmatureFromRigFile(rigfile, obj)
         log.message("Using rig file %s" % rigfile)
+            
+    meshInfo = mh2proxy.getMeshInfo(obj, None, None, rawTargets, None)
+    if stuff.boneInfo:
+        meshInfo.weights = stuff.boneInfo.weights
 
     theStuff = stuff
     deleteGroups = []
@@ -219,17 +223,14 @@ def setupObjects(name, human, rigfile=None, helpers=False, hidden=True, eyebrows
         deleteVerts = None
     else:
         deleteVerts = numpy.zeros(len(obj.verts), bool)
-    _,deleteVerts = setupProxies('Clothes', None, obj, stuffs, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
-    foundProxy,deleteVerts = setupProxies('Proxy', name, obj, stuffs, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
+    _,deleteVerts = setupProxies('Clothes', None, obj, stuffs, meshInfo, cfg.proxyList, deleteGroups, deleteVerts)
+    foundProxy,deleteVerts = setupProxies('Proxy', name, obj, stuffs, meshInfo, cfg.proxyList, deleteGroups, deleteVerts)
     if not foundProxy:
         # If we subdivide here, helpers will not be removed.
         if False and subdivide:
             stuff.setObject3dMesh(human.getSubdivisionMesh(False,progressCallback = lambda p: progress(0,p*0.5)),
                                   stuff.meshInfo.weights, rawTargets)
         else:
-            meshInfo = mh2proxy.getMeshInfo(obj, None, None, rawTargets, None)
-            if stuff.boneInfo:
-                meshInfo.weights = stuff.boneInfo.weights
             if helpers:     # helpers override everything
                 stuff.meshInfo = meshInfo
             else:
@@ -287,10 +288,10 @@ def setupObjects(name, human, rigfile=None, helpers=False, hidden=True, eyebrows
     return stuffs
 
 #
-#    setupProxies(typename, name, obj, stuffs, rawTargets, proxyList, deleteGroups, deleteVerts):
+#    setupProxies(typename, name, obj, stuffs, meshInfo, proxyList, deleteGroups, deleteVerts):
 #
 
-def setupProxies(typename, name, obj, stuffs, rawTargets, proxyList, deleteGroups, deleteVerts):
+def setupProxies(typename, name, obj, stuffs, meshInfo, proxyList, deleteGroups, deleteVerts):
     global theStuff
     
     foundProxy = False    
@@ -315,7 +316,7 @@ def setupProxies(typename, name, obj, stuffs, rawTargets, proxyList, deleteGroup
                     else:
                         stuffname = None
 
-                    stuff.meshInfo = mh2proxy.getMeshInfo(obj, proxy, stuff.rawWeights, rawTargets, stuffname)
+                    stuff.meshInfo = mh2proxy.getMeshInfo(obj, proxy, meshInfo.weights, meshInfo.targets, stuffname)
 
                     stuffs.append(stuff)
     return foundProxy, deleteVerts

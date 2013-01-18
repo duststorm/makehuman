@@ -45,7 +45,8 @@ class CArmature(CConnection):
     def make(self, rig):
         CConnection.make(self, rig)
         self.object = fbx.nodes.objects[rig.name]
-        for bone in rig.data.bones:
+        print("MK", rig.data.bones)
+        for bone in oneOf(rig.data.bones.values(), rig.data.bones):
             if bone.parent == None:
                 self.roots.append(bone)                
         for root in self.roots:
@@ -152,7 +153,7 @@ class CPose(CConnection):
         pose = CPoseNode().make(node, ob.matrix_world)
         self.poses.append(pose)
         self.makeLink(node)
-        for bone in ob.data.bones:
+        for bone in oneOf(ob.data.bones.values(), ob.data.bones):
             node = bones[bone.name]
             pose = CPoseNode().make(node, bone.matrix_local)
             self.poses.append(pose)

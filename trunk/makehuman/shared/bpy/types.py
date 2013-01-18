@@ -88,11 +88,32 @@ class Lamp(Rna):
         Rna.__init__(self, name, 'LAMP')
 
 
+#------------------------------------------------------------------
+#   Collection
+#------------------------------------------------------------------
+
+class Collection:
+    def __init__(self):
+        self.data = {}
+        
+    def __getattr__(self, attr):
+        return self.data[attr]
+        
+    def __setattr__(self, attr, value):
+        self.data[attr] = value
+        
+    def __iter__(self):
+        return self.data.values
+        
+#------------------------------------------------------------------
+#   Armature
+#------------------------------------------------------------------
+
 class Armature(Rna):
 
     def __init__(self, name, boneInfo):
         Rna.__init__(self, name, 'ARMATURE')
-        self.bones = []
+        self.bones = {}
         self.edit_bones = self.bones
         self.boneInfo = boneInfo
         self.addHierarchy(boneInfo.hier[0], None)
@@ -101,7 +122,7 @@ class Armature(Rna):
     def addHierarchy(self, hier, parent):
         (bname, children) = hier
         bone = Bone(bname)
-        self.bones.append(bone)
+        self.bones[bname] = bone
         bone.head = Vector(self.boneInfo.heads[bname])
         bone.tail = Vector(self.boneInfo.tails[bname])
         bone.roll = 0
@@ -164,6 +185,10 @@ class Bone(Rna):
             self.matrix_local = matrix
         self.matrix_local.matrix[:3,3] = self.head.vector
 
+
+#------------------------------------------------------------------
+#   Mesh
+#------------------------------------------------------------------
 
 class Mesh(Rna):
     def __init__(self, name):
@@ -241,6 +266,9 @@ class UvLoop:
         self.name = name
         self.data = uvValues
 
+#------------------------------------------------------------------
+#   Material and Texture
+#------------------------------------------------------------------
 
 class Material(Rna):
     def __init__(self, smat, stex):
@@ -269,8 +297,12 @@ class Image(Rna):
         Rna.__init__(self, tex.name, 'IMAGE')
 
         
+#------------------------------------------------------------------
+#   Object
+#------------------------------------------------------------------
+
 class Object(Rna):
-    def __init__(self, name, content, boneInfo=None):
+    def __init__(self, name, content, stuff=None):
         Rna.__init__(self, name, 'OBJECT')
         
         self.data = content
@@ -281,9 +313,10 @@ class Object(Rna):
         
         if self.data.rnaType == 'MESH':
             self.vertex_groups = []
-            if boneInfo:
+            if stuff.meshInfo:
                 index = 0
-                for name,weights in boneInfo.weights.items():
+                for name,weights in stuff.meshInfo.weights.items():
+                    print("OBJ", name, weights)
                     self.vertex_groups.append(VertexGroup(name, index))
                     for (vn,w) in weights:
                         content.vertices[vn].addToGroup(index, w)
@@ -295,6 +328,10 @@ class Object(Rna):
         return ("<%s: %s type=%s data=%s parent=%s>" % (self.rnaType, self.name, self.type, self.data, self.parent))        
 
    
+#------------------------------------------------------------------
+#   Scene and Action
+#------------------------------------------------------------------
+
 class Scene(Rna):
     def __init__(self, name="Scene"):
         Rna.__init__(self, name, 'SCENE')

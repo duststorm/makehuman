@@ -55,6 +55,13 @@ class FbxBool:
 Y = FbxBool(True)
 N = FbxBool(False)
 
+
+def oneOf(mhCase, blenderCase):
+    if fbx.usingMakeHuman:
+        return mhCase
+    else:
+        return blenderCase
+
 #------------------------------------------------------------------
 #   CFbx
 #------------------------------------------------------------------

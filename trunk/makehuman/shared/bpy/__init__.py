@@ -69,15 +69,15 @@ def initialize():
     context = Context(scn)
     
     
-def addMesh(name, mesh, boneInfo, isStuff=True):
+def addMesh(name, stuff, isStuff=True):
     global data
     me = types.Mesh(name)
     data.meshes.append(me)
     if isStuff:
-        me.fromStuff(mesh)
+        me.fromStuff(stuff)
     else:
-        me.fromMesh(mesh)
-    ob = types.Object(name, me)    
+        me.fromMesh(stuff)
+    ob = types.Object(name, me, stuff)    
     data.objects.append(ob)
     context.scene.objects.append(ob)
     return ob
