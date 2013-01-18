@@ -34,7 +34,6 @@ __docformat__ = 'restructuredtext'
 
 import mh
 import gui3d
-import guidetailmodelling
 import gui
 
 class ModellingCategory(gui3d.Category):
@@ -83,5 +82,3 @@ class ModellingCategory(gui3d.Category):
         def onClicked(event):
             human = gui3d.app.selectedHuman
             human.symmetryModeEnabled = self.symmetryButton.selected
-        
-        self.addTask(guidetailmodelling.DetailModelingTaskView(self))

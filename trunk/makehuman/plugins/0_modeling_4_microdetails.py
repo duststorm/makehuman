@@ -339,11 +339,6 @@ class DetailModelingTaskView(gui3d.TaskView):
         gui3d.TaskView.__init__(self, category, 'Detail modelling', label='Micro')
         self.tool = None
         
-        gui3d.app.addLoadHandler('detail', self.loadHandler)
-        gui3d.app.addLoadHandler('microdetail', self.loadHandler)
-
-        gui3d.app.addSaveHandler(self.saveHandler)
-        
         self.sliders = []
 
         self.modifiersBox = self.addLeftWidget(gui.GroupBox('Modifiers'))
@@ -408,3 +403,15 @@ class DetailModelingTaskView(gui3d.TaskView):
                 file.write('detail %s %f\n' % (os.path.basename(t).replace('.target', ''), human.targetsDetailStack[t]))
             elif '/microdetails' in t:
                 file.write('microdetail %s %f\n' % (os.path.basename(t).replace('.target', ''), human.targetsDetailStack[t]))
+
+def load(app):
+    category = app.getCategory('Modelling')
+    taskview = category.addTask(DetailModelingTaskView(category))
+
+    app.addLoadHandler('detail', taskview.loadHandler)
+    app.addLoadHandler('microdetail', taskview.loadHandler)
+
+    app.addSaveHandler(taskview.saveHandler)
+
+def unload(app):
+    pass
