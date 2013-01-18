@@ -69,7 +69,7 @@ def initialize():
     context = Context(scn)
     
     
-def addMesh(name, mesh, isStuff=True):
+def addMesh(name, mesh, boneInfo, isStuff=True):
     global data
     me = types.Mesh(name)
     data.meshes.append(me)
@@ -83,11 +83,9 @@ def addMesh(name, mesh, isStuff=True):
     return ob
     
 
-def addRig(name, rigData):
+def addRig(name, boneInfo):
     global data
-    (heads, tails, newHier, bones, weights) = rigData
-    
-    amt = types.Armature(name, rigData)
+    amt = types.Armature(name, boneInfo)
     data.armatures.append(amt)
     rig = types.Object(name, amt)
     data.objects.append(rig)

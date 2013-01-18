@@ -35,6 +35,9 @@ import numpy
 import shutil
 import mh2proxy
 import export_config
+import bpy
+import mhx
+import log
 
 #
 #    class CStuff
@@ -44,14 +47,9 @@ class CStuff:
     def __init__(self, name, proxy):
         self.name = os.path.basename(name)
         self.type = None
-        self.bones = None
-        self.rawWeights = None
-        self.verts  = None
-        self.vnormals = None
-        self.uvValues = None
-        self.faces = None
-        self.weights = None
-        self.targets = None
+        #self.bones = None
+        self.meshInfo = None
+        self.boneInfo = None
         self.vertexWeights = None
         self.skinWeights = None
         self.material = None
@@ -62,52 +60,44 @@ class CStuff:
             self.type = proxy.type
             self.material = proxy.material
             self.texture = proxy.texture
+
             
+    def setObject3dMesh(self, object3d, weights, shapes):
+        self.meshInfo.setObject3dMesh(object3d, weights, shapes)
+        
+
     def __repr__(self):
         return "<CStuff %s %s mat %s tex %s>" % (self.name, self.type, self.material, self.texture)
 
-    def setBones(self, armature):
-        (rigHead, rigTail, rigHier, bones, rawWeights) = armature
-        self.rigHead = rigHead
-        self.rigTail = rigTail
-        self.rigHier = rigHier
-        self.bones = bones
-        self.rawWeights = rawWeights
-
+    """
     def copyBones(self, rig):
         self.rigHead = rig.rigHead
         self.rigTail = rig.rigTail
         self.rigHier = rig.rigHier
         self.bones = rig.bones
         self.rawWeights = rig.rawWeights
+    """
 
-    def setMesh(self, mesh):
-        (verts, vnormals, uvValues, faces, weights, targets) = mesh
-        self.verts = verts
-        self.vnormals = vnormals
-        self.uvValues = uvValues
-        self.faces = faces
+
+class CBoneInfo:
+    def __init__(self, root, heads, tails, hier, bones, weights):
+        self.root = root
+        self.heads = heads
+        self.tails = tails
+        self.hier = hier
+        self.bones = bones
         self.weights = weights
-        self.targets = targets
-        return
-
-    def setObject3dMesh(self, object3d, rawWeights, rawShapes):
-        self.verts = [tuple(v) for v in object3d.coord]
-        self.vnormals = [tuple(n) for n in object3d.vnorm]
-        self.uvValues = [tuple(t) for t in object3d.texco]
-
-        self.faces = mh2proxy.oldStyleFaces(object3d)
-
-        self.weights = rawWeights
-        self.targets = rawShapes
         
-
+    def __repr__(self):
+        return ("<CBoneInfo r %s h %d t %s\n   h %s\n   b %s\n   w %s" % 
+            (self.root, len(self.heads), len(self.tails), self.hier, self.bones, self.weights))
+       
 #
-#    filterMesh(mesh1, obj, groups, deleteVerts, eyebrows, lashes):
+#    filterMesh(meshInfo, obj, groups, deleteVerts, eyebrows, lashes):
 #
 
-def filterMesh(mesh1, obj, deleteGroups, deleteVerts, eyebrows, lashes):
-    (verts1, vnormals1, uvValues1, faces1, weights1, targets1) = mesh1
+def filterMesh(meshInfo, obj, deleteGroups, deleteVerts, eyebrows, lashes):
+    #(verts1, vnormals1, uvValues1, faces1, weights1, targets1) = mesh1
     
     killUvs = numpy.zeros(len(obj.texco), bool)
     killFaces = numpy.zeros(len(obj.faces), bool)
@@ -139,66 +129,68 @@ def filterMesh(mesh1, obj, deleteGroups, deleteVerts, eyebrows, lashes):
     
     n = 0
     nv = {}
-    verts2 = []
-    for m,v in enumerate(verts1):
+    verts = []
+    for m,v in enumerate(meshInfo.verts):
         if not killVerts[m]:
-            verts2.append(v)
+            verts.append(v)
             nv[m] = n
             n += 1
+    meshInfo.verts = verts
 
-    vnormals2 = []
-    for m,vn in enumerate(vnormals1):
+    vnormals = []
+    for m,vn in enumerate(meshInfo.vnormals):
         if not killVerts[m]:
-            vnormals2.append(vn)
+            vnormals.append(vn)
+    meshInfo.vnormals = vnormals
 
     n = 0
-    uvValues2 = []
+    uvValues = []
     nuv = {}
-    for m,uv in enumerate(uvValues1):
+    for m,uv in enumerate(meshInfo.uvValues):
         if not killUvs[m]:
-            uvValues2.append(uv)
+            uvValues.append(uv)
             nuv[m] = n
-            n += 1    
+            n += 1   
+    meshInfo.uvValues = uvValues            
 
-    faces2 = []
-    for fn,f in enumerate(faces1):
+    faces = []
+    for fn,f in enumerate(meshInfo.faces):
         if not killFaces[fn]:
             f2 = []
             for c in f:
                 v2 = nv[c[0]]
                 uv2 = nuv[c[1]]
                 f2.append([v2, uv2])
-            faces2.append(f2)
+            faces.append(f2)
+    meshInfo.faces = faces            
 
-    if weights1:
-        weights2 = {}
-        for (b, wts1) in weights1.items():
+    if meshInfo.weights:
+        weights = {}
+        for (b, wts1) in meshInfo.weights.items():
             wts2 = []
             for (v1,w) in wts1:
                 if not killVerts[v1]:
                     wts2.append((nv[v1],w))
-            weights2[b] = wts2
-    else:
-        weights2 = weights1
+            weights[b] = wts2
+        meshInfo.weights = weights            
 
-    if targets1:
-        targets2 = []
-        for (name, morphs1) in targets1:
+    if meshInfo.targets:
+        targets = []
+        for (name, morphs1) in meshInfo.targets:
             morphs2 = []
             for (v1,dx) in morphs1:
                 if not killVerts[v1]:
                     morphs2.append((nv[v1],dx))
-            targets2.append(name, morphs2)
-    else:
-        targets2 = targets1
+            targets.append(name, morphs2)
+        meshInfo.targets = targets
 
-    return (verts2, vnormals2, uvValues2, faces2, weights2, targets2)
+    return meshInfo
 
 #
-#   setupObjects(name, human, armature):
+#   setupObjects(name, human, rigfile=None, helpers=False, hidden=True, eyebrows=True, lashes=True, subdivide = False, progressCallback=None):
 #
 
-def setupObjects(name, human, armature=None, helpers=False, hidden=True, eyebrows=True, lashes=True, subdivide = False, progressCallback=None):
+def setupObjects(name, human, rigfile=None, helpers=False, hidden=True, eyebrows=True, lashes=True, subdivide = False, progressCallback=None):
     global theStuff, theTextures, theTexFiles, theMaterials
 
     def progress(base,prog):
@@ -213,29 +205,37 @@ def setupObjects(name, human, armature=None, helpers=False, hidden=True, eyebrow
     theTexFiles = {}
     theMaterials = {}
     rawTargets = []
+    
     stuffs = []
     stuff = CStuff(name, None)
-    if armature:
-        stuff.setBones(armature)
+
+    if rigfile:
+        stuff.boneInfo = getArmatureFromRigFile(rigfile, obj)
+        log.message("Using rig file %s" % rigfile)
+
     theStuff = stuff
     deleteGroups = []
     if hidden:
         deleteVerts = None
     else:
         deleteVerts = numpy.zeros(len(obj.verts), bool)
-    foundProxy,deleteVerts = setupProxies('Clothes', None, obj, stuffs, armature, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
-    foundProxy,deleteVerts = setupProxies('Proxy', name, obj, stuffs, armature, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
+    _,deleteVerts = setupProxies('Clothes', None, obj, stuffs, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
+    foundProxy,deleteVerts = setupProxies('Proxy', name, obj, stuffs, rawTargets, cfg.proxyList, deleteGroups, deleteVerts)
     if not foundProxy:
-        if subdivide:
+        # If we subdivide here, helpers will not be removed.
+        if False and subdivide:
             stuff.setObject3dMesh(human.getSubdivisionMesh(False,progressCallback = lambda p: progress(0,p*0.5)),
-                                  stuff.rawWeights, rawTargets)
+                                  stuff.meshInfo.weights, rawTargets)
         else:
-            mesh1 = mh2proxy.getMeshInfo(obj, None, stuff.rawWeights, rawTargets, None)
+            meshInfo = mh2proxy.getMeshInfo(obj, None, None, rawTargets, None)
+            if stuff.boneInfo:
+                meshInfo.weights = stuff.boneInfo.weights
             if helpers:     # helpers override everything
-                stuff.setMesh(mesh1)
+                stuff.meshInfo = meshInfo
             else:
-                stuff.setMesh(filterMesh(mesh1, obj, deleteGroups, deleteVerts, eyebrows, lashes))
+                stuff.meshInfo =  filterMesh(meshInfo, obj, deleteGroups, deleteVerts, eyebrows, lashes)
         stuffs = [stuff] + stuffs
+        print("SETYP", stuff.meshInfo)
 
     clothKeys = human.clothesObjs.keys()
 
@@ -272,25 +272,25 @@ def setupObjects(name, human, armature=None, helpers=False, hidden=True, eyebrow
                         # Subdivide clothes
                         clo = human.clothesObjs[uuid]
                         subMesh = clo.getSubdivisionMesh(False)
-                        stuff.setObject3dMesh(subMesh, stuff.rawWeights, rawTargets)
+                        stuff.setObject3dMesh(subMesh, stuff.meshInfo.weights, rawTargets)
                     elif uuid and uuid == human.hairProxy.getUuid():
                         # Subdivide hair
                         hair = human.hairObj
                         subMesh = hair.getSubdivisionMesh(False)
-                        stuff.setObject3dMesh(subMesh, stuff.rawWeights, rawTargets)
+                        stuff.setObject3dMesh(subMesh, stuff.meshInfo.weights, rawTargets)
                 elif proxy.type == 'Proxy':
                     # Subdivide proxy
                     subMesh = human.getSubdivisionMesh(False)
-                    stuff.setObject3dMesh(subMesh, stuff.rawWeights, rawTargets)
+                    stuff.setObject3dMesh(subMesh, stuff.meshInfo.weights, rawTargets)
 
     progress(1,0)
     return stuffs
 
 #
-#    setupProxies(typename, name, obj, stuffs, armature, rawTargets, proxyList, deleteGroups, deleteVerts):
+#    setupProxies(typename, name, obj, stuffs, rawTargets, proxyList, deleteGroups, deleteVerts):
 #
 
-def setupProxies(typename, name, obj, stuffs, armature, rawTargets, proxyList, deleteGroups, deleteVerts):
+def setupProxies(typename, name, obj, stuffs, rawTargets, proxyList, deleteGroups, deleteVerts):
     global theStuff
     
     foundProxy = False    
@@ -306,8 +306,7 @@ def setupProxies(typename, name, obj, stuffs, armature, rawTargets, proxyList, d
                     stuff = CStuff(name, proxy)
                 else:
                     stuff = CStuff(proxy.name, proxy)
-                if armature:
-                    stuff.setBones(armature)
+                stuff.boneInfo = theStuff.boneInfo
                 if stuff:
                     if pfile.type == 'Proxy':
                         theStuff = stuff
@@ -316,8 +315,7 @@ def setupProxies(typename, name, obj, stuffs, armature, rawTargets, proxyList, d
                     else:
                         stuffname = None
 
-                    mesh = mh2proxy.getMeshInfo(obj, proxy, stuff.rawWeights, rawTargets, stuffname)
-                    stuff.setMesh(mesh)
+                    stuff.meshInfo = mh2proxy.getMeshInfo(obj, proxy, stuff.rawWeights, rawTargets, stuffname)
 
                     stuffs.append(stuff)
     return foundProxy, deleteVerts
@@ -369,3 +367,102 @@ def nextName(string):
     else:
         return string + "_001"
         
+#
+#    getArmatureFromRigFile(fileName, obj):    
+#
+
+def getArmatureFromRigFile(fileName, obj):
+    (locations, armature, weights) = mhx.read_rig.readRigFile(fileName, obj)
+    
+    hier = []
+    heads = {}
+    tails = {}
+    root = None
+    for (bone, head, tail, roll, parent, options) in armature:
+        heads[bone] = head
+        tails[bone] = tail
+        if parent == '-':
+            hier.append((bone, []))
+            if root is None:
+                root = bone
+        else:
+            parHier = findInHierarchy(parent, hier)
+            try:
+                (p, children) = parHier
+            except:
+                raise NameError("Did not find %s parent %s" % (bone, parent))
+            children.append((bone, []))
+    
+    if root is None:
+        raise NameError("No root bone found in rig file %s" % fileName)
+    # newHier = addInvBones(hier, heads, tails)
+    newHier = hier
+    bones = []
+    flatten(newHier, bones)
+    return CBoneInfo(root, heads, tails, newHier, bones, weights)
+
+
+def addInvBones(hier, heads, tails):
+    newHier = []
+    for (bone, children) in hier:
+        newChildren = addInvBones(children, heads, tails)
+        n = len(children)
+        if n == 1:
+            (child, subChildren) = children[0]
+            offs = vsub(tails[bone], heads[child])
+        if n > 1 or (n == 1 and vlen(offs) > 1e-4):
+            boneInv = bone+"Inv"
+            heads[boneInv] = tails[bone]
+            #tails[boneInv] = heads[bone]
+            tails[boneInv] = aljabr.vadd(tails[bone], Delta)
+            newHier.append( (bone, [(boneInv, newChildren)]) )
+        else:
+            newHier.append( (bone, newChildren) )
+
+    return newHier
+
+
+def findInHierarchy(bone, hier):
+    if hier == []:
+        return []
+    for pair in hier:
+        (b, children) = pair
+        if b == bone:
+            return pair
+        else:
+            b = findInHierarchy(bone, children)
+            if b: return b
+    return []
+
+
+def flatten(hier, bones):
+    for (bone, children) in hier:
+        bones.append(bone)
+        flatten(children, bones)
+    return
+
+#
+#   setStuffSkinWeights(stuff):
+#
+
+def setStuffSkinWeights(stuff):
+    stuff.vertexWeights = {}
+    for (vn,v) in enumerate(stuff.meshInfo.verts):
+        stuff.vertexWeights[vn] = []
+
+    stuff.skinWeights = []
+    wn = 0    
+    print(stuff.boneInfo)
+    print(stuff.meshInfo)
+    for (bn,b) in enumerate(stuff.boneInfo.bones):
+        try:
+            wts = stuff.meshInfo.weights[b]
+        except KeyError:
+            wts = []
+        #print(b,bn,wts)
+        for (vn,w) in wts:
+            stuff.vertexWeights[int(vn)].append((bn,wn))
+            wn += 1
+        stuff.skinWeights.extend(wts)
+    return
+    

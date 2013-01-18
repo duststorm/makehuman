@@ -25,7 +25,7 @@ Blender API mockup: bpy.types
 from mathutils import *
 from math import *
 
-import mh2collada
+import object_collection
 
 #------------------------------------------------------------------
 #   Blender UI
@@ -90,25 +90,25 @@ class Lamp(Rna):
 
 class Armature(Rna):
 
-    def __init__(self, name, rigData):
+    def __init__(self, name, boneInfo):
         Rna.__init__(self, name, 'ARMATURE')
         self.bones = []
         self.edit_bones = self.bones
-        
-        (self.heads, self.tails, hier, bnames, self.weights) = rigData
-        self.addHierarchy(hier[0], None)
+        self.boneInfo = boneInfo
+        self.addHierarchy(boneInfo.hier[0], None)
         
 
     def addHierarchy(self, hier, parent):
         (bname, children) = hier
         bone = Bone(bname)
         self.bones.append(bone)
-        bone.head = Vector(self.heads[bname])
-        bone.tail = Vector(self.tails[bname])
+        bone.head = Vector(self.boneInfo.heads[bname])
+        bone.tail = Vector(self.boneInfo.tails[bname])
         bone.roll = 0
         bone.parent = parent
 
         bone.matrixLocalFromBone()
+        print("  ", bone)
 
         bone.children = []
         for child in children:
@@ -177,44 +177,21 @@ class Mesh(Rna):
 
     def fromStuff(self, stuff): 
         stuff.bones = []
-        mh2collada.setStuffSkinWeights(stuff)
-        nVerts = len(stuff.verts)
-        nUvVerts = len(stuff.uvValues)
+        object_collection.setStuffSkinWeights(stuff)
+        nVerts = len(stuff.meshInfo.verts)
+        nUvVerts = len(stuff.meshInfo.uvValues)
         nNormals = nVerts
-        nFaces = len(stuff.faces)
+        nFaces = len(stuff.meshInfo.faces)
         nWeights = len(stuff.skinWeights)
         nBones = len(stuff.bones)
-        nTargets = len(stuff.targets)
+        nTargets = len(stuff.meshInfo.targets)
 
-        self.vertices = [MeshVertex(n, v) for (n,v) in enumerate(stuff.verts)]
-        self.polygons = [MeshPolygon(n, [v[0] for v in f]) for (n,f) in enumerate(stuff.faces)]
+        self.vertices = [MeshVertex(n, v) for (n,v) in enumerate(stuff.meshInfo.verts)]
+        self.polygons = [MeshPolygon(n, [v[0] for v in f]) for (n,f) in enumerate(stuff.meshInfo.faces)]
         self.uv_layers = []
-        if stuff.uvValues:
-            self.uv_layers.append(UvLayer(stuff.uvValues, stuff.faces))
+        if stuff.meshInfo.uvValues:
+            self.uv_layers.append(UvLayer(stuff.meshInfo.uvValues, stuff.meshInfo.faces))
         self.materials = []
-
-
-
-        print(stuff.rawWeights)
-        print(stuff.weights)
-        print(stuff.targets)
-        print(stuff.vertexWeights)
-        print(stuff.skinWeights)
-
-        """
-        print("Mat", stuff.material)
-        print("Tex", stuff.texture)
-        if stuff.material or stuff.texture:
-            mat = Material(stuff.material, stuff.texture)
-            self.materials.append(mat)
-
-        nVerts = len(stuff.verts)
-        nUvVerts = len(stuff.uvValues)
-        nNormals = nVerts
-        nWeights = len(stuff.skinWeights)
-        nBones = len(stuff.bones)
-        nTargets = len(stuff.targets)
-        """
             
 
 class MeshVertex:
@@ -224,10 +201,22 @@ class MeshVertex:
         self.normal = []
         self.groups = []
         
+    def addToGroup(self, index, weight):
+        group = MeshGroup(index, weight)
+        self.groups.append(group)
+
+        
+class VertexGroup:
+    def __init__(self, name, index):
+        self.name = name
+        self.index = index        
+        
+
 class MeshGroup:
-    def __init__(self, gn, weight):
-        self.group = gn
+    def __init__(self, index, weight):
+        self.group = index
         self.weight = weight
+
         
 class MeshPolygon:
     def __init__(self, idx, verts):
@@ -281,7 +270,7 @@ class Image(Rna):
 
         
 class Object(Rna):
-    def __init__(self, name, content):
+    def __init__(self, name, content, boneInfo=None):
         Rna.__init__(self, name, 'OBJECT')
         
         self.data = content
@@ -292,13 +281,20 @@ class Object(Rna):
         
         if self.data.rnaType == 'MESH':
             self.vertex_groups = []
+            if boneInfo:
+                index = 0
+                for name,weights in boneInfo.weights.items():
+                    self.vertex_groups.append(VertexGroup(name, index))
+                    for (vn,w) in weights:
+                        content.vertices[vn].addToGroup(index, w)
+                    index += 1
         elif self.data.rnaType == 'ARMATURE':
             pass
         
     def __repr__(self):
         return ("<%s: %s type=%s data=%s parent=%s>" % (self.rnaType, self.name, self.type, self.data, self.parent))        
 
-    
+   
 class Scene(Rna):
     def __init__(self, name="Scene"):
         Rna.__init__(self, name, 'SCENE')

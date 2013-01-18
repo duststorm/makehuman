@@ -36,7 +36,7 @@ import mh2proxy
 import export_config
 import object_collection
 import mhx
-from mhx import the, read_rig
+from mhx import the
 import log
 
 #
@@ -69,32 +69,6 @@ def exportCollada(human, filename, options):
     return
 
 #
-#    findInHierarchy(bone, hier):
-#
-
-def findInHierarchy(bone, hier):
-    if hier == []:
-        return []
-    for pair in hier:
-        (b, children) = pair
-        if b == bone:
-            return pair
-        else:
-            b = findInHierarchy(bone, children)
-            if b: return b
-    return []
-
-#
-#    flatten(hier, bones):
-#
-
-def flatten(hier, bones):
-    for (bone, children) in hier:
-        bones.append(bone)
-        flatten(children, bones)
-    return
-
-#
 #
 #
 
@@ -113,7 +87,7 @@ def rotateLoc(loc, scale):
 #
 #    boneOK(flags, bone, parent):
 #
-
+"""
 Reparents = {
     'UpArm_L'     : 'Clavicle_L',
     'UpArm_R'     : 'Clavicle_R',
@@ -137,8 +111,8 @@ TwistBones = {
 
 SkipBones = [ 'Rib_L', 'Rib_R', 'Stomach_L', 'Stomach_R', 'Scapula_L', 'Scapula_R']
 
-def boneOK(flags, bone, parent):
-    if bone == the.Root:
+def boneOK(flags, bone, parent, root):
+    if bone == root:
         return 'None'
     elif bone in TwistBones.keys():
         return None
@@ -193,14 +167,14 @@ def fixTwistWeights(fp, weights):
                 n += 1
         fp.write("\n%s\n%s\n%s\n" % (twist, weights[twist], weights[bone]))
     return
-                
+"""                
 #
 #    writeBone(fp, bone, orig, extra, pad, stuff):
 #
 
 def writeBone(fp, bone, orig, extra, pad, stuff):
     (name, children) = bone
-    head = stuff.rigHead[name]
+    head = stuff.boneInfo.heads[name]
     vec = aljabr.vsub(head, orig)
     printNode(fp, name, vec, extra, pad)
     for child in children:
@@ -231,63 +205,6 @@ def printNode(fp, name, vec, extra, pad):
     
 
 #
-#    getArmatureFromRigFile(fileName, obj):    
-#
-
-def getArmatureFromRigFile(fileName, obj):
-    (locations, armature, weights) = read_rig.readRigFile(fileName, obj)
-    
-    hier = []
-    heads = {}
-    tails = {}
-    the.Root = None
-    for (bone, head, tail, roll, parent, options) in armature:
-        heads[bone] = head
-        tails[bone] = tail
-        if parent == '-':
-            hier.append((bone, []))
-            if not the.Root:
-                the.Root = bone
-        else:
-            parHier = findInHierarchy(parent, hier)
-            try:
-                (p, children) = parHier
-            except:
-                raise NameError("Did not find %s parent %s" % (bone, parent))
-            children.append((bone, []))
-    
-    if not the.Root:
-        raise NameError("No root bone found in rig file %s" % fileName)
-    # newHier = addInvBones(hier, heads, tails)
-    newHier = hier
-    bones = []
-    flatten(newHier, bones)
-    return (heads, tails, newHier, bones, weights)
-
-#
-#    addInvBones(hier, heads, tails):
-#
-
-def addInvBones(hier, heads, tails):
-    newHier = []
-    for (bone, children) in hier:
-        newChildren = addInvBones(children, heads, tails)
-        n = len(children)
-        if n == 1:
-            (child, subChildren) = children[0]
-            offs = vsub(tails[bone], heads[child])
-        if n > 1 or (n == 1 and vlen(offs) > 1e-4):
-            boneInv = bone+"Inv"
-            heads[boneInv] = tails[bone]
-            #tails[boneInv] = heads[bone]
-            tails[boneInv] = aljabr.vadd(tails[bone], Delta)
-            newHier.append( (bone, [(boneInv, newChildren)]) )
-        else:
-            newHier.append( (bone, newChildren) )
-
-    return newHier
-
-#
 #    exportDae(human, name, fp):
 #
 
@@ -295,11 +212,11 @@ def exportDae(human, name, fp):
     cfg = export_config.exportConfig(human, True)
     obj = human.meshData
     rigfile = "data/rigs/%s.rig" % the.Options["daerig"]
-    log.message("Using rig file %s" % rigfile)
-    amt = getArmatureFromRigFile(rigfile, obj)
 
     stuffs = object_collection.setupObjects(
-        name, human, amt, 
+        name, 
+        human, 
+        rigfile=rigfile, 
         helpers=the.Options["helpers"], 
         hidden=the.Options["hidden"], 
         eyebrows=the.Options["eyebrows"], 
@@ -362,7 +279,7 @@ def exportDae(human, name, fp):
 '  <library_visual_scenes>\n' +
 '    <visual_scene id="Scene" name="Scene">\n' +
 '      <node id="Scene_root">\n')
-    for root in mainStuff.rigHier:
+    for root in mainStuff.boneInfo.hier:
         writeBone(fp, root, [0,0,0], 'layer="L1"', '  ', mainStuff)
     for stuff in stuffs:
         writeNode(obj, fp, "        ", stuff)
@@ -567,40 +484,18 @@ def writeMaterials(obj, fp, stuff):
     return
 
 #
-#   setStuffSkinWeights(stuff):
-#
-
-def setStuffSkinWeights(stuff):
-    stuff.vertexWeights = {}
-    for (vn,v) in enumerate(stuff.verts):
-        stuff.vertexWeights[vn] = []
-
-    stuff.skinWeights = []
-    wn = 0    
-    for (bn,b) in enumerate(stuff.bones):
-        try:
-            wts = stuff.weights[b]
-        except:
-            wts = []
-        for (vn,w) in wts:
-            stuff.vertexWeights[int(vn)].append((bn,wn))
-            wn += 1
-        stuff.skinWeights.extend(wts)
-    return
-    
-#
 #    writeController(obj, fp, stuff):
 #
 
 def writeController(obj, fp, stuff):
-    setStuffSkinWeights(stuff)
-    nVerts = len(stuff.verts)
-    nUvVerts = len(stuff.uvValues)
+    object_collection.setStuffSkinWeights(stuff)
+    nVerts = len(stuff.meshInfo.verts)
+    nUvVerts = len(stuff.meshInfo.uvValues)
     nNormals = nVerts
-    nFaces = len(stuff.faces)
+    nFaces = len(stuff.meshInfo.faces)
     nWeights = len(stuff.skinWeights)
-    nBones = len(stuff.bones)
-    nTargets = len(stuff.targets)
+    nBones = len(stuff.boneInfo.bones)
+    nTargets = len(stuff.meshInfo.targets)
     (scale, unit) = the.Options["scale"]
 
     fp.write('\n' +
@@ -616,7 +511,7 @@ def writeController(obj, fp, stuff):
 '          <IDREF_array count="%d" id="%s-skin-joints-array">\n' % (nBones,stuff.name) +
 '           ')
 
-    for b in stuff.bones:
+    for b in stuff.boneInfo.bones:
         fp.write(' %s' % b)
     
     fp.write('\n' +
@@ -647,8 +542,8 @@ def writeController(obj, fp, stuff):
 '          <float_array count="%d" id="%s-skin-poses-array">' % (16*nBones,stuff.name))
 
     mat = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
-    for b in stuff.bones:
-        vec = stuff.rigHead[b]
+    for b in stuff.boneInfo.bones:
+        vec = stuff.boneInfo.heads[b]
         (x,y,z) = rotateLoc(vec, scale)
         mat[0][3] = -x
         mat[1][3] = -y
@@ -748,12 +643,12 @@ def writeController(obj, fp, stuff):
 #
         
 def writeGeometry(obj, fp, stuff):
-    nVerts = len(stuff.verts)
-    nUvVerts = len(stuff.uvValues)
+    nVerts = len(stuff.meshInfo.verts)
+    nUvVerts = len(stuff.meshInfo.uvValues)
     nNormals = nVerts
     nWeights = len(stuff.skinWeights)
-    nBones = len(stuff.bones)
-    nTargets = len(stuff.targets)
+    nBones = len(stuff.boneInfo.bones)
+    nTargets = len(stuff.meshInfo.targets)
     (scale, unit) = the.Options["scale"]
 
     fp.write('\n' +
@@ -764,7 +659,7 @@ def writeGeometry(obj, fp, stuff):
 '          ')
 
 
-    for v in stuff.verts:
+    for v in stuff.meshInfo.verts:
         (x,y,z) = rotateLoc(v, scale)
         fp.write("%.4f %.4f %.4f " % (x,y,z))
 
@@ -782,7 +677,7 @@ def writeGeometry(obj, fp, stuff):
 '          <float_array count="%d" id="%s-Normals-array">\n' % (3*nNormals,stuff.name) +
 '          ')
 
-    for no in stuff.vnormals:
+    for no in stuff.meshInfo.vnormals:
         (x,y,z) = rotateLoc(no, scale)
         fp.write("%.4f %.4f %.4f " % (x,y,z))
 
@@ -802,7 +697,7 @@ def writeGeometry(obj, fp, stuff):
 '           ')
 
 
-    for uv in stuff.uvValues:
+    for uv in stuff.meshInfo.uvValues:
         fp.write(" %.4f %.4f" %(uv[0], uv[1]))
 
     fp.write('\n' +
@@ -866,12 +761,12 @@ def writeGeometry(obj, fp, stuff):
 
 def writePolygons(fp, stuff):
     fp.write(        
-'        <polygons count="%d">\n' % len(stuff.faces) +
+'        <polygons count="%d">\n' % len(stuff.meshInfo.faces) +
 '          <input offset="0" semantic="VERTEX" source="#%s-Vertex"/>\n' % stuff.name +
 '          <input offset="1" semantic="NORMAL" source="#%s-Normals"/>\n' % stuff.name +
 '          <input offset="2" semantic="TEXCOORD" source="#%s-UV"/>\n' % stuff.name)
 
-    for fc in stuff.faces:
+    for fc in stuff.meshInfo.faces:
         fp.write('          <p>')
         for vs in fc:
             v = vs[0]
@@ -885,20 +780,20 @@ def writePolygons(fp, stuff):
 
 def writePolylist(fp, stuff):
     fp.write(        
-'        <polylist count="%d">\n' % len(stuff.faces) +
+'        <polylist count="%d">\n' % len(stuff.meshInfo.faces) +
 '          <input offset="0" semantic="VERTEX" source="#%s-Vertex"/>\n' % stuff.name +
 '          <input offset="1" semantic="NORMAL" source="#%s-Normals"/>\n' % stuff.name +
 '          <input offset="2" semantic="TEXCOORD" source="#%s-UV"/>\n' % stuff.name +
 '          <vcount>')
 
-    for fc in stuff.faces:
+    for fc in stuff.meshInfo.faces:
         fp.write('%d ' % len(fc))
 
     fp.write('\n' +
 '          </vcount>\n'
 '          <p>')
 
-    for fc in stuff.faces:
+    for fc in stuff.meshInfo.faces:
         for vs in fc:
             v = vs[0]
             uv = vs[1]
@@ -914,7 +809,7 @@ def writePolylist(fp, stuff):
 #
 
 def checkFaces(stuff, nVerts, nUvVerts):
-    for fc in stuff.faces:
+    for fc in stuff.meshInfo.faces:
         for vs in fc:
             v = vs[0]
             uv = vs[1]
@@ -937,7 +832,7 @@ def writeNode(obj, fp, pad, stuff):
 '%s  <rotate sid="rotateX">1 0 0 0</rotate>\n' % pad+
 #'%s  <scale sid="scale">1 1 1</scale>\n' % pad+
 '%s  <instance_controller url="#%s-skin">\n' % (pad, stuff.name) +
-'%s    <skeleton>#%s</skeleton>\n' % (pad, the.Root))
+'%s    <skeleton>#%s</skeleton>\n' % (pad, stuff.boneInfo.root))
 
     (texname, texfile, matname) = object_collection.getTextureNames(stuff)    
     if matname:

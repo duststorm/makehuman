@@ -26,7 +26,7 @@ import os
 import sys
 import export_config
 import object_collection
-import mh2collada
+import log
 
 
 fbxpath = "tools/blender26x"
@@ -42,12 +42,12 @@ def exportFbx(human, filepath, options):
     cfg = export_config.exportConfig(human, True)
     cfg.separatefolder = True
 
+    log.message("Write FBX file %s" % filepath)
     rigfile = "data/rigs/%s.rig" % options["fbxrig"]
-    print("Using rig file %s" % rigfile)
-    amt = mh2collada.getArmatureFromRigFile(rigfile, human.meshData)
-
     stuffs = object_collection.setupObjects(
-        os.path.splitext(filepath)[0], human, amt, 
+        os.path.splitext(filepath)[0], 
+        human, 
+        rigfile, 
         helpers=options["helpers"], 
         hidden=options["hidden"], 
         eyebrows=options["eyebrows"], 
@@ -59,16 +59,17 @@ def exportFbx(human, filepath, options):
 
     bpy.initialize()
     name = os.path.splitext(os.path.basename(filepath))[0]
-    rig = bpy.addRig(name, amt)
+    boneInfo = stuffs[0].boneInfo
+    rig = bpy.addRig(name, boneInfo)
     for stuff in stuffs:
-        ob = bpy.addMesh(stuff.name, stuff, True)
+        ob = bpy.addMesh(stuff.name, stuff, boneInfo, True)
         ob.parent = rig
         
     #name = os.path.splitext(os.path.basename(filepath))[0]
     #bpy.addMesh(name, human.meshData, False)
     
     filename = "%s.fbx" % path
-    print("Mh2Fbx", bpy.context.scene.objects)
+    log.message("Mh2Fbx %s" % bpy.context.scene.objects)
     io_mh_fbx.fbx_export.exportFbxFile(bpy.context, filename)
     return
 

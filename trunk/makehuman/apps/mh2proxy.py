@@ -162,7 +162,42 @@ class CTexture:
         self.file = fname
         self.types = []   
                 
+#
+#   class CMeshInfo:
+#
 
+class CMeshInfo:
+
+    def __init__(self, verts, vnormals, uvValues, faces, weights, targets):
+        self.verts = verts
+        self.vnormals = vnormals
+        self.uvValues = uvValues
+        self.faces = faces
+        self.weights = weights
+        self.targets = targets
+
+    def setObject3dMesh(self, object3d, weights, shapes):
+        self.verts = [tuple(v) for v in object3d.coord]
+        self.vnormals = [tuple(n) for n in object3d.vnorm]
+        self.uvValues = [tuple(t) for t in object3d.texco]
+        self.faces = mh2proxy.oldStyleFaces(object3d)
+        self.weights = weights
+        self.targets = shapes
+        
+    def __repr__(self):
+        nVerts = nNormals = nUvs = nFaces = nWeights = nTargets = -1
+        if self.verts: nVerts = len(self.verts)
+        if self.vnormals: nNormals = len(self.vnormals)
+        if self.uvValues: nUvs = len(self.uvValues)
+        if self.faces: nFaces = len(self.faces)
+        if self.weights: nWeights = len(self.weights)
+        if self.targets: nTargets = len(self.targets)
+        
+        return ("<CMeshInfo v %d n %d u %d f %d w %d t %d>" % (nVerts, nNormals, nUvs, nFaces, nWeights, nTargets))
+
+#
+#
+#
 def stringFromWords(words):
     string = words[0]
     for word in words[1:]:
@@ -898,13 +933,13 @@ def getMeshInfo(obj, proxy, rawWeights, rawShapes, rigname):
 
         weights = getProxyWeights(rawWeights, proxy)
         shapes = getProxyShapes(rawShapes, proxy.verts)
-        return (verts, vnormals, proxy.texVerts, faces, weights, shapes)
+        return CMeshInfo(verts, vnormals, proxy.texVerts, faces, weights, shapes)
     else:
         verts = [tuple(v) for v in obj.coord]
         vnormals = [tuple(n) for n in obj.vnorm]
         texcoords = [tuple(t) for t in obj.texco]
         faces = oldStyleFaces(obj)
-        return (verts, vnormals, texcoords, faces, rawWeights, rawShapes)
+        return CMeshInfo(verts, vnormals, texcoords, faces, rawWeights, rawShapes)
         
         
 def oldStyleFaces(obj):
