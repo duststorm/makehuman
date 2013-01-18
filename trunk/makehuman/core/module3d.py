@@ -106,7 +106,7 @@ class Object3D(object):
         self.vmap = None
         self.tmap = None
         self.priority = 0
-        self.cull = None
+        self.cull = 0
 
         self.__object = None
 
@@ -684,7 +684,7 @@ class Object3D(object):
         This method is used to specify whether or not the object is back-face culled.
 
         :param cull: Whether and how to cull
-        :type cull: None => no culling, >0 => draw front faces, <0 => draw back faces
+        :type cull: 0 => no culling, >0 => draw front faces, <0 => draw back faces
         """
         self.cull = cull
 

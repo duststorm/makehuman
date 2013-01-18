@@ -353,7 +353,7 @@ def drawMesh(obj):
     if obj.shadeless:
         glDisable(GL_LIGHTING)
 
-    if obj.cull is not None:
+    if obj.cull:
         glEnable(GL_CULL_FACE)
         glCullFace(GL_BACK if obj.cull > 0 else GL_FRONT)
 
@@ -444,7 +444,7 @@ def pickMesh(obj):
     # Disable lighting
     glDisable(GL_LIGHTING)
 
-    if obj.cull is not None:
+    if obj.cull:
         glEnable(GL_CULL_FACE)
         glCullFace(GL_BACK if obj.cull > 0 else GL_FRONT)
 
