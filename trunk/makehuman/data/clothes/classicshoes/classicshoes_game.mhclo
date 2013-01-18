@@ -11,6 +11,7 @@
 # z_scale 8208 8220 2.0187
 # y_scale 8223 6827 1.9414
 # z_depth 50
+# backface_culling yes
 # uvtex_layer 0 Texture
 # objfile_layer 0
 # texture classicshoes_texture.png 0

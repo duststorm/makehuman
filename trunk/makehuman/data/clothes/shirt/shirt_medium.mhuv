@@ -12,6 +12,7 @@
   specular_intensity 0.02336
   alpha 1
   texture ShirtTex diffuse 1
+# backface_culling yes
 # texVerts 0
 0.6206 0.8000
 0.6092 0.7964

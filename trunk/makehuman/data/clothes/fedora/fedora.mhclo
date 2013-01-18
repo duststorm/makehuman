@@ -11,7 +11,7 @@
 # z_scale 8208 8220 1.8527
 # y_scale 8223 6827 1.8024
 # z_depth 100
-# backface_culling 1
+# backface_culling yes
 # uvtex_layer 0 UVMap
 # objfile_layer 0
 # texture fedora_texture.png 0
