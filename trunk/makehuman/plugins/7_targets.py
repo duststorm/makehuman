@@ -82,7 +82,7 @@ class TargetsTaskView(gui3d.TaskView):
         mesh.sync_all()
 
 def load(app):
-    category = app.getCategory('Targets')
+    category = app.getCategory('Develop')
     taskview = category.addTask(TargetsTaskView(category))
 
 def unload(app):

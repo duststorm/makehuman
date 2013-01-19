@@ -13,7 +13,7 @@ class LoggingTaskView(gui3d.TaskView):
         self.addTopWidget(G.app.log_window)
 
 def load(app):
-    category = app.getCategory('Logging')
+    category = app.getCategory('Develop')
     taskview = category.addTask(LoggingTaskView(category))
 
 def unload(app):
