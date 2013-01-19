@@ -275,6 +275,7 @@ def executeScript(scriptSource):
         dlg = gui.Dialog()
         dlg.prompt("Good job!","The script was executed without problems.","OK")
     except Exception as e:
+        log.error(e)
         dlg = gui.Dialog()
         dlg.prompt("Crappy script","The script produced an exception: " + format(str(e)),"OK")
 
