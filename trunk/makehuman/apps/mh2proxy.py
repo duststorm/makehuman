@@ -183,7 +183,7 @@ class CMeshInfo:
         self.verts = [tuple(v) for v in object3d.coord]
         self.vnormals = [tuple(n) for n in object3d.vnorm]
         self.uvValues = [tuple(t) for t in object3d.texco]
-        self.faces = mh2proxy.oldStyleFaces(object3d)
+        self.faces = oldStyleFaces(object3d)
         self.weights = weights
         self.targets = shapes
         

@@ -1050,9 +1050,9 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings, progressCallba
 
         # Vertices - Write a POV-Ray array to the output stream
         outputFileDescriptor.write('  vertex_vectors {\n  ')
-        outputFileDescriptor.write('    %s\n  ' % len(stuff.verts))
+        outputFileDescriptor.write('    %s\n  ' % len(stuff.meshInfo.verts))
 
-        for v in stuff.verts:
+        for v in stuff.meshInfo.verts:
             outputFileDescriptor.write('<%s,%s,%s>' % (-v[0],v[1],v[2]))
         outputFileDescriptor.write('''
   }
@@ -1061,8 +1061,8 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings, progressCallba
 
         # Normals - Write a POV-Ray array to the output stream
         outputFileDescriptor.write('  normal_vectors {\n  ')
-        outputFileDescriptor.write('    %s\n  ' % len(stuff.verts))
-        for vno in stuff.vnormals:
+        outputFileDescriptor.write('    %s\n  ' % len(stuff.meshInfo.verts))
+        for vno in stuff.meshInfo.vnormals:
             outputFileDescriptor.write('<%s,%s,%s>' % (-vno[0],vno[1],vno[2]))
 
         outputFileDescriptor.write('''
@@ -1072,8 +1072,8 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings, progressCallba
     
         # UV Vectors - Write a POV-Ray array to the output stream
         outputFileDescriptor.write('  uv_vectors {\n  ')
-        outputFileDescriptor.write('    %s\n  ' % len(stuff.uvValues))
-        for uv in stuff.uvValues:
+        outputFileDescriptor.write('    %s\n  ' % len(stuff.meshInfo.uvValues))
+        for uv in stuff.meshInfo.uvValues:
             outputFileDescriptor.write('<%s,%s>' % tuple(uv))        
 
         outputFileDescriptor.write('''
@@ -1083,13 +1083,13 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings, progressCallba
 
         # Faces - Write a POV-Ray array of arrays to the output stream
         nTriangles = 0
-        for f in stuff.faces:
+        for f in stuff.meshInfo.faces:
             nTriangles += len(f)-2
 
         outputFileDescriptor.write('  face_indices {\n  ')
         outputFileDescriptor.write('    %s\n  ' % nTriangles)
 
-        for f in stuff.faces:
+        for f in stuff.meshInfo.faces:
             verts = []
             for v,vt in f:
                 verts.append(v)
@@ -1107,7 +1107,7 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings, progressCallba
         outputFileDescriptor.write('  uv_indices {\n  ')
         outputFileDescriptor.write('    %s\n  ' % nTriangles)
 
-        for f in stuff.faces:
+        for f in stuff.meshInfo.faces:
             vts = []
             for v,vt in f:
                 vts.append(vt)        
