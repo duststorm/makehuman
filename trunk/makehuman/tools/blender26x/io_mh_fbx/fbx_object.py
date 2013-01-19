@@ -97,13 +97,10 @@ class CObject(CModel):
     
     def build3(self):
         ob = fbx.data[self.id]
-        print("BLD", self, ob)
         if self.properties:
             ob.location = self.getProp("Lcl Translation")
             ob.rotation_euler = self.getProp("Lcl Rotation")
             ob.scale = self.getProp("Lcl Scaling")
         return ob    
                 
-
-print("fbx_object imported")
 

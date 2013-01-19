@@ -75,7 +75,6 @@ def exportFbx(human, filepath, options):
     #bpy.addMesh(name, human.meshData, False)
     
     filename = "%s.fbx" % path
-    log.message("Mh2Fbx %s" % bpy.context.scene.objects)
     io_mh_fbx.fbx_export.exportFbxFile(bpy.context, filename)
     return
 

@@ -28,7 +28,6 @@ bl_info = {
     'wiki_url': "",
     "category": "MakeHuman"}
 
-
 if "bpy" in locals():
     print("Reloading FBX importer")
     import imp

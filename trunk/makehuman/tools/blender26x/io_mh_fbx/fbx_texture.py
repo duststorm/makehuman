@@ -95,7 +95,6 @@ class CTexture(CConnection):
 
 
     def build2(self):
-        print("TEX", self)
         tex = fbx.data[self.id]
         
         type = self.get("Type")
@@ -110,12 +109,8 @@ class CTexture(CConnection):
         
         imgNodes = self.getBChildren('IMAGE')
         for node,channel in imgNodes:
-            print("IMG", node, imgname, channel)
             if node.name == imgname:
-                print(fbx.data.items())
                 tex.image = fbx.data[node.id]
-
-        print("Tex", tex, "Img", tex.image)
 
         return self
 

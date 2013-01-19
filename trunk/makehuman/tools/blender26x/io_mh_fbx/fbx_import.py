@@ -50,5 +50,3 @@ class VIEW3D_OT_TestImportButton(bpy.types.Operator):
         importFbxFile(context, self.filepath)
         return {'FINISHED'}
 
-
-print("fbx_import loaded")

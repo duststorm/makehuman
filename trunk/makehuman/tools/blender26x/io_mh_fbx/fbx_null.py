@@ -67,5 +67,3 @@ class CEmpty(CModel):
         return ob    
                 
 
-print("fbx_object imported")
-

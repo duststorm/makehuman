@@ -71,6 +71,8 @@ class CMaterial(CConnection):
         for mtex in mat.texture_slots:
             if mtex:
                 tex = mtex.texture
+                if tex.type == 'NONE':
+                    continue
                 node = fbx.nodes.textures[tex.name]
                 if tex.type == 'IMAGE':
                     channels = [
@@ -95,7 +97,6 @@ class CMaterial(CConnection):
                     ]
                     for use,ftype in channels:
                         if use:     
-                            print("MCL", use, ftype, node, self)
                             node.makeChannelLink(self, ftype)
 
         self.setProps([
@@ -131,7 +132,6 @@ class CMaterial(CConnection):
             mtex = mat.texture_slots.add()
             mtex.texture = tex
             mtex.texture_coords = 'UV'
-            print("MTEX", tex, channel)
 
             if channel in ["DiffuseIntensity", "DiffuseFactor"]:
                 mtex.use_map_diffuse = True

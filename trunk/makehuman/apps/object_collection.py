@@ -64,7 +64,7 @@ class CStuff:
             self.type = None
             self.material = None
             self.texture = ("data/textures", "texture.png") 
-            self.specular = ("data/textures", "texture_ref.png") 
+            self.specular = None # ("data/textures", "texture_ref.png") 
             self.bump = None
             self.normal = None
             self.transparency = None
@@ -256,7 +256,6 @@ def setupObjects(name, human, rigfile=None, helpers=False, hidden=True, eyebrows
             else:
                 stuff.meshInfo =  filterMesh(meshInfo, obj, deleteGroups, deleteVerts, eyebrows, lashes)
         stuffs = [stuff] + stuffs
-        print("SETYP", stuff.meshInfo)
 
     clothKeys = human.clothesObjs.keys()
 
@@ -473,14 +472,11 @@ def setStuffSkinWeights(stuff):
 
     stuff.skinWeights = []
     wn = 0    
-    print(stuff.boneInfo)
-    print(stuff.meshInfo)
     for (bn,b) in enumerate(stuff.boneInfo.bones):
         try:
             wts = stuff.meshInfo.weights[b]
         except KeyError:
             wts = []
-        #print(b,bn,wts)
         for (vn,w) in wts:
             stuff.vertexWeights[int(vn)].append((bn,wn))
             wn += 1

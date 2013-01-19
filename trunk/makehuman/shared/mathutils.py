@@ -78,7 +78,7 @@ class Vector:
         return Vector(self.vector/denom)
         
     def cross(self, vec):
-    	return Vector(numpy.cross(self.vector, vec.vector))
+        return Vector(numpy.cross(self.vector, vec.vector))
         
         
 
@@ -109,11 +109,14 @@ class Matrix:
     def __setitem__(self, n, value):
         self.matrix[n,:] = value
         
+    def transposed(self):
+        return Matrix(self.matrix.transpose())
+   
     def inverted(self):
-        return Matrix(data= inv(self.matrix))
+        return Matrix(inv(self.matrix))
         
     def mult(self, mat):
-        return Matrix(data= dot(self.matrix, mat.matrix))
+        return Matrix(dot(self.matrix, mat.matrix))
     
     def to_3x3(self):
         return Matrix(3, self.matrix[:3,:3])        

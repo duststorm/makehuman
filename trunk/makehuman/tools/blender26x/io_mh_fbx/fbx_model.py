@@ -66,7 +66,6 @@ class CConnection(CFbx):
         self.properties = CProperties70()
         self.template = {}
         self.struct = {}
-        print("__init__", self)
 
 
     def __repr__(self):
@@ -393,6 +392,4 @@ class CModel(CConnection):
                 alayer = fbx.nodes.alayers[act.name]
                 CConnection.makeLink(alayer, self)
         
-
-print("fbx_model imported")
 

@@ -251,11 +251,16 @@ class CArray(CFbx):
             '                a: ')
         c = ''
         for x in vec:
-            fp.write(self.format % (c,x))
+            fp.write(self.format % (c,round(x)))
             c = ','
         fp.write('\n            }\n')
-        
 
+       
+def round(x):
+    if abs(x) < 1e-5:
+        return 0
+    else:
+        return x
 
 #------------------------------------------------------------------
 #   Coordinate system conversion
@@ -301,5 +306,4 @@ def float2int(f):
     return int(f*0x1000)
     #return int(f*1924421094.0)
 
-print("fbx_basic imported")
 

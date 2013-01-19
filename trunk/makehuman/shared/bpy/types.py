@@ -135,7 +135,6 @@ class Armature(Rna):
         bone.parent = parent
 
         bone.matrixLocalFromBone()
-        print("  ", bone)
 
         bone.children = []
         for child in children:
@@ -415,7 +414,6 @@ class Object(Rna):
             if stuff.meshInfo:
                 index = 0
                 for name,weights in stuff.meshInfo.weights.items():
-                    print("OBJ", name, weights)
                     self.vertex_groups.append(VertexGroup(name, index))
                     for (vn,w) in weights:
                         content.vertices[vn].addToGroup(index, w)

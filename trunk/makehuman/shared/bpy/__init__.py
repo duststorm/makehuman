@@ -90,7 +90,6 @@ def addRig(name, boneInfo):
     data.armatures.append(amt)
     rig = types.Object(name, amt)
     data.objects.append(rig)
-    print(amt, rig)
     context.scene.objects.append(rig)
     return rig
     

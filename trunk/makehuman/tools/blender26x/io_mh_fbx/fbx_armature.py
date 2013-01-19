@@ -237,11 +237,28 @@ class CBone(CModel):
         CModel.__init__(self, subtype, 'BONE')
         self.attribute = CBoneAttribute()
         self.pose = None
+        self.transform = None
+        self.transformLink = None
+        self.head = None
             
 
     def make(self, bone, parent):
         CModel.make(self, bone)
         self.parent = parent
+
+        self.transformLink = bone.matrix_local.transposed()
+        self.transform = self.transformLink.inverted()
+        """
+        (loc, quat, _) = bone.matrix_local.decompose()
+        rot = quat.to_matrix().to_3x3()
+        if bone.parent:
+            self.head = rot*loc
+        else:
+            self.head = rot*loc
+        self.transform = quat.to_matrix().to_4x4()
+        self.transform.row[3][:3] = self.head
+        """
+        
         if bone.parent:
             pmat = bone.parent.matrix_local.inverted()
             if fbx.usingMakeHuman:
@@ -386,13 +403,14 @@ class CDeformer(CConnection):
     
     def make(self, rig):
         CConnection.make(self, rig)
+        amtNode = fbx.nodes.armatures[rig.data.name]
         for vgroup in self.object.vertex_groups:
             try:
-                bone = rig.data.bones[vgroup.name]
+                boneNode = amtNode.bones[vgroup.name]
             except KeyError:
-                bone = None
-            if bone:
-                subdef = CSubDeformer().make(vgroup, bone, self.object)
+                boneNode = None
+            if boneNode:
+                subdef = CSubDeformer().make(vgroup, boneNode, self.object)
                 self.subdeformers[vgroup.index] = subdef
         return self
 
@@ -467,7 +485,7 @@ class CSubDeformer(CConnection):
         return CConnection.parseNodes(self, rest)
 
 
-    def make(self, vgroup, bone, ob):
+    def make(self, vgroup, boneNode, ob):
         CConnection.make(self, vgroup)
         vnums = []
         weights = []
@@ -478,9 +496,8 @@ class CSubDeformer(CConnection):
                     weights.append(g.weight)
         self.indexes.make(vnums)
         self.weights.make(weights)
-        mat = bone.matrix_local
-        self.transform.make(bone.matrix_local)
-        self.transformLink.make(bone.matrix_local)
+        self.transform.make(boneNode.transform)
+        self.transformLink.make(boneNode.transformLink)
         return self
          
 
@@ -502,6 +519,4 @@ class CSubDeformer(CConnection):
     def build3(self):
         return None
         
-
-print("fbx_armature imported")
 

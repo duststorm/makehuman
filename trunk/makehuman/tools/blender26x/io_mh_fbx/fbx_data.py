@@ -120,7 +120,7 @@ def parseLink(pnode):
 
 def createNode(pnode):
     id,name,subtype = nodeInfo(pnode)
-    print(id,name,subtype,pnode)
+    #print(id,name,subtype,pnode)
 
     node = None
     if pnode.key == 'Geometry':
@@ -188,10 +188,9 @@ def buildObjects(context):
 
     fbx.data = {}
     
-    print("CREATING")
+    print("Creating nodes")
     
     for node in fbx.nodes.values():
-        print("  ", node)
         if node.ftype == "Geometry":
             data = bpy.data.meshes.new(node.name)
         elif node.ftype == "Material":
@@ -242,15 +241,13 @@ def buildObjects(context):
                     fbx.data[node.id] = data
             else:
                 for child,channel in node.children:
-                    print("  ", child.subtype, node.subtype)
                     if child.subtype == node.subtype:
                         data = bpy.data.objects.new(node.name, fbx.data[child.id])
                         scn.objects.link(data)
-                        print("Hit", data)
                         break
                 fbx.data[node.id] = data
                     
-    print("BUILDING")
+    print("Building objects")
     for node in fbx.nodes.values():
         node.build1()
     for node in fbx.nodes.values():
@@ -267,7 +264,7 @@ def buildObjects(context):
 #------------------------------------------------------------------
 
 def activateData(datum):
-    print("ACT", datum, isinstance(datum, bpy.types.Armature))
+    #print("ACT", datum, isinstance(datum, bpy.types.Armature))
 
     if datum is None:
         return
@@ -333,11 +330,6 @@ def makeNodes(context):
     
     activateData(context.scene)
     
-    print("OB", fbx.active.objects)
-    print("SC", fbx.active.scenes)
-    print("ME", fbx.active.meshes)
-    
-
     # Second pass: create nodes
     
     for ob in fbx.active.objects.values():
@@ -356,7 +348,6 @@ def makeNodes(context):
             halt
             continue
         fbx.nodes.objects[ob.name] = fbx_object.CObject(ob.type)
-        print("Create", fbx.nodes.objects[ob.name])
         
     for mat in fbx.active.materials.values():
         fbx.nodes.materials[mat.name] = fbx_material.CMaterial()
@@ -377,7 +368,6 @@ def makeNodes(context):
     # Third pass: make the nodes
     
     for act in fbx.active.actions.values():        
-        print("TA", act)
         fbx.nodes.astacks[act.name].make(act)
             
     for ob in fbx.active.objects.values():
@@ -387,14 +377,11 @@ def makeNodes(context):
             fbx.nodes.objects[ob.name].make(ob)
             rig = ob.parent
             if rig and rig.type == 'ARMATURE':
-                print("XX", rig, node, ob)
-                print(fbx.nodes.armatures.items())
                 fbx.nodes.armatures[rig.data.name].addDeformer(node, ob)             
 
     for ob in fbx.active.objects.values():
         if ob.type == 'ARMATURE':
             amt = fbx.nodes.armatures[ob.data.name]
-            print("AMT", amt)
             amt.make(ob)
             fbx.nodes.objects[ob.name].make(ob)
 
@@ -441,7 +428,4 @@ def makeTakes(context):
     for act in fbx.active.actions.values():   
         fbx.takes[act.name] = fbx_anim.CTake().make(context.scene, act)
     
-
-
-print("fbx_data imported")
 

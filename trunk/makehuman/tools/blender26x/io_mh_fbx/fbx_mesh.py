@@ -252,8 +252,6 @@ class LayerElementUVNode(LayerElementNode):
             verts = layer.data
         else:
             verts = [list(data.uv) for data in layer.data]
-        print("V", verts[:10])
-        print("F", faces[:10])
         self.vertices.make(verts)
         self.faces.make(faces)
         return self
@@ -349,6 +347,4 @@ class LayerElementTextureNode(LayerElementNode):
     def build(self, me):
         pass
         #LayerElementNode.build(self, me, layer)
-
-print("fbx_mesh imported")
 

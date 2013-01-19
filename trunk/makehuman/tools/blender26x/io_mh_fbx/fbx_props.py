@@ -253,5 +253,3 @@ class CCompoundProperty(CProperty):
         fp.write('            P: "%s|Z", "%s", "%s", "%s", %s\n' % (self.name, basetype, self.supertype, self.anim, self.value[2]))
 
 
-print("fbx_props imported")
-

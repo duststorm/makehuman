@@ -178,7 +178,6 @@ def exportFbxFile(context, filepath):
     print("Export", filepath)
     fbx.filepath = filepath
     fbx.activeFolder = os.path.dirname(filepath)
-    print("AF", fbx.activeFolder)
 
     fbx_data.makeNodes(context)
     fbx_data.makeTakes(context)
@@ -205,7 +204,6 @@ Objects:  {
 """)
 
     for node in nodes:
-        print("L", node)
         if node.active or fbx.settings.writeAllNodes:
             node.writeFbx(fp)
 
@@ -252,5 +250,3 @@ class VIEW3D_OT_TestExportButton(bpy.types.Operator):
         exportFbxFile(context, "/home/myblends/fbx-stuff/test.fbx")
         return {'FINISHED'}
 
-
-print("fbx_export imported")

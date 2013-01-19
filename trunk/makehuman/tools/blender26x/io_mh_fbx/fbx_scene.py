@@ -43,14 +43,12 @@ class CScene(CModel):
                 node = fbx.nodes.objects[ob.name]
             except KeyError:
                 continue
-            print("S", node)
             node.makeLink(self)
             self.objects.append(ob)
         return self
 
 
     def build3(self):
-        print("BScn", self)
         scn = fbx.data[self.id]
         return scn
         objects,channel = self.getBChildren('OBJECT')
@@ -60,7 +58,4 @@ class CScene(CModel):
             scn.objects.active = ob
         return scn
         
-
-
-print("fbx_scene imported")
 
