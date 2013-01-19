@@ -77,6 +77,7 @@ class ScriptingView(gui3d.TaskView):
 
         self.insertLabel = box2.addWidget(gui.TextView('Append example to script'))
         self.listView = box2.addWidget(gui.ListView())
+        self.listView.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Preferred)
 
         testlist = [ 
             'applyTarget()', 
