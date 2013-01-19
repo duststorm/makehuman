@@ -64,10 +64,12 @@ class CProxy:
         self.rig = None
         self.mask = None
         self.texture = None
+        self.specular = None
         self.bump = None
         self.normal = None
         self.displacement = None
         self.transparency = None
+        self.specularStrength = 1.0
         self.bumpStrength = 1.0
         self.normalStrength = 1.0
         self.dispStrength = 0.2
@@ -354,6 +356,10 @@ def readProxyFile(obj, file, evalOnLoad):
                 proxy.mask = getFileName(folder, words[2], ".png")
                 if len(words) > 3:
                     proxy.maskLayer = int(words[3])
+            elif key == 'specular':
+                proxy.specular = getFileName(folder, words[2], ".png")
+                if len(words) > 4:
+                    proxy.specularStrength = float(words[4])
             elif key == 'bump':
                 proxy.bump = getFileName(folder, words[2], ".png")
                 if len(words) > 4:

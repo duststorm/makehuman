@@ -109,9 +109,13 @@ def parseNodes(pnode):
 def parseLink(pnode):
     childId = pnode.values[1]
     parId = pnode.values[2]
+    if len(pnode.values) > 3:
+        channel = pnode.values[3]
+    else:
+        channel = None
     childNode = fbx.idstruct[childId]
     parNode = fbx.idstruct[parId]
-    childNode.makeLink(parNode)
+    childNode.makeChannelLink(parNode, channel)
     
 
 def createNode(pnode):
@@ -248,20 +252,15 @@ def buildObjects(context):
                     
     print("BUILDING")
     for node in fbx.nodes.values():
-        if node.ftype == "Video":
-            print("  ", node)
-            node.build()
-
+        node.build1()
     for node in fbx.nodes.values():
-        if node.ftype not in ["Video", "Pose", "Deformer"]:
-            print("  ", node)
-            node.build()
-        
+        node.build2()
     for node in fbx.nodes.values():
-        if node.ftype in ["Deformer"]:
-            print("  ", node)
-            node.build()
-        
+        node.build3()
+    for node in fbx.nodes.values():
+        node.build4()
+    for node in fbx.nodes.values():
+        node.build5()               
 
 #------------------------------------------------------------------
 #   Activating

@@ -24,8 +24,12 @@ Blender API mockup: bpy.types
 
 from mathutils import *
 from math import *
+import os
 
 import object_collection
+import export_config
+from mhx import the
+
 
 #------------------------------------------------------------------
 #   Blender UI
@@ -44,10 +48,12 @@ class Operator:
 #------------------------------------------------------------------
 
 def initialize():
-    global RnaNames 
+    global RnaNames
     RnaNames = {}
     for rnaType in ['OBJECT', 'MESH', 'ARMATURE', 'MATERIAL', 'TEXTURE', 'IMAGE', 'SCENE', 'BONE']:
         RnaNames[rnaType] = {}
+
+
         
 def safeName(name, rnaType):
     global RnaNames 
@@ -216,7 +222,10 @@ class Mesh(Rna):
         self.uv_layers = []
         if stuff.meshInfo.uvValues:
             self.uv_layers.append(UvLayer(stuff.meshInfo.uvValues, stuff.meshInfo.faces))
-        self.materials = []
+        if stuff.hasMaterial():
+            self.materials = [Material(stuff)]
+        else:
+            self.materials = []
             
 
 class MeshVertex:
@@ -271,30 +280,120 @@ class UvLoop:
 #------------------------------------------------------------------
 
 class Material(Rna):
-    def __init__(self, smat, stex):
-        Rna.__init__(self, smat.name, 'MATERIAL')        
+    def __init__(self, stuff):
+        
+        Rna.__init__(self, self.materialName(stuff), 'MATERIAL')  
+        
+        if stuff.material:
+            self.diffuse_color = stuff.material.diffuse_color
+            self.diffuse_intensity = stuff.material.diffuse_intensity
+            self.specular_color = stuff.material.specular_color
+            self.specular_intensity = stuff.material.specular_intensity
+            self.specular_hardness = stuff.material.specular_hardness
+            self.transparency = stuff.material.transparency
+            self.translucency = stuff.material.translucency
+            self.ambient_color = stuff.material.ambient_color
+            self.emit_color = stuff.material.emit_color
+            self.use_transparency = stuff.material.use_transparency
+            self.alpha = stuff.material.alpha
+        else:
+            self.diffuse_color = (0.8,0.8,0.8)
+            self.diffuse_intensity = 0.8
+            self.specular_color = (1,1,1)
+            self.specular_intensity = 0.1
+            self.specular_hardness = 25
+            self.transparency = 1
+            self.translucency = 0.0
+            self.ambient_color = (0,0,0)
+            self.emit_color = (0,0,0)
+            self.use_transparency = False
+            self.alpha = 1
+
         self.texture_slots = []
-        if stex:
-            tex = Texture(stex)
-            mtex = MTex(tex)
-            self.texture
-        print(smat.items())
-        if img:
-            tex = Texture(img)
-        halt
         
+        if stuff.texture:
+            tex = Texture(stuff.texture)
+            mtex = MaterialTextureSlot(tex)
+            mtex.use_map_color_diffuse = True
+            self.texture_slots.append(mtex)
         
-class Texture(Rna):
+        if stuff.specular:
+            tex = Texture(stuff.specular)
+            mtex = MaterialTextureSlot(tex)
+            mtex.use_map_color_spec = True
+            self.texture_slots.append(mtex)
+        
+        if stuff.normal:
+            tex = Texture(stuff.normal)
+            mtex = MaterialTextureSlot(tex)
+            mtex.use_map_normal = True
+            self.texture_slots.append(mtex)
+        
+        if stuff.transparency:
+            tex = Texture(stuff.transparency)
+            mtex = MaterialTextureSlot(tex)
+            mtex.use_map_alpha = True
+            self.texture_slots.append(mtex)
+        
+        if stuff.bump:
+            tex = Texture(stuff.bump)
+            mtex = MaterialTextureSlot(tex)
+            mtex.use_map_normal = True
+            self.texture_slots.append(mtex)
+        
+        if stuff.displacement:
+            tex = Texture(stuff.displacement)
+            mtex = MaterialTextureSlot(tex)
+            mtex.use_map_displacement = True
+            self.texture_slots.append(mtex)
+
+
+    def materialName(self, stuff):
+        if stuff.material: 
+            return stuff.material.name
+        elif stuff.texture: 
+            (folder, filename) = stuff.texture
+            return os.path.splitext(filename)[0]
+        else:
+            return "Material"
+            
+
+class MaterialTextureSlot:
+
     def __init__(self, tex):
-        folder,filename = stex
+        self.use_map_diffuse = False
+        self.use_map_color_diffuse = False
+        self.use_map_alpha = False
+        self.use_map_translucency = False
+
+        self.use_map_specular = False
+        self.use_map_color_spec = False
+        self.use_map_hardness = False
+
+        self.use_map_ambient = False
+        self.use_map_emit = False
+        self.use_map_mirror = False
+        self.use_map_raymir = False
+
+        self.use_map_normal = False
+        self.use_map_warp = False
+        self.use_map_displacement = False
+        
+        self.texture = tex
+    
+
+class Texture(Rna):
+    def __init__(self, filepair):
+        folder,filename = filepair
         Rna.__init__(self, filename, 'TEXTURE')
-        filepath = os.path.join(folder, filename)
-        tex.image = img
+        self.type = 'IMAGE'
+        self.image = Image(filename, folder)
         
 
 class Image(Rna):
-    def __init__(self, tex):
-        Rna.__init__(self, tex.name, 'IMAGE')
+    def __init__(self, filename, folder):     
+        Rna.__init__(self, filename, 'IMAGE')
+        self.filepath = export_config.getOutFileName(filename, folder, True, the.Human, the.Config)        
 
         
 #------------------------------------------------------------------

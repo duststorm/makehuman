@@ -77,7 +77,7 @@ class CLamp(CNodeAttribute):
         CNodeAttribute.make(self, ob.data)
         self.struct["GeometryVersion"] = 124
 
-    def build(self):
+    def build3(self):
         lamp = fbx.data[self.id]
         return lamp
         

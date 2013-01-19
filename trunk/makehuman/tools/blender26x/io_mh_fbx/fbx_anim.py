@@ -119,7 +119,7 @@ class CAnimationStack(CConnection):
             alayer.writeLinks(fp)
 
 
-    def build(self):
+    def build3(self):
         for alayer in self.alayers:
             self.action = alayer.build()
         return self.action
@@ -368,7 +368,7 @@ class CAnimationCurve(CConnection):
         return CConnection.make(self, fcu)
         
         
-    def build(self):
+    def build3(self):
         fcu = fbx.data[self.id]
         times = self.struct['KeyTimes']
         values = self.struct['KeyValsFloat']

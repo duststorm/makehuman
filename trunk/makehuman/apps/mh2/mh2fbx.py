@@ -26,6 +26,7 @@ import os
 import sys
 import export_config
 import object_collection
+from mhx import the
 import log
 
 
@@ -42,10 +43,17 @@ def exportFbx(human, filepath, options):
     cfg = export_config.exportConfig(human, True)
     cfg.separatefolder = True
 
-    log.message("Write FBX file %s" % filepath)
+    the.Human = human        
+    the.Config = export_config.exportConfig(human, True, [])
+    the.Config.separatefolder = True
+    outfile = export_config.getOutFileFolder(filepath, the.Config)        
+    (path, ext) = os.path.splitext(outfile)
+
+    log.message("Write FBX file %s" % outfile)
+
     rigfile = "data/rigs/%s.rig" % options["fbxrig"]
     stuffs = object_collection.setupObjects(
-        os.path.splitext(filepath)[0], 
+        os.path.splitext(outfile)[0], 
         human, 
         rigfile, 
         helpers=options["helpers"], 
@@ -54,8 +62,6 @@ def exportFbx(human, filepath, options):
         lashes=options["lashes"])
 
     (scale, unit) = options["scale"]   
-    outfile = export_config.getOutFileFolder(filepath, cfg)   
-    (path, ext) = os.path.splitext(outfile)
 
     bpy.initialize()
     name = os.path.splitext(os.path.basename(filepath))[0]

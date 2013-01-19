@@ -46,12 +46,12 @@ class CNull(CModel):
         return 'EMPTY'
 
         
-    def build(self):
+    def build3(self):
         btype = self.getBtype()
         if btype == 'ARMATURE':
             return fbx_armature.CArmature().buildArmature(self)
         elif btype == 'SCENE':
-            return fbx_scene.CScene.build(self)
+            return fbx_scene.CScene.build3(self)
         elif btype == 'EMPTY':
             return fbx.data[self.id]
 
@@ -62,7 +62,7 @@ class CEmpty(CModel):
     def __init__(self, subtype='Null'):
         CModel.__init__(self, subtype, 'EMPTY')
 
-    def build(self):
+    def build3(self):
         ob = fbx.data[self.id]
         return ob    
                 

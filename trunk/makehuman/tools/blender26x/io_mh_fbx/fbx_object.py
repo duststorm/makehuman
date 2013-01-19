@@ -95,7 +95,7 @@ class CObject(CModel):
             self.makeLink(parent)
             
     
-    def build(self):
+    def build3(self):
         ob = fbx.data[self.id]
         print("BLD", self, ob)
         if self.properties:

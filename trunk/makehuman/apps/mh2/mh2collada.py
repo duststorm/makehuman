@@ -31,7 +31,6 @@ import mh
 import files3d
 import mh2bvh
 import os, time
-import shutil
 import mh2proxy
 import export_config
 import object_collection
@@ -299,16 +298,11 @@ def exportDae(human, name, fp):
 #
 
 def writeImages(obj, fp, stuff, human):
-    if stuff.type:
-        if stuff.texture:
-            textures = [stuff.texture]
-        else:
-            return
-        human = None
+    if stuff.texture:
+        textures = [stuff.texture]
     else:
-        path = "data/textures"
-        texfile = "texture.png"
-        textures = [(path, os.path.basename(texfile))]
+        textures = []
+
     for (folder, texname) in textures: 
         path = export_config.getOutFileName(texname, folder, True, human, the.Config)        
         texfile = os.path.basename(path)

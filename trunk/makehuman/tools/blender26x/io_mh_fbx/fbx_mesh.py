@@ -162,7 +162,7 @@ class CGeometry(CConnection):
             '            }\n')
                 
         
-    def build(self):
+    def build3(self):
         me = fbx.data[self.id]
         me.from_pydata(self.vertices.values, [], self.faces.values)
 

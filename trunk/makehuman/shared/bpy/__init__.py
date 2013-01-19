@@ -28,6 +28,7 @@ to believe that it runs under Blender when it is actually invoked by MakeHuman.
 from . import types
 from . import props
 from . import utils
+from . import path
 
 #------------------------------------------------------------------
 #   Context

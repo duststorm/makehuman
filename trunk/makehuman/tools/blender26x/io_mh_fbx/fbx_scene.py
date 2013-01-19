@@ -49,7 +49,7 @@ class CScene(CModel):
         return self
 
 
-    def build(self):
+    def build3(self):
         print("BScn", self)
         scn = fbx.data[self.id]
         return scn

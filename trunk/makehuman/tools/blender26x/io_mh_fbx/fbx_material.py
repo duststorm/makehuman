@@ -94,9 +94,8 @@ class CMaterial(CConnection):
 
                     ]
                     for use,ftype in channels:
-                        print("MCL", use, ftype, node, self)
                         if use:     
-                            print("  LINK")
+                            print("MCL", use, ftype, node, self)
                             node.makeChannelLink(self, ftype)
 
         self.setProps([
@@ -113,7 +112,7 @@ class CMaterial(CConnection):
         ])
     
     
-    def build(self):
+    def build3(self):
         mat = fbx.data[self.id]
         mat.diffuse_intensity = 1
         mat.specular_intensity = 1
@@ -131,19 +130,19 @@ class CMaterial(CConnection):
             tex = fbx.data[node.id]
             mtex = mat.texture_slots.add()
             mtex.texture = tex
+            mtex.texture_coords = 'UV'
+            print("MTEX", tex, channel)
 
-            if channel == "DiffuseIntensity":
+            if channel in ["DiffuseIntensity", "DiffuseFactor"]:
                 mtex.use_map_diffuse = True
-            elif channel in ["DiffuseColor","Diffuse"]:
-                mtex.use_map_color_diffuse = True
             elif channel in ["Opacity", "TransparencyFactor"]:
                 mtex.use_map_alpha = True
             elif channel == "Translucency":
                 mtex.use_map_translucency = True
 
-            elif channel == "SpecularIntensity":
+            elif channel in ["SpecularIntensity", "SpecularFactor"]:
                 mtex.use_map_specular = True
-            elif channel == ["SpecularColor","Specular"]:
+            elif channel in ["SpecularColor","Specular"]:
                 mtex.use_map_color_spec = True
             elif channel == "ShininessExponent":
                 mtex.use_map_hardness = True
@@ -159,9 +158,17 @@ class CMaterial(CConnection):
 
             elif channel == "Normal":
                 mtex.use_map_normal = True
+                mtex.normal_map_space = 'TANGENT'
+                if tex:
+                    tex.use_normal_map = True
             elif channel == "Warp":
                 mtex.use_map_warp = True
             elif channel == "Displacement":
                 mtex.use_map_displacement = True
+                
+            if channel in ["DiffuseColor","Diffuse"]:
+                mtex.use_map_color_diffuse = True
+            else:
+                mtex.use_map_color_diffuse = False
 
         return mat

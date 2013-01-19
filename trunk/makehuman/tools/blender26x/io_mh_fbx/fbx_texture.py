@@ -94,7 +94,7 @@ class CTexture(CConnection):
         CConnection.writeHeader(self, fp)            
 
 
-    def build(self):
+    def build2(self):
         print("TEX", self)
         tex = fbx.data[self.id]
         
@@ -109,8 +109,8 @@ class CTexture(CConnection):
         cropping = self.get("Cropping")
         
         imgNodes = self.getBChildren('IMAGE')
-        for node,_ in imgNodes:
-            print("IMG", node, imgname)
+        for node,channel in imgNodes:
+            print("IMG", node, imgname, channel)
             if node.name == imgname:
                 print(fbx.data.items())
                 tex.image = fbx.data[node.id]

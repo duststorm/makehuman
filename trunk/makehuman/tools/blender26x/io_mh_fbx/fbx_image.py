@@ -59,10 +59,11 @@ class CImage(CConnection):
         self.image = None
 
 
-    def make(self, img):
+    def make(self, img):        
         CConnection.make(self, img)
-        self.struct["Filename"] = os.path.basename(img.filepath)
-        self.struct["RelativeFilename"] = os.path.basename(img.filepath)
+        filepath = os.path.expanduser(bpy.path.abspath(img.filepath))
+        self.struct["Filename"] = str(os.path.normpath(filepath))
+        self.struct["RelativeFilename"] = str(os.path.normpath(os.path.relpath(filepath, fbx.activeFolder)))
         self.struct["Type"] = "Clip"
         self.struct["UseMipMap"] = 0
 
@@ -72,9 +73,12 @@ class CImage(CConnection):
         return self
     
 
-    def build(self):
+    def build1(self):
         path = os.path.join(fbx.activeFolder, self.struct["RelativeFilename"]) 
         print("Loading", path)
-        self.image = bpy.data.images.load(path)
+        try:
+            self.image = bpy.data.images.load(path)
+        except RuntimeError:
+            self.image = None
         fbx.data[self.id] = self.image
         return self.image

@@ -177,7 +177,8 @@ def exportFbxFile(context, filepath):
     filepath = filepath.replace('\\','/')
     print("Export", filepath)
     fbx.filepath = filepath
-    fbx.folder = os.path.dirname(filepath)
+    fbx.activeFolder = os.path.dirname(filepath)
+    print("AF", fbx.activeFolder)
 
     fbx_data.makeNodes(context)
     fbx_data.makeTakes(context)

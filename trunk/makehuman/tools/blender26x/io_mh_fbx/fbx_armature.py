@@ -45,7 +45,6 @@ class CArmature(CConnection):
     def make(self, rig):
         CConnection.make(self, rig)
         self.object = fbx.nodes.objects[rig.name]
-        print("MK", rig.data.bones)
         for bone in oneOf(rig.data.bones.values(), rig.data.bones):
             if bone.parent == None:
                 self.roots.append(bone)                
@@ -110,7 +109,6 @@ class CArmature(CConnection):
 
         infos = {}
         for child,_ in parent.children:
-            print("AMR", child)
             if isinstance(child, CBone):
                 BoneInfo(child, infos).collect(child, infos, None)
 
@@ -289,10 +287,6 @@ class CBone(CModel):
         CModel.writeHeader(self, fp)   
 
     
-    def build(self):            
-        return None
-
-       
     def buildBone(self, infos, amt):        
         eb = amt.edit_bones.new(self.name)
         info = infos[self.name]
@@ -426,7 +420,7 @@ class CDeformer(CConnection):
         CConnection.writeHeader(self, fp)
         
 
-    def build(self):        
+    def build5(self):        
         meNode,_ = self.getBParent('MESH')
         obNode,_ = meNode.getBParent('OBJECT') 
         ob = fbx.data[obNode.id]
@@ -505,7 +499,7 @@ class CSubDeformer(CConnection):
             vg.add([vn], w, 'REPLACE')
 
 
-    def build(self):
+    def build3(self):
         return None
         
 

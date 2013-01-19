@@ -173,6 +173,6 @@ class CCamera(CNodeAttribute):
         self.struct["CameraOrthoZoom"] =  1
         
 
-    def build(self):
+    def build3(self):
         cam = fbx.data[self.id]
         return cam

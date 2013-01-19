@@ -35,7 +35,6 @@ import numpy
 import shutil
 import mh2proxy
 import export_config
-import bpy
 import mhx
 import log
 
@@ -46,20 +45,31 @@ import log
 class CStuff:
     def __init__(self, name, proxy):
         self.name = os.path.basename(name)
-        self.type = None
-        #self.bones = None
         self.meshInfo = None
         self.boneInfo = None
         self.vertexWeights = None
         self.skinWeights = None
-        self.material = None
-        self.texture = None
-        self.proxy = None
         if proxy:
             self.proxy = proxy
             self.type = proxy.type
             self.material = proxy.material
             self.texture = proxy.texture
+            self.specular = proxy.specular
+            self.normal = proxy.normal
+            self.transparency = proxy.transparency
+            self.bump = proxy.bump
+            self.displacement = proxy.displacement
+        else:                    
+            self.proxy = None
+            self.type = None
+            self.material = None
+            self.texture = ("data/textures", "texture.png") 
+            self.specular = ("data/textures", "texture_ref.png") 
+            self.bump = None
+            self.normal = None
+            self.transparency = None
+            self.bump = None
+            self.displacement = None
 
             
     def setObject3dMesh(self, object3d, weights, shapes):
@@ -69,6 +79,16 @@ class CStuff:
     def __repr__(self):
         return "<CStuff %s %s mat %s tex %s>" % (self.name, self.type, self.material, self.texture)
 
+    def hasMaterial(self):
+        return (
+            self.material != None or
+            self.texture != None or
+            self.specular != None or
+            self.normal != None or
+            self.transparency != None or
+            self.bump != None or
+            self.displacement != None)
+    
     """
     def copyBones(self, rig):
         self.rigHead = rig.rigHead

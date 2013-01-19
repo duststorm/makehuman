@@ -94,6 +94,8 @@ def tokenizeLine(line, pnode):
                         return node1
                     elif token in ['Y','N']:
                         node1.values.append(token)
+                    elif token[0] == '"':
+                    	node1.values.append(token[1:-1])
                     elif token not in [',','*']:
                         node1.values.append(eval(token))
 

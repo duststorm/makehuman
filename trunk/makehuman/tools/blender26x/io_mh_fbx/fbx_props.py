@@ -228,7 +228,7 @@ class CProperty(CFbx):
     def flatten(self):
         return self.value
         
-    def build(self):
+    def build3(self):
         return self.value
 
 

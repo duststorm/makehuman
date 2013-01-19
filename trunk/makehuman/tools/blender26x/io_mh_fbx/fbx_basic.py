@@ -100,7 +100,19 @@ class CFbx:
     def writeLinks(self, fp):
         return
 
-    def build(self):
+    def build1(self):
+        return None
+        
+    def build2(self):
+        return None
+        
+    def build3(self):
+        return None
+        
+    def build4(self):
+        return None
+        
+    def build5(self):
         return None
         
     def addDefinition(self, definitions):        
@@ -190,7 +202,6 @@ class CArray(CFbx):
                     
 
     def make(self, values):
-        print("ARR", values)
         self.values = values
         self.size = len(self.flattenValues(values))
         return self
@@ -273,7 +284,6 @@ def nodeId(pnode):
 
 
 def nodeFromName(name):
-    print("nodefromname", name)
     for node in fbx.nodes.values():
         if node.name == name:
             return node
