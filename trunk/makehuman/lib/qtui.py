@@ -295,7 +295,6 @@ class VLayout(QtGui.QLayout):
                 continue
             last = i
 
-        first = True
         x1 = x + width
         y1 = y + height
 
@@ -304,13 +303,8 @@ class VLayout(QtGui.QLayout):
             if not widget or widget.isHidden():
                 w = 0
                 h = 0
-            elif first or i == last:
-                first = False
-                size = child.maximumSize()
-                w = size.width()
-                h = size.height()
             else:
-                size = child.sizeHint()
+                size = child.maximumSize()
                 w = size.width()
                 h = size.height()
             if real:
@@ -606,3 +600,11 @@ def callAsync(callback):
         log.notice('callAsync with no application')
         return
     G.app.postEvent(G.app, AsyncEvent(callback))
+
+def getSaveFileName(directory, filter = "All files (*.*)"):
+    return str(QtGui.QFileDialog.getSaveFileName(
+        G.app.mainwin, qtgui.getLanguageString("Save File"), directory, filter))
+
+def getOpenFileName(directory, filter = "All files (*.*)"):
+    return str(QtGui.QFileDialog.getOpenFileName(
+        G.app.mainwin, qtgui.getLanguageString("Open File"), directory, filter))
