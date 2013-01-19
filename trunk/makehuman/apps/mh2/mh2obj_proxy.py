@@ -73,17 +73,17 @@ def exportProxyObj(human, name, options):
 #
         
 def writeGeometry(obj, fp, stuff, scale):
-    nVerts = len(stuff.verts)
-    nUvVerts = len(stuff.uvValues)
+    nVerts = len(stuff.meshInfo.verts)
+    nUvVerts = len(stuff.meshInfo.uvValues)
     fp.write("usemtl %s\n" % stuff.name)
     fp.write("g %s\n" % stuff.name)    
-    for v in stuff.verts:
+    for v in stuff.meshInfo.verts:
         fp.write("v %.4g %.4g %.4g\n" % (scale*v[0], scale*v[1], scale*v[2]))
     #for no in stuff.vnormals:
     #    fp.write("vn %.4g %.4g %.4g\n" % (no[0], no[1], no[2]))
-    for uv in stuff.uvValues:
+    for uv in stuff.meshInfo.uvValues:
         fp.write("vt %.4g %.4g\n" %(uv[0], uv[1]))
-    for fc in stuff.faces:
+    for fc in stuff.meshInfo.faces:
         fp.write('f ')
         for vs in fc:
             v = vs[0]
