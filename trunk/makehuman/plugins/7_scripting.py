@@ -39,39 +39,42 @@ class ScriptingView(gui3d.TaskView):
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Scripting')
 
-        box = self.addLeftWidget(gui.GroupBox('Script'))
+        self.directory = os.getcwd()
+        self.filename =  None
 
-        self.fileNameLabel = box.addWidget(gui.TextView('Filename'))
-        self.fileName = box.addWidget(gui.TextEdit())
+        box = self.addLeftWidget(gui.GroupBox('Script'))
 
         self.scriptText = self.addTopWidget(gui.DocumentEdit())
         self.scriptText.setText('');
 
         self.scriptText.setLineWrapMode(QtGui.QTextEdit.NoWrap)
 
-        self.loadButton = box.addWidget(gui.Button('Load'))
-        self.saveButton = box.addWidget(gui.Button('Save'))
+        self.loadButton = box.addWidget(gui.Button('Load ...'), 0, 0)
+        self.saveButton = box.addWidget(gui.Button('Save ...'), 0, 1)
 
         @self.loadButton.mhEvent
         def onClicked(event):
-            filename = self.fileName.getText()
+            filename = mh.getOpenFileName(self.directory, 'Python scripts (*.py);;All files (*.*)')
             if(os.path.exists(filename)):
                 contents = open(filename, 'r').read()
                 self.scriptText.setText(contents)
                 dlg = gui.Dialog()
                 dlg.prompt("Load script","File was loaded in an acceptable manner","OK")
+                self.filename = filename
+                self.directory = os.path.split(filename)[0]
             else:
                 dlg = gui.Dialog()
                 dlg.prompt("Load script","File " + filename + " does not seem to exist","OK")
 
         @self.saveButton.mhEvent
         def onClicked(event):
-            filename = self.fileName.getText()
-            f = open(filename, "w")
-            f.write(self.scriptText.toPlainText())
-            f.close()
+            filename = mh.getSaveFileName(self.filename or self.directory, 'Python scripts (*.py);;All files (*.*)')
+            with open(filename, "w") as f:
+                f.write(self.scriptText.toPlainText())
             dlg = gui.Dialog()
             dlg.prompt("Save script","File was written in an acceptable manner","OK")
+            self.filename = filename
+            self.directory = os.path.split(filename)[0]
 
         box2 = self.addLeftWidget(gui.GroupBox('Examples'))
 
