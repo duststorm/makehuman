@@ -1057,10 +1057,14 @@ class SpinBox(QtGui.QSpinBox, Widget):
         self.blockSignals(False)
 
 class BrowseButton(Button):
-    def __init__(self):
+    def __init__(self, mode = 'open'):
+        mode = mode.lower()
+        if mode not in ('open', 'save', 'dir'):
+            raise RuntimeError("mode '%s' not recognised; must be 'open', 'save', or 'dir'")
         super(BrowseButton, self).__init__("...")
         self._path = ''
         self._filter = ''
+        self._mode = mode
 
     def setPath(self, path):
         self._path = path
@@ -1074,6 +1078,11 @@ class BrowseButton(Button):
             self._path = os.path.split(self._path)[0]
             if not os.path.isdir(self._path):
                 self._path = os.getcwd()
-        self._path = str(QtGui.QFileDialog.getOpenFileName(G.app.mainwin, directory=self._path, filter=self._filter))
+        if self._mode == 'open':
+            self._path = str(QtGui.QFileDialog.getOpenFileName(G.app.mainwin, directory=self._path, filter=self._filter))
+        elif self._mode == 'save':
+            self._path = str(QtGui.QFileDialog.getSaveFileName(G.app.mainwin, directory=self._path, filter=self._filter))
+        elif self._mode == 'dir':
+            self._path = str(QtGui.QFileDialog.getExistingDirectory(G.app.mainwin, directory=self._path))
         self.callEvent('onClicked', self._path)
 

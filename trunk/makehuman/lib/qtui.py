@@ -603,8 +603,12 @@ def callAsync(callback):
 
 def getSaveFileName(directory, filter = "All files (*.*)"):
     return str(QtGui.QFileDialog.getSaveFileName(
-        G.app.mainwin, qtgui.getLanguageString("Save File"), directory, filter))
+        G.app.mainwin, directory = directory, filter = filter))
 
 def getOpenFileName(directory, filter = "All files (*.*)"):
     return str(QtGui.QFileDialog.getOpenFileName(
-        G.app.mainwin, qtgui.getLanguageString("Open File"), directory, filter))
+        G.app.mainwin, directory = directory, filter = filter))
+
+def getExistingDirectory(directory):
+    return str(QtGui.QFileDialog.getExistingDirectory(
+        G.app.mainwin, directory = directory))

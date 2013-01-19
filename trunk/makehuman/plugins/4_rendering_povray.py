@@ -45,7 +45,7 @@ class PovrayTaskView(gui3d.TaskView):
         # this part load old settings values for next session; str(povray_bin)
         povray_bin = gui3d.app.settings.get('povray_bin', '')
         self.path= pathBox.addWidget(gui.TextEdit(str(povray_bin)), 0, 0, 1, 2)
-        self.browse = pathBox.addWidget(gui.BrowseButton(), 1, 0, 1, 1)
+        self.browse = pathBox.addWidget(gui.BrowseButton('dir'), 1, 0, 1, 1)
         self.browse.setPath(povray_bin)
         if sys.platform == 'win32':
             self.browse.setFilter('Executable programs (*.exe);;All files (*.*)')
@@ -62,7 +62,7 @@ class PovrayTaskView(gui3d.TaskView):
 
         @self.browse.mhEvent
         def onClicked(path):
-            if os.path.isfile(path):
+            if os.path.isdir(path):
                 gui3d.app.settings['povray_bin'] = path
                 self.path.setText(path)
         #------------------------------------------------------------------------------------
