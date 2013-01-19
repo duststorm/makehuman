@@ -178,7 +178,7 @@ def loadTextMesh(obj, path):
                         faceGroups[0] = obj.createFaceGroup('default-dummy-group')
                     fg = faceGroups[0]
 
-                if not mtl:
+                if mtl is None:
                     if 0 not in materials:
                         materials[0] = obj.createMaterial('')
                     mtl = materials[0]
