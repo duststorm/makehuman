@@ -497,7 +497,7 @@ class TextEdit(QtGui.QLineEdit, Widget):
         self.setCursorPosition(len(text))
 
     def getText(self):
-        return super(TextEdit, self).text()
+        return unicode(super(TextEdit, self).text())
 
     def validateText(self, text):
         if self.__validator:
@@ -526,12 +526,19 @@ class DocumentEdit(QtGui.QTextEdit, Widget):
         Widget.__init__(self)
         self.setAcceptRichText(False)
 
+    @property
+    def text(self):
+        return self.getText()
+
     def setText(self, text):
         self.setPlainText(text)
 
     def addText(self, text):
         self.moveCursor(QtGui.QTextCursor.End, QtGui.QTextCursor.MoveAnchor)
         self.insertPlainText(text)
+
+    def getText(self):
+        return unicode(super(DocumentEdit, self).toPlainText())
 
 class ProgressBar(QtGui.QProgressBar, Widget):
     def __init__(self, visible=True):

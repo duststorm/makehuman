@@ -70,7 +70,7 @@ class ScriptingView(gui3d.TaskView):
         def onClicked(event):
             filename = mh.getSaveFileName(self.filename or self.directory, 'Python scripts (*.py);;All files (*.*)')
             with open(filename, "w") as f:
-                f.write(self.scriptText.toPlainText())
+                f.write(self.scriptText.getText())
             dlg = gui.Dialog()
             dlg.prompt("Save script","File was written in an acceptable manner","OK")
             self.filename = filename
