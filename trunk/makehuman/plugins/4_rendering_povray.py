@@ -44,7 +44,12 @@ class PovrayTaskView(gui3d.TaskView):
         pathBox = self.addLeftWidget(gui.GroupBox('Povray  bin  path'))
         # this part load old settings values for next session; str(povray_bin)
         povray_bin = gui3d.app.settings.get('povray_bin', '')
-        self.path= pathBox.addWidget(gui.TextEdit(str(povray_bin)))
+        self.path= pathBox.addWidget(gui.TextEdit(str(povray_bin)), 0, 0, 1, 2)
+        self.browse = pathBox.addWidget(gui.BrowseButton(), 1, 0, 1, 1)
+        self.browse.setPath(povray_bin)
+        if sys.platform == 'win32':
+            self.browse.setFilter('Executable programs (*.exe);;All files (*.*)')
+        
         #
         if os.name == 'nt':
             #
@@ -54,6 +59,12 @@ class PovrayTaskView(gui3d.TaskView):
         @self.path.mhEvent
         def onChange(value):
             gui3d.app.settings['povray_bin'] = 'Enter your path' if not value else str(value)
+
+        @self.browse.mhEvent
+        def onClicked(path):
+            if os.path.isfile(path):
+                gui3d.app.settings['povray_bin'] = path
+                self.path.setText(path)
         #------------------------------------------------------------------------------------
         filter = []
         # Options box

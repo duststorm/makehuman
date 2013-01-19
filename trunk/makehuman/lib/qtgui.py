@@ -493,8 +493,8 @@ class TextEdit(QtGui.QLineEdit, Widget):
         self.callEvent('onChange', string)
 
     def setText(self, text):
-        self.setText(text)
-        self.moveCursor(QtGui.QTextCursor.End, QtGui.QTextCursor.MoveAnchor)
+        super(TextEdit, self).setText(text)
+        self.setCursorPosition(len(text))
 
     def getText(self):
         return super(TextEdit, self).text()
@@ -1032,3 +1032,41 @@ class TreeView(QtGui.QTreeWidget, Widget):
     def _expand(self, item):
         if item.isDir:
             self.callEvent('onExpand', item)
+
+class SpinBox(QtGui.QSpinBox, Widget):
+    def __init__(self, value, parent = None):
+        super(SpinBox, self).__init__(parent)
+        Widget.__init__(self)
+        self.setRange(0, 99999)
+        self.setValue(value)
+        self.connect(self, QtCore.SIGNAL('valueChanged(int)'), self._changed)
+
+    def _changed(self, value):
+        self.callEvent('onChange', value)
+
+    def setValue(self, value):
+        self.blockSignals(True)
+        super(SpinBox, self).setValue(value)
+        self.blockSignals(False)
+
+class BrowseButton(Button):
+    def __init__(self):
+        super(BrowseButton, self).__init__("...")
+        self._path = ''
+        self._filter = ''
+
+    def setPath(self, path):
+        self._path = path
+
+    def setFilter(self, filter):
+        self._filter = filter
+
+    def _clicked(self, state):
+        log.debug('clicked')
+        if not os.path.isfile(self._path):
+            self._path = os.path.split(self._path)[0]
+            if not os.path.isdir(self._path):
+                self._path = os.getcwd()
+        self._path = str(QtGui.QFileDialog.getOpenFileName(G.app.mainwin, directory=self._path, filter=self._filter))
+        self.callEvent('onClicked', self._path)
+

@@ -23,8 +23,7 @@ TODO
 """
 
 import sys
-if 'nt' in sys.builtin_module_names:
-    sys.path.append('./pythonmodules')
+import os
 
 # We need this for rendering
 
@@ -44,11 +43,21 @@ class MitsubaTaskView(gui3d.TaskView):
         # Buttons
         pathBox = self.addLeftWidget(gui.GroupBox('Mitsuba  bin  path'))
         mitsuba_bin = gui3d.app.settings.get('mitsuba_bin', '')
-        self.path= pathBox.addWidget(gui.TextEdit(str(mitsuba_bin)))
+        self.path= pathBox.addWidget(gui.TextEdit(str(mitsuba_bin)), 0, 0, 1, 2)
+        self.browse = pathBox.addWidget(gui.BrowseButton(), 1, 0, 1, 1)
+        self.browse.setPath(mitsuba_bin)
+        if sys.platform == 'win32':
+            self.browse.setFilter('Executable programs (*.exe);;All files (*.*)')
         #
         @self.path.mhEvent
         def onChange(value):
             gui3d.app.settings['mitsuba_bin'] = 'Enter your path' if not value else str(value)
+
+        @self.browse.mhEvent
+        def onClicked(path):
+            if os.path.isfile(path):
+                gui3d.app.settings['mitsuba_bin'] = path
+                self.path.setText(path)
         
         # Type of lighting method
         lightingBox = self.addLeftWidget(gui.GroupBox('Integrators'))

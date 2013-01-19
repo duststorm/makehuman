@@ -25,6 +25,7 @@ TODO
 import gui3d
 import mh
 import gui
+import log
 
 class RenderingSettingTaskView(gui3d.TaskView):
 
@@ -35,8 +36,8 @@ class RenderingSettingTaskView(gui3d.TaskView):
         rendering_width = gui3d.app.settings.get('rendering_width', 800)
         rendering_height = gui3d.app.settings.get('rendering_height', 600)
         resBox = self.addLeftWidget(gui.GroupBox('Resolution'))
-        self.width  = resBox.addWidget(gui.TextEdit(str(rendering_width), validator = gui.intValidator))
-        self.height = resBox.addWidget(gui.TextEdit(str(rendering_height), validator = gui.intValidator))
+        self.width  = resBox.addWidget(gui.SpinBox(rendering_width), 0, 0)
+        self.height = resBox.addWidget(gui.SpinBox(rendering_height), 0, 1)
 
         @self.width.mhEvent
         def onChange(value):

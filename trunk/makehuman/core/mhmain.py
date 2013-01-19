@@ -26,6 +26,7 @@ import sys
 import os
 import glob, imp
 from os.path import join, basename, splitext
+from contextlib import contextmanager
 
 from core import G
 import mh
@@ -40,6 +41,21 @@ import gui
 import language as lang
 from camera3d import Camera
 import log
+
+@contextmanager
+def outFile(path):
+    path = os.path.join(mh.getPath(''), path)
+    tmppath = path + '.tmp'
+    try:
+        with open(tmppath, 'w') as f:
+            yield f
+        if os.path.exists(path):
+            os.remove(path)
+        os.rename(tmppath, path)
+    except:
+        if os.path.exists(tmppath):
+            os.remove(tmppath)
+        log.error('unable to save file %s', path, exc_info=True)
 
 class PluginCheckBox(gui.CheckBox):
 
@@ -618,28 +634,25 @@ class MHApplication(gui3d.Application, mh.Application):
             if not os.path.exists(mh.getPath('')):
                 os.makedirs(mh.getPath(''))
 
-            f = open(os.path.join(mh.getPath(''), "settings.ini"), 'w')
-            f.write(mh.formatINI(self.settings))
-            f.close()
+            with outFile("settings.ini") as f:
+                f.write(mh.formatINI(self.settings))
 
-            f = open(os.path.join(mh.getPath(''), "shortcuts.ini"), 'w')
-            for shortcut, method in self.shortcuts.iteritems():
-                f.write('%d %d %s\n' % (shortcut[0], shortcut[1], method.__name__))
-            f.close()
+            with outFile("shortcuts.ini") as f:
+                for shortcut, method in self.shortcuts.iteritems():
+                    f.write('%d %d %s\n' % (shortcut[0], shortcut[1], method.__name__))
 
-            f = open(os.path.join(mh.getPath(''), "mouse.ini"), 'w')
-            for mouseAction, method in self.mouseActions.iteritems():
-                f.write('%d %d %s\n' % (mouseAction[0], mouseAction[1], method.__name__))
-            f.close()
+            with outFile("mouse.ini") as f:
+                for mouseAction, method in self.mouseActions.iteritems():
+                    f.write('%d %d %s\n' % (mouseAction[0], mouseAction[1], method.__name__))
 
             if self.dialog is not None:
                 self.helpIds.update(self.dialog.helpIds)
-            f = open(os.path.join(mh.getPath(''), "help.ini"), 'w')
-            for helpId in self.helpIds:
-                f.write('%s\n' % helpId)
-            f.close()
+
+            with outFile("help.ini") as f:
+                for helpId in self.helpIds:
+                    f.write('%s\n' % helpId)
         except:
-            log.error('Failed to save settings file')
+            log.error('Failed to save settings file', exc_info=True)
             if promptOnFail:
                 self.prompt('Error', 'Could not save settings file.', 'OK')
 
