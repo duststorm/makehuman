@@ -63,7 +63,6 @@ class WarpTarget(algos3d.Target):
         if self.isObsolete:
             halt
         if self.isDirty:
-            #print "reinit", self
             shape = self.modifier.compileWarpTarget(self.human)
             saveWarpedTarget(shape, self.modifier.warppath)
             self.__init__(self.modifier, self.human)
@@ -89,9 +88,36 @@ def saveWarpedTarget(shape, path):
 #   class WarpModifier
 #----------------------------------------------------------
 
+theModifierTypes = {
+    "GenderAgeEthnic" : [
+        ('macrodetails', None, 'Gender', 0.0, 1.0),
+        ('macrodetails', None, 'Age', 0.0, 1.0),
+        ('macrodetails', None, 'African', 0.0, 1.0),
+        ('macrodetails', None, 'Asian', 0.0, 1.0),
+    ],
+    "GenderAgeMuscleWeight" : [
+        ('macrodetails', None, 'Gender', 0.0, 1.0),
+        ('macrodetails', None, 'Age', 0.0, 1.0),
+        ('macrodetails', 'universal', 'Muscle', 0.0, 1.0),
+        ('macrodetails', 'universal', 'Weight', 0.0, 1.0),
+        #('macrodetails', 'universal-stature', 'Height', -1.0, 1.0),
+    ],
+}
+
+
+class TargetSpec:
+    def __init__(self, path, factors):
+        self.path = path
+        self.factors = factors
+    
+    def __repr__(self):
+        return ("<TargetSpec %s %s>" % (self.path, self.factors))
+    
+    
 class WarpModifier (humanmodifier.SimpleModifier):
 
-    def __init__(self, template, bodypart, fallback):
+    def __init__(self, template, bodypart, modtype):
+        global theModifierTypes, theBaseCharacterParts
                 
         string = template.replace('$','').replace('{','').replace('}','')                
         warppath = os.path.join(mh.getPath(""), "warp", string)
@@ -102,32 +128,81 @@ class WarpModifier (humanmodifier.SimpleModifier):
             fp.close()
             
         humanmodifier.SimpleModifier.__init__(self, warppath)
-        self.fallback = getattr(humanmodifier, fallback)(template)
-        self.modtype = fallback
-
         self.warppath = warppath
         self.template = template
-        paths = self.fallback.expandTemplate([(self.template, [])])
-        self.paths = [(path.replace("-/","/"), factors) for (path,factors) in paths]
-        self.bases = {}
-
-        if len(self.paths) == 1:
-            path = self.paths[0]
-            bases = getBaseCharacter(path[0])
-            for char,key in bases:
-                self.bases[key] = (char, -1)
-        else:
-            for path in self.paths:
-                bases = getBaseCharacter(path[1])            
-                for char,key in bases:
-                    self.bases[key] = (char, -1)
         self.isWarp = True
         self.bodypart = bodypart
         self.slider = None
         self.refTargets = {}
-        self.refTargetVerts = {}
+        self.refTargetVerts = {}        
+        self.modtype = modtype
+        
+        self.fallback = None
+        for (tlabel, tname, tvar, tmin, tmax) in theModifierTypes[modtype]:
+            self.fallback = humanmodifier.MacroModifier(tlabel, tname, tvar, tmin, tmax)
+            break
             
+        self.bases = {}
+        self.targetSpecs = {}
+        if modtype == "GenderAgeEthnic":            
+            self.setupBaseCharacters("Gender", "Age", "Ethnic", "NoUniv", "NoUniv")
+        elif modtype == "GenderAgeMuscleWeight":
+            self.setupBaseCharacters("Gender", "Age", "NoEthnic", "Muscle", "Weight")
+                    
+
+    def setupBaseCharacters(self, genders, ages, ethnics, tones, weights):
     
+        baseCharacterParts = {
+            "Gender" : ("male", "female"),
+            "Age" : ("child", "young", "old"),
+            "Ethnic" : ("caucasian", "african", "asian"),
+            "NoEthnic" : ["caucasian"],
+            "Muscle" : ("flaccid", None, "muscle"),
+            "Weight" : ("light", None, "heavy"),
+            "NoUniv" : [None]
+        }
+
+        for gender in baseCharacterParts[genders]:
+            for age in baseCharacterParts[ages]:
+                for ethnic1 in baseCharacterParts[ethnics]:
+                    if ethnic1 == "caucasian":
+                        ethnic2 = "neutral"
+                    else:
+                        ethnic2 = ethnic1
+
+                    base = "data/targets/macrodetails/%s-%s-%s.target" % (ethnic2, gender, age)    
+                    key = "%s-%s-%s" % (ethnic1, gender, age)  
+                    self.bases[key] = (base, -1)
+
+                    path = self.template
+                    path = path.replace("${ethnic}", ethnic1).replace("${gender}", gender).replace("${age}",age)
+                    factors = [ethnic1, gender, age]
+                    self.targetSpecs[key] = TargetSpec(path, factors)
+                    
+                    for muscle in baseCharacterParts[tones]:
+                        for weight in baseCharacterParts[weights]:            
+                            if muscle and weight:    
+                                base = "data/targets/macrodetails/universal-%s-%s-%s-%s.target" % (gender, age, muscle, weight)
+                                key = "universal-%s-%s-%s-%s" % (gender, age, muscle, weight)
+                                self.bases[key] = (base, -1)
+                                path = path.replace("${muscle}", muscle).replace("${weight}", weight)
+                                self.targetSpecs[key] = TargetSpec(path, factors + [muscle, weight])
+                                
+                            elif muscle:    
+                                base = "data/targets/macrodetails/universal-%s-%s-%s.target" % (gender, age, muscle)
+                                key = "universal-%s-%s-%s" % (gender, age, muscle)
+                                self.bases[key] = (base, -1)
+                                path = path.replace("${muscle}", muscle)
+                                self.targetSpecs[key] = TargetSpec(path, factors + [muscle])
+                        
+                            elif weight:    
+                                base = "data/targets/macrodetails/universal-%s-%s-%s.target" % (gender, age, weight)
+                                key = "universal-%s-%s-%s" % (gender, age, weight)
+                                self.bases[key] = (base, -1)
+                                path = path.replace("${weight}", weight)
+                                self.targetSpecs[key] = TargetSpec(path, factors + [weight])
+
+
     def __repr__(self):
         return ("<WarpModifier %s>" % (os.path.basename(self.template)))
             
@@ -175,7 +250,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
                 self.getBases(human)
                 if not self.makeRefTarget(human):
                     raise NameError("Character is empty")
-
+                    
     
     def getBases(self, human):
         targetChanged = False
@@ -199,61 +274,70 @@ class WarpModifier (humanmodifier.SimpleModifier):
         self.refTargetVerts = zeroVerts()
         madeRefTarget = False
         factors = self.fallback.getFactors(human, 1.0)
-        for data in self.paths:
-            cval = reduce(mul, [factors[factor] for factor in data[1]])
+        """
+        print("Factors")
+        for factor in factors.items():
+            print "  ", factor
+        print("Targets")
+        for target in self.targetSpecs.values():
+            print "  ", target
+        """
+        
+        for target in self.targetSpecs.values():
+            cval = reduce(mul, [factors[factor] for factor in target.factors])
             if cval > 0:
-                log.debug("  reftrg %s %s", data[0], cval)
+                log.debug("  reftrg %s %s", target.path, cval)
                 madeRefTarget = True
-                verts = self.getTargetInsist(data[0])
+                verts = self.getTargetInsist(target.path)
                 if verts is not None:
                     self.refTargetVerts = addVerts(self.refTargetVerts, cval, verts)
         return madeRefTarget                            
     
 
-    def getTargetInsist(self, target):
-        verts = self.getTarget(target)
+    def getTargetInsist(self, path):
+        verts = self.getTarget(path)
         if verts is not None:
-            self.refTargets[target] = verts
+            self.refTargets[path] = verts
             return verts
             
         for string in ["flaccid", "muscle", "light", "heavy"]:
-            if string in target:
-                log.message("  Did not find %s", target)
+            if string in path:
+                log.message("  Did not find %s", path)
                 return None
     
-        target1 = target.replace("asian", "caucasian").replace("neutral", "caucasian").replace("african", "caucasian")
-        target1 = target1.replace("cauccaucasian", "caucasian")
-        verts = self.getTarget(target1)
+        path1 = path.replace("asian", "caucasian").replace("neutral", "caucasian").replace("african", "caucasian")
+        path1 = path1.replace("cauccaucasian", "caucasian")
+        verts = self.getTarget(path1)
         if verts is not None:
-            self.refTargets[target] = verts
-            log.message("   Replaced %s\n  -> %s", target, target1)
+            self.refTargets[path] = verts
+            log.message("   Replaced %s\n  -> %s", path, path1)
             return verts
             
-        target2 = target1.replace("child", "young").replace("old", "young")
-        verts = self.getTarget(target2)
+        path2 = path1.replace("child", "young").replace("old", "young")
+        verts = self.getTarget(path2)
         if verts is not None:
-            self.refTargets[target] = verts
-            log.message("   Replaced %s\n  -> %s", target, target2)
+            self.refTargets[path] = verts
+            log.message("   Replaced %s\n  -> %s", path, path2)
             return verts
             
-        target3 = target2.replace("male", "female")
-        target3 = target3.replace("fefemale", "female")
-        verts = self.getTarget(target3)
-        self.refTargets[target] = verts
+        path3 = path2.replace("male", "female")
+        path3 = path3.replace("fefemale", "female")
+        verts = self.getTarget(path3)
+        self.refTargets[path] = verts
         if verts is None:
-            log.message("Warning: Found none of:\n    %s\n    %s\n    %s\n    %s", target, target1, target2, target3)
+            log.message("Warning: Found none of:\n    %s\n    %s\n    %s\n    %s", path, path1, path2, path3)
         else:
-            log.message("   Replaced %s\n  -> %s", target, target3)        
+            log.message("   Replaced %s\n  -> %s", path, path3)        
         return verts
 
 
-    def getTarget(self, target):
+    def getTarget(self, path):
         try:
-            verts = self.refTargets[target]
+            verts = self.refTargets[path]
         except KeyError:
             verts = None
         if verts is None:
-            verts = readTarget(target)
+            verts = readTarget(path)
         return verts            
           
 
@@ -314,44 +398,6 @@ class WarpModifier (humanmodifier.SimpleModifier):
                 theRefObjects[path] = verts
             return verts            
     
-
-def getBaseName(path, name1, name2, name3):
-    if name1 in path:
-        return name1
-    elif name2 in path:
-        return name2
-    else:
-        return name3
-
-
-def getBaseCharacter(path):    
-    race = getBaseName(path, "african", "asian", "neutral")
-    gender = getBaseName(path, "female", "male", "female")
-    age = getBaseName(path, "child", "old", "young")
-    tone = getBaseName(path, "muscle", "flaccid", None)
-    weight = getBaseName(path, "heavy", "light", None)
-
-    path = "data/targets/macrodetails/%s-%s-%s.target" % (race, gender, age)    
-    key = "%s-%s-%s" % (race, gender, age)  
-    bases = [(path, key)]
-    
-    if tone and weight:    
-        path0 = "data/targets/macrodetails/universal-%s-%s-%s-%s.target" % (gender, age, tone, weight)
-        repl = "%s-%s-%s-%s-%s" % (race, gender, age, tone, weight)
-        bases.append((path, key))
-        
-    elif tone:    
-        path = "data/targets/macrodetails/universal-%s-%s-%s.target" % (gender, age, tone)
-        repl = "%s-%s-%s-%s" % (race, gender, age, tone)
-        bases.append((path, key))
-
-    elif weight:    
-        path = "data/targets/macrodetails/universal-%s-%s-%s.target" % (gender, age, weight)
-        repl = "%s-%s-%s-%s" % (race, gender, age, weight)
-        bases.append((path, key))
-        
-    return bases
-
 
 def removeAllWarpTargets(human):
     log.message("Removing all warp targets")
@@ -452,10 +498,10 @@ def copyArray(verts):
 #----------------------------------------------------------
 
 def clearRefObject():
-    global theRefObjectVerts
+    global theRefObjectVerts, theModifierTypes
     theRefObjectVerts = {}
-    theRefObjectVerts["GenderAgeMuscleWeightModifier"] = None
-    theRefObjectVerts["GenderAgeEthnicModifier2"] = None
+    for mtype in theModifierTypes.keys():
+        theRefObjectVerts[mtype] = None
     
 
 def defineGlobals():
@@ -485,19 +531,19 @@ def defineGlobals():
     clearRefObject()
     theRefObjects = {}
 
-    for race in ["african", "asian", "neutral"]:
+    for ethnic in ["african", "asian", "neutral"]:
         for age in ["child", "young", "old"]:
             for gender in ["female", "male"]:
-                path = "data/targets/macrodetails/%s-%s-%s.target" % (race, gender, age)
+                path = "data/targets/macrodetails/%s-%s-%s.target" % (ethnic, gender, age)
                 theRefObjects[path] = None
                 
     for age in ["child", "young", "old"]:
         for gender in ["female", "male"]:
-            for tone in ["flaccid", "muscle"]:
-                path = "data/targets/macrodetails/universal-%s-%s-%s.target" % (gender, age, tone)
+            for muscle in ["flaccid", "muscle"]:
+                path = "data/targets/macrodetails/universal-%s-%s-%s.target" % (gender, age, muscle)
                 theRefObjects[path] = None
                 for weight in ["light", "heavy"]:
-                    path = "data/targets/macrodetails/universal-%s-%s-%s-%s.target" % (gender, age, tone, weight)
+                    path = "data/targets/macrodetails/universal-%s-%s-%s-%s.target" % (gender, age, muscle, weight)
                     theRefObjects[path] = None
             for weight in ["light", "heavy"]:
                 path = "data/targets/macrodetails/universal-%s-%s-%s.target" % (gender, age, weight)

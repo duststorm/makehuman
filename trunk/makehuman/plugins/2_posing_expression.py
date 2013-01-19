@@ -80,13 +80,10 @@ class ExpressionTaskView(gui3d.TaskView):
             
             # Create sliders
             for subname in subnames:
-                
-                #modifier = humanmodifier.GenderAgeModifier('data/targets/expression/units/${gender}_${age}/%s-%s.target' % (name, subname))
-
                 modifier = warpmodifier.WarpModifier(
                         'data/targets/expression/units/${ethnic}/${gender}_${age}/%s-%s.target' % (name, subname),
                         "face",
-                        "GenderAgeEthnicModifier2")
+                        "GenderAgeEthnic")
 
                 self.modifiers[name + '-' + subname] = modifier
                 slider = box.addWidget(ExpressionSlider(subname.capitalize(), modifier))
@@ -227,7 +224,7 @@ class MhmLoadTaskView(gui3d.TaskView):
         if not os.path.exists(self.mhmPath):
             os.makedirs(self.mhmPath)
 
-        self.filechooser = self.addTopWidget(fc.FileChooser([self.globalMhmPath, self.mhmPath], 'mhm', 'png'))
+        self.filechooser = self.addTopWidget(fc.FileChooser([self.globalMhmPath, self.mhmPath], 'mhm', 'thumb'))
         self.addLeftWidget(self.filechooser.sortBox)
 
         @self.filechooser.mhEvent

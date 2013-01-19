@@ -53,7 +53,7 @@ class PoseModifier(humanmodifier.GenderAgeMuscleWeightModifier):
 """        
 class PoseModifier(warpmodifier.WarpModifier):
     def __init__(self, template):
-        warpmodifier.WarpModifier.__init__(self, template, "body", "GenderAgeMuscleWeightModifier") 
+        warpmodifier.WarpModifier.__init__(self, template, "body", "GenderAgeMuscleWeight") 
         self.isPose = True
 
 

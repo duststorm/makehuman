@@ -233,7 +233,7 @@ def readExpressionUnits(human, t0, t1):
 
         shape = warpmodifier.compileWarpTarget(
                 'data/targets/expression/units/${ethnic}/${gender}_${age}/%s.target' % name,
-                "GenderAgeEthnicModifier2",
+                "GenderAgeEthnic",
                 human, 
                 "face")
 
@@ -251,7 +251,7 @@ def readCorrectives(drivers, human, folder, landmarks, t0, t1):
 
         shape = warpmodifier.compileWarpTarget(
                 "shared/mhx/targets/correctives/%s/caucasian/${gender}-${age}-${tone}-${weight}/%s.target" % (folder, pose),
-                'GenderAgeMuscleWeightModifier',
+                'GenderAgeMuscleWeight',
                 human, 
                 landmarks)
 
