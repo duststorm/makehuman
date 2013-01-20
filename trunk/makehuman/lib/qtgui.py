@@ -484,6 +484,15 @@ class TextEdit(QtGui.QLineEdit, Widget):
         Widget.__init__(self)
         self.setValidator(validator)
         self.connect(self, QtCore.SIGNAL('textEdited(QString)'), self._textChanged)
+        self.connect(self, QtCore.SIGNAL('returnPressed()'), self._enter)
+        key_up = QtGui.QShortcut(
+            QtGui.QKeySequence(QtCore.Qt.Key_Up), self,
+            context = QtCore.Qt.WidgetShortcut)
+        key_down = QtGui.QShortcut(
+            QtGui.QKeySequence(QtCore.Qt.Key_Down), self,
+            context = QtCore.Qt.WidgetShortcut)
+        self.connect(key_up, QtCore.SIGNAL("activated()"), self._key_up)
+        self.connect(key_down, QtCore.SIGNAL("activated()"), self._key_down)
 
     @property
     def text(self):
@@ -491,6 +500,9 @@ class TextEdit(QtGui.QLineEdit, Widget):
 
     def _textChanged(self, string):
         self.callEvent('onChange', string)
+
+    def _enter(self):
+        self.callEvent('onActivate', self.getText())
 
     def setText(self, text):
         super(TextEdit, self).setText(text)
@@ -519,6 +531,12 @@ class TextEdit(QtGui.QLineEdit, Widget):
 
     def onChange(self, event):
         pass
+
+    def _key_up(self):
+        self.callEvent('onUpArrow', None)
+
+    def _key_down(self):
+        self.callEvent('onDownArrow', None)
 
 class DocumentEdit(QtGui.QTextEdit, Widget):
     def __init__(self, text=''):
@@ -870,7 +888,10 @@ class VScrollLayout(QtGui.QLayout):
         # log.debug("%x", int(self._child.widget().sizePolicy().horizontalPolicy()))
         if not self._child.widget().sizePolicy().horizontalPolicy() & QtGui.QSizePolicy.ExpandFlag:
             rect.setWidth(size.width())
-        rect.setHeight(size.height())
+        if not self._child.widget().sizePolicy().verticalPolicy() & QtGui.QSizePolicy.ExpandFlag:
+            rect.setHeight(size.height())
+        else:
+            rect.setHeight(max(rect.height(), size.height()))
 
         # log.debug('VScrollLayout.setGeometry(child): %d %d %d %d', rect.x(), rect.y(), rect.width(), rect.height())
         self._child.setGeometry(rect)
