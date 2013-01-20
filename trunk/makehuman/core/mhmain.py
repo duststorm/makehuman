@@ -153,6 +153,7 @@ class MHApplication(gui3d.Application, mh.Application):
             'rtl': False
         }
 
+        self.actions = []
         self.fonts = {}
 
         self.loadHandlers = {}
@@ -387,13 +388,7 @@ class MHApplication(gui3d.Application, mh.Application):
 
         @self.resetButton.mhEvent
         def onClicked(event):
-            human = self.selectedHuman
-            human.resetMeshValues()
-            human.applyAllTargets(self.progress)
-
-
-            gui3d.app.setFilenameCaption("Untitled")
-            self.setFileModified(False)
+            gui3d.app.resetHuman()
 
         self.globalButton = self.buttonBox.addWidget(gui.Button("Global cam"), 3, 0, 1, -1)
         self.faceButton = self.buttonBox.addWidget(gui.Button("Face cam"), 4, 0, 1, -1)
@@ -1011,11 +1006,19 @@ class MHApplication(gui3d.Application, mh.Application):
     def goToHelp(self):
         mh.changeCategory("Help")
 
-    def toggleStereo(self):
-        stereoMode = self.modelCamera.stereoMode
-        stereoMode += 1
-        if stereoMode > 2:
-            stereoMode = 0
+    def setMono(self):
+        stereoMode = 0
+        self.updateStereo()
+
+    def setStereo1(self):
+        stereoMode = 1
+        self.updateStereo()
+
+    def setStereo2(self):
+        stereoMode = 2
+        self.updateStereo()
+
+    def updateStereo(self):
         self.modelCamera.stereoMode = stereoMode
 
         # We need a black background for stereo
@@ -1027,6 +1030,13 @@ class MHApplication(gui3d.Application, mh.Application):
             self.categories["Modelling"].anaglyphsButton.setSelected(False)
 
         self.redraw()
+
+    def toggleStereo(self):
+        stereoMode = self.modelCamera.stereoMode
+        stereoMode += 1
+        if stereoMode > 2:
+            stereoMode = 0
+        self.updateStereo()
 
     def toggleSolid(self):
         self.selectedHuman.setSolid(not self.selectedHuman.isSolid())
@@ -1058,6 +1068,13 @@ class MHApplication(gui3d.Application, mh.Application):
             os.makedirs(grabPath)
         # TODO: use bbox to choose grab region
         mh.grabScreen(0, 0, G.windowWidth, G.windowHeight, os.path.join(grabPath, 'grab.png'))
+
+    def resetHuman(self):
+        human = self.selectedHuman
+        human.resetMeshValues()
+        human.applyAllTargets(self.progress)
+        self.setFilenameCaption("Untitled")
+        self.setFileModified(False)
 
     # Camera navigation
     def rotateCamera(self, axis, amount):
@@ -1185,6 +1202,34 @@ class MHApplication(gui3d.Application, mh.Application):
         else:
             self.stop()
 
+    def createActions(self):
+        Action = gui.Action
+        self.actions.append(Action('undo',    'Undo',     self.undo))
+        self.actions.append(Action('redo',    'Redo',     self.redo))
+        self.actions.append(Action('reset',   'Reset',    self.resetHuman))
+        self.actions.append(Action('save',    'Save',     self.goToSave))
+        self.actions.append(Action('load',    'Load',     self.goToLoad))
+        self.actions.append(Action('export',  'Export',   self.goToExport))
+        self.actions.append(Action('help',    'Help',     self.goToHelp))
+        self.actions.append(Action('mono',    'Mono',     self.setMono,    group='stereo'))
+        self.actions.append(Action('stereo1', 'Stereo 1', self.setStereo1, group='stereo'))
+        self.actions.append(Action('stereo2', 'Stereo 2', self.setStereo2, group='stereo'))
+        self.actions.append(Action('solid',   'Solid',    self.toggleSolid, toggle=True))
+        self.actions.append(Action('savetgt', 'Save target', self.saveTarget))
+        self.actions.append(Action('qexport', 'Quick export', self.quickExport))
+        self.actions.append(Action('smooth',  'Smooth',   self.toggleSubdivision, toggle=True))
+        self.actions.append(Action('grab',    'Grab screen', self.grabScreen))
+        self.actions.append(Action('front',   'Front view', self.frontView))
+        self.actions.append(Action('back',    'Back view', self.backView))
+        self.actions.append(Action('left',    'Left view', self.leftView))
+        self.actions.append(Action('right',   'Right view', self.rightView))
+        self.actions.append(Action('top',     'Top view', self.topView))
+        self.actions.append(Action('bottom',  'Bottom view', self.bottomView))
+        self.actions.append(Action('global',  'Global camera', self.setGlobalCamera))
+        self.actions.append(Action('face',    'Face camera', self.setFaceCamera))
+        for action in self.actions:
+            self.mainwin.toolbar.addAction(action)
+
     def createShortcuts(self):
         for (modifier, key), method in self.shortcuts.iteritems():
             mh.setShortcut(modifier, key, method)
@@ -1199,6 +1244,8 @@ class MHApplication(gui3d.Application, mh.Application):
         # Necessary because otherwise setting back to default theme causes crash
         self.setTheme("default")
         log.debug("Using Qt system style %s", self.getLookAndFeel())
+
+        self.createActions()
 
         self.createShortcuts()
 

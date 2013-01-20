@@ -138,7 +138,8 @@ g_mouse_pos = None
 gg_mouse_pos = None
 
 class Canvas(QtOpenGL.QGLWidget):
-    def __init__(self, parent):
+    def __init__(self, parent, app):
+        self.app = app
         format = QtOpenGL.QGLFormat()
         format.setAlpha(True)
         format.setDepthBufferSize(24)
@@ -153,6 +154,7 @@ class Canvas(QtOpenGL.QGLWidget):
         self.setFocus()
         self.setAutoBufferSwap(False)
         self.setAutoFillBackground(False)
+        self.setAttribute(QtCore.Qt.WA_NativeWindow)
         self.setAttribute(QtCore.Qt.WA_NoSystemBackground, False)
         self.setAttribute(QtCore.Qt.WA_OpaquePaintEvent)
         self.setAttribute(QtCore.Qt.WA_KeyCompression, False)
@@ -163,10 +165,9 @@ class Canvas(QtOpenGL.QGLWidget):
     def callback(self, name, *args, **kwargs):
         accum = kwargs.get('accum', False)
         name = 'on%sCallback' % name
-        app = self.parentWidget().app
-        if not hasattr(app, name):
+        if not hasattr(self.app, name):
             return
-        func = getattr(app, name)
+        func = getattr(self.app, name)
         if G.profile:
             if accum:
                 profiler.accum('func(*args)' % name, globals(), locals())
@@ -359,7 +360,7 @@ class CategoryPanel(QtGui.QWidget, qtgui.Widget):
 def getQtVersion():
     return [ int(versionNb) for versionNb in str(QtCore.qVersion()).split(".") ]
 
-class Frame(QtGui.QWidget):
+class Frame(QtGui.QMainWindow):
     title = "MakeHuman"
 
     def __init__(self, app, size):
@@ -374,9 +375,14 @@ class Frame(QtGui.QWidget):
             self.setWindowIcon(QtGui.QIcon("icons/makehuman_bg.svg"))
         else:
             self.setWindowIcon(QtGui.QIcon("icons/makehuman.bmp"))
-        self.setAttribute(QtCore.Qt.WA_OpaquePaintEvent)
+
         self.setAttribute(QtCore.Qt.WA_KeyCompression, False)
         self.resize(*size)
+        self.toolbar = self.addToolBar("Toolbar")
+        self.statusBar = qtgui.StatusBar()
+        self.setStatusBar(self.statusBar)
+        self.central = QtGui.QWidget()
+        self.setCentralWidget(self.central)
         self.create()
 
     def panel(self):
@@ -387,7 +393,7 @@ class Frame(QtGui.QWidget):
         return widget
 
     def create(self):
-        self.v_layout = QtGui.QGridLayout(self)
+        self.v_layout = QtGui.QGridLayout(self.central)
         self.v_layout.setContentsMargins(0, 0, 0, 0)
         self.v_layout.setSpacing(0)
 
@@ -427,7 +433,7 @@ class Frame(QtGui.QWidget):
         self.t_layout.addWidget(self.t_panel)
         self.t_panel.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Maximum)
 
-        self.canvas = Canvas(self)
+        self.canvas = Canvas(self, app = self.app)
         self.t_layout.addWidget(self.canvas)
 
         self.r_panel = self.panel()
@@ -452,8 +458,6 @@ class Frame(QtGui.QWidget):
         self.r_layout.addWidget(self.right_bottom, 2, 0)
         self.r_layout.setRowStretch(2, 0)
 
-        self.statusBar = qtgui.StatusBar()
-        self.bottom.addWidget(self.statusBar)
         self.progressBar = qtgui.ProgressBar()
         self.bottom.addWidget(self.progressBar)
 

@@ -1111,3 +1111,41 @@ class BrowseButton(Button):
             self._path = str(QtGui.QFileDialog.getExistingDirectory(G.app.mainwin, directory=self._path))
         self.callEvent('onClicked', self._path)
 
+class Action(QtGui.QAction, Widget):
+    _groups = {}
+
+    @classmethod
+    def getIcon(cls, name):
+        # icon = G.app.mainwin.style().standardIcon(QtGui.QStyle.SP_MessageBoxWarning)
+        path = os.path.join('data', 'icons', name + '.png')
+        if not os.path.isfile(path):
+            path = os.path.join('data', 'icons', 'notfound.png')
+        return QtGui.QIcon(path)
+
+    @classmethod
+    def getGroup(cls, name):
+        if name not in cls._groups:
+            cls._groups[name] = ActionGroup()
+        return cls._groups[name]
+
+    def __init__(self, icon, text, method, tooltip = None, group = None, toggle = False):
+        super(Action, self).__init__(self.getIcon(icon), text, G.app.mainwin)
+        self.method = method
+        if tooltip is not None:
+            self.setToolTip(tooltip)
+        if group is not None:
+            self.setActionGroup(self.getGroup(group))
+        if toggle:
+            self.setCheckable(True)
+        self.connect(self, QtCore.SIGNAL('triggered(bool)'), self._activate)
+
+    def setActionGroup(self, group):
+        self.setCheckable(True)
+        super(Action, self).setActionGroup(group)
+
+    def _activate(self, checked):
+        self.method()
+
+class ActionGroup(QtGui.QActionGroup):
+    def __init__(self):
+        super(ActionGroup, self).__init__(G.app.mainwin)
