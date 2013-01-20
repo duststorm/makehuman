@@ -42,7 +42,6 @@ class ShellTaskView(gui3d.TaskView):
         @self.line.mhEvent
         def onActivate(text):
             self.execute(text)
-            self.write('\n')
             self.history.append(text)
             self.histitem = None
             self.line.setText('')
@@ -66,7 +65,7 @@ class ShellTaskView(gui3d.TaskView):
         sys.stderr = self
         try:
             code = compile(text, '<shell>', 'single')
-            eval(code)
+            eval(code, self.globals)
             # exec text in self.globals, {}
         except:
             traceback.print_exc()
