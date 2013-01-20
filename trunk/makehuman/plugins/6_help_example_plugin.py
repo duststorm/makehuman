@@ -143,7 +143,7 @@ taskview = None
 
 
 def load(app):
-    category = app.getCategory('Help')
+    category = app.getCategory('Develop')
     taskview = category.addTask(ExampleTaskView(category))
 
 
