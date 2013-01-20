@@ -48,15 +48,19 @@ class Widget(events3d.EventHandler):
 
     def focusInEvent(self, event):
         self.callEvent('onFocus', self)
+        super(type(self), self).focusInEvent(event)
 
     def focusOutEvent(self, event):
         self.callEvent('onBlur', self)
+        super(type(self), self).focusOutEvent(event)
 
     def showEvent(self, event):
         self.callEvent('onShow', self)
+        super(type(self), self).showEvent(event)
 
     def hideEvent(self, event):
         self.callEvent('onHide', self)
+        super(type(self), self).hideEvent(event)
 
     def onFocus(self, event):
         pass
