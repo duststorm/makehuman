@@ -1271,3 +1271,6 @@ class MHApplication(gui3d.Application, mh.Application):
 
     def run(self):
         self.start()
+
+    def addExporter(self, exporter):
+        self.getCategory('Files').getTaskByName('Export').addExporter(exporter)

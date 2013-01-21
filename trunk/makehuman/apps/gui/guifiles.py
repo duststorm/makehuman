@@ -245,10 +245,11 @@ class LoadTaskView(gui3d.TaskView):
         gui3d.TaskView.onHide(self, event)
 
 class ExportTaskView(gui3d.TaskView):
-    
     def __init__(self, category):
         
         gui3d.TaskView.__init__(self, category, 'Export')
+
+        self.formats = []
 
         exportPath = mh.getPath('exports')
 
@@ -261,182 +262,24 @@ class ExportTaskView(gui3d.TaskView):
         
         # Mesh Formats
         self.formatBox = self.addLeftWidget(gui.GroupBox('Mesh Format'))
-        self.wavefrontObj = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, "Wavefront obj", True))
-        self.fbx = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, "Filmbox (fbx)"))
-        self.mhx = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Blender exchange (mhx)"))
-        self.collada = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Collada (dae)"))
-        self.md5 = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="MD5"))
-        self.stl = self.formatBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Stereolithography (stl)"))
 
         # Rig formats
         self.rigBox = self.addLeftWidget(gui.GroupBox('Rig format'))
-        self.skel = self.rigBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Skeleton (skel)"))
 
         # Map formats
         self.mapsBox = self.addLeftWidget(gui.GroupBox('Maps'))
-        self.lightmap = self.mapsBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="Lightmap"))
-        self.uvmap = self.mapsBox.addWidget(gui.RadioButton(self.exportBodyGroup, label="UV map"))
+
+        self.boxes = {
+            'mesh': self.formatBox,
+            'rig': self.rigBox,
+            'map': self.mapsBox
+            }
+
+        self.empty = True
 
         self.optionsBox = self.addRightWidget(gui.StackedBox())
 
-        # OBJ options
-        self.objOptions = self.optionsBox.addWidget(gui.GroupBox('Options'))
-        self.exportEyebrows = self.objOptions.addWidget(gui.CheckBox("Eyebrows", True))
-        self.exportLashes = self.objOptions.addWidget(gui.CheckBox("Eyelashes", True))
-        self.exportHelpers = self.objOptions.addWidget(gui.CheckBox("Helper geometry", False))
-        self.exportHidden = self.objOptions.addWidget(gui.CheckBox("Keep hidden faces", True))
-        self.exportSkeleton = self.objOptions.addWidget(gui.CheckBox("Skeleton", True))
-        self.exportSmooth = self.objOptions.addWidget(gui.CheckBox( "Subdivide", False))
-        scales = []
-        self.objScales = self.addScales(self.objOptions, scales, "Obj", True)
-
-        # FBX options
-        self.fbxOptions = self.optionsBox.addWidget(gui.GroupBox('Options'))
-        self.fbxEyebrows = self.fbxOptions.addWidget(gui.CheckBox("Eyebrows", True))
-        self.fbxLashes = self.fbxOptions.addWidget(gui.CheckBox("Eyelashes", True))
-        self.fbxHelpers = self.fbxOptions.addWidget(gui.CheckBox("Helper geometry", False))
-        self.fbxHidden = self.fbxOptions.addWidget(gui.CheckBox("Keep hidden faces", True))
-        self.fbxSkeleton = self.fbxOptions.addWidget(gui.CheckBox("Skeleton", True))
-        self.fbxSmooth = self.fbxOptions.addWidget(gui.CheckBox( "Subdivide", False))
-        scales = []
-        self.fbxScales = self.addScales(self.fbxOptions, scales, "Fbx", True)
-        rigs = []
-        self.fbxRigs = self.addRigs(self.fbxOptions, rigs, "Fbx", True)
-
-        # MHX options
-        """
-        y = yy
-        self.mhxOptionsSource = self.optionsBox.addWidget(gui.GroupBox('Options source'))
-        source = []
-        self.mhxConfig = self.mhxOptionsSource.addWidget(gui.RadioButton(source, "Use config options"))
-        self.mhxGui = self.mhxOptionsSource.addWidget(gui.RadioButton(source, "Use gui options", True))
-        self.mhxOptionsSource.hide()
-        y+=16
-        """
-        
-        self.mhxOptions = self.optionsBox.addWidget(gui.GroupBox('Options'))
-        #self.version24 = self.mhxOptions.addWidget(gui.CheckBox("Version 2.4", False))
-        #self.version25 = self.mhxOptions.addWidget(gui.CheckBox("Version 2.5", True))
-        self.mhxSeparateFolder = self.mhxOptions.addWidget(gui.CheckBox("Separate folder", False))
-        self.mhxFeetOnGround = self.mhxOptions.addWidget(gui.CheckBox("Feet on ground", True))
-        self.mhxExpressionUnits = self.mhxOptions.addWidget(gui.CheckBox("Expressions", False))
-        #self.mhxFaceShapes = self.mhxOptions.addWidget(gui.CheckBox("Face shapes", True))
-        self.mhxBodyShapes = self.mhxOptions.addWidget(gui.CheckBox("Body shapes", True))
-        self.mhxCustomShapes = self.mhxOptions.addWidget(gui.CheckBox("Custom shapes", False))
-        #self.mhxFacePanel = self.mhxOptions.addWidget(gui.CheckBox("Face panel", True))
-        self.mhxClothes = self.mhxOptions.addWidget(gui.CheckBox("Clothes", True))
-        self.mhxMasks = self.mhxOptions.addWidget(gui.CheckBox("Clothes masks", False))
-        self.mhxHidden = self.mhxOptions.addWidget(gui.CheckBox("Keep hidden faces", True))
-        self.mhxClothesRig = self.mhxOptions.addWidget(gui.CheckBox("Clothes rig", True))
-        self.mhxCage = self.mhxOptions.addWidget(gui.CheckBox("Cage", False))
-        self.mhxAdvancedSpine = self.mhxOptions.addWidget(gui.CheckBox("Advanced spine", False))
-        self.mhxMaleRig = self.mhxOptions.addWidget(gui.CheckBox("Male rig", False))
-        #self.mhxSkirtRig = self.mhxOptions.addWidget(gui.CheckBox("Skirt rig", False))
-        rigs = []
-        self.mhxMhx = self.mhxOptions.addWidget(gui.RadioButton(rigs, "Use mhx rig", True))
-        self.rigifyMhx = self.mhxOptions.addWidget(gui.RadioButton(rigs, "Use rigify rig", False))
-        addedRigs = self.addRigs(self.mhxOptions, rigs, "Mhx", False)
-        self.mhxRigs = [(self.mhxMhx, "mhx"), (self.rigifyMhx, "rigify")] + addedRigs
-        
-        # Collada options
-        self.colladaOptions = self.optionsBox.addWidget(gui.GroupBox('Options'))
-        self.colladaRot90X = self.colladaOptions.addWidget(gui.CheckBox("Rotate 90 X", False))
-        self.colladaRot90Z = self.colladaOptions.addWidget(gui.CheckBox("Rotate 90 Z", False))
-        self.colladaEyebrows = self.colladaOptions.addWidget(gui.CheckBox("Eyebrows", True))
-        self.colladaLashes = self.colladaOptions.addWidget(gui.CheckBox("Eyelashes", True))
-        self.colladaHelpers = self.colladaOptions.addWidget(gui.CheckBox("Helper geometry", False))
-        self.colladaHidden = self.colladaOptions.addWidget(gui.CheckBox("Keep hidden faces", True))
-        # self.colladaSeparateFolder = self.colladaOptions.addWidget(gui.CheckBox("Separate folder", False))
-        # self.colladaPngTexture = self.colladaOptions.addWidget(gui.CheckBox("PNG texture", selected=True))
-        scales = []
-        self.daeScales = self.addScales(self.colladaOptions, scales, "Dae", True)
-        rigs = []
-        self.daeRigs = self.addRigs(self.colladaOptions, rigs, "Dae", True)
-
-        # STL options
-        self.stlOptions = self.optionsBox.addWidget(gui.GroupBox('Options'))
-        stlOptions = []
-        self.stlAscii = self.stlOptions.addWidget(gui.RadioButton(stlOptions,  "Ascii", selected=True))
-        self.stlBinary = self.stlOptions.addWidget(gui.RadioButton(stlOptions, "Binary"))
-        self.stlSmooth = self.stlOptions.addWidget(gui.CheckBox("Subdivide", False))
-
-        self.md5Options = self.optionsBox.addWidget(gui.GroupBox('Options'))
-        self.skelOptions = self.optionsBox.addWidget(gui.GroupBox('Options'))
-
-        # Lightmap options
-        self.lightmapOptions = self.optionsBox.addWidget(gui.GroupBox('Options'))
-        lightmapOptions = []
-        self.lightmapDisplay = self.lightmapOptions.addWidget(gui.RadioButton(lightmapOptions,  "Display on human", selected=False))
-
-        # Lightmap options
-        self.uvmapOptions = self.optionsBox.addWidget(gui.GroupBox('Options'))
-        uvmapOptions = []
-        self.uvmapDisplay = self.uvmapOptions.addWidget(gui.RadioButton(uvmapOptions,  "Display on human", selected=False))
-
         self.updateGui()
-
-        """                    
-        @self.version24.mhEvent
-        def onClicked(event):
-            
-            if self.version24.selected and self.version25.selected:
-                self.version24.setSelected(False)
-            else:
-                self.version24.setSelected(True)
-                
-        @self.version25.mhEvent
-        def onClicked(event):
-            
-            if self.version25.selected and self.version24.selected:
-                self.version25.setSelected(False)
-            else:
-                self.version25.setSelected(True)
-        """
-        
-        @self.wavefrontObj.mhEvent
-        def onClicked(event):
-            self.updateGui()
-            self.fileentry.setFilter('Wavefront (*.obj)')
-            
-        @self.fbx.mhEvent
-        def onClicked(event):
-            self.updateGui()
-            self.fileentry.setFilter('Filmbox (*.fbx)')
-
-        @self.mhx.mhEvent
-        def onClicked(event):
-            self.updateGui()
-            self.fileentry.setFilter('Blender Exchange (*.mhx)')
-        
-        @self.collada.mhEvent
-        def onClicked(event):
-            self.updateGui()
-            self.fileentry.setFilter('Collada (*.dae)')
-        
-        @self.md5.mhEvent
-        def onClicked(event):
-            self.updateGui()
-            self.fileentry.setFilter('MD5 (*.md5)')
-        
-        @self.stl.mhEvent
-        def onClicked(event):
-            self.updateGui()
-            self.fileentry.setFilter('Stereolithography (*.stl)')
-            
-        @self.skel.mhEvent
-        def onClicked(event):
-            self.updateGui()
-            self.fileentry.setFilter('Skeleton (*.skel)')
-
-        @self.lightmap.mhEvent
-        def onClicked(event):
-            self.updateGui()
-            self.fileentry.setFilter('PNG (*.png)')
-
-        @self.uvmap.mhEvent
-        def onClicked(event):
-            self.updateGui()
-            self.fileentry.setFilter('PNG (*.png)')
         
         @self.fileentry.mhEvent
         def onFileSelected(filename):
@@ -454,117 +297,14 @@ class ExportTaskView(gui3d.TaskView):
                     log.warning("expected extension '.%s' but got '%s'", targetExt, ext)
                 return os.path.join(dir, name + '.' + targetExt)
 
-            if self.wavefrontObj.selected:
-                
-                human = gui3d.app.selectedHuman
+            found = False
+            for exporter, radio, options in self.formats:
+                if radio.selected:
+                    exporter.export(gui3d.app.selectedHuman, filename)
+                    found = True
+                    break
 
-                options = {
-                    "helpers" : self.exportHelpers.selected,
-                    "hidden" : self.exportHidden.selected,
-                    "eyebrows" : self.exportEyebrows.selected,
-                    "lashes" : self.exportLashes.selected,
-                    "scale": self.getScale(self.objScales),
-                    "subdivide": self.exportSmooth.selected
-                }                    
-                mh2obj_proxy.exportProxyObj(human, filename("obj"), options)
-                
-                if self.exportSkeleton.selected:
-                    mh2bvh.exportSkeleton(human.meshData, filename("bvh", True))
-                    
-            elif self.fbx.selected:
-                
-                human = gui3d.app.selectedHuman
-
-                for (button, rig) in self.fbxRigs:
-                    if button.selected:
-                        break                
-                options = {
-                    "fbxrig" : rig,
-                    "helpers" : self.fbxHelpers.selected,
-                    "hidden" : self.fbxHidden.selected,
-                    "eyebrows" : self.fbxEyebrows.selected,
-                    "lashes" : self.fbxLashes.selected,
-                    "scale": self.getScale(self.fbxScales),
-                    "subdivide": self.fbxSmooth.selected
-                }                    
-                mh2fbx.exportFbx(human, filename("fbx"), options)
-            
-            elif self.mhx.selected:
-                #mhxversion = []
-                #if self.version24.selected: mhxversion.append('24')
-                #if self.version25.selected: mhxversion.append('25')
-                for (button, rig) in self.mhxRigs:
-                    if button.selected:
-                        break
-                options = {
-                    'mhxversion': ["25"],  #mhxversion,
-                    'usemasks':self.mhxMasks.selected,
-                    'hidden':self.mhxHidden.selected,
-                    #'expressions':False,    #self.mhxExpressions.selected,
-                    'expressionunits':self.mhxExpressionUnits.selected,
-                    #'faceshapes':self.mhxFaceShapes.selected,
-                    'bodyshapes':self.mhxBodyShapes.selected,
-                    'customshapes':self.mhxCustomShapes.selected,
-                    #'facepanel':self.mhxFacePanel.selected,
-                    'clothes':self.mhxClothes.selected,
-                    'cage':self.mhxCage.selected,
-                    'separatefolder':self.mhxSeparateFolder.selected,
-                    'feetonground':self.mhxFeetOnGround.selected,
-                    'advancedspine':self.mhxAdvancedSpine.selected,
-                    'malerig':self.mhxMaleRig.selected,
-                    'skirtrig':False, #self.mhxSkirtRig.selected,
-                    'clothesrig':self.mhxClothesRig.selected,
-                    'mhxrig': rig,
-                }
-
-                mh2mhx.exportMhx(gui3d.app.selectedHuman, filename("mhx"), options)
-            elif self.collada.selected:
-                for (button, rig) in self.daeRigs:
-                    if button.selected:
-                        break                
-                options = {
-                    "daerig": rig,
-                    "rotate90X" : self.colladaRot90X.selected,
-                    "rotate90Z" : self.colladaRot90Z.selected,
-                    "eyebrows" : self.colladaEyebrows.selected,
-                    "lashes" : self.colladaLashes.selected,
-                    "helpers" : self.colladaHelpers.selected,
-                    "hidden" : self.colladaHidden.selected,
-                    "scale": self.getScale(self.daeScales),
-                }
-                mh2collada.exportCollada(gui3d.app.selectedHuman, filename("dae"), options)
-            elif self.md5.selected:
-                mh2md5.exportMd5(gui3d.app.selectedHuman.meshData, filename("md5mesh"))
-            elif self.stl.selected:
-                mesh = gui3d.app.selectedHuman.getSubdivisionMesh() if self.exportSmooth.selected else gui3d.app.selectedHuman.meshData
-                if self.stlAscii.selected:
-                    mh2stl.exportStlAscii(mesh, filename("stl"))
-                else:
-                    mh2stl.exportStlBinary(mesh, filename("stl"))
-            elif self.skel.selected:
-                mesh = gui3d.app.selectedHuman.getSubdivisionMesh() if self.exportSmooth.selected else gui3d.app.selectedHuman.meshData
-                mh2skel.exportSkel(mesh, filename("skel"))
-            elif self.lightmap.selected:
-                import projection
-                human = gui3d.app.selectedHuman
-                dstImg = projection.mapLighting()
-                filepath = filename("png")
-                dstImg.save(filepath)
-                if self.lightmapDisplay:
-                    human.setTexture(filepath)
-                    log.debug("Enabling shadeless rendering on body")
-                    human.mesh.setShadeless(True)
-            elif self.uvmap.selected:
-                import projection
-                human = gui3d.app.selectedHuman
-                dstImg = projection.mapUV()
-                filepath = filename("png")
-                dstImg.save(filepath)
-                if self.uvmapDisplay:
-                    human.setTexture(filepath)
-                    log.debug("Enabling shadeless rendering on body")
-                    human.mesh.setShadeless(True)
-            else:
+            if not found:
                 log.error("Unknown export format selected!")
                 return
 
@@ -572,25 +312,23 @@ class ExportTaskView(gui3d.TaskView):
 
             mh.changeCategory('Modelling')
             
+    def addExporter(self, exporter):
+        radio = self.boxes[exporter.group].addWidget(gui.RadioButton(self.exportBodyGroup, exporter.name, self.empty))
+        options = self.optionsBox.addWidget(gui.GroupBox('Options'))
+        exporter.build(options)
+        self.empty = False
+        self.formats.append((exporter, radio, options))
+
+        @radio.mhEvent
+        def onClicked(event):
+            self.updateGui()
+            self.fileentry.setFilter(exporter.filter)
+    
     def updateGui(self):
-        if self.wavefrontObj.selected:
-            self.optionsBox.showWidget(self.objOptions)
-        elif self.mhx.selected:
-            self.optionsBox.showWidget(self.mhxOptions)
-        elif self.fbx.selected:
-            self.optionsBox.showWidget(self.fbxOptions)
-        elif self.collada.selected:
-            self.optionsBox.showWidget(self.colladaOptions)
-        elif self.md5.selected:
-            self.optionsBox.showWidget(self.md5Options)
-        elif self.stl.selected:
-            self.optionsBox.showWidget(self.stlOptions)
-        elif self.skel.selected:
-            self.optionsBox.showWidget(self.skelOptions)
-        elif self.lightmap.selected:
-            self.optionsBox.showWidget(self.lightmapOptions)
-        elif self.uvmap.selected:
-            self.optionsBox.showWidget(self.uvmapOptions)
+        for exporter, radio, options in self.formats:
+            if radio.selected:
+                self.optionsBox.showWidget(options)
+                break
 
     def onShow(self, event):
 
@@ -613,8 +351,6 @@ class ExportTaskView(gui3d.TaskView):
         gui3d.app.setGlobalCamera();
         camera.eyeZ = 70
         human.setRotation([0.0, 0.0, 0.0])
-        self.exportSmooth.setSelected(human.isSubdivided())
-        self.stlSmooth.setSelected(human.isSubdivided())
 
     def onHide(self, event):
         
@@ -631,43 +367,6 @@ class ExportTaskView(gui3d.TaskView):
         camera.focusY = self.focusY
         camera.focusZ = self.focusZ
         human.setRotation(self.rotation)
-        
-    def addRigs(self, options, rigs, suffix, check):
-        path = "data/rigs"
-        if not os.path.exists(path):
-            log.message("Did not find directory %s", path)
-            return (y, [])
-        buttons = []
-        for fname in os.listdir(path):
-            (name, ext) = os.path.splitext(fname)
-            if ext == ".rig":
-                button = options.addWidget(gui.RadioButton(rigs, "Use %s rig" % name, check))
-                setattr(self, name + suffix, button)
-                check = False
-                buttons.append((button,name))
-        return buttons
-
-    def addScales(self, options, scales, suffix, check):
-        buttons = []
-        for name in ["decimeter", "meter", "inch", "centimeter"]:
-            button = options.addWidget(gui.RadioButton(scales, name, check))
-            setattr(self, name + suffix, button)
-            check = False
-            buttons.append((button,name))
-        return buttons
-        
-    def getScale(self, buttons):
-        for (button, name) in buttons:
-            if button.selected:
-                if name == "decimeter":
-                    return (1.0, name)
-                elif name == "meter":
-                    return (0.1, name)
-                elif name == "inch":
-                    return (0.254, name)
-                elif name == "centimeter":
-                    return (10, name)
-        return (1, "decimeter")                    
         
 class FilesCategory(gui3d.Category):
 
