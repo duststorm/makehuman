@@ -65,18 +65,9 @@ class BackgroundTaskView(gui3d.TaskView):
         mesh.setDepthless(True)
         mesh.priority = -90
 
-        self.backgroundImageToggle = gui3d.app.categories['Modelling'].viewBox.addWidget(gui.ToggleButton('Background'), 3);
-
-        @self.backgroundImageToggle.mhEvent
-        def onClicked(event):
-            if self.backgroundImage.isVisible():
-                self.backgroundImage.hide()
-                self.backgroundImageToggle.setSelected(False)
-            elif self.backgroundImage.hasTexture():
-                self.backgroundImage.show()
-                self.backgroundImageToggle.setSelected(True)
-            else:
-                mh.changeTask('Library', 'Background')
+        self.backgroundImageToggle = gui.Action('background', 'Background', self.toggleBackground, toggle=True)
+        gui3d.app.mainwin.toolbar.addAction(self.backgroundImageToggle)
+        # gui3d.app.categories['Modelling'].viewBox.addWidget(gui.ToggleButton('Background'), 3);
 
         self.filechooser = self.addTopWidget(fc.FileChooser(self.backgroundsFolder, ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None))
         self.addLeftWidget(self.filechooser.sortBox)
@@ -120,10 +111,20 @@ class BackgroundTaskView(gui3d.TaskView):
             gui3d.app.modelCamera.switchToOrtho()
 
             bg.show()
-            self.backgroundImageToggle.setSelected(True)
+            self.backgroundImageToggle.setChecked(True)
 
             mh.changeTask('Modelling', 'Background')
             gui3d.app.redraw()
+
+    def toggleBackground(self):
+        if not self.backgroundImageToggle.isChecked():
+            self.backgroundImage.hide()
+            gui3d.app.redraw()
+        elif self.backgroundImage.hasTexture():
+            self.backgroundImage.show()
+            gui3d.app.redraw()
+        else:
+            mh.changeTask('Library', 'Background')
         
     def projectBackground(self):
         if not self.backgroundImage.isVisible():

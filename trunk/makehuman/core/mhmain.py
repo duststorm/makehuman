@@ -150,10 +150,11 @@ class MHApplication(gui3d.Application, mh.Application):
             'font':'arial',
             'language':'english',
             'excludePlugins':[],
-            'rtl': False
+            'rtl': False,
+            'sliderImages': False
         }
 
-        self.actions = []
+        self.actions = gui.Actions()
         self.fonts = {}
 
         self.loadHandlers = {}
@@ -372,41 +373,6 @@ class MHApplication(gui3d.Application, mh.Application):
         def onClicked(event):
             self.promptAndExit()
 
-        panel = mh.getPanelBottomRight()
-        self.buttonBox = panel.addWidget(gui.GroupBox('Edit'))
-        self.undoButton  = self.buttonBox.addWidget(gui.Button("Undo"),  0, 0)
-        self.redoButton  = self.buttonBox.addWidget(gui.Button("Redo"),  0, 1)
-        self.resetButton = self.buttonBox.addWidget(gui.Button("Reset"), 2, 0)
-
-        @self.undoButton.mhEvent
-        def onClicked(event):
-            gui3d.app.undo()
-
-        @self.redoButton.mhEvent
-        def onClicked(event):
-            gui3d.app.redo()
-
-        @self.resetButton.mhEvent
-        def onClicked(event):
-            gui3d.app.resetHuman()
-
-        self.globalButton = self.buttonBox.addWidget(gui.Button("Global cam"), 3, 0, 1, -1)
-        self.faceButton = self.buttonBox.addWidget(gui.Button("Face cam"), 4, 0, 1, -1)
-        self.imagesButton = self.buttonBox.addWidget(gui.CheckBox("Slider images", gui.Slider.imagesShown()), 5, 0, 1, -1)
-
-        @self.globalButton.mhEvent
-        def onClicked(event):
-          gui3d.app.setGlobalCamera()
-
-        @self.faceButton.mhEvent
-        def onClicked(event):
-          gui3d.app.setFaceCamera()
-
-        @self.imagesButton.mhEvent
-        def onClicked(event):
-            gui.Slider.showImages(self.imagesButton.selected)
-            mh.refreshLayout()
-
         """
         self.poseModeBox = self.buttonBox.addWidget(gui.CheckBox("Pose mode", False))
 
@@ -581,6 +547,8 @@ class MHApplication(gui3d.Application, mh.Application):
 
         if 'language' in gui3d.app.settings:
             self.setLanguage(gui3d.app.settings['language'])
+
+        gui.Slider.showImages(gui3d.app.settings['sliderImages'])
 
         try:
             if os.path.isfile(os.path.join(mh.getPath(''), "shortcuts.ini")):
@@ -1007,18 +975,15 @@ class MHApplication(gui3d.Application, mh.Application):
         mh.changeCategory("Help")
 
     def setMono(self):
-        stereoMode = 0
-        self.updateStereo()
+        self.updateStereo(0)
 
     def setStereo1(self):
-        stereoMode = 1
-        self.updateStereo()
+        self.updateStereo(1)
 
     def setStereo2(self):
-        stereoMode = 2
-        self.updateStereo()
+        self.updateStereo(2)
 
-    def updateStereo(self):
+    def updateStereo(self, stereoMode):
         self.modelCamera.stereoMode = stereoMode
 
         # We need a black background for stereo
@@ -1036,14 +1001,14 @@ class MHApplication(gui3d.Application, mh.Application):
         stereoMode += 1
         if stereoMode > 2:
             stereoMode = 0
-        self.updateStereo()
+        self.updateStereo(stereoMode)
 
     def toggleSolid(self):
-        self.selectedHuman.setSolid(not self.selectedHuman.isSolid())
+        self.selectedHuman.setSolid(not self.actions.wire.isChecked())
         self.redraw()
 
     def toggleSubdivision(self):
-        self.selectedHuman.setSubdivided(not self.selectedHuman.isSubdivided(), True, self.progress)
+        self.selectedHuman.setSubdivided(self.actions.smooth.isChecked(), True, self.progress)
         self.redraw()
 
     def saveTarget(self):
@@ -1204,29 +1169,27 @@ class MHApplication(gui3d.Application, mh.Application):
 
     def createActions(self):
         Action = gui.Action
-        self.actions.append(Action('undo',    'Undo',     self.undo))
-        self.actions.append(Action('redo',    'Redo',     self.redo))
-        self.actions.append(Action('reset',   'Reset',    self.resetHuman))
-        self.actions.append(Action('save',    'Save',     self.goToSave))
-        self.actions.append(Action('load',    'Load',     self.goToLoad))
-        self.actions.append(Action('export',  'Export',   self.goToExport))
-        self.actions.append(Action('help',    'Help',     self.goToHelp))
-        self.actions.append(Action('mono',    'Mono',     self.setMono,    group='stereo'))
-        self.actions.append(Action('stereo1', 'Stereo 1', self.setStereo1, group='stereo'))
-        self.actions.append(Action('stereo2', 'Stereo 2', self.setStereo2, group='stereo'))
-        self.actions.append(Action('solid',   'Solid',    self.toggleSolid, toggle=True))
-        self.actions.append(Action('savetgt', 'Save target', self.saveTarget))
-        self.actions.append(Action('qexport', 'Quick export', self.quickExport))
-        self.actions.append(Action('smooth',  'Smooth',   self.toggleSubdivision, toggle=True))
-        self.actions.append(Action('grab',    'Grab screen', self.grabScreen))
-        self.actions.append(Action('front',   'Front view', self.frontView))
-        self.actions.append(Action('back',    'Back view', self.backView))
-        self.actions.append(Action('left',    'Left view', self.leftView))
-        self.actions.append(Action('right',   'Right view', self.rightView))
-        self.actions.append(Action('top',     'Top view', self.topView))
-        self.actions.append(Action('bottom',  'Bottom view', self.bottomView))
-        self.actions.append(Action('global',  'Global camera', self.setGlobalCamera))
-        self.actions.append(Action('face',    'Face camera', self.setFaceCamera))
+
+        self.actions.undo      = Action('undo',      'Undo',          self.undo)
+        self.actions.redo      = Action('redo',      'Redo',          self.redo)
+        self.actions.reset     = Action('reset',     'Reset',         self.resetHuman)
+        self.actions.save      = Action('save',      'Save',          self.goToSave)
+        self.actions.load      = Action('load',      'Load',          self.goToLoad)
+        self.actions.export    = Action('export',    'Export',        self.goToExport)
+        self.actions.help      = Action('help',      'Help',          self.goToHelp)
+        self.actions.smooth    = Action('smooth',    'Smooth',        self.toggleSubdivision, toggle=True)
+        self.actions.savetgt   = Action('savetgt',   'Save target',   self.saveTarget)
+        self.actions.qexport   = Action('qexport',   'Quick export',  self.quickExport)
+        self.actions.grab      = Action('grab',      'Grab screen',   self.grabScreen)
+        self.actions.front     = Action('front',     'Front view',    self.frontView)
+        self.actions.back      = Action('back',      'Back view',     self.backView)
+        self.actions.left      = Action('left',      'Left view',     self.leftView)
+        self.actions.right     = Action('right',     'Right view',    self.rightView)
+        self.actions.top       = Action('top',       'Top view',      self.topView)
+        self.actions.bottom    = Action('bottom',    'Bottom view',   self.bottomView)
+        self.actions.globCam   = Action('global',    'Global camera', self.setGlobalCamera)
+        self.actions.faceCam   = Action('face',      'Face camera',   self.setFaceCamera)
+
         for action in self.actions:
             self.mainwin.toolbar.addAction(action)
 

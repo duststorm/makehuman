@@ -22,7 +22,9 @@ Abstract
 TODO
 """
 
-import gui3d, mh, os, module3d
+import os
+import mh
+import gui3d
 import gui
 import log
 
@@ -91,6 +93,8 @@ class SettingsTaskView(gui3d.TaskView):
             gui3d.app.settings.get('realtimeNormalUpdates', True)))
         self.cameraAutoZoom = sliderBox.addWidget(gui.CheckBox("Auto-zoom camera",
             gui3d.app.settings.get('cameraAutoZoom', True)))
+        self.sliderImages = sliderBox.addWidget(gui.CheckBox("Slider images",
+            gui3d.app.settings.get('sliderImages', True)))
             
         mouseBox = self.addLeftWidget(gui.SliderBox('Mouse behavior'))
         self.normal = mouseBox.addWidget(gui.Slider(gui3d.app.settings.get('lowspeed', 1), 1, 10,
@@ -163,6 +167,12 @@ class SettingsTaskView(gui3d.TaskView):
         @self.cameraAutoZoom.mhEvent
         def onClicked(event):
             gui3d.app.settings['cameraAutoZoom'] = self.cameraAutoZoom.selected
+
+        @self.sliderImages.mhEvent
+        def onClicked(event):
+            gui3d.app.settings['sliderImages'] = self.sliderImages.selected
+            gui.Slider.showImages(self.sliderImages.selected)
+            mh.refreshLayout()
             
         @self.normal.mhEvent
         def onChange(value):

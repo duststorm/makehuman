@@ -76,15 +76,6 @@ def addPanels():
 def showPanels(left, right):
     return G.app.mainwin.showPanels(left, right)
 
-def addPanelBottomLeft():
-    return G.app.mainwin.addPanelBottomLeft()
-
-def showPanelBottomLeft(panel):
-    return G.app.mainwin.showPanelBottomLeft(panel)
-
-def getPanelBottomRight():
-    return G.app.mainwin.getPanelBottomRight()
-
 def addTopWidget(widget, *args, **kwargs):
     return G.app.mainwin.addTopWidget(widget, *args, **kwargs)
 

@@ -1128,8 +1128,9 @@ class Action(QtGui.QAction, Widget):
             cls._groups[name] = ActionGroup()
         return cls._groups[name]
 
-    def __init__(self, icon, text, method, tooltip = None, group = None, toggle = False):
-        super(Action, self).__init__(self.getIcon(icon), text, G.app.mainwin)
+    def __init__(self, name, text, method, tooltip = None, group = None, toggle = False):
+        super(Action, self).__init__(self.getIcon(name), text, G.app.mainwin)
+        self.name = name
         self.method = method
         if tooltip is not None:
             self.setToolTip(tooltip)
@@ -1149,3 +1150,15 @@ class Action(QtGui.QAction, Widget):
 class ActionGroup(QtGui.QActionGroup):
     def __init__(self):
         super(ActionGroup, self).__init__(G.app.mainwin)
+
+class Actions(object):
+    def __init__(self):
+        self._order = []
+
+    def __setattr__(self, name, value):
+        if name[0] != '_':
+            self._order.append(value)
+        object.__setattr__(self, name, value)
+
+    def __iter__(self):
+        return iter(self._order)

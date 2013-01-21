@@ -589,18 +589,6 @@ class Category(View):
 
     def getTaskByName(self, name):
         return self.tasksByName.get(name)
-
-    def showWidgets(self):
-        super(Category, self).showWidgets()
-        mh.showPanelBottomLeft(self.panel)
-
-    def addBottomWidget(self, widget):
-        if self.panel is None:
-            self.panel = mh.addPanelBottomLeft()
-        return self.panel.addWidget(widget)
-
-    def removeBottomWidget(self, widget):
-        self.panel.removeWidget(widget)
  
 # The application
 app = None

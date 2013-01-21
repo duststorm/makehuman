@@ -418,8 +418,7 @@ class Frame(QtGui.QMainWindow):
         self.v_layout.setRowStretch(2, 0)
 
         self.l_panel = self.panel()
-        self.l_layout = QtGui.QGridLayout(self.l_panel)
-        self.l_layout.setContentsMargins(0, 0, 0, 0)
+        self.left_top = QtGui.QStackedLayout(self.l_panel)
         self.h_layout.addWidget(self.l_panel, 0, 0)
         self.h_layout.setColumnStretch(0, 0)
 
@@ -437,26 +436,9 @@ class Frame(QtGui.QMainWindow):
         self.t_layout.addWidget(self.canvas)
 
         self.r_panel = self.panel()
-        self.r_layout = QtGui.QGridLayout(self.r_panel)
-        self.r_layout.setContentsMargins(0, 0, 0, 0)
+        self.right_top    = QtGui.QStackedLayout(self.r_panel)
         self.h_layout.addWidget(self.r_panel, 0, 2)
         self.h_layout.setColumnStretch(2, 0)
-
-        self.left_top    = QtGui.QStackedLayout()
-        self.l_layout.addLayout(self.left_top, 0, 0)
-        self.l_layout.setRowStretch(0, 1)
-
-        self.left_bottom  = QtGui.QBoxLayout(QtGui.QBoxLayout.BottomToTop)
-        self.l_layout.addLayout(self.left_bottom, 2, 0)
-        self.l_layout.setRowStretch(2, 0)
-
-        self.right_top    = QtGui.QStackedLayout()
-        self.r_layout.addLayout(self.right_top, 0, 0)
-        self.r_layout.setRowStretch(0, 1)
-
-        self.right_bottom = CategoryPanel()
-        self.r_layout.addWidget(self.right_bottom, 2, 0)
-        self.r_layout.setRowStretch(2, 0)
 
         self.progressBar = qtgui.ProgressBar()
         self.bottom.addWidget(self.progressBar)
@@ -473,22 +455,6 @@ class Frame(QtGui.QMainWindow):
     def showPanels(self, left, right):
         self.left_top.setCurrentWidget(left)
         self.right_top.setCurrentWidget(right)
-
-    def addPanelBottomLeft(self):
-        panel = CategoryPanel()
-        self.left_bottom.addWidget(panel)
-        return panel
-
-    def showPanelBottomLeft(self, panel):
-        for widget in [self.left_bottom.itemAt(i).widget()
-                       for i in xrange(self.left_bottom.count())]:
-            if widget is not panel:
-                widget.hide()
-        if panel is not None:
-            panel.show()
-
-    def getPanelBottomRight(self):
-        return self.right_bottom
 
     def addTopWidget(self, widget, *args, **kwargs):
         self.top.addWidget(widget, *args, **kwargs)
