@@ -36,6 +36,7 @@ from object3d import Object3D
 from camera import Camera
 
 from qtui import getKeyModifiers, addTimer, removeTimer, callAsync, addToolBar
+from qtui import setShortcut
 from qtui import getSaveFileName, getOpenFileName, getExistingDirectory
 from glmodule import createVertexShader, createFragmentShader, createShader
 from glmodule import updatePickingBuffer, grabScreen, hasRenderSkin, renderSkin
@@ -81,9 +82,6 @@ def addTopWidget(widget, *args, **kwargs):
 
 def removeTopWidget(widget):
     return G.app.mainwin.removeTopWidget(widget)
-
-def setShortcut(modifier, key, method):
-    G.app.mainwin.setShortcut(modifier, key, method)
 
 def _u2s(value):
     if isinstance(value, unicode):

@@ -95,41 +95,41 @@ class MHApplication(gui3d.Application, mh.Application):
 
         self.shortcuts = {
             # Actions
-            (mh.Modifiers.CTRL, mh.Keys.z): self.undo,
-            (mh.Modifiers.CTRL, mh.Keys.y): self.redo,
-            (mh.Modifiers.CTRL, mh.Keys.m): self.goToModelling,
-            (mh.Modifiers.CTRL, mh.Keys.s): self.goToSave,
-            (mh.Modifiers.CTRL, mh.Keys.l): self.goToLoad,
-            (mh.Modifiers.CTRL, mh.Keys.e): self.goToExport,
-            (mh.Modifiers.CTRL, mh.Keys.r): self.goToRendering,
-            (mh.Modifiers.CTRL, mh.Keys.h): self.goToHelp,
-            (mh.Modifiers.CTRL, mh.Keys.q): self.promptAndExit,
-            (mh.Modifiers.CTRL, mh.Keys.w): self.toggleStereo,
-            (mh.Modifiers.CTRL, mh.Keys.f): self.toggleSolid,
-            (mh.Modifiers.ALT, mh.Keys.t): self.saveTarget,
-            (mh.Modifiers.ALT, mh.Keys.e): self.quickExport,
-            (mh.Modifiers.ALT, mh.Keys.s): self.toggleSubdivision,
-            (mh.Modifiers.ALT, mh.Keys.g): self.grabScreen,
+            (mh.Modifiers.CTRL, mh.Keys.z): 'undo',
+            (mh.Modifiers.CTRL, mh.Keys.y): 'redo',
+            (mh.Modifiers.CTRL, mh.Keys.m): 'modelling',
+            (mh.Modifiers.CTRL, mh.Keys.s): 'save',
+            (mh.Modifiers.CTRL, mh.Keys.l): 'load',
+            (mh.Modifiers.CTRL, mh.Keys.e): 'export',
+            (mh.Modifiers.CTRL, mh.Keys.r): 'rendering',
+            (mh.Modifiers.CTRL, mh.Keys.h): 'help',
+            (mh.Modifiers.CTRL, mh.Keys.q): 'exit',
+            (mh.Modifiers.CTRL, mh.Keys.w): 'stereo',
+            (mh.Modifiers.CTRL, mh.Keys.f): 'wireframe',
+            (mh.Modifiers.ALT, mh.Keys.t): 'savetgt',
+            (mh.Modifiers.ALT, mh.Keys.e): 'qexport',
+            (mh.Modifiers.ALT, mh.Keys.s): 'smooth',
+            (mh.Modifiers.ALT, mh.Keys.g): 'grab',
             # Camera navigation
-            (0, mh.Keys.N2): self.rotateDown,
-            (0, mh.Keys.N4): self.rotateLeft,
-            (0, mh.Keys.N6): self.rotateRight,
-            (0, mh.Keys.N8): self.rotateUp,
-            (0, mh.Keys.UP): self.panUp,
-            (0, mh.Keys.DOWN): self.panDown,
-            (0, mh.Keys.RIGHT): self.panRight,
-            (0, mh.Keys.LEFT): self.panLeft,
-            (0, mh.Keys.PLUS): self.zoomIn,
-            (0, mh.Keys.MINUS): self.zoomOut,
-            (0, mh.Keys.N1): self.frontView,
-            (0, mh.Keys.N3): self.rightView,
-            (0, mh.Keys.N7): self.topView,
-            (mh.Modifiers.CTRL, mh.Keys.N1): self.backView,
-            (mh.Modifiers.CTRL, mh.Keys.N3): self.leftView,
-            (mh.Modifiers.CTRL, mh.Keys.N7): self.bottomView,
-            (0, mh.Keys.PERIOD): self.resetView,
+            (0, mh.Keys.N2): 'rotateD',
+            (0, mh.Keys.N4): 'rotateL',
+            (0, mh.Keys.N6): 'rotateR',
+            (0, mh.Keys.N8): 'rotateU',
+            (0, mh.Keys.UP): 'panU',
+            (0, mh.Keys.DOWN): 'panD',
+            (0, mh.Keys.RIGHT): 'panR',
+            (0, mh.Keys.LEFT): 'panL',
+            (0, mh.Keys.PLUS): 'zoomIn',
+            (0, mh.Keys.MINUS): 'zoomOut',
+            (0, mh.Keys.N1): 'front',
+            (0, mh.Keys.N3): 'right',
+            (0, mh.Keys.N7): 'top',
+            (mh.Modifiers.CTRL, mh.Keys.N1): 'back',
+            (mh.Modifiers.CTRL, mh.Keys.N3): 'left',
+            (mh.Modifiers.CTRL, mh.Keys.N7): 'bottom',
+            (0, mh.Keys.PERIOD): 'resetCam',
             # Version check
-            (0, 0x12345678): self._versionSentinel
+            (0, 0x87654321): '_versionSentinel'
         }
 
         self.mouseActions = {
@@ -555,12 +555,10 @@ class MHApplication(gui3d.Application, mh.Application):
                 self.shortcuts = {}
                 f = open(os.path.join(mh.getPath(''), "shortcuts.ini"), 'r')
                 for line in f:
-                    modifier, key, method = line.split(' ')
-                    #print modifier, key, method[0:-1]
-                    if hasattr(self, method[0:-1]):
-                        self.shortcuts[(int(modifier), int(key))] = getattr(self, method[0:-1])
+                    modifier, key, action = line.strip().split(' ')
+                    self.shortcuts[(int(modifier), int(key))] = action
                 f.close()
-                if (0, 0x12345678) not in self.shortcuts:
+                if (0, 0x87654321) not in self.shortcuts:
                     log.warning('shortcuts.ini out of date; ignoring')
                     self.shortcuts = shortcuts
         except:
@@ -571,10 +569,9 @@ class MHApplication(gui3d.Application, mh.Application):
                 self.mouseActions = {}
                 f = open(os.path.join(mh.getPath(''), "mouse.ini"), 'r')
                 for line in f:
-                    modifier, button, method = line.split(' ')
-                    #print modifier, button, method[0:-1]
-                    if hasattr(self, method[0:-1]):
-                        self.mouseActions[(int(modifier), int(button))] = getattr(self, method[0:-1])
+                    modifier, button, method = line.strip().split(' ')
+                    if hasattr(self, method):
+                        self.mouseActions[(int(modifier), int(button))] = getattr(self, method)
                 f.close()
         except:
             log.error('Failed to load mouse settings')
@@ -600,8 +597,8 @@ class MHApplication(gui3d.Application, mh.Application):
                 f.write(mh.formatINI(self.settings))
 
             with outFile("shortcuts.ini") as f:
-                for shortcut, method in self.shortcuts.iteritems():
-                    f.write('%d %d %s\n' % (shortcut[0], shortcut[1], method.__name__))
+                for shortcut, action in self.shortcuts.iteritems():
+                    f.write('%d %d %s\n' % (shortcut[0], shortcut[1], action))
 
             with outFile("mouse.ini") as f:
                 for mouseAction, method in self.mouseActions.iteritems():
@@ -882,32 +879,29 @@ class MHApplication(gui3d.Application, mh.Application):
         self.setTargetCamera(("r-lowerleg", "r-upperleg"), right, distance=30)
 
     # Shortcuts
-    def setShortcut(self, modifier, key, method):
+    def setShortcut(self, modifier, key, action):
 
         shortcut = (modifier, key)
 
         if shortcut in self.shortcuts:
-            self.prompt('Warning', 'This combination is already in use. Change the combination for the action which has reserved this shortcut', 'OK', helpId='shortcutWarning')
+            self.prompt('Warning', 'This combination is already in use.', 'OK', helpId='shortcutWarning')
             return False
 
         # Remove old entry
-        for s, m in self.shortcuts.iteritems():
-            if m == method:
+        for s, a in self.shortcuts.iteritems():
+            if a == action.name:
                 del self.shortcuts[s]
                 break
 
-        self.shortcuts[shortcut] = method
-        mh.setShortcut(modifier, key, method)
-
-        #for shortcut, m in self.shortcuts.iteritems():
-        #    print shortcut, m
+        self.shortcuts[shortcut] = action.name
+        mh.setShortcut(modifier, key, action)
 
         return True
 
-    def getShortcut(self, method):
+    def getShortcut(self, action):
 
-        for shortcut, m in self.shortcuts.iteritems():
-            if m == method:
+        for shortcut, a in self.shortcuts.iteritems():
+            if a == action.name:
                 return shortcut
 
     # Mouse actions
@@ -916,7 +910,7 @@ class MHApplication(gui3d.Application, mh.Application):
         mouseAction = (modifier, key)
 
         if mouseAction in self.mouseActions:
-            self.prompt('Warning', 'This combination is already in use. Change the combination for the action which has reserved this mouse action', 'OK', helpId='mouseActionWarning')
+            self.prompt('Warning', 'This combination is already in use.', 'OK', helpId='mouseActionWarning')
             return False
 
         # Remove old entry
@@ -1179,65 +1173,77 @@ class MHApplication(gui3d.Application, mh.Application):
             self.stop()
 
     def createActions(self):
-        Action = gui.Action
-
         self.actions = gui.Actions()
 
-        self.actions.undo      = Action('undo',      'Undo',          self.undo)
-        self.actions.redo      = Action('redo',      'Redo',          self.redo)
-        self.actions.reset     = Action('reset',     'Reset',         self.resetHuman)
-        self.actions.save      = Action('save',      'Save',          self.goToSave)
-        self.actions.load      = Action('load',      'Load',          self.goToLoad)
-        self.actions.export    = Action('export',    'Export',        self.goToExport)
-        self.actions.help      = Action('help',      'Help',          self.goToHelp)
-        self.actions.smooth    = Action('smooth',    'Smooth',        self.toggleSubdivision, toggle=True)
-        self.actions.savetgt   = Action('savetgt',   'Save target',   self.saveTarget)
-        self.actions.qexport   = Action('qexport',   'Quick export',  self.quickExport)
-        self.actions.grab      = Action('grab',      'Grab screen',   self.grabScreen)
+        def action(*args, **kwargs):
+            action = gui.Action(*args, **kwargs)
+            self.mainwin.addAction(action)
+            if toolbar is not None:
+                toolbar.addAction(action)
+            return action
 
-        self.main_toolbar = mh.addToolBar("Main")
-        for action in self.actions:
-            self.main_toolbar.addAction(action)
+        toolbar = None
 
-        self.view_actions = gui.Actions()
+        self.actions.rendering = action('rendering', 'Rendering',     self.goToRendering)
+        self.actions.modelling = action('modelling', 'Modelling',     self.goToModelling)
+        self.actions.exit      = action('exit'     , 'Exit',          self.promptAndExit)
+        self.actions.stereo    = action('stereo',    'Stereo',        self.toggleStereo)
 
-        self.view_actions.mono      = Action('mono',      'Mono',      self.setMono,    group='stereo')
-        self.view_actions.stereo1   = Action('stereo1',   'Stereo 1',  self.setStereo1, group='stereo')
-        self.view_actions.stereo2   = Action('stereo2',   'Stereo 2',  self.setStereo2, group='stereo')
-        self.view_actions.wireframe = Action('wireframe', 'Wireframe', self.toggleSolid, toggle=True)
+        self.actions.rotateU   = action('rotateU',   'Rotate Up',     self.rotateUp)
+        self.actions.rotateD   = action('rotateD',   'Rotate Down',   self.rotateDown)
+        self.actions.rotateR   = action('rotateR',   'Rotate Right',  self.rotateRight)
+        self.actions.rotateL   = action('rotateL',   'Rotate Left',   self.rotateLeft)
+        self.actions.panU      = action('panU',      'Pan Up',        self.panUp)
+        self.actions.panD      = action('panD',      'Pan Down',      self.panDown)
+        self.actions.panR      = action('panR',      'Pan Right',     self.panRight)
+        self.actions.panL      = action('panL',      'Pan Left',      self.panLeft)
+        self.actions.zoomIn    = action('zoomIn',    'Zoom In',       self.zoomIn)
+        self.actions.zoomOut   = action('zoomOut',   'Zoom Out',      self.zoomOut)
 
-        self.view_toolbar = mh.addToolBar("View")
-        for action in self.view_actions:
-            self.view_toolbar.addAction(action)
+        toolbar = self.main_toolbar = mh.addToolBar("Main")
 
-        self.sym_actions = gui.Actions()
+        self.actions.undo      = action('undo',      'Undo',          self.undo)
+        self.actions.redo      = action('redo',      'Redo',          self.redo)
+        self.actions.reset     = action('reset',     'Reset',         self.resetHuman)
+        self.actions.save      = action('save',      'Save',          self.goToSave)
+        self.actions.load      = action('load',      'Load',          self.goToLoad)
+        self.actions.export    = action('export',    'Export',        self.goToExport)
+        self.actions.help      = action('help',      'Help',          self.goToHelp)
+        self.actions.smooth    = action('smooth',    'Smooth',        self.toggleSubdivision, toggle=True)
+        self.actions.savetgt   = action('savetgt',   'Save target',   self.saveTarget)
+        self.actions.qexport   = action('qexport',   'Quick export',  self.quickExport)
+        self.actions.grab      = action('grab',      'Grab screen',   self.grabScreen)
 
-        self.sym_actions.symmetryR = Action('symm1', 'Symmmetry R>L', self.symmetryRight)
-        self.sym_actions.symmetryL = Action('symm2', 'Symmmetry L>R', self.symmetryLeft)
-        self.sym_actions.symmetry  = Action('symm',  'Symmmetry L>R', self.symmetry, toggle=True)
+        toolbar = self.view_toolbar = mh.addToolBar("View")
 
-        self.sym_toolbar = mh.addToolBar("Symmetry")
-        for action in self.sym_actions:
-            self.sym_toolbar.addAction(action)
+        self.actions.mono      = action('mono',      'Mono',          self.setMono,    group='stereo')
+        self.actions.stereo1   = action('stereo1',   'Stereo 1',      self.setStereo1, group='stereo')
+        self.actions.stereo2   = action('stereo2',   'Stereo 2',      self.setStereo2, group='stereo')
+        self.actions.wireframe = action('wireframe', 'Wireframe',     self.toggleSolid, toggle=True)
 
-        self.camera_actions = gui.Actions()
+        toolbar = self.sym_toolbar = mh.addToolBar("Symmetry")
 
-        self.camera_actions.front     = Action('front',     'Front view',    self.frontView)
-        self.camera_actions.back      = Action('back',      'Back view',     self.backView)
-        self.camera_actions.left      = Action('left',      'Left view',     self.leftView)
-        self.camera_actions.right     = Action('right',     'Right view',    self.rightView)
-        self.camera_actions.top       = Action('top',       'Top view',      self.topView)
-        self.camera_actions.bottom    = Action('bottom',    'Bottom view',   self.bottomView)
-        self.camera_actions.globCam   = Action('global',    'Global camera', self.setGlobalCamera)
-        self.camera_actions.faceCam   = Action('face',      'Face camera',   self.setFaceCamera)
+        self.actions.symmetryR = action('symm1', 'Symmmetry R>L',     self.symmetryRight)
+        self.actions.symmetryL = action('symm2', 'Symmmetry L>R',     self.symmetryLeft)
+        self.actions.symmetry  = action('symm',  'Symmmetry',         self.symmetry, toggle=True)
 
-        self.camera_toolbar = mh.addToolBar("Camera")
-        for action in self.camera_actions:
-            self.camera_toolbar.addAction(action)
+        toolbar = self.camera_toolbar = mh.addToolBar("Camera")
+
+        self.actions.front     = action('front',     'Front view',    self.frontView)
+        self.actions.back      = action('back',      'Back view',     self.backView)
+        self.actions.left      = action('left',      'Left view',     self.leftView)
+        self.actions.right     = action('right',     'Right view',    self.rightView)
+        self.actions.top       = action('top',       'Top view',      self.topView)
+        self.actions.bottom    = action('bottom',    'Bottom view',   self.bottomView)
+        self.actions.globalCam = action('global',    'Global camera', self.setGlobalCamera)
+        self.actions.faceCam   = action('face',      'Face camera',   self.setFaceCamera)
+        self.actions.resetCam  = action('resetCam',  'Reset camera',  self.resetView)
 
     def createShortcuts(self):
-        for (modifier, key), method in self.shortcuts.iteritems():
-            mh.setShortcut(modifier, key, method)
+        for (modifier, key), action in self.shortcuts.iteritems():
+            action = getattr(self.actions, action, None)
+            if action is not None:
+                mh.setShortcut(modifier, key, action)
 
     def OnInit(self):
         mh.Application.OnInit(self)

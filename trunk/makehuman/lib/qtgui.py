@@ -575,8 +575,11 @@ class ProgressBar(QtGui.QProgressBar, Widget):
 
 class ShortcutEdit(QtGui.QLabel, Widget):
     def __init__(self, shortcut):
-        modifiers, key = shortcut
-        text = self.shortcutToLabel(modifiers, key)
+        if shortcut is not None:
+            modifiers, key = shortcut
+            text = self.shortcutToLabel(modifiers, key)
+        else:
+            text = ''
         super(ShortcutEdit, self).__init__(text)
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
 
@@ -1139,6 +1142,10 @@ class Action(QtGui.QAction, Widget):
         if toggle:
             self.setCheckable(True)
         self.connect(self, QtCore.SIGNAL('triggered(bool)'), self._activate)
+
+    @property
+    def text(self):
+        return str(super(Action, self).text())
 
     def setActionGroup(self, group):
         self.setCheckable(True)

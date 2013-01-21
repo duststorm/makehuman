@@ -367,8 +367,6 @@ class Frame(QtGui.QMainWindow):
         self.app = app
         super(Frame, self).__init__()
 
-        self.shortcuts = {}
-
         self.setWindowTitle(self.title)
         qtVersion = getQtVersion()
         if qtVersion[0] >= 4 and qtVersion[1] >= 2:
@@ -478,18 +476,6 @@ class Frame(QtGui.QMainWindow):
             if child.isWidgetType():
                 self.refreshLayout(child)
 
-    def setShortcut(self, modifier, key, method):
-        sequence = QtGui.QKeySequence(modifier + key)
-
-        if method in self.shortcuts:
-            self.shortcuts[method].setKey(sequence)
-            return
-                
-        shortcut = QtGui.QShortcut(sequence, self)
-        shortcut.setContext(QtCore.Qt.ApplicationShortcut)
-        self.connect(shortcut, QtCore.SIGNAL("activated()"), method)
-        self.shortcuts[method] = shortcut
-
 class Application(QtGui.QApplication, events3d.EventHandler):
     def __init__(self):
         super(Application, self).__init__(sys.argv)
@@ -584,3 +570,6 @@ def getExistingDirectory(directory):
 
 def addToolBar(name):
     return G.app.mainwin.addToolBar(name)
+
+def setShortcut(modifier, key, action):
+    action.setShortcut(QtGui.QKeySequence(modifier + key))

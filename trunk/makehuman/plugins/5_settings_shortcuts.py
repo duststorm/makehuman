@@ -27,58 +27,62 @@ import mh
 import gui
     
 class AppShortcutEdit(gui.ShortcutEdit):
-    def __init__(self, method):
-        super(AppShortcutEdit, self).__init__(gui3d.app.getShortcut(method))
-        self.method = method
+    def __init__(self, action):
+        super(AppShortcutEdit, self).__init__(gui3d.app.getShortcut(action))
+        self.action = action
 
     def onChanged(self, shortcut):
         modifiers, key = shortcut
-        if not gui3d.app.setShortcut(modifiers, key, self.method):
-            self.setShortcut(gui3d.app.getShortcut(self.method))
+        if not gui3d.app.setShortcut(modifiers, key, self.action):
+            self.setShortcut(gui3d.app.getShortcut(self.action))
 
 class ShortcutsTaskView(gui3d.TaskView):
 
     def __init__(self, category):
         gui3d.TaskView.__init__(self, category, 'Shortcuts')
 
+        box = None
+
         row = [0]
-        def add(widget, name, method):
-            widget.addWidget(gui.TextView(name), row[0], 0)
-            widget.addWidget(AppShortcutEdit(method), row[0], 1)
+        def add(action):
+            box.addWidget(gui.TextView(action.text), row[0], 0)
+            box.addWidget(AppShortcutEdit(action), row[0], 1)
             row[0] += 1
 
-        self.cameraBox = self.addLeftWidget(gui.GroupBox('Camera'))
-        add(self.cameraBox, "Turn left",    gui3d.app.rotateLeft)
-        add(self.cameraBox, "Turn up",      gui3d.app.rotateUp)
-        add(self.cameraBox, "Turn down",    gui3d.app.rotateDown)
-        add(self.cameraBox, "Turn right",   gui3d.app.rotateRight)
-        add(self.cameraBox, "Pan up",       gui3d.app.panUp)
-        add(self.cameraBox, "Pan down",     gui3d.app.panDown)
-        add(self.cameraBox, "Pan right",    gui3d.app.panRight)
-        add(self.cameraBox, "Pan left",     gui3d.app.panLeft)
-        add(self.cameraBox, "Zoom in",      gui3d.app.zoomIn)
-        add(self.cameraBox, "Zoom out",     gui3d.app.zoomOut)
-        add(self.cameraBox, "Front view",   gui3d.app.frontView)
-        add(self.cameraBox, "Right view",   gui3d.app.rightView)
-        add(self.cameraBox, "Top view",     gui3d.app.topView)
-        add(self.cameraBox, "Back view",    gui3d.app.backView)
-        add(self.cameraBox, "Left view",    gui3d.app.leftView)
-        add(self.cameraBox, "Bottom view",  gui3d.app.bottomView)
-        add(self.cameraBox, "Reset view",   gui3d.app.resetView)
+        actions = gui3d.app.actions
 
-        self.actionBox = self.addRightWidget(gui.GroupBox('Actions'))
-        add(self.actionBox, "Undo",         gui3d.app.undo)
-        add(self.actionBox, "Redo",         gui3d.app.redo)
+        box = self.cameraBox = self.addLeftWidget(gui.GroupBox('Camera'))
+        add(actions.rotateU)
+        add(actions.rotateD)
+        add(actions.rotateL)
+        add(actions.rotateR)
+        add(actions.panU)
+        add(actions.panD)
+        add(actions.panL)
+        add(actions.panR)
+        add(actions.zoomIn)
+        add(actions.zoomOut)
+        add(actions.front)
+        add(actions.right)
+        add(actions.top)
+        add(actions.back)
+        add(actions.left)
+        add(actions.bottom)
+        add(actions.resetCam)
 
-        self.navigationBox = self.addRightWidget(gui.GroupBox('Navigation'))
-        add(self.navigationBox, "Modelling", gui3d.app.goToModelling)
-        add(self.navigationBox, "Save",      gui3d.app.goToSave)
-        add(self.navigationBox, "Load",      gui3d.app.goToLoad)
-        add(self.navigationBox, "Export",    gui3d.app.goToExport)
-        add(self.navigationBox, "Rendering", gui3d.app.goToRendering)
-        add(self.navigationBox, "Help",      gui3d.app.goToHelp)
-        add(self.navigationBox, "Exit",      gui3d.app.promptAndExit)
-    
+        box = self.actionBox = self.addRightWidget(gui.GroupBox('Actions'))
+        add(actions.undo)
+        add(actions.redo)
+
+        box = self.navigationBox = self.addRightWidget(gui.GroupBox('Navigation'))
+        add(actions.modelling)
+        add(actions.save)
+        add(actions.load)
+        add(actions.export)
+        add(actions.rendering)
+        add(actions.help)
+        add(actions.exit)
+
     def onShow(self, event):
         
         gui3d.TaskView.onShow(self, event)
