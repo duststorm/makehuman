@@ -66,8 +66,7 @@ class BackgroundTaskView(gui3d.TaskView):
         mesh.priority = -90
 
         self.backgroundImageToggle = gui.Action('background', 'Background', self.toggleBackground, toggle=True)
-        gui3d.app.mainwin.toolbar.addAction(self.backgroundImageToggle)
-        # gui3d.app.categories['Modelling'].viewBox.addWidget(gui.ToggleButton('Background'), 3);
+        gui3d.app.main_toolbar.addAction(self.backgroundImageToggle)
 
         self.filechooser = self.addTopWidget(fc.FileChooser(self.backgroundsFolder, ['bmp', 'png', 'tif', 'tiff', 'jpg', 'jpeg'], None))
         self.addLeftWidget(self.filechooser.sortBox)

@@ -35,7 +35,7 @@ from texture import Texture, getTexture, reloadTextures
 from object3d import Object3D
 from camera import Camera
 
-from qtui import getKeyModifiers, addTimer, removeTimer, callAsync
+from qtui import getKeyModifiers, addTimer, removeTimer, callAsync, addToolBar
 from qtui import getSaveFileName, getOpenFileName, getExistingDirectory
 from glmodule import createVertexShader, createFragmentShader, createShader
 from glmodule import updatePickingBuffer, grabScreen, hasRenderSkin, renderSkin

@@ -154,7 +154,6 @@ class MHApplication(gui3d.Application, mh.Application):
             'sliderImages': False
         }
 
-        self.actions = gui.Actions()
         self.fonts = {}
 
         self.loadHandlers = {}
@@ -1011,6 +1010,18 @@ class MHApplication(gui3d.Application, mh.Application):
         self.selectedHuman.setSubdivided(self.actions.smooth.isChecked(), True, self.progress)
         self.redraw()
 
+    def symmetryRight(self):
+        human = self.selectedHuman
+        human.applySymmetryRight()
+
+    def symmetryLeft(self):
+        human = self.selectedHuman
+        human.applySymmetryLeft()
+
+    def symmetry(self):
+        human = self.selectedHuman
+        human.symmetryModeEnabled = self.sym_actions.symmetry.isChecked()
+
     def saveTarget(self):
         human = self.selectedHuman
         algos3d.saveTranslationTarget(human.meshData, "full_target.target")
@@ -1170,6 +1181,8 @@ class MHApplication(gui3d.Application, mh.Application):
     def createActions(self):
         Action = gui.Action
 
+        self.actions = gui.Actions()
+
         self.actions.undo      = Action('undo',      'Undo',          self.undo)
         self.actions.redo      = Action('redo',      'Redo',          self.redo)
         self.actions.reset     = Action('reset',     'Reset',         self.resetHuman)
@@ -1181,17 +1194,46 @@ class MHApplication(gui3d.Application, mh.Application):
         self.actions.savetgt   = Action('savetgt',   'Save target',   self.saveTarget)
         self.actions.qexport   = Action('qexport',   'Quick export',  self.quickExport)
         self.actions.grab      = Action('grab',      'Grab screen',   self.grabScreen)
-        self.actions.front     = Action('front',     'Front view',    self.frontView)
-        self.actions.back      = Action('back',      'Back view',     self.backView)
-        self.actions.left      = Action('left',      'Left view',     self.leftView)
-        self.actions.right     = Action('right',     'Right view',    self.rightView)
-        self.actions.top       = Action('top',       'Top view',      self.topView)
-        self.actions.bottom    = Action('bottom',    'Bottom view',   self.bottomView)
-        self.actions.globCam   = Action('global',    'Global camera', self.setGlobalCamera)
-        self.actions.faceCam   = Action('face',      'Face camera',   self.setFaceCamera)
 
+        self.main_toolbar = mh.addToolBar("Main")
         for action in self.actions:
-            self.mainwin.toolbar.addAction(action)
+            self.main_toolbar.addAction(action)
+
+        self.view_actions = gui.Actions()
+
+        self.view_actions.mono      = Action('mono',      'Mono',      self.setMono,    group='stereo')
+        self.view_actions.stereo1   = Action('stereo1',   'Stereo 1',  self.setStereo1, group='stereo')
+        self.view_actions.stereo2   = Action('stereo2',   'Stereo 2',  self.setStereo2, group='stereo')
+        self.view_actions.wireframe = Action('wireframe', 'Wireframe', self.toggleSolid, toggle=True)
+
+        self.view_toolbar = mh.addToolBar("View")
+        for action in self.view_actions:
+            self.view_toolbar.addAction(action)
+
+        self.sym_actions = gui.Actions()
+
+        self.sym_actions.symmetryR = Action('symm1', 'Symmmetry R>L', self.symmetryRight)
+        self.sym_actions.symmetryL = Action('symm2', 'Symmmetry L>R', self.symmetryLeft)
+        self.sym_actions.symmetry  = Action('symm',  'Symmmetry L>R', self.symmetry, toggle=True)
+
+        self.sym_toolbar = mh.addToolBar("Symmetry")
+        for action in self.sym_actions:
+            self.sym_toolbar.addAction(action)
+
+        self.camera_actions = gui.Actions()
+
+        self.camera_actions.front     = Action('front',     'Front view',    self.frontView)
+        self.camera_actions.back      = Action('back',      'Back view',     self.backView)
+        self.camera_actions.left      = Action('left',      'Left view',     self.leftView)
+        self.camera_actions.right     = Action('right',     'Right view',    self.rightView)
+        self.camera_actions.top       = Action('top',       'Top view',      self.topView)
+        self.camera_actions.bottom    = Action('bottom',    'Bottom view',   self.bottomView)
+        self.camera_actions.globCam   = Action('global',    'Global camera', self.setGlobalCamera)
+        self.camera_actions.faceCam   = Action('face',      'Face camera',   self.setFaceCamera)
+
+        self.camera_toolbar = mh.addToolBar("Camera")
+        for action in self.camera_actions:
+            self.camera_toolbar.addAction(action)
 
     def createShortcuts(self):
         for (modifier, key), method in self.shortcuts.iteritems():

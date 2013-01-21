@@ -378,7 +378,6 @@ class Frame(QtGui.QMainWindow):
 
         self.setAttribute(QtCore.Qt.WA_KeyCompression, False)
         self.resize(*size)
-        self.toolbar = self.addToolBar("Toolbar")
         self.statusBar = qtgui.StatusBar()
         self.setStatusBar(self.statusBar)
         self.central = QtGui.QWidget()
@@ -582,3 +581,6 @@ def getOpenFileName(directory, filter = "All files (*.*)"):
 def getExistingDirectory(directory):
     return str(QtGui.QFileDialog.getExistingDirectory(
         G.app.mainwin, directory = directory))
+
+def addToolBar(name):
+    return G.app.mainwin.addToolBar(name)

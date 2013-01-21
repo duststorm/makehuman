@@ -40,33 +40,3 @@ class ModellingCategory(gui3d.Category):
 
     def __init__(self):
         super(ModellingCategory, self).__init__('Modelling')
-        self.createActions()
-
-    def createActions(self):
-        self.actions = gui.Actions()
-
-        Action = gui.Action
-
-        self.actions.mono      = Action('mono',      'Mono',      gui3d.app.setMono,    group='stereo')
-        self.actions.stereo1   = Action('stereo1',   'Stereo 1',  gui3d.app.setStereo1, group='stereo')
-        self.actions.stereo2   = Action('stereo2',   'Stereo 2',  gui3d.app.setStereo2, group='stereo')
-        self.actions.wireframe = Action('wireframe', 'Wireframe', gui3d.app.toggleSolid, toggle=True)
-
-        self.actions.symmetryR = Action('symm1', 'Symmmetry R>L', self.symmetryRight)
-        self.actions.symmetryL = Action('symm2', 'Symmmetry L>R', self.symmetryLeft)
-        self.actions.symmetry  = Action('symm',  'Symmmetry L>R', self.symmetry, toggle=True)
-
-        for action in self.actions:
-            gui3d.app.mainwin.toolbar.addAction(action)
-
-    def symmetryRight(self):
-        human = gui3d.app.selectedHuman
-        human.applySymmetryRight()
-
-    def symmetryLeft(self):
-        human = gui3d.app.selectedHuman
-        human.applySymmetryLeft()
-
-    def symmetry(self):
-        human = gui3d.app.selectedHuman
-        human.symmetryModeEnabled = self.actions.symmetry.isChecked()
