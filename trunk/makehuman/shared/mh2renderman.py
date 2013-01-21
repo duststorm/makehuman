@@ -795,39 +795,11 @@ class RMRScene:
         self.writeSceneFile()
         filesTorender.append((self.sceneFileName, 'Rendering scene'))
 
-        renderThread = RenderThread(self.app, filesTorender)
-        renderThread.renderPath = os.path.join(self.ribsPath, self.renderResult).replace('\\', '/')
-        renderManager = RenderManager(self.app, renderThread)
-        renderThread.start()
-        renderManager.start()
+        self.renderThread = RenderThread(self.app, filesTorender)
+        self.renderThread.renderPath = os.path.join(self.ribsPath, self.renderResult).replace('\\', '/')
+        self.renderThread.start()
 
-from threading import Thread, Lock
-
-class RenderManager(object):
-    def __init__(self, app, thread):
-        self.app = app
-        self.thread = thread
-        self.timer = None
-
-    def start(self):
-        self.timer = mh.addTimer(100, self.update)
-
-    def stop(self):
-        mh.removeTimer(self.timer)
-        self.timer = None
-        self.app.prompt("Render finished", "The image is saved in {0}".format(self.thread.renderPath),
-                        "OK", helpId="'renderFinishedPrompt'")
-
-    def update(self):
-        if self.thread.lock.acquire(False):
-            for progress, status in self.thread.updates:
-                self.app.progress(progress, status)
-            self.thread.updates = []
-        self.thread.lock.release()
-
-        if not self.thread.is_alive():
-            self.stop()
-            return
+from threading import Thread
 
 class RenderThread(Thread):
 
@@ -837,13 +809,15 @@ class RenderThread(Thread):
         self.app = app
         self.filenames = filenames
         self.renderPath = ""
-        self.lock = Lock()
-        self.updates = []
 
     def progress(self, progress, status=None):
-        self.lock.acquire()
-        self.updates.append((progress, status))
-        self.lock.release()
+        mh.callAsyncThread(self.app.progress, progress, status)
+
+
+    def prompt(self):
+        mh.callAsyncThread(self.app.prompt,
+                           "Render finished", "The image is saved in {0}".format(self.renderPath),
+                           "OK", helpId="'renderFinishedPrompt'")
 
     def run(self):
         
@@ -865,8 +839,8 @@ class RenderThread(Thread):
                 pass
 
             self.progress(1.0)
-            
-            
+
+        self.prompt()
 
 
         

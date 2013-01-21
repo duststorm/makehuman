@@ -32,6 +32,7 @@ from core import G
 import glmodule as gl
 import events3d
 import qtgui
+import queue
 
 class Modifiers:
     SHIFT = int(QtCore.Qt.ShiftModifier)
@@ -484,8 +485,10 @@ class Application(QtGui.QApplication, events3d.EventHandler):
         self.statusBar = None
         self.progressBar = None
         self.splash = None
+        self.messages = None
 
     def OnInit(self):
+        self.messages = queue.Manager(callAsync)
         self.mainwin = Frame(self, (G.windowWidth, G.windowHeight))
         self.statusBar = self.mainwin.statusBar
         self.progressBar = self.mainwin.progressBar
@@ -498,6 +501,7 @@ class Application(QtGui.QApplication, events3d.EventHandler):
     def start(self):
         self.OnInit()
         callAsync(self.started)
+        self.messages.start()
         self.exec_()
         gl.OnExit()
 
@@ -573,3 +577,6 @@ def addToolBar(name):
 
 def setShortcut(modifier, key, action):
     action.setShortcut(QtGui.QKeySequence(modifier + key))
+
+def callAsyncThread(func, *args, **kwargs):
+    G.app.messages.post(lambda: func(*args, **kwargs))
