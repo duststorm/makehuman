@@ -19,10 +19,11 @@
 Abstract
 --------
 
-Functions that help create texture maps by projection on the model.
+Methods that help create texture maps by projection on the model.
 Supported creators:
 Light map creator
 Image map creator
+UV map creator
 
 """
 

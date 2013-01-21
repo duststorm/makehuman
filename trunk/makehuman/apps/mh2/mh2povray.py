@@ -42,7 +42,7 @@ prefix so that you end up with your own unique prefix.
 import os
 import string
 import shutil
-import subprocess
+import apprun
 import projection
 import mh2povray_ini
 import random
@@ -158,7 +158,7 @@ def povrayExport(obj, app, settings):
             iniFD.close()
 
             # Run Pov-Ray
-            pathHandle = subprocess.Popen(cwd=outputDirectory, args=cmdLine)
+            apprun.execute(args=cmdLine,cwd=outputDirectory)
         #
         else:
             app.prompt('POV-Ray not found',
