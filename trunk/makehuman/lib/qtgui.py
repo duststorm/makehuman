@@ -110,7 +110,10 @@ class TabsBase(Widget):
         return self._tabs_by_name.get(name)
 
     def changeTab(self, name):
-        self.setCurrentIndex(self.findTab(name).idx)
+        tab = self.findTab(name)
+        if tab is None:
+            return
+        self.setCurrentIndex(tab.idx)
 
     def onTabSelected(self, event):
         pass
