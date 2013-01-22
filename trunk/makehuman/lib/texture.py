@@ -139,6 +139,8 @@ def getTexture(path, cache=None):
     
     if path in cache:
         texture = cache[path]
+        if texture is False:
+            return texture
 
         if os.path.getmtime(path) >= texture.modified:
             log.message('reloading %s', path)   # TL: unicode problems unbracketed
@@ -157,9 +159,10 @@ def getTexture(path, cache=None):
             texture = Texture(img)
         except RuntimeError, text:
             log.error("Error loading texture %s", path, exc_info=True)
+            texture = False
         else:
             texture.modified = os.path.getmtime(path)
-            cache[path] = texture
+        cache[path] = texture
 
     return texture
     

@@ -232,6 +232,8 @@ class Object3D(object):
 
     @property
     def textureTex(self):
+        if self._textureTex is False:
+            return None
         if self._textureTex is None or self._texturePath != self.parent.texture:
             self._texturePath = self.parent.texture
             if self._texturePath is None:
