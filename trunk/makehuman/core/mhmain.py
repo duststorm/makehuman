@@ -968,24 +968,22 @@ class MHApplication(gui3d.Application, mh.Application):
         mh.changeCategory("Help")
 
     def setMono(self):
-        self.updateStereo(0)
+        self.setStereo(0)
 
     def setStereo1(self):
-        self.updateStereo(1)
+        self.setStereo(1)
 
     def setStereo2(self):
-        self.updateStereo(2)
+        self.setStereo(2)
 
-    def updateStereo(self, stereoMode):
+    def setStereo(self, stereoMode):
         self.modelCamera.stereoMode = stereoMode
 
         # We need a black background for stereo
         if stereoMode:
             mh.setClearColor(0.0, 0.0, 0.0, 1.0)
-            self.categories["Modelling"].anaglyphsButton.setSelected(True)
         else:
             mh.setClearColor(self.clearColor[0], self.clearColor[1], self.clearColor[2], 1.0)
-            self.categories["Modelling"].anaglyphsButton.setSelected(False)
 
         self.redraw()
 
@@ -994,10 +992,17 @@ class MHApplication(gui3d.Application, mh.Application):
         stereoMode += 1
         if stereoMode > 2:
             stereoMode = 0
-        self.updateStereo(stereoMode)
+        self.setStereo(stereoMode)
+        self.updateStereoButtons()
+
+    def updateStereoButtons(self):
+        stereoMode = self.modelCamera.stereoMode
+        self.actions.mono.setChecked(stereoMode == 0)
+        self.actions.stereo1.setChecked(stereoMode == 1)
+        self.actions.stereo2.setChecked(stereoMode == 2)
 
     def toggleSolid(self):
-        self.selectedHuman.setSolid(not self.actions.wire.isChecked())
+        self.selectedHuman.setSolid(not self.actions.wireframe.isChecked())
         self.redraw()
 
     def toggleSubdivision(self):
@@ -1014,7 +1019,7 @@ class MHApplication(gui3d.Application, mh.Application):
 
     def symmetry(self):
         human = self.selectedHuman
-        human.symmetryModeEnabled = self.sym_actions.symmetry.isChecked()
+        human.symmetryModeEnabled = self.actions.symmetry.isChecked()
 
     def saveTarget(self):
         human = self.selectedHuman
@@ -1257,6 +1262,7 @@ class MHApplication(gui3d.Application, mh.Application):
         log.debug("Using Qt system style %s", self.getLookAndFeel())
 
         self.createActions()
+        self.updateStereoButtons()
 
         self.createShortcuts()
 
