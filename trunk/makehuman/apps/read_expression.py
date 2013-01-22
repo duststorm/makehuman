@@ -222,6 +222,7 @@ def readExpressions(human, t0, t1):
 """
 
 def readExpressionUnits(human, t0, t1):
+    print "REU", human
     shapeList = []
     t,dt = initTimes(ExpressionUnits, 0.0, 1.0)
     
@@ -248,7 +249,7 @@ def readCorrectives(drivers, human, folder, landmarks, t0, t1):
 
         shape = warpmodifier.compileWarpTarget(
                 "shared/mhx/targets/correctives/%s/caucasian/${gender}-${age}-${tone}-${weight}/%s.target" % (folder, pose),
-                'GenderAgeMuscleWeight',
+                'GenderAgeToneWeight',
                 human, 
                 landmarks)
 

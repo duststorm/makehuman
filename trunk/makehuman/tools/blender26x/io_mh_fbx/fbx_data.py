@@ -116,7 +116,7 @@ def parseLink(pnode):
         channel = None
     childNode = fbx.idstruct[childId]
     parNode = fbx.idstruct[parId]
-    childNode.makeChannelLink(parNode, channel)
+    childNode.makeChannelLink(parNode, channel)    
     
 
 def createNode(pnode):

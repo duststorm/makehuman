@@ -215,7 +215,7 @@ class CBlendShapeDeformer(CConnection):
 class CBlendShapeChannelSubDeformer(CConnection):
  
     def __init__(self, subtype='BlendShapeChannel'):
-         CConnection.__init__(self, 'Deformer', subtype, 'DEFORMER')
+         CConnection.__init__(self, 'Deformer', subtype, 'BLEND_CHANNEL_DEFORMER')
          self.fullWeights = CArray('FullWeights', int, 1)
 
          

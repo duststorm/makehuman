@@ -29,6 +29,7 @@ import log
 import export_config
 import object_collection
 import read_expression
+import posemode
 from mhx import the, mhx_custom
 
 
@@ -42,6 +43,9 @@ import bpy
 
 
 def exportFbx(human, filepath, options):
+    posemode.exitPoseMode()        
+    posemode.enterPoseMode()
+    
     the.Human = human        
     the.Config = export_config.exportConfig(human, True, [])
     the.Config.separatefolder = True
@@ -50,27 +54,10 @@ def exportFbx(human, filepath, options):
 
     log.message("Write FBX file %s" % outfile)
 
-    rigfile = "data/rigs/%s.rig" % options["fbxrig"]
-    stuffs = object_collection.setupObjects(
-        os.path.splitext(outfile)[0], 
-        human, 
-        rigfile, 
-        helpers=options["helpers"], 
-        hidden=options["hidden"], 
-        eyebrows=options["eyebrows"], 
-        lashes=options["lashes"])
-
-    (scale, unit) = options["scale"]   
-
-    character = stuffs[0]
+    rawTargets = []
     if options["expressions"]:
         shapeList = read_expression.readExpressionUnits(human, 0, 1)
-        for target in shapeList:
-            (pose,shape) = target
-            print(pose)
-            print(shape)
-            print(" ")
-            character.meshInfo.targets.append(target)
+        rawTargets += shapeList
 
     if options["customshapes"]:
         the.Config.customshapes = True
@@ -81,7 +68,20 @@ def exportFbx(human, filepath, options):
             log.message("    %s", path)
             shape = mhx_custom.readCustomTarget(path)
             target = (name,shape)
-            character.meshInfo.targets.append(target)
+            rawTargets.append(target)
+
+    rigfile = "data/rigs/%s.rig" % options["fbxrig"]
+    stuffs = object_collection.setupObjects(
+        os.path.splitext(outfile)[0], 
+        human, 
+        rigfile, 
+        rawTargets=rawTargets,
+        helpers=options["helpers"], 
+        hidden=options["hidden"], 
+        eyebrows=options["eyebrows"], 
+        lashes=options["lashes"])
+
+    (scale, unit) = options["scale"]   
 
     bpy.initialize()
     name = os.path.splitext(os.path.basename(filepath))[0]
@@ -96,5 +96,6 @@ def exportFbx(human, filepath, options):
     
     filename = "%s.fbx" % outpath
     io_mh_fbx.fbx_export.exportFbxFile(bpy.context, filename)
+    posemode.exitPoseMode()        
     return
 

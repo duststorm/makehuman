@@ -197,20 +197,20 @@ def filterMesh(meshInfo, obj, deleteGroups, deleteVerts, eyebrows, lashes):
     if meshInfo.targets:
         targets = []
         for (name, morphs1) in meshInfo.targets:
-            morphs2 = []
-            for (v1,dx) in morphs1:
+            morphs2 = {}
+            for (v1,dx) in morphs1.items():
                 if not killVerts[v1]:
-                    morphs2.append((nv[v1],dx))
-            targets.append(name, morphs2)
+                    morphs2[nv[v1]] = dx
+            targets.append((name, morphs2))
         meshInfo.targets = targets
 
     return meshInfo
 
 #
-#   setupObjects(name, human, rigfile=None, helpers=False, hidden=True, eyebrows=True, lashes=True, subdivide = False, progressCallback=None):
+#   setupObjects(name, human, rigfile=None, rawTargets=[], helpers=False, hidden=True, eyebrows=True, lashes=True, subdivide = False, progressCallback=None):
 #
 
-def setupObjects(name, human, rigfile=None, helpers=False, hidden=True, eyebrows=True, lashes=True, subdivide = False, progressCallback=None):
+def setupObjects(name, human, rigfile=None, rawTargets=[], helpers=False, hidden=True, eyebrows=True, lashes=True, subdivide = False, progressCallback=None):
     global theStuff, theTextures, theTexFiles, theMaterials
 
     def progress(base,prog):
@@ -224,7 +224,6 @@ def setupObjects(name, human, rigfile=None, helpers=False, hidden=True, eyebrows
     theTextures = {}
     theTexFiles = {}
     theMaterials = {}
-    rawTargets = []
     
     stuffs = []
     stuff = CStuff(name, None)

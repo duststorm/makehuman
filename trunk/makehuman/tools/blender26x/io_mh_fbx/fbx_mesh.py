@@ -209,11 +209,10 @@ class CGeometryShape(CConnection):
         #self.normals.writeFbx(fp)
 
 
-    def build4(self):
-        print("N", self.name)
-        print("C", self.children)
-        print("L", self.links)
-        meNode,_ = self.getBChildren('MESH')[0]
+    def build4(self):        
+        subdef,_ = self.getBParent('BLEND_CHANNEL_DEFORMER')
+        deformer,_ = subdef.getBParent('BLEND_DEFORMER')
+        meNode,_ = deformer.getBParent('MESH')
         me = fbx.data[meNode.id]
         obNode,_ = meNode.getBParent('OBJECT')
         ob = fbx.data[obNode.id]

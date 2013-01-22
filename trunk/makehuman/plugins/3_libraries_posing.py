@@ -45,15 +45,15 @@ import posemode
 #
 
 """
-class PoseModifier(humanmodifier.GenderAgeMuscleWeightModifier):
+class PoseModifier(humanmodifier.GenderAgeToneWeight):
     def __init__(self, template):        
-        humanmodifier.GenderAgeMuscleWeightModifier.__init__(self, template)
+        humanmodifier.GenderAgeToneWeight.__init__(self, template)
         self.isPose = True
 
 """        
 class PoseModifier(warpmodifier.WarpModifier):
     def __init__(self, template):
-        warpmodifier.WarpModifier.__init__(self, template, "body", "GenderAgeMuscleWeight") 
+        warpmodifier.WarpModifier.__init__(self, template, "body", "GenderAgeToneWeight") 
         self.isPose = True
 
 
