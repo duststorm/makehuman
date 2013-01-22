@@ -224,67 +224,6 @@ class UniversalSlider(GenericSlider):
         min = -1.0 if modifier.left is not None else 0.0
         super(UniversalSlider, self).__init__(min, 1.0, modifier, label, image, view)
 
-class Modifier:
-
-    def __init__(self, left, right):
-        
-        self.left = left
-        self.right = right
-        self.verts = None
-        self.faces = None
-
-    def setValue(self, human, value, update=1):
-        
-        value = max(-1.0, min(1.0, value))
-
-        left = -value if value < 0.0 else 0.0
-        right = value if value > 0.0 else 0.0
-        
-        human.setDetail(self.left, left)
-        human.setDetail(self.right, right)
-
-    def getValue(self, human):
-        
-        value = human.getDetail(self.left)
-        if value:
-            return -value
-        value = human.getDetail(self.right)
-        if value:
-            return value
-        else:
-            return 0.0
-
-    def updateValue(self, human, value, updateNormals=1):
-        
-        # Collect vertex and face indices if we didn't yet
-        if self.verts is None and self.faces is None:
-            # Collect verts
-            vmask = np.zeros(human.meshData.getVertexCount(), dtype=bool)
-            for target in (self.left, self.right):
-                t = algos3d.getTarget(human.meshData, target)
-                vmask[t.verts] = True
-            self.verts = np.argwhere(vmask)[...,0]
-            del vmask
-
-            # collect faces
-            self.faces = human.meshData.getFacesForVertices(self.verts)
-
-        # Update detail state
-        old_detail = [human.getDetail(target) for target in (self.left, self.right)]
-        self.setValue(human, value)
-        new_detail = [human.getDetail(target) for target in (self.left, self.right)]
-
-        # Apply changes
-        for target, old, new in zip((self.left, self.right), old_detail, new_detail):
-            if new == old:
-                continue
-            algos3d.loadTranslationTarget(human.meshData, target, new - old, None, 0, 0)
-            
-        # Update vertices
-        if updateNormals:
-            human.meshData.calcNormals(1, 1, self.verts, self.faces)
-        human.meshData.update(self.verts, updateNormals)
-
 class BaseModifier(object):
 
     def __init__(self):
@@ -339,6 +278,37 @@ class BaseModifier(object):
             human.meshData.calcNormals(1, 1, self.verts, self.faces)
         human.meshData.update(self.verts, updateNormals)
         human.warpNeedReset = True
+
+class Modifier(BaseModifier):
+
+    def __init__(self, left, right):
+        
+        self.left = left
+        self.right = right
+        self.targets = [[self.left], [self.right]]
+        self.verts = None
+        self.faces = None
+
+    def setValue(self, human, value, update=1):
+        
+        value = max(-1.0, min(1.0, value))
+
+        left = -value if value < 0.0 else 0.0
+        right = value if value > 0.0 else 0.0
+        
+        human.setDetail(self.left, left)
+        human.setDetail(self.right, right)
+
+    def getValue(self, human):
+        
+        value = human.getDetail(self.left)
+        if value:
+            return -value
+        value = human.getDetail(self.right)
+        if value:
+            return value
+        else:
+            return 0.0
 
 class SimpleModifier(BaseModifier):
     # overrides
