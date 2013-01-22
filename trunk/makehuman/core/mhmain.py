@@ -33,7 +33,7 @@ import mh
 import files3d
 import gui3d, animation3d
 import human
-import guimodelling, guifiles
+import guifiles
 from aljabr import centroid
 import algos3d
 #import posemode
@@ -305,8 +305,7 @@ class MHApplication(gui3d.Application, mh.Application):
                     task.callEvent('onHumanHidden', event)
 
         # Set up categories and tasks
-
-        self.addCategory(guimodelling.ModellingCategory())
+        self.getCategory("Modelling")
         self.addCategory(guifiles.FilesCategory())
 
     def loadPlugins(self):
@@ -367,7 +366,7 @@ class MHApplication(gui3d.Application, mh.Application):
         category.addTask(PluginsTaskView(category))
 
         # Exit button
-        category = self.addCategory(gui3d.Category(self, "Exit"))
+        category = self.getCategory("Exit")
         @category.tab.mhEvent
         def onClicked(event):
             self.promptAndExit()
