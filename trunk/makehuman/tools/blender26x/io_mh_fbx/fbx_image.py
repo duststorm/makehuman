@@ -54,7 +54,7 @@ class CImage(CConnection):
 
     def __init__(self, subtype=''):
         CConnection.__init__(self, 'Video', subtype, 'IMAGE')        
-        self.parseTemplate('Video', CImage.propertyTemplate)
+        self.template = self.parseTemplate('Video', CImage.propertyTemplate)
         self.isModel = True    
         self.image = None
 

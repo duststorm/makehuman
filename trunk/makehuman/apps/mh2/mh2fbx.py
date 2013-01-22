@@ -24,10 +24,12 @@ Fbx exporter
 
 import os
 import sys
+import log
+
 import export_config
 import object_collection
-from mhx import the
-import log
+import read_expression
+from mhx import the, mhx_custom
 
 
 fbxpath = "tools/blender26x"
@@ -40,14 +42,11 @@ import bpy
 
 
 def exportFbx(human, filepath, options):
-    cfg = export_config.exportConfig(human, True)
-    cfg.separatefolder = True
-
     the.Human = human        
     the.Config = export_config.exportConfig(human, True, [])
     the.Config.separatefolder = True
     outfile = export_config.getOutFileFolder(filepath, the.Config)        
-    (path, ext) = os.path.splitext(outfile)
+    (outpath, ext) = os.path.splitext(outfile)
 
     log.message("Write FBX file %s" % outfile)
 
@@ -63,6 +62,27 @@ def exportFbx(human, filepath, options):
 
     (scale, unit) = options["scale"]   
 
+    character = stuffs[0]
+    if options["expressions"]:
+        shapeList = read_expression.readExpressionUnits(human, 0, 1)
+        for target in shapeList:
+            (pose,shape) = target
+            print(pose)
+            print(shape)
+            print(" ")
+            character.meshInfo.targets.append(target)
+
+    if options["customshapes"]:
+        the.Config.customshapes = True
+        mhx_custom.listCustomFiles(the.Config)                            
+
+        log.message("Custom shapes:")    
+        for path,name in the.Config.customShapeFiles:
+            log.message("    %s", path)
+            shape = mhx_custom.readCustomTarget(path)
+            target = (name,shape)
+            character.meshInfo.targets.append(target)
+
     bpy.initialize()
     name = os.path.splitext(os.path.basename(filepath))[0]
     boneInfo = stuffs[0].boneInfo
@@ -74,7 +94,7 @@ def exportFbx(human, filepath, options):
     #name = os.path.splitext(os.path.basename(filepath))[0]
     #bpy.addMesh(name, human.meshData, False)
     
-    filename = "%s.fbx" % path
+    filename = "%s.fbx" % outpath
     io_mh_fbx.fbx_export.exportFbxFile(bpy.context, filename)
     return
 

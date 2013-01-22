@@ -17,6 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+from mathutils import Vector
 
 from . import fbx
 from .fbx_basic import *
@@ -68,6 +69,13 @@ class CObject(CModel):
             ("InheritType", 1),
             ("ScalingMax", (0,0,0)),
         ])    
+        if ob.location.length > 1e-4:
+            self.setProp("Lcl Translation", ob.location)
+        if Vector(ob.rotation_euler).length > 1e-4:
+            self.setProp("Lcl Rotation", ob.rotation_euler)
+        #if ob.scale.length > 1e-4:
+        #    self.setProp("Lcl Scaling", ob.scale)
+
 
         if ob.type == 'MESH':
             self.dataFtype = 'Mesh'

@@ -161,10 +161,14 @@ Definitions:  {
     fp.write('    Count: %d\n' % n)
 
     for name,defi in definitions.items():
+        if fbx.settings.includePropertyTemplates:
+            template = defi.template
+        else:
+            template = "\n"
         fp.write(
             '    ObjectType: "%s" {\n' % (name) +
             '        Count: %d' % defi.count +
-            defi.template +
+            template +
             '    }\n')
 
     fp.write('}\n')            
@@ -216,6 +220,10 @@ Objects:  {
 Connections:  {
 """)
     
+    print("CONN")
+    for node in nodes:
+        print("  ", node)
+    print("END CONN")
     for node in nodes:
         if node.active or fbx.settings.writeAllNodes:
             node.writeLinks(fp)

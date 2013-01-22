@@ -31,13 +31,13 @@ import os
 import sys
 import mh2proxy
 import armature
+import read_expression
 import log
 
 from . import the
 from the import *
 from . import mhxbones
 from . import posebone
-from . import read_expression
 from . import mhx_custom
 from . import read_rig
 

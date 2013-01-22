@@ -81,7 +81,7 @@ class CAnimationStack(CConnection):
 
     def __init__(self, subtype=''):
         CConnection.__init__(self, 'AnimationStack', subtype, 'ANIMATION')
-        self.parseTemplate('AnimationStack', CAnimationStack.propertyTemplate)
+        self.template = self.parseTemplate('AnimationStack', CAnimationStack.propertyTemplate)
         self.name = "Take 001"
         self.action = None
         self.alayers = []
@@ -92,7 +92,7 @@ class CAnimationStack(CConnection):
         print("ANIM", self, act)
         self.name = act.name
         self.active = True
-        self.action = act        
+        self.action = act       
         alayer = CAnimationLayer().make(act)
         fbx.nodes.alayers[act.name] = alayer
         alayer.makeLink(self)
@@ -115,8 +115,8 @@ class CAnimationStack(CConnection):
     def writeLinks(self, fp):
         take = fbx.takes[self.name]
         #self.writeLink(fp, take)
-        for alayer in self.alayers:
-            alayer.writeLinks(fp)
+        #for alayer in self.alayers:
+        #    alayer.writeLink(fp, self)
 
 
     def build3(self):
@@ -148,7 +148,7 @@ class CAnimationLayer(CConnection):
 
     def __init__(self, subtype=''):
         CConnection.__init__(self, 'AnimationLayer', subtype, 'ACTION')
-        self.parseTemplate('FbxAnimLayer', CAnimationLayer.propertyTemplate)
+        self.template = self.parseTemplate('AnimationLayer', CAnimationLayer.propertyTemplate)
         self.name = "Layer0"
         self.groups = {}
         self.acnodes = {}
@@ -159,7 +159,7 @@ class CAnimationLayer(CConnection):
         groups = groupFcurves(act)            
         for key,group in groups.items():
             acnode = self.acnodes[key] = CAnimationCurveNode().make(group)
-            acnode.makeLink(self)
+            #acnode.makeLink(self)
         return self
                                 
 
@@ -253,7 +253,7 @@ class CAnimationCurveNode(CConnection):
 
     def __init__(self, subtype=''):
         CConnection.__init__(self, 'AnimationCurveNode', '', subtype)
-        self.parseTemplate('AnimationCurveNode', CAnimationCurveNode.propertyTemplate)
+        self.template = self.parseTemplate('AnimationCurveNode', CAnimationCurveNode.propertyTemplate)
         self.acurves = {}
 
 
@@ -272,8 +272,8 @@ class CAnimationCurveNode(CConnection):
             self.acurves[2] = self.acurves[3]
             del self.acurves[3]
 
-        for acu in self.acurves.values():
-            acu.makeLink(self)
+        #for acu in self.acurves.values():
+        #    acu.makeLink(self)
 
         self.setProps([("d", kvec)])
         return self
@@ -296,7 +296,7 @@ class CAnimationCurveNode(CConnection):
         print("L", self.acurves.items())
         for index,acu in self.acurves.items():
             print("WL", index, acu)
-            acu.writeChannelLink(fp, self, '"d|%s"' % XYZ[index])
+            acu.writeChannelLink(fp, self, 'd|%s' % XYZ[index])
 
 
     def build(self):
@@ -306,6 +306,9 @@ class CAnimationCurveNode(CConnection):
 #   AnimationCurve
 #   Corresponds to a single F-curve in Blender
 #------------------------------------------------------------------
+
+#Cubic|TangeantAuto|GenericTimeIndependent|GenericClampProgressive
+#6108
 
 # KeyAttrFlags:
 TangeantUser =      0x00000008

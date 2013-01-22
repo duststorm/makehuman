@@ -28,17 +28,17 @@ class Property:
         
         
 class StringProperty(Property):
-    def __init__(self, default="", options={}):
+    def __init__(self, name="Name", default="", options={}):
         pass
         
 class BoolProperty(Property):
-    def __init__(self, default=False, options={}):
+    def __init__(self, name="Name", default=False, options={}):
         pass
         
 class IntProperty(Property):
-    def __init__(self, default=0, options={}):
+    def __init__(self, name="Name", default=0, options={}):
         pass
         
 class FloatProperty(Property):
-    def __init__(self, default=0.0, options={}):
+    def __init__(self, name="Name", default=0.0, options={}):
         pass

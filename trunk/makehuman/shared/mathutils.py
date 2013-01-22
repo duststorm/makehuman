@@ -22,12 +22,11 @@ Blender API mockup
 
 """
 
-
+from math import *
 import numpy
 from numpy import dot
 from numpy.linalg import inv
-import armature
-from armature import transformations as tm
+import transformations as tm
 
 #------------------------------------------------------------------
 #   Data types
@@ -45,6 +44,8 @@ def round(x):
 
 class Vector:
     def __init__(self, vec):
+        if isinstance(vec, Vector):
+            vec = vec.vector
         self.vector = numpy.array(vec)
         
     def __repr__(self):
@@ -79,6 +80,15 @@ class Vector:
         
     def cross(self, vec):
         return Vector(numpy.cross(self.vector, vec.vector))
+        
+    def getLength(self):
+        return sqrt(dot(self.vector, self.vector))
+        
+    def setLength(self):
+        pass
+  
+    length = property(getLength, setLength)
+    
         
         
 

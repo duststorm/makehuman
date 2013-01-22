@@ -157,6 +157,16 @@ class Bone(Rna):
         self.matrix_local = None
         
 
+    def getLength(self):
+        vector = self.tail.vector - self.head.vector
+        return sqrt(dot(vector, vector))
+        
+    def setLength(self):
+        pass
+  
+    length = property(getLength, setLength)
+
+
     def matrixLocalFromBone(self):        
     
         u = self.tail.sub(self.head)
@@ -198,12 +208,15 @@ class Bone(Rna):
 class Mesh(Rna):
     def __init__(self, name):
         Rna.__init__(self, name, 'MESH')
+        self.vertices = []
+        self.faces = []
+        self.uv_layers = []
+        self.materials = []
+        self.shape_keys = []
         
     def fromMeshData(self, mesh):        
         self.vertices = [MeshVertex(v.idx, v.co) for v in mesh.verts]
         self.faces = [[v.idx for v in f.verts] for f in mesh.faces]
-        self.uv_layers = []
-        self.materials = []
 
     def fromStuff(self, stuff): 
         stuff.bones = []
@@ -218,13 +231,23 @@ class Mesh(Rna):
 
         self.vertices = [MeshVertex(n, v) for (n,v) in enumerate(stuff.meshInfo.verts)]
         self.polygons = [MeshPolygon(n, [v[0] for v in f]) for (n,f) in enumerate(stuff.meshInfo.faces)]
-        self.uv_layers = []
+
         if stuff.meshInfo.uvValues:
             self.uv_layers.append(UvLayer(stuff.meshInfo.uvValues, stuff.meshInfo.faces))
+
         if stuff.hasMaterial():
             self.materials = [Material(stuff)]
         else:
             self.materials = []
+
+        if stuff.meshInfo.targets:
+            self.shape_keys = ShapeKeys()
+            keyblock = KeyBlock("Basis", {})
+            self.shape_keys.key_blocks.append(keyblock)
+            for (name,shape) in stuff.meshInfo.targets:
+                keyblock = KeyBlock(name, shape)
+                self.shape_keys.key_blocks.append(keyblock)
+                
             
 
 class MeshVertex:
@@ -274,6 +297,23 @@ class UvLoop:
         self.name = name
         self.data = uvValues
 
+class ShapeKeys:
+    def __init__(self):
+        self.key_blocks = []
+        
+        
+class KeyBlock:
+    def __init__(self, name, shape):
+        self.name = name
+        self.data = shape
+        target = list(shape.items())
+        target.sort()                
+        self.indexes = [t[0] for t in target]
+        self.vertices = [t[1] for t in target]
+        
+    def __repr__(self):
+        return ("<KeyBlock %s>" % self.name)
+        
 #------------------------------------------------------------------
 #   Material and Texture
 #------------------------------------------------------------------
@@ -282,6 +322,7 @@ class Material(Rna):
     def __init__(self, stuff):
         
         Rna.__init__(self, self.materialName(stuff), 'MATERIAL')  
+        self.diffuse_shader = 'LAMBERT'
         
         if stuff.material:
             self.diffuse_color = stuff.material.diffuse_color
@@ -408,6 +449,9 @@ class Object(Rna):
         self.parent = None
         self.matrix_world = Matrix()
         self.select = True
+        self.location = Vector((0,0,0))
+        self.rotation_euler = Vector((0,0,0))
+        self.scale = Vector((1,1,1))
         
         if self.data.rnaType == 'MESH':
             self.vertex_groups = []

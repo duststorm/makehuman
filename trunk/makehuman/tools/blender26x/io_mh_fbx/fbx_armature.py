@@ -25,6 +25,7 @@ from .fbx_basic import *
 from .fbx_props import *
 from .fbx_model import *
 from .fbx_object import CObject
+from .fbx_deformer import CSkinDeformer
 
 
 #------------------------------------------------------------------
@@ -66,7 +67,7 @@ class CArmature(CConnection):
 
 
     def addDeformer(self, node, ob):
-        deformer = CDeformer().set(self, node, ob)
+        deformer = CSkinDeformer().set(self, node, ob)
         if deformer is None:
             halt
         self.deformers.append(deformer)
@@ -221,15 +222,34 @@ class CPoseNode(CFbx):
             '            Node: %d\n' % (self.node.id))
         self.matrix.writeFbx(fp)
         fp.write('        }\n')
-        
+             
+
 #------------------------------------------------------------------
 #   Bone
 #------------------------------------------------------------------
 
 class CBoneAttribute(CNodeAttribute):
+    propertyTemplate = (
+"""    
+        PropertyTemplate: "FbxBoneAttribute" {
+            Properties70:  {
+                P: "Size", "double", "Number", "",0
+            }
+        }
+""")
+
     def __init__(self, subtype='LimbNode'):
         CNodeAttribute.__init__(self, subtype, 'BONEATTR', "Skeleton")
+        self.template = self.parseTemplate('BoneAttribute', CBoneAttribute.propertyTemplate)
 
+
+    def make(self, bone):
+        self.bone = bone        
+        CNodeAttribute.make(self, bone)
+        self.setProps([
+            ("Size", bone.length),
+        ])
+        
 
 class CBone(CModel):
 
@@ -248,16 +268,6 @@ class CBone(CModel):
 
         self.transformLink = bone.matrix_local.transposed()
         self.transform = self.transformLink.inverted()
-        """
-        (loc, quat, _) = bone.matrix_local.decompose()
-        rot = quat.to_matrix().to_3x3()
-        if bone.parent:
-            self.head = rot*loc
-        else:
-            self.head = rot*loc
-        self.transform = quat.to_matrix().to_4x4()
-        self.transform.row[3][:3] = self.head
-        """
         
         if bone.parent:
             pmat = bone.parent.matrix_local.inverted()
@@ -380,143 +390,3 @@ def composeMatrix(loc,rot,scale):
     mat.row[3][:3] = (0,0,0)
     return mat
      
-#------------------------------------------------------------------
-#   Deformer
-#------------------------------------------------------------------
-
-class CDeformer(CConnection):
-
-    def __init__(self, subtype='Skin'):
-        CConnection.__init__(self, 'Deformer', subtype, 'DEFORMER')
-        self.rigNode = None
-        self.meshNode = None
-        self.object = None
-        self.subdeformers = {}
-        
-   
-    def set(self, rigNode, meshNode, ob):
-        self.rigNode = rigNode
-        self.meshNode = meshNode
-        self.object = ob
-        return self
-    
-    
-    def make(self, rig):
-        CConnection.make(self, rig)
-        amtNode = fbx.nodes.armatures[rig.data.name]
-        for vgroup in self.object.vertex_groups:
-            try:
-                boneNode = amtNode.bones[vgroup.name]
-            except KeyError:
-                boneNode = None
-            if boneNode:
-                subdef = CSubDeformer().make(vgroup, boneNode, self.object)
-                self.subdeformers[vgroup.index] = subdef
-        return self
-
-    
-    def addDefinition(self, definitions):     
-        CConnection.addDefinition(self, definitions)
-        for subdef in self.subdeformers.values():
-            subdef.addDefinition(definitions)
-
-
-    def writeLinks(self, fp):
-        self.writeLink(fp, self.meshNode)
-        for subdef in self.subdeformers.values():
-            subdef.writeLink(fp, self)
-            try:
-                bone = self.rigNode.bones[subdef.name]
-            except KeyError:
-                continue
-            bone.writeLink(fp, subdef)
-
-    
-    def writeHeader(self, fp):
-        for subdef in self.subdeformers.values():
-            subdef.writeFbx(fp)
-        CConnection.writeHeader(self, fp)
-        
-
-    def build5(self):        
-        meNode,_ = self.getBParent('MESH')
-        obNode,_ = meNode.getBParent('OBJECT') 
-        ob = fbx.data[obNode.id]
-
-        rigNode,_ = obNode.getFParent2('Model', 'Null')
-        if rigNode:
-            rig = fbx.data[rigNode.id]
-            mod = ob.modifiers.new(rig.name, 'ARMATURE')
-            mod.object = rig
-            mod.use_bone_envelopes = False
-            mod.use_vertex_groups = True
-        
-        for child,_ in self.children:
-            child.buildVertGroups(ob)
-            
- 
- #------------------------------------------------------------------
- #   SubDeformer
- #------------------------------------------------------------------
- 
-class CSubDeformer(CConnection):
- 
-    def __init__(self, subtype='Cluster'):
-         CConnection.__init__(self, 'Deformer', subtype, 'DEFORMER')
-         self.indexes = CArray('Indexes', int, 1)
-         self.weights = CArray('Weights', float, 1)
-         self.transform = CArray('Transform', float, 4)
-         self.transformLink = CArray('TransformLink', float, 4)
-
-         
-    def parseNodes(self, pnodes):
-        rest = []
-        for pnode in pnodes:
-            if pnode.key == 'Indexes':
-                self.indexes.parse(pnode)
-            elif pnode.key == 'Weights':
-                self.weights.parse(pnode)
-            elif pnode.key == 'Transform':
-                self.transform.parse(pnode)
-            elif pnode.key == 'TransformLink':
-                self.transformLink.parse(pnode)
-            else:
-                rest.append(pnode)
-        return CConnection.parseNodes(self, rest)
-
-
-    def make(self, vgroup, boneNode, ob):
-        CConnection.make(self, vgroup)
-        vnums = []
-        weights = []
-        for v in ob.data.vertices:
-            for g in v.groups:
-                if g.group == vgroup.index:
-                    vnums.append(v.index)
-                    weights.append(g.weight)
-        self.indexes.make(vnums)
-        self.weights.make(weights)
-        self.transform.make(boneNode.transform)
-        self.transformLink.make(boneNode.transformLink)
-        return self
-         
-
-    def writeHeader(self, fp):
-        CConnection.writeHeader(self, fp)
-        self.indexes.writeFbx(fp)
-        self.weights.writeFbx(fp)
-        self.transform.writeFbx(fp)
-        self.transformLink.writeFbx(fp)
-        
-        
-    def buildVertGroups(self, ob):
-        vg = ob.vertex_groups.new(self.name)
-        for n,vn in enumerate(self.indexes.values):        
-            w = self.weights.values[n]
-            vg.add([vn], w, 'REPLACE')
-
-
-    def build3(self):
-        return None
-        
-

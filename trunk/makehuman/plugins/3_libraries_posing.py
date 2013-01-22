@@ -35,7 +35,7 @@ import log
 #import cProfile
 
 import armature
-from armature import transformations as tm
+import transformations as tm
 import warpmodifier
 import humanmodifier
 import posemode

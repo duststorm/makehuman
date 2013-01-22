@@ -28,33 +28,6 @@ import shutil
 
 import log
 
-#
-#    safePrint( string, filename ):
-#    Utility for evading encoding errors
-#
-
-"""
-def safePrint( string, filename ):
-    try:
-        print("%s %s" % (string, filename))
-        return
-    except:
-        pass
-    return
-    ascii = ""
-    space = ord(' ')
-    z = ord('z')
-    for c in filename:
-        d = ord(c)
-        if d < space or d > z:
-            ascii += "\\x%x " % d
-        else:
-            ascii += chr(d)
-    print("%s %s" % (string, ascii))
-"""
-#
-#
-#
 
 def truthValue(word):
     if word.lower() in ["false", "no", "0"]:

@@ -28,7 +28,7 @@ from .fbx_model import *
 #   Camera
 #------------------------------------------------------------------
 
-class CCamera(CNodeAttribute):
+class CCameraAttribute(CNodeAttribute):
     propertyTemplate = (
 """    
         PropertyTemplate: "FbxCamera" {
@@ -144,8 +144,8 @@ class CCamera(CNodeAttribute):
 """)
 
     def __init__(self):
-        CNodeAttribute.__init__(self, "Camera", "Camera", 'CAMERA')
-        self.parseTemplate('Camera', CCamera.propertyTemplate)
+        CNodeAttribute.__init__(self, "Camera", 'CAMERA', "Camera")
+        self.template = self.parseTemplate('CameraAttribute', CCameraAttribute.propertyTemplate)
         self.isObjectData = True
         self.camera = None
 
@@ -164,15 +164,94 @@ class CCamera(CNodeAttribute):
             ("FocusDistance", 5),
         ])
         CNodeAttribute.make(self, ob.data)
-        self.struct["Position"] = (0,0,-50)
-        self.struct["Up"] = (0,1,0)
-        self.struct["LookAt"] = (0,0,-1)
-        self.struct["ShowInfoOnMoving"] =  1
-        self.struct["ShowAudio"] =  0
-        self.struct["AudioColor"] =  (0,1,0)
-        self.struct["CameraOrthoZoom"] =  1
+        self.setMulti([
+            ("Position", (0,0,-50)),
+            ("Up", (0,1,0)),
+            ("LookAt", (0,0,-1)),
+            ("ShowInfoOnMoving", 1),
+            ("ShowAudio", 0),
+            ("AudioColor", (0,1,0)),
+            ("CameraOrthoZoom", 1),
+        ])
         
 
     def build3(self):
         cam = fbx.data[self.id]
         return cam
+
+#------------------------------------------------------------------
+#   Camera Switcher
+#------------------------------------------------------------------
+
+class CCameraSwitcher(CNodeAttribute):
+    propertyTemplate = (
+"""    
+        PropertyTemplate: "FbxCameraSwitcher" {
+            Properties70:  {
+                P: "Camera Index", "Integer", "", "A",0
+            }
+        }
+""")
+
+    def __init__(self):
+        CNodeAttribute.__init__(self, "CameraSwitcher", "CameraSwitcher", 'EMPTY')
+        self.template = self.parseTemplate('NodeAttribute', CCameraSwitcher.propertyTemplate)
+
+
+    def make(self, ob):
+        self.setProps([
+            ("Camera Index", 0),
+        ])
+        CNodeAttribute.make(self, ob.data)
+        self.setMulti([
+        ])
+  
+  
+class CCameraSwitcher(CModel):
+    propertyTemplate = (
+"""    
+        PropertyTemplate: "FbxCameraSwitcher" {
+		Properties70:  {
+			P: "ScalingMin", "Vector3D", "Vector", "",1,1,1
+			P: "Show", "bool", "", "",0
+			P: "DefaultAttributeIndex", "int", "Integer", "",0
+			P: "Visibility Inheritance", "Visibility Inheritance", "", "",0
+			P: "MultiTake", "int", "Integer", "",1
+			P: "ManipulationMode", "enum", "", "",0
+			P: "ScalingPivotUpdateOffset", "Vector3D", "Vector", "",0,0,0
+			P: "SetPreferedAngle", "Action", "", "",0
+			P: "PivotsVisibility", "enum", "", "",1
+			P: "RotationLimitsVisibility", "bool", "", "",0
+			P: "LocalTranslationRefVisibility", "bool", "", "",0
+			P: "RotationRefVisibility", "bool", "", "",0
+			P: "RotationAxisVisibility", "bool", "", "",0
+			P: "ScalingRefVisibility", "bool", "", "",0
+			P: "HierarchicalCenterVisibility", "bool", "", "",0
+			P: "GeometricCenterVisibility", "bool", "", "",0
+			P: "ReferentialSize", "double", "Number", "",12
+			P: "DefaultKeyingGroup", "int", "Integer", "",0
+			P: "DefaultKeyingGroupEnum", "enum", "", "",0
+			P: "Pickable", "bool", "", "",1
+			P: "Transformable", "bool", "", "",1
+			P: "CullingMode", "enum", "", "",0
+			P: "ShowTrajectories", "bool", "", "",0
+		}
+	}
+""")	
+
+    def __init__(self):
+        CModel.__init__(self, "CameraSwitcher", "CameraSwitcher", 'EMPTY')
+        self.template = self.parseTemplate('Model', CCameraSwitcher.propertyTemplate)
+
+
+    def make(self, ob):
+        self.setProps([
+        ])
+        CNodeAttribute.make(self, ob.data)
+        self.setMulti([
+		("Version", 232),
+		("Shading", W),
+		("Culling", "CullingOff"),
+        ])
+  
+ 

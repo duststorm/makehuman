@@ -28,7 +28,8 @@ from .fbx_model import *
 #------------------------------------------------------------------
 
 class CMaterial(CConnection):
-    propertyTemplate = ( 
+    propertyTemplates = {
+        "Phong" : ( 
 """
         PropertyTemplate: "FbxSurfacePhong" {
             Properties70:  {
@@ -56,17 +57,61 @@ class CMaterial(CConnection):
                 P: "ReflectionFactor", "Number", "", "A",1
             }
         }
-""")
+"""),
+
+        "Lambert" : ( 
+"""
+        PropertyTemplate: "FbxSurfaceLambert" {
+            Properties70:  {
+                P: "ShadingModel", "KString", "", "", "Lambert"
+                P: "MultiLayer", "bool", "", "",0
+                P: "EmissiveColor", "Color", "", "A",0,0,0
+                P: "EmissiveFactor", "Number", "", "A",1
+                P: "AmbientColor", "Color", "", "A",0.2,0.2,0.2
+                P: "AmbientFactor", "Number", "", "A",1
+                P: "DiffuseColor", "Color", "", "A",0.8,0.8,0.8
+                P: "DiffuseFactor", "Number", "", "A",1
+                P: "Bump", "Vector3D", "Vector", "",0,0,0
+                P: "NormalMap", "Vector3D", "Vector", "",0,0,0
+                P: "BumpFactor", "double", "Number", "",1
+                P: "TransparentColor", "Color", "", "A",0,0,0
+                P: "TransparencyFactor", "Number", "", "A",0
+                P: "DisplacementColor", "ColorRGB", "Color", "",0,0,0
+                P: "DisplacementFactor", "double", "Number", "",1
+                P: "VectorDisplacementColor", "ColorRGB", "Color", "",0,0,0
+                P: "VectorDisplacementFactor", "double", "Number", "",1
+            }
+        }
+"""),
+    }
+    
+    propertyTemplate = propertyTemplates["Phong"]
+    
+    FbxShaders = {
+        'LAMBERT' : 'Phong',
+        'OREN_NAYAR' : 'Phong',
+        'TOON' : 'Phong',
+        'MINNAERT' : 'Phong',
+        'FRESNEL' : 'Phong',      
+    }
+    
+    BlenderShaders = {
+        'Phong' : 'LAMBERT',
+        'Lambert' : 'LAMBERT',
+    }
 
     def __init__(self, subtype=''):
         CConnection.__init__(self, 'Material', subtype, 'MATERIAL')        
-        self.parseTemplate('Material', CMaterial.propertyTemplate)
         self.isModel = True        
         self.textures = []
+        self.shader = "Lambert"
 
 
     def make(self, mat):
-        CConnection.make(self, mat)
+        CConnection.make(self, mat)        
+        self.shader = CMaterial.FbxShaders[mat.diffuse_shader]
+        self.propertyTemplate = CMaterial.propertyTemplates[self.shader]
+        self.template = self.parseTemplate('Material', self.propertyTemplate)        
         
         for mtex in mat.texture_slots:
             if mtex:
@@ -100,7 +145,7 @@ class CMaterial(CConnection):
                             node.makeChannelLink(self, ftype)
 
         self.setProps([
-            ("ShadingModel", "Phong"),
+            ("ShadingModel", self.shader),
             ("MultiLayer", 0),
 
             ("DiffuseFactor", mat.diffuse_intensity),
@@ -115,6 +160,15 @@ class CMaterial(CConnection):
     
     def build3(self):
         mat = fbx.data[self.id]
+        try:
+            self.shader = self.getProp("ShadingModel")
+        except AttributeError:
+            self.shader = "Phong"
+        self.shader = self.shader.capitalize()
+        mat.diffuse_shader = CMaterial.BlenderShaders[self.shader]
+        self.propertyTemplate = CMaterial.propertyTemplates[self.shader]
+        self.template = self.parseTemplate('Material', self.propertyTemplate)                
+        
         mat.diffuse_intensity = 1
         mat.specular_intensity = 1
 

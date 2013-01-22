@@ -54,7 +54,7 @@ class CTexture(CConnection):
 
     def __init__(self, subtype=''):
         CConnection.__init__(self, 'Texture', subtype, 'TEXTURE')        
-        self.parseTemplate('Texture', CTexture.propertyTemplate)
+        self.template = self.parseTemplate('Texture', CTexture.propertyTemplate)
         self.isModel = True 
         self.image = None
 

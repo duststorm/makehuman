@@ -41,6 +41,7 @@ import export_config
 import armature
 import warpmodifier
 import posemode
+import read_expression
 
 from . import the
 from . import mhx_rig
@@ -51,7 +52,6 @@ from . import rig_shoulder_25
 from . import rig_arm_25
 from . import rig_leg_25
 from . import rig_body_25
-from . import read_expression
 
 
 

@@ -39,22 +39,6 @@ def resetFbx():
     
 resetFbx()    
 
-R = math.pi/180
-D = 180/math.pi
-
-class FbxBool:
-    def __init__(self, value):
-        self.value = value
-        
-    def __repr__(self):
-        if self.value:
-            return "Y"
-        else:
-            return "N"
-            
-Y = FbxBool(True)
-N = FbxBool(False)
-
 
 def oneOf(mhCase, blenderCase):
     if fbx.usingMakeHuman:
@@ -153,6 +137,7 @@ class CArray(CFbx):
     def __init__(self, name, type, step, csys=False):
         CFbx.__init__(self, 'ARRAY')
         self.name = name
+        self.values = []
         self.subtype = type
         self.step = step
         self.size = 0
@@ -262,6 +247,10 @@ def round(x):
     else:
         return x
 
+def dist(x,y):
+    d = x-y
+    return d.length
+    
 #------------------------------------------------------------------
 #   Coordinate system conversion
 #------------------------------------------------------------------
@@ -272,6 +261,29 @@ def csysB2F(vec):
 
 def csysF2B(vec):
     return (vec[0], -vec[2], vec[1])
+
+
+#------------------------------------------------------------------
+#   Literals
+#------------------------------------------------------------------
+
+R = math.pi/180
+D = 180/math.pi
+
+class FbxLiteral:
+    def __init__(self, value):
+        self.value = value
+        
+    def __repr__(self):
+    	return self.value
+
+
+U = FbxLiteral("U")            
+V = FbxLiteral("V")            
+W = FbxLiteral("W")            
+X = FbxLiteral("X")            
+Y = FbxLiteral("Y")            
+Z = FbxLiteral("Z")            
 
 #------------------------------------------------------------------
 #   Parsing utilities

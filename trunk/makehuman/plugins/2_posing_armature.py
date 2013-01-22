@@ -32,7 +32,7 @@ import gui
 import log
 
 import armature
-from armature import transformations as tm
+import transformations as tm
 import warpmodifier
 
 

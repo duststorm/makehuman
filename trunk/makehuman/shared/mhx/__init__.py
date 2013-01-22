@@ -28,7 +28,6 @@ from . import mhx_rig
 from . import mhx_24
 from . import mhx_custom
 from . import mhxbones
-from . import read_expression
 from . import read_rig
 from . import read_uvset
 from . import rigify_rig

@@ -40,12 +40,12 @@ class CProperties70(CFbx):
             pass
         
         proplist = fbx_token.tokenizePropertyString(template)
-        struct = {}
+        template = {}
         for prop in proplist:
-            struct[prop[0]] = CPropertyTemplate(prop)
+            template[prop[0]] = CPropertyTemplate(prop)
         
-        fbx.templates[ftype] = struct
-        return struct
+        fbx.templates[ftype] = template
+        return template
         
     
     def setProp(self, key, value, template):

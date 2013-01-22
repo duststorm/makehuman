@@ -45,7 +45,9 @@ Prefix = {
 Prefix2 = {
     "Deformer" : {
         "Skin" : "Deformer", 
-        "Cluster" : "SubDeformer"
+        "Cluster" : "SubDeformer",
+        "BlendShape" : "Deformer", 
+        "BlendShapeChannel" : "SubDeformer",
     },
 }
 
@@ -54,6 +56,7 @@ class CConnection(CFbx):
     def __init__(self, type, subtype, btype):
         CFbx.__init__(self, type)
         self.subtype = subtype
+        self.rna = None
         try:
             self.prefix = Prefix[type]
         except KeyError:
@@ -103,6 +106,7 @@ class CConnection(CFbx):
         template = self.properties.parseTemplate(ftype, template)        
         for key,value in template.items():
             self.template[key] = value
+        return template            
         
     # Overwrites
     
@@ -133,13 +137,24 @@ class CConnection(CFbx):
         return self    
 
 
-    def make(self, datum):
+    def make(self, rna):
         CFbx.make(self)
         try:
-            self.name = datum.name
+            self.name = rna.name
         except AttributeError:
             pass
-        return self
+
+        self.rna = rna
+        try:
+            adata = rna.animation_data
+        except AttributeError:
+            adata = None
+        if adata:
+            act = adata.action
+            if act:
+                alayer = fbx.nodes.alayers[act.name]
+                CConnection.makeLink(alayer, self)
+        return self                
         
                 
     def makeChannelLink(self, parent, channel):
@@ -185,6 +200,9 @@ class CConnection(CFbx):
     def writeHeader(self, fp):
         fp.write('    %s: %d, "%s::%s", "%s" {\n' % (self.ftype, self.id, self.prefix, self.name, self.subtype))
 
+    def writeFooter(self, fp):
+        fp.write('    }\n')
+        
     def writeProps(self, fp):        
         self.properties.write(fp, self.template)
         
@@ -209,7 +227,7 @@ class CConnection(CFbx):
         self.writeHeader(fp)
         self.writeProps(fp)
         self.writeStruct(fp)
-        fp.write('    }\n')
+        self.writeFooter(fp)
 
 
     def writeLinks(self, fp):
@@ -262,9 +280,10 @@ class RootNode(CConnection):
 
 class CNodeAttribute(CConnection):
 
-    def __init__(self, subtype, btype, typeflags):
+    def __init__(self, subtype, btype, typeflags=None):
         CConnection.__init__(self, 'NodeAttribute', subtype, btype)
-        self.struct['TypeFlags'] = typeflags
+        if typeflags:
+            self.struct['TypeFlags'] = typeflags
 
 
     def parseNodes(self, pnodes):
@@ -363,7 +382,7 @@ class CModel(CConnection):
 
     def __init__(self, subtype, btype):
         CConnection.__init__(self, 'Model', subtype, btype)
-        self.parseTemplate('Model', CModel.propertyTemplate)
+        self.template = self.parseTemplate('Model', CModel.propertyTemplate)
         self.setMulti([
             ('Version', 232),
             ('Shading', Y),
@@ -378,18 +397,5 @@ class CModel(CConnection):
                 self.properties.parse(pnode)
         return self    
 
-
-    def make(self, rna):
-        CConnection.make(self, rna)
-        self.rna = rna
-        try:
-            adata = rna.animation_data
-        except AttributeError:
-            adata = None
-        if adata:
-            act = adata.action
-            if act:
-                alayer = fbx.nodes.alayers[act.name]
-                CConnection.makeLink(alayer, self)
         
 

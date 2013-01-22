@@ -24,6 +24,7 @@ from .fbx_props import *
 from .fbx_model import *
 from . import fbx_null
 from . import fbx_mesh
+from . import fbx_deformer
 from . import fbx_armature
 from . import fbx_lamp
 from . import fbx_camera
@@ -53,8 +54,8 @@ class NodeStruct:
         
         self.astacks = {}
         self.alayers = {}
-        self.anodes = {}
-        self.acurves = {}
+        #self.anodes = {}
+        #self.acurves = {}
         
     def getAllNodes(self):
         return (
@@ -74,8 +75,8 @@ class NodeStruct:
 
             list(self.astacks.values()) +
             list(self.alayers.values()) +
-            list(self.anodes.values()) +
-            list(self.acurves.values()) +
+            #list(self.anodes.values()) +
+            #list(self.acurves.values()) +
             []
         )
         
@@ -124,7 +125,15 @@ def createNode(pnode):
 
     node = None
     if pnode.key == 'Geometry':
-        node = fbx_mesh.CGeometry(subtype)
+        if subtype == 'Mesh':
+            node = fbx_mesh.CGeometryMesh(subtype)
+        elif subtype == 'Shape':
+            node = fbx_mesh.CGeometryShape(subtype)
+        elif subtype == 'Nurb':
+            node = fbx_nurb.CGeometryNurb(subtype)
+        else:
+            print(pnode.key, pnode)
+            halt
     elif pnode.key == 'Material':
         node = fbx_material.CMaterial(subtype)
     elif pnode.key == 'Texture':
@@ -145,18 +154,33 @@ def createNode(pnode):
         if subtype == "LimbNode":
             node = fbx_armature.CBoneAttribute()
         elif subtype == "Light":
-            node = fbx_lamp.CLamp()
+            node = fbx_lamp.CLampAttribute()
         elif subtype == "Camera":
-            node = fbx_camera.CCamera()
+            node = fbx_camera.CCameraAttribute()
+        elif subtype == "IKEffector":
+            node = fbx_camera.CIKEffectorAttribute()
+        elif subtype == "FKEffector":
+            node = fbx_camera.CFKEffectorAttribute()
+        elif subtype == "Camera":
+            node = fbx_camera.CCameraAttribute()
+        elif subtype == "Camera":
+            node = fbx_camera.CCameraAttribute()
     elif pnode.key == 'Pose':            
         node = fbx_armature.CPose()
     elif pnode.key == 'Bone':            
         node = fbx_armature.CBone()
     elif pnode.key == 'Deformer':     
         if subtype == 'Skin':
-            node = fbx_armature.CDeformer()
+            node = fbx_deformer.CSkinDeformer()
         elif subtype == 'Cluster':
-            node = fbx_armature.CSubDeformer()        
+            node = fbx_deformer.CClusterSubDeformer()        
+        elif subtype == 'BlendShape':
+            node = fbx_deformer.CBlendShapeDeformer()        
+        elif subtype == 'BlendShapeChannel':
+            node = fbx_deformer.CBlendShapeChannelSubDeformer()        
+        else:
+            print("Unknown deformer: %s", pnode.key)
+            halt
     elif pnode.key == 'AnimationStack':   
         node = fbx_anim.CAnimationStack(subtype)
     elif pnode.key == 'AnimationLayer':            
@@ -200,17 +224,22 @@ def buildObjects(context):
         elif node.ftype == "Video":
             continue
             bpy.data.images.new(node.name)
-        elif node.ftype == "Light":
-            data = bpy.data.lamps.new(node.name, type='POINT')
-        elif node.ftype == "Camera":
-            data = bpy.data.cameras.new(node.name)
         elif node.ftype == "AnimationStack":
             data = bpy.data.actions.new(node.name)
         elif node.ftype == "AnimationCurve":
             data = bpy.data.fcurves.new(node.name)
         elif node.ftype == "Pose":
             data = node
+        elif node.ftype == "NodeAttribute":
+            if node.typeflags == "Light":
+                data = bpy.data.lamps.new(node.name, type='POINT')
+            elif node.typeflags == "Camera":
+                data = bpy.data.cameras.new(node.name)
+            else:
+                #print("Skipped", node)
+                continue
         else:
+            #print("Skipped", node)
             continue
             
         fbx.data[node.id] = data
@@ -334,13 +363,13 @@ def makeNodes(context):
     
     for ob in fbx.active.objects.values():
         if ob.type == 'MESH':
-            fbx.nodes.meshes[ob.data.name] = fbx_mesh.CGeometry()
+            fbx.nodes.meshes[ob.data.name] = fbx_mesh.CGeometryMesh()
         elif ob.type == 'ARMATURE':
             fbx.nodes.armatures[ob.data.name] = fbx_armature.CArmature()
         elif ob.type == 'LAMP':
-            fbx.nodes.lamps[ob.data.name] = fbx_lamp.CLamp()
+            fbx.nodes.lamps[ob.data.name] = fbx_lamp.CLampAttribute()
         elif ob.type == 'CAMERA':
-            fbx.nodes.cameras[ob.data.name] = fbx_camera.CCamera()
+            fbx.nodes.cameras[ob.data.name] = fbx_camera.CCameraAttribute()
         #elif ob.type == 'EMPTY':
         #    pass
         else:
