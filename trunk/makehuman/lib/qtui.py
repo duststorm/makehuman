@@ -256,7 +256,6 @@ class Canvas(QtOpenGL.QGLWidget):
         gl.OnInit()
 
     def paintGL(self):
-        log.debug('paintGL')
         gl.draw()
 
     def resizeGL(self, w, h):
@@ -508,7 +507,6 @@ class Application(QtGui.QApplication, events3d.EventHandler):
         
     def redraw(self):
         if self.mainwin and self.mainwin.canvas:
-            log.debug('redraw')
             self.mainwin.canvas.update()
         
     def getWindowSize(self):
