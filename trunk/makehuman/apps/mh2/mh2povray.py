@@ -187,17 +187,7 @@ class POVRender(threading.Thread):
     def run(self):
         subprocess.call(self.args,cwd = self.cwd,
                         shell = True if isinstance(self.args,str) else False)
-        subprocess.call(os.path.normpath(self.path),shell=True)
-        # Try to run an image viewer.
-        if os.name == 'nt': # Windows
-            subprocess.call('"' + os.path.normpath(self.path) + '"',shell=True)
-        elif os.name == 'posix': # Linux, mac
-            #if sys.Platform == 'mac' or sys.Platform == 'darwin':
-                #findertools.launch(os.path.normpath(self.path))
-            #else: # Linux
-            subprocess.call(("xdg-open",self.path))
-        else: # other
-            subprocess.call(os.path.normpath(self.path),shell=True)
+        subprocess.call([os.path.normpath(self.path)],shell = True)
 
 def povrayExportArray(obj, camera, resolution, path):
     """
