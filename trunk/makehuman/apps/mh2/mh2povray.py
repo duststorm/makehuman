@@ -187,7 +187,10 @@ class POVRender(threading.Thread):
     def run(self):
         subprocess.call(self.args,cwd = self.cwd,
                         shell = True if isinstance(self.args,str) else False)
-        subprocess.call([os.path.normpath(self.path)],shell = True)
+        if os.name == 'nt':
+            os.startfile (os.path.normpath(self.path))
+        else:
+            subprocess.call([os.path.normpath(self.path)],shell = True)
 
 def povrayExportArray(obj, camera, resolution, path):
     """
