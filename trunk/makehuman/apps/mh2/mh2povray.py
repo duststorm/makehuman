@@ -172,7 +172,7 @@ def povrayExport(obj, app, settings):
 
 import threading
 import subprocess
-#import sys # unused yet.
+import sys
 #import findertools
 #^ this doesn't exist in other oses and throws a bug.
 
@@ -187,9 +187,12 @@ class POVRender(threading.Thread):
     def run(self):
         subprocess.call(self.args,cwd = self.cwd,
                         shell = True if isinstance(self.args,str) else False)
-        if os.name == 'nt':
+        # Try to open an image viewer
+        if os.name == 'nt': # Windows
             os.startfile (os.path.normpath(self.path))
-        else:
+        elif os.name == 'posix' and (sys.platform is not 'mac' or 'darwin'): # Linux
+            subprocess.call(['xdg-open', self.path])
+        else: # ...we 're doomed
             subprocess.call([os.path.normpath(self.path)])
 
 def povrayExportArray(obj, camera, resolution, path):
