@@ -313,7 +313,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
         @self.cube.mhEvent
         def onMouseEntered(event):            
             gui3d.TaskView.onMouseEntered(self, event)
-            gui3d.app.redraw()
+            mh.redraw()
 
         @self.cube.mhEvent
         def onMouseDragged(event):        
@@ -381,7 +381,7 @@ class PoseArmatureTaskView(gui3d.TaskView):
         angles = bone.getRotation()
         self.setSliders(angles)
         self.updateAll()
-        gui3d.app.redraw()
+        mh.redraw()
     
     def zeroSliders(self):
         self.setSliders((1000,0,0,0,0,0,0))

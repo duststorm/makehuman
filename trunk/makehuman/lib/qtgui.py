@@ -43,8 +43,6 @@ class Widget(events3d.EventHandler):
 
     def callEvent(self, eventType, event):
         super(Widget, self).callEvent(eventType, event)
-        if G.app:
-            G.app.redraw()
 
     def focusInEvent(self, event):
         self.callEvent('onFocus', self)

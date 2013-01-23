@@ -29,16 +29,8 @@ import os
 import humanmodifier
 import events3d
 import warp
+import mh
 import log
-
-class HumanEvent(events3d.Event):
-
-    def __init__(self, human, change):
-        self.human = human
-        self.change = change
-
-    def __repr__(self):
-        return 'event: %s, %s' % (self.human, self.change)
 
 class Human(gui3d.Object):
 
@@ -170,7 +162,7 @@ class Human(gui3d.Object):
 
         gender = min(max(gender, 0.0), 1.0)
         self._setGenderVals(gender)
-        self.callEvent('onChanging', HumanEvent(self, 'gender'))
+        self.callEvent('onChanging', events3d.HumanEvent(self, 'gender'))
 
     def getGender(self):
         return self.maleVal
@@ -196,7 +188,7 @@ class Human(gui3d.Object):
 
         age = min(max(age, 0.0), 1.0)
         self._setAgeVals(-1 + 2 * age)
-        self.callEvent('onChanging', HumanEvent(self, 'age'))
+        self.callEvent('onChanging', events3d.HumanEvent(self, 'age'))
 
     def getAge(self):
         if self.oldVal:
@@ -233,7 +225,7 @@ class Human(gui3d.Object):
 
         weight = min(max(weight, 0.0), 1.0)
         self._setWeightVals(-1 + 2 * weight)
-        self.callEvent('onChanging', HumanEvent(self, 'weight'))
+        self.callEvent('onChanging', events3d.HumanEvent(self, 'weight'))
 
     def getWeight(self):
         if self.overweightVal:
@@ -269,7 +261,7 @@ class Human(gui3d.Object):
 
         muscle = min(max(muscle, 0.0), 1.0)
         self._setMuscleVals(-1 + 2 * muscle)
-        self.callEvent('onChanging', HumanEvent(self, 'muscle'))
+        self.callEvent('onChanging', events3d.HumanEvent(self, 'muscle'))
 
     def getMuscle(self):
         if self.muscleVal:
@@ -304,7 +296,7 @@ class Human(gui3d.Object):
         else:
             self.asianVal *= new / old
             self.africanVal *= new / old
-        self.callEvent('onChanging', HumanEvent(self, 'caucasian'))
+        self.callEvent('onChanging', events3d.HumanEvent(self, 'caucasian'))
         
     def getCaucasian(self):
         return self.caucasianVal
@@ -322,7 +314,7 @@ class Human(gui3d.Object):
         else:
             self.caucasianVal *= new / old
             self.asianVal *= new / old
-        self.callEvent('onChanging', HumanEvent(self, 'african'))
+        self.callEvent('onChanging', events3d.HumanEvent(self, 'african'))
         
     def getAfrican(self):
         return self.africanVal
@@ -340,7 +332,7 @@ class Human(gui3d.Object):
         else:
             self.caucasianVal *= new / old
             self.africanVal *= new / old
-        self.callEvent('onChanging', HumanEvent(self, 'asian'))
+        self.callEvent('onChanging', events3d.HumanEvent(self, 'asian'))
 
     def getAsian(self):
         return self.asianVal
@@ -358,7 +350,7 @@ class Human(gui3d.Object):
     def setHeight(self, height):
         height = min(max(height, -1.0), 1.0)
         self._setHeightVals(height)
-        self.callEvent('onChanging', HumanEvent(self, 'height'))
+        self.callEvent('onChanging', events3d.HumanEvent(self, 'height'))
 
     def getHeight(self):
         if self.giantVal:
@@ -405,9 +397,6 @@ class Human(gui3d.Object):
         else:
             return None
 
-    def notify(self, modifier):
-        self.callEvent('onChanging', HumanEvent(self, 'modifier'))
-
     def applyAllTargets(self, progressCallback=None, update=True):
         """
         This method applies all targets, in function of age and sex
@@ -452,7 +441,7 @@ class Human(gui3d.Object):
         if progressCallback:
             progressCallback(1.0)
             
-        self.callEvent('onChanged', HumanEvent(self, 'targets'))
+        self.callEvent('onChanged', events3d.HumanEvent(self, 'targets'))
         
    
     def getPartNameForGroupName(self, groupName):
@@ -535,7 +524,7 @@ class Human(gui3d.Object):
         if self.isSubdivided():
             self.getSubdivisionMesh()
 
-        gui3d.app.redraw()
+        mh.redraw()
 
     def rotateLimb(self, targetPath, morphFactor):
         targetPath1 = targetPath+".target"
@@ -575,8 +564,8 @@ class Human(gui3d.Object):
         
         self.setTexture("data/textures/texture.png")
         
-        self.callEvent('onChanging', HumanEvent(self, 'reset'))
-        self.callEvent('onChanged', HumanEvent(self, 'reset'))
+        self.callEvent('onChanging', events3d.HumanEvent(self, 'reset'))
+        self.callEvent('onChanged', events3d.HumanEvent(self, 'reset'))
 
     def load(self, filename, update=True, progressCallback=None):
         
@@ -620,7 +609,7 @@ class Human(gui3d.Object):
 
         self.syncRace()
 
-        self.callEvent('onChanged', HumanEvent(self, 'load'))
+        self.callEvent('onChanged', events3d.HumanEvent(self, 'load'))
 
         if update:
             self.applyAllTargets(progressCallback)

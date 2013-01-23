@@ -166,14 +166,14 @@ class DetailTool(events3d.EventHandler):
                 g.setColor([0, 255, 0, 255])
 
         self.selectedGroups = groups
-        gui3d.app.redraw()
+        mh.redraw()
 
     def onMouseExited(self, event):
         for g in self.selectedGroups:
             g.setColor([255, 255, 255, 255])
 
         self.selectedGroups = []
-        gui3d.app.redraw()
+        mh.redraw()
 
 
 class Detail3dTool(events3d.EventHandler):
@@ -324,14 +324,14 @@ class Detail3dTool(events3d.EventHandler):
                 g.setColor([0, 255, 0, 255])
 
         self.selectedGroups = groups
-        gui3d.app.redraw()
+        mh.redraw()
 
     def onMouseExited(self, event):
         for g in self.selectedGroups:
             g.setColor([255, 255, 255, 255])
 
         self.selectedGroups = []
-        gui3d.app.redraw()
+        mh.redraw()
 
 class DetailModelingTaskView(gui3d.TaskView):
 

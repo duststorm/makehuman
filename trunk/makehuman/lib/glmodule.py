@@ -277,17 +277,7 @@ def cameraPosition(camera, eye):
     glLoadMatrixd(np.ascontiguousarray(mv.T))
 
 def transformObject(obj):
-    glMultMatrixd(np.ascontiguousarray(objectTransform(obj).T))
-
-def objectTransform(obj):
-    m = matrix.translate((obj.x, obj.y, obj.z))
-    if any(x != 0 for x in obj.parent.rot):
-        m = m * matrix.rotx(obj.rx)
-        m = m * matrix.roty(obj.ry)
-        m = m * matrix.rotz(obj.rz)
-    if any(x != 1 for x in obj.parent.scale):
-        m = m * matrix.scale((obj.sx, obj.sy, obj.sz))
-    return m
+    glMultMatrixd(np.ascontiguousarray(obj.transform.T))
 
 def setObjectUniforms(obj):
     if obj.uniforms is None:

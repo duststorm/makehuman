@@ -113,15 +113,15 @@ class BackgroundTaskView(gui3d.TaskView):
             self.backgroundImageToggle.setChecked(True)
 
             mh.changeTask('Modelling', 'Background')
-            gui3d.app.redraw()
+            mh.redraw()
 
     def toggleBackground(self):
         if not self.backgroundImageToggle.isChecked():
             self.backgroundImage.hide()
-            gui3d.app.redraw()
+            mh.redraw()
         elif self.backgroundImage.hasTexture():
             self.backgroundImage.show()
-            gui3d.app.redraw()
+            mh.redraw()
         else:
             mh.changeTask('Library', 'Background')
         

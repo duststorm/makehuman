@@ -24,14 +24,16 @@ TODO
 
 import sys
 import os
-import glob, imp
-from os.path import join, basename, splitext
-from contextlib import contextmanager
+import glob
+import imp
+import contextlib
 
 from core import G
 import mh
+import events3d
 import files3d
-import gui3d, animation3d
+import gui3d
+import animation3d
 import human
 import guifiles
 from aljabr import centroid
@@ -42,7 +44,7 @@ import language as lang
 from camera3d import Camera
 import log
 
-@contextmanager
+@contextlib.contextmanager
 def outFile(path):
     path = os.path.join(mh.getPath(''), path)
     tmppath = path + '.tmp'
@@ -313,7 +315,7 @@ class MHApplication(gui3d.Application, mh.Application):
         self.progress(0.4)
 
         # Load plugins not starting with _
-        self.pluginsToLoad = glob.glob(join("plugins/",'[!_]*.py'))
+        self.pluginsToLoad = glob.glob(os.path.join("plugins/",'[!_]*.py'))
         self.pluginsToLoad.sort()
         self.pluginsToLoad.reverse()
 
@@ -331,7 +333,7 @@ class MHApplication(gui3d.Application, mh.Application):
 
         path = self.pluginsToLoad.pop()
         try:
-            name, ext = splitext(basename(path))
+            name, ext = os.path.splitext(os.path.basename(path))
             if name not in self.settings['excludePlugins']:
                 log.message('Importing plugin %s', name)
                 module = imp.load_source(name, path)
@@ -393,7 +395,7 @@ class MHApplication(gui3d.Application, mh.Application):
     def loadFinish(self):
 
         self.selectedHuman.applyAllTargets(gui3d.app.progress)
-        self.selectedHuman.callEvent('onChanged', human.HumanEvent(self.selectedHuman, 'reset'))
+        self.selectedHuman.callEvent('onChanged', events3d.HumanEvent(self.selectedHuman, 'reset'))
 
         self.prompt('Warning', 'This is an alpha release, which means that there are still bugs present and features missing. Use at your own risk.',
             'OK', helpId='alphaWarning')

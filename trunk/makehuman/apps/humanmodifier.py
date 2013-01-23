@@ -26,14 +26,14 @@ __docformat__ = 'restructuredtext'
 
 import algos3d
 import gui3d
-from string import Template
-from operator import mul
+import events3d
+import operator
 import math
 import re
 import numpy as np
 import gui
 import log
-from targets import getTargets
+import targets
 
 # Gender[0..1]
 # -
@@ -207,7 +207,7 @@ class GenericSlider(ModifierSlider):
         if name is None:
             return None
         name = name.lower()
-        return getTargets().images.get(name, name)
+        return targets.getTargets().images.get(name, name)
 
     def __init__(self, min, max, modifier, label, image, view):
         image = self.findImage(image)
@@ -237,7 +237,7 @@ class BaseModifier(object):
         human.warpNeedReset = True
         
         for target in self.targets:
-            human.setDetail(target[0], value * reduce(mul, [factors[factor] for factor in target[1]]))
+            human.setDetail(target[0], value * reduce(operator.mul, [factors[factor] for factor in target[1]]))
             
     def getValue(self, human):
         
@@ -278,7 +278,7 @@ class BaseModifier(object):
             human.meshData.calcNormals(1, 1, self.verts, self.faces)
         human.meshData.update(self.verts, updateNormals)
         human.warpNeedReset = True
-        human.notify(self)
+        human.callEvent('onChanging', events3d.HumanEvent(human, 'modifier'))
 
 class Modifier(BaseModifier):
 
@@ -342,16 +342,16 @@ class GenericModifier(BaseModifier):
         if path is None:
             return []
         path = tuple(path.split('-'))
-        targets = []
-        if path not in getTargets().groups:
+        result = []
+        if path not in targets.getTargets().groups:
             log.debug('missing target %s', path)
-        for target in getTargets().groups.get(path, []):
+        for target in targets.getTargets().groups.get(path, []):
             keys = [var
                     for var in target.data.itervalues()
                     if var is not None]
             keys.append('-'.join(target.key))
-            targets.append((target.path, keys))
-        return targets
+            result.append((target.path, keys))
+        return result
 
     def clampValue(self, value):
         value = min(1.0, value)

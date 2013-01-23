@@ -137,7 +137,7 @@ class LoadTaskView(gui3d.TaskView):
 
         # HACK: otherwise the toolbar background disappears for some weird reason
 
-        gui3d.app.redraw()
+        mh.redraw()
 
     def onHide(self, event):
         

@@ -134,21 +134,12 @@ class Camera(object):
         s = matrix.scale((1,-1,1))
         return t * s
 
-    @staticmethod
-    def getObjectMatrix(obj):
-            m = matrix.translate((obj.x, obj.y, obj.z))
-            m = m * matrix.rotx(obj.rx)
-            m = m * matrix.roty(obj.ry)
-            m = m * matrix.rotz(obj.rz)
-            m = m * matrix.scale((obj.sx, obj.sy, obj.sz))
-            return m
-
     def getConvertToScreenMatrix(self, obj = None):
         viewport = matrix.viewport(0, 0, G.windowWidth, G.windowHeight)
         projection, modelview = self.getMatrices(0)
         m = viewport * projection * modelview
         if obj:
-            m = m * self.getObjectMatrix(obj)
+            m = m * obj.transform
         return self.getFlipMatrix() * m
 
     def convertToScreen(self, x, y, z, obj = None):

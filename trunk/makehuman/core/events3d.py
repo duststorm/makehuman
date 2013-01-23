@@ -22,6 +22,7 @@ Abstract
 This module contains classes to allow an object to handle events.
 """
 import log
+from core import G
 
 class Event:
     """
@@ -135,6 +136,14 @@ class ResizeEvent(Event):
         return 'ResizeEvent(%d, %d, %s)' % (self.width, self.height, self.fullscreen)
         
 
+class HumanEvent(Event):
+    def __init__(self, human, change):
+        self.human = human
+        self.change = change
+
+    def __repr__(self):
+        return 'event: %s, %s' % (self.human, self.change)
+
 class EventHandler(object):
     """
     Base event handler class. Derive from this class if an object needs to be able to have events attached to it.
@@ -173,7 +182,7 @@ class EventHandler(object):
 
     def callEvent(self, eventType, event):
         if not hasattr(self, eventType):
-            return
+            return False
         EventHandler._depth += 1
         try:
             self._logger.debug('callEvent[%d]: %s.%s(%s)', self._depth, self, eventType, event)
@@ -183,6 +192,10 @@ class EventHandler(object):
         EventHandler._depth -= 1
         if EventHandler._depth == 0:
             self._logger.debug('callEvent: done')
+            if G.app:
+                G.app.redraw()
+            return True
+        return False
 
     def attachEvent(self, eventName, eventMethod):
         setattr(self, eventName, eventMethod)

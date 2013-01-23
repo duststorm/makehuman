@@ -22,38 +22,30 @@ Abstract
 Python compatibility layer replacing the old C functions of MakeHuman.
 """
 
-import json
-
 from core import G
 from getpath import getPath
-import glmodule as gl
-
-import qtui as ui
 
 from image import Image
 from texture import Texture, getTexture, reloadTextures
-from object3d import Object3D
 from camera import Camera
 
+from qtui import Keys, Buttons, Modifiers, Application
 from qtui import getKeyModifiers, addTimer, removeTimer, callAsync, callAsyncThread
 from qtui import setShortcut, addToolBar
 from qtui import getSaveFileName, getOpenFileName, getExistingDirectory
+
 from glmodule import createVertexShader, createFragmentShader, createShader
 from glmodule import updatePickingBuffer, grabScreen, hasRenderSkin, renderSkin
 
-cameras = G.cameras
+from inifile import parseINI, formatINI
 
-Keys = ui.Keys
-Buttons = ui.Buttons
-Modifiers = ui.Modifiers
+cameras = G.cameras
 
 def getColorPicked():
     return G.color_picked
 
 def setClearColor(r, g, b, a):
     G.clearColor = (r, g, b, a)
-
-Application = ui.Application
 
 def setCaption(caption):
     G.app.mainwin.setWindowTitle(caption)
@@ -83,24 +75,5 @@ def addTopWidget(widget, *args, **kwargs):
 def removeTopWidget(widget):
     return G.app.mainwin.removeTopWidget(widget)
 
-def _u2s(value):
-    if isinstance(value, unicode):
-        return str(value)
-    elif isinstance(value, dict):
-        return dict([(str(key), _u2s(val)) for key, val in value.iteritems()])
-    elif isinstance(value, list):
-        return [_u2s(val) for val in value]
-    else:
-        return value
-
-def parseINI(s, replace = []):
-    try:
-        result = json.loads(s)
-    except ValueError:
-        for src, dst in replace + [("'",'"'), (": True",": true"), (": False",": false"), (": None",": null")]:
-            s = s.replace(src, dst)
-        result = json.loads(s)
-    return _u2s(result)
-
-def formatINI(d):
-    return json.dumps(d, indent=4, ensure_ascii=True, encoding='iso-8859-1') + '\n'
+def redraw():
+    G.app.redraw()

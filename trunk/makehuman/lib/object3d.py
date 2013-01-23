@@ -27,6 +27,7 @@ import numpy as np
 import glmodule as gl
 import texture
 import log
+import matrix
 from core import G
 
 class Object3D(object):
@@ -114,7 +115,14 @@ class Object3D(object):
 
     @property
     def transform(self):
-        return gl.objectTransform(self)
+        m = matrix.translate((self.x, self.y, self.z))
+        if any(x != 0 for x in self.rotation):
+            m = m * matrix.rotx(self.rx)
+            m = m * matrix.roty(self.ry)
+            m = m * matrix.rotz(self.rz)
+        if any(x != 1 for x in self.scale):
+            m = m * matrix.scale((self.sx, self.sy, self.sz))
+        return m
 
     @property
     def x(self):

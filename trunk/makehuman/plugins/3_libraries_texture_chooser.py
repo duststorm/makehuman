@@ -216,7 +216,7 @@ class TextureTaskView(gui3d.TaskView):
         human = gui3d.app.selectedHuman
         # TODO this is temporary, until new eye texturing approach
         if 'data/eyes' in self.filechooser.paths:
-            self.filechooser.previewExtensions = ['thumb', 'png']
+            self.filechooser.setPreviewExtensions(['thumb', 'png'])
             self.filechooser.extension = 'png'
             
         if self.skinRadio.selected:
@@ -225,7 +225,7 @@ class TextureTaskView(gui3d.TaskView):
             proxy = human.hairProxy
             self.textures = [os.path.dirname(proxy.file)]
         elif self.eyesRadio.selected:
-            self.filechooser.previewExtensions = ['png']
+            self.filechooser.setPreviewExtensions('png')
             self.filechooser.extension = 'mhstx'
             self.textures = ['data/eyes']
         else: # Clothes
@@ -242,7 +242,7 @@ class TextureTaskView(gui3d.TaskView):
                 log.debug("fc %s %s %s added", filec, filec.children.count(), str(filec.files))
 
         # Reload filechooser
-        self.filechooser.paths = self.textures
+        self.filechooser.setPaths(self.textures)
         self.filechooser.refresh()
         self.filechooser.setFocus()
 

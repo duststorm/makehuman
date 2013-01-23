@@ -28,10 +28,9 @@ import os
 
 from PyQt4 import QtCore, QtGui
 
-import gui3d
-from qtgui import *
-import qtui
-import os
+import qtgui as gui
+import mh
+import log
 
 class ThumbnailCache(object):
     aspect_mode = QtCore.Qt.KeepAspectRatioByExpanding
@@ -65,13 +64,13 @@ class ThumbnailCache(object):
             pixmap = pixmap.copy(x0, y0, width, height)
         return pixmap
 
-class FileChooserRectangle(Button):
+class FileChooserRectangle(gui.Button):
     _size = (128, 128)
     _imageCache = ThumbnailCache(_size)
 
     def __init__(self, owner, file, label, imagePath):
         super(FileChooserRectangle, self).__init__()
-        Widget.__init__(self)
+        gui.Widget.__init__(self)
         self.owner = owner
         self.file = file
 
@@ -201,9 +200,9 @@ class FileSort(object):
         decorated.sort()
         return [filename for size, i, filename in decorated]
 
-class FileSortRadioButton(RadioButton):
+class FileSortRadioButton(gui.RadioButton):
     def __init__(self, chooser, group, selected, field):
-        RadioButton.__init__(self, group, "By %s" % field, selected)
+        gui.RadioButton.__init__(self, group, "By %s" % field, selected)
         self.field = field
         self.chooser = chooser
         
@@ -211,7 +210,7 @@ class FileSortRadioButton(RadioButton):
         self.chooser.sortBy = self.field
         self.chooser.refresh()
 
-class FileChooser(QtGui.QWidget, Widget):
+class FileChooser(QtGui.QWidget, gui.Widget):
     """
     A FileChooser widget. This widget can be used to let the user choose an existing file.
     
@@ -227,15 +226,13 @@ class FileChooser(QtGui.QWidget, Widget):
     :type sort: FileSort
     """
     
-    def __init__(self, path, extension, previewExtension='bmp', notFoundImage=None, sort=FileSort()):
+    def __init__(self, path, extension, previewExtensions='bmp', notFoundImage=None, sort=FileSort()):
         super(FileChooser, self).__init__()
-        Widget.__init__(self)
+        gui.Widget.__init__(self)
 
-        self.location = None
-
-        self.paths = path
+        self.paths = None
         self.extension = extension
-        self.previewExtensions = previewExtension
+        self.setPreviewExtensions(previewExtensions)
 
         self.sort = sort
         self.selection = ''
@@ -246,7 +243,7 @@ class FileChooser(QtGui.QWidget, Widget):
 
         self.layout = QtGui.QGridLayout(self)
 
-        self.sortBox = GroupBox('Sort')
+        self.sortBox = gui.GroupBox('Sort')
         self.layout.addWidget(self.sortBox, 0, 0)
         self.layout.setRowStretch(0, 0)
         self.layout.setColumnStretch(0, 0)
@@ -267,61 +264,46 @@ class FileChooser(QtGui.QWidget, Widget):
         self.children = FlowLayout(self.files)
         self.children.setSizeConstraint(QtGui.QLayout.SetMinimumSize)
 
+        self.location = gui.TextView('')
         self.layout.addWidget(self.location, 2, 0, 1, -1)
         self.layout.setRowStretch(2, 0)
 
-        self.refreshButton = self.sortBox.addWidget(Button('Refresh'))
+        self.refreshButton = self.sortBox.addWidget(gui.Button('Refresh'))
         for i, field in enumerate(self.sort.fields()):
             self.sortBox.addWidget(FileSortRadioButton(self, self.sortgroup, i == 0, field))
-        
+
+        self.setPaths(path)
+
         @self.refreshButton.mhEvent
         def onClicked(value):
             self.refresh()
 
-    @property
-    def paths(self):
-        return self._paths
-
-    @paths.setter
-    def paths(self, value):
-        self._paths = value if isinstance(value, list) else [value]
+    def setPaths(self, value):
+        self.paths = value if isinstance(value, list) else [value]
         locationLbl = "  |  ".join(self.paths)
-        if not self.location:
-            self.location = TextView(os.path.abspath(locationLbl))
+        self.location.setText(os.path.abspath(locationLbl))
+
+    def setPreviewExtensions(self, value):
+        if not value:
+            self.previewExtensions = None
+        elif isinstance(value, list):
+            self.previewExtensions = value
         else:
-            self.location.setText(os.path.abspath(locationLbl))
-
-    @property
-    def previewExtensions(self):
-        return self._previewExtensions
-
-    @previewExtensions.setter
-    def previewExtensions(self, value):
-        if value:
-            self._previewExtensions = value if isinstance(value, list) else [value]
-        else:
-            self._previewExtensions = None
-
-    @property
-    def extension(self):
-        return self._extension
-
-    @extension.setter
-    def extension(self,value):
-        self._extension = value
+            self.previewExtensions = [value]
 
     def _updateScrollBar(self):
         pass
 
     def eventFilter(self, object, event):
         if event.type() == QtCore.QEvent.Resize:
-            qtui.callAsync(self._updateScrollBar)
+            mh.callAsync(self._updateScrollBar)
         return False
         
     def getPreview(self, filename):
         preview = filename
         
         if self.previewExtensions:
+            log.debug('%s, %s', self.extension, self.previewExtensions)
             preview = filename.replace('.' + self.extension, '.' + self.previewExtensions[0])
             i = 1
             while not os.path.exists(preview) and i < len(self.previewExtensions):
@@ -365,7 +347,7 @@ class FileChooser(QtGui.QWidget, Widget):
                 label = os.path.splitext(label)[0]
             self.children.addWidget(FileChooserRectangle(self, file, label, self.getPreview(file)))
 
-        gui3d.app.redraw()
+        mh.redraw()
 
     def onShow(self, event):
         self.refresh()

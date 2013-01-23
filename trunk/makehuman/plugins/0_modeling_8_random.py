@@ -22,8 +22,10 @@ Abstract
 TODO
 """
 
-import gui3d, random, humanmodifier
-from human import HumanEvent
+import random
+import gui3d
+import humanmodifier
+import events3d
 import mh
 import gui
 
@@ -179,7 +181,7 @@ class RandomTaskView(gui3d.TaskView):
                 #print "applying "+modName
                 modifiers[modName].setValue(human, self.getRandom(modName) )
 
-        human.callEvent('onChanged', HumanEvent(human, 'random'))
+        human.callEvent('onChanged', events3d.HumanEvent(human, 'random'))
         human.applyAllTargets(gui3d.app.progress)
         
     # get the stored random value for the given modifierName, applying amount slider
