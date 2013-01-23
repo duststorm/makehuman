@@ -42,7 +42,6 @@ prefix so that you end up with your own unique prefix.
 import os
 import string
 import shutil
-import apprun
 import projection
 import mh2povray_ini
 import random
@@ -145,11 +144,11 @@ def povrayExport(obj, app, settings):
             else:
                 baseName = mh2povray_ini.renderscenefile
             # Prepare command line.
-            cmdLine = (povray_bin, 'RENDER', '/EXIT')
+            cmdLine = (povray_bin, 'MHRENDER', '/EXIT')
             
             # Pass parameters by writing an .ini file.
             try:
-                iniFD = open(os.path.join(outputDirectory, 'RENDER.ini'), 'w')
+                iniFD = open(os.path.join(outputDirectory, 'MHRENDER.ini'), 'w')
             except:
                 log.error('Error opening .ini to write parameters.')
                 return
@@ -157,8 +156,9 @@ def povrayExport(obj, app, settings):
                         '+W%d +H%d +a%s +am2\n' % (resW, resH, settings['AA']))
             iniFD.close()
 
-            # Run Pov-Ray
-            apprun.execute(args=cmdLine,cwd=outputDirectory)
+            # Run Pov-Ray in a separate thread.
+            POVRender (cmdLine,path.replace('.inc','.png'))
+            
         #
         else:
             app.prompt('POV-Ray not found',
@@ -168,6 +168,34 @@ def povrayExport(obj, app, settings):
                        downloadPovRay 
                        )
             return
+
+
+import threading
+import subprocess
+#import sys # unused yet.
+#import findertools
+#^ this doesn't exist in other oses and throws a bug.
+
+class POVRender(threading.Thread):
+    def __init__(self, args, path):
+        self.args = args
+        self.cwd = os.path.dirname(path)
+        self.path = path
+        threading.Thread.__init__(self)
+        self.start()
+
+    def run(self):
+        subprocess.call(self.args,cwd = self.cwd,
+                        shell = True if isinstance(self.args,str) else False)
+        subprocess.call(os.path.normpath(self.path),shell=True)
+        # Try to run an image viewer.
+        if os.name == 'posix': # Linux, mac
+            #if sys.Platform == 'mac' or sys.Platform == 'darwin':
+                #findertools.launch(os.path.normpath(self.path))
+            #else: # Linux
+            subprocess.call(("xdg-open",self.path))
+        else: # NT / other
+            subprocess.call(os.path.normpath(self.path),shell=True)
 
 def povrayExportArray(obj, camera, resolution, path):
     """
