@@ -110,11 +110,16 @@ class Camera(events3d.EventHandler):
         self.changed()
         
     eyeZ = property(getEyeZ, setEyeZ)
-    
-    @property
-    def eye(self):
+
+    def getEye(self):
         return (self.camera.eyeX, self.camera.eyeY, self.camera.eyeZ)
-        
+    
+    def setEye(self, xyz):
+        (self.camera.eyeX, self.camera.eyeY, self.camera.eyeZ) = xyz
+        self.changed()
+
+    eye = property(getEye, setEye)
+
     def getFocusX(self):
     
         return self.camera.focusX
@@ -148,10 +153,15 @@ class Camera(events3d.EventHandler):
         
     focusZ = property(getFocusZ, setFocusZ)
     
-    @property
-    def focus(self):
+    def getFocus(self):
         return (self.camera.focusX, self.camera.focusY, self.camera.focusZ)
-    
+
+    def setFocus(self, xyz):
+        (self.camera.focusX, self.camera.focusY, self.camera.focusZ) = xyz
+        self.changed()
+        
+    focus = property(getFocus, setFocus)
+
     def getUpX(self):
     
         return self.camera.upX
@@ -185,10 +195,15 @@ class Camera(events3d.EventHandler):
         
     upZ = property(getUpZ, setUpZ)
     
-    @property
-    def up(self):
+    def getUp(self):
         return (self.camera.upX, self.camera.upY, self.camera.upZ)
-    
+
+    def setUp(self, xyz):
+        (self.camera.upX, self.camera.upY, self.camera.upZ) = xyz
+        self.changed()
+
+    up = property(getUp, setUp)
+
     def getScale(self):
         return self.camera.scale
 
@@ -219,15 +234,6 @@ class Camera(events3d.EventHandler):
         return self.camera.convertToWorld2D(x, y, z, obj)
 
     def changed(self):
-        
-        if self.changedPending:
-            return
-            
-        self.changedPending = True
-        mh.callAsync(self.callChanged)
-        
-    def callChanged(self):
-    
         self.callEvent('onChanged', self)
         self.changedPending = False
         

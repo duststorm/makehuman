@@ -840,14 +840,17 @@ class Object3D(object):
         if recalcVertexNormals:
             self.calcVertexNormals(verticesToUpdate)
                 
-    def calcBBox(self):
+    def calcBBox(self, ix=None):
         """
         Calculates the axis aligned bounding box of this object in the object's coordinate system. 
         """
-        if len(self.coord) == 0:
+        if ix is None:
+            ix = np.s_[:]
+        coord = self.coord[ix]
+        if len(coord) == 0:
             return np.zeros((2,3), dtype = np.float32)
-        v0 = np.amin(self.coord, axis=0)
-        v1 = np.amax(self.coord, axis=0)
+        v0 = np.amin(coord, axis=0)
+        v1 = np.amax(coord, axis=0)
         return np.vstack((v0, v1))
 
     def __str__(self):

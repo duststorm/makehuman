@@ -404,7 +404,10 @@ class Human(gui3d.Object):
             return name.replace('r-', 'l-', 1)
         else:
             return None
-    
+
+    def notify(self, modifier):
+        self.callEvent('onChanging', HumanEvent(self, 'modifier'))
+
     def applyAllTargets(self, progressCallback=None, update=True):
         """
         This method applies all targets, in function of age and sex

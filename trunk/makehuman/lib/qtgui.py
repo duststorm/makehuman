@@ -43,8 +43,8 @@ class Widget(events3d.EventHandler):
 
     def callEvent(self, eventType, event):
         super(Widget, self).callEvent(eventType, event)
-        if G.app and G.app.mainwin and G.app.mainwin.canvas:
-            G.app.mainwin.canvas.update()
+        if G.app:
+            G.app.redraw()
 
     def focusInEvent(self, event):
         self.callEvent('onFocus', self)
@@ -811,7 +811,6 @@ class SplashScreen(QtGui.QSplashScreen):
     def logMessage(self, text):
         text = self._format % self.escape(text)
         self.showMessage(text, alignment = QtCore.Qt.AlignHCenter)
-        G.app.processEvents()
 
 class StatusBar(QtGui.QStatusBar, Widget):
     def __init__(self):

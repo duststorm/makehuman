@@ -41,7 +41,7 @@ class MediaSync(Thread):
     def run(self):
         
         cache = DownloadCache(self.path)
-        mh.callAsync(lambda:self.app.progress(0.0, 'Downloading media list'))
+        mh.callAsync(self.app.progress, 0.0, 'Downloading media list')
         success, code = cache.download(os.path.join(self.url, 'media.ini'))
         if success:
             f = open(os.path.join(self.path, 'media.ini'), 'r')
@@ -50,16 +50,16 @@ class MediaSync(Thread):
             for index, filename in enumerate(filenames):
                 try:
                     filename = filename.split()[0]
-                    mh.callAsync(lambda:self.app.progress(index/n, 'Downloading %s' % filename))
+                    mh.callAsync(self.app.progress, index/n, 'Downloading %s' % filename)
                     url = os.path.join(self.url, filename)
                     success, code = cache.download(url)
                 except:
                     pass
             f.close()
-            mh.callAsync(lambda:self.app.progress(1.0))
+            mh.callAsync(self.app.progress, 1.0)
         else:
-            mh.callAsync(lambda:self.app.progress(1.0))
-            mh.callAsync(lambda:self.app.prompt('Error', 'Failed to sync media from %s, error %d.' % (self.path, code), 'OK'))
+            mh.callAsync(self.app.progress, 1.0)
+            mh.callAsync(self.app.prompt, 'Error', 'Failed to sync media from %s, error %d.' % (self.path, code), 'OK')
             
         if self.callback:
              mh.callAsync(self.callback)

@@ -29,7 +29,7 @@ import os
 import logging
 import logging.config
 import code
-from logging import debug, warning, error
+from logging import debug, warning, error, getLogger
 
 from core import G
 from getpath import getPath
@@ -90,6 +90,20 @@ class ApplicationLogHandler(logging.Handler):
         if G.app is not None and G.app.log_window is not None:
             G.app.log_window.addText(self.format(record) + '\n')
 
+_logger_notice_src = r'''
+def _logger_notice(self, msg, *args, **kwargs):
+    self.log(NOTICE, msg, *args, **kwargs)
+'''
+try:
+    exec(code.compile_command(_logger_notice_src, logging.info.func_code.co_filename))
+except:
+    def _logger_notice(self, format, *args, **kwargs):
+        self.log(NOTICE, format, *args, **kwargs)
+
+class Logger(logging.Logger):
+    message = logging.Logger.info
+    notice = _logger_notice
+
 def init():
     def config():
         userDir = getPath('')
@@ -116,6 +130,9 @@ def init():
             pass
 
     config()
+
+    logging.setLoggerClass(Logger)
+    logging.getLogger('mh.callAsync').setLevel(logging.WARNING)
 
     try:
         logging.getLogger('OpenGL.formathandler').addFilter(NoiseFilter())

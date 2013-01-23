@@ -125,12 +125,8 @@ class ExportTaskView(gui3d.TaskView):
         camera = mh.cameras[0]
         
         self.pan = human.getPosition()
-        self.eyeX = camera.eyeX
-        self.eyeY = camera.eyeY
-        self.eyeZ = camera.eyeZ
-        self.focusX = camera.focusX
-        self.focusY = camera.focusY
-        self.focusZ = camera.focusZ
+        self.eye = camera.eye
+        self.focus = camera.focus
         self.rotation = human.getRotation()
         human.setPosition([0, -1, 0])
         gui3d.app.setGlobalCamera();
@@ -145,11 +141,6 @@ class ExportTaskView(gui3d.TaskView):
         camera = mh.cameras[0]
         
         human.setPosition(self.pan)
-        camera.eyeX = self.eyeX
-        camera.eyeY = self.eyeY
-        camera.eyeZ = self.eyeZ
-        camera.focusX = self.focusX
-        camera.focusY = self.focusY
-        camera.focusZ = self.focusZ
+        camera.eye = self.eye
+        camera.focus = self.focus
         human.setRotation(self.rotation)
-        

@@ -278,6 +278,7 @@ class BaseModifier(object):
             human.meshData.calcNormals(1, 1, self.verts, self.faces)
         human.meshData.update(self.verts, updateNormals)
         human.warpNeedReset = True
+        human.notify(self)
 
 class Modifier(BaseModifier):
 

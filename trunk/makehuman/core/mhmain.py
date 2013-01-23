@@ -319,7 +319,6 @@ class MHApplication(gui3d.Application, mh.Application):
 
         while self.pluginsToLoad:
             self.loadNextPlugin()
-            yield
 
     def loadNextPlugin(self):
 
@@ -341,6 +340,7 @@ class MHApplication(gui3d.Application, mh.Application):
                 log.message('Loading plugin %s', name)
                 module.load(self)
                 log.message('Loaded plugin %s', name)
+                self.processEvents()
             else:
                 self.modules[name] = None
         except Exception, e:
@@ -411,42 +411,32 @@ class MHApplication(gui3d.Application, mh.Application):
         self.splash.setFormat('<br><br><b><font size="48" color="#ff0000">%s</font></b>')
         old_stdout = sys.stdout
         sys.stdout = self.splash
-        yield None
 
         log.message('Loading human')
         self.loadHuman()
-        yield None
 
         log.message('Loading main GUI')
         self.loadMainGui()
-        yield None
 
         log.message('Loading fonts')
         self.loadFonts()
-        yield None
 
         log.message('Loading plugins')
-        for _ in self.loadPlugins():
-            yield None
-        yield None
+        self.loadPlugins()
 
         log.message('Loading GUI')
         self.loadGui()
-        yield None
 
         log.message('Loading theme')
         try:
-            self.setTheme(self.settings.get('guiTheme', 'makehuman'))
+            self.setTheme(self.settings.get('guiTheme', 'default'))
         except:
             self.setTheme("default")
-        yield None
 
         log.message('Loading done')
         self.loadFinish()
-        yield None
 
         log.message('')
-        yield None
 
         sys.stdout = old_stdout
 
@@ -456,14 +446,9 @@ class MHApplication(gui3d.Application, mh.Application):
         self.splash.hide()
         # self.splash.finish(self.mainwin)
 
-    def nextStartupTask(self):
-        if not next(self.tasks, True):
-            mh.callAsync(self.nextStartupTask)
-
     # Events
     def onStart(self, event):
-        self.tasks = self.startupSequence()
-        self.nextStartupTask()
+        self.startupSequence()
 
     def onStop(self, event):
 

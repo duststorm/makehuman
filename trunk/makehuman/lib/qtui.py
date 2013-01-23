@@ -256,6 +256,7 @@ class Canvas(QtOpenGL.QGLWidget):
         gl.OnInit()
 
     def paintGL(self):
+        log.debug('paintGL')
         gl.draw()
 
     def resizeGL(self, w, h):
@@ -461,10 +462,6 @@ class Frame(QtGui.QMainWindow):
     def removeTopWidget(self, widget):
         self.top.removeWidget(widget)
 
-    def update(self):
-        super(Frame, self).update()
-        self.canvas.update()
-
     def closeEvent(self, ev):
         ev.ignore()
         self.app.onQuitCallback()
@@ -488,7 +485,7 @@ class Application(QtGui.QApplication, events3d.EventHandler):
         self.messages = None
 
     def OnInit(self):
-        self.messages = queue.Manager(callAsync)
+        self.messages = queue.Manager(self._postAsync)
         self.mainwin = Frame(self, (G.windowWidth, G.windowHeight))
         self.statusBar = self.mainwin.statusBar
         self.progressBar = self.mainwin.progressBar
@@ -510,7 +507,9 @@ class Application(QtGui.QApplication, events3d.EventHandler):
         sys.exit()
         
     def redraw(self):
-        self.mainwin.update()
+        if self.mainwin and self.mainwin.canvas:
+            log.debug('redraw')
+            self.mainwin.canvas.update()
         
     def getWindowSize(self):
         return G.windowWidth, G.windowHeight
@@ -525,9 +524,12 @@ class Application(QtGui.QApplication, events3d.EventHandler):
 
     def event(self, event):
         if event.type() == QtCore.QEvent.User:
-            event.callback()
+            event.callback(*event.args, **event.kwargs)
             return True
         return super(Application, self).event(event)
+
+    def _postAsync(self, event):
+        self.postEvent(self, event)
 
 g_timers = {}
 
@@ -550,15 +552,18 @@ def handleTimer(id):
     callback()
 
 class AsyncEvent(QtCore.QEvent):
-    def __init__(self, callback):
+    def __init__(self, callback, args, kwargs):
         super(AsyncEvent, self).__init__(QtCore.QEvent.User)
         self.callback = callback
+        self.args = args
+        self.kwargs = kwargs
 
-def callAsync(callback):
+def callAsync(func, *args, **kwargs):
     if G.app is None:
         log.notice('callAsync with no application')
         return
-    G.app.postEvent(G.app, AsyncEvent(callback))
+    log.getLogger('mh.callAsync').debug('%s(%s, %s)', func, args, kwargs)
+    G.app._postAsync(AsyncEvent(func, args, kwargs))
 
 def getSaveFileName(directory, filter = "All files (*.*)"):
     return str(QtGui.QFileDialog.getSaveFileName(
@@ -579,4 +584,4 @@ def setShortcut(modifier, key, action):
     action.setShortcut(QtGui.QKeySequence(modifier + key))
 
 def callAsyncThread(func, *args, **kwargs):
-    G.app.messages.post(lambda: func(*args, **kwargs))
+    G.app.messages.post(AsyncEvent(func, args, kwargs))

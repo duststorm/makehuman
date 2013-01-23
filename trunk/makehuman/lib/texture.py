@@ -31,8 +31,13 @@ from image import Image
 import log
 
 class Texture(object):
+    _mipmaps = None
+
     def __new__(cls, *args, **kwargs):
         self = super(Texture, cls).__new__(cls)
+
+        if cls._mipmaps is None:
+            cls._mipmaps = not glInitTextureNonPowerOfTwoARB()
 
         self.textureId = glGenTextures(1)
         self.width = 0
@@ -66,8 +71,6 @@ class Texture(object):
             raise RuntimeError("Unsupported pixel format")
 
     def initTexture(self, width, height, components = 4, pixels = None):
-        mipmaps = not glInitTextureNonPowerOfTwoARB()
-
         internalFormat, format = self.getFormat(components)
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
@@ -76,13 +79,13 @@ class Texture(object):
             glBindTexture(GL_TEXTURE_1D, self.textureId)
             glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
             glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
-            if mipmaps:
+            if self._mipmaps:
                 glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
             else:
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
             glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
-            if mipmaps:
+            if self._mipmaps:
                 gluBuild1DMipmaps(GL_TEXTURE_1D, internalFormat, width, format, GL_UNSIGNED_BYTE, pixels)
             else:
                 glTexImage1D(GL_TEXTURE_1D, 0, internalFormat, width, 0, format, GL_UNSIGNED_BYTE, pixels)
@@ -91,13 +94,13 @@ class Texture(object):
             glBindTexture(GL_TEXTURE_2D, self.textureId)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
-            if mipmaps:
+            if self._mipmaps:
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
             else:
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
-            if mipmaps:
+            if self._mipmaps:
                 gluBuild2DMipmaps(GL_TEXTURE_2D, internalFormat, width, height, format, GL_UNSIGNED_BYTE, pixels)
             else:
                 glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, pixels)

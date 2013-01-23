@@ -22,9 +22,14 @@ Abstract
 TODO
 """
 
-import gui3d, aljabr, mh
+import mh
+import gui3d
 import gui
-    
+import log
+
+import numpy as np
+np.set_printoptions(precision=6, suppress=True)
+
 class CensorTaskView(gui3d.TaskView):
 
     def __init__(self, category):
@@ -35,7 +40,7 @@ class CensorTaskView(gui3d.TaskView):
         
         human = gui3d.app.selectedHuman
 
-        self.breastVertices, _ = human.mesh.getVerticesAndFacesForGroups(['l-torso-nipple', 'r-torso-nipple'])
+        self.breastVertices = human.mesh.getVerticesForGroups(['l-torso-nipple', 'r-torso-nipple'])
         mesh = gui3d.RectangleMesh(100, 100)
         self.breastCensorship = gui3d.app.addObject(gui3d.Object([0, 0, 9], mesh))
         mesh.setColor([0, 0, 0, 255])
@@ -43,8 +48,8 @@ class CensorTaskView(gui3d.TaskView):
         mesh.setShadeless(True)
         mesh.setDepthless(True)
         mesh.priority = 80
-        
-        self.genitalbreastVertices, _ = human.mesh.getVerticesAndFacesForGroups(['pelvis-genital-area'])
+
+        self.genitalVertices = human.mesh.getVerticesForGroups(['pelvis-genital-area'])
         mesh = gui3d.RectangleMesh(100, 100)
         self.genitalCensorship = gui3d.app.addObject(gui3d.Object([0, 0, 9], mesh))
         mesh.setColor([0, 0, 0, 255])
@@ -73,19 +78,10 @@ class CensorTaskView(gui3d.TaskView):
     def calcProjectedBBox(self, vertices):
     
         human = gui3d.app.selectedHuman
-        
-        vmin, vmax = aljabr.calcBBox(vertices)
-        
-        box = [
-            vmin,
-            [vmax[0], vmin[1], vmin[2]],
-            [vmax[0], vmax[1], vmin[2]],
-            [vmin[0], vmax[1], vmin[2]],
-            [vmin[0], vmin[1], vmax[2]],
-            [vmax[0], vmin[1], vmax[2]],
-            vmax,
-            [vmin[0], vmax[1], vmax[2]]
-        ]
+        box = human.mesh.calcBBox(vertices)
+        box = [[box[(i>>j)&1,j]
+                for j in xrange(3)]
+               for i in xrange(8)]
         
         for i, v in enumerate(box):
             v = gui3d.app.modelCamera.convertToScreen(v[0], v[1], v[2], human.mesh.object3d)
@@ -95,12 +91,14 @@ class CensorTaskView(gui3d.TaskView):
         return min([v[0] for v in box]), min([v[1] for v in box]), max([v[0] for v in box]), max([v[1] for v in box])
         
     def updateCensor(self):
-    
+        if not gui3d.app.settings.get('censor', False):
+            return
+
         x1, y1, x2, y2 = self.calcProjectedBBox(self.breastVertices)
         self.breastCensorship.setPosition([x1, y1, 9])
         self.breastCensorship.mesh.resize(x2 - x1, y2 - y1)
         
-        x1, y1, x2, y2 = self.calcProjectedBBox(self.genitalbreastVertices)
+        x1, y1, x2, y2 = self.calcProjectedBBox(self.genitalVertices)
         self.genitalCensorship.setPosition([x1, y1, 9])
         self.genitalCensorship.mesh.resize(x2 - x1, y2 - y1)
     
@@ -121,17 +119,19 @@ class CensorTaskView(gui3d.TaskView):
     def onHumanChanged(self, event):
     
         self.updateCensor()
+        
+    def onHumanChanging(self, event):
+    
+        self.updateCensor()
             
     def onHumanTranslated(self, event):
     
-        if gui3d.app.settings.get('censor', False):
-            mh.callAsync(lambda:self.updateCensor())
+        self.updateCensor()
             
     def onHumanRotated(self, event):
     
-        if gui3d.app.settings.get('censor', False):
-            mh.callAsync(lambda:self.updateCensor())
-            
+        self.updateCensor()
+
     def onHumanShown(self, event):
     
         if gui3d.app.settings.get('censor', False):
@@ -145,9 +145,8 @@ class CensorTaskView(gui3d.TaskView):
             self.genitalCensorship.hide();
 
     def onCameraChanged(self, event):
-    
-        if gui3d.app.settings.get('censor', False):
-            mh.callAsync(lambda:self.updateCensor())
+
+        self.updateCensor()
 
 def load(app):
     category = app.getCategory('Settings')
