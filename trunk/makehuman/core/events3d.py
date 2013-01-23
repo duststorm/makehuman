@@ -126,15 +126,13 @@ class ResizeEvent(Event):
     :param dy: the change in height of the window in pixels.
     :type dy: int
     """
-    def __init__(self, width, height, fullscreen, dx, dy):
+    def __init__(self, width, height, fullscreen):
         self.width = width
         self.height = height
         self.fullscreen = fullscreen
-        self.dx = dx
-        self.dy = dy
 
     def __repr__(self):
-        return 'ResizeEvent(%d, %d, %s, %d, %d)' % (self.width, self.height, self.fullscreen, self.dx, self.dy)
+        return 'ResizeEvent(%d, %d, %s)' % (self.width, self.height, self.fullscreen)
         
 
 class EventHandler(object):
@@ -170,14 +168,21 @@ class EventHandler(object):
     def __init__(self):
         pass
 
-    def callEvent(self, eventType, event):
+    _logger = log.getLogger('mh.callEvent')
+    _depth = 0
 
-        #print("Sending %s to %s" % (eventType, self))
+    def callEvent(self, eventType, event):
+        if not hasattr(self, eventType):
+            return
+        EventHandler._depth += 1
         try:
-            if hasattr(self, eventType):
-                getattr(self, eventType)(event)
+            self._logger.debug('callEvent[%d]: %s.%s(%s)', self._depth, self, eventType, event)
+            getattr(self, eventType)(event)
         except Exception, e:
             log.warning('Exception during event %s', eventType, exc_info=True)
+        EventHandler._depth -= 1
+        if EventHandler._depth == 0:
+            self._logger.debug('callEvent: done')
 
     def attachEvent(self, eventName, eventMethod):
         setattr(self, eventName, eventMethod)

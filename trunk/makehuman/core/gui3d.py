@@ -612,8 +612,6 @@ class Application(events3d.EventHandler):
         self.mouseDownObject = None
         self.enteredObject = None
         self.fullscreen = False
-        self.width = 800
-        self.height = 600
         
     def addObject(self, object):
         """
@@ -760,12 +758,15 @@ class Application(events3d.EventHandler):
 
         self.switchTask(category.task)
 
+    def getCategory(self, name):
+        category = self.categories.get(name)
+        if category:
+            return category
+        return self.addCategory(Category(name))
+
     # called from native
 
-    def onMouseDownCallback(self, button, x, y):
-        # Build event
-        event = events3d.MouseEvent(button, x, y)
-
+    def onMouseDownCallback(self, event):
         # Get picked object
         pickedObject = self.getSelectedFaceGroupAndObject()
         if pickedObject:
@@ -781,12 +782,9 @@ class Application(events3d.EventHandler):
 
         object.callEvent('onMouseDown', event)
 
-    def onMouseUpCallback(self, button, x, y):
-        if button == 4 or button == 5:
+    def onMouseUpCallback(self, event):
+        if event.button == 4 or event.button == 5:
             return
-
-        # Build event
-        event = events3d.MouseEvent(button, x, y)
 
         # Get picked object
         pickedObject = self.getSelectedFaceGroupAndObject()
@@ -800,13 +798,8 @@ class Application(events3d.EventHandler):
             if self.mouseDownObject is object:
                 self.mouseDownObject.callEvent('onClicked', event)
 
-    def onMouseMovedCallback(self, mouseState, x, y, xRel, yRel):
-        
-        # Build event
-        event = events3d.MouseEvent(mouseState, x, y, xRel, yRel)
-
+    def onMouseMovedCallback(self, event):
         # Get picked object
-
         picked = self.getSelectedFaceGroupAndObject()
         
         if picked:
@@ -819,7 +812,7 @@ class Application(events3d.EventHandler):
         event.object = object
         event.group = group
 
-        if mouseState:
+        if event.button:
             if self.mouseDownObject:
                 self.mouseDownObject.callEvent('onMouseDragged', event)
         else:
@@ -828,39 +821,20 @@ class Application(events3d.EventHandler):
                     self.enteredObject.callEvent('onMouseExited', event)
                 self.enteredObject = object
                 self.enteredObject.callEvent('onMouseEntered', event)
-            object.callEvent('onMouseMoved', event)
+            if object != self:
+                object.callEvent('onMouseMoved', event)
 
-    def onMouseWheelCallback(self, wheelDelta, x, y):
-        event = events3d.MouseWheelEvent(wheelDelta)
+    def onMouseWheelCallback(self, event):
         if self.currentTask:
             self.currentTask.callEvent('onMouseWheel', event)
             
-    def onResizedCallback(self, width, height, fullscreen):
-        if self.fullscreen != fullscreen:
+    def onResizedCallback(self, event):
+        if self.fullscreen != event.fullscreen:
             module3d.reloadTextures()
-        self.fullscreen = fullscreen
-        
-        event = events3d.ResizeEvent(width, height, fullscreen, width - self.width, height - self.height)
-        
-        self.width = width
-        self.height = height
-        
-        self.callEvent('onResized', event)
-        
-        for category in self.categories.itervalues():
-            
-            category.callEvent('onResized', event)
-            
-            for task in category.tasks:
-                
-                task.callEvent('onResized', event)
-                
-    def onQuitCallback(self):
-        self.callEvent('onQuit', None)
-            
-    def getCategory(self, name):
-        category = self.categories.get(name)
-        if category:
-            return category
-        return self.addCategory(Category(name))
 
+        self.fullscreen = event.fullscreen
+
+        for category in self.categories.itervalues():
+            category.callEvent('onResized', event)
+            for task in category.tasks:
+                task.callEvent('onResized', event)

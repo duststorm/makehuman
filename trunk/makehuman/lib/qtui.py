@@ -163,20 +163,18 @@ class Canvas(QtOpenGL.QGLWidget):
         self.setMinimumHeight(5)
         self.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Ignored)
 
-    def callback(self, name, *args, **kwargs):
-        accum = kwargs.get('accum', False)
+    def callback(self, name, event, accum=False):
         name = 'on%sCallback' % name
         if not hasattr(self.app, name):
             return
-        func = getattr(self.app, name)
         if G.profile:
             if accum:
-                profiler.accum('func(*args)' % name, globals(), locals())
+                profiler.accum('G.app.callEvent(name, event)', globals(), locals())
             else:
                 profiler.flush()
-                profiler.run('func(*args)' % name, globals(), locals())
+                profiler.run('G.app.callEvent(name, event)', globals(), locals())
         else:
-            func(*args)
+            G.app.callEvent(name, event)
 
     def mousePressEvent(self, ev):
         self.mouseUpDownEvent(ev, "MouseDown")
@@ -195,7 +193,7 @@ class Canvas(QtOpenGL.QGLWidget):
 
         gl.getPickedColor(x, y)
 
-        self.callback(direction, b, x, y)
+        self.callback(direction, events3d.MouseEvent(b, x, y))
 
         # Update screen
         self.update()
@@ -213,7 +211,7 @@ class Canvas(QtOpenGL.QGLWidget):
 
         b = 1 if d > 0 else -1
 
-        self.callback('MouseWheel', b, x, y)
+        self.callback('MouseWheel', events3d.MouseWheelEvent(b))
 
     def mouseMoveEvent(self, ev):
         global gg_mouse_pos, g_mouse_pos
@@ -247,7 +245,7 @@ class Canvas(QtOpenGL.QGLWidget):
         if not buttons:
             gl.getPickedColor(x, y)
 
-        self.callback('MouseMoved', buttons, x, y, xrel, yrel, accum = True)
+        self.callback('MouseMoved', events3d.MouseEvent(buttons, x, y, xrel, yrel), accum = True)
 
         if buttons:
             self.update()
@@ -262,7 +260,7 @@ class Canvas(QtOpenGL.QGLWidget):
         G.windowHeight = h
         G.windowWidth = w
         gl.reshape(w, h)
-        self.callback('Resized', w, h, False)
+        self.callback('Resized', events3d.ResizeEvent(w, h, False))
 
     def timerEvent(self, ev):
         handleTimer(ev.timerId())
@@ -463,7 +461,7 @@ class Frame(QtGui.QMainWindow):
 
     def closeEvent(self, ev):
         ev.ignore()
-        self.app.onQuitCallback()
+        self.app.callEvent('onQuit', None)
 
     def refreshLayout(self, widget=None):
         if widget is None:
@@ -556,11 +554,12 @@ class AsyncEvent(QtCore.QEvent):
         self.args = args
         self.kwargs = kwargs
 
+_logger_async = log.getLogger('mh.callAsync')
 def callAsync(func, *args, **kwargs):
     if G.app is None:
         log.notice('callAsync with no application')
         return
-    log.getLogger('mh.callAsync').debug('%s(%s, %s)', func, args, kwargs)
+    _logger_async.debug('callAsync: %s(%s, %s)', func, args, kwargs)
     G.app._postAsync(AsyncEvent(func, args, kwargs))
 
 def getSaveFileName(directory, filter = "All files (*.*)"):

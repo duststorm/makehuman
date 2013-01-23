@@ -129,10 +129,14 @@ def init():
         except Exception:
             pass
 
+    logging.setLoggerClass(Logger)
+
+    logging.getLogger('mh.callAsync').setLevel(logging.WARNING)
+    logging.getLogger('mh.callEvent').setLevel(logging.WARNING)
+
     config()
 
-    logging.setLoggerClass(Logger)
-    logging.getLogger('mh.callAsync').setLevel(logging.WARNING)
+    logging.captureWarnings(True)
 
     try:
         logging.getLogger('OpenGL.formathandler').addFilter(NoiseFilter())

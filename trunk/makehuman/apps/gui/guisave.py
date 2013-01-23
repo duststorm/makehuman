@@ -118,7 +118,3 @@ class SaveTaskView(gui3d.TaskView):
         gui3d.app.modelCamera.focusZ = self.focusZ
         gui3d.app.selectedHuman.setRotation(self.rotation)
         self.selection.hide()
-        
-    def onResized(self, event):
-        pass
-        
