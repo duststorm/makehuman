@@ -179,6 +179,8 @@ class MHApplication(gui3d.Application, mh.Application):
 
         self.selectedHuman = None
 
+        self.theme = None
+
         self.modelCamera = Camera(self)
 
         @self.modelCamera.mhEvent
