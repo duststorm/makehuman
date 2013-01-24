@@ -1126,6 +1126,10 @@ class Action(QtGui.QAction, Widget):
     def getIcon(cls, name):
         # icon = G.app.mainwin.style().standardIcon(QtGui.QStyle.SP_MessageBoxWarning)
         path = os.path.join('data', 'icons', name + '.png')
+        if G.app.theme:
+            themePath = os.path.join('data', 'themes', G.app.theme, 'icons', name + '.png')
+            if os.path.isfile(themePath):
+                path = themePath
         if not os.path.isfile(path):
             path = os.path.join('data', 'icons', 'notfound.png')
         return QtGui.QIcon(path)

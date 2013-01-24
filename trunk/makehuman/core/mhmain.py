@@ -173,6 +173,8 @@ class MHApplication(gui3d.Application, mh.Application):
         self.redoStack = []
         self.modified = False
 
+        self.actions = None
+
         self.clearColor = [0.5, 0.5, 0.5]
 
         self.modules = {}
@@ -646,7 +648,14 @@ class MHApplication(gui3d.Application, mh.Application):
             '''
 
         self.theme = theme
+        self.reloadIcons()
         self.redraw()
+
+    def reloadIcons(self):
+        if not self.actions:
+            return
+        for action in self.actions:
+            action.setIcon(gui.Action.getIcon(action.name))
 
     def loadFonts(self):
         """
