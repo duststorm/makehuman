@@ -26,7 +26,6 @@ import sys
 import math
 import atexit
 import numpy as np
-from ctypes import c_double, byref
 
 import OpenGL
 OpenGL.ERROR_CHECKING = False
@@ -81,9 +80,9 @@ def createShader(vertexShader, fragmentShader):
     return program
 
 def queryDepth(sx, sy):
-    sz = c_double(0)
-    glReadPixels(sx, G.windowHeight - sy, 1, 1, GL_DEPTH_COMPONENT, GL_DOUBLE, byref(sz))
-    return sz.value
+    sz = np.zeros((1,), dtype=np.float32)
+    glReadPixels(sx, G.windowHeight - sy, 1, 1, GL_DEPTH_COMPONENT, GL_DOUBLE, sz)
+    return sz[0]
 
 def grabScreen(x, y, width, height, filename = None):
     if width <= 0 or height <= 0:
@@ -135,16 +134,10 @@ def grabScreen(x, y, width, height, filename = None):
 
 pickingBuffer = None
 
-have_multisample = None
-
 def updatePickingBuffer():
     width = G.windowWidth
     height = G.windowHeight
     rwidth = (width + 3) / 4 * 4
-
-    global have_multisample
-    if have_multisample is None:
-        have_multisample = glInitMultisampleARB()
 
     # Resize the buffer in case the window size has changed
     global pickingBuffer
@@ -217,6 +210,8 @@ def drawBegin():
 def drawEnd():
     G.swapBuffers()
 
+have_multisample = None
+
 def OnInit():
     def A(*args):
         return np.array(list(args), dtype=np.float32)
@@ -230,6 +225,9 @@ def OnInit():
         debugdump.appendMessage("GL.VERSION: " + glGetString(GL_VERSION))
     except Exception as e:
         log.error("Failed to GL debug info to debug dump: %s", format(str(e)))
+
+    global have_multisample
+    have_multisample = glInitMultisampleARB()
 
     # Lights and materials
     lightPos = A( -10.99, 20.0, 20.0, 1.0)  # Light - Position
@@ -269,6 +267,8 @@ def OnInit():
     glEnableClientState(GL_NORMAL_ARRAY)
     glEnableClientState(GL_COLOR_ARRAY)
     glEnableClientState(GL_VERTEX_ARRAY)
+    if have_multisample:
+        glEnable(GL_MULTISAMPLE)
 
 def OnExit():
     # Deactivate the pointers to vertex and normal array
