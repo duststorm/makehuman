@@ -29,7 +29,8 @@ import os
 import logging
 import logging.config
 import code
-from logging import debug, warning, error, getLogger
+from logging import debug, warning, error, getLogger, getLevelName
+from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 from core import G
 from getpath import getPath
@@ -102,7 +103,7 @@ class StatusLogHandler(logging.Handler):
 class ApplicationLogHandler(logging.Handler):
     def emit(self, record):
         if G.app is not None and G.app.log_window is not None:
-            G.app.log_window.addText(self.format(record) + '\n')
+            G.app.addLogMessage(self.format(record), record.levelno)
 
 _logger_notice_src = r'''
 def _logger_notice(self, msg, *args, **kwargs):

@@ -468,6 +468,34 @@ class Frame(QtGui.QMainWindow):
             if child.isWidgetType():
                 self.refreshLayout(child)
 
+class LogWindow(qtgui.ListView):
+    _logLevelColors = {
+        log.DEBUG: 'grey',
+        log.NOTICE: 'blue',
+        log.WARNING: 'darkorange',
+        log.ERROR: 'red',
+        log.CRITICAL: 'red'
+        }
+
+    def __init__(self):
+        super(LogWindow, self).__init__()
+        self.level = log.DEBUG
+
+    def setLevel(self, level):
+        self.level = level
+        self.updateView()
+
+    def updateView(self):
+        for i in xrange(self.count()):
+            ilevel = self.getItemData(i)
+            self.showItem(i, ilevel >= self.level)
+
+    def addLogMessage(self, text, level = None):
+        index = self.count()
+        color = self._logLevelColors.get(level)
+        self.addItem(text, color, level)
+        self.showItem(index, level >= self.level)
+
 class AsyncEvent(QtCore.QEvent):
     def __init__(self, callback, args, kwargs):
         super(AsyncEvent, self).__init__(QtCore.QEvent.User)
@@ -493,7 +521,7 @@ class Application(QtGui.QApplication, events3d.EventHandler):
         self.statusBar = self.mainwin.statusBar
         self.progressBar = self.mainwin.progressBar
         self.mainwin.show()
-        self.log_window = qtgui.DocumentEdit()
+        self.log_window = LogWindow()
         
     def started(self):
         self.callEvent('onStart', None)
@@ -513,10 +541,9 @@ class Application(QtGui.QApplication, events3d.EventHandler):
         if self.mainwin and self.mainwin.canvas:
             self.mainwin.canvas.update()
 
-    def addLogMessage(self, text):
-        if self.log_window is None:
-            return
-        self.log_window.addText(text)
+    def addLogMessage(self, text, level = None):
+        if self.log_window is not None:
+            self.log_window.addLogMessage(text, level)
 
     def processEvents(self, flags = QtCore.QEventLoop.ExcludeUserInputEvents):
         super(Application, self).processEvents(flags)

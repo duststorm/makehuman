@@ -451,11 +451,33 @@ class ListView(QtGui.QListWidget, Widget):
         self.clear()
         self.addItems(items)
 
+    _brushes = {}
+    @classmethod
+    def getBrush(cls, color):
+        if color not in cls._brushes:
+            cls._brushes[color] = QtGui.QBrush(QtGui.QColor(color))
+        return cls._brushes[color]
+
+    def addItem(self, text, color = None, data = None):
+        item = QtGui.QListWidgetItem(self)
+        item.setText(text)
+        if color is not None:
+            item.setForeground(self.getBrush(color))
+        if data is not None:
+            item.setData(QtCore.Qt.UserRole, data)
+        super(ListView, self).addItem(item)
+
     def getSelectedItem(self):
         items = self.selectedItems()
         if len(items) > 0:
             return str(items[0].text())
         return None
+
+    def getItemData(self, row):
+        return self.item(row).data(QtCore.Qt.UserRole).toPyObject()
+
+    def showItem(self, row, state):
+        self.item(row).setHidden(not state)
 
 class TextView(QtGui.QLabel, Widget):
     def __init__(self, label = ''):
