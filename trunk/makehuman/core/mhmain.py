@@ -417,8 +417,6 @@ class MHApplication(gui3d.Application, mh.Application):
 
     def startupSequence(self):
         self.splash.setFormat('<br><br><b><font size="48" color="#ff0000">%s</font></b>')
-        old_stdout = sys.stdout
-        sys.stdout = self.splash
 
         log.message('Loading human')
         self.loadHuman()
@@ -445,8 +443,6 @@ class MHApplication(gui3d.Application, mh.Application):
         self.loadFinish()
 
         log.message('')
-
-        sys.stdout = old_stdout
 
         if sys.platform.startswith("darwin"):
             self.splash.resize(0,0) # work-around for mac splash-screen closing bug

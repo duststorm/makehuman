@@ -800,14 +800,6 @@ class SplashScreen(QtGui.QSplashScreen):
     def setFormat(self, fmt):
         self._format = fmt
 
-    def write(self, text):
-        if self._stdout:
-            self._stdout.write(text)
-        self._text += text
-        while '\n' in self._text:
-            line, self._text = self._text.split('\n', 1)
-            self.logMessage(line)
-
     def escape(self, text):
         return text.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
 
