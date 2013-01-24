@@ -50,13 +50,10 @@ The dataTo3Dobject() function can then be used to convert it into an object that
 is visible to the user through the GUI.
 """
 
-import os
-import algos3d
+import os.path
 import module3d
 import numpy as np
 import log
-
-originalVertexCache = {}
 
 def packStringList(strings):
     text = ''
@@ -286,52 +283,5 @@ def loadMesh(path, locX=0, locY=0, locZ=0, loadColors=1):
 
     obj.updateIndexBuffer()
     obj.calcNormals()
-
-    originalVertexCache[path] = obj.coord.copy()
-
-    if loadColors:
-        colorPath = path + '.colors'
-        algos3d.loadVertsColors(obj, colorPath, None)
         
     return obj
-    
-originalVertexCoordinates = []
-
-def loadVertsCoo(path):
-    """
-    This function serves as a small utility function to load just the vertex
-    data from a WaveFront object file.
-   
-    It is used for example to build the original vertex data
-    or to reset mesh modifications to their pre-modified state.
-    
-    Parameters
-    ----------
-    
-    path:
-        *string*. The file system path to the file to be read.
-       
-    """
-
-    if path in originalVertexCache:
-        return originalVertexCache[path]
-
-    global originalVertexCoordinates
-
-    if originalVertexCoordinates:
-        return originalVertexCoordinates
-
-    try:
-        fileDescriptor = open(path)
-    except:
-        log.error('Error opening %s file', path)
-        return
-    originalVertexCoordinates = []
-    for data in fileDescriptor:
-        dataList = data.split()
-        if len(dataList) == 4:
-            if dataList[0] == 'v':
-                co = (float(dataList[1]), float(dataList[2]), float(dataList[3]))
-                originalVertexCoordinates.append(co)
-    fileDescriptor.close()
-    return originalVertexCoordinates

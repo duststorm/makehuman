@@ -34,6 +34,7 @@ import os
 import warp
 import humanmodifier
 import log
+from core import G
 
 ShadowCoords = None
 
@@ -232,7 +233,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
     def compileWarpTarget(self, human):
         global ShadowCoords
         log.message("Compile %s", self)
-        landmarks = theLandMarks[self.bodypart]
+        landmarks = theLandMarks()[self.bodypart]
         objectChanged = self.getRefObject(human)
         self.getRefTarget(human, objectChanged)    
         if self.refTargetVerts and theRefObjectVerts[self.modtype]:
@@ -363,14 +364,14 @@ class WarpModifier (humanmodifier.SimpleModifier):
         
         
     def getRefObject(self, human):
-        global theRefObjects, theRefObjectVerts, theBaseObjectVerts
+        global theRefObjectVerts
     
         if theRefObjectVerts[self.modtype]:
             return False
         else:
             log.message("Reset warps")
-            refverts = copyArray(theBaseObjectVerts)
-            for char in theRefObjects.keys():
+            refverts = copyArray(G.app.selectedHuman.meshData.orig_coord)
+            for char in theRefObjects().keys():
                 cval = human.getDetail(char)
                 if cval:
                     log.debug("  refobj %s %s", os.path.basename(char), cval)
@@ -382,14 +383,14 @@ class WarpModifier (humanmodifier.SimpleModifier):
 
 
     def getRefObjectVerts(self, path):
-        global theRefObjects
+        refObjects = theRefObjects()
     
-        if theRefObjects[path]:
-            return theRefObjects[path]
+        if refObjects[path]:
+            return refObjects[path]
         else:
             verts = readTarget(path)
             if verts is not None:
-                theRefObjects[path] = verts
+                refObjects[path] = verts
             return verts            
     
 
@@ -491,20 +492,20 @@ def copyArray(verts):
 #----------------------------------------------------------
 
 def clearRefObject():
-    global theRefObjectVerts, theModifierTypes
+    global theRefObjectVerts
     theRefObjectVerts = {}
     for mtype in theModifierTypes.keys():
         theRefObjectVerts[mtype] = None
     
+_theLandMarks = None
 
-def defineGlobals():
-    global theLandMarks, theBaseObjectVerts, theRefObjects
-    
-    obj = files3d.loadMesh("data/3dobjs/base.obj")
-    theBaseObjectVerts = [ v.co for v in obj.verts ]
-    theBaseObjectVerts = makeArray(theBaseObjectVerts)
+def theLandMarks():
+    global _theLandMarks
 
-    theLandMarks = {}
+    if _theLandMarks is not None:
+        return _theLandMarks
+
+    _theLandMarks = {}
     folder = "data/landmarks"
     for file in os.listdir(folder):
         (name, ext) = os.path.splitext(file)
@@ -519,29 +520,37 @@ def defineGlobals():
                     m = int(words[0])
                     landmark.append(m)
 
-        theLandMarks[name] = landmark
-    
+        _theLandMarks[name] = landmark
+
+    return _theLandMarks
+
+_theRefObjects = None
+
+def theRefObjects():
+    global _theRefObjects
+
+    if _theRefObjects is not None:
+        return _theRefObjects
+
     clearRefObject()
-    theRefObjects = {}
+    _theRefObjects = {}
 
     for ethnic in ["african", "asian", "neutral"]:
         for age in ["child", "young", "old"]:
             for gender in ["female", "male"]:
                 path = "data/targets/macrodetails/%s-%s-%s.target" % (ethnic, gender, age)
-                theRefObjects[path] = None
-                
+                _theRefObjects[path] = None
+
     for age in ["child", "young", "old"]:
         for gender in ["female", "male"]:
             for tone in ["flaccid", "muscle"]:
                 path = "data/targets/macrodetails/universal-%s-%s-%s.target" % (gender, age, tone)
-                theRefObjects[path] = None
+                _theRefObjects[path] = None
                 for weight in ["light", "heavy"]:
                     path = "data/targets/macrodetails/universal-%s-%s-%s-%s.target" % (gender, age, tone, weight)
-                    theRefObjects[path] = None
+                    _theRefObjects[path] = None
             for weight in ["light", "heavy"]:
                 path = "data/targets/macrodetails/universal-%s-%s-%s.target" % (gender, age, weight)
-                theRefObjects[path] = None
+                _theRefObjects[path] = None
 
-defineGlobals()
-       
-  
+    return _theRefObjects

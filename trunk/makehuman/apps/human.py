@@ -526,13 +526,6 @@ class Human(gui3d.Object):
 
         mh.redraw()
 
-    def rotateLimb(self, targetPath, morphFactor):
-        targetPath1 = targetPath+".target"
-        targetPath2 = targetPath+".rot"
-        algos3d.loadTranslationTarget(self.meshData, targetPath1, morphFactor, None, 1, 0)
-        algos3d.loadRotationTarget(self.meshData, targetPath2, morphFactor)
-
-
     def storeMesh(self):
         log.message("Storing mesh status")
         self.meshStored = self.meshData.coord.copy()

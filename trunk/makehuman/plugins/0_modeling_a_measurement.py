@@ -299,7 +299,8 @@ class MeasureTaskView(gui3d.TaskView):
 
         human = gui3d.app.selectedHuman
 
-        height = 10 * max(human.meshData.verts[8223].co[1] - human.meshData.verts[12361].co[1], human.meshData.verts[8223].co[1] - human.meshData.verts[13155].co[1])
+        height = 10 * max(human.meshData.coord[8223,1] - human.meshData.coord[12361,1],
+                          human.meshData.coord[8223,1] - human.meshData.coord[13155,1])
         if gui3d.app.settings['units'] == 'metric':
             height = '%.2f cm' % height
         else:
@@ -432,16 +433,10 @@ class Ruler:
         measure = 0
         vindex1 = self.Measures[measurementname][0]
         for vindex2 in self.Measures[measurementname]:
-            measure += aljabr.vdist(human.meshData.verts[vindex1].co, human.meshData.verts[vindex2].co)
+            measure += aljabr.vdist(human.meshData.coord[vindex1], human.meshData.coord[vindex2])
             vindex1 = vindex2
 
         if mode == 'metric':
             return 10.0 * measure
         else:
             return 10.0 * measure * 0.393700787
-
-
-
-
-
-

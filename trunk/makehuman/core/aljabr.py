@@ -1183,62 +1183,6 @@ def convexQuadrilateralArea(v1,v2,v3,v4):
     pq = vdot(vsub(v3,v1),vsub(v4,v2))
     return 0.5*sqrt(p*p*q*q - pq*pq)
     #return sqrt(4*p*p*q*q - pow((b*b+d*d-a*a-c*c),2))/4
-        
-def calcBBox(verts, indices=None):
-    
-    if indices:
-        bbox = [verts[indices[0]].co[:], verts[indices[0]].co[:]]
-        for i in indices:
-            if verts[i].co[0] < bbox[0][0]: #minX
-                bbox[0][0] = verts[i].co[0]
-            if verts[i].co[0] > bbox[1][0]: #maxX
-                bbox[1][0] = verts[i].co[0]
-            if verts[i].co[1] < bbox[0][1]: #minY
-                bbox[0][1] = verts[i].co[1]
-            if verts[i].co[1] > bbox[1][1]: #maxY
-                bbox[1][1] = verts[i].co[1]
-            if verts[i].co[2] < bbox[0][2]: #minZ
-                bbox[0][2] = verts[i].co[2]
-            if verts[i].co[2] > bbox[1][2]: #maxX
-                bbox[1][2] = verts[i].co[2]
-        return bbox
-    else:
-        bbox =  [verts[0].co[:],verts[0].co[:]]
-        for v in verts:
-            if v.co[0] < bbox[0][0]: #minX
-                bbox[0][0] = v.co[0]
-            if v.co[0] > bbox[1][0]: #maxX
-                bbox[1][0] = v.co[0]
-            if v.co[1] < bbox[0][1]: #minY
-                bbox[0][1] = v.co[1]
-            if v.co[1] > bbox[1][1]: #maxY
-                bbox[1][1] = v.co[1]
-            if v.co[2] < bbox[0][2]: #minZ
-                bbox[0][2] = v.co[2]
-            if v.co[2] > bbox[1][2]: #maxX
-                bbox[1][2] = v.co[2]
-        return bbox
-
-
-def quadPrismPseudoVol(p1,p2,p3,p4):
-  """
-  This function returns the unit "volume" for a prism with rectangular base, as described in  
-  U{http://www-ljk.imag.fr/membres/Stefanie.Hahmann/PUBLICATIONS/RHC09/}.
-  
-  
-  :return:   the value of the unit "volume"
-  :type  pi:  list of doubles
-  :param pi:  coordinate values of the base of the rectangular prism
-  """
-  M = [4.0, 2.0, 2.0, 1.0, 2.0, 4.0, 1.0, 2.0, 2.0, 1.0, 4.0, 2.0, 1.0, 2.0, 2.0, 4.0]
-  M = vmul(M, 1.0/36)
-  z = [p1.co[0],p2,p3[0],p4[0]]
-  k = [(p2[0]-p1[0])*(p3[1]-p1[1]) - (p2[1]-p1[1])*(p3[0]-p1[0]),
-       (p2[0]-p1[0])*(p4[1]-p2[1]) - (p2[1]-p1[1])*(p4[0]-p2[0]),
-       (p4[0]-p3[0])*(p3[1]-p1[1]) - (p4[1]-p3[1])*(p3[0]-p1[0]),
-       (p4[0]-p3[0])*(p4[1]-p2[1]) - (p4[1]-p3[1])*(p4[0]-p2[0])]
-  return _vmulv(z,_mmul(M, k, 4,4,1))
-  
 
 #Various Functions
 

@@ -22,11 +22,11 @@ Abstract
 TODO
 """
 
-import gui3d, mh, os
+import os
+import gui3d
+import mh
 import files3d
-from aljabr import in2pts, vadd, vsub, calcBBox
 import mh2proxy
-import export_config
 import gui
 import filechooser as fc
 import log
@@ -82,7 +82,6 @@ class HairTaskView(gui3d.TaskView):
             else:
                 human.hairObj.mesh.setCull(None)
             human.hairObj.mesh.setTransparentPrimitives(len(human.hairObj.mesh.faces))
-            human.hairObj.mesh.originalHairVerts = [v.co[:] for v in human.hairObj.mesh.verts]
             human.hairObj.mesh.priority = 20
                 
             hairName = human.hairObj.mesh.name.split('.')[0]
