@@ -248,6 +248,8 @@ class Object3D(object):
                 self._textureTex = None
             else:
                 self._textureTex = texture.getTexture(self._texturePath)
+        if self._textureTex is False:
+            return None
         return self._textureTex
 
     @property
