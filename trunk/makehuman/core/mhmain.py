@@ -81,7 +81,9 @@ class PluginsTaskView(gui3d.TaskView):
 
         self.scroll = self.addTopWidget(gui.VScrollArea())
         self.pluginsBox = gui.GroupBox('Plugins')
-        self.pluginsBox.setSizePolicy(gui.QtGui.QSizePolicy.MinimumExpanding, gui.QtGui.QSizePolicy.MinimumExpanding)
+        self.pluginsBox.setSizePolicy(
+            gui.SizePolicy.MinimumExpanding,
+            gui.SizePolicy.MinimumExpanding)
         self.scroll.setWidget(self.pluginsBox)
 
         for module in sorted(gui3d.app.modules):

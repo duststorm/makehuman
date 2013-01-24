@@ -32,7 +32,6 @@ import os
 from cStringIO import StringIO
 from core import G
 import glmodule
-from PyQt4 import QtGui
 
 class ScriptingView(gui3d.TaskView):
 
@@ -47,7 +46,7 @@ class ScriptingView(gui3d.TaskView):
         self.scriptText = self.addTopWidget(gui.DocumentEdit())
         self.scriptText.setText('');
 
-        self.scriptText.setLineWrapMode(QtGui.QTextEdit.NoWrap)
+        self.scriptText.setLineWrapMode(gui.DocumentEdit.NoWrap)
 
         self.loadButton = box.addWidget(gui.Button('Load ...'), 0, 0)
         self.saveButton = box.addWidget(gui.Button('Save ...'), 0, 1)
@@ -80,7 +79,7 @@ class ScriptingView(gui3d.TaskView):
 
         self.insertLabel = box2.addWidget(gui.TextView('Append example to script'))
         self.listView = box2.addWidget(gui.ListView())
-        self.listView.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Preferred)
+        self.listView.setSizePolicy(gui.SizePolicy.Ignored, gui.SizePolicy.Preferred)
 
         testlist = [ 
             'applyTarget()', 

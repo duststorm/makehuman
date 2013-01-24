@@ -35,6 +35,7 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GL.framebufferobjects import *
 from OpenGL.GL.ARB.transpose_matrix import *
+from OpenGL.GL.ARB.multisample import *
 
 from core import G
 from image import Image
@@ -134,10 +135,16 @@ def grabScreen(x, y, width, height, filename = None):
 
 pickingBuffer = None
 
+have_multisample = None
+
 def updatePickingBuffer():
     width = G.windowWidth
     height = G.windowHeight
     rwidth = (width + 3) / 4 * 4
+
+    global have_multisample
+    if have_multisample is None:
+        have_multisample = glInitMultisampleARB()
 
     # Resize the buffer in case the window size has changed
     global pickingBuffer
@@ -149,7 +156,8 @@ def updatePickingBuffer():
 
     # Turn off antialiasing
     glDisable(GL_BLEND)
-    glDisable(GL_MULTISAMPLE)
+    if have_multisample:
+        glDisable(GL_MULTISAMPLE)
 
     # Clear screen
     glClearColor(0.0, 0.0, 0.0, 0.0)
@@ -166,7 +174,8 @@ def updatePickingBuffer():
 
     # Turn on antialiasing
     glEnable(GL_BLEND)
-    glEnable(GL_MULTISAMPLE)
+    if have_multisample:
+        glEnable(GL_MULTISAMPLE)
 
     # restore lighting
     glEnable(GL_LIGHTING)

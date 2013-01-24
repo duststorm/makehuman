@@ -223,7 +223,7 @@ class Canvas(QtOpenGL.QGLWidget):
             gg_mouse_pos = x, y
 
         if g_mouse_pos is None:
-            callAsync(self.handleMouse)
+            self.app.callAsync(self.handleMouse)
 
         g_mouse_pos = (x, y)
 
@@ -261,9 +261,6 @@ class Canvas(QtOpenGL.QGLWidget):
         G.windowWidth = w
         gl.reshape(w, h)
         self.callback('Resized', events3d.ResizeEvent(w, h, False))
-
-    def timerEvent(self, ev):
-        handleTimer(ev.timerId())
 
 class VLayout(QtGui.QLayout):
     def __init__(self, parent = None):
@@ -471,6 +468,13 @@ class Frame(QtGui.QMainWindow):
             if child.isWidgetType():
                 self.refreshLayout(child)
 
+class AsyncEvent(QtCore.QEvent):
+    def __init__(self, callback, args, kwargs):
+        super(AsyncEvent, self).__init__(QtCore.QEvent.User)
+        self.callback = callback
+        self.args = args
+        self.kwargs = kwargs
+
 class Application(QtGui.QApplication, events3d.EventHandler):
     def __init__(self):
         super(Application, self).__init__(sys.argv)
@@ -480,6 +484,8 @@ class Application(QtGui.QApplication, events3d.EventHandler):
         self.progressBar = None
         self.splash = None
         self.messages = None
+        self.g_timers = {}
+        self.logger_async = log.getLogger('mh.callAsync')
 
     def OnInit(self):
         self.messages = queue.Manager(self._postAsync)
@@ -494,7 +500,7 @@ class Application(QtGui.QApplication, events3d.EventHandler):
 
     def start(self):
         self.OnInit()
-        callAsync(self.started)
+        self.callAsync(self.started)
         self.messages.start()
         self.exec_()
         gl.OnExit()
@@ -506,9 +512,6 @@ class Application(QtGui.QApplication, events3d.EventHandler):
     def redraw(self):
         if self.mainwin and self.mainwin.canvas:
             self.mainwin.canvas.update()
-        
-    def getWindowSize(self):
-        return G.windowWidth, G.windowHeight
 
     def addLogMessage(self, text):
         if self.log_window is None:
@@ -524,43 +527,30 @@ class Application(QtGui.QApplication, events3d.EventHandler):
             return True
         return super(Application, self).event(event)
 
+    def addTimer(self, milliseconds, callback):
+        timer_id = self.startTimer(milliseconds)
+        self.g_timers[timer_id] = callback
+        return timer_id
+
+    def removeTimer(self, id):
+        self.killTimer(id)
+        del self.g_timers[id]
+
+    def handleTimer(self, id):
+        if id not in self.g_timers:
+            return
+        callback = self.g_timers[id]
+        callback()
+
+    def timerEvent(self, ev):
+        self.handleTimer(ev.timerId())
+
     def _postAsync(self, event):
         self.postEvent(self, event)
 
-g_timers = {}
-
-def getKeyModifiers():
-    return int(QtGui.QApplication.keyboardModifiers())
-
-def addTimer(milliseconds, callback):
-    timer_id = G.app.mainwin.canvas.startTimer(milliseconds)
-    g_timers[timer_id] = callback
-    return timer_id
-
-def removeTimer(id):
-    G.app.mainwin.canvas.killTimer(id)
-    del g_timers[id]
-
-def handleTimer(id):
-    if id not in g_timers:
-        return
-    callback = g_timers[id]
-    callback()
-
-class AsyncEvent(QtCore.QEvent):
-    def __init__(self, callback, args, kwargs):
-        super(AsyncEvent, self).__init__(QtCore.QEvent.User)
-        self.callback = callback
-        self.args = args
-        self.kwargs = kwargs
-
-_logger_async = log.getLogger('mh.callAsync')
-def callAsync(func, *args, **kwargs):
-    if G.app is None:
-        log.notice('callAsync with no application')
-        return
-    _logger_async.debug('callAsync: %s(%s, %s)', func, args, kwargs)
-    G.app._postAsync(AsyncEvent(func, args, kwargs))
+    def callAsync(self, func, *args, **kwargs):
+        self.logger_async.debug('callAsync: %s(%s, %s)', func, args, kwargs)
+        self._postAsync(AsyncEvent(func, args, kwargs))
 
 def getSaveFileName(directory, filter = "All files (*.*)"):
     return str(QtGui.QFileDialog.getSaveFileName(
@@ -573,9 +563,6 @@ def getOpenFileName(directory, filter = "All files (*.*)"):
 def getExistingDirectory(directory):
     return str(QtGui.QFileDialog.getExistingDirectory(
         G.app.mainwin, directory = directory))
-
-def addToolBar(name):
-    return G.app.mainwin.addToolBar(name)
 
 def setShortcut(modifier, key, action):
     action.setShortcut(QtGui.QKeySequence(modifier + key))

@@ -6,7 +6,6 @@ import gui3d
 import gui
 from core import G
 import log
-from PyQt4 import QtGui
 
 class DataTree(gui.TreeView):
     def __init__(self, root):
@@ -49,8 +48,8 @@ class DataTaskView(gui3d.TaskView):
         super(DataTaskView, self).__init__(category, 'Data')
         self.pp = pprint.PrettyPrinter()
         self.left.child.setSizePolicy(
-            QtGui.QSizePolicy.MinimumExpanding,
-            QtGui.QSizePolicy.MinimumExpanding)
+            gui.SizePolicy.MinimumExpanding,
+            gui.SizePolicy.MinimumExpanding)
 
         self.tree = self.addLeftWidget(DataTree(G.app))
         self.clear = self.addLeftWidget(gui.Button('Clear'))
@@ -59,8 +58,8 @@ class DataTaskView(gui3d.TaskView):
         self.tree.setHeaderHidden(True)
         self.tree.resizeColumnToContents(0)
         self.tree.setSizePolicy(
-            QtGui.QSizePolicy.Ignored,
-            QtGui.QSizePolicy.Expanding)
+            gui.SizePolicy.Ignored,
+            gui.SizePolicy.Expanding)
         self.left.layout.setStretchFactor(self.tree, 1)
 
         @self.tree.mhEvent

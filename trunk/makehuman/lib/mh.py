@@ -30,8 +30,7 @@ from texture import Texture, getTexture, reloadTextures
 from camera import Camera
 
 from qtui import Keys, Buttons, Modifiers, Application
-from qtui import getKeyModifiers, addTimer, removeTimer, callAsync, callAsyncThread
-from qtui import setShortcut, addToolBar
+from qtui import callAsyncThread, setShortcut
 from qtui import getSaveFileName, getOpenFileName, getExistingDirectory
 
 from glmodule import createVertexShader, createFragmentShader, createShader
@@ -75,5 +74,20 @@ def addTopWidget(widget, *args, **kwargs):
 def removeTopWidget(widget):
     return G.app.mainwin.removeTopWidget(widget)
 
+def addToolBar(name):
+    return G.app.mainwin.addToolBar(name)
+
 def redraw():
     G.app.redraw()
+
+def getKeyModifiers():
+    return int(G.app.keyboardModifiers())
+
+def addTimer(milliseconds, callback):
+    return G.app.addTimer(milliseconds, callback)
+
+def removeTimer(id):
+    G.app.removeTimer(id)
+
+def callAsync(func, *args, **kwargs):
+    G.app.callAsync(func, *args, **kwargs)

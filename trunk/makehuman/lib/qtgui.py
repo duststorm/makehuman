@@ -544,6 +544,11 @@ class TextEdit(QtGui.QLineEdit, Widget):
         self.callEvent('onDownArrow', None)
 
 class DocumentEdit(QtGui.QTextEdit, Widget):
+    NoWrap		= QtGui.QTextEdit.NoWrap
+    WidgetWidth		= QtGui.QTextEdit.WidgetWidth
+    FixedPixelWidth	= QtGui.QTextEdit.FixedPixelWidth
+    FixedColumnWidth	= QtGui.QTextEdit.FixedColumnWidth
+
     def __init__(self, text=''):
         super(DocumentEdit, self).__init__(text)
         Widget.__init__(self)
@@ -1169,3 +1174,12 @@ class Actions(object):
 
     def __iter__(self):
         return iter(self._order)
+
+class SizePolicy(object):
+    Fixed               = QtGui.QSizePolicy.Fixed
+    Minimum             = QtGui.QSizePolicy.Minimum
+    Maximum             = QtGui.QSizePolicy.Maximum
+    Preferred           = QtGui.QSizePolicy.Preferred
+    Expanding           = QtGui.QSizePolicy.Expanding
+    MinimumExpanding    = QtGui.QSizePolicy.MinimumExpanding
+    Ignored             = QtGui.QSizePolicy.Ignored
