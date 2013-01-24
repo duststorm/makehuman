@@ -606,6 +606,9 @@ class MHApplication(gui3d.Application, mh.Application):
     # Themes
     def setTheme(self, theme):
 
+        if self.theme == theme:
+            return
+
         f = open(os.path.join("data/themes/", theme + ".mht"), 'r')
 
         for data in f.readlines():

@@ -136,7 +136,6 @@ def init():
 
     config()
 
-
     # Compatibility test for Python 2.6 logging module
     if hasattr(logging, "captureWarnings") and callable(logging.captureWarnings):
         logging.captureWarnings(True)
