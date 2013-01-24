@@ -106,7 +106,7 @@ def exitPoseMode():
     
 def changePoseMode(event):
     human = event.human
-    log.message("Change pose mode %s w=%s e=%s", InPoseMode, human.warpsNeedReset, event.change)
+    log.debug("Change pose mode %s w=%s e=%s", InPoseMode, human.warpsNeedReset, event.change)
     if human:
         if event.change != "targets" or human.warpsNeedReset:
             exitPoseMode()

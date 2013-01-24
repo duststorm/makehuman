@@ -75,6 +75,20 @@ class NoiseFilter(logging.Filter):
             traceback.print_exc()
         return True
 
+class DowngradeFilter(logging.Filter):
+    def __init__(self, level):
+        self.level = level
+
+    def filter(self, record):
+        try:
+            if record.levelno > self.level:
+                record.levelno = self.level
+                record.levelname = logging.getLevelName(record.levelno)
+        except:
+            import traceback
+            traceback.print_exc()
+        return True
+
 class SplashLogHandler(logging.Handler):
     def emit(self, record):
         if G.app is not None and G.app.splash is not None:
@@ -142,6 +156,7 @@ def init():
 
     try:
         logging.getLogger('OpenGL.formathandler').addFilter(NoiseFilter())
+        logging.getLogger('OpenGL.extensions').addFilter(DowngradeFilter(logging.DEBUG))
     except Exception:
         import traceback
         traceback.print_exc()

@@ -439,9 +439,10 @@ class MHApplication(gui3d.Application, mh.Application):
         except:
             self.setTheme("default")
 
-        log.message('Loading done')
+        log.message('Applying targets')
         self.loadFinish()
 
+        log.message('Loading done')
         log.message('')
 
         if sys.platform.startswith("darwin"):
