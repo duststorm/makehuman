@@ -27,6 +27,7 @@ import os
 import mh
 import gui
 import gui3d
+import geometry3d
 import log
 
 class SaveTaskView(gui3d.TaskView):
@@ -43,7 +44,7 @@ class SaveTaskView(gui3d.TaskView):
 
         self.selection_width = 1.2
         self.selection_height = 1.3
-        mesh = gui3d.FrameMesh(self.selection_width, self.selection_height)
+        mesh = geometry3d.FrameMesh(self.selection_width, self.selection_height)
         mesh.move(-self.selection_width/2, -self.selection_height/2)
 
         self.selection = gui3d.app.addObject(gui3d.Object([0, 0, 9], mesh))

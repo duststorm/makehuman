@@ -22,16 +22,15 @@ Fbx exporter
 
 """
 
-import os
+import os.path
 import sys
-import log
 
 import export_config
 import object_collection
 import read_expression
 import posemode
 from mhx import the, mhx_custom
-
+import log
 
 fbxpath = "tools/blender26x"
 if fbxpath not in sys.path:

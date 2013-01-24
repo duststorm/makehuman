@@ -22,10 +22,9 @@ Abstract
 TODO
 """
 
-import module3d, aljabr
 import os
-import numpy
-from aljabr import *
+import numpy as np
+import aljabr
 import export_config
 import log
 
@@ -256,7 +255,7 @@ def readProxyFile(obj, file, evalOnLoad):
     locations = {}
     tails = {}
     proxy = CProxy(pfile.file, pfile.type, pfile.layer)
-    proxy.deleteVerts = numpy.zeros(len(verts), bool)
+    proxy.deleteVerts = np.zeros(len(verts), bool)
     proxy.name = "MyProxy"
 
     useProjection = True
@@ -699,7 +698,7 @@ class CUvSet:
         self.filename = filename
             
         nFaces = len(human.meshData.faces)                
-        self.faceMaterials = numpy.zeros(nFaces, int)
+        self.faceMaterials = np.zeros(nFaces, int)
         fn = 0
         for line in self.faceNumbers:
             words = line.split()

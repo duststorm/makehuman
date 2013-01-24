@@ -22,11 +22,10 @@ Abstract
 TODO
 """
 
-import gui3d, mh, os
-import files3d
-import export_config
+import os
+import gui3d
+import mh
 import mh2proxy
-import gui
 import filechooser as fc
 import log
 

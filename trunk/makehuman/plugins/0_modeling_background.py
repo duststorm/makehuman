@@ -25,12 +25,12 @@ TODO
 
 __docformat__ = 'restructuredtext'
 
+import os
+
 import gui3d
 import events3d
+import geometry3d
 import mh
-import os
-from aljabr import vsub, vadd, vdot, mtransform
-from math import floor, ceil, pi, sqrt, exp
 import projection
 import gui
 import filechooser as fc
@@ -56,7 +56,7 @@ class BackgroundTaskView(gui3d.TaskView):
 
         self.filenames = {}
 
-        mesh = gui3d.RectangleMesh(1, 1)
+        mesh = geometry3d.RectangleMesh(1, 1)
         self.backgroundImage = gui3d.app.categories['Modelling'].addObject(gui3d.Object([0, 0, 1], mesh, visible=False))
         self.opacity = 100
         mesh.setColor([255, 255, 255, self.opacity])

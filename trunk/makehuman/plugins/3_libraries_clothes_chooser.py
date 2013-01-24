@@ -22,7 +22,9 @@ Abstract
 TODO
 """
 
-import gui3d, mh, os
+import os
+import gui3d
+import mh
 import download
 import files3d
 import mh2proxy

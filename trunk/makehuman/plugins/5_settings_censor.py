@@ -24,6 +24,7 @@ TODO
 
 import mh
 import gui3d
+import geometry3d
 import gui
 import log
 
@@ -41,7 +42,7 @@ class CensorTaskView(gui3d.TaskView):
         human = gui3d.app.selectedHuman
 
         self.breastVertices = human.mesh.getVerticesForGroups(['l-torso-nipple', 'r-torso-nipple'])
-        mesh = gui3d.RectangleMesh(100, 100)
+        mesh = geometry3d.RectangleMesh(100, 100)
         self.breastCensorship = gui3d.app.addObject(gui3d.Object([0, 0, 9], mesh))
         mesh.setColor([0, 0, 0, 255])
         mesh.setPickable(False)
@@ -50,7 +51,7 @@ class CensorTaskView(gui3d.TaskView):
         mesh.priority = 80
 
         self.genitalVertices = human.mesh.getVerticesForGroups(['pelvis-genital-area'])
-        mesh = gui3d.RectangleMesh(100, 100)
+        mesh = geometry3d.RectangleMesh(100, 100)
         self.genitalCensorship = gui3d.app.addObject(gui3d.Object([0, 0, 9], mesh))
         mesh.setColor([0, 0, 0, 255])
         mesh.setPickable(False)

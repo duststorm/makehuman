@@ -22,7 +22,9 @@ Abstract
 TODO
 """
 
-import gui3d, mh, os, module3d
+import os.path
+import gui3d
+import mh
 import gui
 import filechooser as fc
 import log

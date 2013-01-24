@@ -23,14 +23,14 @@ This module contains classes defined to implement widgets that provide utility f
 to the graphical user interface.
 """
 
+import os.path
+import weakref
+
 import events3d
 import module3d
 import mh
-import os
 import files3d
-import weakref
-from catmull_clark_subdivision import createSubdivisionObject, updateSubdivisionObject
-from geometry3d import NineSliceMesh, RectangleMesh, FrameMesh
+import catmull_clark_subdivision as cks
 import log
 import selection
 import object3d
@@ -235,20 +235,20 @@ class Object(events3d.EventHandler):
         
         if self.isProxied():
             if not self.__proxySubdivisionMesh:
-                self.__proxySubdivisionMesh = createSubdivisionObject(self.__proxyMesh, progressCallback)
+                self.__proxySubdivisionMesh = cks.createSubdivisionObject(self.__proxyMesh, progressCallback)
                 if self.__seedMesh.object3d:
                     self.attachMesh(self.__proxySubdivisionMesh)
             elif update:
-                updateSubdivisionObject(self.__proxySubdivisionMesh, progressCallback)
+                cks.updateSubdivisionObject(self.__proxySubdivisionMesh, progressCallback)
                 
             return self.__proxySubdivisionMesh
         else:
             if not self.__subdivisionMesh:
-                self.__subdivisionMesh = createSubdivisionObject(self.__seedMesh, progressCallback)
+                self.__subdivisionMesh = cks.createSubdivisionObject(self.__seedMesh, progressCallback)
                 if self.__seedMesh.object3d:
                     self.attachMesh(self.__subdivisionMesh)
             elif update:
-                updateSubdivisionObject(self.__subdivisionMesh, progressCallback)
+                cks.updateSubdivisionObject(self.__subdivisionMesh, progressCallback)
                 
             return self.__subdivisionMesh
 

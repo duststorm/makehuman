@@ -17,7 +17,8 @@ class ExporterOBJ(Exporter):
         self.objScales = self.addScales(options)
 
     def export(self, human, filename):
-        import mh2obj_proxy, mh2bvh
+        import mh2obj_proxy
+        import mh2bvh
 
         options = {
             "helpers" : self.exportHelpers.selected,

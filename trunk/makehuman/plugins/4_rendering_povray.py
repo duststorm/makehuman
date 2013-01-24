@@ -22,14 +22,14 @@ Abstract
 TODO
 """
 
-import sys, os
+import sys
+import os
 
 # We need this for rendering
 import mh2povray
 
 # We need this for gui controls
 import gui3d
-import mh
 import gui
 
 class PovrayTaskView(gui3d.TaskView):

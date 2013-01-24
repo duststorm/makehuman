@@ -25,16 +25,12 @@ Blender by collada_import.py.
 TODO
 """
 
-import module3d
+import os.path
+import time
+
 import aljabr
-import mh
-import files3d
-import mh2bvh
-import os, time
-import mh2proxy
 import export_config
 import object_collection
-import mhx
 from mhx import the
 import log
 

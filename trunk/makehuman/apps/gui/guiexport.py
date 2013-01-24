@@ -68,8 +68,6 @@ class ExportTaskView(gui3d.TaskView):
         
         @self.fileentry.mhEvent
         def onFileSelected(filename):
-            import mh2obj, mh2bvh, mh2mhx, mh2obj_proxy, mh2collada, mh2md5, mh2stl, mh2skel, mh2fbx
-
             path = os.path.normpath(os.path.join(exportPath, filename))
             dir, name = os.path.split(path)
             name, ext = os.path.splitext(name)

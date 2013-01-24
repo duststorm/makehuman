@@ -25,13 +25,10 @@ TODO
 
 __docformat__ = 'restructuredtext'
 
-
-import gui3d, mh, os
+import os
+import gui3d
+import mh
 import download
-import files3d
-import module3d
-import mh2proxy
-import export_config
 import gui
 import filechooser as fc
 import log

@@ -23,11 +23,8 @@ TODO
 """
 
 import os
-import numpy as np
 import gui3d
-import module3d
 import mh
-import aljabr
 import gui
 import filechooser as fc
 import log
@@ -35,22 +32,13 @@ import log
 #import cProfile
 
 import armature
-import transformations as tm
 import warpmodifier
-import humanmodifier
 import posemode
 
 #
 #   Pose library
 #
 
-"""
-class PoseModifier(humanmodifier.GenderAgeToneWeight):
-    def __init__(self, template):        
-        humanmodifier.GenderAgeToneWeight.__init__(self, template)
-        self.isPose = True
-
-"""        
 class PoseModifier(warpmodifier.WarpModifier):
     def __init__(self, template):
         warpmodifier.WarpModifier.__init__(self, template, "body", "GenderAgeToneWeight") 
