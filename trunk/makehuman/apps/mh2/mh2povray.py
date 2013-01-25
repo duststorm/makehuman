@@ -1240,7 +1240,9 @@ Item types
 def writeItemsMaterials(outputFileDescriptor, stuffs, settings, outDir):
     for stuff in stuffs[1:]:
         proxy = stuff.proxy
-        if proxy.type == 'Clothes' and proxy.getUuid() == gui3d.app.selectedHuman.hairProxy.getUuid():
+        if (proxy.type == 'Clothes'
+            and gui3d.app.selectedHuman.hairProxy is not None
+            and proxy.getUuid() == gui3d.app.selectedHuman.hairProxy.getUuid()):
             itemtype = 2 # Hair.
             texdata = getChannelData(stuff.texture)                        
             if settings['hairSpec'] == True:
