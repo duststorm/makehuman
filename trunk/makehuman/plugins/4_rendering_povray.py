@@ -70,7 +70,7 @@ class PovrayTaskView(gui3d.TaskView):
         # Options box
         optionsBox = self.addLeftWidget(gui.GroupBox('Options'))
         self.doSubdivide = optionsBox.addWidget(gui.CheckBox('Subdivide mesh', True))
-        self.useSSS = optionsBox.addWidget(gui.CheckBox('Use S.S. Scattering', False))
+        self.useSSS = optionsBox.addWidget(gui.CheckBox('Use S.S. Scattering', True))
         self.SSSA = optionsBox.addWidget(gui.Slider(value=0.3, label="SSS Amount"))
         self.AA = optionsBox.addWidget(gui.Slider(value=0.4, label="AntiAliasing"))
 
