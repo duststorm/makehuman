@@ -740,7 +740,7 @@ def calcJointPos(obj, joint):
     for f in g.faces:
         for v in f.verts:
             verts.append(v.co)
-    return centroid(verts)
+    return aljabr.centroid(verts)
     
 
 #
