@@ -74,7 +74,6 @@ def tokenizeFbxFile(filepath):
     for line in fp:
         pnode = tokenizeLine(line, pnode)
     fp.close()    
-    print("%s tokenized" % filepath)
     return proot
         
         

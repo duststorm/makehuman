@@ -25,17 +25,17 @@ from .fbx_basic import *
 from .fbx_props import *
 from .fbx_model import *
 from .fbx_object import CObject
-from .fbx_deformer import CSkinDeformer
+from .fbx_deformer import FbxSkin
 
 
 #------------------------------------------------------------------
 #   Armature
 #------------------------------------------------------------------
 
-class CArmature(CConnection):
+class CArmature(FbxObject):
 
     def __init__(self, subtype=''):
-        CConnection.__init__(self, 'Null', subtype, 'ARMATURE')
+        FbxObject.__init__(self, 'Null', subtype, 'ARMATURE')
         self.pose = None
         self.roots = []
         self.bones = {}
@@ -44,7 +44,7 @@ class CArmature(CConnection):
         self.object = None
 
     def make(self, rig):
-        CConnection.make(self, rig)
+        FbxObject.make(self, rig)
         self.object = fbx.nodes.objects[rig.name]
         for bone in oneOf(rig.data.bones.values(), rig.data.bones):
             if bone.parent == None:
@@ -67,12 +67,12 @@ class CArmature(CConnection):
 
 
     def addDeformer(self, node, ob):
-        deformer = CSkinDeformer().set(self, node, ob)
+        deformer = FbxSkin().set(self, node, ob)
         if deformer is None:
             halt
         self.deformers.append(deformer)
         if not self.pose:
-            self.pose = CPose()
+            self.pose = FbxPose()
     
     
     def addDefinition(self, definitions):            
@@ -103,7 +103,7 @@ class CArmature(CConnection):
             
 
     def buildArmature(self, parent):
-        ob = fbx.data[parent.id]
+        ob = self.object = fbx.data[parent.id]
         scn = bpy.context.scene
         old = scn.objects.active
         scn.objects.active = ob
@@ -116,10 +116,16 @@ class CArmature(CConnection):
         bpy.ops.object.mode_set(mode='EDIT')        
         for child,_ in parent.children:
             if isinstance(child, CBone):
-                child.buildBone(infos, ob.data)        
-        bpy.ops.object.mode_set(mode='OBJECT')        
-        scn.objects.active = old
+                nodes = child.buildBone(infos, ob.data)        
 
+        bpy.ops.object.mode_set(mode='POSE')  
+        for node in nodes:
+            pb = node.datum = ob.pose.bones[node.name]
+            node.object = ob
+            pb.rotation_mode = 'XYZ'
+
+        bpy.ops.object.mode_set(mode='OBJECT') 
+        scn.objects.active = old
         return self
     
 
@@ -127,10 +133,10 @@ class CArmature(CConnection):
 #   Pose
 #------------------------------------------------------------------
 
-class CPose(CConnection):
+class FbxPose(FbxObject):
 
     def __init__(self, subtype='BindPose'):
-        CConnection.__init__(self, 'Pose', subtype, 'POSE')
+        FbxObject.__init__(self, 'Pose', subtype, 'POSE')
         self.poses = []
         fbx.matrices = {}
 
@@ -143,11 +149,11 @@ class CPose(CConnection):
             else:
                 rest.append(pnode)
 
-        return CConnection.parseNodes(self, rest)
+        return FbxObject.parseNodes(self, rest)
 
 
     def make(self, ob, bones):
-        CConnection.make(self, ob)
+        FbxObject.make(self, ob)
         node = fbx.nodes.armatures[ob.data.name]
         pose = CPoseNode().make(node, ob.matrix_world)
         self.poses.append(pose)
@@ -160,7 +166,7 @@ class CPose(CConnection):
         
         
     def writeHeader(self, fp):
-        CConnection.writeHeader(self, fp)
+        FbxObject.writeHeader(self, fp)
         fp.write(
             '        Type: "BindPose"\n' +
             '        Version: 100\n' +
@@ -186,12 +192,16 @@ class CPose(CConnection):
 #   PoseNode
 #------------------------------------------------------------------
 
-class CPoseNode(CFbx):
+class CPoseNode(FbxStuff):
 
     def __init__(self):
-        CFbx.__init__(self, 'PoseNode')
+        FbxStuff.__init__(self, 'PoseNode')
         self.node = None
-        self.matrix = None
+        self.matrix = CArray('Matrix', float, 4, csys=(True,False))
+        
+    
+    def parse(self, pnode):
+        self.parseNodes(pnode.values)
         
         
     def parseNodes(self, pnodes):
@@ -204,15 +214,15 @@ class CPoseNode(CFbx):
             else:
                 rest.append(pnode)
 
-        fbx.matrices[self.node.id] = self.matrix
-        return CFbx.parseNodes(self, rest)
+        fbx.matrices[self.node] = self.matrix
+        return FbxStuff.parseNodes(self, rest)
 
 
     def make(self, node, matrix):
-        CFbx.make(self)
+        FbxStuff.make(self)
         self.node = node
-        self.matrix = CArray('PoseNode', float, 4, csys=(True,False)).make(matrix)
-        fbx.matrices[self.node.id] = self.matrix
+        self.matrix.make(matrix)
+        fbx.matrices[self.node] = self.matrix
         return self
         
         
@@ -228,7 +238,7 @@ class CPoseNode(CFbx):
 #   Bone
 #------------------------------------------------------------------
 
-class CBoneAttribute(CNodeAttribute):
+class CBoneAttribute(FbxNodeAttribute):
     propertyTemplate = (
 """    
         PropertyTemplate: "FbxBoneAttribute" {
@@ -239,13 +249,13 @@ class CBoneAttribute(CNodeAttribute):
 """)
 
     def __init__(self, subtype='LimbNode'):
-        CNodeAttribute.__init__(self, subtype, 'BONEATTR', "Skeleton")
+        FbxNodeAttribute.__init__(self, subtype, 'BONEATTR', "Skeleton")
         self.template = self.parseTemplate('BoneAttribute', CBoneAttribute.propertyTemplate)
 
 
     def make(self, bone):
         self.bone = bone        
-        CNodeAttribute.make(self, bone)
+        FbxNodeAttribute.make(self, bone)
         self.setProps([
             ("Size", bone.length),
         ])
@@ -256,6 +266,8 @@ class CBone(CModel):
     def __init__(self, subtype='LimbNode'):
         CModel.__init__(self, subtype, 'BONE')
         self.attribute = CBoneAttribute()
+        self.object = None
+        self.datum = None
         self.pose = None
         self.transform = None
         self.transformLink = None
@@ -268,36 +280,22 @@ class CBone(CModel):
 
         self.transformLink = bone.matrix_local.transposed()
         self.transform = self.transformLink.inverted()
+        trans,rot,scaling = boneTransformations(bone)
         
-        if bone.parent:
-            pmat = bone.parent.matrix_local.inverted()
-            if fbx.usingMakeHuman:
-                mat = pmat.mult(bone.matrix_local)
-            else:
-                mat = pmat * bone.matrix_local
-        else:
-            mat = bone.matrix_local
-        (loc,rot,scale) = mat.decompose()
-
-        if fbx.usingMakeHuman:
-            euler = Vector(rot.to_euler()).mult(D)
-        else:
-            euler = Vector(rot.to_euler())*D
-
         self.setProps([
             ("RotationActive", 1),
             ("InheritType", 1),
             ("ScalingMax", (0,0,0)),
             ("DefaultAttributeIndex", 0),
 
-            ("Lcl Translation", loc),
-            ("Lcl Rotation", euler),
-            ("Lcl Scaling", (1,1,1))
+            ("Lcl Translation", trans),
+            ("Lcl Rotation", rot),
+            ("Lcl Scaling", scaling)
         ])
 
         self.attribute.make(bone)
         return self
-        
+       
 
     def addDefinition(self, definitions):            
         CModel.addDefinition(self, definitions)
@@ -314,18 +312,39 @@ class CBone(CModel):
         CModel.writeHeader(self, fp)   
 
     
-    def buildBone(self, infos, amt):        
+    def buildBone(self, infos, amt):      
+        nodes = [self]
         eb = amt.edit_bones.new(self.name)
         info = infos[self.name]
         eb.head = info.head
         eb.tail = info.tail
         if info.parent:
             eb.parent = amt.edit_bones[info.parent.name]
-        #eb.roll = info.roll
+        eb.roll = info.roll
         for child,_ in self.children:
             if isinstance(child, CBone):
-                child.buildBone(infos, amt)
-        return eb
+                nodes += child.buildBone(infos, amt)
+        return nodes
+
+
+def boneTransformations(bone):
+    if bone.parent:
+        pmat = bone.parent.matrix_local.inverted()
+        if fbx.usingMakeHuman:
+            mat = pmat.mult(bone.matrix_local)
+        else:
+            mat = pmat * bone.matrix_local
+    else:
+        mat = bone.matrix_local
+    (trans,rot,scale) = mat.decompose()
+
+    if fbx.usingMakeHuman:
+        euler = Vector(rot.to_euler()).mult(D)
+    else:
+        euler = Vector(rot.to_euler())*D
+
+    scale = Vector((1,1,1))
+    return trans,euler,scale
 
 
 class BoneInfo:
@@ -335,7 +354,8 @@ class BoneInfo:
         infos[self.name] = self
         self.head = None
         self.tail = None
-        self.roll = None
+        self.length = 1.0
+        self.roll = 0
         self.parent = None
         self.restMat = None
         self.matrix = None
@@ -372,14 +392,18 @@ class BoneInfo:
                 nChildren += 1
                     
         if nChildren > 0:                    
-            self.tail = sum/nChildren
+            vec = sum/nChildren - self.head
+            self.length = vec.length
+        elif parent:
+            self.length = parent.length
         else:
-            self.tail = self.head + Vector( self.matrix.col[1][:3] )
+            self.length = 1
+        self.tail = self.head + self.length*Vector( self.matrix.col[1][:3] )
 
         if abs(quat.w) < 1e-4:
             self.roll = math.pi
         else:
-            self.roll = -2*math.atan(quat.y/quat.w)
+            self.roll = 2*math.atan(quat.y/quat.w)
         
         return self
 

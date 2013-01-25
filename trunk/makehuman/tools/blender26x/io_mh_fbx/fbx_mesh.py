@@ -30,7 +30,7 @@ from .fbx_deformer import *
 #   Geometry Mesh
 #------------------------------------------------------------------
 
-class CGeometryMesh(CGeometry):
+class FbxMesh(FbxGeometryBase):
     propertyTemplate = (
 """
         PropertyTemplate: "FbxMesh" {
@@ -46,8 +46,8 @@ class CGeometryMesh(CGeometry):
 """)
 
     def __init__(self, subtype='Mesh'):
-        CGeometry.__init__(self, subtype, 'MESH')
-        self.template = self.parseTemplate('GeometryMesh', CGeometryMesh.propertyTemplate)
+        FbxGeometryBase.__init__(self, subtype, 'MESH')
+        self.template = self.parseTemplate('GeometryMesh', FbxMesh.propertyTemplate)
         self.isModel = True
         self.isObjectData = True
         self.mesh = None
@@ -72,7 +72,7 @@ class CGeometryMesh(CGeometry):
             else:
                 rest.append(pnode)
 
-        return CGeometry.parseNodes(self, rest)
+        return FbxGeometryBase.parseNodes(self, rest)
 
     
     def make(self, ob):        
@@ -98,7 +98,7 @@ class CGeometryMesh(CGeometry):
                     m = len(f.vertices)
                     uvfaces += [k for k in range(n, n+m)]
                     n += m
-            self.uvLayers.append(LayerElementUVNode().make(uvloop, index, uvfaces))
+            self.uvLayers.append(FbxLayerElementUV().make(uvloop, index, uvfaces))
         
         if me.shape_keys:
             baseVerts = me.vertices
@@ -106,18 +106,18 @@ class CGeometryMesh(CGeometry):
                 if index == 0:
                     baseVerts = skey.data
                 else:
-                    node = CGeometryShape().make(skey, baseVerts)
+                    node = FbxShape().make(skey, baseVerts)
                     self.shapeKeys[skey.name] = node
                     #node.makeLink(self)
-            self.blendDeformer = CBlendShapeDeformer().make(self, me)
+            self.blendDeformer = FbxBlendShape().make(self, me)
             self.blendDeformer.makeLink(self)
             
         matfaces = [f.material_index for f in me.polygons]
-        return CGeometry.make(self, me, ob, matfaces)
+        return FbxGeometryBase.make(self, me, ob, matfaces)
                                 
 
     def writeHeader(self, fp):
-        CGeometry.writeHeader(self, fp)            
+        FbxGeometryBase.writeHeader(self, fp)            
         self.vertices.writeFbx(fp)
         #self.normals.writeFbx(fp)
         self.faces.writeFbx(fp)
@@ -126,7 +126,7 @@ class CGeometryMesh(CGeometry):
                 
 
     def writeFooter(self, fp):
-        CGeometry.writeFooter(self, fp)
+        FbxGeometryBase.writeFooter(self, fp)
         for node in self.shapeKeys.values():
             node.writeFbx(fp)
         if self.blendDeformer:
@@ -134,7 +134,7 @@ class CGeometryMesh(CGeometry):
             
 
     def writeLinks(self, fp):
-        CGeometry.writeLinks(self, fp)
+        FbxGeometryBase.writeLinks(self, fp)
         for node in self.shapeKeys.values():
             node.writeLinks(fp)
         if self.blendDeformer:        
@@ -151,17 +151,17 @@ class CGeometryMesh(CGeometry):
             mat = fbx.data[node.id]
             me.materials.append(mat)
             
-        return CGeometry.build(self, me)
+        return FbxGeometryBase.build(self, me)
 
 
 #------------------------------------------------------------------
 #   Blendshapes
 #------------------------------------------------------------------
 
-class CGeometryShape(CConnection):
+class FbxShape(FbxObject):
 
     def __init__(self, subtype='Shape'):
-        CConnection.__init__(self, 'Geometry', subtype, 'SHAPEKEY')
+        FbxObject.__init__(self, 'Geometry', subtype, 'SHAPEKEY')
         self.indexes = CArray("Indexes", int, 1)
         self.vertices = CArray("Vertices", float, 3, csys=True)
         self.normals = CArray("Normals", float, 3, csys=True)
@@ -180,11 +180,11 @@ class CGeometryShape(CConnection):
             else:
                 rest.append(pnode)
 
-        return CGeometry.parseNodes(self, rest)
+        return FbxGeometryBase.parseNodes(self, rest)
 
     
     def make(self, skey, baseVerts):        
-        CConnection.make(self, skey)
+        FbxObject.make(self, skey)
         
         if fbx.usingMakeHuman:
             self.indexes.make(skey.indexes)
@@ -203,7 +203,7 @@ class CGeometryShape(CConnection):
 
 
     def writeHeader(self, fp):
-        CConnection.writeHeader(self, fp)            
+        FbxObject.writeHeader(self, fp)            
         self.indexes.writeFbx(fp)
         self.vertices.writeFbx(fp)
         #self.normals.writeFbx(fp)

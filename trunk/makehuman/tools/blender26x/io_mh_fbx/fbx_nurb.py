@@ -28,14 +28,14 @@ from .fbx_geometry import *
 #   Nurb geometry
 #------------------------------------------------------------------
 
-class CGeometryNurb(CGeometry):
+class FbxNurbs(FbxGeometryBase):
     propertyTemplate = (
 """
 """)
 
     def __init__(self, subtype='Nurb'):
-        CGeometry.__init__(self, subtype, 'CURVE')
-        self.template = self.parseTemplate('GeometryNurb', CGeometryNurb.propertyTemplate)
+        FbxGeometryBase.__init__(self, subtype, 'CURVE')
+        self.template = self.parseTemplate('GeometryNurb', FbxNurbs.propertyTemplate)
         self.isModel = True
         self.isObjectData = True
         self.points = CArray("Points", float, 3, csys=True)
@@ -61,7 +61,7 @@ class CGeometryNurb(CGeometry):
             else:
                 rest.append(pnode)
 
-        return CGeometry.parseNodes(self, rest)
+        return FbxGeometryBase.parseNodes(self, rest)
 
     
     def make(self, ob):        
@@ -82,4 +82,4 @@ class CGeometryNurb(CGeometry):
         self.knotVectorU.make( [v.normal for v in me.vertices] )
         self.knotVectorU.make( [v.normal for v in me.vertices] )
 
-        return CGeometry.make(self, cu)
+        return FbxGeometryBase.make(self, cu)

@@ -49,6 +49,8 @@ class CObject(CModel):
         except KeyError:
             pass
         CModel.__init__(self, subtype, 'OBJECT')
+        self.datum = None
+        self.object = None
         self.data = None
         self.datanode = None
         self.dataBtype = 'EMPTY'
@@ -69,6 +71,8 @@ class CObject(CModel):
             ("InheritType", 1),
             ("ScalingMax", (0,0,0)),
         ])    
+        trans,rot,scale = objectTransformations(ob)
+        
         if ob.location.length > 1e-4:
             self.setProp("Lcl Translation", ob.location)
         if Vector(ob.rotation_euler).length > 1e-4:
@@ -104,7 +108,7 @@ class CObject(CModel):
             
     
     def build3(self):
-        ob = fbx.data[self.id]
+        self.datum = self.object = ob = fbx.data[self.id]
         if self.properties:
             ob.location = self.getProp("Lcl Translation")
             ob.rotation_euler = self.getProp("Lcl Rotation")
@@ -112,3 +116,9 @@ class CObject(CModel):
         return ob    
                 
 
+def objectTransformations(ob):
+    scale = ob.scale
+    scale = Vector((1,1,1))
+    return (ob.location, ob.rotation_euler, scale)
+        
+        

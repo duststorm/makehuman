@@ -24,9 +24,22 @@ try:
 except:
     usingMakeHuman = False
     
+if usingMakeHuman:
 
-nodes = []
-data = []
+    import log
+    from log import message, debug
+
+else:    
+    def message(string):
+        print(string)
+
+    def debug(string):
+        print(string)
+    
+
+nodes = {}
+data = {}
+takes = {}
 root = None
 idnum = 1000
 idstruct = {}
@@ -44,36 +57,6 @@ class Settings:
         self.makeSceneNode = False
         self.selectedOnly = True
        
-
-    def getStruct(self):
-        return {
-            "createNewScenes" : self.createNewScenes,
-            "writeAllNodes" : self.writeAllNodes,
-            "changeCsys" : self.changeCsys,    
-            "includePropertyTemplates" : self.includePropertyTemplates,
-            "makeSceneNode" : self.makeSceneNode,
-            "selectedOnly" : self.selectedOnly,
-        }
-        
-    def setStruct(self, struct):
-        for key,value in struct.items():
-            self.setSetting(key, value)
-        
-        
-    def setSetting(self, key, value):
-        if key == "createNewScenes":
-            self.createNewScenes = value
-        elif key == "writeAllNodes":
-            self.writeAllNodes = value
-        elif key == "changeCsys":
-            self.changeCsys = value
-        elif key == "includePropertyTemplates":
-            self.includePropertyTemplates = value
-        elif key == "makeSceneNode":
-            self.makeSceneNode = value
-        elif key == "selectedOnly":
-            self.selectedOnly = value
-            
             
 settings = Settings()
 

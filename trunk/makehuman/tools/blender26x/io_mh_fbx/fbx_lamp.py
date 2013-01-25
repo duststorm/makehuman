@@ -28,7 +28,7 @@ from .fbx_model import *
 #   Lamp
 #------------------------------------------------------------------
 
-class CLampAttribute(CNodeAttribute):
+class FbxLight(FbxNodeAttribute):
     propertyTemplate = (
 """    
         PropertyTemplate: "FbxLight" {
@@ -65,8 +65,8 @@ class CLampAttribute(CNodeAttribute):
 """)        
 
     def __init__(self):
-        CNodeAttribute.__init__(self, "Light", 'LAMP', "Light")
-        self.template = self.parseTemplate('LampAttribute', CLampAttribute.propertyTemplate)
+        FbxNodeAttribute.__init__(self, "Light", 'LAMP', "Light")
+        self.template = self.parseTemplate('LampAttribute', FbxLight.propertyTemplate)
         self.isObjectData = True
         self.lamp = None
             
@@ -74,7 +74,7 @@ class CLampAttribute(CNodeAttribute):
     def make(self, ob):
         self.lamp = ob.data
         
-        CNodeAttribute.make(self, ob.data)
+        FbxNodeAttribute.make(self, ob.data)
         self.setProps([
         ])
         self.setMulti([

@@ -22,12 +22,14 @@ from . import fbx
 from .fbx_basic import *
 from .fbx_props import *
 from .fbx_model import *
+from .fbx_armature import *
+from .fbx_object import *
 
 #------------------------------------------------------------------
 #   Constraint
 #------------------------------------------------------------------
 
-class CConstraint(CConnection):
+class FbxConstraint(FbxObject):
     propertyTemplate = (
 """
         PropertyTemplate: "FbxNode" {
@@ -37,7 +39,7 @@ class CConstraint(CConnection):
 """)
 
     def __init__(self, subtype, btype):
-        CConnection.__init__(self, 'Model', subtype, btype)
+        FbxObject.__init__(self, 'Model', subtype, btype)
         self.setMulti([
             ('Version', 232),
             ('Shading', Y),
@@ -47,14 +49,14 @@ class CConstraint(CConnection):
 
 
     def make(self, cns, bone=None):
-        CConnection.make(self, cns)
+        FbxObject.make(self, cns)
 
 
 #------------------------------------------------------------------
 #   Look At
 #------------------------------------------------------------------
 
-class CLookAttribute(CNodeAttribute):
+class CLookAttribute(FbxNodeAttribute):
     propertyTemplate = (
 """    
     PropertyTemplate: "FbxLookAttribute" {
@@ -65,13 +67,13 @@ class CLookAttribute(CNodeAttribute):
 """)
 
     def __init__(self, subtype='Null'):
-        CNodeAttribute.__init__(self, subtype, 'BONEATTR', "Null")
+        FbxNodeAttribute.__init__(self, subtype, 'BONEATTR', "Null")
         self.template = self.parseTemplate('LookAttribute', CLookAttribute.propertyTemplate)
 
 
     def make(self, bone):
         self.bone = bone    
-        CNodeAttribute.make(self, bone)
+        FbxNodeAttribute.make(self, bone)
         self.setProps([
             ("Look", 0),
         ])
@@ -81,7 +83,7 @@ class CLookAttribute(CNodeAttribute):
 #   IK
 #------------------------------------------------------------------
 
-class CIKEffectorAttribute(CNodeAttribute):
+class CIKEffectorAttribute(FbxNodeAttribute):
     propertyTemplate = (
 """    
     Properties70:  {
@@ -94,13 +96,13 @@ class CIKEffectorAttribute(CNodeAttribute):
 """)
 
     def __init__(self, subtype='IKEffector'):
-        CNodeAttribute.__init__(self, subtype, 'BONEATTR', "Marker")
+        FbxNodeAttribute.__init__(self, subtype, 'BONEATTR', "Marker")
         self.template = self.parseTemplate('IKEffectorAttribute', CIKEffectorAttribute.propertyTemplate)
 
 
     def make(self, bone):
         self.bone = bone    
-        CNodeAttribute.make(self, bone)
+        FbxNodeAttribute.make(self, bone)
         self.setProps([
             ("Color", (1,0.25,0.25)),
             ("Look", 3),
@@ -116,7 +118,7 @@ class CIKEffectorAttribute(CNodeAttribute):
 
 
     
-class CIKEffector(CConstraint):
+class CIKEffector(FbxConstraint):
     propertyTemplate = (
 """ 
     Properties70:  {
@@ -124,8 +126,8 @@ class CIKEffector(CConstraint):
         P: "InheritType", "enum", "", "",1
         P: "ScalingMax", "Vector3D", "Vector", "",0,0,0
         P: "DefaultAttributeIndex", "int", "Integer", "",0
-        P: "Lcl Translation", "Lcl Translation", "", "A+",-2.38418579101563e-007,12.4463262557983,-0.0435358583927155
-        P: "Lcl Rotation", "Lcl Rotation", "", "A+",3.65929906262582,-4.63946712446924e-008,1.1487226493973e-007
+        P: "Lcl Translation", "Lcl Translation", "", "A+",0,0,0
+        P: "Lcl Rotation", "Lcl Rotation", "", "A+",0,0,0
         P: "Lcl Scaling", "Lcl Scaling", "", "A+",1,1,1
         P: "MultiTake", "int", "Integer", "",1
         P: "ManipulationMode", "enum", "", "",0
@@ -158,18 +160,34 @@ class CIKEffector(CConstraint):
     }
 """)
 
-class CIKEffector(CConstraint):
+class CIKEffector(FbxConstraint):
 
     def __init__(self, subtype='IKEffector'):
-        CConstraint.__init__(self, subtype, 'IK')
+        FbxConstraint.__init__(self, subtype, 'IK')
         self.template = self.parseTemplate('IKEffector', CIKEffector.propertyTemplate)
         self.attribute = CIKEffectorAttribute()
             
 
-    def make(self, cns, bone=None):
-        CConstraint.make(self, cns)
+    def make(self, cns, bone=None, object=None):
+        FbxConstraint.make(self, cns)
+        self.attribute.make(cns)
+        
+        if bone:
+            trans,rot,scale = boneTransformations(bone)
+        elif object:
+            trans,rot,scale = objectTransformations(object)
+            
         self.setProps([
+            ("RotationActive", 1),
+            ("InheritType", 1),
+            ("ScalingMax", (0,0,0)),
+            ("DefaultAttributeIndex", 0),
+
+            ("Lcl Translation", trans),
+            ("Lcl Rotation", rot),
+            ("Lcl Scaling", scale)
         ])
+
         self.setMulti([
             ("Version", 232),
             ("Shading", U),
@@ -183,7 +201,7 @@ class CIKEffector(CConstraint):
 #   FK
 #------------------------------------------------------------------
 
-class CFKEffectorAttribute(CNodeAttribute):
+class CFKEffectorAttribute(FbxNodeAttribute):
     propertyTemplate = (
 """    
     Properties70:  {
@@ -194,13 +212,13 @@ class CFKEffectorAttribute(CNodeAttribute):
 """)
 
     def __init__(self, subtype='FKEffector'):
-        CNodeAttribute.__init__(self, subtype, 'BONEATTR', "Marker")
+        FbxNodeAttribute.__init__(self, subtype, 'BONEATTR', "Marker")
         self.template = self.parseTemplate('FKEffectorAttribute', CFKEffectorAttribute.propertyTemplate)
 
 
     def make(self, bone):
         self.bone = bone    
-        CNodeAttribute.make(self, bone)
+        FbxNodeAttribute.make(self, bone)
         self.setProps([
             ("Color", (1,1,0)),
             ("Look", 9),
@@ -208,7 +226,7 @@ class CFKEffectorAttribute(CNodeAttribute):
         ])
 
 
-class CFKEffector(CConstraint):
+class CFKEffector(FbxConstraint):
     propertyTemplate = (
 """ 
         Properties70:  {
@@ -247,13 +265,13 @@ class CFKEffector(CConstraint):
 """)
 
     def __init__(self, subtype='FKEffector'):
-        CConstraint.__init__(self, subtype, 'FK')
+        FbxConstraint.__init__(self, subtype, 'FK')
         self.template = self.parseTemplate('FKEffector', CFKEffector.propertyTemplate)
         self.attribute = CFKEffectorAttribute()
             
 
     def make(self, cns, bone):
-        CConstraint.make(self, cns)
+        FbxConstraint.make(self, cns)
         self.setProps([
         ])
         self.setMulti([

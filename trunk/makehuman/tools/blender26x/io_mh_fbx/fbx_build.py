@@ -19,7 +19,7 @@
 import bpy
 
 def buildFbxNode(context):
-    print("Build")
+    fbx.message("Build")
 
 
 class VIEW3D_OT_TestBuildButton(bpy.types.Operator):
@@ -31,5 +31,3 @@ class VIEW3D_OT_TestBuildButton(bpy.types.Operator):
         buildFbxNode(context)
         return {'FINISHED'}
 
-
-print("fbx_build loaded")

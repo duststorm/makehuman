@@ -28,13 +28,13 @@ from . import fbx_material
 #   Geometry
 #------------------------------------------------------------------
 
-class CGeometry(CConnection):
+class FbxGeometryBase(FbxObject):
     propertyTemplate = (
 """
 """)
 
     def __init__(self, subtype, btype):
-        CConnection.__init__(self, 'Geometry', subtype, btype)
+        FbxObject.__init__(self, 'Geometry', subtype, btype)
         self.uvLayers = []
         self.materialLayers = []
         self.textureLayers = []
@@ -46,25 +46,25 @@ class CGeometry(CConnection):
             if pnode.key == 'Layer' : 
                 pass
             elif pnode.key == 'LayerElementUV' : 
-                self.uvLayers.append( LayerElementUVNode().parse(pnode) )
+                self.uvLayers.append( FbxLayerElementUV().parse(pnode) )
             elif pnode.key == 'LayerElementMaterial' : 
-                self.materialLayers.append( LayerElementMaterialNode().parse(pnode) )
+                self.materialLayers.append( FbxLayerElementMaterial().parse(pnode) )
             elif pnode.key == 'LayerElementTexture' : 
-                self.textureLayers.append( LayerElementTextureNode().parse(pnode) )  
+                self.textureLayers.append( FbxLayerElementTexture().parse(pnode) )  
             else:
                 rest.append(pnode)
 
-        return CConnection.parseNodes(self, rest)
+        return FbxObject.parseNodes(self, rest)
 
     
     def make(self, rna, ob=None, matfaces=None):        
-        CConnection.make(self, rna)
+        FbxObject.make(self, rna)
         if not hasattr(rna, "materials"):
             return self
             
         tn = 0
         layer = DummyLayer()
-        self.materialLayers.append(LayerElementMaterialNode().make(layer, 0, rna.materials, matfaces))
+        self.materialLayers.append(FbxLayerElementMaterial().make(layer, 0, rna.materials, matfaces))
         
         for mn,mat in enumerate(rna.materials):
             if mat:
@@ -78,13 +78,13 @@ class CGeometry(CConnection):
                         if tex and tex.type == 'IMAGE':
                             self.hastex = True
 
-        self.textureLayers.append(LayerElementTextureNode().make(layer, 0, self.hastex))            
+        self.textureLayers.append(FbxLayerElementTexture().make(layer, 0, self.hastex))            
         return self
 
                                 
     def writeFooter(self, fp):
         if not( self.uvLayers or self.materialLayers or self.textureLayers ):
-            CConnection.writeFooter(self, fp)
+            FbxObject.writeFooter(self, fp)
             return
             
         for layer in self.uvLayers:
@@ -105,7 +105,7 @@ class CGeometry(CConnection):
             self.writeLayerElement(fp, "LayerElementTexture")
         fp.write('        }\n')
 
-        CConnection.writeFooter(self, fp)         
+        FbxObject.writeFooter(self, fp)         
 
 
     def writeLayerElement(self, fp, type):
@@ -136,39 +136,36 @@ class DummyLayer():
         self.name = "Dummy"
 
     
-class LayerElementNode(CFbx):
-    def __init__(self, type):
-        CFbx.__init__(self, type)
-        self.mappingInfoType = "NoMappingInformation"
-        self.referenceInformationType = "Direct"
+class FbxLayerElement(FbxStuff):
+    def __init__(self, ftype):
+        FbxStuff.__init__(self, ftype)
+        self.index = 0
+        self.setMulti([
+            ("Version", 101),
+            ("Name", None),
+            ("MappingInformationType", "NoMappingInformation"),
+            ("ReferenceInformationType", "Direct")
+        ])
 
-    def parse(self, pnode0):
-        CFbx.parse(self, pnode0)
-        self.index = pnode0.values[0]
-        for pnode in pnode0.values[1:]:
-            values = pnode.values
-            if pnode.key == "Name":
-                self.name = values[0]
-            elif pnode.key == 'MappingInformationType':
-                self.mappingInfoType = values[0]
-            elif pnode.key == 'ReferenceInformationType':
-                self.referenceInformationType = values[0]
-        return self                
+
+    def parse(self, pnode):
+        self.index = pnode.values[0]
+        return self.parseNodes(pnode.values[1:])
+        
         
     def make(self, layer, index):
-        self.name = layer.name
         self.index = index
+        self.setMulti([
+            ("Name", layer.name),
+        ])
+        
 
-    def writeStart(self, fp):
-        fp.write(
-            '        %s: %d { \n' % (self.ftype, self.index) +
-            '            Version: 101 \n' +
-            '            Name: "%s" \n' % self.name +
-            '            MappingInformationType: "%s"\n' % self.mappingInfoType+
-            '            ReferenceInformationType: "%s"\n' % self.referenceInformationType)
+    def writeHeader(self, fp):
+        fp.write('        %s: %d { \n' % (self.ftype, self.index))
+
 
     def build(self, me, layer):
-        layer.name = self.name
+        layer.name = self.get("Name")
         return
         
 
@@ -176,26 +173,28 @@ class LayerElementNode(CFbx):
 #   UV Layer
 #------------------------------------------------------------------
 
-class LayerElementUVNode(LayerElementNode):
+class FbxLayerElementUV(FbxLayerElement):
 
     def __init__(self):
-        LayerElementNode.__init__(self, 'LayerElementUV')
-        self.mappingInfoType = "NoMappingInformation"
-        self.referenceInformationType = "Direct"
+        FbxLayerElement.__init__(self, 'LayerElementUV')
         self.vertices = CArray("UV", float, 2)
         self.faces = CArray("UVIndex", int, 1)
 
-    def parse(self, pnode0):
-        LayerElementNode.parse(self, pnode0)
-        for pnode in pnode0.values[1:]:
+
+    def parseNodes(self, pnodes):
+        rest = []        
+        for pnode in pnodes:
             if pnode.key == 'UV':
                 self.vertices.parse(pnode)
             elif pnode.key == 'UVIndex':
                 self.faces.parse(pnode)
-        return self                
+            else:
+                rest.append(pnode)
+        return FbxLayerElement.parseNodes(self, rest)
+
         
     def make(self, layer, index, faces):
-        LayerElementNode.make(self, layer, index)
+        FbxLayerElement.make(self, layer, index)
         if fbx.usingMakeHuman:
             verts = layer.data
         else:
@@ -204,16 +203,17 @@ class LayerElementUVNode(LayerElementNode):
         self.faces.make(faces)
         return self
         
-    def writeFbx(self, fp):
-        self.writeStart(fp)
+        
+    def writeHeader(self, fp):
+        FbxLayerElement.writeHeader(self, fp)
         self.vertices.writeFbx(fp)
         self.faces.writeFbx(fp)
-        fp.write('        }\n')
+
 
     def build(self, me):
         uvtex = me.uv_textures.new()
         uvloop = me.uv_layers[-1]
-        LayerElementNode.build(self, me, uvtex)
+        FbxLayerElement.build(self, me, uvtex)
         for fn,vn in enumerate(self.faces.values):            
             uvloop.data[fn].uv = self.vertices.values[vn]
         return
@@ -223,83 +223,83 @@ class LayerElementUVNode(LayerElementNode):
 #   Material Layer
 #------------------------------------------------------------------
 
-class LayerElementMaterialNode(LayerElementNode):
+class FbxLayerElementMaterial(FbxLayerElement):
 
     def __init__(self):
-        LayerElementNode.__init__(self, 'LayerElementMaterial')
+        FbxLayerElement.__init__(self, 'LayerElementMaterial')
         self.materials = CArray("Materials", int, 1)
                 
-    def parse(self, pnode0):
-        LayerElementNode.parse(self, pnode0)
-        for pnode in pnode0.values[1:]:
+                
+    def parseNodes(self, pnodes):        
+        rest = []
+        for pnode in pnodes:
             if pnode.key == 'Materials':
                 self.materials.parse(pnode)
-        return self                
+            else:
+                rest.append(pnode)
+        return FbxLayerElement.parseNodes(self, rest)
+        
         
     def make(self, layer, index, mats, faces):
-        LayerElementNode.make(self, layer, index)
+        FbxLayerElement.make(self, layer, index)
         if len(mats) == 1:
-            self.mappingInfoType = "AllSame"
-            self.referenceInformationType = "IndexToDirect"
-            self.materials.make( [0] )
+            self.setMulti([
+                ("MappingInformationType", "AllSame"),
+                ("ReferenceInformationType", "IndexToDirect")
+            ])
+            self.materials.make([0])
         else:
-            self.mappingInfoType = "ByPolygon"
-            self.referenceInformationType = "IndexToDirect"
+            self.setMulti([
+                ("MappingInformationType", "ByPolygon"),
+                ("ReferenceInformationType", "IndexToDirect")
+            ])
             self.materials.make(faces)
         return self
 
-    def writeFbx(self, fp):
-        self.writeStart(fp)
+
+    def writeHeader(self, fp):
+        FbxLayerElement.writeHeader(self, fp)
         self.materials.writeFbx(fp)
-        fp.write('        }\n')
+
 
     def build(self, me):
         pass
-        #LayerElementNode.build(self, me, layer)
+        #FbxLayerElement.build(self, me, layer)
 
 
 #------------------------------------------------------------------
 #   Texture Layer
 #------------------------------------------------------------------
 
-class LayerElementTextureNode(LayerElementNode):
+class FbxLayerElementTexture(FbxLayerElement):
 
     def __init__(self):
-        LayerElementNode.__init__(self, 'LayerElementTexture')
-        self.blendMode = "Translucent"
-        self.textureAlpha = 1.0
+        FbxLayerElement.__init__(self, 'LayerElementTexture')
+        self.setMulti([
+            ("BlendMode", "Translucent"),
+            ("TextureAlpha", 1.0)
+        ])
         self.hastex = False
 
-    def parse(self, pnode0):
-        LayerElementNode.parse(self, pnode0)
-        for pnode in pnode0.values[1:]:
-            if pnode.key == 'BlendMode':
-                self.blendMode = pnode.values[0]
-            elif pnode.key == 'TextureAlpha':
-                self.textureAlpha = pnode.values[0]
-        return self                
-        
+
     def make(self, layer, index, hastex):
         self.hastex = hastex
-        LayerElementNode.make(self, layer, index)
+        FbxLayerElement.make(self, layer, index)
         if hastex:
-            self.mappingInfoType = "ByPolygonVertex"
-            self.referenceInformationType = "IndexToDirect"
+            self.setMulti([
+                ("MappingInformationType", "ByPolygonVertex"),
+                ("ReferenceInformationType", "IndexToDirect"),
+            ])
         else:
-            self.mappingInfoType = "NoMappingInformation"
-            self.referenceInformationType = "IndexToDirect"
-            self.blendMode = "Translucent"
-            self.textureAlpha = 1.0
+            self.setMulti([
+                ("MappingInformationType", "NoMappingInformation"),
+                ("ReferenceInformationType", "IndexToDirect"),
+                ("BlendMode", "Translucent"),
+                ("TextureAlpha", 1.0)
+            ])
         return self        
 
-    def writeFbx(self, fp):
-        self.writeStart(fp)
-        if not self.hastex:
-            fp.write(
-                '            BlendMode: "%s"\n' % self.blendMode +
-                '            TextureAlpha: %.4g\n' % self.textureAlpha)
-        fp.write('        }\n')
 
     def build(self, me):
         pass
-        #LayerElementNode.build(self, me, layer)
+        #FbxLayerElement.build(self, me, layer)

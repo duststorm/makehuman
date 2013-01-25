@@ -29,10 +29,10 @@ from .fbx_model import *
 #   Deformer
 #------------------------------------------------------------------
 
-class CSkinDeformer(CConnection):
+class FbxSkin(FbxObject):
 
     def __init__(self, subtype='Skin'):
-        CConnection.__init__(self, 'Deformer', subtype, 'SKIN_DEFORMER')
+        FbxObject.__init__(self, 'Deformer', subtype, 'SKIN_DEFORMER')
         self.rigNode = None
         self.meshNode = None
         self.object = None
@@ -47,7 +47,7 @@ class CSkinDeformer(CConnection):
     
     
     def make(self, ob):
-        CConnection.make(self, ob)
+        FbxObject.make(self, ob)
         
         amtNode = fbx.nodes.armatures[ob.data.name]
         for vgroup in self.object.vertex_groups:
@@ -56,14 +56,14 @@ class CSkinDeformer(CConnection):
             except KeyError:
                 boneNode = None
             if boneNode:
-                subdef = CClusterSubDeformer().make(vgroup, boneNode, self.object)
+                subdef = FbxCluster().make(vgroup, boneNode, self.object)
                 self.subdeformers[vgroup.index] = subdef
 
         return self
 
     
     def addDefinition(self, definitions):     
-        CConnection.addDefinition(self, definitions)
+        FbxObject.addDefinition(self, definitions)
         for subdef in self.subdeformers.values():
             subdef.addDefinition(definitions)
 
@@ -82,7 +82,7 @@ class CSkinDeformer(CConnection):
     def writeHeader(self, fp):
         for subdef in self.subdeformers.values():
             subdef.writeFbx(fp)
-        CConnection.writeHeader(self, fp)
+        FbxObject.writeHeader(self, fp)
         
 
     def build5(self):            
@@ -103,10 +103,10 @@ class CSkinDeformer(CConnection):
             
  
 
-class CClusterSubDeformer(CConnection):
+class FbxCluster(FbxObject):
  
     def __init__(self, subtype='Cluster'):
-         CConnection.__init__(self, 'Deformer', subtype, 'DEFORMER')
+         FbxObject.__init__(self, 'Deformer', subtype, 'DEFORMER')
          self.indexes = CArray('Indexes', int, 1)
          self.weights = CArray('Weights', float, 1)
          self.transform = CArray('Transform', float, 4)
@@ -126,11 +126,11 @@ class CClusterSubDeformer(CConnection):
                 self.transformLink.parse(pnode)
             else:
                 rest.append(pnode)
-        return CConnection.parseNodes(self, rest)
+        return FbxObject.parseNodes(self, rest)
 
 
     def make(self, vgroup, boneNode, ob):
-        CConnection.make(self, vgroup)
+        FbxObject.make(self, vgroup)
         vnums = []
         weights = []
         for v in ob.data.vertices:
@@ -150,7 +150,7 @@ class CClusterSubDeformer(CConnection):
         self.weights.writeFbx(fp)
         self.transform.writeFbx(fp)
         self.transformLink.writeFbx(fp)
-        CConnection.writeFooter(self, fp)
+        FbxObject.writeFooter(self, fp)
         
         
     def buildVertGroups(self, ob):
@@ -160,26 +160,26 @@ class CClusterSubDeformer(CConnection):
             vg.add([vn], w, 'REPLACE')
 
  #------------------------------------------------------------------
- #   BlendShapeDeformer
+ #   FbxBlendShape
  #------------------------------------------------------------------
  
-class CBlendShapeDeformer(CConnection):
+class FbxBlendShape(FbxObject):
 
     def __init__(self, subtype='BlendShape'):
-        CConnection.__init__(self, 'Deformer', subtype, 'BLEND_DEFORMER')
+        FbxObject.__init__(self, 'Deformer', subtype, 'BLEND_DEFORMER')
         self.mesh = None
         self.subdeformers = []
         
    
     def make(self, meshNode, me):
-        CConnection.make(self, me)
+        FbxObject.make(self, me)
         self.meshNode = meshNode
         self.mesh = me
         
         for index,skey in enumerate(me.shape_keys.key_blocks):
             if index > 0:
                 skeyNode = meshNode.shapeKeys[skey.name]
-                subdef = CBlendShapeChannelSubDeformer().make(skey)
+                subdef = FbxBlendShapeChannel().make(skey)
                 self.subdeformers.append(subdef)
                 subdef.makeLink(self)
                 skeyNode.makeLink(subdef)
@@ -188,20 +188,20 @@ class CBlendShapeDeformer(CConnection):
 
     
     def addDefinition(self, definitions):     
-        CConnection.addDefinition(self, definitions)
+        FbxObject.addDefinition(self, definitions)
         for subdef in self.subdeformers:
             subdef.addDefinition(definitions)
 
 
     def writeLinks(self, fp):
-        CConnection.writeLinks(self, fp)
+        FbxObject.writeLinks(self, fp)
         for subdef in self.subdeformers:
             subdef.writeLinks(fp)
 
     
 
     def writeFooter(self, fp):
-        CConnection.writeFooter(self, fp)
+        FbxObject.writeFooter(self, fp)
         for subdef in self.subdeformers:
             subdef.writeFbx(fp)
         
@@ -212,10 +212,10 @@ class CBlendShapeDeformer(CConnection):
         ob = fbx.data[obNode.id]
             
 
-class CBlendShapeChannelSubDeformer(CConnection):
+class FbxBlendShapeChannel(FbxObject):
  
     def __init__(self, subtype='BlendShapeChannel'):
-         CConnection.__init__(self, 'Deformer', subtype, 'BLEND_CHANNEL_DEFORMER')
+         FbxObject.__init__(self, 'Deformer', subtype, 'BLEND_CHANNEL_DEFORMER')
          self.fullWeights = CArray('FullWeights', int, 1)
 
          
@@ -226,17 +226,17 @@ class CBlendShapeChannelSubDeformer(CConnection):
                 self.fullWeights.parse(pnode)
             else:
                 rest.append(pnode)
-        return CConnection.parseNodes(self, rest)
+        return FbxObject.parseNodes(self, rest)
 
 
     def make(self, skey):
-        CConnection.make(self, skey)
+        FbxObject.make(self, skey)
         self.fullWeights.make([100])
         self.set("DeformPercent", 0)
         return self
          
 
     def writeHeader(self, fp):
-        CConnection.writeHeader(self, fp)
+        FbxObject.writeHeader(self, fp)
         self.fullWeights.writeFbx(fp) 
 

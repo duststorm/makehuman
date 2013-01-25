@@ -27,9 +27,9 @@ from .fbx_basic import *
 #   Properties70 nodes
 #------------------------------------------------------------------
 
-class CProperties70(CFbx):
+class CProperties70(FbxPlug):
     def __init__(self):
-        CFbx.__init__(self, "Properties70")
+        FbxPlug.__init__(self, "Properties70")
         self.properties = {}
         
 
@@ -154,7 +154,7 @@ def newProp(name, ftype, supertype, anim):
     elif ftype in CompoundTypes:
         prop = CCompoundProperty(name, ftype, supertype, anim)
     else:
-        print("Unknown proptype", ftype)
+        fbx.debug("Unknown proptype %s" % ftype)
         halt
     return prop
         
@@ -186,10 +186,10 @@ class CPropertyTemplate:
 #   Property node
 #------------------------------------------------------------------
 
-class CProperty(CFbx):
+class CProperty(FbxPlug):
 
     def __init__(self, name, ftype, supertype, anim):
-        CFbx.__init__(self, ftype)
+        FbxPlug.__init__(self, ftype)
         self.name = name
         self.value = None
         self.supertype = supertype

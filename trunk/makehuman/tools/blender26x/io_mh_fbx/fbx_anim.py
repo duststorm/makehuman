@@ -27,45 +27,59 @@ from .fbx_model import *
 #   Take
 #------------------------------------------------------------------
 
-class CTake(CFbx):
+class FbxTake(FbxStuff):
 
     def __init__(self):
-        CFbx.__init__(self, "Take")
+        FbxStuff.__init__(self, "Take")
         self.name = "Take 001"
-        self.filename = "Take_001.tak"
-        self.localTime = (float2int(1), float2int(100))
-        self.referenceTime = (float2int(1), float2int(100))
+        frameStart = float2int(1)
+        frameEnd = float2int(100)
+        self.setMulti([
+            ("FileName", self.name),
+            ("LocalTime", (frameStart, frameEnd)),
+            ("ReferenceTime", (frameStart, frameEnd)),
+        ])
 
 
-    def make(self, scn, act):
-        print("TAKE", self, scn, act)
-        self.name = act.name
-        self.filename = act.name.replace(" ","_") + ".tak"
-        begin = float2int(scn.frame_start)
-        end = float2int(scn.frame_end)
-        self.localTime = (begin,end)
-        self.referenceTime = (begin,end)
+    def parse(self, pnode):
+        self.name = pnode.values[0]
+        return self.parseNodes(pnode.values[1:])
+        
+        
+    def make(self, scn, name):
+        self.name = name.replace(" ","_") + ".tak"
+        frameStart = float2int(scn.frame_start)
+        frameEnd = float2int(scn.frame_end)
+        self.setMulti([
+            ("FileName", self.name),
+            ("LocalTime", (frameStart, frameEnd)),
+            ("ReferenceTime", (frameStart, frameEnd)),
+        ])
         return self
+
+
+    def writeHeader(self, fp):
+        fp.write('    Take: "%s" {\n' % self.name)
+    
+
+    def build(self):
+        if fbx.settings.createNewScenes:
+            name = self.name.split(".")[0]
+            scn = bpy.data.scenes.new(name)
+            bpy.context.scene = scn
+        else:
+            scn = bpy.context.scene
         
-        
-    def writeFbx(self, fp):
-        return
-        
-    def writeTake(self, fp):
-        fp.write(
-            '    Take: "%s" {\n' % self.name +
-            '        FileName: "%s"\n' % self.filename +
-            '        LocalTime: %d,%d\n' % tuple(self.localTime) +
-            '        ReferenceTime: %d,%d\n' % tuple(self.referenceTime)  +
-            '    }\n')
-        
+        frameStart, frameEnd = self.get("LocalTime")
+        scn.frame_start = int2float(frameStart)
+        scn.frame_end = int2float(frameEnd)
         
         
 #------------------------------------------------------------------
 #   AnimationStack
 #------------------------------------------------------------------
 
-class CAnimationStack(CConnection):
+class CAnimationStack(FbxObject):
     propertyTemplate = (
 """
         PropertyTemplate: "FbxAnimStack" {
@@ -80,55 +94,25 @@ class CAnimationStack(CConnection):
 """)
 
     def __init__(self, subtype=''):
-        CConnection.__init__(self, 'AnimationStack', subtype, 'ANIMATION')
+        FbxObject.__init__(self, 'AnimationStack', subtype, 'ANIMATION')
         self.template = self.parseTemplate('AnimationStack', CAnimationStack.propertyTemplate)
         self.name = "Take 001"
-        self.action = None
-        self.alayers = []
                 
 
     def make(self, act):        
-        CConnection.make(self, act)
-        print("ANIM", self, act)
-        self.name = act.name
-        self.active = True
-        self.action = act       
-        alayer = CAnimationLayer().make(act)
-        fbx.nodes.alayers[act.name] = alayer
-        alayer.makeLink(self)
-        self.alayers.append(alayer)
+        FbxObject.make(self, act)
         return self
-                                
-
-    def addDefinition(self, definitions):            
-        CConnection.addDefinition(self, definitions)            
-        for alayer in self.alayers:
-            alayer.addDefinition(definitions)
-
-
-    def writeHeader(self, fp):
-        for alayer in self.alayers:
-            alayer.writeFbx(fp)
-        CConnection.writeHeader(self, fp)   
-
+        
 
     def writeLinks(self, fp):
-        take = fbx.takes[self.name]
-        #self.writeLink(fp, take)
-        #for alayer in self.alayers:
-        #    alayer.writeLink(fp, self)
-
-
-    def build3(self):
-        for alayer in self.alayers:
-            self.action = alayer.build()
-        return self.action
-
+        return
+                         
+                         
 #------------------------------------------------------------------
 #   AnimationLayer
 #------------------------------------------------------------------
 
-class CAnimationLayer(CConnection):
+class CAnimationLayer(FbxObject):
     propertyTemplate = (
 """
         PropertyTemplate: "FbxAnimLayer" {
@@ -147,48 +131,52 @@ class CAnimationLayer(CConnection):
 """)
 
     def __init__(self, subtype=''):
-        CConnection.__init__(self, 'AnimationLayer', subtype, 'ACTION')
+        FbxObject.__init__(self, 'AnimationLayer', subtype, 'ACTION')
         self.template = self.parseTemplate('AnimationLayer', CAnimationLayer.propertyTemplate)
         self.name = "Layer0"
         self.groups = {}
         self.acnodes = {}
+        self.users = []
                 
     
     def make(self, act):        
-        CConnection.make(self, act)
+        FbxObject.make(self, act)
         groups = groupFcurves(act)            
         for key,group in groups.items():
-            acnode = self.acnodes[key] = CAnimationCurveNode().make(group)
-            #acnode.makeLink(self)
+            acnode = self.acnodes[key] = FbxAnimationCurveNode().make(group)
+            acnode.makeLink(self)
+            for user in self.users:
+                if group.pose:
+                    if user.btype == 'ARMATURE':
+                        boneNode = user.bones[group.bone]
+                        acnode.makeChannelLink(boneNode, acnode.channel)
+                else:
+                    acnode.makeChannelLink(user, acnode.channel)
         return self
                                 
 
     def addDefinition(self, definitions):            
-        CConnection.addDefinition(self, definitions)            
+        FbxObject.addDefinition(self, definitions)            
         for acnode in self.acnodes.values():
             acnode.addDefinition(definitions)
 
 
-    def writeHeader(self, fp):
+    def writeFooter(self, fp):
+        FbxObject.writeFooter(self, fp)            
         for acnode in self.acnodes.values():
             acnode.writeFbx(fp)
-        CConnection.writeHeader(self, fp)            
 
 
     def writeLinks(self, fp):
-        CConnection.writeLinks(self, fp)
+        FbxObject.writeLinks(self, fp)
         for acnode in self.acnodes.values():
-            acnode.writeLink(fp, self)
+            acnode.writeLinks(fp)
 
 
-    def build(self):
-        act = bpy.data.actions.new(self.name)
-        for acnode in self.acnodes.values():
-            key,group = acnode.build()
-            self.groups[key] = group
-            for fcu in group.fcurves.values():
-                act.fcurves.append(fcu)
-        return act
+    def build4(self):
+        for acnode,_ in self.children:
+            if acnode.ftype == 'AnimationCurveNode':
+                acnode.build()
 
 #------------------------------------------------------------------
 #   F-curve group
@@ -196,36 +184,49 @@ class CAnimationLayer(CConnection):
 
 class FCurveGroup():
 
-    def __init__(self, name):
-        self.name = name
-        self.type = fcurveName(name)
+    def __init__(self, datapath):
+        self.name = datapath
+        words = datapath.split('.')
+        self.channel = words[-1].lower()
+        self.pose = (words[0] == "pose")
+        if self.pose:
+            words = datapath.split('"')
+            self.bone = words[1]
+        else:
+            self.bone = None
         self.fcurves = {}                
 
-
-def fcurveType(fcu):
-    return fcu.data_path.split('.')[-1].lower()
-    
-
-def fcurveName(datapath):
-    words = datapath.split('"')
-    if len(words) == 1:
-        return words[0]
-    else:
-        return words[1]
-
+    def __repr__(self):
+        return ("<FCurveGroup %p\n   c %s p %s b %s>" % 
+                    (self.datapath, self.channel, self.pose, self.bone))
+                    
     
 def groupFcurves(act):        
     groups = {}
     for fcu in act.fcurves:
-        print("GG", fcu.data_path, fcu.array_index)
-        name = fcu.data_path
         try:
-            group = groups[name]
+            group = groups[fcu.data_path]
         except KeyError:
-            group = groups[name] = FCurveGroup(name)
+            group = groups[fcu.data_path] = FCurveGroup(fcu.data_path)
         group.fcurves[fcu.array_index] = fcu
     return groups    
   
+  
+def getDataPath(channel, btype, rna):
+    datapaths = {
+        'Lcl Translation' : 'location',
+        'Lcl Rotation' : 'rotation_euler',
+        #'Lcl Rotation' : 'rotation_quaternion',
+        'Lcl Scaling' : 'scale'
+    }
+    bchannel = datapaths[channel]
+    if btype == 'BONE':
+        return bchannel,('pose.bones["%s"].%s' % (rna.name, bchannel))
+    elif btype == 'OBJECT':
+        return bchannel,bchannel
+    else:
+        fbx.debug("getDataPath %s %s %s" % (channel, btype, rna))
+        halt
 
 #------------------------------------------------------------------
 #   AnimationCurveNode
@@ -234,14 +235,23 @@ def groupFcurves(act):
 
 Channels = {
     'location' : ('T', 'Lcl Translation', 'Vector3', (0,0,0)),
-    'rotation_quaternion' : ('R', 'Lcl Rotation', 'Vector3', (0,0,0)), 
+    #'rotation_quaternion' : ('R', 'Lcl Rotation', 'Vector3', (0,0,0)), 
     'rotation_euler' : ('R', 'Lcl Rotation', 'Vector3', (0,0,0)), 
     'scale' : ('S', 'Lcl Scaling', 'Vector3', (1,1,1)),
 }
 
 XYZ = ['X', 'Y', 'Z']
 
-class CAnimationCurveNode(CConnection):
+Index = {
+    "d|X" : 0,
+    "d|Y" : 1,
+    "d|Z" : 2,
+}
+
+
+
+
+class FbxAnimationCurveNode(FbxObject):
     propertyTemplate = (
 """
         PropertyTemplate: "FbxAnimCurveNode" {
@@ -252,19 +262,24 @@ class CAnimationCurveNode(CConnection):
 """)
 
     def __init__(self, subtype=''):
-        CConnection.__init__(self, 'AnimationCurveNode', '', subtype)
-        self.template = self.parseTemplate('AnimationCurveNode', CAnimationCurveNode.propertyTemplate)
+        FbxObject.__init__(self, 'AnimationCurveNode', '', subtype)
+        self.template = self.parseTemplate('AnimationCurveNode', FbxAnimationCurveNode.propertyTemplate)
         self.acurves = {}
 
 
     def make(self, group):        
-        CConnection.make(self, group)
+        FbxObject.make(self, group)
         channel = self.name.split(".")[-1]
         self.name, self.channel, self.proptype, kvec = Channels[channel]
         self.group = group
+        if self.channel in ["Lcl Rotation"]:
+            deg = D
+        else:
+            deg = 1
 
         for index,fcu in group.fcurves.items():
-            self.acurves[index] = CAnimationCurve().make(fcu)
+            acu = self.acurves[index] = FbxAnimationCurve().make(fcu, deg)
+            acu.makeChannelLink(self, ("d|%s" % XYZ[index]))
 
         if channel == 'rotation_quaternion':
             self.acurves[0] = self.acurves[1]
@@ -280,28 +295,55 @@ class CAnimationCurveNode(CConnection):
                                 
 
     def addDefinition(self, definitions):            
-        CConnection.addDefinition(self, definitions)            
+        FbxObject.addDefinition(self, definitions)            
         for acu in self.acurves.values():
             acu.addDefinition(definitions)
 
 
-    def writeHeader(self, fp):
+    def writeFooter(self, fp):
+        FbxObject.writeFooter(self, fp)            
         for index,acu in self.acurves.items():
             acu.writeFbx(fp)        
-        CConnection.writeHeader(self, fp)            
 
 
-    def writeLink(self, fp, node):
-        CConnection.writeChannelLink(self, fp, node, self.channel)
-        print("L", self.acurves.items())
+    def writeLinks(self, fp):
+        FbxObject.writeLinks(self, fp)
         for index,acu in self.acurves.items():
-            print("WL", index, acu)
-            acu.writeChannelLink(fp, self, 'd|%s' % XYZ[index])
+            acu.writeLinks(fp)
 
 
     def build(self):
-        return None
+        rna = None
+        group = None
+        for btype in ['BONE', 'OBJECT']:        
+            node,channel = self.getBParent(btype)
+            if node:
+                rna = node.datum
+                ob = node.object
+                group = rna.name
+                break
 
+        if channel in ["Lcl Rotation"]:
+            rad = R
+        else:
+            deg = 1
+
+        
+        for child,idx in self.children:       
+            index = Index[idx]
+            bchannel,datapath = getDataPath(channel, btype, rna)
+            ob.keyframe_insert(datapath, index, frame=0, group=group)
+            act = ob.animation_data.action
+            fcu = getFCurveFromAction(act, datapath, index)
+            child.build(fcu, rad)
+            
+
+def getFCurveFromAction(act, datapath, index):
+    for fcu in act.fcurves:
+        if fcu.data_path == datapath and fcu.array_index == index:
+            return fcu
+    return None
+    
 #------------------------------------------------------------------
 #   AnimationCurve
 #   Corresponds to a single F-curve in Blender
@@ -326,23 +368,22 @@ KeyAttrFlags = {
 }
 
 
-class CAnimationCurve(CConnection):
+class FbxAnimationCurve(FbxObject):
 
     def __init__(self, subtype=''):
-        CConnection.__init__(self, 'AnimationCurve', '', subtype)
+        FbxObject.__init__(self, 'AnimationCurve', '', subtype)
         self.name = ""
         self.setMulti([
             ('Default', 0),
             ('KeyVer', 4008),
-            ('KeyTimes', CArray("KeyTime", float, 1) ),
-            ('KeyValsFloat', CArray("KeyValueFloat", float, 1) ),
-            ('KeyAttrFlags', CArray("KeyAttrFlags", int, 1) ),
-            ('KeyAttrDataFloat', CArray("KeyAttrDataFloat", int, 4) ),
-            ('KeyAttrRefCount', CArray("KeyAttrRefCount", int, 1) ),
+            ('KeyTime', CArray("KeyTime", int, 1)),
+            ('KeyValueFloat', CArray("KeyValueFloat", float, 1)),
+            ('KeyAttrFlags', CArray("KeyAttrFlags", int, 1)),
+            ('KeyAttrDataFloat', CArray("KeyAttrDataFloat", int, 4)),
+            ('KeyAttrRefCount', CArray("KeyAttrRefCount", int, 1)),
         ])
-        
-
-    def make(self, fcu):        
+       
+    def make(self, fcu, deg):        
 
         times = []
         values = []
@@ -353,7 +394,7 @@ class CAnimationCurve(CConnection):
         for kp in fcu.keyframe_points:
             t = float2int(kp.co[0])
             times.append(t)
-            y = kp.co[1]
+            y = kp.co[1]*deg
             values.append(y)
             #data += [list(kp.handle_left), list(kp.handle_right)]
             data.append((0,0,0xd050d05,0))
@@ -362,25 +403,21 @@ class CAnimationCurve(CConnection):
             flags.append(flag)
             refcounts.append(1)
 
-        self.get('KeyTimes').make(times)
-        self.get('KeyValsFloat').make(values)
+        self.get('KeyTime').make(times)
+        self.get('KeyValueFloat').make(values)
         self.get('KeyAttrFlags').make(flags)
         self.get('KeyAttrDataFloat').make(data)
         self.get('KeyAttrRefCount').make(refcounts)
         
-        return CConnection.make(self, fcu)
+        return FbxObject.make(self, fcu)
         
         
-    def build3(self):
-        fcu = fbx.data[self.id]
-        times = self.struct['KeyTimes']
-        values = self.struct['KeyValsFloat']
-        flags = self.struct['KeyAttrFlags']
-        attrs = self.struct['KeyAttrDataFloat']
-        refcounts = self.struct['KeyAttrRefCount']
-
-        for n,t in enumerate(times):
-            fcu.keyframe_points.append((t,values[t]))
+    def build(self, fcu, rad):
+        times = self.get('KeyTime')
+        yvals = self.get('KeyValueFloat')
+        for n,t in enumerate(times.values):
+            yval = yvals.values[n]
+            fcu.keyframe_points.insert(int2float(t), yval*rad, options={'FAST'})
 
         return fcu            
             

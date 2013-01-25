@@ -39,10 +39,6 @@ class CNull(CModel):
                 self.node = child
                 return 'ARMATURE'
 
-        for child,channel in self.children:
-            if child.ftype == 'Model':
-                return 'SCENE'
-
         return 'EMPTY'
 
         
@@ -50,8 +46,6 @@ class CNull(CModel):
         btype = self.getBtype()
         if btype == 'ARMATURE':
             return fbx_armature.CArmature().buildArmature(self)
-        elif btype == 'SCENE':
-            return fbx_scene.CScene.build3(self)
         elif btype == 'EMPTY':
             return fbx.data[self.id]
 

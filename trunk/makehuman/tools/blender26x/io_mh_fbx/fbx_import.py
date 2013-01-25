@@ -32,12 +32,13 @@ from . import fbx_scene
 
 def importFbxFile(context, filepath):
     fbx.activeFolder = os.path.dirname(filepath)
-    print("Import", filepath)
+    fbx.message('Import "%s"' % filepath)
     proot = fbx_token.tokenizeFbxFile(filepath)
+    fbx.message("  File tokenized")
     fbx_data.parseNodes(proot)    
-    print("Tree parsed")
+    fbx.message("  Tree parsed")
     fbx_data.buildObjects(context)          
-    print("Objects built")
+    fbx.message('File "%s" imported' % filepath)
     
 
 class VIEW3D_OT_TestImportButton(bpy.types.Operator):

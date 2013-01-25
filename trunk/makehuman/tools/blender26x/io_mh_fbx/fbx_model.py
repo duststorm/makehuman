@@ -22,6 +22,106 @@ from . import fbx
 from .fbx_basic import *
 from .fbx_props import *
 
+
+
+class FbxStuff(FbxPlug):
+
+    def __init__(self, ftype):
+        FbxPlug.__init__(self, ftype)
+        self.properties = CProperties70()
+        self.struct = {}
+        self.template = {}
+        
+        
+    def parseTemplate(self, ftype, template):
+        template = self.properties.parseTemplate(ftype, template)        
+        for key,value in template.items():
+            self.template[key] = value
+        return template            
+
+    # Struct        
+
+    def get(self, key):
+        try:
+            return self.struct[key]
+        except KeyError:
+            fbx.debug("Unrecognized key %s" % key)
+            return None
+        
+    def set(self, key, value):
+        self.struct[key] = value
+        
+    def setMulti(self, list):
+        for key,value in list:
+            self.struct[key] = value
+            
+    # Properties
+
+    def setProp(self, key, value):
+        self.properties.setProp(key, value, self.template)
+        
+    def getProp(self, key):
+        return self.properties.getProp(key, self.template)
+        
+    def setProps(self, list):
+        for key,value in list:
+            self.setProp(key, value)
+            
+
+    def parseNodes(self, pnodes): 
+        for pnode in pnodes:
+            try:
+                elt = self.struct[pnode.key]
+            except KeyError:
+                elt = None
+            
+            if elt and isinstance(elt, FbxPlug):
+                elt.parse(pnode)
+            elif pnode.key == 'Properties70':
+                self.properties.parse(pnode)
+            elif len(pnode.values) == 1:
+                self.struct[pnode.key] = pnode.values[0]
+            elif len(pnode.values) > 1:
+                self.struct[pnode.key] = pnode.values  
+            else:
+                fbx.debug(pnode)
+                pnode.write()
+                halt
+        return self    
+
+
+    def writeFooter(self, fp):
+        fp.write('    }\n')
+
+        
+    def writeProps(self, fp):        
+        self.properties.write(fp, self.template)
+        
+
+    def writeStruct(self, fp):
+        for key,value in self.struct.items():
+            if isinstance(value, FbxPlug):
+                value.writeFbx(fp)
+            elif isinstance(value, str):
+                fp.write('        %s: "%s"\n' % (key,value))
+            elif isinstance(value, list) or isinstance(value, tuple):
+                fp.write('        %s:' % key)
+                c = ' '
+                for x in value:
+                    fp.write('%s %s' % (c,x))
+                    c = ','
+                fp.write('\n')
+            else:
+                fp.write('        %s: %s\n' % (key,value))
+    
+
+    def writeFbx(self, fp):
+        self.writeHeader(fp)
+        self.writeProps(fp)
+        self.writeStruct(fp)
+        self.writeFooter(fp)
+
+
 #------------------------------------------------------------------
 #   Connection node
 #------------------------------------------------------------------
@@ -51,62 +151,25 @@ Prefix2 = {
     },
 }
 
-class CConnection(CFbx):
+class FbxObject(FbxStuff):
 
-    def __init__(self, type, subtype, btype):
-        CFbx.__init__(self, type)
+    def __init__(self, ftype, subtype, btype):
+        FbxStuff.__init__(self, ftype)
         self.subtype = subtype
         self.rna = None
         try:
-            self.prefix = Prefix[type]
+            self.prefix = Prefix[ftype]
         except KeyError:
-            self.prefix = Prefix2[type][subtype]
+            self.prefix = Prefix2[ftype][subtype]
         self.btype = btype
         self.links = []
         self.children = []
         self.active = False
         self.isObjectData = False
-        self.properties = CProperties70()
-        self.template = {}
-        self.struct = {}
 
 
     def __repr__(self):
         return ("<CNode %d %s %s %s %s %s %s>" % (self.id, self.ftype, self.subtype, self.name, self.isModel, self.active, self.btype))
-
-    # Struct        
-
-    def get(self, key):
-        try:
-            return self.struct[key]
-        except KeyError:
-            #print("Unrecognized key", key)
-            return None
-        
-    def set(self, key, value):
-        self.struct[key] = value
-        
-    def setMulti(self, list):
-        for key,value in list:
-            self.struct[key] = value
-            
-    # Properties
-
-    def setProp(self, key, value):
-        self.properties.setProp(key, value, self.template)
-        
-    def getProp(self, key):
-        return self.properties.getProp(key, self.template)
-        
-    def setProps(self, list):
-        for key,value in list:
-            self.setProp(key, value)
-            
-    def parseTemplate(self, ftype, template):
-        template = self.properties.parseTemplate(ftype, template)        
-        for key,value in template.items():
-            self.template[key] = value
-        return template            
         
     # Overwrites
     
@@ -115,30 +178,8 @@ class CConnection(CFbx):
         return self
 
 
-    def parseNodes(self, pnodes): 
-        for pnode in pnodes:
-            try:
-                elt = self.struct[pnode.key]
-            except KeyError:
-                elt = None
-            
-            if elt and isinstance(elt, CFbx):
-                elt.parse(pnode)
-            elif pnode.key == 'Properties70':
-                self.properties.parse(pnode)
-            elif len(pnode.values) == 1:
-                self.struct[pnode.key] = pnode.values[0]
-            elif len(pnode.values) > 1:
-                self.struct[pnode.key] = pnode.values  
-            else:
-                print(pnode)
-                pnode.write()
-                halt
-        return self    
-
-
     def make(self, rna):
-        CFbx.make(self)
+        FbxStuff.make(self)
         try:
             self.name = rna.name
         except AttributeError:
@@ -153,13 +194,14 @@ class CConnection(CFbx):
             act = adata.action
             if act:
                 alayer = fbx.nodes.alayers[act.name]
-                CConnection.makeLink(alayer, self)
+                alayer.users.append(self)
+                #FbxObject.makeLink(alayer, self)
         return self                
         
                 
     def makeChannelLink(self, parent, channel):
         if self == parent:
-            print("Linking to self", self)
+            fbx.message("Linking to self %s" % self)
             return
             halt
         self.links.append((parent,channel))
@@ -176,6 +218,16 @@ class CConnection(CFbx):
                 return link
         return None                
         
+        
+    def getBParentRecursive(self, btype):
+        for link in self.links:
+            if link[0].btype == btype:
+                return link
+        for link in self.links:
+            parent = link[0].getBParentRecursive(btype)
+            if parent:
+                return parent
+                
 
     def getFParent(self, ftype):
         for link in self.links:
@@ -199,35 +251,6 @@ class CConnection(CFbx):
                 
     def writeHeader(self, fp):
         fp.write('    %s: %d, "%s::%s", "%s" {\n' % (self.ftype, self.id, self.prefix, self.name, self.subtype))
-
-    def writeFooter(self, fp):
-        fp.write('    }\n')
-        
-    def writeProps(self, fp):        
-        self.properties.write(fp, self.template)
-        
-    def writeStruct(self, fp):
-        for key,value in self.struct.items():
-            if isinstance(value, CFbx):
-                value.writeFbx(fp)
-            elif isinstance(value, str):
-                fp.write('        %s: "%s"\n' % (key,value))
-            elif isinstance(value, list) or isinstance(value, tuple):
-                fp.write('        %s' % key)
-                c = ' '
-                for x in value:
-                    fp.write('%s %s' % (c,x))
-                    c = ','
-                fp.write('\n')
-            else:
-                fp.write('        %s: %s\n' % (key,value))
-    
-
-    def writeFbx(self, fp):
-        self.writeHeader(fp)
-        self.writeProps(fp)
-        self.writeStruct(fp)
-        self.writeFooter(fp)
 
 
     def writeLinks(self, fp):
@@ -259,10 +282,10 @@ class CConnection(CFbx):
 #   Root node
 #------------------------------------------------------------------
 
-class RootNode(CConnection):
+class RootNode(FbxObject):
 
     def __init__(self):
-        CConnection.__init__(self, "Model", "", None)
+        FbxObject.__init__(self, "Model", "", None)
         self.name = "RootNode"
         self.id = 0
         fbx.idstruct[0] = self
@@ -278,10 +301,10 @@ class RootNode(CConnection):
 #   Node Attribute node
 #------------------------------------------------------------------
 
-class CNodeAttribute(CConnection):
+class FbxNodeAttribute(FbxObject):
 
     def __init__(self, subtype, btype, typeflags=None):
-        CConnection.__init__(self, 'NodeAttribute', subtype, btype)
+        FbxObject.__init__(self, 'NodeAttribute', subtype, btype)
         if typeflags:
             self.struct['TypeFlags'] = typeflags
 
@@ -300,7 +323,7 @@ class CNodeAttribute(CConnection):
 #   Model node
 #------------------------------------------------------------------
 
-class CModel(CConnection):
+class CModel(FbxObject):
     propertyTemplate = (
 """
         PropertyTemplate: "FbxNode" {
@@ -381,7 +404,7 @@ class CModel(CConnection):
 """)
 
     def __init__(self, subtype, btype):
-        CConnection.__init__(self, 'Model', subtype, btype)
+        FbxObject.__init__(self, 'Model', subtype, btype)
         self.template = self.parseTemplate('Model', CModel.propertyTemplate)
         self.setMulti([
             ('Version', 232),

@@ -47,10 +47,10 @@ def oneOf(mhCase, blenderCase):
         return blenderCase
 
 #------------------------------------------------------------------
-#   CFbx
+#   FbxPlug
 #------------------------------------------------------------------
 
-class CFbx:
+class FbxPlug:
 
     def __init__(self, ftype):
         self.id = 0
@@ -65,6 +65,8 @@ class CFbx:
         return self
         
     def parse(self, pnode):
+        fbx.debug("Unparsed pnode %s" % pnode)
+        halt
         return self
         
     def identify(self):
@@ -79,11 +81,14 @@ class CFbx:
         return ("<Node %d %s %s %s>" % (self.id, self.ftype, self.name, self.isModel))
 
     def writeFbx(self, fp):
+        halt
         return
               
     def writeLinks(self, fp):
         return
 
+    # Build
+    
     def build1(self):
         return None
         
@@ -99,6 +104,8 @@ class CFbx:
     def build5(self):
         return None
         
+    # Add definition
+    
     def addDefinition(self, definitions):        
         try:
             defi = definitions[self.ftype]
@@ -132,10 +139,10 @@ class Definition:
 #   Array nodes
 #------------------------------------------------------------------
 
-class CArray(CFbx):
+class CArray(FbxPlug):
 
     def __init__(self, name, type, step, csys=False):
-        CFbx.__init__(self, 'ARRAY')
+        FbxPlug.__init__(self, 'ARRAY')
         self.name = name
         self.values = []
         self.subtype = type
@@ -145,11 +152,15 @@ class CArray(CFbx):
         if type == float:
             self.format = '%s%.5g'
         elif type == int:
-            self.format = '%s%d'
+            self.format = '%s%ld'
 
 
-    def parse(self, pnode0):
-        for pnode in pnode0.values[1:]:
+    def parse(self, pnode):     
+        return self.parseNodes(pnode.values[1:])
+
+
+    def parseNodes(self, pnodes):
+        for pnode in pnodes:
             if pnode.key == 'a':
                 self.size = len(pnode.values)
                 if self.step == 1:
@@ -275,7 +286,7 @@ class FbxLiteral:
         self.value = value
         
     def __repr__(self):
-    	return self.value
+        return self.value
 
 
 U = FbxLiteral("U")            
@@ -315,7 +326,11 @@ def nameName(string):
 
 
 def float2int(f):
-    return int(f*0x1000)
-    #return int(f*1924421094.0)
+    #return int(f*0x1000)
+    return int(f*1924421094.0)
+
+def int2float(d):
+    #return int(f*0x1000)
+    return float(d/1924421094.0)
 
 

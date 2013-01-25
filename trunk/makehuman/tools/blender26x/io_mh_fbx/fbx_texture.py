@@ -27,7 +27,7 @@ from .fbx_model import *
 #   Texture
 #------------------------------------------------------------------
 
-class CTexture(CConnection):
+class FbxFileTexture(FbxObject):
     propertyTemplate = ( 
 """
         PropertyTemplate: "FbxFileTexture" {
@@ -53,8 +53,8 @@ class CTexture(CConnection):
 """)
 
     def __init__(self, subtype=''):
-        CConnection.__init__(self, 'Texture', subtype, 'TEXTURE')        
-        self.template = self.parseTemplate('Texture', CTexture.propertyTemplate)
+        FbxObject.__init__(self, 'Texture', subtype, 'TEXTURE')        
+        self.template = self.parseTemplate('Texture', FbxFileTexture.propertyTemplate)
         self.isModel = True 
         self.image = None
 
@@ -66,11 +66,11 @@ class CTexture(CConnection):
                 self.image = nodeFromName(pnode.values[0])
             else:
                 rest.append(pnode)
-        return  CConnection.parseNodes(self, rest)     
+        return  FbxObject.parseNodes(self, rest)     
     """
 
     def make(self, tex):
-        CConnection.make(self, tex)
+        FbxObject.make(self, tex)
         img = tex.image
         if img:
             self.image = fbx.nodes.images[img.name].make(img)
@@ -91,7 +91,7 @@ class CTexture(CConnection):
         
 
     def writeHeader(self, fp):   
-        CConnection.writeHeader(self, fp)            
+        FbxObject.writeHeader(self, fp)            
 
 
     def build2(self):

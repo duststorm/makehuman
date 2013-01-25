@@ -27,7 +27,7 @@ from .fbx_model import *
 #   Material
 #------------------------------------------------------------------
 
-class CMaterial(CConnection):
+class FbxSurfaceMaterial(FbxObject):
     propertyTemplates = {
         "Phong" : ( 
 """
@@ -101,16 +101,16 @@ class CMaterial(CConnection):
     }
 
     def __init__(self, subtype=''):
-        CConnection.__init__(self, 'Material', subtype, 'MATERIAL')        
+        FbxObject.__init__(self, 'Material', subtype, 'MATERIAL')        
         self.isModel = True        
         self.textures = []
         self.shader = "Lambert"
 
 
     def make(self, mat):
-        CConnection.make(self, mat)        
-        self.shader = CMaterial.FbxShaders[mat.diffuse_shader]
-        self.propertyTemplate = CMaterial.propertyTemplates[self.shader]
+        FbxObject.make(self, mat)        
+        self.shader = FbxSurfaceMaterial.FbxShaders[mat.diffuse_shader]
+        self.propertyTemplate = FbxSurfaceMaterial.propertyTemplates[self.shader]
         self.template = self.parseTemplate('Material', self.propertyTemplate)        
         
         for mtex in mat.texture_slots:
@@ -165,8 +165,8 @@ class CMaterial(CConnection):
         except AttributeError:
             self.shader = "Phong"
         self.shader = self.shader.capitalize()
-        mat.diffuse_shader = CMaterial.BlenderShaders[self.shader]
-        self.propertyTemplate = CMaterial.propertyTemplates[self.shader]
+        mat.diffuse_shader = FbxSurfaceMaterial.BlenderShaders[self.shader]
+        self.propertyTemplate = FbxSurfaceMaterial.propertyTemplates[self.shader]
         self.template = self.parseTemplate('Material', self.propertyTemplate)                
         
         mat.diffuse_intensity = 1

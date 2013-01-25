@@ -62,7 +62,7 @@ class CGroup(CModel):
 
     def __init__(self):
         CModel.__init__(self, "Group", "Group", 'GROUP')
-        self.template = self.parseTemplate('Group', CCameraSwitcher.propertyTemplate)
+        self.template = self.parseTemplate('Group', FbxCameraSwitcher.propertyTemplate)
 
 
     def make(self, grp):

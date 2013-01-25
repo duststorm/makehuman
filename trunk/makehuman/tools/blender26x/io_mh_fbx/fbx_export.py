@@ -179,7 +179,7 @@ Definitions:  {
     
 def exportFbxFile(context, filepath):    
     filepath = filepath.replace('\\','/')
-    print("Export", filepath)
+    fbx.message('Export "%s"' % filepath)
     fbx.filepath = filepath
     fbx.activeFolder = os.path.dirname(filepath)
 
@@ -220,10 +220,6 @@ Objects:  {
 Connections:  {
 """)
     
-    print("CONN")
-    for node in nodes:
-        print("  ", node)
-    print("END CONN")
     for node in nodes:
         if node.active or fbx.settings.writeAllNodes:
             node.writeLinks(fp)
@@ -239,14 +235,14 @@ Takes:  {
 """)
 
     for take in fbx.takes.values():
-        take.writeTake(fp)
+        take.writeFbx(fp)
         
     fp.write(
 """
 }
 """)
     fp.close()
-    print("%s exported" % filepath)
+    fbx.message('File "%s" exported' % filepath)
 
 
 class VIEW3D_OT_TestExportButton(bpy.types.Operator):

@@ -28,7 +28,7 @@ from .fbx_model import *
 #   Camera
 #------------------------------------------------------------------
 
-class CCameraAttribute(CNodeAttribute):
+class FbxCamera(FbxNodeAttribute):
     propertyTemplate = (
 """    
         PropertyTemplate: "FbxCamera" {
@@ -144,8 +144,8 @@ class CCameraAttribute(CNodeAttribute):
 """)
 
     def __init__(self):
-        CNodeAttribute.__init__(self, "Camera", 'CAMERA', "Camera")
-        self.template = self.parseTemplate('CameraAttribute', CCameraAttribute.propertyTemplate)
+        FbxNodeAttribute.__init__(self, "Camera", 'CAMERA', "Camera")
+        self.template = self.parseTemplate('CameraAttribute', FbxCamera.propertyTemplate)
         self.isObjectData = True
         self.camera = None
 
@@ -163,7 +163,7 @@ class CCameraAttribute(CNodeAttribute):
             ("FarPlane", 100),
             ("FocusDistance", 5),
         ])
-        CNodeAttribute.make(self, ob.data)
+        FbxNodeAttribute.make(self, ob.data)
         self.setMulti([
             ("Position", (0,0,-50)),
             ("Up", (0,1,0)),
@@ -183,7 +183,7 @@ class CCameraAttribute(CNodeAttribute):
 #   Camera Switcher
 #------------------------------------------------------------------
 
-class CCameraSwitcher(CNodeAttribute):
+class FbxCameraSwitcher(FbxNodeAttribute):
     propertyTemplate = (
 """    
         PropertyTemplate: "FbxCameraSwitcher" {
@@ -194,20 +194,20 @@ class CCameraSwitcher(CNodeAttribute):
 """)
 
     def __init__(self):
-        CNodeAttribute.__init__(self, "CameraSwitcher", "CameraSwitcher", 'EMPTY')
-        self.template = self.parseTemplate('NodeAttribute', CCameraSwitcher.propertyTemplate)
+        FbxNodeAttribute.__init__(self, "CameraSwitcher", "CameraSwitcher", 'EMPTY')
+        self.template = self.parseTemplate('NodeAttribute', FbxCameraSwitcher.propertyTemplate)
 
 
     def make(self, ob):
         self.setProps([
             ("Camera Index", 0),
         ])
-        CNodeAttribute.make(self, ob.data)
+        FbxNodeAttribute.make(self, ob.data)
         self.setMulti([
         ])
   
   
-class CCameraSwitcher(CModel):
+class FbxCameraSwitcher(CModel):
     propertyTemplate = (
 """    
         PropertyTemplate: "FbxCameraSwitcher" {
@@ -241,13 +241,13 @@ class CCameraSwitcher(CModel):
 
     def __init__(self):
         CModel.__init__(self, "CameraSwitcher", "CameraSwitcher", 'EMPTY')
-        self.template = self.parseTemplate('Model', CCameraSwitcher.propertyTemplate)
+        self.template = self.parseTemplate('Model', FbxCameraSwitcher.propertyTemplate)
 
 
     def make(self, ob):
         self.setProps([
         ])
-        CNodeAttribute.make(self, ob.data)
+        FbxNodeAttribute.make(self, ob.data)
         self.setMulti([
 		("Version", 232),
 		("Shading", W),

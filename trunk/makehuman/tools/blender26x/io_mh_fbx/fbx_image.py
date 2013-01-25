@@ -28,7 +28,7 @@ from .fbx_model import *
 #   Image
 #------------------------------------------------------------------
 
-class CImage(CConnection):
+class CImage(FbxObject):
     propertyTemplate = (         
 """
         PropertyTemplate: "FbxVideo" {
@@ -53,14 +53,14 @@ class CImage(CConnection):
 """)        
 
     def __init__(self, subtype=''):
-        CConnection.__init__(self, 'Video', subtype, 'IMAGE')        
+        FbxObject.__init__(self, 'Video', subtype, 'IMAGE')        
         self.template = self.parseTemplate('Video', CImage.propertyTemplate)
         self.isModel = True    
         self.image = None
 
 
     def make(self, img):        
-        CConnection.make(self, img)
+        FbxObject.make(self, img)
         filepath = os.path.expanduser(bpy.path.abspath(img.filepath))
         self.struct["Filename"] = str(os.path.normpath(filepath))
         self.struct["RelativeFilename"] = str(os.path.normpath(os.path.relpath(filepath, fbx.activeFolder)))
@@ -75,7 +75,7 @@ class CImage(CConnection):
 
     def build1(self):
         path = os.path.join(fbx.activeFolder, self.struct["RelativeFilename"]) 
-        print("Loading", path)
+        fbx.message("Loading %s" % path)
         try:
             self.image = bpy.data.images.load(path)
         except RuntimeError:
