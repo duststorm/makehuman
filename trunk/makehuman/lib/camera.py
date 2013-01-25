@@ -158,3 +158,15 @@ class Camera(object):
         m = self.getConvertToScreenMatrix(obj)
         x, y, z = matrix.transform3(m.I, [sx, sy, sz])
         return [x, y, z]
+
+    @property
+    def eye(self):
+        return (self.eyeX, self.eyeY, self.eyeZ)
+
+    @property
+    def focus(self):
+        return (self.focusX, self.focusY, self.focusZ)
+
+    @property
+    def up(self):
+        return (self.upX, self.upY, self.upZ)
