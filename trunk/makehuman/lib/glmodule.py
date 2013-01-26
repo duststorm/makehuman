@@ -42,6 +42,7 @@ import matrix
 from debugdump import DebugDump
 import log
 from texture import Texture
+import profiler
 
 g_primitiveMap = [GL_POINTS, GL_LINES, GL_TRIANGLES, GL_QUADS]
 
@@ -625,7 +626,7 @@ def _draw():
     drawEnd()
 
 def draw():
-    if G.profile:
+    if profiler.active():
         profiler.accum('_draw()', globals(), locals())
     else:
         _draw()

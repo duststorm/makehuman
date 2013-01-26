@@ -163,24 +163,11 @@ class Canvas(QtOpenGL.QGLWidget):
         self.setMinimumHeight(5)
         self.setSizePolicy(QtGui.QSizePolicy.Ignored, QtGui.QSizePolicy.Ignored)
 
-    def callback(self, name, event, accum=False):
-        name = 'on%sCallback' % name
-        if not hasattr(self.app, name):
-            return
-        if G.profile:
-            if accum:
-                profiler.accum('G.app.callEvent(name, event)', globals(), locals())
-            else:
-                profiler.flush()
-                profiler.run('G.app.callEvent(name, event)', globals(), locals())
-        else:
-            G.app.callEvent(name, event)
-
     def mousePressEvent(self, ev):
-        self.mouseUpDownEvent(ev, "MouseDown")
+        self.mouseUpDownEvent(ev, "onMouseDownCallback")
 
     def mouseReleaseEvent(self, ev):
-        self.mouseUpDownEvent(ev, "MouseUp")
+        self.mouseUpDownEvent(ev, "onMouseUpCallback")
 
     def mouseUpDownEvent(self, ev, direction):
         global gg_mouse_pos
@@ -193,7 +180,7 @@ class Canvas(QtOpenGL.QGLWidget):
 
         gl.getPickedColor(x, y)
 
-        self.callback(direction, events3d.MouseEvent(b, x, y))
+        G.app.callEvent(direction, events3d.MouseEvent(b, x, y))
 
         # Update screen
         self.update()
@@ -211,7 +198,7 @@ class Canvas(QtOpenGL.QGLWidget):
 
         b = 1 if d > 0 else -1
 
-        self.callback('MouseWheel', events3d.MouseWheelEvent(b))
+        G.app.callEvent('onMouseWheelCallback', events3d.MouseWheelEvent(b))
 
     def mouseMoveEvent(self, ev):
         global gg_mouse_pos, g_mouse_pos
@@ -245,7 +232,7 @@ class Canvas(QtOpenGL.QGLWidget):
         if not buttons:
             gl.getPickedColor(x, y)
 
-        self.callback('MouseMoved', events3d.MouseEvent(buttons, x, y, xrel, yrel), accum = True)
+        G.app.callEvent('onMouseMovedCallback', events3d.MouseEvent(buttons, x, y, xrel, yrel))
 
         if buttons:
             self.update()
@@ -260,7 +247,7 @@ class Canvas(QtOpenGL.QGLWidget):
         G.windowHeight = h
         G.windowWidth = w
         gl.reshape(w, h)
-        self.callback('Resized', events3d.ResizeEvent(w, h, False))
+        G.app.callEvent('onResizedCallback', events3d.ResizeEvent(w, h, False))
 
 class VLayout(QtGui.QLayout):
     def __init__(self, parent = None):

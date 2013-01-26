@@ -22,10 +22,11 @@ Abstract
 TODO
 """
 
+import atexit
 from cProfile import Profile
 
 _sort = 'cumulative'
-_accum = {}
+_profiler = None
 
 def run(cmd, globals, locals):
     prof = Profile()
@@ -34,18 +35,26 @@ def run(cmd, globals, locals):
     finally:
         show(prof)
 
-def accum(cmd, globals, locals):
-    if cmd not in _accum:
-        prof = Profile()
-        _accum[cmd] = prof
-    else:
-        prof = _accum[cmd]
-    prof.runctx(cmd, globals, locals)
+def active():
+    return _profiler is not None
 
-def flush():
-    for cmd in sorted(_accum.keys()):
-        show(_accum[cmd])
-    _accum.clear()
+def start():
+    global _profiler
+    if active():
+        return
+    _profiler = Profile()
+
+def stop():
+    global _profiler
+    if not active():
+        return
+    show(_profiler)
+    _profiler = None
+
+def accum(cmd, globals, locals):
+    if not active():
+        return
+    _profiler.runctx(cmd, globals, locals)
 
 def show(prof):
     prof.print_stats(_sort)
@@ -53,3 +62,5 @@ def show(prof):
 def set_sort(sort):
     global _sort
     _sort = sort
+
+atexit.register(stop)

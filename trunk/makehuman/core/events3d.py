@@ -21,6 +21,7 @@ Abstract
 
 This module contains classes to allow an object to handle events.
 """
+import profiler
 import log
 from core import G
 
@@ -183,14 +184,19 @@ class EventHandler(object):
     def callEvent(self, eventType, event):
         if not hasattr(self, eventType):
             return False
+        topLevel = EventHandler._depth == 0
         EventHandler._depth += 1
         try:
             self._logger.debug('callEvent[%d]: %s.%s(%s)', self._depth, self, eventType, event)
-            getattr(self, eventType)(event)
+            method = getattr(self, eventType)
+            if topLevel and profiler.active():
+                profiler.accum('method(event)', globals(), locals())
+            else:
+                method(event)
         except Exception, e:
             log.warning('Exception during event %s', eventType, exc_info=True)
         EventHandler._depth -= 1
-        if EventHandler._depth == 0:
+        if topLevel:
             self._logger.debug('callEvent: done')
             if G.app:
                 G.app.redraw()

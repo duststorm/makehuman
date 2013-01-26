@@ -32,6 +32,5 @@ class Globals(object):
         self.color_picked = (0, 0, 0)
         self.clearColor = (0.0, 0.0, 0.0, 0.0)
         self.swapBuffers = None
-        self.profile = False
 
 G = Globals()

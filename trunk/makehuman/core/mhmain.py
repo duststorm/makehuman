@@ -98,41 +98,42 @@ class MHApplication(gui3d.Application, mh.Application):
 
         self.shortcuts = {
             # Actions
-            (mh.Modifiers.CTRL, mh.Keys.z): 'undo',
-            (mh.Modifiers.CTRL, mh.Keys.y): 'redo',
-            (mh.Modifiers.CTRL, mh.Keys.m): 'modelling',
-            (mh.Modifiers.CTRL, mh.Keys.s): 'save',
-            (mh.Modifiers.CTRL, mh.Keys.l): 'load',
-            (mh.Modifiers.CTRL, mh.Keys.e): 'export',
-            (mh.Modifiers.CTRL, mh.Keys.r): 'rendering',
-            (mh.Modifiers.CTRL, mh.Keys.h): 'help',
-            (mh.Modifiers.CTRL, mh.Keys.q): 'exit',
-            (mh.Modifiers.CTRL, mh.Keys.w): 'stereo',
-            (mh.Modifiers.CTRL, mh.Keys.f): 'wireframe',
-            (mh.Modifiers.ALT, mh.Keys.t): 'savetgt',
-            (mh.Modifiers.ALT, mh.Keys.e): 'qexport',
-            (mh.Modifiers.ALT, mh.Keys.s): 'smooth',
-            (mh.Modifiers.ALT, mh.Keys.g): 'grab',
+            'undo':		(mh.Modifiers.CTRL, mh.Keys.z),
+            'redo':		(mh.Modifiers.CTRL, mh.Keys.y),
+            'modelling':	(mh.Modifiers.CTRL, mh.Keys.m),
+            'save':		(mh.Modifiers.CTRL, mh.Keys.s),
+            'load':		(mh.Modifiers.CTRL, mh.Keys.l),
+            'export':		(mh.Modifiers.CTRL, mh.Keys.e),
+            'rendering':	(mh.Modifiers.CTRL, mh.Keys.r),
+            'help':		(mh.Modifiers.CTRL, mh.Keys.h),
+            'exit':		(mh.Modifiers.CTRL, mh.Keys.q),
+            'stereo':		(mh.Modifiers.CTRL, mh.Keys.w),
+            'wireframe':	(mh.Modifiers.CTRL, mh.Keys.f),
+            'savetgt':		(mh.Modifiers.ALT, mh.Keys.t),
+            'qexport':		(mh.Modifiers.ALT, mh.Keys.e),
+            'smooth':		(mh.Modifiers.ALT, mh.Keys.s),
+            'grab':		(mh.Modifiers.ALT, mh.Keys.g),
+            'profiling':	(mh.Modifiers.ALT, mh.Keys.p),
             # Camera navigation
-            (0, mh.Keys.N2): 'rotateD',
-            (0, mh.Keys.N4): 'rotateL',
-            (0, mh.Keys.N6): 'rotateR',
-            (0, mh.Keys.N8): 'rotateU',
-            (0, mh.Keys.UP): 'panU',
-            (0, mh.Keys.DOWN): 'panD',
-            (0, mh.Keys.RIGHT): 'panR',
-            (0, mh.Keys.LEFT): 'panL',
-            (0, mh.Keys.PLUS): 'zoomIn',
-            (0, mh.Keys.MINUS): 'zoomOut',
-            (0, mh.Keys.N1): 'front',
-            (0, mh.Keys.N3): 'right',
-            (0, mh.Keys.N7): 'top',
-            (mh.Modifiers.CTRL, mh.Keys.N1): 'back',
-            (mh.Modifiers.CTRL, mh.Keys.N3): 'left',
-            (mh.Modifiers.CTRL, mh.Keys.N7): 'bottom',
-            (0, mh.Keys.PERIOD): 'resetCam',
+            'rotateD':		(0, mh.Keys.N2),
+            'rotateL':		(0, mh.Keys.N4),
+            'rotateR':		(0, mh.Keys.N6),
+            'rotateU':		(0, mh.Keys.N8),
+            'panU':		(0, mh.Keys.UP),
+            'panD':		(0, mh.Keys.DOWN),
+            'panR':		(0, mh.Keys.RIGHT),
+            'panL':		(0, mh.Keys.LEFT),
+            'zoomIn':		(0, mh.Keys.PLUS),
+            'zoomOut':		(0, mh.Keys.MINUS),
+            'front':		(0, mh.Keys.N1),
+            'right':		(0, mh.Keys.N3),
+            'top':		(0, mh.Keys.N7),
+            'back':		(mh.Modifiers.CTRL, mh.Keys.N1),
+            'left':		(mh.Modifiers.CTRL, mh.Keys.N3),
+            'bottom':		(mh.Modifiers.CTRL, mh.Keys.N7),
+            'resetCam':		(0, mh.Keys.PERIOD),
             # Version check
-            (0, 0x87654321): '_versionSentinel'
+            '_versionSentinel':	(0, 0x87654321)
         }
 
         self.mouseActions = {
@@ -539,16 +540,16 @@ class MHApplication(gui3d.Application, mh.Application):
 
         try:
             if os.path.isfile(os.path.join(mh.getPath(''), "shortcuts.ini")):
-                shortcuts = self.shortcuts.copy()
-                self.shortcuts = {}
+                shortcuts = {}
                 f = open(os.path.join(mh.getPath(''), "shortcuts.ini"), 'r')
                 for line in f:
                     modifier, key, action = line.strip().split(' ')
-                    self.shortcuts[(int(modifier), int(key))] = action
+                    shortcuts[action] = (int(modifier), int(key))
                 f.close()
-                if (0, 0x87654321) not in self.shortcuts:
+                if shortcuts.get('_versionSentinel') != (0, 0x87654321):
                     log.warning('shortcuts.ini out of date; ignoring')
-                    self.shortcuts = shortcuts
+                else:
+                    self.shortcuts.update(shortcuts)
         except:
             log.error('Failed to load shortcut settings')
 
@@ -585,7 +586,7 @@ class MHApplication(gui3d.Application, mh.Application):
                 f.write(mh.formatINI(self.settings))
 
             with outFile("shortcuts.ini") as f:
-                for shortcut, action in self.shortcuts.iteritems():
+                for action, shortcut in self.shortcuts.iteritems():
                     f.write('%d %d %s\n' % (shortcut[0], shortcut[1], action))
 
             with outFile("mouse.ini") as f:
@@ -881,26 +882,17 @@ class MHApplication(gui3d.Application, mh.Application):
 
         shortcut = (modifier, key)
 
-        if shortcut in self.shortcuts:
+        if shortcut in self.shortcuts.values():
             self.prompt('Warning', 'This combination is already in use.', 'OK', helpId='shortcutWarning')
             return False
 
-        # Remove old entry
-        for s, a in self.shortcuts.iteritems():
-            if a == action.name:
-                del self.shortcuts[s]
-                break
-
-        self.shortcuts[shortcut] = action.name
+        self.shortcuts[action.name] = shortcut
         mh.setShortcut(modifier, key, action)
 
         return True
 
     def getShortcut(self, action):
-
-        for shortcut, a in self.shortcuts.iteritems():
-            if a == action.name:
-                return shortcut
+        return self.shortcuts.get(action.name)
 
     # Mouse actions
     def setMouseAction(self, modifier, key, method):
@@ -1175,6 +1167,15 @@ class MHApplication(gui3d.Application, mh.Application):
         else:
             self.stop()
 
+    def toggleProfiling(self):
+        import profiler
+        if self.actions.profiling.isChecked():
+            profiler.start()
+            log.debug('profiling started')
+        else:
+            profiler.stop()
+            log.debug('profiling stopped')
+
     def createActions(self):
         self.actions = gui.Actions()
 
@@ -1202,6 +1203,8 @@ class MHApplication(gui3d.Application, mh.Application):
         self.actions.panL      = action('panL',      'Pan Left',      self.panLeft)
         self.actions.zoomIn    = action('zoomIn',    'Zoom In',       self.zoomIn)
         self.actions.zoomOut   = action('zoomOut',   'Zoom Out',      self.zoomOut)
+
+        self.actions.profiling = action('profiling', 'Profiling',     self.toggleProfiling, toggle=True)
 
         toolbar = self.main_toolbar = mh.addToolBar("Main")
 
@@ -1243,7 +1246,7 @@ class MHApplication(gui3d.Application, mh.Application):
         self.actions.resetCam  = action('resetCam',  'Reset camera',  self.resetView)
 
     def createShortcuts(self):
-        for (modifier, key), action in self.shortcuts.iteritems():
+        for action, (modifier, key) in self.shortcuts.iteritems():
             action = getattr(self.actions, action, None)
             if action is not None:
                 mh.setShortcut(modifier, key, action)
