@@ -26,6 +26,7 @@ import math
 import numpy as np
 import glmodule as gl
 import texture
+import matrix
 import log
 from core import G
 
@@ -179,48 +180,17 @@ class Object3D(object):
     def sortFaces(self):
         camera = G.cameras[0]
 
-        cx = camera.eyeX
-        cy = camera.eyeY
-        cz = camera.eyeZ
-
         indices = self.primitives[self.nPrimitives - self.nTransparentPrimitives:]
 
-        # Rotate camera position according to object position
-        # This is less costly that transforming all points
-        cx -= self.x
-        cy -= self.y
-        cz -= self.z
-
-        # Rotate X
-        alpha = math.radians(-self.rx)
-        c = math.cos(alpha)
-        s = math.sin(alpha)
-        tx = cx
-        ty = cy*c - cz*s
-        tz = cy*s + cz*c
-
-        # Rotate Y
-        alpha = math.radians(-self.ry)
-        c = math.cos(alpha)
-        s = math.sin(alpha)
-        cx = tz*s + tx*c
-        cy = ty
-        cz = tz*c - tx*s
-
-        # Rotate Z
-        alpha = math.radians(-self.rz)
-        c = math.cos(alpha)
-        s = math.sin(alpha)
-        tx = cx*c - cy*s
-        ty = cx*s + cy*c
-        tz = cz
-
-        cx = tx + self.x
-        cy = ty + self.y
-        cz = tz + self.z
+        m = matrix.translate(-self.translation)
+        m = matrix.rotx(-self.rx) * m
+        m = matrix.roty(-self.ry) * m
+        m = matrix.rotz(-self.rz) * m
+        m = matrix.translate(self.translation) * m
+        cxyz = matrix.transform3(m, camera.eye)
 
         # Prepare sorting data
-        verts = self.verts[self.primitives] - (cx, cy, cz)
+        verts = self.verts[self.primitives] - cxyz
         distances = np.sum(verts ** 2, axis = -1)
         distances = np.amin(distances, axis = -1)
         distances = -distances
