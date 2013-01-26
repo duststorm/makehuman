@@ -27,6 +27,7 @@ from cProfile import Profile
 
 _sort = 'cumulative'
 _profiler = None
+_show = None
 
 def run(cmd, globals, locals):
     prof = Profile()
@@ -57,10 +58,20 @@ def accum(cmd, globals, locals):
     _profiler.runctx(cmd, globals, locals)
 
 def show(prof):
-    prof.print_stats(_sort)
+    try:
+        if _show is not None:
+            _show(prof)
+        else:
+            prof.print_stats(_sort)
+    except TypeError:
+        pass
 
 def set_sort(sort):
     global _sort
     _sort = sort
+
+def set_show(show):
+    global _show
+    _show = show
 
 atexit.register(stop)

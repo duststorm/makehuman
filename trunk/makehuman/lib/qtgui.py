@@ -1201,3 +1201,17 @@ class SizePolicy(object):
     Expanding           = QtGui.QSizePolicy.Expanding
     MinimumExpanding    = QtGui.QSizePolicy.MinimumExpanding
     Ignored             = QtGui.QSizePolicy.Ignored
+
+class TableView(QtGui.QTableWidget, Widget):
+    def __init__(self):
+        super(TableView, self).__init__()
+        Widget.__init__(self)
+
+    def setItem(self, row, col, text, data = None):
+        item = QtGui.QTableWidgetItem(text)
+        if data is not None:
+            item.setData(QtCore.Qt.UserRole, data)
+        super(TableView, self).setItem(row, col, item)
+
+    def getItemData(self, row, col):
+        return self.item(row, col).data(QtCore.Qt.UserRole).toPyObject()
