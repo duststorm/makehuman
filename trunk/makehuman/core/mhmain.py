@@ -41,7 +41,6 @@ import algos3d
 #import posemode
 import gui
 import language as lang
-from camera3d import Camera
 import log
 
 @contextlib.contextmanager
@@ -183,7 +182,7 @@ class MHApplication(gui3d.Application, mh.Application):
 
         self.theme = None
 
-        self.modelCamera = Camera(self)
+        self.modelCamera = mh.Camera()
 
         @self.modelCamera.mhEvent
         def onChanged(event):
@@ -191,14 +190,14 @@ class MHApplication(gui3d.Application, mh.Application):
                 for task in category.tasks:
                     task.callEvent('onCameraChanged', event)
 
-        mh.cameras.append(self.modelCamera.camera)
+        mh.cameras.append(self.modelCamera)
 
-        self.guiCamera = Camera(self)
-        self.guiCamera.fovAngle = 45
-        self.guiCamera.eyeZ = 10
-        self.guiCamera.projection = 0
+        self.guiCamera = mh.Camera()
+        self.guiCamera._fovAngle = 45
+        self.guiCamera._eyeZ = 10
+        self.guiCamera._projection = 0
 
-        mh.cameras.append(self.guiCamera.camera)
+        mh.cameras.append(self.guiCamera)
 
     def _versionSentinel(self):
         # dummy method used for checking the shortcuts.ini version

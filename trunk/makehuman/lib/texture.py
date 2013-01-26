@@ -78,7 +78,7 @@ class Texture(object):
 
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
 
-        use_mipmaps = (width in self._powers and height in self._powers) or not self._npot
+        use_mipmaps = ((width in self._powers and height in self._powers) or not self._npot) and pixels is not None
 
         if height == 0:
             glBindTexture(GL_TEXTURE_1D, self.textureId)

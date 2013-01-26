@@ -24,38 +24,216 @@ TODO
 
 import math
 import numpy as np
+
+import events3d
 from core import G
 import glmodule as gl
 import matrix
 
-class Camera(object):
-    def __new__(cls, *args, **kwargs):
-        self = super(Camera, cls).__new__(cls)
+class Camera(events3d.EventHandler):
+    def __init__(self):
+        super(Camera, self).__init__()
 
-        self.fovAngle = 25.0
-        self.nearPlane = 0.1
-        self.farPlane = 100.0
+        self.changedPending = False
 
-        self.projection = 1
+        self._fovAngle = 25.0
+        self._nearPlane = 0.1
+        self._farPlane = 100.0
+        self._projection = 1
+        self._stereoMode = 0
+        self._eyeX = 0.0
+        self._eyeY = 0.0
+        self._eyeZ = 60.0
+        self._focusX = 0.0
+        self._focusY = 0.0
+        self._focusZ = 0.0
+        self._upX = 0.0
+        self._upY = 1.0
+        self._upZ = 0.0
+        self._scale = 1.0
 
-        self.stereoMode = 0
         self.eyeSeparation = 1.0
 
-        self.eyeX = 0.0
-        self.eyeY = 0.0
-        self.eyeZ = 60.0
-        self.focusX = 0.0
-        self.focusY = 0.0
-        self.focusZ = 0.0
-        self.upX = 0.0
-        self.upY = 1.0
-        self.upZ = 0.0
-        self.scale = 1.0
+    def changed(self):
+        self.callEvent('onChanged', self)
+        self.changedPending = False
 
-        return self
+    def getProjection(self):
+        return self._projection
 
-    def __init__(self, path = None):
-        pass
+    def setProjection(self, value):
+        self._projection = value
+        self.changed()
+
+    projection = property(getProjection, setProjection)
+
+    def getFovAngle(self):
+        return self._fovAngle
+
+    def setFovAngle(self, value):
+        self._fovAngle = value
+        self.changed()
+
+    fovAngle = property(getFovAngle, setFovAngle)
+
+    def getNearPlane(self):
+        return self._nearPlane
+
+    def setNearPlane(self, value):
+        self._nearPlane = value
+        self.changed()
+
+    nearPlane = property(getNearPlane, setNearPlane)
+
+    def getFarPlane(self):
+        return self._farPlane
+
+    def setFarPlane(self, value):
+        self._farPlane = value
+        self.changed()
+
+    farPlane = property(getFarPlane, setFarPlane)
+
+    def getEyeX(self):
+        return self._eyeX
+
+    def setEyeX(self, value):
+        self._eyeX = value
+        self.changed()
+
+    eyeX = property(getEyeX, setEyeX)
+
+    def getEyeY(self):
+        return self._eyeY
+
+    def setEyeY(self, value):
+        self._eyeY = value
+        self.changed()
+
+    eyeY = property(getEyeY, setEyeY)
+
+    def getEyeZ(self):
+        return self._eyeZ
+
+    def setEyeZ(self, value):
+        self._eyeZ = value
+        self.changed()
+
+    eyeZ = property(getEyeZ, setEyeZ)
+
+    def getEye(self):
+        return (self._eyeX, self._eyeY, self._eyeZ)
+
+    def setEye(self, xyz):
+        (self._eyeX, self._eyeY, self._eyeZ) = xyz
+        self.changed()
+
+    eye = property(getEye, setEye)
+
+    def getFocusX(self):
+        return self._focusX
+
+    def setFocusX(self, value):
+        self._focusX = value
+        self.changed()
+
+    focusX = property(getFocusX, setFocusX)
+
+    def getFocusY(self):
+        return self._focusY
+
+    def setFocusY(self, value):
+        self._focusY = value
+        self.changed()
+
+    focusY = property(getFocusY, setFocusY)
+
+    def getFocusZ(self):
+        return self._focusZ
+
+    def setFocusZ(self, value):
+        self._focusZ = value
+        self.changed()
+
+    focusZ = property(getFocusZ, setFocusZ)
+
+    def getFocus(self):
+        return (self._focusX, self._focusY, self._focusZ)
+
+    def setFocus(self, xyz):
+        (self._focusX, self._focusY, self._focusZ) = xyz
+        self.changed()
+
+    focus = property(getFocus, setFocus)
+
+    def getUpX(self):
+        return self._upX
+
+    def setUpX(self, value):
+        self._upX = value
+        self.changed()
+
+    upX = property(getUpX, setUpX)
+
+    def getUpY(self):
+        return self._upY
+
+    def setUpY(self, value):
+        self._upY = value
+        self.changed()
+
+    upY = property(getUpY, setUpY)
+
+    def getUpZ(self):
+        return self._upZ
+
+    def setUpZ(self, value):
+        self._upZ = value
+        self.changed()
+
+    upZ = property(getUpZ, setUpZ)
+
+    def getUp(self):
+        return (self._upX, self._upY, self._upZ)
+
+    def setUp(self, xyz):
+        (self._upX, self._upY, self._upZ) = xyz
+        self.changed()
+
+    up = property(getUp, setUp)
+
+    def getScale(self):
+        return self._scale
+
+    def setScale(self, value):
+        self._scale = value
+        self.changed()
+
+    scale = property(getScale, setScale)
+
+    def getStereoMode(self):
+        return self._stereoMode
+
+    def setStereoMode(self, value):
+        self._stereoMode = value
+        self.changed()
+
+    stereoMode = property(getStereoMode, setStereoMode)
+
+    def switchToOrtho(self):
+        fov = math.tan(self.fovAngle * 0.5 * math.pi / 180.0)
+        delta = np.array(self.eye) - np.array(self.focus)
+        scale = math.sqrt(np.sum(delta ** 2)) * fov
+
+        self._projection = 0
+        self._scale = scale
+        self._nearPlane = -100.0
+        self.changed()
+
+    def switchToPerspective(self):
+        self._projection = 1
+        self._nearPlane = 0.1
+        self.changed()
 
     def getMatrices(self, eye):
         def lookat(ex, ey, ez, tx, ty, tz, ux, uy, uz):
@@ -158,27 +336,3 @@ class Camera(object):
         m = self.getConvertToScreenMatrix(obj)
         x, y, z = matrix.transform3(m.I, [sx, sy, sz])
         return [x, y, z]
-
-    def getEye(self):
-        return (self.eyeX, self.eyeY, self.eyeZ)
-
-    def setEye(self, eye):
-        (self.eyeX, self.eyeY, self.eyeZ) = eye
-
-    eye = property(getEye, setEye)
-
-    def getFocus(self):
-        return (self.focusX, self.focusY, self.focusZ)
-
-    def setFocus(self, focus):
-        (self.focusX, self.focusY, self.focusZ) = focus
-
-    focus = property(getFocus, setFocus)
-
-    def getUp(self):
-        return (self.upX, self.upY, self.upZ)
-
-    def setUp(self, up):
-        (self.upX, self.upY, self.upZ) = up
-
-    up = property(getUp, setUp)

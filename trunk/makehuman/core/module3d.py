@@ -28,6 +28,7 @@ import weakref
 import numpy as np
 
 from compat import VertProxy, FaceProxy, VertsProxy, FacesProxy, MaterialsProxy
+import matrix
 import log
 
 class FaceGroup(object):
@@ -183,6 +184,17 @@ class Object3D(object):
         self.scale[2] = sz
 
     sz = property(get_sz, set_sz)
+
+    @property
+    def transform(self):
+        m = matrix.translate(self.loc)
+        if any(x != 0 for x in self.rot):
+            m = m * matrix.rotx(self.rx)
+            m = m * matrix.roty(self.ry)
+            m = m * matrix.rotz(self.rz)
+        if any(x != 1 for x in self.scale):
+            m = m * matrix.scale(self.scale)
+        return m
 
     @property
     def verts(self):

@@ -100,7 +100,7 @@ def getCamera(mesh):
     eye = np.matrix([ex,ey,ez,1]).T
     fx, fy, fz = gui3d.app.modelCamera.focus
     focus = np.matrix([fx,fy,fz,1]).T
-    transform = gui3d.app.modelCamera.camera.getObjectMatrix(mesh).I
+    transform = mesh.transform.I
     eye = v4to3(transform * eye)
     focus = v4to3(transform * focus)
     camera = vnorm(eye - focus)
@@ -126,10 +126,10 @@ def mapImageSoft(srcImg, mesh, leftTop, rightBottom):
     camera = getCamera(mesh)
     faces = getFaces(mesh)
 
-    # log.debug('matrix: %s', gui3d.app.modelCamera.camera.getConvertToScreenMatrix())
+    # log.debug('matrix: %s', gui3d.app.modelCamera.getConvertToScreenMatrix())
 
     texco = np.asarray([0,dstH])[None,None,:] + mesh.texco[mesh.fuvs[faces]] * np.asarray([dstW,-dstH])[None,None,:]
-    matrix = np.asarray(gui3d.app.modelCamera.camera.getConvertToScreenMatrix(mesh))
+    matrix = np.asarray(gui3d.app.modelCamera.getConvertToScreenMatrix(mesh))
     coord = np.concatenate((mesh.coord[mesh.fvert[faces]], np.ones((len(faces),4,1))), axis=-1)
     # log.debug('texco: %s, coord: %s', texco.shape, coord.shape)
     coord = np.sum(matrix[None,None,:,:] * coord[:,:,None,:], axis = -1)
@@ -188,7 +188,7 @@ def mapImageGL(srcImg, mesh, leftTop, rightBottom):
 
     coords = mesh.r_texco
 
-    texmat = gui3d.app.modelCamera.camera.getConvertToScreenMatrix(mesh)
+    texmat = gui3d.app.modelCamera.getConvertToScreenMatrix(mesh)
     texmat = matrix.scale((1/(right - left), 1/(top - bottom), 1)) * matrix.translate((-left, -bottom, 0)) * texmat
     texmat = np.asarray(texmat)
 
