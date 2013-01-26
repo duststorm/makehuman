@@ -930,7 +930,7 @@ def createRig(human, rigtype):
     #setupCircles(fp)
 
     mhx.mhx_rig.writeControlPoses(fp, config)
-    #amt.checkDirty()
+    amt.checkDirty()
     return amt
 
     mhx.mhx_rig.writeAllActions(fp, config)
