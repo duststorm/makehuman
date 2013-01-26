@@ -17,6 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+from mathutils import *
 
 from . import fbx
 from .fbx_basic import *
@@ -47,11 +48,11 @@ class FbxTake(FbxStuff):
         
         
     def make(self, scn, name):
-        self.name = name.replace(" ","_") + ".tak"
+        self.name = name.replace(" ","_")
         frameStart = float2int(scn.frame_start)
         frameEnd = float2int(scn.frame_end)
         self.setMulti([
-            ("FileName", self.name),
+            ("FileName", self.name + ".tak"),
             ("LocalTime", (frameStart, frameEnd)),
             ("ReferenceTime", (frameStart, frameEnd)),
         ])
@@ -235,7 +236,7 @@ def getDataPath(channel, btype, rna):
 
 Channels = {
     'location' : ('T', 'Lcl Translation', 'Vector3', (0,0,0)),
-    #'rotation_quaternion' : ('R', 'Lcl Rotation', 'Vector3', (0,0,0)), 
+    'rotation_quaternion' : ('R', 'Lcl Rotation', 'Vector3', (0,0,0)), 
     'rotation_euler' : ('R', 'Lcl Rotation', 'Vector3', (0,0,0)), 
     'scale' : ('S', 'Lcl Scaling', 'Vector3', (1,1,1)),
 }
@@ -277,18 +278,14 @@ class FbxAnimationCurveNode(FbxObject):
         else:
             deg = 1
 
-        for index,fcu in group.fcurves.items():
+        if channel == 'rotation_quaternion':
+            fcurves = quat2euler(group.fcurves)
+        else:
+            fcurves = group.fcurves
+    
+        for index,fcu in fcurves.items():
             acu = self.acurves[index] = FbxAnimationCurve().make(fcu, deg)
             acu.makeChannelLink(self, ("d|%s" % XYZ[index]))
-
-        if channel == 'rotation_quaternion':
-            self.acurves[0] = self.acurves[1]
-            self.acurves[1] = self.acurves[2]
-            self.acurves[2] = self.acurves[3]
-            del self.acurves[3]
-
-        #for acu in self.acurves.values():
-        #    acu.makeLink(self)
 
         self.setProps([("d", kvec)])
         return self
@@ -326,7 +323,7 @@ class FbxAnimationCurveNode(FbxObject):
         if channel in ["Lcl Rotation"]:
             rad = R
         else:
-            deg = 1
+            rad = 1
 
         
         for child,idx in self.children:       
@@ -343,7 +340,43 @@ def getFCurveFromAction(act, datapath, index):
         if fcu.data_path == datapath and fcu.array_index == index:
             return fcu
     return None
+
+  
+#------------------------------------------------------------------
+#   Quaternion -> Euler for F-curves
+#------------------------------------------------------------------
+
+class FbxFCurve:
+    def __init__(self):
+        self.keyframe_points = []
+
+        
+class KP:
+    def __init__(self, t, y):
+        self.co = [t,y]
+        
+        
+def quat2euler(fcurves):
+    wfcu = fcurves[0]
+    xfcu = fcurves[1]
+    yfcu = fcurves[2]
+    zfcu = fcurves[3]
+    times = []
+    eulerFCurves = {
+        0 : FbxFCurve(),
+        1 : FbxFCurve(),
+        2 : FbxFCurve(),
+    }
     
+    for kp in wfcu.keyframe_points:
+        t = kp.co[0]
+        quat = Quaternion((wfcu.evaluate(t), xfcu.evaluate(t), yfcu.evaluate(t), zfcu.evaluate(t)))
+        euler = quat.to_euler('XYZ')
+        for n in range(3):
+            eulerFCurves[n].keyframe_points.append(KP(t, euler[n]))
+        
+    return eulerFCurves        
+        
 #------------------------------------------------------------------
 #   AnimationCurve
 #   Corresponds to a single F-curve in Blender

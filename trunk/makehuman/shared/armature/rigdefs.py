@@ -308,7 +308,7 @@ class CArmature:
             
 
         if not self.boneWeights:
-            nVerts = len(warpmodifier.ShadowCoords)
+            nVerts = len(warpmodifier.shadowCoords)
             self.restCoords = numpy.zeros((nVerts,4), float)
             self.restCoords[:,3] = 1
             self.syncRestVerts("rest")

@@ -216,7 +216,7 @@ class FbxObject(FbxStuff):
         for link in self.links:
             if link[0].btype == btype:
                 return link
-        return None                
+        return None,None                
         
         
     def getBParentRecursive(self, btype):
@@ -233,7 +233,7 @@ class FbxObject(FbxStuff):
         for link in self.links:
             if link[0].ftype == ftype:
                 return link
-        return None                
+        return None,None               
         
 
     def getFParent2(self, ftype, subtype):

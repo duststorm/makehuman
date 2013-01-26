@@ -44,10 +44,10 @@ resetPoseMode()
 def printVert(human):
     for vn in [8202]:
         x = human.meshData.coord[vn]
-        if warpmodifier.ShadowCoords is None:
+        if warpmodifier.shadowCoords is None:
             y = (0,0,0)
         else:
-            y = warpmodifier.ShadowCoords[vn]
+            y = warpmodifier.shadowCoords[vn]
         log.debug("  %d: (%.3f %.3f %.3f) (%.3f %.3f %.3f)", vn,x[0],x[1],x[2],y[0],y[1],y[2])
         
         
@@ -59,7 +59,7 @@ def enterPoseMode():
     human = gui3d.app.selectedHuman
     printVert(human)
     InPoseMode = True
-    warpmodifier.ShadowCoords = human.meshData.coord.copy()
+    warpmodifier.shadowCoords = human.meshData.coord.copy()
     warpmodifier.clearRefObject()
     human.warpsNeedReset = False
     if False and theShadowBones:
@@ -86,10 +86,10 @@ def exitPoseMode():
         theShadowBones = amt.store()
 
     InPoseMode = False
-    if warpmodifier.ShadowCoords == None:
+    if warpmodifier.shadowCoords == None:
         halt
     warpmodifier.removeAllWarpTargets(human)        
-    obj.changeCoords(warpmodifier.ShadowCoords)
+    obj.changeCoords(warpmodifier.shadowCoords)
     obj.calcNormals()
     obj.update()
     
@@ -98,7 +98,7 @@ def exitPoseMode():
         amt.dirty = True
         #amt.removeModifier()
         human.armature = None    
-    warpmodifier.ShadowCoords = None    
+    warpmodifier.shadowCoords = None    
     log.message("Pose mode exited")
     #gui3d.app.poseModeBox.selected = False
     printVert(human)

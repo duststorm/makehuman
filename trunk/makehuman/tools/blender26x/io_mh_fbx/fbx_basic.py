@@ -150,7 +150,7 @@ class CArray(FbxPlug):
         self.size = 0
         self.csys = csys
         if type == float:
-            self.format = '%s%.5g'
+            self.format = '%s%.6g'
         elif type == int:
             self.format = '%s%ld'
 
@@ -247,16 +247,16 @@ class CArray(FbxPlug):
             '                a: ')
         c = ''
         for x in vec:
-            fp.write(self.format % (c,round(x)))
+            fp.write("%s %s" % (c,round(x)))
             c = ','
         fp.write('\n            }\n')
 
        
 def round(x):
     if abs(x) < 1e-5:
-        return 0
+        return "0"
     else:
-        return x
+        return ("%.5g" % x)
 
 def dist(x,y):
     d = x-y

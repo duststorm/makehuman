@@ -241,7 +241,7 @@ class CStringProperty(CProperty):
 class CVectorProperty(CProperty):
 
     def flatten(self):
-        return "%.3g,%.3g,%.3g" % tuple(self.value)
+        return "%s, %s, %s" % (round(self.value[0]), round(self.value[1]), round(self.value[2]))
 
 
 class CCompoundProperty(CProperty):

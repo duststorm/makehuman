@@ -100,17 +100,19 @@ class CStuff:
 
 
 class CBoneInfo:
-    def __init__(self, root, heads, tails, hier, bones, weights):
+    def __init__(self, root, heads, tails, rolls, hier, bones, weights):
         self.root = root
         self.heads = heads
         self.tails = tails
+        self.rolls = rolls
         self.hier = hier
         self.bones = bones
         self.weights = weights
         
     def __repr__(self):
-        return ("<CBoneInfo r %s h %d t %s\n   h %s\n   b %s\n   w %s" % 
-            (self.root, len(self.heads), len(self.tails), self.hier, self.bones, self.weights))
+        return ("<CBoneInfo r %s h %d t %s r %d\n   h %s\n   b %s\n   w %s" % 
+            (self.root, len(self.heads), len(self.tails), len(self.rolls), 
+             self.hier, self.bones, self.weights))
        
 #
 #    filterMesh(meshInfo, obj, groups, deleteVerts, eyebrows, lashes):
@@ -396,10 +398,12 @@ def getArmatureFromRigFile(fileName, obj):
     hier = []
     heads = {}
     tails = {}
+    rolls = {}
     root = None
     for (bone, head, tail, roll, parent, options) in armature:
         heads[bone] = head
         tails[bone] = tail
+        rolls[bone] = roll
         if parent == '-':
             hier.append((bone, []))
             if root is None:
@@ -418,7 +422,7 @@ def getArmatureFromRigFile(fileName, obj):
     newHier = hier
     bones = []
     flatten(newHier, bones)
-    return CBoneInfo(root, heads, tails, newHier, bones, weights)
+    return CBoneInfo(root, heads, tails, rolls, newHier, bones, weights)
 
 
 def addInvBones(hier, heads, tails):

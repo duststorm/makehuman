@@ -119,7 +119,7 @@ class FbxMesh(FbxGeometryBase):
     def writeHeader(self, fp):
         FbxGeometryBase.writeHeader(self, fp)            
         self.vertices.writeFbx(fp)
-        #self.normals.writeFbx(fp)
+        self.normals.writeFbx(fp)
         self.faces.writeFbx(fp)
         fp.write(
             '       GeometryVersion: 124\n')
@@ -189,6 +189,7 @@ class FbxShape(FbxObject):
         if fbx.usingMakeHuman:
             self.indexes.make(skey.indexes)
             self.vertices.make(skey.vertices)
+            #self.indexes.make(skey.normals)
         else:
             nVerts = len(skey.data)
             vectors = [skey.data[vn].co - v.co for vn,v in enumerate(baseVerts)]

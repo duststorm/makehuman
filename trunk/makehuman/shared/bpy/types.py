@@ -25,6 +25,7 @@ Blender API mockup: bpy.types
 from mathutils import *
 from math import *
 import os
+import log
 
 import object_collection
 import export_config
@@ -131,7 +132,7 @@ class Armature(Rna):
         self.bones[bname] = bone
         bone.head = Vector(self.boneInfo.heads[bname])
         bone.tail = Vector(self.boneInfo.tails[bname])
-        bone.roll = 0
+        bone.roll = self.boneInfo.rolls[bname]
         bone.parent = parent
 
         bone.matrixLocalFromBone()
@@ -154,7 +155,8 @@ class Bone(Rna):
         self.parent = None
         self.roll = 0
         self.children = []
-        self.matrix_local = None
+        self.matrix_local = Matrix()
+        self.matrix = Matrix()
         
 
     def getLength(self):
@@ -172,14 +174,13 @@ class Bone(Rna):
         u = self.tail.sub(self.head)
         length = sqrt(u.dot(u))
         if length < 1e-3:
-            print("Zero-length bone %s. Removed" % self.name)
-            self.matrix_local = tm.identity(4)
+            log.message("Zero-length bone %s. Removed" % self.name)
             self.matrix_local.matrix[:3,3] = self.head.vector
             return
         u = u.div(length)
 
         yu = Bone.ey.dot(u)        
-        if abs(yu) > 0.999:
+        if abs(yu) > 0.99999:
             axis = Bone.ey
             if yu > 0:
                 angle = 0
@@ -192,12 +193,10 @@ class Bone(Rna):
             angle = acos(yu)
 
         mat = tm.rotation_matrix(angle,axis)
-        matrix = Matrix(mat)
-        if self.parent:
-            pmat = self.parent.matrix_local.inverted()
-            self.matrix_local = matrix.mult(pmat)
-        else:
-            self.matrix_local = matrix
+        if self.roll:
+            roll = tm.rotation_matrix(self.roll, Bone.ey)
+            mat = dot(mat, roll)
+        self.matrix_local = Matrix(mat)
         self.matrix_local.matrix[:3,3] = self.head.vector
 
 

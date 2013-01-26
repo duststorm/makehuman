@@ -370,7 +370,6 @@ class BoneInfo:
         rot = node.getProp("Lcl Rotation")
         scale = node.getProp("Lcl Scaling")
         euler = Euler(Vector(rot)*R)        
-        quat = euler.to_quaternion()
         rmat = euler.to_matrix()
 
         self.restMat = composeMatrix(trans,rmat,scale)
@@ -394,12 +393,20 @@ class BoneInfo:
         if nChildren > 0:                    
             vec = sum/nChildren - self.head
             self.length = vec.length
-        elif parent:
-            self.length = parent.length
+        #elif parent:
+        #    self.length = parent.length
         else:
             self.length = 1
         self.tail = self.head + self.length*Vector( self.matrix.col[1][:3] )
+        
+        if nChildren > 0:
+            print("\n", self.name)
+            print("  v", vec)
+            print("  m", self.length*Vector( self.matrix.col[1][:3] ))
+            print(self.matrix)
+            print(self.restMat)
 
+        quat = self.matrix.to_quaternion()
         if abs(quat.w) < 1e-4:
             self.roll = math.pi
         else:

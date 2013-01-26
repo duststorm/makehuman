@@ -195,6 +195,10 @@ class FbxLayerElementUV(FbxLayerElement):
         
     def make(self, layer, index, faces):
         FbxLayerElement.make(self, layer, index)
+        self.setMulti([
+            ("MappingInformationType", "ByPolygonVertex"),
+            ("ReferenceInformationType", "IndexToDirect")
+        ])
         if fbx.usingMakeHuman:
             verts = layer.data
         else:

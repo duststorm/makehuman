@@ -36,7 +36,7 @@ import humanmodifier
 import log
 from core import G
 
-ShadowCoords = None
+shadowCoords = None
 
 #----------------------------------------------------------
 #   class WarpTarget
@@ -231,13 +231,13 @@ class WarpModifier (humanmodifier.SimpleModifier):
 
 
     def compileWarpTarget(self, human):
-        global ShadowCoords
+        global shadowCoords
         log.message("Compile %s", self)
         landmarks = theLandMarks()[self.bodypart]
         objectChanged = self.getRefObject(human)
         self.getRefTarget(human, objectChanged)    
         if self.refTargetVerts and theRefObjectVerts[self.modtype]:
-            shape = warp.warp_target(self.refTargetVerts, theRefObjectVerts[self.modtype], ShadowCoords, landmarks)
+            shape = warp.warp_target(self.refTargetVerts, theRefObjectVerts[self.modtype], shadowCoords, landmarks)
         else:
             shape = {}
         log.message("...done")
@@ -410,7 +410,7 @@ def removeAllWarpTargets(human):
 
 
 def getWarpedCoords():
-    coords = ShadowCoords.copy()
+    coords = shadowCoords.copy()
     for target in algos3d.targetBuffer.values():
         if hasattr(target, "isWarp") and not hasattr(target, "isPose"):
             verts = algos3d.targetBuffer[target.name].verts
