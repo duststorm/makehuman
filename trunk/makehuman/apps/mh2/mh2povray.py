@@ -1004,9 +1004,9 @@ def povrayExportMesh2_TL(obj, camera, resolution, path, settings, progressCallba
     # If fake SSS is enabled, render lightmaps there. # TODO: if they aren't already rendered.
     if settings['SSS'] == True:
         # calculate resolution of each cannel, according to settings
-        resred = int(settings['SSSA'])
-        resgreen = 2**(10-resred/2) 
-        resred = 2**(10-resred)
+        resred = float(settings['SSSA'])
+        resgreen = int(2.0**(10-resred/2))
+        resred = int(2.0**(10-resred))
         # blue channel
         lmap = projection.mapLighting(progressCallback = lambda p: progress(progbase,p*(0.55-progbase),"Rendering lightmaps"))
         log.debug('SSS: Hi-Res lightmap resolution: %s', lmap.width)
