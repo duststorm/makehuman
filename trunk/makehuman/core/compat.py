@@ -188,8 +188,7 @@ class FaceProxy(object):
 
     @property
     def uv(self):
-        uvs = self.object.fuvs[self.idx]
-        return IndexedUVsProxy(self.object, uvs)
+        return self.object.fuvs[self.idx]
 
     @property
     def group(self):
@@ -242,10 +241,6 @@ class IndexedVertsProxy(IndexedProxy):
 class IndexedFacesProxy(IndexedProxy):
     def __getitem__(self, idx):
         return FaceProxy(self._object, self._indices[idx])
-
-class IndexedUVsProxy(IndexedProxy):
-    def __getitem__(self, idx):
-        return tuple(self._object.texco[self._indices[idx]])
 
 class MaterialsProxy(object):
     def __init__(self, object):
