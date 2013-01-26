@@ -409,7 +409,11 @@ def removeAllWarpTargets(human):
             del algos3d.targetBuffer[target.name]
 
 
-def getWarpedCoords():
+def getWarpedCoords(human):
+    global shadowCoords
+
+    if shadowCoords == None:
+        shadowCoords = human.meshData.coord.copy()
     coords = shadowCoords.copy()
     for target in algos3d.targetBuffer.values():
         if hasattr(target, "isWarp") and not hasattr(target, "isPose"):

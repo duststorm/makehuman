@@ -203,7 +203,7 @@ class CArmature:
     def syncRestVerts(self, caller):
         log.message("Synch rest verts: %s", caller)
         #nVerts = len(self.restVerts)
-        self.restCoords[:,:3] = warpmodifier.getWarpedCoords()
+        self.restCoords[:,:3] = warpmodifier.getWarpedCoords(self.human)
         #for n in range(nVerts):
         #    self.restVerts[n].co[:3] = coords[n]
     
@@ -308,7 +308,7 @@ class CArmature:
             
 
         if not self.boneWeights:
-            nVerts = len(warpmodifier.shadowCoords)
+            nVerts = len(self.human.meshData.coord)
             self.restCoords = numpy.zeros((nVerts,4), float)
             self.restCoords[:,3] = 1
             self.syncRestVerts("rest")
@@ -930,7 +930,7 @@ def createRig(human, rigtype):
     #setupCircles(fp)
 
     mhx.mhx_rig.writeControlPoses(fp, config)
-    amt.checkDirty()
+    #amt.checkDirty()
     return amt
 
     mhx.mhx_rig.writeAllActions(fp, config)
