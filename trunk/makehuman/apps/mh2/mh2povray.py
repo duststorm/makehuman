@@ -144,8 +144,11 @@ def povrayExport(obj, app, settings):
             else:
                 baseName = mh2povray_ini.renderscenefile
             # Prepare command line.
-            cmdLine = (povray_bin, 'MHRENDER', '/EXIT')
-            
+            if os.name == 'nt':
+                cmdLine = (povray_bin, 'MHRENDER', '/EXIT')
+            else:
+                cmdLine = (povray_bin, 'MHRENDER')
+                
             # Pass parameters by writing an .ini file.
             try:
                 iniFD = open(os.path.join(outputDirectory, 'MHRENDER.ini'), 'w')
