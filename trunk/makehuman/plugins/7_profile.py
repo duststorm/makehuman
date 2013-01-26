@@ -126,7 +126,7 @@ class ProfilingTaskView(gui3d.TaskView):
     def __init__(self, category):
         super(ProfilingTaskView, self).__init__(category, 'Profile')
 
-        self.sortKey = 'cumul'
+        self.sortKey = 'prim'
         self.sortDir = 0
 
         self.table = self.addTopWidget(gui.TableView())

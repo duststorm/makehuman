@@ -1171,10 +1171,10 @@ class MHApplication(gui3d.Application, mh.Application):
         import profiler
         if self.actions.profiling.isChecked():
             profiler.start()
-            log.debug('profiling started')
+            log.notice('profiling started')
         else:
             profiler.stop()
-            log.debug('profiling stopped')
+            log.notice('profiling stopped')
             mh.changeTask('Develop', 'Profile')
 
     def createActions(self):

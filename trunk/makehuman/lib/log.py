@@ -47,7 +47,7 @@ message = logging.info
 
 _notice_src = r'''
 def notice(format, *args, **kwargs):
-    logging.info(format, *args, **kwargs)
+    logging.log(NOTICE, format, *args, **kwargs)
 '''
 try:
     exec(code.compile_command(_notice_src, logging.info.func_code.co_filename))
