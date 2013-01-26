@@ -159,14 +159,26 @@ class Camera(object):
         x, y, z = matrix.transform3(m.I, [sx, sy, sz])
         return [x, y, z]
 
-    @property
-    def eye(self):
+    def getEye(self):
         return (self.eyeX, self.eyeY, self.eyeZ)
 
-    @property
-    def focus(self):
+    def setEye(self, eye):
+        (self.eyeX, self.eyeY, self.eyeZ) = eye
+
+    eye = property(getEye, setEye)
+
+    def getFocus(self):
         return (self.focusX, self.focusY, self.focusZ)
 
-    @property
-    def up(self):
+    def setFocus(self, focus):
+        (self.focusX, self.focusY, self.focusZ) = focus
+
+    focus = property(getFocus, setFocus)
+
+    def getUp(self):
         return (self.upX, self.upY, self.upZ)
+
+    def setUp(self, up):
+        (self.upX, self.upY, self.upZ) = up
+
+    up = property(getUp, setUp)
