@@ -105,6 +105,16 @@ theModifierTypes = {
 }
 
 
+class BaseSpec:
+    def __init__(self, path, factors):
+        self.path = path
+        self.factors = factors
+        self.value = -1
+    
+    def __repr__(self):
+        return ("<BaseSpec %s %.4f %s>" % (self.path, self.value, self.factors))
+    
+    
 class TargetSpec:
     def __init__(self, path, factors):
         self.path = path
@@ -128,6 +138,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
             fp.close()
             
         humanmodifier.SimpleModifier.__init__(self, warppath)
+        self.eventType = 'warp'
         self.warppath = warppath
         self.template = template
         self.isWarp = True
@@ -156,7 +167,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
             "Gender" : ("male", "female"),
             "Age" : ("child", "young", "old"),
             "Ethnic" : ("caucasian", "african", "asian"),
-            "NoEthnic" : ["caucasian"],
+            "NoEthnic" : [None],
             "Tone" : ("flaccid", None, "muscle"),
             "Weight" : ("light", None, "heavy"),
             "NoUniv" : [None]
@@ -164,46 +175,56 @@ class WarpModifier (humanmodifier.SimpleModifier):
 
         for gender in baseCharacterParts[genders]:
             for age in baseCharacterParts[ages]:
-                for ethnic1 in baseCharacterParts[ethnics]:
-                    if ethnic1 == "caucasian":
-                        ethnic2 = "neutral"
-                    else:
-                        ethnic2 = ethnic1
-
-                    base = "data/targets/macrodetails/%s-%s-%s.target" % (ethnic2, gender, age)    
-                    key = "%s-%s-%s" % (ethnic1, gender, age)  
-                    self.bases[key] = (base, -1)
-
+                for ethnic1 in baseCharacterParts[ethnics]:                    
                     path1 = self.template
-                    path1 = path1.replace("${ethnic}", ethnic1).replace("${gender}", gender).replace("${age}",age)
-                    factors = [ethnic1, gender, age]
+                    
+                    if ethnic1 is None:
+                        base1 = "data/targets/macrodetails/neutral-%s-%s.target" % (gender, age)    
+                        key1 = "%s-%s" % (gender, age)                      
+                        factors1 = [gender, age]
+                    else:
+                        if ethnic1 == "caucasian":
+                            ethnic2 = "neutral"
+                        else:
+                            ethnic2 = ethnic1
+                        base1 = "data/targets/macrodetails/%s-%s-%s.target" % (ethnic2, gender, age)    
+                        key1 = "%s-%s-%s" % (ethnic1, gender, age)  
+                        factors1 = [ethnic1, gender, age]
+                        path1 = path1.replace("${ethnic}", ethnic1)
+
+                    self.bases[key1] = BaseSpec(base1, factors1)
+                    path1 = path1.replace("${gender}", gender).replace("${age}",age)
                     
                     for tone in baseCharacterParts[tones]:
                         for weight in baseCharacterParts[weights]:            
                             if tone and weight:    
-                                base = "data/targets/macrodetails/universal-%s-%s-%s-%s.target" % (gender, age, tone, weight)
-                                key = "universal-%s-%s-%s-%s" % (gender, age, tone, weight)
-                                self.bases[key] = (base, -1)
+                                base2 = "data/targets/macrodetails/universal-%s-%s-%s-%s.target" % (gender, age, tone, weight)
+                                key2 = "universal-%s-%s-%s-%s" % (gender, age, tone, weight)
+                                factors2 = factors1 + [tone, weight]
+                                self.bases[key2] = BaseSpec(base2, factors2)
                                 path2 = path1.replace("${tone}", tone).replace("${weight}", weight)
-                                self.targetSpecs[key] = TargetSpec(path2, factors + [tone, weight])
+                                self.targetSpecs[key2] = TargetSpec(path2, factors2)
                                 
                             elif tone:    
-                                base = "data/targets/macrodetails/universal-%s-%s-%s.target" % (gender, age, tone)
-                                key = "universal-%s-%s-%s" % (gender, age, tone)
-                                self.bases[key] = (base, -1)
+                                base2 = "data/targets/macrodetails/universal-%s-%s-%s.target" % (gender, age, tone)
+                                key2 = "universal-%s-%s-%s" % (gender, age, tone)
+                                factors2 = factors1 + [tone, 'averageWeight']
+                                self.bases[key2] = BaseSpec(base2, factors2)
                                 path2 = path1.replace("${tone}", tone).replace("-${weight}", "")
-                                self.targetSpecs[key] = TargetSpec(path2, factors + [tone])
+                                self.targetSpecs[key2] = TargetSpec(path2, factors2)
                         
                             elif weight:    
-                                base = "data/targets/macrodetails/universal-%s-%s-%s.target" % (gender, age, weight)
-                                key = "universal-%s-%s-%s" % (gender, age, weight)
-                                self.bases[key] = (base, -1)
+                                base2 = "data/targets/macrodetails/universal-%s-%s-%s.target" % (gender, age, weight)
+                                key2 = "universal-%s-%s-%s" % (gender, age, weight)
+                                factors2 = factors1 + ['averageTone', weight]
+                                self.bases[key2] = BaseSpec(base2, factors2)
                                 path2 = path1.replace("-${tone}", "").replace("${weight}", weight)
-                                self.targetSpecs[key] = TargetSpec(path2, factors + [weight])
+                                self.targetSpecs[key2] = TargetSpec(path2, factors2)
                                 
                             else:                            
+                                factors2 = factors1 + ['averageTone', 'averageWeight']
                                 path2 = path1.replace("-${tone}", "").replace("-${weight}", "")
-                                self.targetSpecs[key] = TargetSpec(path2, factors)
+                                self.targetSpecs[key1] = TargetSpec(path2, factors2)
 
 
 
@@ -247,9 +268,9 @@ class WarpModifier (humanmodifier.SimpleModifier):
     def getRefTarget(self, human, objectChanged):       
         targetChanged = self.getBases(human)
         if targetChanged or objectChanged:
-            #log.message("Reference target changed")
+            log.message("Reference target changed")
             if not self.makeRefTarget(human):
-                #log.message("Updating character")
+                log.message("Updating character")
                 human.applyAllTargets()
                 self.getBases(human)
                 if not self.makeRefTarget(human):
@@ -258,17 +279,15 @@ class WarpModifier (humanmodifier.SimpleModifier):
     
     def getBases(self, human):
         targetChanged = False
-        for key in self.bases.keys():
-            char,cval0 = self.bases[key]
-    
-            verts = self.getRefObjectVerts(char)
-            if verts is None:
-                self.bases[key] = char,0
+        for key,base in self.bases.items():
+            verts = self.getRefObjectVerts(base.path)
+            if verts is None:            
+                base.value = 0
                 continue
     
-            cval1 = human.getDetail(char)    
-            if cval0 != cval1:
-                self.bases[key] = char,cval1
+            cval1 = human.getDetail(base.path)    
+            if base.value != cval1:
+                base.value = cval1
                 targetChanged = True
         return targetChanged
         
@@ -278,7 +297,7 @@ class WarpModifier (humanmodifier.SimpleModifier):
         madeRefTarget = False
         factors = self.fallback.getFactors(human, 1.0)
         
-        for target in self.targetSpecs.values():
+        for target in self.targetSpecs.values():        
             cval = reduce(mul, [factors[factor] for factor in target.factors])
             if cval > 0:
                 log.debug("  reftrg %s %s", target.path, cval)

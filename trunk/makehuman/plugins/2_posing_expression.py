@@ -108,9 +108,11 @@ class ExpressionTaskView(gui3d.TaskView):
         for slider in self.sliders:
             slider.update()
         
-    def onHumanChanged(self, event):
-        
-        posemode.changePoseMode(event)        
+    def onHumanChanging(self, event):
+        posemode.changePoseMode(event)
+
+    def onHumanChanged(self, event):        
+        posemode.changePoseMode(event)
         for slider in self.sliders:
             slider.update()
                 

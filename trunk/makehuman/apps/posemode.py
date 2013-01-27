@@ -106,12 +106,13 @@ def exitPoseMode():
     
 def changePoseMode(event):
     human = event.human
-    log.debug("Change pose mode %s w=%s e=%s", InPoseMode, human.warpsNeedReset, event.change)
-    if human:
-        if event.change != "targets" or human.warpsNeedReset:
-            exitPoseMode()
-        if event.change == "reset":
-            resetPoseMode()     
+    #log.debug("Change pose mode %s w=%s e=%s", InPoseMode, human.warpsNeedReset, event.change)
+    if human and human.warpsNeedReset:
+        exitPoseMode()
+    elif event.change not in ["targets", "warp"]:
+        exitPoseMode()
+    if event.change == "reset":
+        resetPoseMode()     
      
 #----------------------------------------------------------
 #   class PoseModifierSlider

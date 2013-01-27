@@ -229,6 +229,7 @@ class BaseModifier(object):
     def __init__(self):
         self.verts = None
         self.faces = None
+        self.eventType = 'modifier'
         
     def setValue(self, human, value):
     
@@ -278,7 +279,7 @@ class BaseModifier(object):
             human.meshData.calcNormals(1, 1, self.verts, self.faces)
         human.meshData.update(self.verts, updateNormals)
         human.warpNeedReset = True
-        human.callEvent('onChanging', events3d.HumanEvent(human, 'modifier'))
+        human.callEvent('onChanging', events3d.HumanEvent(human, self.eventType))
 
 class Modifier(BaseModifier):
 

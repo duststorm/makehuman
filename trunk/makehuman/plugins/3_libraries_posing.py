@@ -116,14 +116,11 @@ class PoseLoadTaskView(gui3d.TaskView):
         gui3d.app.selectedHuman.show()
         gui3d.TaskView.onHide(self, event)
                 
-
     def onHumanChanging(self, event):
         posemode.changePoseMode(event)
-
                 
     def onHumanChanged(self, event):
         posemode.changePoseMode(event)
-
 
     def loadHandler(self, human, values):
         pass
