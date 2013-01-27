@@ -35,6 +35,7 @@ from OpenGL.GLU import *
 from OpenGL.GL.framebufferobjects import *
 from OpenGL.GL.ARB.transpose_matrix import *
 from OpenGL.GL.ARB.multisample import *
+from OpenGL.GL.ARB.texture_multisample import *
 
 from core import G
 from image import Image
@@ -42,43 +43,10 @@ import matrix
 from debugdump import DebugDump
 import log
 from texture import Texture
+from shader import Shader
 import profiler
 
 g_primitiveMap = [GL_POINTS, GL_LINES, GL_TRIANGLES, GL_QUADS]
-
-def createShaderType(source, type):
-    if not bool(glCreateShader):
-        raise RuntimeError("No shader support detected")
-
-    v = glCreateShader(type)
-    glShaderSource(v, source)
-    glCompileShader(v)
-    if not glGetShaderiv(v, GL_COMPILE_STATUS):
-        log = glGetShaderInfoLog(v)
-        raise RuntimeError("Error compiling vertex shader: %s" % log)
-
-    return v
-
-def createVertexShader(source):
-    return createShaderType(source, GL_VERTEX_SHADER)
-
-def createFragmentShader(source):
-    return createShaderType(source, GL_FRAGMENT_SHADER)
-
-def createShader(vertexShader, fragmentShader):
-    if not bool(glCreateProgram):
-        raise RuntimeError("No shader support detected")
-
-    program = glCreateProgram()
-
-    glAttachShader(program, vertexShader)
-    glAttachShader(program, fragmentShader)
-
-    glLinkProgram(program)
-    if not glGetProgramiv(program, GL_LINK_STATUS):
-        raise RuntimeError("Error linking shader: %s" % glGetProgramInfoLog(program))
-
-    return program
 
 def queryDepth(sx, sy):
     sz = np.zeros((1,), dtype=np.float32)
@@ -189,19 +157,22 @@ def getPickedColor(x, y):
     G.color_picked = tuple(pickingBuffer[y,x,:])
 
 def reshape(w, h):
-    # Prevent a division by zero when minimising the window
-    if h == 0:
-        h = 1
-    # Set the drawable region of the window
-    glViewport(0, 0, w, h)
-    # set up the projection matrix
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
+    try:
+        # Prevent a division by zero when minimising the window
+        if h == 0:
+            h = 1
+        # Set the drawable region of the window
+        glViewport(0, 0, w, h)
+        # set up the projection matrix
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
 
-    # go back to modelview matrix so we can move the objects about
-    glMatrixMode(GL_MODELVIEW)
+        # go back to modelview matrix so we can move the objects about
+        glMatrixMode(GL_MODELVIEW)
 
-    updatePickingBuffer()
+        updatePickingBuffer()
+    except StandardError:
+        log.error('gl.reshape', exc_info=True)
 
 def drawBegin():
     # clear the screen & depth buffer
@@ -290,42 +261,6 @@ def cameraPosition(camera, eye):
 def transformObject(obj):
     glMultMatrixd(np.ascontiguousarray(obj.transform.T))
 
-def setObjectUniforms(obj):
-    if obj.uniforms is None:
-        obj.uniforms = []
-        parameterCount = glGetProgramiv(obj.shader, GL_ACTIVE_UNIFORMS)
-        for index in xrange(parameterCount):
-            name, size, type = glGetActiveUniform(obj.shader, index)
-            obj.uniforms.append((name, size, type))
-
-    currentTextureSampler = 1
-
-    for index, (name, size, type) in enumerate(obj.uniforms):
-        value = obj.shaderParameters.get(name)
-
-        if value is not None:
-            if type == GL_FLOAT:
-                glUniform1f(index, value)
-            elif type == GL_FLOAT_VEC2:
-                if hasattr(value, '__len__') and len(value) == 2:
-                    glUniform2f(index, *value)
-            elif type == GL_FLOAT_VEC3:
-                if hasattr(value, '__len__') and len(value) == 3:
-                    glUniform3f(index, *value)
-            elif type == GL_FLOAT_VEC4:
-                if hasattr(value, '__len__') and len(value) == 4:
-                    glUniform4f(index, *value)
-            elif type == GL_SAMPLER_1D:
-                glActiveTexture(GL_TEXTURE0 + currentTextureSampler)
-                glBindTexture(GL_TEXTURE_1D, value)
-                glUniform1i(index, currentTextureSampler)
-                currentTextureSampler += 1
-            elif type == GL_SAMPLER_2D:
-                glActiveTexture(GL_TEXTURE0 + currentTextureSampler)
-                glBindTexture(GL_TEXTURE_2D, value)
-                glUniform1i(index, currentTextureSampler)
-                currentTextureSampler += 1
-
 def drawMesh(obj):
     if not obj.visibility:
         return
@@ -359,14 +294,13 @@ def drawMesh(obj):
         glCullFace(GL_BACK if obj.cull > 0 else GL_FRONT)
 
     # Enable the shader if the driver supports it and there is a shader assigned
-    if obj.shader and obj.solid:
-        if bool(glUseProgram):
-            glUseProgram(obj.shader)
+    if obj.shader and obj.solid and Shader.supported():
+        glUseProgram(obj.shader)
 
-            # This should be optimized, since we only need to do it when it's changed
-            # Validation should also only be done when it is set
-            if obj.shaderParameters:
-                setObjectUniforms(obj)
+        # This should be optimized, since we only need to do it when it's changed
+        # Validation should also only be done when it is set
+        if obj.shaderParameters:
+            obj.shaderObj.setUniforms(obj.shaderParameters)
 
     # draw the mesh
     if not obj.solid:
@@ -408,9 +342,8 @@ def drawMesh(obj):
         glEnableClientState(GL_COLOR_ARRAY)
 
     # Disable the shader if the driver supports it and there is a shader assigned
-    if obj.shader and obj.solid:
-        if bool(glUseProgram):
-            glUseProgram(0)
+    if obj.shader and obj.solid and Shader.supported():
+        glUseProgram(0)
         glActiveTexture(GL_TEXTURE0)
 
     glDisable(GL_CULL_FACE)
@@ -626,7 +559,10 @@ def _draw():
     drawEnd()
 
 def draw():
-    if profiler.active():
-        profiler.accum('_draw()', globals(), locals())
-    else:
-        _draw()
+    try:
+        if profiler.active():
+            profiler.accum('_draw()', globals(), locals())
+        else:
+            _draw()
+    except StandardError:
+        log.error('gl.draw', exc_info=True)

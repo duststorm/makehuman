@@ -97,7 +97,7 @@ class Object3D(object):
         self.visibility = True
         self.pickable = True
         self.texture = None
-        self.shader = 0
+        self.shader = None
         self.shaderParameters = {}
         self.shadeless = False
         self.depthless = False
@@ -672,8 +672,8 @@ class Object3D(object):
         """
         This method is used to specify the shader.
         
-        :param shader: The shader.
-        :type shader: int
+        :param shader: The path to a pair of shader files.
+        :type shader: string
         """
 
         self.shader = shader

@@ -27,13 +27,13 @@ from getpath import getPath
 
 from image import Image
 from texture import Texture, getTexture, reloadTextures
+from shader import Shader
 from camera import Camera
 
 from qtui import Keys, Buttons, Modifiers, Application
 from qtui import callAsyncThread, setShortcut
 from qtui import getSaveFileName, getOpenFileName, getExistingDirectory
 
-from glmodule import createVertexShader, createFragmentShader, createShader
 from glmodule import updatePickingBuffer, grabScreen, hasRenderSkin, renderSkin
 
 from inifile import parseINI, formatINI

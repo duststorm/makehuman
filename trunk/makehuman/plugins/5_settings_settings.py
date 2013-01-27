@@ -140,19 +140,19 @@ class SettingsTaskView(gui3d.TaskView):
         @self.shaderNo.mhEvent
         def onClicked(event):
             human = gui3d.app.selectedHuman
-            human.mesh.setShader(0)
+            human.mesh.setShader(None)
             
         @self.shaderPhong.mhEvent
         def onClicked(event):
-            self.setShader("data/shaders/glsl/phong_vertex_shader.txt", "data/shaders/glsl/phong_fragment_shader.txt")
+            self.setShader("data/shaders/glsl/phong")
                 
         @self.shaderToon.mhEvent
         def onClicked(event):
-            self.setShader("data/shaders/glsl/toon_vertex_shader.txt", "data/shaders/glsl/toon_fragment_shader.txt")
+            self.setShader("data/shaders/glsl/toon")
             
         #@self.shaderSkin.mhEvent
         #def onClicked(event):
-            #self.setShader("data/shaders/glsl/skin_vertex_shader.txt", "data/shaders/glsl/skin_fragment_shader.txt")
+            #self.setShader("data/shaders/glsl/skin")
             #gui3d.app.selectedHuman.mesh.setShaderParameter("gradientMap", module3d.getTexture("data/textures/color_temperature.png").textureId)
             #gui3d.app.selectedHuman.mesh.setShaderParameter("ambientOcclusionMap", module3d.getTexture("data/textures/female_young.tif").textureId)
                 
@@ -190,15 +190,8 @@ class SettingsTaskView(gui3d.TaskView):
         def onClicked(event):
             gui3d.app.settings['units'] = 'imperial'
                 
-    def setShader(self, vertex, fragment):
-            human = gui3d.app.selectedHuman
-            try:
-                human.vertex_shader = mh.createVertexShader(open(vertex).read())
-                human.fragment_shader = mh.createFragmentShader(open(fragment).read())
-                human.shader_program = mh.createShader(human.vertex_shader, human.fragment_shader)
-                human.mesh.setShader(human.shader_program)
-            except Exception, e:
-                log.message("No shader support: %s", str(e))
+    def setShader(self, path):
+            gui3d.app.selectedHuman.mesh.setShader(path)
     
     def onShow(self, event):
     

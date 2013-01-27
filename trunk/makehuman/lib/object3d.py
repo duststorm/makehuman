@@ -26,6 +26,7 @@ import math
 import numpy as np
 import glmodule as gl
 import texture
+import shader
 import matrix
 import log
 from core import G
@@ -33,9 +34,10 @@ from core import G
 class Object3D(object):
     def __init__(self, parent):
         self.parent = parent
-        self.uniforms = None
         self._texturePath = None
         self._textureTex = None
+        self._shaderPath = None
+        self._shaderObj = None
 
     @property
     def verts(self):
@@ -154,8 +156,28 @@ class Object3D(object):
         return self.parent.sz
 
     @property
+    def shaderObj(self):
+        if not shader.Shader.supported():
+            return None
+        if self._shaderPath != self.parent.shader:
+            self._shaderObj = None
+        if self._shaderObj is False:
+            return None
+        if self._shaderObj is None:
+            self._shaderPath = self.parent.shader
+            if self._shaderPath is None:
+                self._shaderObj = None
+            else:
+                self._shaderObj = shader.getShader(self._shaderPath)
+        if self._shaderObj is False:
+            return None
+        return self._shaderObj
+
+    @property
     def shader(self):
-        return self.parent.shader
+        if self.shaderObj is None:
+            return 0
+        return self.shaderObj.shaderId
 
     @property
     def priority(self):
@@ -202,9 +224,11 @@ class Object3D(object):
 
     @property
     def textureTex(self):
+        if self._texturePath != self.parent.texture:
+            self._textureTex = None
         if self._textureTex is False:
             return None
-        if self._textureTex is None or self._texturePath != self.parent.texture:
+        if self._textureTex is None:
             self._texturePath = self.parent.texture
             if self._texturePath is None:
                 self._textureTex = None
