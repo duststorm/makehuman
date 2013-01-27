@@ -382,7 +382,8 @@ def readProxyFile(obj, file, evalOnLoad):
             elif key == 'uvtex_layer':
                 proxy.uvtexLayerName[int(words[2])] = words[3]
             elif key == 'material_file':
-                proxy.material_file = getFileName(folder, words[2], ".mhx")
+                pass
+                #proxy.material_file = getFileName(folder, words[2], ".mhx")
             elif key == 'obj_file':
                 proxy.obj_file = getFileName(folder, words[2], ".obj")
             elif key == 'backface_culling':
