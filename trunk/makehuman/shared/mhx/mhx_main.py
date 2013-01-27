@@ -361,11 +361,14 @@ def copyFile25(human, tmplName, fp, proxy, config, proxyData):
                 layers = list(proxy.uvtexLayerName.keys())
                 layers.sort()
                 for layer in layers:
+                    try:
+                        texfaces = proxy.texFacesLayers[layer]
+                        texverts = proxy.texVertsLayers[layer]
+                    except KeyError:
+                        continue
                     fp.write(                   
                         '  MeshTextureFaceLayer %s\n' % proxy.uvtexLayerName[layer] +
                         '    Data \n')
-                    texfaces = proxy.texFacesLayers[layer]
-                    texverts = proxy.texVertsLayers[layer]
                     for f in texfaces:
                         fp.write("    vt")
                         for v in f:
