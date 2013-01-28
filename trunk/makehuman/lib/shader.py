@@ -236,38 +236,42 @@ class Shader(object):
         }
 
     if 'GL_IMAGE_1D' in globals():    
-        textureTargets2 = {
-            GL_IMAGE_1D:                                    GL_TEXTURE_1D,
-            GL_IMAGE_2D:                                    GL_TEXTURE_2D,
-            GL_IMAGE_3D:                                    GL_TEXTURE_3D,
-            GL_IMAGE_2D_RECT:                               GL_TEXTURE_2D_RECTANGLE,
-            GL_IMAGE_CUBE:                                  GL_TEXTURE_CUBE_MAP,
-            GL_IMAGE_BUFFER:                                GL_TEXTURE_BUFFER,
-            GL_IMAGE_1D_ARRAY:                              GL_TEXTURE_1D_ARRAY,
-            GL_IMAGE_2D_ARRAY:                              GL_TEXTURE_2D_ARRAY,
-            GL_IMAGE_2D_MULTISAMPLE:                        GL_TEXTURE_2D_MULTISAMPLE,
-            GL_IMAGE_2D_MULTISAMPLE_ARRAY:                  GL_TEXTURE_2D_MULTISAMPLE_ARRAY,
-            GL_INT_IMAGE_1D:                                GL_TEXTURE_1D,
-            GL_INT_IMAGE_2D:                                GL_TEXTURE_2D,
-            GL_INT_IMAGE_3D:                                GL_TEXTURE_3D,
-            GL_INT_IMAGE_2D_RECT:                           GL_TEXTURE_2D_RECTANGLE,
-            GL_INT_IMAGE_CUBE:                              GL_TEXTURE_CUBE_MAP,
-            GL_INT_IMAGE_BUFFER:                            GL_TEXTURE_BUFFER,
-            GL_INT_IMAGE_1D_ARRAY:                          GL_TEXTURE_1D_ARRAY,
-            GL_INT_IMAGE_2D_ARRAY:                          GL_TEXTURE_2D_ARRAY,
-            GL_INT_IMAGE_2D_MULTISAMPLE:                    GL_TEXTURE_2D_MULTISAMPLE,
-            GL_INT_IMAGE_2D_MULTISAMPLE_ARRAY:              GL_TEXTURE_2D_MULTISAMPLE_ARRAY,
-            GL_UNSIGNED_INT_IMAGE_1D:                       GL_TEXTURE_1D,
-            GL_UNSIGNED_INT_IMAGE_2D:                       GL_TEXTURE_2D,
-            GL_UNSIGNED_INT_IMAGE_3D:                       GL_TEXTURE_3D,
-            GL_UNSIGNED_INT_IMAGE_2D_RECT:                  GL_TEXTURE_2D_RECTANGLE,
-            GL_UNSIGNED_INT_IMAGE_CUBE:                     GL_TEXTURE_CUBE_MAP,
-            GL_UNSIGNED_INT_IMAGE_BUFFER:                   GL_TEXTURE_BUFFER,
-            GL_UNSIGNED_INT_IMAGE_1D_ARRAY:                 GL_TEXTURE_1D_ARRAY,
-            GL_UNSIGNED_INT_IMAGE_2D_ARRAY:                 GL_TEXTURE_2D_ARRAY,
-            GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE:           GL_TEXTURE_2D_MULTISAMPLE,
-            GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_ARRAY:     GL_TEXTURE_2D_MULTISAMPLE_ARRAY,
-            }
+        try:
+            textureTargets2 = {
+                GL_IMAGE_1D:                                    GL_TEXTURE_1D,
+                GL_IMAGE_2D:                                    GL_TEXTURE_2D,
+                GL_IMAGE_3D:                                    GL_TEXTURE_3D,
+                GL_IMAGE_2D_RECT:                               GL_TEXTURE_2D_RECTANGLE,
+                GL_IMAGE_CUBE:                                  GL_TEXTURE_CUBE_MAP,
+                GL_IMAGE_BUFFER:                                GL_TEXTURE_BUFFER,
+                GL_IMAGE_1D_ARRAY:                              GL_TEXTURE_1D_ARRAY,
+                GL_IMAGE_2D_ARRAY:                              GL_TEXTURE_2D_ARRAY,
+                GL_IMAGE_2D_MULTISAMPLE:                        GL_TEXTURE_2D_MULTISAMPLE,
+                GL_IMAGE_2D_MULTISAMPLE_ARRAY:                  GL_TEXTURE_2D_MULTISAMPLE_ARRAY,
+                GL_INT_IMAGE_1D:                                GL_TEXTURE_1D,
+                GL_INT_IMAGE_2D:                                GL_TEXTURE_2D,
+                GL_INT_IMAGE_3D:                                GL_TEXTURE_3D,
+                GL_INT_IMAGE_2D_RECT:                           GL_TEXTURE_2D_RECTANGLE,
+                GL_INT_IMAGE_CUBE:                              GL_TEXTURE_CUBE_MAP,
+                GL_INT_IMAGE_BUFFER:                            GL_TEXTURE_BUFFER,
+                GL_INT_IMAGE_1D_ARRAY:                          GL_TEXTURE_1D_ARRAY,
+                GL_INT_IMAGE_2D_ARRAY:                          GL_TEXTURE_2D_ARRAY,
+                GL_INT_IMAGE_2D_MULTISAMPLE:                    GL_TEXTURE_2D_MULTISAMPLE,
+                GL_INT_IMAGE_2D_MULTISAMPLE_ARRAY:              GL_TEXTURE_2D_MULTISAMPLE_ARRAY,
+                GL_UNSIGNED_INT_IMAGE_1D:                       GL_TEXTURE_1D,
+                GL_UNSIGNED_INT_IMAGE_2D:                       GL_TEXTURE_2D,
+                GL_UNSIGNED_INT_IMAGE_3D:                       GL_TEXTURE_3D,
+                GL_UNSIGNED_INT_IMAGE_2D_RECT:                  GL_TEXTURE_2D_RECTANGLE,
+                GL_UNSIGNED_INT_IMAGE_CUBE:                     GL_TEXTURE_CUBE_MAP,
+                GL_UNSIGNED_INT_IMAGE_BUFFER:                   GL_TEXTURE_BUFFER,
+                GL_UNSIGNED_INT_IMAGE_1D_ARRAY:                 GL_TEXTURE_1D_ARRAY,
+                GL_UNSIGNED_INT_IMAGE_2D_ARRAY:                 GL_TEXTURE_2D_ARRAY,
+                GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE:           GL_TEXTURE_2D_MULTISAMPLE,
+                GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_ARRAY:     GL_TEXTURE_2D_MULTISAMPLE_ARRAY,
+                }
+        except:
+            pass
+
 
     def getUniforms(self):
         if self.uniforms is None:
