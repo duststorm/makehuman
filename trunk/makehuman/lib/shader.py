@@ -26,7 +26,53 @@ import os.path
 import numpy as np
 from OpenGL.GL import *
 from OpenGL.GL.ARB.texture_multisample import *
+import texture
 import log
+
+class Uniform(object):
+    def __init__(self, index, name, pytype):
+        self.index = index
+        self.name = name
+        self.pytype = pytype
+
+    def __call__(self, index, values):
+        raise NotImplementedError
+
+class VectorUniform(object):
+    def __init__(self, index, name, pytype, dims, type, func):
+        super(VectorUniform, self).__init__(index, name, pytype)
+        self.dims = dims
+        self.type = type
+        self.func = func
+
+    def __call__(self, data):
+        self.call(self.values(data))
+
+    def values(self, data):
+        return np.asarray(data, dtype=self.type).reshape(self.dims)
+
+    def call(self, values):
+        self.func(self.index, len(values), values)
+
+class MatrixUniform(VectorUniform):
+    def call(self, values):
+        self.func(self.index, 1, GL_TRUE, values)
+
+class SamplerUniform(Uniform):
+    def __init__(self, index, name, target):
+        super(SamplerUniform, self).__init__(index, name, str)
+        self.target = target
+
+    def __call__(self, data):
+        cls = type(self)
+        glActiveTexture(GL_TEXTURE0 + cls.currentSampler)
+        glBindTexture(self.target, texture.getTexture(data).textureId)
+        glUniform1i(self.index, cls.currentSampler)
+        cls.currentSampler += 1
+
+    @classmethod
+    def reset(cls):
+        cls.currentSampler = 1
 
 class Shader(object):
     _supported = None
@@ -102,6 +148,8 @@ class Shader(object):
             log.error("Error linking shader: %s", glGetProgramInfoLog(self.shaderId))
             self.delete()
             return
+
+        self.uniforms = None
 
     uniformTypes = {
         GL_FLOAT:               ((1,),  np.float32,     float,  glUniform1fv),
@@ -221,39 +269,40 @@ class Shader(object):
             GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_ARRAY:     GL_TEXTURE_2D_MULTISAMPLE_ARRAY,
             }
 
-    def setUniforms(self, params):
-        if hasattr(self, 'uniformTypes2') and self.uniformTypes2:
-            self.uniformTypes.update(self.uniformTypes2)
-            self.uniformTypes2.clear()
-
-        if hasattr(self, 'textureTargets2') and self.textureTargets2:
-            self.textureTargets.update(self.textureTargets2)
-            self.textureTargets2.clear()
-
+    def getUniforms(self):
         if self.uniforms is None:
+            if hasattr(self, 'uniformTypes2') and self.uniformTypes2:
+                self.uniformTypes.update(self.uniformTypes2)
+                self.uniformTypes2.clear()
+
+            if hasattr(self, 'textureTargets2') and self.textureTargets2:
+                self.textureTargets.update(self.textureTargets2)
+                self.textureTargets2.clear()
+
             parameterCount = glGetProgramiv(self.shaderId, GL_ACTIVE_UNIFORMS)
-            self.uniforms = [glGetActiveUniform(self.shaderId, index)
-                             for index in xrange(parameterCount)]
+            self.uniforms = []
+            for index in xrange(parameterCount):
+                name, size, type = glGetActiveUniform(self.shaderId, index)
+                if type in self.uniformTypes:
+                    dims, nptype, pytype, glfunc = self.uniformTypes[type]
+                    if len(values.shape) > 1:
+                        func = MatrixUniform(index, name, pytype, dims, nptype, glfunc)
+                    else:
+                        func = VectorUniform(index, name, pytype, dims, nptype, glfunc)
+                elif type in self.textureTargets:
+                    target = self.textureTargets[type]
+                    func = SamplerUniform(index, name, target)
+                self.uniforms.append(func)
 
-        currentTextureSampler = 1
+        return self.uniforms
 
-        for index, (name, size, type) in enumerate(self.uniforms):
+    def setUniforms(self, params):
+        SamplerUniform.reset()
+
+        for uniform in self.getUniforms():
             value = params.get(name)
-            if value is None:
-                continue
-            if type in self.uniformTypes:
-                dims, nptype, pytype, func = self.uniformTypes[type]
-                values = np.asarray(value, dtype=nptype).reshape(dims)
-                if len(values.shape) > 1:
-                    func(index, 1, GL_TRUE, values)	# matrix
-                else:
-                    func(index, len(value), values)
-            elif type in self.textureTargets:
-                target = self.textureTargets[type]
-                glActiveTexture(GL_TEXTURE0 + currentTextureSampler)
-                glBindTexture(target, value)
-                glUniform1i(index, currentTextureSampler)
-                currentTextureSampler += 1
+            if value is not None:
+                uniform(value)
 
 _shaderCache = {}
 

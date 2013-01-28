@@ -153,8 +153,8 @@ class SettingsTaskView(gui3d.TaskView):
         #@self.shaderSkin.mhEvent
         #def onClicked(event):
             #self.setShader("data/shaders/glsl/skin")
-            #gui3d.app.selectedHuman.mesh.setShaderParameter("gradientMap", module3d.getTexture("data/textures/color_temperature.png").textureId)
-            #gui3d.app.selectedHuman.mesh.setShaderParameter("ambientOcclusionMap", module3d.getTexture("data/textures/female_young.tif").textureId)
+            #gui3d.app.selectedHuman.mesh.setShaderParameter("gradientMap", "data/textures/color_temperature.png")
+            #gui3d.app.selectedHuman.mesh.setShaderParameter("ambientOcclusionMap", "data/textures/female_young.tif")
                 
         @self.realtimeUpdates.mhEvent
         def onClicked(event):

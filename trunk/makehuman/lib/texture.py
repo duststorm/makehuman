@@ -80,7 +80,7 @@ class Texture(object):
 
         use_mipmaps = ((width in self._powers and height in self._powers) or not self._npot) and pixels is not None
 
-        if height == 0:
+        if height == 1:
             glBindTexture(GL_TEXTURE_1D, self.textureId)
 
             if not use_mipmaps:
@@ -142,7 +142,7 @@ class Texture(object):
 
         pixels = image.flip_vertical().data
 
-        if image.height == 0:
+        if image.height == 1:
             glBindTexture(GL_TEXTURE_1D, self.textureId)
             glTexSubImage1D(GL_TEXTURE_1D, 0, x, image.width, format, GL_UNSIGNED_BYTE, pixels)
         else:
