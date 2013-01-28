@@ -52,10 +52,10 @@ class Settings:
     def __init__(self):
         self.createNewScenes = False
         self.writeAllNodes = True
-        self.changeCsys = False
         self.includePropertyTemplates = True
         self.makeSceneNode = False
         self.selectedOnly = True
+        self.yUp = False
        
             
 settings = Settings()

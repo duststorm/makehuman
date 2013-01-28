@@ -60,7 +60,7 @@ class FbxLex(shlex.shlex):
     def __init__(self, stream):
         shlex.shlex.__init__(self, stream)
         self.commenters = ';'
-        self.wordchars += ':-.'
+        self.wordchars += ':+-.'
         self.quotes = '"'
         
 #------------------------------------------------------------------

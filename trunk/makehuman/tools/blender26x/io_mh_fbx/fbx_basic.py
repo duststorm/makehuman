@@ -17,8 +17,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-import math
-import mathutils
+from math import pi
+from mathutils import *
 import sys
 from . import fbx
 
@@ -141,14 +141,13 @@ class Definition:
 
 class CArray(FbxPlug):
 
-    def __init__(self, name, type, step, csys=False):
+    def __init__(self, name, type, step):
         FbxPlug.__init__(self, 'ARRAY')
         self.name = name
         self.values = []
         self.subtype = type
         self.step = step
         self.size = 0
-        self.csys = csys
         if type == float:
             self.format = '%s%.6g'
         elif type == int:
@@ -180,23 +179,9 @@ class CArray(FbxPlug):
                         val.append(-1-rest[0])
                         rest = rest[1:]
                 
-                if self.csys and fbx.settings.changeCsys:
-                    self.changeCsys(csysF2B, csysB2F)
-                    
         return self                
         
     
-    def changeCsys(fcn, inv):                    
-        if self.step == 3:
-            self.values = [fcn(val) for val in self.values]
-        elif self.step == 4:
-            (left, right) = self.changeCsys
-            if right:
-                self.values = [fcn(val) for val in self.values]
-            if left:
-                self.values = inv(self.values)
-                    
-
     def make(self, values):
         self.values = values
         self.size = len(self.flattenValues(values))
@@ -238,8 +223,6 @@ class CArray(FbxPlug):
 
 
     def writeFbx(self, fp):
-        if self.csys and fbx.settings.changeCsys:
-            self.changeCsys(csysB2F, csysF2B)
         vec = self.flattenValues(self.values)
 
         fp.write(
@@ -247,16 +230,16 @@ class CArray(FbxPlug):
             '                a: ')
         c = ''
         for x in vec:
-            fp.write("%s %s" % (c,round(x)))
+            fp.write(self.format % (c,round(x)))
             c = ','
         fp.write('\n            }\n')
 
        
 def round(x):
     if abs(x) < 1e-5:
-        return "0"
+        return 0
     else:
-        return ("%.5g" % x)
+        return x
 
 def dist(x,y):
     d = x-y
@@ -266,20 +249,144 @@ def dist(x,y):
 #   Coordinate system conversion
 #------------------------------------------------------------------
 
-def csysB2F(vec):
-    return (vec[0], vec[2], -vec[1])
+
+def b2fYup(vec):
+    return Vector((vec[0], vec[2], -vec[1]))
+
+def f2bYup(vec):
+    return Vector((vec[0], -vec[2], vec[1]))
+    
+def b2fEulerYup(eu):
+    return Vector((eu[0], eu[2], -eu[1]))
+
+def f2bEulerYup(eu):
+    return Vector((eu[0], -eu[2], eu[1]))
+    
+def b2fRot4Yup(mat):
+    return b2fGlobRot * mat * b2fLocRot
+    
+def f2bRot4Yup(mat):
+    return f2bGlobRot * mat * f2bLocRot
+    
+  
+def b2fZup(vec):
+    return vec
+
+def f2bZup(vec):
+    return vec
+
+def b2fEulerZup(eu):
+    return eu
+
+def f2bEulerZup(eu):
+    return eu
+
+def b2fRot4Zup(mat):
+    return mat
+    
+def f2bRot4Zup(mat):
+    return mat
 
 
-def csysF2B(vec):
-    return (vec[0], -vec[2], vec[1])
+# string : (fIndex, bIndex, factor)
 
+BTransIndexYup = {
+    "d|X" : (0, 0, 1),
+    "d|Y" : (1, 2, -1),
+    "d|Z" : (2, 1, 1),
+}
+
+BRotIndexYup = {
+    "d|X" : (0, 0, 1),
+    "d|Y" : (1, 2, -1),
+    "d|Z" : (2, 1, 1),
+}
+
+# bIndex : (string, fIndex, factor)
+
+FRotChannelYup = {
+    0 : ("d|X", 0, 1),
+    1 : ("d|Z", 2, 1),
+    2 : ("d|Y", 1, -1),
+}
+
+FTransChannelYup = {
+    0 : ("d|X", 0, 1),
+    1 : ("d|Z", 2, 1),
+    2 : ("d|Y", 1, -1),
+}
+
+
+BTransIndexZup = {
+    "d|X" : (0, 0, 1),
+    "d|Y" : (1, 1, 1),
+    "d|Z" : (2, 2, 1),
+}
+
+BRotIndexZup = {
+    "d|X" : (0, 0, 1),
+    "d|Y" : (1, 1, 1),
+    "d|Z" : (2, 2, 1),
+}
+
+FRotChannelZup = {
+    0 : ("d|X", 0, 1),
+    1 : ("d|Y", 1, 1),
+    2 : ("d|Z", 2, 1),
+}
+
+FTransChannelZup = {
+    0 : ("d|X", 0, 1),
+    1 : ("d|Y", 1, 1),
+    2 : ("d|Z", 2, 1),
+}
+
+
+def setCsysChangers():
+    global b2f, f2b, b2fEuler, f2bEuler, b2fRot4, f2bRot4 
+    global f2bGlobRot, b2fGlobRot, f2bLocRot, b2fLocRot
+    global BTransIndex, BRotIndex, FRotChannel, FTransChannel
+   
+    if fbx.settings.yUp:
+        f2bGlobRot = Matrix.Rotation(pi/2, 4, 'X')
+        b2fGlobRot = Matrix.Rotation(-pi/2, 4, 'X')
+        f2bLocRot = Matrix.Rotation(0, 4, 'Z')
+        b2fLocRot = Matrix.Rotation(0, 4, 'Z')
+
+        b2f = b2fYup
+        f2b = f2bYup
+        b2fEuler = b2fEulerYup
+        f2bEuler = f2bEulerYup
+        b2fRot4 = b2fRot4Yup
+        f2bRot4 = f2bRot4Yup
+        
+        BTransIndex = BTransIndexYup
+        BRotIndex = BRotIndexYup
+        FRotChannel = FRotChannelYup
+        FTransChannel = FTransChannelYup
+        
+    else:
+        b2f = b2fZup
+        f2b = f2bZup
+        b2fEuler = b2fEulerZup
+        f2bEuler = f2bEulerZup
+        b2fRot4 = b2fRot4Zup
+        f2bRot4 = f2bRot4Zup
+
+        BTransIndex = BTransIndexZup
+        BRotIndex = BRotIndexZup
+        FRotChannel = FRotChannelZup
+        FTransChannel = FTransChannelZup
+        
+
+setCsysChangers()
 
 #------------------------------------------------------------------
 #   Literals
 #------------------------------------------------------------------
 
-R = math.pi/180
-D = 180/math.pi
+R = pi/180
+D = 180/pi
 
 class FbxLiteral:
     def __init__(self, value):

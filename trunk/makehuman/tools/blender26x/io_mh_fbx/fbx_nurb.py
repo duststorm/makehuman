@@ -38,7 +38,7 @@ class FbxNurbs(FbxGeometryBase):
         self.template = self.parseTemplate('GeometryNurb', FbxNurbs.propertyTemplate)
         self.isModel = True
         self.isObjectData = True
-        self.points = CArray("Points", float, 3, csys=True)
+        self.points = CArray("Points", float, 3)
         self.multiplicityU = CArray("MultiplicityU", int, 1)
         self.multiplicityV = CArray("MultiplicityV", int, 1)
         self.knotVectorU = CArray("KnotVectorU", int, 1)
@@ -76,7 +76,7 @@ class FbxNurbs(FbxGeometryBase):
             "Form", ["Periodic", "Open"],
         ])
 
-        self.points.make( [v.co for v in me.vertices] )
+        self.points.make( [b2f(v.co) for v in me.vertices] )
         self.multiplicityU.make( [v.normal for v in me.vertices] )
         self.multiplicityV.make( [v.normal for v in me.vertices] )
         self.knotVectorU.make( [v.normal for v in me.vertices] )

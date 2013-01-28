@@ -142,17 +142,16 @@ class CAnimationLayer(FbxObject):
     
     def make(self, act):        
         FbxObject.make(self, act)
-        groups = groupFcurves(act)            
+        groups = groupFcurves(act)    
+        user = self.users[0]
         for key,group in groups.items():
-            acnode = self.acnodes[key] = FbxAnimationCurveNode().make(group)
+            node = user
+            if group.pose:
+                if user.btype == 'ARMATURE':
+                    node = user.bones[group.bone]                
+            acnode = self.acnodes[key] = FbxAnimationCurveNode().make(group, node)
             acnode.makeLink(self)
-            for user in self.users:
-                if group.pose:
-                    if user.btype == 'ARMATURE':
-                        boneNode = user.bones[group.bone]
-                        acnode.makeChannelLink(boneNode, acnode.channel)
-                else:
-                    acnode.makeChannelLink(user, acnode.channel)
+            acnode.makeChannelLink(node, acnode.channel)
         return self
                                 
 
@@ -241,17 +240,6 @@ Channels = {
     'scale' : ('S', 'Lcl Scaling', 'Vector3', (1,1,1)),
 }
 
-XYZ = ['X', 'Y', 'Z']
-
-Index = {
-    "d|X" : 0,
-    "d|Y" : 1,
-    "d|Z" : 2,
-}
-
-
-
-
 class FbxAnimationCurveNode(FbxObject):
     propertyTemplate = (
 """
@@ -268,24 +256,30 @@ class FbxAnimationCurveNode(FbxObject):
         self.acurves = {}
 
 
-    def make(self, group):        
+    def make(self, group, user):        
         FbxObject.make(self, group)
         channel = self.name.split(".")[-1]
         self.name, self.channel, self.proptype, kvec = Channels[channel]
         self.group = group
+        offsets = user.getProp(self.channel)
+
         if self.channel in ["Lcl Rotation"]:
             deg = D
-        else:
+            fChannel = FRotChannel
+        elif self.channel in ["Lcl Translation"]:
             deg = 1
+            fChannel = FTransChannel
 
         if channel == 'rotation_quaternion':
             fcurves = quat2euler(group.fcurves)
         else:
             fcurves = group.fcurves
     
-        for index,fcu in fcurves.items():
-            acu = self.acurves[index] = FbxAnimationCurve().make(fcu, deg)
-            acu.makeChannelLink(self, ("d|%s" % XYZ[index]))
+        for bIndex,fcu in fcurves.items():
+            string,fIndex,factor = fChannel[bIndex]
+            offset = offsets[fIndex]
+            acu = self.acurves[fIndex] = FbxAnimationCurve().make(fcu, offset, factor*deg)
+            acu.makeChannelLink(self, string)
 
         self.setProps([("d", kvec)])
         return self
@@ -315,24 +309,39 @@ class FbxAnimationCurveNode(FbxObject):
         for btype in ['BONE', 'OBJECT']:        
             node,channel = self.getBParent(btype)
             if node:
-                rna = node.datum
-                ob = node.object
-                group = rna.name
+                user = node
                 break
+
+        rna = user.datum
+        ob = user.object
+        group = rna.name
 
         if channel in ["Lcl Rotation"]:
             rad = R
-        else:
+            indexer = BRotIndex
+            try:
+                offsets = user.getProp(channel)
+            except KeyError:
+                offsets = (0,0,0)
+
+        elif channel in ["Lcl Translation"]:
             rad = 1
+            indexer = BTransIndex
+            try:
+                offsets = f2b(user.getProp(channel))
+            except KeyError:
+                offsets = (0,0,0)
+        else:
+            halt
 
         
-        for child,idx in self.children:       
-            index = Index[idx]
+        for child,fChannel in self.children:       
+            fIndex,bIndex,factor = indexer[fChannel]
             bchannel,datapath = getDataPath(channel, btype, rna)
-            ob.keyframe_insert(datapath, index, frame=0, group=group)
+            ob.keyframe_insert(datapath, bIndex, frame=0, group=group)
             act = ob.animation_data.action
-            fcu = getFCurveFromAction(act, datapath, index)
-            child.build(fcu, rad)
+            fcu = getFCurveFromAction(act, datapath, bIndex)
+            child.build(fcu, offsets[fIndex], factor*rad)
             
 
 def getFCurveFromAction(act, datapath, index):
@@ -416,7 +425,7 @@ class FbxAnimationCurve(FbxObject):
             ('KeyAttrRefCount', CArray("KeyAttrRefCount", int, 1)),
         ])
        
-    def make(self, fcu, deg):        
+    def make(self, fcu, offset, deg):        
 
         times = []
         values = []
@@ -427,7 +436,7 @@ class FbxAnimationCurve(FbxObject):
         for kp in fcu.keyframe_points:
             t = float2int(kp.co[0])
             times.append(t)
-            y = kp.co[1]*deg
+            y = kp.co[1]*deg + offset
             values.append(y)
             #data += [list(kp.handle_left), list(kp.handle_right)]
             data.append((0,0,0xd050d05,0))
@@ -445,12 +454,12 @@ class FbxAnimationCurve(FbxObject):
         return FbxObject.make(self, fcu)
         
         
-    def build(self, fcu, rad):
+    def build(self, fcu, offset, rad):
         times = self.get('KeyTime')
         yvals = self.get('KeyValueFloat')
         for n,t in enumerate(times.values):
             yval = yvals.values[n]
-            fcu.keyframe_points.insert(int2float(t), yval*rad, options={'FAST'})
+            fcu.keyframe_points.insert(int2float(t), (yval-offset)*rad, options={'FAST'})
 
         return fcu            
             

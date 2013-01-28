@@ -197,7 +197,7 @@ class CPoseNode(FbxStuff):
     def __init__(self):
         FbxStuff.__init__(self, 'PoseNode')
         self.node = None
-        self.matrix = CArray('Matrix', float, 4, csys=(True,False))
+        self.matrix = CArray('Matrix', float, 4)
         
     
     def parse(self, pnode):
@@ -269,6 +269,7 @@ class CBone(CModel):
         self.object = None
         self.datum = None
         self.pose = None
+        self.matrixLocal = None
         self.transform = None
         self.transformLink = None
         self.head = None
@@ -278,9 +279,16 @@ class CBone(CModel):
         CModel.make(self, bone)
         self.parent = parent
 
-        self.transformLink = bone.matrix_local.transposed()
+        if parent.btype == 'OBJECT':
+            self.matrixLocal = b2fRot4(bone.matrix_local)
+        elif parent.btype == 'BONE':
+            self.matrixLocal =  b2fRot4(bone.matrix_local)
+        else:
+            halt
+            
+        self.transformLink = self.matrixLocal.transposed()
         self.transform = self.transformLink.inverted()
-        trans,rot,scaling = boneTransformations(bone)
+        trans,rot,scaling = self.boneTransformations()
         
         self.setProps([
             ("RotationActive", 1),
@@ -296,6 +304,27 @@ class CBone(CModel):
         self.attribute.make(bone)
         return self
        
+
+    def boneTransformations(self):
+        if self.parent.btype == 'OBJECT':
+            mat = self.matrixLocal
+        elif self.parent.btype == 'BONE':
+            pmat = self.parent.matrixLocal.inverted()
+            if fbx.usingMakeHuman:
+                mat = pmat.mult(self.matrixLocal)
+            else:
+                mat = pmat * self.matrixLocal
+
+        (trans,rot,scale) = mat.decompose()
+    
+        if fbx.usingMakeHuman:
+            euler = Vector(rot.to_euler()).mult(D)
+        else:
+            euler = Vector(rot.to_euler())*D
+    
+        scale = Vector((1,1,1))
+        return trans,euler,scale
+
 
     def addDefinition(self, definitions):            
         CModel.addDefinition(self, definitions)
@@ -327,26 +356,6 @@ class CBone(CModel):
         return nodes
 
 
-def boneTransformations(bone):
-    if bone.parent:
-        pmat = bone.parent.matrix_local.inverted()
-        if fbx.usingMakeHuman:
-            mat = pmat.mult(bone.matrix_local)
-        else:
-            mat = pmat * bone.matrix_local
-    else:
-        mat = bone.matrix_local
-    (trans,rot,scale) = mat.decompose()
-
-    if fbx.usingMakeHuman:
-        euler = Vector(rot.to_euler()).mult(D)
-    else:
-        euler = Vector(rot.to_euler())*D
-
-    scale = Vector((1,1,1))
-    return trans,euler,scale
-
-
 class BoneInfo:
    
     def __init__(self, node, infos):
@@ -376,6 +385,7 @@ class BoneInfo:
         if parent:
             self.matrix = parent.matrix * self.restMat
         else:
+            self.restMat = f2bRot4(self.restMat)
             self.matrix = self.restMat
         self.head = Vector( self.matrix.col[3][:3] )
         
@@ -399,13 +409,6 @@ class BoneInfo:
             self.length = 1
         self.tail = self.head + self.length*Vector( self.matrix.col[1][:3] )
         
-        if nChildren > 0:
-            print("\n", self.name)
-            print("  v", vec)
-            print("  m", self.length*Vector( self.matrix.col[1][:3] ))
-            print(self.matrix)
-            print(self.restMat)
-
         quat = self.matrix.to_quaternion()
         if abs(quat.w) < 1e-4:
             self.roll = math.pi

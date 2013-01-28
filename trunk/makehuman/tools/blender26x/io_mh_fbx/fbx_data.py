@@ -154,7 +154,7 @@ def createNode(pnode):
         if subtype == "LimbNode":
             node = fbx_armature.CBoneAttribute()
         elif subtype == "Light":
-            node = fbx_lamp.CLampAttribute()
+            node = fbx_lamp.FbxLight()
         elif subtype == "Camera":
             node = fbx_camera.FbxCamera()
         elif subtype == "IKEffector":
@@ -212,6 +212,7 @@ def buildObjects(context):
 
     fbx.data = {}
     scn = context.scene
+    setCsysChangers()
     
     fbx.message("  Creating nodes")
     
@@ -341,6 +342,8 @@ def activateData(datum):
 
 def makeNodes(context):
 
+    resetFbx()
+    setCsysChangers()
     fbx.root = RootNode()
     fbx.nodes = NodeStruct()
     fbx.active = NodeStruct()
@@ -358,7 +361,7 @@ def makeNodes(context):
         elif ob.type == 'ARMATURE':
             fbx.nodes.armatures[ob.data.name] = fbx_armature.CArmature()
         elif ob.type == 'LAMP':
-            fbx.nodes.lamps[ob.data.name] = fbx_lamp.CLampAttribute()
+            fbx.nodes.lamps[ob.data.name] = fbx_lamp.FbxLight()
         elif ob.type == 'CAMERA':
             fbx.nodes.cameras[ob.data.name] = fbx_camera.FbxCamera()
         #elif ob.type == 'EMPTY':

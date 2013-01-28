@@ -108,11 +108,11 @@ class ImportFBX(bpy.types.Operator, ImportHelper):
     filter_glob = StringProperty(default="*.fbx", options={'HIDDEN'})
 
     createNewScenes = BoolProperty(name="Create New Scenes", default=False)
-    changeCsys = BoolProperty(name="Change Coordinate System", default=False)        
+    yUp = BoolProperty(name="Y Up", default=True)        
     
     def execute(self, context):
         fbx.settings.createNewScenes = self.createNewScenes
-        fbx.settings.changeCsys = self.changeCsys
+        fbx.settings.yUp = self.yUp
         fbx_import.importFbxFile(context, self.filepath)
         return {'FINISHED'}
 
@@ -126,13 +126,13 @@ class ExportFBX(bpy.types.Operator, ExportHelper):
     filename_ext = ".fbx"
     filter_glob = StringProperty(default="*.fbx", options={'HIDDEN'} )
     
-    changeCsys = BoolProperty(name="Change Coordinate System", default=False)        
+    yUp = BoolProperty(name="Y Up", default=True)        
     includePropertyTemplates = BoolProperty(name="Include Property Templates", default=True)
     makeSceneNode = BoolProperty(name="Make Scene Node", default=False)
     selectedOnly = BoolProperty(name="Selected Objects Only", default=True)
 
     def execute(self, context):
-        fbx.settings.changeCsys = self.changeCsys
+        fbx.settings.yUp = self.yUp
         fbx.settings.includePropertyTemplates = self.includePropertyTemplates
         fbx.settings.makeSceneNode = self.makeSceneNode
         fbx.settings.selectedOnly = self.selectedOnly

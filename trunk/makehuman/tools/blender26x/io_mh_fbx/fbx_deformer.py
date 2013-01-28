@@ -97,6 +97,7 @@ class FbxSkin(FbxObject):
             mod.object = rig
             mod.use_bone_envelopes = False
             mod.use_vertex_groups = True
+            ob.parent = rig
         
         for child,_ in self.children:
             child.buildVertGroups(ob)
