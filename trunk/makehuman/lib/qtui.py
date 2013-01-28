@@ -359,6 +359,12 @@ class Frame(QtGui.QMainWindow):
 
         self.setAttribute(QtCore.Qt.WA_KeyCompression, False)
         self.resize(*size)
+        
+        # work-around for mac QT toolbar bug described in: https://bugreports.qt-project.org/browse/QTBUG-18567
+        if sys.platform.startswith("darwin"):
+            self.toolbar = self.addToolBar("Toolbar")
+            self.toolbar.hide()
+
         self.statusBar = qtgui.StatusBar()
         self.setStatusBar(self.statusBar)
         self.central = QtGui.QWidget()
