@@ -44,6 +44,28 @@ KnownTags = [
     "underweartop",
 ]
 
+class Action(object):
+
+    def __init__(self, name, human, library, mhcloFile, postAction=None):
+        self.name = name
+        self.human = human
+        self.library = library
+        self.mhclo = mhcloFile
+        self.postAction = postAction
+
+    def do(self):
+        self.library.setClothes(self.human, self.mhclo)
+        if self.postAction:
+            self.postAction()
+        return True
+
+    def undo(self):
+        self.library.setClothes(self.human, self.mhclo)
+        if self.postAction:
+            self.postAction()
+        return True
+
+
 #
 #   Clothes
 #
@@ -68,7 +90,10 @@ class ClothesTaskView(gui3d.TaskView):
 
         @self.filechooser.mhEvent
         def onFileSelected(filename):
-            self.setClothes(gui3d.app.selectedHuman, filename)
+            gui3d.app.do(Action("Change clothing piece",
+                gui3d.app.selectedHuman,
+                self,
+                filename))
             mh.changeCategory('Modelling')
 
         @self.update.mhEvent
@@ -115,8 +140,11 @@ class ClothesTaskView(gui3d.TaskView):
                     proxy = human.clothesProxies[uuid]
                     clothesPath = os.path.dirname(proxy.file)
                     texPath = os.path.join(clothesPath, texPath)
-                clo = human.clothesObjs[uuid]
-                clo.mesh.setTexture(texPath)
+                if uuid in human.clothesObjs.keys():
+                    clo = human.clothesObjs[uuid]
+                    clo.mesh.setTexture(texPath)
+                else:
+                    log.warning("No clothing item with UUID %s assigned.", uuid)
             return
             
         #folder = os.path.dirname(filepath)
