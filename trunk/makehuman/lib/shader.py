@@ -30,18 +30,18 @@ import texture
 import log
 
 class Uniform(object):
-    def __init__(self, index, name, pytype):
+    def __init__(self, index, name, pytype, dims):
         self.index = index
         self.name = name
         self.pytype = pytype
+        self.dims = dims
 
     def __call__(self, index, values):
         raise NotImplementedError
 
 class VectorUniform(object):
     def __init__(self, index, name, pytype, dims, type, func):
-        super(VectorUniform, self).__init__(index, name, pytype)
-        self.dims = dims
+        super(VectorUniform, self).__init__(index, name, pytype, dims)
         self.type = type
         self.func = func
 
@@ -60,7 +60,7 @@ class MatrixUniform(VectorUniform):
 
 class SamplerUniform(Uniform):
     def __init__(self, index, name, target):
-        super(SamplerUniform, self).__init__(index, name, str)
+        super(SamplerUniform, self).__init__(index, name, str, (1,))
         self.target = target
 
     def __call__(self, data):
@@ -131,6 +131,7 @@ class Shader(object):
 
     def initShader(self):
         vertexSource = self.path + '_vertex_shader.txt'
+        geometrySource = self.path + '_geometry_shader.txt'
         fragmentSource = self.path + '_fragment_shader.txt'
 
         self.shaderId = glCreateProgram()
@@ -138,6 +139,10 @@ class Shader(object):
         if os.path.isfile(vertexSource):
             self.vertexId = self.createShader(vertexSource, GL_VERTEX_SHADER)
             glAttachShader(self.shaderId, self.vertexId)
+
+        if os.path.isfile(geometrySource) and 'GL_GEOMETRY_SHADER' in globals():
+            self.geometryId = self.createShader(geometrySource, GL_GEOMETRY_SHADER)
+            glAttachShader(self.shaderId, self.geometryId)
 
         if os.path.isfile(fragmentSource):
             self.fragmentId = self.createShader(fragmentSource, GL_FRAGMENT_SHADER)
@@ -316,11 +321,13 @@ def getShader(path, cache=None):
 
     path1 = path + '_vertex_shader.txt'
     path2 = path + '_fragment_shader.txt'
-    if not all(os.path.isfile(p) for p in (path1, path2)):
+    path3 = path + '_geometry_shader.txt'
+    paths = [p for p in [path1, path2, path3] if os.path.isfile(p)]
+    if not paths:
         cache[path] = False
         return False
 
-    mtime = max(os.path.getmtime(p) for p in (path1, path2))
+    mtime = max(os.path.getmtime(p) for p in paths)
 
     if path in cache:
         shader = cache[path]
