@@ -33,27 +33,77 @@ import gui
 import filechooser as fc
 import log
 
-class Action:
+class Action(object):
 
-    def __init__(self, human, before, after, postAction=None):
-        self.name = 'Change texture'
+    def __init__(self, name, human, postAction=None):
+        self.name = name
         self.human = human
-        self.before = before
-        self.after = after
         self.postAction = postAction
 
     def do(self):
-        self.human.setTexture(self.after)
-        self.human.mesh.setShadeless(False)
         if self.postAction:
             self.postAction()
         return True
 
     def undo(self):
-        self.human.setTexture(self.before)
         if self.postAction:
             self.postAction()
         return True
+
+
+class SkinAction(Action):
+
+    def __init__(self, human, before, after, postAction=None):
+        super(SkinAction, self).__init__('Change skin texture', human, postAction)
+        self.before = before
+        self.after = after
+
+    def do(self):
+        self.human.setTexture(self.after)
+        self.human.mesh.setShadeless(False)
+        return super(SkinAction, self).do()
+
+    def undo(self):
+        self.human.setTexture(self.before)
+        return super(SkinAction, self).undo()
+
+
+class HairAction(Action):
+
+    def __init__(self, human, before, after, postAction=None):
+        super(HairAction, self).__init__('Change hair texture', human, postAction)
+        self.before = before
+        self.after = after
+
+    def do(self):
+        if self.human.hairObj:
+            self.human.hairObj.mesh.setTexture(self.after)
+        return super(HairAction, self).do()
+
+    def undo(self):
+        if self.human.hairObj:
+            self.human.hairObj.mesh.setTexture(self.before)
+        return super(HairAction, self).undo()
+
+
+class ClothesAction(Action):
+
+    def __init__(self, human, library, clothesUuid, before, after, postAction=None):
+        super(ClothesAction, self).__init__('Change clothes texture', human, postAction)
+        self.before = before
+        self.after = after
+        self.uuid = clothesUuid
+        self.library = library
+
+    def do(self):
+        self.library.applyClothesTexture(self.uuid, self.after)
+        return super(ClothesAction, self).do()
+
+    def undo(self):
+        if self.before:
+            self.library.applyClothesTexture(self.uuid, self.before)
+        return super(ClothesAction, self).undo()
+
 
 class TextureTaskView(gui3d.TaskView):
 
@@ -84,19 +134,26 @@ class TextureTaskView(gui3d.TaskView):
 
         @self.filechooser.mhEvent
         def onFileSelected(filename):
-            # TODO add undo action
+            human = gui3d.app.selectedHuman
             if self.skinRadio.selected:
-                gui3d.app.do(Action(gui3d.app.selectedHuman,
-                gui3d.app.selectedHuman.getTexture(),
-                filename))
+                gui3d.app.do(SkinAction(human,
+                    human.getTexture(),
+                    filename))
             elif self.hairRadio.selected:
-                gui3d.app.selectedHuman.hairObj.mesh.setTexture(filename)
+                gui3d.app.do(HairAction(human,
+                    human.hairObj.getTexture(),
+                    filename))
             elif self.eyesRadio.selected:
+                # TODO make undoable action 
                 self.setEyes(gui3d.app.selectedHuman, filename)
             else: # Clothes
                 if self.activeClothing:
                     uuid = self.activeClothing
-                    self.applyClothesTexture(uuid, filename)
+                    gui3d.app.do(ClothesAction(human,
+                        self,
+                        uuid,
+                        self.getClothesTexture(uuid),
+                        filename))
 
             mh.changeCategory('Modelling')
             
@@ -183,8 +240,22 @@ class TextureTaskView(gui3d.TaskView):
 
     def applyClothesTexture(self, uuid, filename):
         human = gui3d.app.selectedHuman
+        if uuid not in human.clothesObjs.keys():
+            log.warning("Cannot set texture for clothes with UUID %s, no such item", uuid)
+            return False
         clo = human.clothesObjs[uuid]
         clo.mesh.setTexture(filename)
+        return True
+
+    def getClothesTexture(self, uuid):
+        """
+        Get the currently set texture for clothing item with specified UUID.
+        """
+        human = gui3d.app.selectedHuman
+        if uuid not in human.clothesObjs.keys():
+            return None
+        clo = human.clothesObjs[uuid]
+        return clo.getTexture()
 
     def setEyes(self, human, mhstx):
         # TODO this will change, for now eyes might only be compatible with the original skin
