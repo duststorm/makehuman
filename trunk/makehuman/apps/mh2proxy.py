@@ -49,6 +49,7 @@ class CProxy:
         self.zScaleData = None
         self.z_depth = 50
         self.cull = False
+        self.transparent = True
         self.layer = layer
         self.material = CMaterial()
         self.verts = {}
@@ -388,6 +389,8 @@ def readProxyFile(obj, file, evalOnLoad):
                 proxy.obj_file = getFileName(folder, words[2], ".obj")
             elif key == 'backface_culling':
                 proxy.cull = words[2].lower() in ["1", "yes", "true", "enable", "enabled"]
+            elif key == 'transparent':
+                proxy.transparent = words[2].lower() in ["1", "yes", "true", "enable", "enabled"]
             elif key == 'clothing':
                 if len(words) > 3:
                     clothingPiece = (words[2], words[3])

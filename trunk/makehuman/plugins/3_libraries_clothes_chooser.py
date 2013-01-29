@@ -185,7 +185,10 @@ class ClothesTaskView(gui3d.TaskView):
             clo.mesh.setCull(1)
         else:
             clo.mesh.setCull(None)
-        clo.mesh.setTransparentPrimitives(len(clo.mesh.faces))
+        if proxy.transparent:
+            clo.mesh.setTransparentPrimitives(len(clo.mesh.faces))
+        else:
+            clo.mesh.setTransparentPrimitives(0)
         clo.mesh.priority = 10
         human.clothesObjs[uuid] = clo        
         human.clothesProxies[uuid] = proxy
