@@ -495,14 +495,14 @@ class MHApplication(gui3d.Application, mh.Application):
             del self.redoStack[:]
             self.setFileModified(True)
             log.message('do %s', action.name)
-            self.redraw()
+            self.syncUndoRedo()
 
     def did(self, action):
         self.undoStack.append(action)
         self.setFileModified(True)
         del self.redoStack[:]
         log.message('did %s', action.name)
-        self.redraw()
+        self.syncUndoRedo()
 
     def undo(self):
         if self.undoStack:
@@ -511,7 +511,7 @@ class MHApplication(gui3d.Application, mh.Application):
             action.undo()
             self.redoStack.append(action)
             self.setFileModified(True)
-            self.redraw()
+            self.syncUndoRedo()
 
     def redo(self):
         if self.redoStack:
@@ -520,7 +520,12 @@ class MHApplication(gui3d.Application, mh.Application):
             action.do()
             self.undoStack.append(action)
             self.setFileModified(True)
-            self.redraw()
+            self.syncUndoRedo()
+
+    def syncUndoRedo(self):
+        self.actions.undo.setEnabled(bool(self.undoStack))
+        self.actions.redo.setEnabled(bool(self.redoStack))
+        self.redraw()
 
     # Settings
 
@@ -1265,6 +1270,7 @@ class MHApplication(gui3d.Application, mh.Application):
 
         self.createActions()
         self.updateStereoButtons()
+        self.syncUndoRedo()
 
         self.createShortcuts()
 
