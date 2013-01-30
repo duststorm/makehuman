@@ -94,7 +94,8 @@ class ClothesTaskView(gui3d.TaskView):
                 gui3d.app.selectedHuman,
                 self,
                 filename))
-            mh.changeCategory('Modelling')
+            if gui3d.app.settings.get('jumpToModelling', True):
+                mh.changeCategory('Modelling')
 
         @self.update.mhEvent
         def onClicked(event):

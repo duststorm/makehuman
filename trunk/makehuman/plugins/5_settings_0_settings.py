@@ -106,6 +106,10 @@ class SettingsTaskView(gui3d.TaskView):
         unitBox = self.unitsBox = self.addLeftWidget(gui.GroupBox('Units'))
         metric = unitBox.addWidget(gui.RadioButton(modes, 'Metric', gui3d.app.settings.get('units', 'metric') == 'metric'))
         imperial = unitBox.addWidget(gui.RadioButton(modes, 'Imperial', gui3d.app.settings.get('units', 'metric') == 'imperial'))
+
+        libraryBox = self.addLeftWidget(gui.GroupBox('Library behavior'))
+        self.jumpToModelling = libraryBox.addWidget(gui.CheckBox("To Modelling after choice",
+            gui3d.app.settings.get('jumpToModelling', True)))
         
         themes = []
         themesBox = self.themesBox = self.addRightWidget(gui.GroupBox('Theme'))
@@ -189,6 +193,10 @@ class SettingsTaskView(gui3d.TaskView):
         @imperial.mhEvent
         def onClicked(event):
             gui3d.app.settings['units'] = 'imperial'
+
+        @self.jumpToModelling.mhEvent
+        def onClicked(event):
+            gui3d.app.settings['jumpToModelling'] = self.jumpToModelling.selected
                 
     def setShader(self, path):
             gui3d.app.selectedHuman.mesh.setShader(path)

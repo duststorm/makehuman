@@ -49,8 +49,9 @@ class HairTaskView(gui3d.TaskView):
         def onFileSelected(filename):
             
             mhclo = filename.replace('.obj', '.mhclo')
-            self.setHair(gui3d.app.selectedHuman, filename, mhclo)            
-            mh.changeCategory('Modelling')
+            self.setHair(gui3d.app.selectedHuman, filename, mhclo)
+            if gui3d.app.settings.get('jumpToModelling', True):
+                mh.changeCategory('Modelling')
 
     def setHair(self, human, obj, mhclo):
 

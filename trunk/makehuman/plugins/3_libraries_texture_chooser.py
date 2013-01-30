@@ -155,7 +155,8 @@ class TextureTaskView(gui3d.TaskView):
                         self.getClothesTexture(uuid),
                         filename))
 
-            mh.changeCategory('Modelling')
+            if gui3d.app.settings.get('jumpToModelling', True):
+                mh.changeCategory('Modelling')
             
         @self.update.mhEvent
         def onClicked(event):
