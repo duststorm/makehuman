@@ -58,6 +58,18 @@ def outFile(path):
             os.remove(tmppath)
         log.error('unable to save file %s', path, exc_info=True)
 
+@contextlib.contextmanager
+def inFile(path):
+    path = os.path.join(mh.getPath(''), path)
+    if not os.path.isfile(path):
+        yield []
+        return
+    try:
+        with open(path, 'r') as f:
+            yield f
+    except:
+        log.error('Failed to load file %s', path, exc_info=True)
+
 class PluginCheckBox(gui.CheckBox):
 
     def __init__(self, module):
@@ -530,57 +542,40 @@ class MHApplication(gui3d.Application, mh.Application):
     # Settings
 
     def loadSettings(self):
-        try:
-            if os.path.isfile(os.path.join(mh.getPath(''), "settings.ini")):
-                with open(os.path.join(mh.getPath(''), "settings.ini"), 'r') as f:
-                    settings = mh.parseINI(f.read())
-                self.settings.update(settings)
-        except:
-            log.error('Failed to load settings')
+        with inFile("settings.ini") as f:
+            settings = mh.parseINI(f.read())
+            self.settings.update(settings)
 
         if 'language' in gui3d.app.settings:
             self.setLanguage(gui3d.app.settings['language'])
 
         gui.Slider.showImages(gui3d.app.settings['sliderImages'])
 
-        try:
-            if os.path.isfile(os.path.join(mh.getPath(''), "shortcuts.ini")):
-                shortcuts = {}
-                f = open(os.path.join(mh.getPath(''), "shortcuts.ini"), 'r')
-                for line in f:
-                    modifier, key, action = line.strip().split(' ')
-                    shortcuts[action] = (int(modifier), int(key))
-                f.close()
-                if shortcuts.get('_versionSentinel') != (0, 0x87654321):
-                    log.warning('shortcuts.ini out of date; ignoring')
-                else:
-                    self.shortcuts.update(shortcuts)
-        except:
-            log.error('Failed to load shortcut settings')
+        with inFile("shortcuts.ini") as f:
+            shortcuts = {}
+            for line in f:
+                modifier, key, action = line.strip().split(' ')
+                shortcuts[action] = (int(modifier), int(key))
+            if shortcuts.get('_versionSentinel') != (0, 0x87654321):
+                log.warning('shortcuts.ini out of date; ignoring')
+            else:
+                self.shortcuts.update(shortcuts)
 
-        try:
-            if os.path.isfile(os.path.join(mh.getPath(''), "mouse.ini")):
-                self.mouseActions = {}
-                f = open(os.path.join(mh.getPath(''), "mouse.ini"), 'r')
-                for line in f:
-                    modifier, button, method = line.strip().split(' ')
-                    if hasattr(self, method):
-                        self.mouseActions[(int(modifier), int(button))] = getattr(self, method)
-                f.close()
-        except:
-            log.error('Failed to load mouse settings')
+        with inFile("mouse.ini") as f:
+            mouseActions = {}
+            for line in f:
+                modifier, button, method = line.strip().split(' ')
+                if hasattr(self, method):
+                    mouseActions[(int(modifier), int(button))] = getattr(self, method)
+            self.mouseActions = mouseActions
 
-        try:
-            if os.path.isfile(os.path.join(mh.getPath(''), "help.ini")):
-                self.helpIds = set()
-                f = open(os.path.join(mh.getPath(''), "help.ini"), 'r')
-                for line in f:
-                    self.helpIds.add(line[0:-1])
-                f.close()
-                if self.dialog is not None:
-                    self.dialog.helpIds.update(self.helpIds)
-        except:
-            log.error('Failed to load help settings')
+        with inFile("help.ini") as f:
+            helpIds = set()
+            for line in f:
+                helpIds.add(line.strip())
+            if self.dialog is not None:
+                self.dialog.helpIds.update(self.helpIds)
+            self.helpIds = helpIds
 
     def saveSettings(self, promptOnFail=False):
         try:
