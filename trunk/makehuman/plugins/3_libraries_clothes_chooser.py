@@ -133,19 +133,28 @@ class ClothesTaskView(gui3d.TaskView):
             gui3d.app.progress(1, text="%s loaded" % proxy.name)
             # Load custom textures
             for (uuid, texPath) in proxy.textures:
-                if not uuid in human.clothesProxies.keys():
-                    log.warning("Could not load texture for object with uuid %s!" % uuid)
+                if not uuid in human.clothesObjs.keys():
+                    log.warning("Cannot override texture for clothing piece with uuid %s!" % uuid)
                     continue
-                proxy = human.clothesProxies[uuid]
+                pieceProxy = human.clothesProxies[uuid]
                 if not os.path.dirname(texPath):
-                    proxy = human.clothesProxies[uuid]
-                    clothesPath = os.path.dirname(proxy.file)
+                    pieceProxy = human.clothesProxies[uuid]
+                    clothesPath = os.path.dirname(pieceProxy.file)
                     texPath = os.path.join(clothesPath, texPath)
-                if uuid in human.clothesObjs.keys():
-                    clo = human.clothesObjs[uuid]
-                    clo.mesh.setTexture(texPath)
+                log.debug("Overriding texture for clothpiece %s to %s", uuid, texPath)
+                clo = human.clothesObjs[uuid]
+                clo.mesh.setTexture(texPath)
+            # Apply overridden transparency setting to pieces of a costume
+            for (uuid, isTransparent) in proxy.transparencies.items():
+                if not uuid in human.clothesProxies.keys():
+                    log.warning("Could not override transparency for object with uuid %s!" % uuid)
+                    continue
+                clo = human.clothesObjs[uuid]
+                log.debug("Overriding transparency setting for clothpiece %s to %s", uuid, bool(proxy.transparencies[uuid]))
+                if proxy.transparencies[uuid]:
+                    clo.mesh.setTransparentPrimitives(len(clo.mesh.faces))
                 else:
-                    log.warning("No clothing item with UUID %s assigned.", uuid)
+                    clo.mesh.setTransparentPrimitives(0)
             return
             
         #folder = os.path.dirname(filepath)

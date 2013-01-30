@@ -12,6 +12,8 @@
 # z_scale 6930 7245 1.8953
 # y_scale 14022 14040 4.7092
 # z_depth 60
+# backface_culling yes
+# transparent no
 # shapekey Breathe
 # uvtex_layer 0 UVMap
 # uvtex_layer 1 Mask

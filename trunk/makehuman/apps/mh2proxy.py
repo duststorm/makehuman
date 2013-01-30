@@ -91,6 +91,7 @@ class CProxy:
         self.weights = None
         self.refVerts = []
         self.clothings = []
+        self.transparencies = dict()
         self.textures = []
         return
         
@@ -397,6 +398,9 @@ def readProxyFile(obj, file, evalOnLoad):
                 else:
                     clothingPiece = (words[2], None)
                 proxy.clothings.append(clothingPiece)
+            elif key == 'transparencies':
+                uuid = words[2]
+                proxy.transparencies[uuid] = words[3].lower() in ["1", "yes", "true", "enable", "enabled"]
             elif key == 'textures':
                 proxy.textures.append( (words[2], words[3]) )
             elif key == 'subsurf':
