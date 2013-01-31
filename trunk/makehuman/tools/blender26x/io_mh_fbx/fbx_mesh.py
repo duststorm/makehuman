@@ -54,10 +54,6 @@ class FbxMesh(FbxGeometryBase):
         self.vertices = CArray("Vertices", float, 3)
         self.normals = CArray("Normals", float, 3)
         self.faces = CArray("PolygonVertexIndex", float, -1)
-        self.shapeKeys = {}
-        self.hastex = False
-        self.materials = []
-        self.blendDeformer = None
         
 
     def parseNodes(self, pnodes):
@@ -101,6 +97,7 @@ class FbxMesh(FbxGeometryBase):
             self.uvLayers.append(FbxLayerElementUV().make(uvloop, index, uvfaces))
         
         if me.shape_keys:
+            obNode = fbx.nodes.objects[ob.name]
             baseVerts = me.vertices
             for index,skey in enumerate(me.shape_keys.key_blocks):
                 if index == 0:
@@ -108,6 +105,7 @@ class FbxMesh(FbxGeometryBase):
                 else:
                     node = FbxShape().make(skey, baseVerts)
                     self.shapeKeys[skey.name] = node
+                    obNode.setPropLong("%s.%s" % (me.name, skey.name), "Shape", "", "A+",0)
                     #node.makeLink(self)
             self.blendDeformer = FbxBlendShape().make(self, me)
             self.blendDeformer.makeLink(self)
@@ -220,10 +218,17 @@ class FbxShape(FbxObject):
         ob = fbx.data[obNode.id]
         if not me.shape_keys:
             ob.shape_key_add("Basis")
+        ob.active_shape_key_index = 0
+        base = ob.active_shape_key
         skey = ob.shape_key_add(self.name)
+        print(skey)
         n = 0
+        print(self.name)
         for vn in self.indexes.values:
             dx = f2b( self.vertices.values[n] )
             n += 1
-            skey.data[vn].co += Vector(dx)
+            print(vn, dx, skey.data[vn].co)
+            skey.data[vn].co = base.data[vn].co + Vector(dx)
+            print("   ", skey.data[vn].co)
+        subdef.build(skey)
   

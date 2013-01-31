@@ -38,6 +38,10 @@ class FbxGeometryBase(FbxObject):
         self.uvLayers = []
         self.materialLayers = []
         self.textureLayers = []
+        self.shapeKeys = {}
+        self.hastex = False
+        self.materials = []
+        self.blendDeformer = None
         
 
     def parseNodes(self, pnodes):
@@ -59,9 +63,10 @@ class FbxGeometryBase(FbxObject):
     
     def make(self, rna, ob=None, matfaces=None):        
         FbxObject.make(self, rna)
-        if not hasattr(rna, "materials"):
+        #if not hasattr(rna, "materials") or not rna.materials.items():
+        if not hasattr(rna, "materials"):        
             return self
-            
+        
         tn = 0
         layer = DummyLayer()
         self.materialLayers.append(FbxLayerElementMaterial().make(layer, 0, rna.materials, matfaces))

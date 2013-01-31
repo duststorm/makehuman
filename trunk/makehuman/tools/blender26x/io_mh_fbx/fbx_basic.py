@@ -316,7 +316,6 @@ FTransChannelYup = {
     2 : ("d|Y", 1, -1),
 }
 
-
 BTransIndexZup = {
     "d|X" : (0, 0, 1),
     "d|Y" : (1, 1, 1),
@@ -396,6 +395,7 @@ class FbxLiteral:
         return self.value
 
 
+T = FbxLiteral("T")            
 U = FbxLiteral("U")            
 V = FbxLiteral("V")            
 W = FbxLiteral("W")            

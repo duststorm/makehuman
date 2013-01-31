@@ -58,6 +58,18 @@ class CProperties70(FbxPlug):
         prop.value = value
         prop.isSet = True
         
+
+    def setPropLong(self, name, ftype, supertype, anim, value):
+        try:
+            prop = self.properties[name]
+        except KeyError:
+            prop = None
+        if prop is None:
+            prop = self.properties[name] = newProp(name, ftype, supertype, anim)
+        print("  ", prop)
+        prop.value = value
+        prop.isSet = True
+
             
     def getProp2(self, key, template):
         if isinstance(key, list):
@@ -124,7 +136,7 @@ class CProperties70(FbxPlug):
 
 SimpleTypes = [
         "int", "float", "bool", "enum", "double", "Number",
-        "ULongLong",
+        "ULongLong", "Shape",
         "FieldOfView",
         "Time", "KTime",
         "Visibility", "Visibility Inheritance"
@@ -247,6 +259,8 @@ class CVectorProperty(CProperty):
 class CCompoundProperty(CProperty):
 
     def write(self, fp):
+        print(self.name, self.supertype, self.anim, self.value)
+        print(self)
         basetype = "Number"
         fp.write('            P: "%s|X", "%s", "%s", "%s", %s\n' % (self.name, basetype, self.supertype, self.anim, self.value[0]))
         fp.write('            P: "%s|Y", "%s", "%s", "%s", %s\n' % (self.name, basetype, self.supertype, self.anim, self.value[1]))

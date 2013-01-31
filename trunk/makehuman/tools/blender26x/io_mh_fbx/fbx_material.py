@@ -111,7 +111,9 @@ class FbxSurfaceMaterial(FbxObject):
         FbxObject.make(self, mat)        
         self.shader = FbxSurfaceMaterial.FbxShaders[mat.diffuse_shader]
         self.propertyTemplate = FbxSurfaceMaterial.propertyTemplates[self.shader]
-        self.template = self.parseTemplate('Material', self.propertyTemplate)        
+        self.template = self.parseTemplate('Material', self.propertyTemplate)   
+        #print(self.shader)
+        #print(self.template)
         
         for mtex in mat.texture_slots:
             if mtex:
@@ -161,7 +163,7 @@ class FbxSurfaceMaterial(FbxObject):
     def build3(self):
         mat = fbx.data[self.id]
         try:
-            self.shader = self.getProp("ShadingModel")
+            self.shader = self.get("ShadingModel")
         except AttributeError:
             self.shader = "Phong"
         self.shader = self.shader.capitalize()
@@ -174,11 +176,12 @@ class FbxSurfaceMaterial(FbxObject):
 
         if self.properties:
             mat.diffuse_color = self.getProp(["DiffuseColor","Diffuse"])
-            mat.specular_color = self.getProp(["SpecularColor","Specular"])
             mat.diffuse_intensity = self.getProp("DiffuseFactor")
-            mat.specular_intensity = self.getProp("SpecularFactor")
-            mat.specular_hardness = self.getProp("ShininessExponent")
             mat.alpha = self.getProp(["Opacity", "TransparencyFactor"])
+            if self.shader == "Phong":
+            	mat.specular_color = self.getProp(["SpecularColor","Specular"])
+            	mat.specular_intensity = self.getProp("SpecularFactor")
+            	mat.specular_hardness = self.getProp("ShininessExponent")
 
         texNodes = self.getBChildren('TEXTURE')
         for node,channel in texNodes:

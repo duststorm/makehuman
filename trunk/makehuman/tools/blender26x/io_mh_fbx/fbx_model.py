@@ -46,7 +46,7 @@ class FbxStuff(FbxPlug):
             return self.struct[key]
         except KeyError:
             fbx.debug("Unrecognized key %s" % key)
-            return None
+        return self.getProp(key)
         
     def set(self, key, value):
         self.struct[key] = value
@@ -59,6 +59,9 @@ class FbxStuff(FbxPlug):
 
     def setProp(self, key, value):
         self.properties.setProp(key, value, self.template)
+        
+    def setPropLong(self, name, ftype, supertype, anim, value):
+        self.properties.setPropLong(name, ftype, supertype, anim, value)
         
     def getProp(self, key):
         return self.properties.getProp(key, self.template)
@@ -190,6 +193,11 @@ class FbxObject(FbxStuff):
             adata = rna.animation_data
         except AttributeError:
             adata = None
+        if not adata:
+            try:
+                adata = rna.shape_keys.animation_data
+            except AttributeError:
+                adata = None
         if adata:
             act = adata.action
             if act:
@@ -317,8 +325,7 @@ class FbxNodeAttribute(FbxObject):
                 self.typeflags = pnode.values[0]
         return self    
 
-                    
-            
+
 #------------------------------------------------------------------
 #   Model node
 #------------------------------------------------------------------

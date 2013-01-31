@@ -20,6 +20,8 @@ import os
 import sys
 import shlex
 
+from .fbx_basic import *
+
 
 #------------------------------------------------------------------
 #   ParseNode

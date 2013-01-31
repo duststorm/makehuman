@@ -159,4 +159,17 @@ class Matrix:
         return tm.quaternion_from_matrix(self.matrix)
     
         
-        
+    Axis = {
+        'X' : (1,0,0),
+        'Y' : (0,1,0),
+        'Z' : (0,0,1),
+    }
+    
+    @classmethod
+    def Rotation(self, angle, dim, axis):
+        self.size = dim
+        mat = tm.rotation_matrix(angle, Matrix.Axis[axis])
+        if dim == 3:
+            self.matrix = mat[:3,:3]
+        else:
+            self.matrix = mat

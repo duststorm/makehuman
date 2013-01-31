@@ -95,6 +95,21 @@ class Lamp(Rna):
         Rna.__init__(self, name, 'LAMP')
 
 
+class Curve(Rna):
+    def __init__(self, name):
+        Rna.__init__(self, name, 'CURVE')
+
+
+class TextCurve(Rna):
+    def __init__(self, name):
+        Rna.__init__(self, name, 'TEXT_CURVE')
+
+
+class SurfaceCurve(Rna):
+    def __init__(self, name):
+        Rna.__init__(self, name, 'SURFACE')
+
+
 #------------------------------------------------------------------
 #   Collection
 #------------------------------------------------------------------

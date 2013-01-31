@@ -147,8 +147,10 @@ class FbxTestPanel(bpy.types.Panel):
     bl_region_type = "UI"
     
     def draw(self, context):    
+        scn = context.scene
+        self.layout.prop(scn, "FbxFile")
         self.layout.operator("fbx.test_export")
-        self.layout.operator("fbx.test_import").filepath="/home/myblends/fbx-stuff/test.fbx"
+        self.layout.operator("fbx.test_import").filepath=("/home/myblends/fbx-stuff/%s.fbx" % scn.FbxFile)
         self.layout.operator("fbx.test_import", text="Test Import foo").filepath="/Users/Thomas/Documents/makehuman/exports/foo/foo.fbx"
         self.layout.operator("fbx.test_build")
 
@@ -166,6 +168,8 @@ def menu_func_export(self, context):
 
 def register():
     bpy.utils.register_module(__name__)
+    
+    bpy.types.Scene.FbxFile = StringProperty(name="File", default="test")    
 
     bpy.types.INFO_MT_file_import.append(menu_func_import)
     bpy.types.INFO_MT_file_export.append(menu_func_export)

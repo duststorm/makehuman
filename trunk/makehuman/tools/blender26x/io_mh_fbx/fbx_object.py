@@ -31,14 +31,20 @@ from . import fbx_material
 
 Ftype2Btype = {
     "Mesh" : 'MESH',
+    "NurbsCurve" : 'CURVE',
+    "NurbsSurface" : 'CURVE',
     "Light" : 'LAMP',
     "Camera" : 'CAMERA',
+    #"Null" : 'EMPTY',
 }
 
 Btype2Ftype = {
     'MESH' : "Mesh",
+    'CURVE' : "NurbsCurve",
+    'SURFACE' : "NurbsSurface",
     'LAMP' : "Light",
     'CAMERA' : "Camera",
+    'EMPTY' : "Null",
 }
 
 class CObject(CModel):
@@ -70,6 +76,7 @@ class CObject(CModel):
             ("RotationActive", 1),
             ("InheritType", 1),
             ("ScalingMax", (0,0,0)),
+            ("DefaultAttributeIndex", 0),
         ])    
         trans,rot,scale = objectTransformations(ob)
         
@@ -84,7 +91,12 @@ class CObject(CModel):
         if ob.type == 'MESH':
             self.dataFtype = 'Mesh'
             self.datanode = fbx.nodes.meshes[ob.data.name]                  
-            self.setProp("DefaultAttributeIndex", 0)
+        elif ob.type == 'CURVE':
+            self.dataFtype = 'NurbsCurve'
+            self.datanode = fbx.nodes.curves[ob.data.name]  
+        elif ob.type == 'SURFACE':
+            self.dataFtype = 'NurbsSurface'
+            self.datanode = fbx.nodes.nurbs[ob.data.name]
         elif ob.type == 'ARMATURE':
             self.subtype = self.dataFtype = 'Null'
             self.datanode = fbx.nodes.armatures[ob.data.name]                  
@@ -94,8 +106,9 @@ class CObject(CModel):
         elif ob.type == 'CAMERA':
             self.dataFtype = 'Camera'
             self.datanode = fbx.nodes.cameras[ob.data.name]
-        elif self.datanode.type == 'EMPTY':
-            pass
+        elif ob.type == 'EMPTY':
+            self.dataFtype = 'Null'
+            self.datanode = None
         else:
             halt
             
@@ -109,6 +122,15 @@ class CObject(CModel):
     
     def build3(self):
         self.datum = self.object = ob = fbx.data[self.id]
+        if self.links:
+            pnode,_ = self.links[0]
+            if pnode.id != 0 and pnode.btype == 'OBJECT':
+                ob.parent = fbx.data[pnode.id]
+                if fbx.settings.lockChildren:
+                    ob.lock_location = (True,True,True)
+                    ob.lock_rotation = (True,True,True)
+                    ob.lock_scale = (True,True,True)
+                
         if self.properties:
             ob.location = self.getProp("Lcl Translation")
             ob.rotation_euler = self.getProp("Lcl Rotation")

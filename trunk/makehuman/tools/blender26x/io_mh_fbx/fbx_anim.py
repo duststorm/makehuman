@@ -146,9 +146,11 @@ class CAnimationLayer(FbxObject):
         user = self.users[0]
         for key,group in groups.items():
             node = user
-            if group.pose:
+            if group.shape:
+                node = user.subdeformers[group.sub]
+            elif group.pose:
                 if user.btype == 'ARMATURE':
-                    node = user.bones[group.bone]                
+                    node = user.bones[group.sub]                
             acnode = self.acnodes[key] = FbxAnimationCurveNode().make(group, node)
             acnode.makeLink(self)
             acnode.makeChannelLink(node, acnode.channel)
@@ -188,17 +190,21 @@ class FCurveGroup():
         self.name = datapath
         words = datapath.split('.')
         self.channel = words[-1].lower()
-        self.pose = (words[0] == "pose")
-        if self.pose:
-            words = datapath.split('"')
-            self.bone = words[1]
-        else:
-            self.bone = None
+        self.pose = False
+        self.shape = False
+        self.sub = None
+        words = datapath.split('"')
+        if words[0] == "pose.bones[":
+            self.pose = True
+            self.sub = words[1]
+        elif words[0] == "key_blocks[":
+            self.shape = True
+            self.sub = words[1]
         self.fcurves = {}                
 
     def __repr__(self):
-        return ("<FCurveGroup %p\n   c %s p %s b %s>" % 
-                    (self.datapath, self.channel, self.pose, self.bone))
+        return ("<FCurveGroup p %s\n   c %s p %s s %s b %s>" % 
+                    (self.name, self.channel, self.pose, self.shape, self.sub))
                     
     
 def groupFcurves(act):        
@@ -238,6 +244,7 @@ Channels = {
     'rotation_quaternion' : ('R', 'Lcl Rotation', 'Vector3', (0,0,0)), 
     'rotation_euler' : ('R', 'Lcl Rotation', 'Vector3', (0,0,0)), 
     'scale' : ('S', 'Lcl Scaling', 'Vector3', (1,1,1)),
+    'value' : ('DeformPercent', 'DeformPercent', 'Number', 0),
 }
 
 class FbxAnimationCurveNode(FbxObject):
@@ -252,7 +259,7 @@ class FbxAnimationCurveNode(FbxObject):
 
     def __init__(self, subtype=''):
         FbxObject.__init__(self, 'AnimationCurveNode', '', subtype)
-        self.template = self.parseTemplate('AnimationCurveNode', FbxAnimationCurveNode.propertyTemplate)
+        #self.template = self.parseTemplate('AnimationCurveNode', FbxAnimationCurveNode.propertyTemplate)
         self.acurves = {}
 
 
@@ -261,27 +268,40 @@ class FbxAnimationCurveNode(FbxObject):
         channel = self.name.split(".")[-1]
         self.name, self.channel, self.proptype, kvec = Channels[channel]
         self.group = group
-        offsets = user.getProp(self.channel)
 
         if self.channel in ["Lcl Rotation"]:
             deg = D
             fChannel = FRotChannel
+            offsets = user.getProp(self.channel)
+            self.setPropLong("d", "Compound", "", "A", kvec)
         elif self.channel in ["Lcl Translation"]:
             deg = 1
             fChannel = FTransChannel
+            offsets = user.getProp(self.channel)
+            self.setPropLong("d", "Compound", "", "A", kvec)
+        elif self.channel in ["DeformPercent"]:
+            deg = 1
+            name = "d|%s" % self.channel
+            fChannel = { 0 : (name, 0, 1) }
+            offsets = [0]
+            self.setPropLong(name, "Number", "", "A", kvec)
+        elif self.channel in ["Lcl Scaling"]:
+            return self
+        else:
+            fbx.debug("Unknown channel %s" % self.channel)
+            halt
 
         if channel == 'rotation_quaternion':
             fcurves = quat2euler(group.fcurves)
         else:
             fcurves = group.fcurves
-    
+
         for bIndex,fcu in fcurves.items():
             string,fIndex,factor = fChannel[bIndex]
             offset = offsets[fIndex]
             acu = self.acurves[fIndex] = FbxAnimationCurve().make(fcu, offset, factor*deg)
             acu.makeChannelLink(self, string)
 
-        self.setProps([("d", kvec)])
         return self
                                 
 
@@ -292,6 +312,8 @@ class FbxAnimationCurveNode(FbxObject):
 
 
     def writeFooter(self, fp):
+        print("acnode footer")
+        print(self.acurves.values())
         FbxObject.writeFooter(self, fp)            
         for index,acu in self.acurves.items():
             acu.writeFbx(fp)        
@@ -331,7 +353,12 @@ class FbxAnimationCurveNode(FbxObject):
                 offsets = f2b(user.getProp(channel))
             except KeyError:
                 offsets = (0,0,0)
+
+        elif channel in ["Lcl Scaling"]:
+            return
+
         else:
+            fbx.debug("Unknown channel %s" % channel)
             halt
 
         
@@ -436,7 +463,7 @@ class FbxAnimationCurve(FbxObject):
         for kp in fcu.keyframe_points:
             t = float2int(kp.co[0])
             times.append(t)
-            y = kp.co[1]*deg + offset
+            y = kp.co[1]*deg + offset            
             values.append(y)
             #data += [list(kp.handle_left), list(kp.handle_right)]
             data.append((0,0,0xd050d05,0))

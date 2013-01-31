@@ -26,6 +26,7 @@ from . import fbx_null
 from . import fbx_mesh
 from . import fbx_deformer
 from . import fbx_armature
+from . import fbx_nurb
 from . import fbx_lamp
 from . import fbx_camera
 from . import fbx_material
@@ -42,6 +43,9 @@ class NodeStruct:
         self.armatures = {}
         self.bones = {}
         self.limbs = {}
+        self.curves = {}
+        self.nurbs = {}
+        self.textcurves = {}
         self.lamps = {}
         self.cameras = {}
         self.materials = {}
@@ -65,6 +69,9 @@ class NodeStruct:
             list(self.meshes.values()) +
             list(self.bones.values()) +
             list(self.limbs.values()) +
+            list(self.curves.values()) +
+            list(self.nurbs.values()) +
+            list(self.textcurves.values()) +
             list(self.armatures.values()) +
             list(self.lamps.values()) +
             list(self.cameras.values()) +
@@ -129,8 +136,10 @@ def createNode(pnode):
             node = fbx_mesh.FbxMesh(subtype)
         elif subtype == 'Shape':
             node = fbx_mesh.FbxShape(subtype)
-        elif subtype == 'Nurb':
-            node = fbx_nurb.FbxNurbs(subtype)
+        elif subtype == 'NurbsCurve':
+            node = fbx_nurb.FbxNurbsCurve(subtype)
+        elif subtype == 'NurbsSurface':
+            node = fbx_nurb.FbxNurbsSurface()
         else:
             fbx.debug("Bug: %s %s" % (pnode.key, pnode))
             halt
@@ -145,6 +154,7 @@ def createNode(pnode):
             node = fbx_object.CObject(subtype)
         elif subtype == "Null":
             node = fbx_null.CNull(subtype)
+            print("  ", node)
         elif subtype == "LimbNode":
             node = fbx_armature.CBone(subtype)
         else:
@@ -158,11 +168,11 @@ def createNode(pnode):
         elif subtype == "Camera":
             node = fbx_camera.FbxCamera()
         elif subtype == "IKEffector":
-            node = fbx_camera.CIKEffectorAttribute()
+            node = fbx_constraint.CIKEffectorAttribute()
         elif subtype == "FKEffector":
-            node = fbx_camera.CFKEffectorAttribute()
-        elif subtype == "Camera":
-            node = fbx_camera.FbxCamera()
+            node = fbx_constraint.CFKEffectorAttribute()
+        elif subtype == "Null":
+            node = fbx_null.FbxNullAttribute()
         elif subtype == "Camera":
             node = fbx_camera.FbxCamera()
     elif pnode.key == 'Pose':            
@@ -218,7 +228,12 @@ def buildObjects(context):
     
     for node in fbx.nodes.values():
         if node.ftype == "Geometry":
-            data = bpy.data.meshes.new(node.name)
+            if node.subtype == "Mesh":
+                data = bpy.data.meshes.new(node.name)
+            elif node.subtype == "NurbsCurve":
+                data = bpy.data.curves.new(node.name, 'CURVE')
+            elif node.subtype == "NurbsSurface":
+                data = bpy.data.curves.new(node.name, 'SURFACE')
         elif node.ftype == "Material":
             data = bpy.data.materials.new(node.name)
         elif node.ftype == "Texture":
@@ -248,6 +263,7 @@ def buildObjects(context):
         
     for node in fbx.nodes.values():
         if node.ftype == "Model":
+            print("B", node)
             if node.subtype in ["LimbNode"]:
                 continue
             elif node.subtype == "Null":
@@ -260,6 +276,7 @@ def buildObjects(context):
                 elif btype == 'EMPTY':
                     data = bpy.data.objects.new(node.name, None)
                     fbx.data[node.id] = data
+                    scn.objects.link(data)
             else:
                 for child,channel in node.children:
                     if child.subtype == node.subtype:
@@ -290,6 +307,16 @@ def buildObjects(context):
 #   Activating
 #------------------------------------------------------------------
 
+def activateGeometryData(datum):
+    for mat in datum.materials:
+        activateData(mat)
+    skeys = datum.shape_keys
+    if skeys and skeys.animation_data:
+        act = skeys.animation_data.action
+        if act:
+            fbx.active.actions[act.name] = act
+
+
 def activateData(datum):
 
     if datum is None:
@@ -302,8 +329,18 @@ def activateData(datum):
 
     elif isinstance(datum, bpy.types.Mesh):
         fbx.active.meshes[datum.name] = datum        
-        for mat in datum.materials:
-            activateData(mat)
+        activateGeometryData(datum)
+
+    elif isinstance(datum, bpy.types.SurfaceCurve):
+        fbx.active.nurbs[datum.name] = datum        
+        activateGeometryData(datum)
+
+    elif isinstance(datum, bpy.types.TextCurve):
+        pass
+
+    elif isinstance(datum, bpy.types.Curve):
+        fbx.active.curves[datum.name] = datum        
+        activateGeometryData(datum)
 
     elif isinstance(datum, bpy.types.Armature):
         fbx.active.armatures[datum.name] = datum        
@@ -353,6 +390,8 @@ def makeNodes(context):
     for ob in context.scene.objects:
         activateData(ob)
     
+    print(fbx.active.actions.items())
+    
     # Second pass: create nodes
     
     for ob in fbx.active.objects.values():
@@ -360,14 +399,23 @@ def makeNodes(context):
             fbx.nodes.meshes[ob.data.name] = fbx_mesh.FbxMesh()
         elif ob.type == 'ARMATURE':
             fbx.nodes.armatures[ob.data.name] = fbx_armature.CArmature()
+        elif ob.type == 'CURVE':
+            #if isinstance(ob.data, bpy.types.SurfaceCurve):
+            #    fbx.nodes.nurbs[ob.data.name] = fbx_nurb.CNurbsCollection()
+            if isinstance(ob.data, bpy.types.TextCurve):
+                pass
+            else:
+                fbx.nodes.curves[ob.data.name] = fbx_nurb.FbxNurbsCurve()
+        elif ob.type == 'SURFACE':
+            fbx.nodes.nurbs[ob.data.name] = fbx_nurb.FbxNurbsSurface()
         elif ob.type == 'LAMP':
             fbx.nodes.lamps[ob.data.name] = fbx_lamp.FbxLight()
         elif ob.type == 'CAMERA':
             fbx.nodes.cameras[ob.data.name] = fbx_camera.FbxCamera()
-        #elif ob.type == 'EMPTY':
-        #    pass
+        elif ob.type == 'EMPTY':
+            pass
         else:
-            fbx.debug("Unrecognized object %s" % ob)
+            fbx.debug("Unrecognized object %s t %s" % (ob, ob.type))
             halt
             continue
         fbx.nodes.objects[ob.name] = fbx_object.CObject(ob.type)
@@ -390,11 +438,20 @@ def makeNodes(context):
     for ob in fbx.active.objects.values():
         if ob.type == 'MESH':
             node = fbx.nodes.meshes[ob.data.name]
-            node.make(ob)
-            fbx.nodes.objects[ob.name].make(ob)
-            rig = ob.parent
-            if rig and rig.type == 'ARMATURE':
-                fbx.nodes.armatures[rig.data.name].addDeformer(node, ob)             
+        elif ob.type == 'CURVE':
+            node = fbx.nodes.curves[ob.data.name]            
+        elif ob.type == 'SURFACE':
+            node = fbx.nodes.nurbs[ob.data.name]
+        else:
+            continue
+        
+        print("AO", ob, node)
+
+        node.make(ob)
+        fbx.nodes.objects[ob.name].make(ob)
+        rig = ob.parent
+        if rig and rig.type == 'ARMATURE':
+            fbx.nodes.armatures[rig.data.name].addDeformer(node, ob)             
 
     for ob in fbx.active.objects.values():
         if ob.type == 'ARMATURE':

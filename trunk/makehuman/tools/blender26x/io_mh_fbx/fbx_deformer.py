@@ -169,7 +169,7 @@ class FbxBlendShape(FbxObject):
     def __init__(self, subtype='BlendShape'):
         FbxObject.__init__(self, 'Deformer', subtype, 'BLEND_DEFORMER')
         self.mesh = None
-        self.subdeformers = []
+        self.subdeformers = {}
         
    
     def make(self, meshNode, me):
@@ -181,7 +181,7 @@ class FbxBlendShape(FbxObject):
             if index > 0:
                 skeyNode = meshNode.shapeKeys[skey.name]
                 subdef = FbxBlendShapeChannel().make(skey)
-                self.subdeformers.append(subdef)
+                self.subdeformers[skey.name] = subdef
                 subdef.makeLink(self)
                 skeyNode.makeLink(subdef)
 
@@ -190,20 +190,20 @@ class FbxBlendShape(FbxObject):
     
     def addDefinition(self, definitions):     
         FbxObject.addDefinition(self, definitions)
-        for subdef in self.subdeformers:
+        for subdef in self.subdeformers.values():
             subdef.addDefinition(definitions)
 
 
     def writeLinks(self, fp):
         FbxObject.writeLinks(self, fp)
-        for subdef in self.subdeformers:
+        for subdef in self.subdeformers.values():
             subdef.writeLinks(fp)
 
     
 
     def writeFooter(self, fp):
         FbxObject.writeFooter(self, fp)
-        for subdef in self.subdeformers:
+        for subdef in self.subdeformers.values():
             subdef.writeFbx(fp)
         
 
@@ -232,8 +232,9 @@ class FbxBlendShapeChannel(FbxObject):
 
     def make(self, skey):
         FbxObject.make(self, skey)
+        self.set("Version", 100)
         self.fullWeights.make([100])
-        self.set("DeformPercent", 0)
+        self.set("DeformPercent", skey.value)
         return self
          
 
@@ -241,3 +242,8 @@ class FbxBlendShapeChannel(FbxObject):
         FbxObject.writeHeader(self, fp)
         self.fullWeights.writeFbx(fp) 
 
+
+    def build(self, skey):
+        skey.value = self.get("DeformPercent")
+        
+        

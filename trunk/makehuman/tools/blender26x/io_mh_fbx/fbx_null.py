@@ -23,13 +23,19 @@ from .fbx_basic import *
 from .fbx_props import *
 from .fbx_model import *
 from . import fbx_scene
+from .fbx_object import *
 from . import fbx_armature
 
 
-class CNull(CModel):
+class FbxNullAttribute(FbxNodeAttribute):
+    def __init__(self, subtype="Null"):
+       FbxNodeAttribute.__init__(self, subtype, 'EMPTY')
+    
+            
+class CNull(CObject):
 
     def __init__(self, subtype='Null'):
-        CModel.__init__(self, subtype, 'NULL')
+        CObject.__init__(self, subtype)
         self.node = None
 
 
@@ -46,8 +52,10 @@ class CNull(CModel):
         btype = self.getBtype()
         if btype == 'ARMATURE':
             return fbx_armature.CArmature().buildArmature(self)
-        elif btype == 'EMPTY':
-            return fbx.data[self.id]
+        elif btype == 'EMPTY':    
+            return self
+        else:
+            halt
 
                 
 

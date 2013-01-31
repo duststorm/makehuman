@@ -55,6 +55,7 @@ class Settings:
         self.includePropertyTemplates = True
         self.makeSceneNode = False
         self.selectedOnly = True
+        self.lockChildren = True
         self.yUp = False
        
             
