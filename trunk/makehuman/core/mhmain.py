@@ -60,11 +60,11 @@ def outFile(path):
 
 @contextlib.contextmanager
 def inFile(path):
-    path = os.path.join(mh.getPath(''), path)
-    if not os.path.isfile(path):
-        yield []
-        return
     try:
+        path = os.path.join(mh.getPath(''), path)
+        if not os.path.isfile(path):
+            yield []
+            return
         with open(path, 'r') as f:
             yield f
     except:
@@ -563,12 +563,14 @@ class MHApplication(gui3d.Application, mh.Application):
                 self.shortcuts.update(shortcuts)
 
         with inFile("mouse.ini") as f:
-            mouseActions = {}
+            mouseActions = dict([(method.__name__, shortcut)
+                                 for shortcut, method in self.mouseActions.iteritems()])
             for line in f:
                 modifier, button, method = line.strip().split(' ')
                 if hasattr(self, method):
-                    mouseActions[(int(modifier), int(button))] = getattr(self, method)
-            self.mouseActions = mouseActions
+                    mouseActions[method] = (int(modifier), int(button))
+            self.mouseActions = dict([(shortcut, getattr(self, method))
+                                      for method, shortcut in mouseActions.iteritems()])
 
         with inFile("help.ini") as f:
             helpIds = set()
