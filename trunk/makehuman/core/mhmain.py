@@ -543,13 +543,14 @@ class MHApplication(gui3d.Application, mh.Application):
 
     def loadSettings(self):
         with inFile("settings.ini") as f:
-            settings = mh.parseINI(f.read())
-            self.settings.update(settings)
+            if f:
+                settings = mh.parseINI(f.read())
+                self.settings.update(settings)
 
-        if 'language' in gui3d.app.settings:
-            self.setLanguage(gui3d.app.settings['language'])
+        if 'language' in self.settings:
+            self.setLanguage(self.settings['language'])
 
-        gui.Slider.showImages(gui3d.app.settings['sliderImages'])
+        gui.Slider.showImages(self.settings['sliderImages'])
 
         with inFile("shortcuts.ini") as f:
             shortcuts = {}
