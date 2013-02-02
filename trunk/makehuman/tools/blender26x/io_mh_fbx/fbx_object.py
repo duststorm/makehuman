@@ -121,7 +121,11 @@ class CObject(CModel):
             
     
     def build3(self):
-        self.datum = self.object = ob = fbx.data[self.id]
+        self.buildObject(fbx.data[self.id])
+    
+    
+    def buildObject(self, ob):
+        self.datum = self.object = ob
         if self.links:
             pnode,_ = self.links[0]
             if pnode.id != 0 and pnode.btype == 'OBJECT':

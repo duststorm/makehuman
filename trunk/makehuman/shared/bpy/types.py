@@ -461,6 +461,7 @@ class Object(Rna):
         self.data = content
         self.type = content.rnaType
         self.parent = None
+        self.children = []
         self.matrix_world = Matrix()
         self.select = True
         self.location = Vector((0,0,0))

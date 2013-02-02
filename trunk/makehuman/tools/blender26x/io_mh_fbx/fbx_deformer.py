@@ -169,6 +169,7 @@ class FbxBlendShape(FbxObject):
     def __init__(self, subtype='BlendShape'):
         FbxObject.__init__(self, 'Deformer', subtype, 'BLEND_DEFORMER')
         self.mesh = None
+        self.object = None
         self.subdeformers = {}
         
    
@@ -207,16 +208,18 @@ class FbxBlendShape(FbxObject):
             subdef.writeFbx(fp)
         
 
-    def build5(self):        
+    def build4(self):        
         meNode,_ = self.getBParent('MESH')
         obNode,_ = meNode.getBParent('OBJECT') 
-        ob = fbx.data[obNode.id]
+        self.object = fbx.data[obNode.id]
             
 
 class FbxBlendShapeChannel(FbxObject):
  
     def __init__(self, subtype='BlendShapeChannel'):
          FbxObject.__init__(self, 'Deformer', subtype, 'BLEND_CHANNEL_DEFORMER')
+         self.datum = None
+         self.object = None
          self.fullWeights = CArray('FullWeights', int, 1)
 
          
@@ -243,7 +246,9 @@ class FbxBlendShapeChannel(FbxObject):
         self.fullWeights.writeFbx(fp) 
 
 
-    def build(self, skey):
+    def build(self, skey, ob):
+        self.datum = skey
         skey.value = self.get("DeformPercent")
+        self.object = ob.data.shape_keys
         
         

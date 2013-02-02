@@ -26,6 +26,7 @@ from .fbx_props import *
 from .fbx_model import *
 from .fbx_object import CObject
 from .fbx_deformer import FbxSkin
+from .fbx_null import CNull
 
 
 #------------------------------------------------------------------
@@ -103,7 +104,11 @@ class CArmature(FbxObject):
             
 
     def buildArmature(self, parent):
-        ob = self.object = fbx.data[parent.id]
+        self.buildArmature1(parent, fbx.data[parent.id])
+    
+    
+    def buildArmature1(self, parent, ob):
+        self.object = ob
         scn = bpy.context.scene
         old = scn.objects.active
         scn.objects.active = ob
@@ -152,13 +157,21 @@ class FbxPose(FbxObject):
         return FbxObject.parseNodes(self, rest)
 
 
-    def make(self, ob, bones):
-        FbxObject.make(self, ob)
-        node = fbx.nodes.armatures[ob.data.name]
-        pose = CPoseNode().make(node, ob.matrix_world)
+    def make(self, rig, bones):
+        FbxObject.make(self, rig)
+        node = fbx.nodes.objects[rig.name]
+        pose = CPoseNode().make(node, rig.matrix_world)
         self.poses.append(pose)
-        self.makeLink(node)
-        for bone in oneOf(ob.data.bones.values(), ob.data.bones):
+
+        for ob in rig.children:
+            if ob.type == 'MESH':
+                for mod in ob.modifiers:
+                    if mod.type == 'ARMATURE' and mod.object == rig:
+                        node = fbx.nodes.objects[ob.name]
+                        pose = CPoseNode().make(node, ob.matrix_world)
+                        self.poses.append(pose)
+
+        for bone in oneOf(rig.data.bones.values(), rig.data.bones):
             node = bones[bone.name]
             pose = CPoseNode().make(node, bone.matrix_local)
             self.poses.append(pose)
@@ -221,7 +234,7 @@ class CPoseNode(FbxStuff):
     def make(self, node, matrix):
         FbxStuff.make(self)
         self.node = node
-        self.matrix.make(matrix)
+        self.matrix.make(matrix.transposed())
         fbx.matrices[self.node] = self.matrix
         return self
         
@@ -354,6 +367,25 @@ class CBone(CModel):
             if isinstance(child, CBone):
                 nodes += child.buildBone(infos, amt)
         return nodes
+        
+        
+    def build4(self):
+        parent,_ = self.getFParent('Model')
+        if (not parent) or (parent.id != 0):
+            return
+        
+        amt = bpy.data.armatures.new("_AMT")
+        ob = bpy.data.objects.new("_RIG", amt)
+        scn = bpy.context.scene
+        scn.objects.link(ob)
+        
+        amtNode = CArmature()
+        obNode = CObject("Null")
+        self.makeLink(obNode)
+        amtNode.makeLink(obNode)
+
+        amtNode.buildArmature1(obNode, ob)
+        obNode.buildObject(ob)
 
 
 class BoneInfo:
@@ -368,6 +400,7 @@ class BoneInfo:
         self.parent = None
         self.restMat = None
         self.matrix = None
+        self.euler = None
         self.children = []
         
     def __repr__(self):
@@ -376,12 +409,14 @@ class BoneInfo:
    
     def collect(self, node, infos, parent):   
         trans = Vector(node.getProp("Lcl Translation"))
-        rot = node.getProp("Lcl Rotation")
+        has,euler = node.getProp2("Lcl Rotation")
+        if not has:
+            _,euler = node.getProp2("PreRotation")
         scale = node.getProp("Lcl Scaling")
-        euler = Euler(Vector(rot)*R)        
-        rmat = euler.to_matrix()
-
-        self.restMat = composeMatrix(trans,rmat,scale)
+        self.euler = Euler(Vector(euler)*R, 'XYZ')
+        rot = self.euler.to_matrix()  
+        
+        self.restMat = composeMatrix(trans,rot,scale)
         if parent:
             self.matrix = parent.matrix * self.restMat
         else:
@@ -399,24 +434,38 @@ class BoneInfo:
                 self.children.append(cinfo)
                 sum += cinfo.head
                 nChildren += 1
-                    
+                 
+        unit = Vector( self.matrix.col[fbx.settings.boneAxis][:3] )                 
+        sign = +1
         if nChildren > 0:                    
             vec = sum/nChildren - self.head
-            self.length = vec.length
+            if fbx.settings.mirrorFix and unit.dot(vec) < 0:
+                sign = -1
+            if vec.length > fbx.settings.minBoneLength:
+                self.length = vec.length
+            else:
+                self.length = fbx.settings.minBoneLength
         #elif parent:
         #    self.length = parent.length
         else:
-            self.length = 1
-        self.tail = self.head + self.length*Vector( self.matrix.col[1][:3] )
+            self.length = fbx.settings.minBoneLength
         
+        self.tail = self.head + sign*self.length*unit
+        self.getRoll()
+        return self
+
+        
+    def getRoll(self):
         quat = self.matrix.to_quaternion()
         if abs(quat.w) < 1e-4:
             self.roll = math.pi
-        else:
+        elif fbx.settings.boneAxis == 0:
+            self.roll = 2*math.atan(quat.x/quat.w)
+        elif fbx.settings.boneAxis == 1:
             self.roll = 2*math.atan(quat.y/quat.w)
+        elif fbx.settings.boneAxis == 2:
+            self.roll = 2*math.atan(quat.z/quat.w)
         
-        return self
-
 
 def composeMatrix(loc,rot,scale):
     mat = rot.to_4x4()

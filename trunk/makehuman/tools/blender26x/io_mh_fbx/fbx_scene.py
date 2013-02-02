@@ -22,10 +22,6 @@ from . import fbx
 from .fbx_basic import *
 from .fbx_props import *
 from .fbx_model import *
-from . import fbx_mesh
-from . import fbx_armature
-from . import fbx_material
-from . import fbx_object
 
 
             

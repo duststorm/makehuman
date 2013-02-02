@@ -28,17 +28,21 @@ class Property:
         
         
 class StringProperty(Property):
-    def __init__(self, name="Name", default="", options={}):
+    def __init__(self, name="Name", description="", default="", options={}):
         pass
         
 class BoolProperty(Property):
-    def __init__(self, name="Name", default=False, options={}):
+    def __init__(self, name="Name", description="", default=False, options={}):
         pass
         
 class IntProperty(Property):
-    def __init__(self, name="Name", default=0, options={}):
+    def __init__(self, name="Name", description="", default=0, options={}):
         pass
         
 class FloatProperty(Property):
-    def __init__(self, name="Name", default=0.0, options={}):
+    def __init__(self, name="Name", description="", min=0.0, max=1.0, default=0.0, options={}):
+        pass
+        
+class EnumProperty(Property):
+    def __init__(self, name="Name", items=[], description="", default='X', options={}):
         pass

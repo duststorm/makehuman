@@ -24,7 +24,7 @@ from .fbx_props import *
 from .fbx_model import *
 from . import fbx_scene
 from .fbx_object import *
-from . import fbx_armature
+from .fbx_armature import *
 
 
 class FbxNullAttribute(FbxNodeAttribute):
@@ -50,8 +50,9 @@ class CNull(CObject):
         
     def build3(self):
         btype = self.getBtype()
+        print("B3", self, btype)
         if btype == 'ARMATURE':
-            return fbx_armature.CArmature().buildArmature(self)
+            return CArmature().buildArmature(self)
         elif btype == 'EMPTY':    
             return self
         else:

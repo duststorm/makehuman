@@ -64,7 +64,7 @@ class FbxTake(FbxStuff):
     
 
     def build(self):
-        if fbx.settings.createNewScenes:
+        if fbx.settings.createNewScene:
             name = self.name.split(".")[0]
             scn = bpy.data.scenes.new(name)
             bpy.context.scene = scn
@@ -175,7 +175,7 @@ class CAnimationLayer(FbxObject):
             acnode.writeLinks(fp)
 
 
-    def build4(self):
+    def build5(self):
         for acnode,_ in self.children:
             if acnode.ftype == 'AnimationCurveNode':
                 acnode.build()
@@ -223,13 +223,16 @@ def getDataPath(channel, btype, rna):
         'Lcl Translation' : 'location',
         'Lcl Rotation' : 'rotation_euler',
         #'Lcl Rotation' : 'rotation_quaternion',
-        'Lcl Scaling' : 'scale'
+        'Lcl Scaling' : 'scale',
+        'DeformPercent' : 'value',
     }
     bchannel = datapaths[channel]
     if btype == 'BONE':
         return bchannel,('pose.bones["%s"].%s' % (rna.name, bchannel))
     elif btype == 'OBJECT':
         return bchannel,bchannel
+    elif btype == 'BLEND_CHANNEL_DEFORMER':
+        return bchannel,('key_blocks["%s"].%s' % (rna.name, bchannel))
     else:
         fbx.debug("getDataPath %s %s %s" % (channel, btype, rna))
         halt
@@ -328,12 +331,13 @@ class FbxAnimationCurveNode(FbxObject):
     def build(self):
         rna = None
         group = None
-        for btype in ['BONE', 'OBJECT']:        
-            node,channel = self.getBParent(btype)
-            if node:
-                user = node
-                break
-
+        user = None
+        user,channel = self.getBParent(['BONE', 'OBJECT', 'BLEND_CHANNEL_DEFORMER'])
+        if not user:
+            print("No user", self)
+            print(self.links)
+            halt
+        
         rna = user.datum
         ob = user.object
         group = rna.name
@@ -354,6 +358,11 @@ class FbxAnimationCurveNode(FbxObject):
             except KeyError:
                 offsets = (0,0,0)
 
+        elif channel in ["DeformPercent"]:
+            rad = 1
+            indexer = { ("d|%s" % channel) : (0, -1, 1) }
+            offsets = [0]
+
         elif channel in ["Lcl Scaling"]:
             return
 
@@ -364,7 +373,7 @@ class FbxAnimationCurveNode(FbxObject):
         
         for child,fChannel in self.children:       
             fIndex,bIndex,factor = indexer[fChannel]
-            bchannel,datapath = getDataPath(channel, btype, rna)
+            bchannel,datapath = getDataPath(channel, user.btype, rna)
             ob.keyframe_insert(datapath, bIndex, frame=0, group=group)
             act = ob.animation_data.action
             fcu = getFCurveFromAction(act, datapath, bIndex)
@@ -373,7 +382,8 @@ class FbxAnimationCurveNode(FbxObject):
 
 def getFCurveFromAction(act, datapath, index):
     for fcu in act.fcurves:
-        if fcu.data_path == datapath and fcu.array_index == index:
+        if (fcu.data_path == datapath and 
+            (index < 0 or fcu.array_index == index)):
             return fcu
     return None
 

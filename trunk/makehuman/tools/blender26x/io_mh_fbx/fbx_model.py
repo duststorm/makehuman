@@ -66,6 +66,9 @@ class FbxStuff(FbxPlug):
     def getProp(self, key):
         return self.properties.getProp(key, self.template)
         
+    def getProp2(self, key):
+        return self.properties.getProp2(key, self.template)
+        
     def setProps(self, list):
         for key,value in list:
             self.setProp(key, value)
@@ -193,17 +196,18 @@ class FbxObject(FbxStuff):
             adata = rna.animation_data
         except AttributeError:
             adata = None
+
         if not adata:
             try:
                 adata = rna.shape_keys.animation_data
             except AttributeError:
                 adata = None
+
         if adata:
             act = adata.action
             if act:
                 alayer = fbx.nodes.alayers[act.name]
                 alayer.users.append(self)
-                #FbxObject.makeLink(alayer, self)
         return self                
         
                 
@@ -220,9 +224,11 @@ class FbxObject(FbxStuff):
         self.makeChannelLink(parent, None)
 
 
-    def getBParent(self, btype):
+    def getBParent(self, btypes):
+        if not isinstance(btypes, list):
+            btypes = [btypes]
         for link in self.links:
-            if link[0].btype == btype:
+            if link[0].btype in btypes:
                 return link
         return None,None                
         

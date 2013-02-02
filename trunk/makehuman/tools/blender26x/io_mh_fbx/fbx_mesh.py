@@ -221,14 +221,10 @@ class FbxShape(FbxObject):
         ob.active_shape_key_index = 0
         base = ob.active_shape_key
         skey = ob.shape_key_add(self.name)
-        print(skey)
         n = 0
-        print(self.name)
         for vn in self.indexes.values:
             dx = f2b( self.vertices.values[n] )
             n += 1
-            print(vn, dx, skey.data[vn].co)
-            skey.data[vn].co = base.data[vn].co + Vector(dx)
-            print("   ", skey.data[vn].co)
-        subdef.build(skey)
+            skey.data[vn].co = me.vertices[vn].co + Vector(dx)
+        subdef.build(skey, ob)
   

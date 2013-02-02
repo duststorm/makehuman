@@ -50,13 +50,16 @@ templates = {}
 
 class Settings:
     def __init__(self):
-        self.createNewScenes = False
+        self.createNewScene = False
         self.writeAllNodes = True
         self.includePropertyTemplates = True
         self.makeSceneNode = False
         self.selectedOnly = True
         self.lockChildren = True
         self.yUp = False
+        self.boneAxis = 1
+        self.minBoneLength = 1.0
+        self.mirrorFix = True
        
             
 settings = Settings()

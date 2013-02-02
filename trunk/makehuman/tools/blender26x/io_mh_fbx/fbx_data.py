@@ -154,7 +154,6 @@ def createNode(pnode):
             node = fbx_object.CObject(subtype)
         elif subtype == "Null":
             node = fbx_null.CNull(subtype)
-            print("  ", node)
         elif subtype == "LimbNode":
             node = fbx_armature.CBone(subtype)
         else:
@@ -234,6 +233,8 @@ def buildObjects(context):
                 data = bpy.data.curves.new(node.name, 'CURVE')
             elif node.subtype == "NurbsSurface":
                 data = bpy.data.curves.new(node.name, 'SURFACE')
+            elif node.subtype == "Shape":
+                continue
         elif node.ftype == "Material":
             data = bpy.data.materials.new(node.name)
         elif node.ftype == "Texture":
@@ -263,7 +264,6 @@ def buildObjects(context):
         
     for node in fbx.nodes.values():
         if node.ftype == "Model":
-            print("B", node)
             if node.subtype in ["LimbNode"]:
                 continue
             elif node.subtype == "Null":
@@ -321,7 +321,7 @@ def activateData(datum):
 
     if datum is None:
         return
-        
+                
     elif isinstance(datum, bpy.types.Object):
         if (not fbx.settings.selectedOnly) or datum.select:
             fbx.active.objects[datum.name] = datum        
@@ -388,7 +388,8 @@ def makeNodes(context):
     # First pass: activate
     
     for ob in context.scene.objects:
-        activateData(ob)
+        if ob.select:
+            activateData(ob)
     
     print(fbx.active.actions.items())
     

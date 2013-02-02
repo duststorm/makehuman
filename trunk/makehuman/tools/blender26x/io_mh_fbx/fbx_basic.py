@@ -349,8 +349,8 @@ def setCsysChangers():
     if fbx.settings.yUp:
         f2bGlobRot = Matrix.Rotation(pi/2, 4, 'X')
         b2fGlobRot = Matrix.Rotation(-pi/2, 4, 'X')
-        f2bLocRot = Matrix.Rotation(0, 4, 'Z')
-        b2fLocRot = Matrix.Rotation(0, 4, 'Z')
+        f2bLocRot = Matrix.Rotation(0, 4, 'X')
+        b2fLocRot = Matrix.Rotation(0, 4, 'X')
 
         b2f = b2fYup
         f2b = f2bYup

@@ -107,12 +107,29 @@ class ImportFBX(bpy.types.Operator, ImportHelper):
     filename_ext = ".fbx"
     filter_glob = StringProperty(default="*.fbx", options={'HIDDEN'})
 
-    createNewScenes = BoolProperty(name="Create New Scenes", default=False)
-    yUp = BoolProperty(name="Y Up", default=True)        
+    createNewScene = BoolProperty(name="Create New Scene", default=False)
+    yUp = BoolProperty(name="Y Up", description="Export to app with Y up convention", default=True)        
+    boneAxis = EnumProperty(
+        name="Bone Axis", 
+        description="Axis pointing along bone",
+        items=(('X','X','X',0),('Y','Y','Y',1),('Z','Z','Z',2)), 
+        default = 'X',
+    )
+    minBoneLength = FloatProperty(name="Minimal Bone Length", min=0.01, max=100.0, default=1.0)
+    yUp = BoolProperty(name="Y Up", description="Export to app with Y up convention", default=True)        
+    mirrorFix = BoolProperty(name="Bone Mirror Fix", description="Try to fix problem with mirrored bones", default=True)        
     
     def execute(self, context):
-        fbx.settings.createNewScenes = self.createNewScenes
+        fbx.settings.createNewScene = self.createNewScene
         fbx.settings.yUp = self.yUp
+        if self.boneAxis == 'X':
+            fbx.settings.boneAxis = 0
+        elif self.boneAxis == 'Y':
+            fbx.settings.boneAxis = 1
+        elif self.boneAxis == 'Z':
+            fbx.settings.boneAxis = 2
+        fbx.settings.minBoneLength = self.minBoneLength
+        fbx.settings.mirrorFix = self.mirrorFix
         fbx_import.importFbxFile(context, self.filepath)
         return {'FINISHED'}
 
@@ -126,8 +143,8 @@ class ExportFBX(bpy.types.Operator, ExportHelper):
     filename_ext = ".fbx"
     filter_glob = StringProperty(default="*.fbx", options={'HIDDEN'} )
     
-    yUp = BoolProperty(name="Y Up", default=True)        
-    includePropertyTemplates = BoolProperty(name="Include Property Templates", default=True)
+    yUp = BoolProperty(name="Y Up", description="Import from app with Y up convention", default=True)        
+    includePropertyTemplates = BoolProperty(name="Include Property Templates", description="Include property templates in exported file", default=True)
     makeSceneNode = BoolProperty(name="Make Scene Node", default=False)
     selectedOnly = BoolProperty(name="Selected Objects Only", default=True)
 
