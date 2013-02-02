@@ -24,11 +24,12 @@ Abstract
 This file starts the MakeHuman python application.
 """
 
+from __future__ import absolute_import  # Fix 'from . import x' statements on python 2.6
 import sys
 import os
 import string
 import re
-import subprocess 
+import subprocess
 
 # print os.getcwd()
 
@@ -203,10 +204,6 @@ def main():
     make_user_dir()
     init_logging()
     debug_dump()
-
-    # Fix 'from . import x' statements on python 2.6
-    if sys.version_info < (2, 7):
-        from __future__ import absolute_import
 
     from mhmain import MHApplication
     application = MHApplication()
